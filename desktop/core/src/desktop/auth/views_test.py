@@ -104,6 +104,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
     User.objects.all().delete()
     self.c = Client()
 
+    self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
+
   def test_login(self):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
@@ -211,7 +213,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
       'username': "curly",
       'password': "ldap1"
     })
-    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(302, response.status_code, response.status_code)
     assert_equal(1, len(User.objects.all()))
     # The two curly are a part of in LDAP and the default group.
     assert_equal(3, User.objects.all()[0].groups.all().count(), User.objects.all()[0].groups.all())
@@ -398,10 +400,12 @@ class TestLogin(object):
 
 
 class MockLdapBackend(object):
+  settings = django_auth_ldap_backend.LDAPSettings()
+
   def get_or_create_user(self, username, ldap_user):
     return User.objects.get_or_create(username)
 
-  def authenticate(self, username=None, password=None):
+  def authenticate(self, username=None, password=None, server=None):
     user, created = self.get_or_create_user(username, None)
     return user
 

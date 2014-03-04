@@ -421,36 +421,6 @@ LDAP = ConfigSection(
   key="ldap",
   help=_("Configuration options for LDAP connectivity."),
   members=dict(
-    BASE_DN=Config("base_dn",
-                   default=None,
-                   help=_("The base LDAP distinguished name to use for LDAP search.")),
-    NT_DOMAIN=Config("nt_domain",
-                     default=None,
-                     help=_("The NT domain used for LDAP authentication.")),
-    LDAP_URL=Config("ldap_url",
-                     default=None,
-                     help=_("The LDAP URL to connect to.")),
-    USE_START_TLS=Config("use_start_tls",
-                         default=True,
-                         type=coerce_bool,
-                         help=_("Use StartTLS when communicating with LDAP server.")),
-    LDAP_CERT=Config("ldap_cert",
-                     default=None,
-                     help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
-    LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
-                                 default=None,
-                                 help=_("A pattern to use for constructing LDAP usernames.")),
-    BIND_DN=Config("bind_dn",
-                   default=None,
-                   help=_("The distinguished name to bind as, when importing from LDAP.")),
-    BIND_PASSWORD=Config("bind_password",
-                   default=None,
-                   private=True,
-                   help=_("The password for the bind user.")),
-    SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
-                   default=True,
-                   type=coerce_bool,
-                   help=_("Use search bind authentication.")),
     CREATE_USERS_ON_LOGIN = Config("create_users_on_login",
       help=_("Create users when they login with their LDAP credentials."),
       type=coerce_bool,
@@ -468,7 +438,6 @@ LDAP = ConfigSection(
       type=coerce_bool,
       private=True,
       default=False),
-
     SUBGROUPS = Config("subgroups",
       help=_("Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."),
       type=coerce_str_lowercase,
@@ -510,7 +479,102 @@ LDAP = ConfigSection(
                                       "members of a group.")),
       )
     ),
-))
+
+    LDAP_SERVERS = UnspecifiedConfigSection(
+      key="ldap_servers",
+      help=_("LDAP server record."),
+      each=ConfigSection(
+        members=dict(
+          BASE_DN=Config("base_dn",
+                         default=None,
+                         help=_("The base LDAP distinguished name to use for LDAP search.")),
+          NT_DOMAIN=Config("nt_domain",
+                           default=None,
+                           help=_("The NT domain used for LDAP authentication.")),
+          LDAP_URL=Config("ldap_url",
+                           default=None,
+                           help=_("The LDAP URL to connect to.")),
+          USE_START_TLS=Config("use_start_tls",
+                               default=True,
+                               type=coerce_bool,
+                               help=_("Use StartTLS when communicating with LDAP server.")),
+          LDAP_CERT=Config("ldap_cert",
+                           default=None,
+                           help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
+          LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
+                                       default=None,
+                                       help=_("A pattern to use for constructing LDAP usernames.")),
+          BIND_DN=Config("bind_dn",
+                         default=None,
+                         help=_("The distinguished name to bind as, when importing from LDAP.")),
+          BIND_PASSWORD=Config("bind_password",
+                         default=None,
+                         private=True,
+                         help=_("The password for the bind user.")),
+
+          USERS = ConfigSection(
+            key="users",
+            help=_("Configuration for LDAP user schema and search."),
+            members=dict(
+              USER_FILTER=Config("user_filter",
+                                 default="objectclass=*",
+                                 help=_("A base filter for use when searching for users.")),
+              USER_NAME_ATTR=Config("user_name_attr",
+                                    default="sAMAccountName",
+                                    help=_("The username attribute in the LDAP schema. "
+                                         "Typically, this is 'sAMAccountName' for AD and 'uid' "
+                                         "for other LDAP systems.")),
+            )
+          ),
+
+          GROUPS = ConfigSection(
+            key="groups",
+            help=_("Configuration for LDAP group schema and search."),
+            members=dict(
+              GROUP_FILTER=Config("group_filter",
+                                 default="objectclass=*",
+                                 help=_("A base filter for use when searching for groups.")),
+              GROUP_NAME_ATTR=Config("group_name_attr",
+                                    default="cn",
+                                    help=_("The group name attribute in the LDAP schema. "
+                                        "Typically, this is 'cn'.")),
+              GROUP_MEMBER_ATTR=Config("group_member_attr",
+                                       default="member",
+                                       help=_("The LDAP attribute which specifies the "
+                                            "members of a group.")),
+            ))))),
+
+    # Every thing below here is deprecated and should be removed in an upcoming major release.
+    BASE_DN=Config("base_dn",
+                   default=None,
+                   help=_("The base LDAP distinguished name to use for LDAP search.")),
+    NT_DOMAIN=Config("nt_domain",
+                     default=None,
+                     help=_("The NT domain used for LDAP authentication.")),
+    LDAP_URL=Config("ldap_url",
+                     default=None,
+                     help=_("The LDAP URL to connect to.")),
+    USE_START_TLS=Config("use_start_tls",
+                         default=True,
+                         type=coerce_bool,
+                         help=_("Use StartTLS when communicating with LDAP server.")),
+    LDAP_CERT=Config("ldap_cert",
+                     default=None,
+                     help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
+    LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
+                                 default=None,
+                                 help=_("A pattern to use for constructing LDAP usernames.")),
+    BIND_DN=Config("bind_dn",
+                   default=None,
+                   help=_("The distinguished name to bind as, when importing from LDAP.")),
+    BIND_PASSWORD=Config("bind_password",
+                   default=None,
+                   private=True,
+                   help=_("The password for the bind user.")),
+    SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
+                   default=True,
+                   type=coerce_bool,
+                   help=_("Use search bind authentication."))))
 
 
 OAUTH = ConfigSection(
@@ -645,6 +709,40 @@ DJANGO_EMAIL_BACKEND = Config(
 )
 
 
+def validate_ldap(user, config):
+  res = []
+
+  if config.SEARCH_BIND_AUTHENTICATION.get():
+    if config.LDAP_URL.get() is not None and bool(config.BIND_DN.get()) != bool(config.BIND_PASSWORD.get()):
+      if config.BIND_DN.get() == None:
+        res.append((LDAP.BIND_DN,
+                  unicode(_("If you set bind_password, then you must set bind_dn."))))
+      else:
+        res.append((LDAP.BIND_PASSWORD,
+                    unicode(_("If you set bind_dn, then you must set bind_password."))))
+  else:
+    if config.NT_DOMAIN.get() is not None or \
+        config.LDAP_USERNAME_PATTERN.get() is not None:
+      if config.LDAP_URL.get() is None:
+        res.append((config.LDAP_URL,
+                    unicode(_("LDAP is only partially configured. An LDAP URL must be provided."))))
+
+    if config.LDAP_URL.get() is not None:
+      if config.NT_DOMAIN.get() is None and \
+          config.LDAP_USERNAME_PATTERN.get() is None:
+        res.append((config.LDAP_URL,
+                    unicode(_("LDAP is only partially configured. An NT Domain or username "
+                    "search pattern must be provided."))))
+
+    if config.LDAP_USERNAME_PATTERN.get() is not None and \
+        '<username>' not in config.LDAP_USERNAME_PATTERN.get():
+        res.append((config.LDAP_USERNAME_PATTERN,
+                   unicode(_("The LDAP username pattern should contain the special"
+                   "<username> replacement string for authentication."))))
+
+  return res
+
+
 def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
@@ -653,7 +751,7 @@ def config_validator(user):
   """
   from desktop.lib import i18n
 
-  res = [ ]
+  res = []
   if not SECRET_KEY.get():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string."))))
 
@@ -682,32 +780,10 @@ def config_validator(user):
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
 
-  if LDAP.SEARCH_BIND_AUTHENTICATION.get():
-    if LDAP.LDAP_URL.get() is not None and bool(LDAP.BIND_DN.get()) != bool(LDAP.BIND_PASSWORD.get()):
-      if LDAP.BIND_DN.get() == None:
-        res.append((LDAP.BIND_DN,
-                  unicode(_("If you set bind_password, then you must set bind_dn."))))
-      else:
-        res.append((LDAP.BIND_PASSWORD,
-                    unicode(_("If you set bind_dn, then you must set bind_password."))))
+  if LDAP.LDAP_SERVERS.get():
+    for ldap_record_key in LDAP.LDAP_SERVERS.get():
+      res.update(validate_ldap(user, LDAP.LDAP_SERVERS.get()[ldap_record_key]))
   else:
-    if LDAP.NT_DOMAIN.get() is not None or \
-        LDAP.LDAP_USERNAME_PATTERN.get() is not None:
-      if LDAP.LDAP_URL.get() is None:
-        res.append((LDAP.LDAP_URL,
-                    unicode(_("LDAP is only partially configured. An LDAP URL must be provided."))))
-
-    if LDAP.LDAP_URL.get() is not None:
-      if LDAP.NT_DOMAIN.get() is None and \
-          LDAP.LDAP_USERNAME_PATTERN.get() is None:
-        res.append((LDAP.LDAP_URL,
-                    unicode(_("LDAP is only partially configured. An NT Domain or username "
-                    "search pattern must be provided."))))
-
-    if LDAP.LDAP_USERNAME_PATTERN.get() is not None and \
-        '<username>' not in LDAP.LDAP_USERNAME_PATTERN.get():
-        res.append((LDAP.LDAP_USERNAME_PATTERN,
-                   unicode(_("The LDAP username pattern should contain the special"
-                   "<username> replacement string for authentication."))))
+    res.update(validate_ldap(user, LDAP))
 
   return res

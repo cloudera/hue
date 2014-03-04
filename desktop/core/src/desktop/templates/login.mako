@@ -22,6 +22,7 @@
 
 ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <style type="text/css">
   body {
     background-color: #FFF;
@@ -144,6 +145,29 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     font-weight: 400;
     margin-bottom: 20px;
   }
+
+  .chosen-single {
+    min-height: 38px;
+    text-align: left;
+    font-size: 18px;
+  }
+
+  .chosen-single span {
+    display: inline;
+    line-height: 38px;
+    vertical-align: middle;
+  }
+
+  .chosen-container-active.chosen-with-drop .chosen-single div b,
+  .chosen-container-single .chosen-single div b {
+    background-position-x: 1px;
+    background-position-y: 10px;
+  }
+
+  .chosen-container-active.chosen-with-drop .chosen-single div b {
+    background-position-x: -17px;
+    background-position-y: 10px;
+  }
 </style>
 
 
@@ -190,6 +214,13 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         </div>
         ${ form['password'].errors | n,unicode }
 
+        %if active_directory:
+        <div class="input-prepend">
+          <span class="add-on"><i class="fa fa-globe"></i></span>
+          ${ form['server'] | n,unicode }
+        </div>
+        %endif
+
         %if login_errors:
           <div class="alert alert-error" style="text-align: center">
             <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
@@ -216,8 +247,15 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
   </div>
 </div>
 
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
   $(document).ready(function () {
+    $("#id_server").chosen({
+      disable_search_threshold: 5,
+      width: "90%",
+      no_results_text: "${_('Oops, no database found!')}"
+    });
+
     $("form").on("submit", function () {
       window.setTimeout(function () {
         $("#logo").addClass("waiting");

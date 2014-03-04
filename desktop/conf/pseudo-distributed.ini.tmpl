@@ -167,9 +167,6 @@
     # The search base for finding users and groups
     ## base_dn="DC=mycompany,DC=com"
 
-    # The NT domain to connect to (only for use with Active Directory)
-    ## nt_domain=mycompany.com
-
     # URL of the LDAP server
     ## ldap_url=ldap://auth.mycompany.com
 
@@ -223,13 +220,59 @@
       # The username attribute in the LDAP schema
       ## user_name_attr=sAMAccountName
 
-      [[[groups]]]
+    [[[groups]]]
 
       # Base filter for searching for groups
       ## group_filter="objectclass=*"
 
       # The username attribute in the LDAP schema
       ## group_name_attr=cn
+
+    [[[ldap_servers]]]
+
+      ## [[[[mycompany]]]]
+
+        # The search base for finding users and groups
+        ## base_dn="DC=mycompany,DC=com"
+
+        # URL of the LDAP server
+        ## ldap_url=ldap://auth.mycompany.com
+
+        # A PEM-format file containing certificates for the CA's that
+        # Hue will trust for authentication over TLS.
+        # The certificate for the CA that signed the
+        # LDAP server certificate must be included among these certificates.
+        # See more here http://www.openldap.org/doc/admin24/tls.html.
+        ## ldap_cert=
+        ## use_start_tls=true
+
+        # Distinguished name of the user to bind as -- not necessary if the LDAP server
+        # supports anonymous searches
+        ## bind_dn="CN=ServiceAccount,DC=mycompany,DC=com"
+
+        # Password of the bind user -- not necessary if the LDAP server supports
+        # anonymous searches
+        ## bind_password=
+
+        # Pattern for searching for usernames -- Use <username> for the parameter
+        # For use when using LdapBackend for Hue authentication
+        ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
+
+        ## [[[[[users]]]]]
+
+          # Base filter for searching for users
+          ## user_filter="objectclass=Person"
+
+          # The username attribute in the LDAP schema
+          ## user_name_attr=sAMAccountName
+
+        ## [[[[[groups]]]]]
+
+          # Base filter for searching for groups
+          ## group_filter="objectclass=groupOfNames"
+
+          # The username attribute in the LDAP schema
+          ## group_name_attr=cn
 
   # Configuration options for specifying the Desktop Database.  For more info,
   # see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine

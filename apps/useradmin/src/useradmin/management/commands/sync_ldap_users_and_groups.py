@@ -14,11 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from optparse import make_option
+
+from django.core.management.base import BaseCommand
+from django.utils.translation import ugettext_lazy as _t
+
+from desktop.conf import LDAP
+
+from useradmin import ldap_access
 from useradmin.views import sync_ldap_users_and_groups
 
-from django.core.management.base import NoArgsCommand
-
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   """
   Handler for syncing the Hue database with LDAP users and groups.
 
@@ -27,5 +33,15 @@ class Command(NoArgsCommand):
   server's current state.
   """
 
-  def handle_noargs(self, **options):
-    sync_ldap_users_and_groups()
+  option_list = BaseCommand.option_list + (
+      make_option("--server", help=_t("Server to connect to."),
+                              action="store_true",
+                              default=None),
+   )
+
+  def handle(self, **options):
+    server = options['server']
+
+    connection = ldap_access.get_connection_from_server(server)
+
+    sync_ldap_users_and_groups(connection)

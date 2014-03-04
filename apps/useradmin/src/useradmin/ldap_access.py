@@ -33,25 +33,30 @@ LOG = logging.getLogger(__name__)
 
 CACHED_LDAP_CONN = None
 
-def get_connection():
+
+def get_connection_from_server(server=None):
+  if server:
+    return get_connection(desktop.conf.LDAP.LDAP_SERVERS.get()[server], search_bind_authentication=desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get())
+  else:
+    return get_connection(desktop.conf.LDAP, search_bind_authentication=desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get())
+
+def get_connection(ldap_config, search_bind_authentication):
   global CACHED_LDAP_CONN
   if CACHED_LDAP_CONN is not None:
     return CACHED_LDAP_CONN
 
-  ldap_url = desktop.conf.LDAP.LDAP_URL.get()
-  nt_domain = desktop.conf.LDAP.NT_DOMAIN.get()
-  username = desktop.conf.LDAP.BIND_DN.get()
-  password = desktop.conf.LDAP.BIND_PASSWORD.get()
-  ldap_cert = desktop.conf.LDAP.LDAP_CERT.get()
-  search_bind_authentication = desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get()
+  ldap_url = ldap_config.LDAP_URL.get()
+  username = ldap_config.BIND_DN.get()
+  password = ldap_config.BIND_PASSWORD.get()
+  ldap_cert = ldap_config.LDAP_CERT.get()
 
   if ldap_url is None:
     raise Exception('No LDAP URL was specified')
 
   if search_bind_authentication:
-    return LdapConnection(ldap_url, username, password, ldap_cert)
+    return LdapConnection(ldap_config, ldap_url, username, password, ldap_cert)
   else:
-    return LdapConnection(ldap_url, get_ldap_username(username, nt_domain), password, ldap_cert)
+    return LdapConnection(ldap_config, ldap_url, get_ldap_username(username, ldap_config.NT_DOMAIN.get()), password, ldap_cert)
 
 def get_ldap_username(username, nt_domain):
   if nt_domain:
@@ -92,10 +97,12 @@ class LdapConnection(object):
   to easily query an LDAP server.
   """
 
-  def __init__(self, ldap_url, bind_user=None, bind_password=None, cert_file=None):
+  def __init__(self, ldap_config, ldap_url, bind_user=None, bind_password=None, cert_file=None):
     """
     Constructor initializes the LDAP connection
     """
+    self.ldap_config = ldap_config
+
     if cert_file is not None:
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert_file)
@@ -109,7 +116,7 @@ class LdapConnection(object):
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
       except:
         raise RuntimeError("Failed to bind to LDAP server as user %s" %
-            (bind_user,))
+            bind_user)
     else:
       try:
         # Do anonymous bind
@@ -185,7 +192,7 @@ class LdapConnection(object):
     return user_info
 
 
-  def _transform_find_group_results(self, result_data, group_name_attr):
+  def _transform_find_group_results(self, result_data, group_name_attr, group_member_attr):
     group_info = []
     if result_data:
       for dn, data in result_data:
@@ -204,9 +211,8 @@ class LdapConnection(object):
             'name': data[group_name_attr][0]
           }
 
-          member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
-          if member_attr in data and 'posixGroup' not in data['objectClass']:
-            ldap_info['members'] = data[member_attr]
+          if group_member_attr in data and 'posixGroup' not in data['objectClass']:
+            ldap_info['members'] = data[group_member_attr]
           else:
             ldap_info['members'] = []
 
@@ -219,7 +225,7 @@ class LdapConnection(object):
 
     return group_info
 
-  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, user_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
@@ -241,11 +247,14 @@ class LdapConnection(object):
     ``
     """
     if not search_attr:
-      search_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+      search_attr = self.ldap_config.USERS.USER_NAME_ATTR.get()
+
     if not user_name_attr:
       user_name_attr = search_attr
 
-    user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
+    if not user_filter:
+      user_filter = self.ldap_config.USERS.USER_FILTER.get()
+
     if not user_filter.startswith('('):
       user_filter = '(' + user_filter + ')'
 
@@ -266,7 +275,7 @@ class LdapConnection(object):
     else:
       return []
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """
     LDAP search helper method for finding groups
 
@@ -286,11 +295,17 @@ class LdapConnection(object):
     }
     """
     if not search_attr:
-      search_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
+      search_attr = self.ldap_config.GROUPS.GROUP_NAME_ATTR.get()
+
     if not group_name_attr:
       group_name_attr = search_attr
 
-    group_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
+    if not group_member_attr:
+      group_member_attr = self.ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+
+    if not group_filter:
+      group_filter = self.ldap_config.GROUPS.GROUP_FILTER.get()
+
     if not group_filter.startswith('('):
       group_filter = '(' + group_filter + ')'
 
@@ -298,13 +313,13 @@ class LdapConnection(object):
     sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
     search_dn, group_name_filter = self._get_search_params(sanitized_name, search_attr, find_by_dn)
     ldap_filter = '(&' + group_filter + group_name_filter + ')'
-    attrlist = ['objectClass', 'dn', 'memberUid', desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get(), group_name_attr]
+    attrlist = ['objectClass', 'dn', 'memberUid', group_member_attr, group_name_attr]
 
     ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
 
     if result_type == ldap.RES_SEARCH_RESULT:
-      return self._transform_find_group_results(result_data, group_name_attr)
+      return self._transform_find_group_results(result_data, group_name_attr, group_member_attr)
     else:
       return []
 
@@ -330,19 +345,17 @@ class LdapConnection(object):
       return []
 
   def find_users_of_group(self, dn):
-    ldap_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
-    name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+    ldap_filter = self.ldap_config.USERS.USER_FILTER.get()
+    name_attr = self.ldap_config.USERS.USER_NAME_ATTR.get()
     result_data = self.find_members_of_group(dn, name_attr, ldap_filter)
     return self._transform_find_user_results(result_data, name_attr)
 
   def find_groups_of_group(self, dn):
-    ldap_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
-    name_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
+    ldap_filter = self.ldap_config.GROUPS.GROUP_FILTER.get()
+    name_attr = self.ldap_config.GROUPS.GROUP_NAME_ATTR.get()
+    member_attr = self.ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
     result_data = self.find_members_of_group(dn, name_attr, ldap_filter)
-    return self._transform_find_group_results(result_data, name_attr)
+    return self._transform_find_group_results(result_data, name_attr, member_attr)
 
   def _get_root_dn(self):
-    """
-    Returns the configured base DN (DC=desktop,DC=local).
-    """
-    return desktop.conf.LDAP.BASE_DN.get()
+    return self.ldap_config.BASE_DN.get()
