@@ -23,6 +23,110 @@
   </div>
 
 
+<p>Thanks to HiveServer2 integration, Hue is getting the benefits from <a href="http://cloudera.com/content/cloudera/en/campaign/introducing-sentry.html">Sentry</a> (How to <a href="https://blogs.apache.org/sentry/entry/getting_started">configure Sentry Video</a>). In addition to the <a href="http://sentry.incubator.apache.org"><span>security</span></a> provided, Hue’s interface becomes more consistent. For example, a user without permissions on a database or table won’t see it in the query editor or in the <a href="http://gethue.tumblr.com/tagged/metastore"><span>Metastore app</span></a>.</p>
+<p><br/><span></span></p>
+<p><span>HiveServer2 also provides performant access to the </span><a href="http://gethue.tumblr.com/tagged/metastore"><span>Metastore</span></a><span>.</span></p>
+<p><br/><span></span></p>
+<p><span>On top of this, the Beeswax Hive UI is a Web editor for increasing the productivity:</span></p>
+
+<ul><li>
+<p><span>Syntax highlighting and auto completion</span></p>
+</li>
+<li>
+<p><span>Submit several queries and check they progress later</span></p>
+</li>
+<li>
+<p><a href="http://gethue.tumblr.com/post/58711590309/hadoop-tutorial-hive-udf-in-1-minute"><span>UDF</span></a><span> integration</span></p>
+</li>
+<li>
+<p><span>Multiple queries execution</span></p>
+</li>
+<li>
+<p><span>Select and send a fraction of a query</span></p>
+</li>
+<li>
+<p><span>Download or save the query results</span></p>
+</li>
+<li>
+<p><span>Navigate through the metadata</span></p>
+</li>
+</ul><p><br/><span></span></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/79883574" width="900"></iframe></p>
+<p><br/><span></span></p>
+<h2><span>Hue 2.x</span></h2>
+<p><span>We recommend to use the latest version of Hue (2.5). Have Hue point to HiveServer2 by updating the Beeswax section in the </span><a href="https://github.com/cloudera/hue/blob/branch-2.5.1/desktop/conf.dist/hue.ini#L384"><span>hue.ini</span></a><span>:</span></p>
+<p><br/><span></span></p>
+<pre class="code">[beeswax]
+  beeswax_server_host=&lt;FQDN of Beeswax server&gt;
+  server_interface=hiveserver2
+  beeswax_server_port=10000
+</pre>
+<p><br/><span></span></p>
+<h2><span>Hue 3.x</span></h2>
+<p><span>Hue 3 does not bundle Beeswaxd anymore, and is configured by default to use HiveServer2. If HiveServer2 is not on the same machine as Hue update </span><a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L438"><span>hue.ini</span></a><span> with:</span></p>
+<p><br/><span></span></p>
+<pre class="code">[beeswax]
+ hive_server_host=&lt;FQDN of HiveServer2&gt;
+</pre>
+<p><span>Other Hive specific settings (e.g. security, impersonation) are read from a local </span><a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L450"><span>/etc/hive/conf/hive-site.xml</span></a><span>. We recommend to keep this one in exact sync with the original Hive one (or put Hue and Hive on the same machine).</span></p>
+<p><span><strong><br/>Note</strong>:</span></p>
+<p>If you are using Hive 0.12 or later, Hue needs to have <a href="https://issues.cloudera.org/browse/HUE-1561">HUE-1561</a> (or use Hue 3.0 or later).</p>
+<h2><br/>With Sentry: Hue 2.x or 3.x</h2>
+<p>Hue will automatically work with a HiveServer2 configured with Sentry.</p>
+<p>Notice that HiveServer2 impersonation (described below) should be turned off in case of Sentry. Permissions of the impersonated user (e.g. ‘bob’) will be used instead of the ones of the ‘hue’ user. Also we need the warehouse permissions to be owned by hive:hive with 770 so that only super users in hive group can read, write.</p>
+<p>HiveServer2 needs to be using strong authentication like Kerberos/LDAP for Sentry to work.</p>
+
+<p><br/><span></span></p>
+<h1><span>Troubleshooting without Sentry</span></h1>
+
+<pre class="code">org.apache.hive.service.cli.HiveSQLException: Error while processing statement: FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. MetaException(message:Got exception: org.apache.hadoop.security.AccessControlException Permission denied: user=hive, access=WRITE, inode="/user/test/data":test:supergroup:drwxr-xr-x
+</pre>
+<p><br/><span></span></p>
+<p><span>By default HiveServer2 now owns the Hive warehouse (default ‘</span><span>/user/hive/warehouse</span><span>’), meaning the data files need to belong to the ‘hive’ user. If you get this error when creating a table, change the permission of the data directory (here </span><span>/user/test/data</span><span>) to ‘write’ for everybody or revert HiveServer2 to the old Beeswax behavior by authorizing ‘hive’ to impersonate the user. </span></p>
+<p>Adding ‘hive’ as a Hadoop <a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_9_1.html?scroll=topic_9_1_3_unique_1__title_140_unique_1">proxy user</a> and edit your hive-site.xml:</p>
+<pre class="code"> &lt;property&gt;
+   &lt;name&gt;hive.server2.enable.doAs&lt;/name&gt;
+   &lt;value&gt;true&lt;/value&gt;
+ &lt;/property&gt;
+</pre>
+<p><span>Then restart HiveServer2:</span><span></span></p>
+<pre class="code">sudo service hive-server2 restart
+</pre>
+<p><br/><span></span><br/><span></span></p>
+<p><span>Another common error when using YARN is:</span></p>
+<pre class="code">Cannot initialize Cluster. Please check your configuration for mapreduce.framework.name and the correspond server addresses.
+</pre>
+<p>It means that the HADOOP_MAPRED_HOME environment variable is not set to:</p>
+<pre class="code">export HADOOP_MAPRED_HOME=/usr/lib/hadoop-mapreduce
+</pre>
+<p><span>HADOOP_HOME could also be wrong.</span></p>
+<p><br/><span></span></p>
+<pre class="code">TTransportException('Could not start SASL: Error in sasl_client_start (-4) SASL(-4): no mechanism available: No worthy mechs found',)
+</pre>
+<p><span>Hue is missing a </span><a href="https://github.com/cloudera/hue#development-prerequisites"><span>SASL lib</span></a><span> in your system.</span></p>
+
+<p><span>HiveServer2 supports 3 authentication modes specified by the &#8216;hive.server2.authentication&#8217; in hive-site.xml:</span></p>
+<ul><li>
+<p><span>NOSASL</span></p>
+</li>
+<li>
+<p><span>NONE (default)</span></p>
+</li>
+<li>
+<p><span>KERBEROS</span></p>
+</li>
+</ul><p><br/>Only NOSASL does not require SASL, so you either switch to it or install the missing packages.</p>
+<p>Hue will pick the value from its local <a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L471">/etc/hive/conf/hive-site.xml</a> so make sure it is synced with the original hive-site.xml (manually or via CM Beeswax safety valve).</p>
+<p><br/><span></span></p>
+<pre class="code">Error while compiling statement: FAILED: RuntimeException org.apache.hadoop.security.AccessControlException: Permission denied: user=admin, access=WRITE, inode="/tmp/hive-hive":hive:hdfs:drwxr-xr-x at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:234) at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:214) at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:158)<br/></pre>
+<p>The Hive HDFS workspace &#8216;/tmp/hive-hive&#8217; would need to be set to 1777 permissions.</p>
+
+<p></p>
+<h1>Troubleshooting with Sentry</h1>
+<pre class="code">AuthorizationException: User 'hue/test.com' does not have privileges to execute 'CREATE' on: default.sample_08"
+</pre>
+<p>The user ‘hue’ is not configured in Sentry and have not the CREATE table permission. </p>
+
   <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_1"><a name="topic_4_1"><!-- --></a>
 
     <h2 class="title topictitle2">Beeswax and Hive Installation and
@@ -228,7 +332,7 @@
 
       <div class="body conbody">
         <div class="note important"><span class="importanttitle"><img src="/static/art/help/important.jpg"/> 
-      <b>Important</b>:</span> 
+      <b>Important</b>:</span>
           <a name="concept_axp_mgb_zj__ul_p4w_yx1_zj"><!-- --></a><ul class="ul" id="concept_axp_mgb_zj__ul_p4w_yx1_zj">
             <li class="li">You can only save results to a file when the results were
               generated by a MapReduce job.</li>
@@ -282,10 +386,10 @@
           following options: </p>
 
 
-        
+
 <div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
-            
-            
+
+
             <thead class="thead" align="left">
               <tr class="row">
                 <th class="entry" valign="top" width="16.666666666666664%" id="d5062e390">
@@ -520,10 +624,10 @@
           clicking <strong class="ph b">Saved Queries</strong>. You can copy any query, but you
           can edit, delete, and view the history of only your own queries. </p>
 
-        
+
 <div class="tablenoborder"><a name="topic_4_3_4__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_4_3_4__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
-            
-            
+
+
             <thead class="thead" align="left">
               <tr class="row">
                 <th class="entry" valign="top" width="25%" id="d5062e719">Saved Query</th>

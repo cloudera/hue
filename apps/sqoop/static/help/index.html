@@ -14,6 +14,78 @@
 <p>The Sqoop UI enables transfering data from a relational database
 to Hadoop and vice versa. The UI lives uses Apache Sqoop to do this.
 See the <a href="http://sqoop.apache.org/docs/1.99.2/index.html">Sqoop Documentation</a> for more details on Sqoop.</p>
+
+<p>
+<p>Hue, the <a href="http://gethue.com">open source Big Data UI</a>, has an application that enables transferring data between relational databases and <a href="http://hadoop.apache.org/">Hadoop</a>. This new application is driven by <a href="http://sqoop.apache.org/">Sqoop 2</a> and has several user experience improvements to boot.</p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/76063637" width="900"></iframe></p>
+<p>Sqoop is a batch data migration tool for transferring data between traditional databases and Hadoop. The first version of Sqoop is a heavy client that drives and oversees data transfer via MapReduce. In Sqoop 2, the majority of the work was moved to a server that a thin client communicates with. Also, any client can communicate with the Sqoop 2 server over its JSON-REST protocol. Sqoop 2 was chosen instead of its predecessors because of its client-server design.</p>
+<h2>Importing from MySQL to HDFS</h2>
+<p>The following is the canonical import job example sourced from <a href="http://sqoop.apache.org/docs/1.99.2/Sqoop5MinutesDemo.html"><a href="http://sqoop.apache.org/docs/1.99.2/Sqoop5MinutesDemo.html">http://sqoop.apache.org/docs/1.99.2/Sqoop5MinutesDemo.html</a></a>. In Hue, this can be done in 3 easy steps:</p>
+<h3>Environment</h3>
+<ul><li>
+<p>CDH 4.4 or <span>Hue 3.0.0</span></p>
+</li>
+<li>
+<p>MySQL 5.1</p>
+</li>
+</ul><h3>Troubleshooting</h3>
+<p>If the new job button is not appearing, Sqoop2 is probably not starting. Make sure the MySql or other DB connectors are in the /usr/lib/sqoop/lib directory of Sqoop2. Make sure you have these properties in the Sqoop2 Server configuration:</p>
+<pre class="code">org.apache.sqoop.repository.schema.immutable=false
+org.apache.sqoop.connector.autoupgrade=true
+org.apache.sqoop.framework.autoupgrade=true 
+</pre>
+
+<h3>1. Create a Connection</h3>
+<p>In the Sqoop app, the connection manager is available from the “New Job” wizard. To get to the new job wizard, click on “New Job”. There may be a list of connections available if a few have been created before. For the purposes of this demo, we’ll go through the process of creating a new connection. Click “Add a new connection” and fill in the blanks with the data below. Then click save to return to the “New Job” wizard!</p>
+
+<div>
+<pre class="code">Connection Parameter                  Value
+
+Name                                  mysql-connection-demo 
+
+JDBC Driver Class                     com.mysql.jdbc.Driver 
+
+JDBC Connection String                jdbc:mysql://hue-demo/demo
+
+Username                              demo
+
+Password                              demo
+</pre>
+</div>
+<p><br/>Connection form values.<br/><br/></p>
+<h3>2. Create a Job</h3>
+<p>After creating a connection, follow the wizard and fill in the blanks with the information below.</p>
+
+<div>
+<pre class="code">Job Wizard Parameter              Value
+
+Name                              mysql-import-job-demo
+
+Type                              IMPORT
+
+Connection                        mysql-connection-demo
+
+Table name                        test
+
+Storage Type                      HDFS
+
+Output format                     TEXT_FILE
+
+Output directory                  /tmp/mysql-import-job-demo
+</pre>
+</div>
+<p><br/>Job wizard form values.</p>
+
+<h3>3. Save and Submit the Job</h3>
+<p>At the end of the Job wizard, click “Save and Run”! The job should automagically start after that and the job dashboard will be displayed. As the job is running, a progress bar below the job listing will be dynamically updated. Links to the HDFS output via the File Browser and Map Reduce logs via Job Browser will be available on the left hand side of the job edit page.</p>
+<h1>Sum Up</h1>
+<p>The new Sqoop application enables batch data migration from a more traditional databases to Hadoop and vice versa through Hue. Using Hue, a user can move data between storage systems in a distributed fashion with the click of a button.</p>
+
+<p>I’d like to send out a big thank you to the Sqoop community for the new client-server design!</p>
+
+<p>Both projects are undergoing heavy development and are welcoming external contributions! Have any suggestions? Feel free to tell us what you think through <a href="http://groups.google.com/a/cloudera.org/group/hue-user">hue-user</a> or <a href="https://twitter.com/gethue">@gethue</a>​!</p>
+                </p>
+
 <h2>Installation and Configuration</h2>
 <p>The Sqoop UI is one of the applications installed as part of
 Hue. For information about installing and configuring Hue, see the Hue Installation
