@@ -270,6 +270,7 @@ ${layout.menubar(section='query')}
             <button data-bind="click: tryCancelQuery, visible: $root.design.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
 
             <button data-bind="click: tryExecuteNextStatement, visible: !$root.design.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
+            <button data-bind="click: tryExecuteQuery, visible: !$root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Restart')}</button>
 
             <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
@@ -2065,9 +2066,19 @@ function tryExecuteQuery() {
 
 function tryExecuteNextStatement() {
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.design.query.value(query);
 
-  viewModel.executeNextStatement();
+  // If we highlight a part of query, we update the query and restart the query history
+  // In the other case we update the query but continue at the same statement we were
+  if (viewModel.design.query.value() != query) {
+    viewModel.design.query.value(query);
+    if (getHighlightedQuery()) {
+      viewModel.executeQuery();
+    } else {
+      viewModel.executeNextStatement();
+    }
+  } else {
+    viewModel.executeNextStatement();
+  }
 
   logGA('query/execute_next');
 }
