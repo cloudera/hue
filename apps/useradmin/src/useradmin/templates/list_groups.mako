@@ -42,10 +42,16 @@ ${layout.menubar(section='groups')}
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
+          % if is_ldap_setup:
             <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
                 class="fa fa-plus-circle"></i> ${_('Add group')}</a>
             <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
                 class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
+          % endif
+          <a href="http://gethue.tumblr.com/post/75499679342/making-hadoop-accessible-to-your-employees-with-ldap" class="btn"
+            title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
+            <i class="fa fa-question-circle"> LDAP</i>
+          </a>
         %endif
       </%def>
     </%actionbar:render>
