@@ -55,17 +55,28 @@ def home(request):
       Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
       Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
   )
+  docs = list(docs)
   tags = DocumentTag.objects.get_tags(user=request.user)
 
   apps = appmanager.get_apps_dict(request.user)
 
   return render('home.mako', request, {
     'apps': apps,
-    'documents': docs,
-    'json_documents': json.dumps(massaged_documents_for_json(docs)),
-    'tags': tags,
+    'documents': augment_docs(docs, request.user),
+    'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
+    'tags': augment_tags(tags, request.user),
     'json_tags': json.dumps(massaged_tags_for_json(tags, request.user))
   })
+
+def augment_docs(docs, user):
+  for doc in docs:
+    doc.is_mine = doc.owner.username == user.username
+  return docs
+
+def augment_tags(tags, user):
+  for tag in tags:
+    tag.is_mine = tag.owner.username == user.username
+  return tags
 
 
 @access_log_level(logging.WARN)
