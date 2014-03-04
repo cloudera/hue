@@ -541,13 +541,18 @@ var PigViewModel = function (props) {
   function callStop(script) {
     $(document).trigger("stopping");
     $.post(self.STOP_URL, {
-        id: script.id()
-      },
-      function (data) {
-        $(document).trigger("stopped");
-        $("#stopModal").modal("hide");
-      }, "json"
-    );
+          id: script.id()
+        },
+        function (data) {
+          $(document).trigger("stopped");
+          $("#stopModal").modal("hide");
+        }, "json"
+    ).fail(function () {
+      self.currentScript().isRunning(false);
+      $(document).trigger("stopError");
+      $(document).trigger("stopped");
+      $("#stopModal").modal("hide");
+    });
   }
 
   function callCopy(script) {

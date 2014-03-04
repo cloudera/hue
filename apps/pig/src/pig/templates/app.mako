@@ -123,6 +123,11 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <i class="fa fa-floppy-o"></i> ${ _('Save') }
               </a>
             </li>
+            <li data-bind="click: confirmNewScript">
+              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
+                <i class="fa fa-plus-circle"></i> ${ _('New Script') }
+              </a>
+            </li>
             <li class="nav-header">${_('Run')}</li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
@@ -139,7 +144,6 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <i class="fa fa-tasks"></i> ${ _('Logs') }
               </a>
             </li>
-            <li class="nav-header">${_('File')}</li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
               <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
                 <i class="fa fa-files-o"></i> ${ _('Copy') }
@@ -148,11 +152,6 @@ ${ commonheader(None, "pig", user) | n,unicode }
             <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
               <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
                 <i class="fa fa-trash-o"></i> ${ _('Delete') }
-              </a>
-            </li>
-            <li data-bind="click: confirmNewScript">
-              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-plus-circle"></i> ${ _('Script') }
               </a>
             </li>
             <li>
@@ -1126,6 +1125,10 @@ ${ commonheader(None, "pig", user) | n,unicode }
       $("#withLogs").text("").addClass("hide");
       logsAtEnd = true;
       forceLogsAtEnd = true;
+    });
+
+    $(document).on("stopError", function () {
+      $.jHueNotify.error(LABELS.KILL_ERROR);
     });
 
     var _resizeTimeout = -1;
