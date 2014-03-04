@@ -43,11 +43,19 @@ ${layout.menubar(section='users')}
       <%def name="creation()">
         %if user.is_superuser:
             <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+
+            % if is_ldap_setup:
             <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i
                 class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
             <a href="javascript:void(0)" class="btn confirmationModal"
                data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i
                 class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+            % endif
+
+            <a href="http://gethue.tumblr.com/post/75499679342/making-hadoop-accessible-to-your-employees-with-ldap" class="btn"
+              title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
+              <i class="fa fa-question-circle"> LDAP</i>
+            </a>
         %endif
       </%def>
     </%actionbar:render>

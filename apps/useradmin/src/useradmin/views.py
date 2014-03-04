@@ -15,10 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-User management application.
-"""
-
 import pwd
 import grp
 import logging
@@ -39,12 +35,14 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 
 import desktop.conf
+from desktop.conf import LDAP
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm,\
   AddLdapUsersForm, PermissionsEditForm, GroupEditForm, SuperUserChangeForm,\
   UserChangeForm
+
 
 
 LOG = logging.getLogger(__name__)
@@ -57,12 +55,16 @@ def list_users(request):
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
-      'request': request
+      'request': request,
+      'is_ldap_setup': LDAP.LDAP_URL.get() is not None
   })
 
 
 def list_groups(request):
-  return render("list_groups.mako", request, dict(groups=Group.objects.all()))
+  return render("list_groups.mako", request, {
+      'groups': Group.objects.all(),
+      'is_ldap_setup': LDAP.LDAP_URL.get() is not None
+  })
 
 
 def list_permissions(request):
