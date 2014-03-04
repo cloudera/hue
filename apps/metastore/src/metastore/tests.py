@@ -215,14 +215,14 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       assertz("Drop</button>" in response.content, response.content)
       assertz("Create a new table" in response.content, response.content)
 
-    check(client, assert_true)
+    check(client, assert_false)
 
-    # Remove access
+    # Add access
     group, created = Group.objects.get_or_create(name='write_access_frontend')
-    perm, created = HuePermission.objects.get_or_create(app='metastore', action='read_only_access')
+    perm, created = HuePermission.objects.get_or_create(app='metastore', action='write')
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
-    check(client, assert_false)
+    check(client, assert_true)
 
 
   def test_has_write_access_backend(self):
@@ -242,11 +242,11 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       resp = client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_perm_1']}, follow=True)
       assert_equal(resp.status_code, http_code, resp.content)
 
-    check(client, 200)
+    check(client, 500)
 
-    # Remove access
+    # Add access
     group, created = Group.objects.get_or_create(name='write_access_backend')
-    perm, created = HuePermission.objects.get_or_create(app='metastore', action='read_only_access')
+    perm, created = HuePermission.objects.get_or_create(app='metastore', action='write')
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
-    check(client, 500)
+    check(client, 200)
