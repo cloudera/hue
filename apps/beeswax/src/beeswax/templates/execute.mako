@@ -370,7 +370,9 @@ ${layout.menubar(section='query')}
           <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
             <tbody data-bind="foreach: $root.design.results.columns">
               <tr class="columnRow" data-bind="visible: $index() > 0">
-                <td rel="columntooltip" data-placement="left" data-bind="attr: {title: 'Scroll the column \'' + $data.name + '\''}"><a href="javascript:void(0)" data-row-selector="true" class="column-selector" data-bind="text: $data.name"></a></td>
+                <td rel="columntooltip" data-placement="left" data-bind="attr: {title: '${ _("Scroll to the column") }">
+                  <a href="javascript:void(0)" data-row-selector="true" class="column-selector" data-bind="text: $data.name"></a>
+                </td>
                 <td class="columnType" data-bind="text: $.trim($data.type)"></td>
               </tr>
             </tbody>
