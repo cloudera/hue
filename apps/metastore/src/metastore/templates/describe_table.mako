@@ -34,6 +34,7 @@ ${ components.menubar() }
   <table class="table table-striped table-condensed datatables">
     <thead>
       <tr>
+        <th>&nbsp;</th>
         <th>${_('Name')}</th>
         <th>${_('Type')}</th>
         <th>${_('Comment')}</th>
@@ -42,7 +43,10 @@ ${ components.menubar() }
     <tbody>
       % for column in cols:
         <tr>
-          <td>${ column.name }</td>
+          <td>${ loop.index }</td>
+          <td title="${ _("Scroll to the column") }">
+            <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
+          </td>
           <td>${ column.type }</td>
           <td>${ column.comment != 'None' and column.comment or "" }</td>
         </tr>
@@ -208,7 +212,24 @@ ${ components.menubar() }
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}",
-      }
+      },
+      "aoColumns": [
+        { "sWidth" : "10px" },
+        null,
+        null,
+        { "bSortable": false }
+      ],
+    });
+
+    $(".column-selector").on("click", function () {
+      var _t = $("#sample");
+      var _text = $.trim($(this).text().split("(")[0]);
+      var _col = _t.find("th").filter(function() {
+        return $.trim($(this).text()) == _text;
+      });
+      _t.find(".columnSelected").removeClass("columnSelected");
+      _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+      $("a[href='#sample']").click();
     });
 
     % if has_write_access:
