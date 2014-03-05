@@ -743,6 +743,10 @@
   # Set to 0 for disabling the option and backward compatibility.
   ## querycache_rows=50000
 
+  # Hue will try to close the Impala query when the user leaves the editor page.
+  # This will free all the query resources in Impala, but also make its results inaccessible.
+  ## close_queries=false
+
 
 ###########################################################################
 # Settings to configure Hbase
