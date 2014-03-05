@@ -161,7 +161,7 @@ app.initialize().done(function() {
         if (cluster != null && $.inArray(cluster, app.clusterNames()) > -1) {
           routie(cluster);
         } else {
-          routie(data[0].name);
+          routie(app.clusterNames()[0]);
         }
         resetElements();
         routed = true;
