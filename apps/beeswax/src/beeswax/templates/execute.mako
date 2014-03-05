@@ -16,7 +16,8 @@
 <%!
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter
-  from beeswax.conf import CLOSE_QUERIES
+  from beeswax import conf as beeswax_conf
+  from impala import conf as impala_conf
   from django.utils.translation import ugettext as _
 %>
 
@@ -2270,7 +2271,7 @@ $(document).ready(function () {
 });
 % endif
 
-% if CLOSE_QUERIES.get() or app_name == 'impala':
+% if ( app_name == 'beeswax' and beeswax_conf.CLOSE_QUERIES.get() ) or ( app_name == 'impala' and impala_conf.CLOSE_QUERIES.get() ):
 $(document).ready(function () {
   $(document).on('explain.query', function() {
     viewModel.closeQuery();

@@ -55,6 +55,14 @@ QUERYCACHE_ROWS=Config(
   type=int,
   default=50000)
 
+CLOSE_QUERIES = Config(
+  key="close_queries",
+  help=_t("Hue will try to close the Impala query when the user leaves the editor page. "
+          "This will free all the query resources in Impala, but also make its results inaccessible."),
+  type=coerce_bool,
+  default=True
+)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)

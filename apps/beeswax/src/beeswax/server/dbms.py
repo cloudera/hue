@@ -16,10 +16,10 @@
 # limitations under the License.
 
 import logging
+import threading
 import time
 
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
@@ -36,15 +36,30 @@ from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
+DBMS_CACHE = {}
+DBMS_CACHE_LOCK = threading.Lock()
+
 
 def get(user, query_server=None):
+  global DBMS_CACHE
+  global DBMS_CACHE_LOCK
+
   # Avoid circular dependency
   from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
 
   if query_server is None:
     query_server = get_query_server_config()
 
-  return HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+  DBMS_CACHE_LOCK.acquire()
+  try:
+    DBMS_CACHE.setdefault(user.username, {})
+
+    if query_server['server_name'] not in DBMS_CACHE[user.username]:
+      DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+
+    return DBMS_CACHE[user.username][query_server['server_name']]
+  finally:
+    DBMS_CACHE_LOCK.release()
 
 
 def get_query_server_config(name='beeswax', server=None):
