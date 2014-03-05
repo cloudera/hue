@@ -231,22 +231,21 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     grant_access("write_access_backend", "write_access_backend", "beeswax")
     user = User.objects.get(username='write_access_backend')
 
-    def check(client, http_code):
-      resp = _make_query(client, 'CREATE TABLE test_perm_1 (a int);')
-      resp = wait_for_query_to_finish(client, resp, max=30.0)
+    resp = _make_query(client, 'CREATE TABLE test_perm_1 (a int);') # Only fails if we were using Sentry and won't allow SELECT to user
+    resp = wait_for_query_to_finish(client, resp, max=30.0)
 
-      resp = client.get('/metastore/tables/drop/default', follow=True)
-      #assert_true('want to delete' in resp.content, resp.content)
-      assert_equal(resp.status_code, http_code, resp.content)
+    def check(client, http_codes):
+      resp = client.get('/metastore/tables/drop/default')
+      assert_true(resp.status_code in http_codes, resp.content)
 
-      resp = client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_perm_1']}, follow=True)
-      assert_equal(resp.status_code, http_code, resp.content)
+      resp = client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_perm_1']})
+      assert_true(resp.status_code in http_codes, resp.content)
 
-    check(client, 500)
+    check(client, [301]) # Denied
 
     # Add access
     group, created = Group.objects.get_or_create(name='write_access_backend')
     perm, created = HuePermission.objects.get_or_create(app='metastore', action='write')
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
-    check(client, 200)
+    check(client, [200, 302]) # Ok

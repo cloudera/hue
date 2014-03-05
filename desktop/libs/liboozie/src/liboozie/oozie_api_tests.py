@@ -44,7 +44,7 @@ class OozieServerProvider(object):
   """
   Setup a Oozie server.
   """
-  OOZIE_TEST_PORT = '18080'
+  OOZIE_TEST_PORT = '18001'
   OOZIE_HOME = get_run_root('ext/oozie/oozie')
 
   requires_hadoop = True
