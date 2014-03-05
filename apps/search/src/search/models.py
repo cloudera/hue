@@ -286,8 +286,9 @@ class Collection(models.Model):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
 
-    dynamic_fields = SolrApi(SOLR_URL.get(), user).fields(self.name, dynamic=True)
-    dynamic_fields = dynamic_fields['fields']
+    dynamic_fields = []
+#    dynamic_fields = SolrApi(SOLR_URL.get(), user).fields(self.name, dynamic=True)
+#    dynamic_fields = dynamic_fields['fields']
 
     schema_fields.update(dynamic_fields)
 

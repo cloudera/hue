@@ -21,7 +21,6 @@ import sys
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
-from hadoop import cluster
 
 from beeswax.settings import NICE_NAME
 
@@ -135,6 +134,7 @@ def config_validator(user):
     res.append((NICE_NAME, _("The application won't work without a running HiveServer2.")))
 
   try:
+    from hadoop import cluster
     warehouse = '/user/hive/warehouse'
     fs = cluster.get_hdfs()
     fs.stats(warehouse)
