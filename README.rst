@@ -4,21 +4,21 @@ Welcome to the repository for Hue
 =================================
 
 `Hue
-<http://gethue.com>`_ is a Web UI and framework for making Hadoop easy to use.
+<http://gethue.com>`_ is an open source Web UI for doing big data with Hadoop.
 
 .. image:: docs/images/hue-screen.png
 
 It features:
 
       * File Browser for accessing HDFS
-      * Beeswax application for executing Hive queries
+      * Hive Editor for developing and running Hive queries
       * Impala App for executing Impala queries
+      * Search App for querying and exploring data with Solr
       * Spark Editor and Dashboard
       * Pig Editor for submitting Pig scripts
       * Oozie App for submitting and monitoring workflows, coordinators and bundles
-      * HBase Browser for exploring and modifying HBase tables and data
-      * Table Browser for accessing Hive metadata and HCatalog
-      * Search App for querying Solr and Solr Cloud
+      * HBase Browser for visualizing and modifying HBase tables
+      * Metastore Browser for accessing Hive metadata and HCatalog
       * Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
       * Job Designer for creating MapReduce/Streaming/Java jobs
       * A Sqoop 2 Editor and Dashboard
