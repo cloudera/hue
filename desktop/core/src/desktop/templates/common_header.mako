@@ -18,6 +18,7 @@
 from desktop import conf
 import urllib
 from desktop.lib.i18n import smart_unicode
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 %>
 
@@ -316,6 +317,9 @@ from django.utils.translation import ugettext as _
   </ul>
   % else:
   <ul class="nav nav-pills" style="margin-right: 40px">
+    <li id="login">
+      <a href="${ reverse('desktop.auth.views.dt_login') }" title="${_('Sign in')}" rel="navigator-tooltip"><i class="fa fa-sign-in"></i></a>
+    </li>
     <li id="jHueTourFlagPlaceholder"></li>
   </ul>
   % endif
