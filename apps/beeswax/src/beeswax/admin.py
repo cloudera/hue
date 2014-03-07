@@ -15,6 +15,8 @@
 # limitations under the License.
 
 from django.contrib import admin
-from jobsub.models import JobDesign
+from beeswax.models import QueryHistory, SavedQuery, Session
 
-admin.site.register(JobDesign)
+admin.site.register(QueryHistory)
+admin.site.register(SavedQuery)
+admin.site.register(Session)

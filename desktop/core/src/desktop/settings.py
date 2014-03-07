@@ -96,6 +96,9 @@ MEDIA_URL = ''
 # Additional locations of static files
 STATICFILES_DIRS = ()
 
+# For Django admin interface
+STATIC_URL = '/static/'
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
   'django.template.loaders.filesystem.Loader',

@@ -15,6 +15,9 @@
 # limitations under the License.
 
 from django.contrib import admin
-from jobsub.models import JobDesign
+from search.models import Collection, Result, Facet, Sorting
 
-admin.site.register(JobDesign)
+admin.site.register(Collection)
+admin.site.register(Result)
+admin.site.register(Facet)
+admin.site.register(Sorting)

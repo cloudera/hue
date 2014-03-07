@@ -15,6 +15,8 @@
 # limitations under the License.
 
 from django.contrib import admin
-from jobsub.models import JobDesign
+from desktop.models import Document, DocumentPermission, DocumentTag
 
-admin.site.register(JobDesign)
+admin.site.register(Document)
+admin.site.register(DocumentPermission)
+admin.site.register(DocumentTag)
