@@ -55,24 +55,24 @@ class OAuthBackend(DesktopBackendBase):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
 
-    	if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
-            is_super=True
-    	else:
-            is_super=False
+      if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+        is_super=True
+      else:
+        is_super=False
 
       # Could save oauth_token detail in the user profile here
-    	user = find_or_create_user(username, password)
+      user = find_or_create_user(username, password)
     
-    	profile = get_profile(user)
-    	profile.creation_method = UserProfile.CreationMethod.EXTERNAL
-    	profile.save()
+      profile = get_profile(user)
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.save()
 
-    	user.is_superuser = is_super
-    	user.save()
+      user.is_superuser = is_super
+      user.save()
 
-    	default_group = get_default_user_group()
-    	if default_group is not None:
-      	    user.groups.add(default_group)
+      default_group = get_default_user_group()
+      if default_group is not None:
+        user.groups.add(default_group)
 
     return user
 
