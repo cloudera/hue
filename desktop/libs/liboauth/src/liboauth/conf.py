@@ -19,7 +19,8 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config, coerce_bool, coerce_csv
+
 
 CONSUMER_KEY_TWITTER = Config(
       key="consumer_key_twitter",
@@ -147,3 +148,10 @@ AUTHORIZE_URL_LINKEDIN = Config(
       type=str,
       default="https://api.linkedin.com/v1/people/~"
     )
+
+WHITELISTED_DOMAINS_GOOGLE = Config(
+    key="whitelisted_domains_google",
+    help=_t("Comma-separated list of whitelisted domains."),
+    type=coerce_csv,
+    default=''
+)
