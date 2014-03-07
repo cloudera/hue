@@ -89,7 +89,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </form>
 </div>
 
-% if 'is_demo' in response['responseHeader']:
+% if 'is_demo' in response.get('responseHeader', {}):
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
@@ -506,7 +506,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       if (typeof _this.data("field") == "undefined") {
         _sort = "";
       }
-      location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + (_sort != "" ? "&sort=" + _sort : "");
+      location.href = "?collection=${ current_collection }&query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + (_sort != "" ? "&sort=" + _sort : "");
     });
 
     $("#id_query").focus();
