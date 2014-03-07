@@ -306,7 +306,9 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       </div>
     </div>
     % else:
-    <div class="span12">
+    <div class="span2">
+    </div>
+    <div class="span10">
       <h4>
         ${_('Your search')} - <strong>${solr_query["q"]}</strong> - ${_('did not match any documents.')}
       </h4>

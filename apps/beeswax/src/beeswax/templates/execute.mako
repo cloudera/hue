@@ -175,7 +175,7 @@ ${layout.menubar(section='query')}
                   <li class="nav-header">
                     ${_('Metastore Catalog')}
                   </li>
-                  <li class="white">
+                  <li class="white" style="padding-top:0; padding-left:0">
                     <div class="control-group">
                       <span id="refresh-dyk">
                         <i class="fa fa-refresh"></i>
