@@ -158,6 +158,10 @@ class OAuthBackend(DesktopBackendBase):
                 raise Exception(_("Invalid response from OAuth provider: %s") % resp)
             username=(json.loads(content))["email"]
             access_token = dict(screen_name=''.join([x for x in username if x.isalnum()]), oauth_token_secret=access_tok)
+            whitelisted_domains = liboauth.conf.WHITELISTED_DOMAINS_GOOGLE.get()
+            if len(whitelisted_domains) > 0:
+                if username.split('@')[1] not in whitelisted_domains:
+                    access_token = ""
         #facebook
         elif social == 'facebook':
             access_tok = (dict(cgi.parse_qsl(cont)))['access_token']
