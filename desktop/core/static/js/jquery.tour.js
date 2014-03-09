@@ -209,6 +209,8 @@
       _closeBtn.html('<i class="fa fa-times"></i>').css("cursor", "pointer").css("padding", "5px").css("padding-left", "17px").css("padding-right", "7px").css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
       _closeBtn.click(function () {
         $(".popover").remove();
+        $(document).off("keyup");
+        $(document).off("click");
       });
 
       _questionMark.popover("destroy").popover({
@@ -222,6 +224,17 @@
         $(".popover").css("top", "10px");
       }
       _closeBtn.prependTo($(".popover-title"));
+
+      $(document).on("keyup", function (e) {
+        if (e.keyCode == 27) {
+          _closeBtn.click();
+        }
+      });
+      $(document).on("click", function (e) {
+        if ($(e.target).parents('.popover').length == 0 && !($(e.target).hasClass("fa-flag-checkered"))) {
+          _closeBtn.click();
+        }
+      });
     });
     _questionMark.appendTo($("#jHueTourFlagPlaceholder"));
   };
