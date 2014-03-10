@@ -141,6 +141,13 @@ APP_BLACKLIST = Config(
   help=_('Comma separated list of apps to not load at server startup.')
 )
 
+DEMO_ENABLED = Config( # Internal and Temporary
+  key="demo_enabled",
+  help=_("To set to true in combination when using Hue demo backend."),
+  type=coerce_bool,
+  private=True,
+  default=False)
+
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 

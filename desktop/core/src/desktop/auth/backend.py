@@ -231,6 +231,40 @@ class AllowAllBackend(DesktopBackendBase):
     return True
 
 
+class DemoBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  Log automatically users without a session with a new user account.
+  """
+  def authenticate(self, username, password):
+    user = super(DemoBackend, self).authenticate(username, password)
+
+    if not user:
+      username = self._randome_name()
+
+      user = find_or_create_user(username, None)
+
+      user.is_superuser = False
+      user.save()
+      default_group = get_default_user_group()
+      if default_group is not None:
+        user.groups.add(default_group)
+
+    user = rewrite_user(user)
+
+    return user
+
+  def get_user(self, user_id):
+    user = super(DemoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+
+  def _randome_name(self):
+    import string
+    import random
+
+    N = 7
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(N))
+
 
 class PamBackend(DesktopBackendBase):
   """

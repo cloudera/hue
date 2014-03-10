@@ -40,7 +40,7 @@ from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
-from desktop.conf import OAUTH
+from desktop.conf import OAUTH, DEMO_ENABLED
 
 LOG = logging.getLogger(__name__)
 
@@ -80,7 +80,6 @@ def get_backend_name():
 
 @login_notrequired
 def dt_login(request):
-  """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
   backend_name = get_backend_name()
@@ -98,7 +97,6 @@ def dt_login(request):
         # It provides 'backends' on the User object.
         user = auth_form.get_user()
         login(request, user)
-
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
@@ -119,6 +117,12 @@ def dt_login(request):
   else:
     first_user_form = None
     auth_form = AuthenticationForm()
+
+  if DEMO_ENABLED.get() and not 'admin' in request.REQUEST:
+    user = authenticate(username='', password='')
+    login(request, user)
+    ensure_home_directory(request.fs, user.username)
+    return HttpResponseRedirect(redirect_to)
 
   request.session.set_test_cookie()
   return render('login.mako', request, {
