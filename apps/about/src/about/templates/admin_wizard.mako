@@ -16,6 +16,7 @@
 
 <%!
 from desktop.views import commonheader, commonfooter
+from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 %>
@@ -239,13 +240,16 @@ ${ header.menubar() }
         <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
       </div>
       % else:
+       <div class="card-body">
         <p>
-        </br>
-        &nbsp;&nbsp;&nbsp;${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>.
+          ${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>.
+          <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
+          % if not user.is_authenticated():
+            <br/>
+            <a href="${ reverse('desktop.auth.views.dt_login') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+          % endif
         </p>
-        <div class="form-actions">
-          <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
-        </div>
+       </div>
       % endif
 
     </div>
