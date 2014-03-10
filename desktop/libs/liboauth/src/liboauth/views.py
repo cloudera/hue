@@ -46,7 +46,7 @@ from liboauth.backend import OAuthBackend
 
 
 @login_notrequired
-def show_login_page(request):
+def show_login_page(request, login_errors=False):
    """Used by the non-jframe login"""
    redirect_to = request.REQUEST.get('next', '/')
    is_first_login_ever = OAuthBackend.is_first_login_ever()
@@ -56,7 +56,7 @@ def show_login_page(request):
      'action': urlresolvers.reverse('oauth_login'),
      'next': redirect_to,
      'first_login_ever': is_first_login_ever,
-     'login_errors': request.method == 'POST',
+     'login_errors': request.method == 'POST' or login_errors,
      'socialGoogle':   liboauth.conf.CONSUMER_KEY_GOOGLE.get() != "" and liboauth.conf.CONSUMER_SECRET_GOOGLE.get() != "",
      'socialFacebook': liboauth.conf.CONSUMER_KEY_FACEBOOK.get() != "" and liboauth.conf.CONSUMER_SECRET_FACEBOOK.get() != "",
      'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
@@ -81,8 +81,7 @@ def oauth_authenticated(request):
    
   access_token = OAuthBackend.handleAuthenticationRequest(request)
   if access_token == "":
-      login_failed_url = '/'
-      return HttpResponseRedirect('{loginfailed}'.format(loginfailed = login_failed_url))
+      return show_login_page(request, True)
   user = authenticate(access_token = access_token)
   login(request, user)
   redirect_to = request.REQUEST.get('next', '/')
