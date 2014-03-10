@@ -295,6 +295,8 @@ if 'test' in sys.argv:
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 # Desktop supports only one authentication backend.
 AUTHENTICATION_BACKENDS = (desktop.conf.AUTH.BACKEND.get(),)
+if desktop.conf.DEMO_ENABLED.get():
+  AUTHENTICATION_BACKENDS = ('desktop.auth.backend.DemoBackend',)
 
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
