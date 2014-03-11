@@ -37,6 +37,8 @@ from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistor
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
 
+from impala import conf as impala_conf
+
 
 LOG = logging.getLogger(__name__)
 
@@ -307,8 +309,10 @@ class HiveServerClient:
 
     if self.query_server['server_name'] == 'impala':
       ssl_enabled = False
+      timeout = impala_conf.SERVER_CONN_TIMEOUT.get()
     else:
       ssl_enabled = beeswax_conf.SSL.ENABLED.get()
+      timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
@@ -318,7 +322,7 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=user.username,
-                                          timeout_seconds=beeswax_conf.SERVER_CONN_TIMEOUT.get(),
+                                          timeout_seconds=timeout,
                                           use_ssl=ssl_enabled,
                                           ca_certs=beeswax_conf.SSL.CACERTS.get(),
                                           keyfile=beeswax_conf.SSL.KEY.get(),
