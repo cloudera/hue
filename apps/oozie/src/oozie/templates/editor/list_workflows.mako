@@ -200,7 +200,7 @@ ${ layout.menubar(section='workflows') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']");
+      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
       if (selector.length == 1) {
         var action_buttons = [
           ['#submit-btn', 'data-submit-url'],
@@ -217,8 +217,7 @@ ${ layout.menubar(section='workflows') }
         });
       }
       var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
-      var can_delete_box_count = $(".hueCheckbox[data-delete-id]").length;
-      if (can_delete.length >= 1 || can_delete.length == can_delete_box_count) {
+      if (can_delete.length > 0 && can_delete.length == selector.length) {
         $("#trash-btn").removeAttr("disabled");
         $("#trash-btn-caret").removeAttr("disabled");
       }
