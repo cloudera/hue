@@ -25,7 +25,7 @@ class AuthenticationForm(AuthAuthenticationForm):
   """
   Adds appropriate classes to authentication form
   """
-  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username")}))
+  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), "autofocus": "autofocus"}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password")}))
 
 
