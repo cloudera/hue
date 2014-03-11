@@ -88,7 +88,7 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
   try:
     pig_script = PigScript.objects.get(id=id)
     pig_script.doc.get().can_write_or_exception(user)
-  except PigScript.DoesNotExist, ex:
+  except PigScript.DoesNotExist:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
     Doc.objects.link(pig_script, owner=pig_script.owner, name=name)
     if not is_design:
