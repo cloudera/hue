@@ -414,6 +414,22 @@ ${ layout.menubar(section='workflows') }
   </div>
 </div>
 
+<div id="runUnsaved" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('The workflow has some unsaved changes')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      ${_('Your current workflow has some unsaved changes. Please save or undo your changes before submitting it.')}
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a id="saveAndSubmitBtn" class="btn btn-primary" href="javascript:void(0);">${_('Save and submit')}</a>
+  </div>
+</div>
+
 
 <div id="modal-window" class="modal hide fade"></div>
 
@@ -663,14 +679,18 @@ function workflow_load_error(jqXHR) {
   workflow.loading(false);
 }
 
-function save_workflow() {
+function save_workflow(callback) {
+  var _callbackFn = workflow_save_success;
+  if (typeof callback != "undefined"){
+    _callbackFn = callback;
+  }
   workflow.loading(true);
   if (kill_view_model.enabled()) {
     if (kill_view_model.isValid()) {
-      workflow.save({ success: workflow_save_success, error: workflow_save_error });
+      workflow.save({ success: _callbackFn, error: workflow_save_error });
     }
   } else {
-    workflow.save({ success: workflow_save_success, error: workflow_save_error });
+    workflow.save({ success: _callbackFn, error: workflow_save_error });
   }
 }
 
@@ -1004,16 +1024,38 @@ $(document).ready(function () {
     var _url = $(this).data('clone-url');
     $.post(_url, function (data) {
       window.location = data.url;
+    }).error(function(){
+      $(document).trigger("error", "${ _('There was a problem copying this workflow.') }");
     });
   });
+
   $('#submit-btn').on('click', function () {
-    var _url = $(this).data('submit-url');
-    $.get(_url, function (response) {
+    if (workflow.is_dirty()) {
+      $("#runUnsaved").modal();
+      $("#runUnsaved").data("submit-url", $(this).data('submit-url'));
+    }
+    else {
+      submitWorkflow($(this).data('submit-url'));
+    }
+  });
+
+  $("#saveAndSubmitBtn").on("click", function () {
+    $("#runUnsaved").modal("hide");
+    save_workflow(function (data) {
+      workflow_save_success(data);
+      submitWorkflow($("#runUnsaved").data('submit-url'));
+    });
+  });
+
+  function submitWorkflow(url) {
+    $.get(url, function (response) {
         $('#submit-wf-modal').html(response);
         $('#submit-wf-modal').modal('show');
       }
-    );
-  });
+    ).error(function(){
+      $(document).trigger("error", "${ _('There was a problem submitting this workflow.') }");
+    });
+  }
 
   routie({
     'properties':function () {
