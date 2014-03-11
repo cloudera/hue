@@ -87,8 +87,8 @@ class PigScript(Document):
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
-    pig_script.doc.get().can_read_or_exception(user)
-  except PigScript.DoesNotExist:
+    pig_script.doc.get().can_write_or_exception(user)
+  except PigScript.DoesNotExist, ex:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
     Doc.objects.link(pig_script, owner=pig_script.owner, name=name)
     if not is_design:
@@ -122,6 +122,7 @@ def get_scripts(user, is_design=None):
       'resources': data['resources'],
       'hadoopProperties': data.get('hadoopProperties', []),
       'isDesign': script.is_design,
+      'can_write': script.doc.get().can_write(user)
     }
     scripts.append(massaged_script)
 
