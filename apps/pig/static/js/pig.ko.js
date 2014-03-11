@@ -37,6 +37,7 @@ var PigScript = function (pigScript) {
   self.id = ko.observable(pigScript.id);
   self.isDesign = ko.observable(pigScript.isDesign);
   self.name = ko.observable(pigScript.name);
+  self.can_write = ko.observable(pigScript.can_write);
   self.script = ko.observable(pigScript.script);
   self.scriptSumup = ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100));
   self.isRunning = ko.observable(false);
@@ -205,7 +206,8 @@ var PigViewModel = function (props) {
     parameters: self.LABELS.NEW_SCRIPT_PARAMETERS,
     resources: self.LABELS.NEW_SCRIPT_RESOURCES,
     hadoopProperties: self.LABELS.NEW_SCRIPT_HADOOP_PROPERTIES,
-    parentModel: self
+    parentModel: self,
+    can_write: true
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));
@@ -502,7 +504,9 @@ var PigViewModel = function (props) {
           self.currentScript().id(data.id);
           $(document).trigger("saved");
           self.updateScripts();
-        }, "json");
+        }, "json").fail( function(xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
   }
 
   function callRun(script) {

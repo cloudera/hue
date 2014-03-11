@@ -118,7 +118,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
             <li data-bind="click: editScriptProperties" data-section="properties">
               <a href="#"><i class="fa fa-bars"></i> ${ _('Properties') }</a>
             </li>
-            <li data-bind="click: saveScript">
+            <li data-bind="click: saveScript, visible: currentScript().can_write()">
               <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
                 <i class="fa fa-floppy-o"></i> ${ _('Save') }
               </a>
