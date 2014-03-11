@@ -55,6 +55,12 @@ QUERYCACHE_ROWS=Config(
   type=int,
   default=50000)
 
+SERVER_CONN_TIMEOUT = Config(
+  key='server_conn_timeout',
+  default=120,
+  type=int,
+  help=_t('Timeout in seconds for Thrift calls.'))
+
 CLOSE_QUERIES = Config(
   key="close_queries",
   help=_t("Hue will try to close the Impala query when the user leaves the editor page. "
