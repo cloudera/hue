@@ -31,7 +31,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
   TCloseOperationReq
 
-from beeswax import conf
+from beeswax import conf as beeswax_conf
 from beeswax import hive_site
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
@@ -304,6 +304,12 @@ class HiveServerClient:
     self.use_sasl = use_sasl
     self.kerberos_principal_short_name = kerberos_principal_short_name
     self.impersonation_enabled = impersonation_enabled
+
+    if self.query_server['server_name'] == 'impala':
+      ssl_enabled = False
+    else:
+      ssl_enabled = beeswax_conf.SSL.ENABLED.get()
+
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
@@ -312,12 +318,12 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=user.username,
-                                          timeout_seconds=conf.SERVER_CONN_TIMEOUT.get(),
-                                          use_ssl=conf.SSL.ENABLED.get(),
-                                          ca_certs=conf.SSL.CACERTS.get(),
-                                          keyfile=conf.SSL.KEY.get(),
-                                          certfile=conf.SSL.CERT.get(),
-                                          validate=conf.SSL.VALIDATE.get())
+                                          timeout_seconds=beeswax_conf.SERVER_CONN_TIMEOUT.get(),
+                                          use_ssl=ssl_enabled,
+                                          ca_certs=beeswax_conf.SSL.CACERTS.get(),
+                                          keyfile=beeswax_conf.SSL.KEY.get(),
+                                          certfile=beeswax_conf.SSL.CERT.get(),
+                                          validate=beeswax_conf.SSL.VALIDATE.get())
 
 
   def get_security(self):
