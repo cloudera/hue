@@ -421,7 +421,7 @@ ${ layout.menubar(section='workflows') }
   </div>
   <div class="modal-body">
     <p>
-      ${_('Your current workflow has some unsaved changes. Please save or undo your changes before submitting it.')}
+      ${_('Please save or undo your changes before submitting it.')}
     </p>
   </div>
   <div class="modal-footer">
