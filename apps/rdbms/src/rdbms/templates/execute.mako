@@ -91,7 +91,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
               <div data-bind="css: {'hide': query.errors().length == 0}" class="hide alert alert-error">
                 <p><strong>${_('Your query has the following error(s):')}</strong></p>
-                <div data-bind="foreach: query.errors">
+                <div data-bind="foreach: { 'data': query.errors, 'afterRender': resizeTable }">
                   <p data-bind="text: $data" class="queryErrorMessage"></p>
                 </div>
               </div>
@@ -648,8 +648,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       }
     }
   })());
-  viewModel.query.errors.subscribe(function() {
-    // Ensure table headers are in right place when query errors exist.
+  function resizeTable() {
     $(".resultTable").jHueTableExtender({
       hintElement: "#jumpToColumnAlert",
       fixedHeader: true,
@@ -657,7 +656,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     });
 
     $("#executeQuery").button("reset");
-  });
+  }
   ko.applyBindings(viewModel);
 
   function resetNavigator() {
