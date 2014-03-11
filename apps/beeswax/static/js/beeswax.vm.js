@@ -163,6 +163,10 @@ function BeeswaxViewModel(server) {
 
   self.updateDatabases = function(databases) {
     if (databases) {
+      var i = databases.indexOf("_impala_builtins"); // Blacklist of system databases
+      if (i != -1) {
+        databases.splice(i, 1);
+      }
       self.databases(databases);
     }
   };
