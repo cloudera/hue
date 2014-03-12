@@ -129,7 +129,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
             % for tag in tags:
               % if tag.tag not in ('trash', 'history') and tag.is_mine:
               <% has_tag = True %>
-              <li class="toggle-tag" data-tag="${ tag.tag }"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
+              <li class="toggle-tag" data-tag="${ tag.tag }" data-ismine="true"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
               % endif
             % endfor
           % endif
@@ -144,7 +144,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
             % for tag in tags:
               % if tag.tag not in ('trash', 'history') and not tag.is_mine:
               <% has_tag = True %>
-              <li class="toggle-tag" data-tag="${ tag.tag }" rel="tooltip" title="${_('Shared by %s' % tag.owner)}" data-placement="right"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
+              <li class="toggle-tag" data-tag="${ tag.tag }" data-ismine="false" rel="tooltip" title="${_('Shared by %s' % tag.owner)}" data-placement="right"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
               % endif
             % endfor
           % endif
@@ -355,17 +355,17 @@ $(document).ready(function () {
 
   $(".view-trash").on("click", function () {
     $(".viewHistory").removeClass("active");
-    toggleSpecificSection($(this), "trash");
+    toggleSpecificSection($(this), "trash", true);
   });
 
   $(".viewHistory").on("click", function () {
     $(".view-trash").removeClass("active");
-    toggleSpecificSection($(this), "history");
+    toggleSpecificSection($(this), "history", true);
   });
 
-  function toggleSpecificSection(section, filter){
+  function toggleSpecificSection(section, filter, isMine){
     section.siblings().removeClass("active");
-    populateTable(filter);
+    populateTable(filter, isMine);
     section.addClass("active");
   }
 
@@ -374,7 +374,7 @@ $(document).ready(function () {
     _this.siblings().removeClass("active");
     _this.blur();
     _this.addClass("active");
-    populateTable($(".toggle-tag.active").data("tag"));
+    populateTable($(".toggle-tag.active").data("tag"), $(".toggle-tag.active").data("ismine"));
   });
 
   function updateTagCounters(){
@@ -440,6 +440,7 @@ $(document).ready(function () {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
         var _t = $("<li>").addClass("toggle-tag");
         _t.attr("data-tag", JSON_TAGS[i].name);
+        _t.attr("data-isMine", JSON_TAGS[i].is_mine);
         _t.html('<a href="javascript:void(0)"><i class="fa fa-tag"></i> ' + JSON_TAGS[i].name + '<span class="tag-counter badge pull-right">0</span></a>');
         if (JSON_TAGS[i].isMine){
           _t.insertAfter(".tag-mine-header");
@@ -630,12 +631,12 @@ $(document).ready(function () {
     if (_doc != null) {
       if (_doc.perms != null && _doc.perms.read != null){
         if (_doc.perms.read.users != null){
-          for (var i=0; i<_doc.perms.read.users.length;i++){
+          for (var i=0; i < _doc.perms.read.users.length; i++){
             addToShareList(map[_doc.perms.read.users[i].username]);
           }
         }
         if (_doc.perms.read.groups != null){
-          for (var i=0; i<_doc.perms.read.groups.length;i++){
+          for (var i=0; i < _doc.perms.read.groups.length; i++){
             addToShareList(map[_doc.perms.read.groups[i].name]);
           }
         }
@@ -714,9 +715,9 @@ $(document).ready(function () {
     }
 
     $.post("/desktop/api/doc/update_permissions", {
-      doc_id: $("#documentShareModal").data("document-id"),
-      data: JSON.stringify(_postPerms)
-    }, function (response) {
+        doc_id: $("#documentShareModal").data("document-id"),
+        data: JSON.stringify(_postPerms)
+      }, function (response) {
       $("#documentShareModal").modal("hide");
       if (response!=null){
         if (response.status == 0){
@@ -755,15 +756,21 @@ function isInTags(doc, tag) {
   return _inTags;
 }
 
-function populateTable(tag) {
+function populateTable(tag, isMine) {
   if (tag == null || tag == "") {
-    tag = "default"; //force default tag in case of empty
+    tag = "default"; // force default tag in case of empty
   }
+  if (isMine === undefined ) {
+    isMine = true; // default owner is current user
+  }
+
   $.totalStorage("hueHomeTags", tag);
   documentsTable.fnClearTable();
   documentsTable.fnDraw();
+
   $(JSON_DOCS).each(function (cnt, doc) {
-    if (((tag == ("trash") || tag == "history") || (tag != "trash" && tag != "history" && !isInTags(doc, "trash") && !isInTags(doc, "history"))) && isInTags(doc, tag)) {
+    // Need to simplify this
+    if (isMine == doc.isMine && ((tag == ("trash") || tag == "history") || (tag != "trash" && tag != "history" && !isInTags(doc, "trash") && !isInTags(doc, "history"))) && isInTags(doc, tag)) {
       addRow(doc);
     }
   });
@@ -781,10 +788,11 @@ function addRow(doc) {
       '<img src="' + doc.icon + '" width="80%"/>',
       '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
       emptyStringIfNull(doc.description),
-      '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>',
+      doc.isMine ? '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>' : '<div class="documentTags">' + _tags + '</div>',
       emptyStringIfNull(doc.owner),
       emptyStringIfNull(doc.lastModified),
-      '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' + doc.name + '" data-placement="left" style="padding-left:10px"><i class="fa fa-share-square-o"></i></a>',
+      doc.isMine ? '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' +
+        doc.name + '" data-placement="left" style="padding-left:10px"><i class="fa fa-share-square-o"></i></a>' : '<i class="fa fa-user"></i>',
     ], false);
     $("td", documentsTable.fnGetNodes(_addedRow[0]))[5].setAttribute("data-sort-value", doc.lastModifiedInMillis); // a bit of black magic.
   }

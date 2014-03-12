@@ -239,7 +239,7 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
     user = super(DemoBackend, self).authenticate(username, password)
 
     if not user:
-      username = self._randome_name()
+      username = self._random_name()
 
       user = find_or_create_user(username, None)
 
@@ -258,7 +258,7 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
     user = rewrite_user(user)
     return user
 
-  def _randome_name(self):
+  def _random_name(self):
     import string
     import random
 

@@ -57,18 +57,7 @@ class Settings(models.Model):
 class DocumentTagManager(models.Manager):
 
   def get_tags(self, user):
-    # For now, the only shared tag is from 'sample' user and is named 'example'
-    # Tag permissions will come later.
-    # Share Tag from shared document will come later.
-    tags = self
-
-    try:
-      sample_user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
-      tags = tags.filter(Q(owner=user) | Q(owner=sample_user, tag=DocumentTag.EXAMPLE))
-    except:
-      tags = tags.filter(owner=user)
-
-    return tags.distinct()
+    return self.filter(owner=user).distinct()
 
   def create_tag(self, owner, tag_name):
     if tag_name in DocumentTag.RESERVED:
@@ -120,6 +109,7 @@ class DocumentTagManager(models.Manager):
       raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
 
     doc = Document.objects.get_doc(doc_id, owner=owner)
+    doc.can_write_or_exception(owner)
     doc.remove_tag(tag)
 
   def delete_tag(self, tag_id, owner):
@@ -135,8 +125,8 @@ class DocumentTagManager(models.Manager):
       doc.add_tag(default_tag)
 
   def update_tags(self, owner, doc_id, tag_ids):
-    # TODO secu
     doc = Document.objects.get_doc(doc_id, owner)
+    doc.can_write_or_exception(owner)
 
     for tag in doc.tags.all():
       if tag.tag not in DocumentTag.RESERVED:
@@ -175,6 +165,7 @@ class DocumentTag(models.Model):
 class DocumentManager(models.Manager):
 
   def documents(self, user):
+    # Check for READ perm only, not write
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all())).distinct()
 
   def get_docs(self, user, model_class=None, extra=None):
