@@ -135,7 +135,7 @@ class TestDocModelTags():
     response = self.client.post("/desktop/api/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})
     content = json.loads(response.content)
 
-    assert_equal(0, content['status'])
+    assert_equal(0, content['status'], content)
     assert_equal([
         {"id": default_tag.id, "name": "default"},
         {"id": tag1_id, "name": "update_tags_1"},

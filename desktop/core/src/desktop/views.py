@@ -40,7 +40,7 @@ from desktop.lib.django_util import login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences, Settings, Document, DocumentTag
+from desktop.models import UserPreferences, Settings, Document
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
@@ -56,7 +56,7 @@ def home(request):
       Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
   )
   docs = list(docs)
-  tags = DocumentTag.objects.get_tags(user=request.user)
+  tags = list(set([tag for doc in docs for tag in doc.tags.all()])) # List of all personal and share tags
 
   apps = appmanager.get_apps_dict(request.user)
 
