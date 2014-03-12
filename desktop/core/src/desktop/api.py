@@ -20,6 +20,7 @@ import logging
 import json
 import time
 
+from collections import defaultdict
 
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
@@ -50,6 +51,81 @@ def list_tags(request):
   tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
+def massaged_tags_for_json2(tags, user):
+  ts = {
+    'trash': [],
+    'history': [],
+    'mine': [],
+    'notmine': [],
+  }
+  
+  ts['trash'].append(massaged_tags(DocumentTag.objects.get_trash_tag(user)))
+  ts['history'].append(massaged_tags(DocumentTag.objects.get_history_tag(user)))
+
+  for tag in tags:
+    massaged_tag = massaged_tags(tag)
+    if tag.owner == user:
+      ts['mine'].append(massaged_tag)
+    else:
+      ts['notmine'].append(massaged_tag)
+
+  return ts
+
+def massaged_tags(tag):
+  return {
+    'id': tag.id,
+    'name': tag.tag,
+    'owner': tag.owner.username,
+  }
+
+def massaged_documents_for_json2(documents, user):
+  docs = {'mydocs': defaultdict(list), 'shared_docs': defaultdict(list),}
+  tags = {}
+  
+  trash_tag = DocumentTag.objects.get_trash_tag(user)
+  history_tag = DocumentTag.objects.get_history_tag(user)
+  
+  tags[trash_tag.id] = {'owner': trash_tag.owner.username, 'owner_id': trash_tag.owner.id, 'name': trash_tag.tag}
+  tags[history_tag.id] = {'owner': history_tag.owner.username, 'owner_id': history_tag.owner.id, 'name': history_tag.tag}
+  
+  for doc in documents:
+    if doc.is_trashed():
+      docs['mydocs'][trash_tag.id].append(massage_doc_for_json2(doc))
+    elif doc.is_historic():
+      docs['mydocs'][history_tag.id].append(massage_doc_for_json2(doc))   
+    elif doc.owner.username == user.username: 
+      for tag in doc.tags.all():
+        docs['mydocs'][tag.id].append(massage_doc_for_json2(doc))
+        tags[tag.id] = {'owner': tag.owner.username, 'owner_id': tag.owner.id, 'name': tag.tag} 
+    else:
+      for tag in doc.tags.all():
+        docs['shared_docs'][tag.id].append(massage_doc_for_json2(doc)) 
+        tags[tag.id] = {'owner': tag.owner.username, 'owner_id': tag.owner.id, 'name': tag.tag}
+      
+  return {'docs': docs, 'tags': tags}
+
+
+def massage_doc_for_json2(doc):
+  perms = doc.list_permissions()
+  
+  return {
+      'id': doc.id,
+      'contentType': doc.content_type.name,
+      'icon': doc.icon,
+      'name': doc.name,
+      'url': doc.content_object.get_absolute_url(),
+      'description': doc.description,
+      'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
+      'perms': {
+#        'read': {
+#          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
+#          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
+#        }
+      },
+      'owner': doc.owner.username,
+      'lastModified': doc.last_modified.strftime("%x %X"),
+      'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
+    }
 
 def massaged_documents_for_json(documents, user):
   return [massage_doc_for_json(doc, user) for doc in documents]

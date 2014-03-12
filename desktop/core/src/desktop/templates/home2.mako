@@ -1,0 +1,271 @@
+## Licensed to Cloudera, Inc. under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  Cloudera, Inc. licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+<%!
+  from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
+%>
+
+${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
+
+<style type="text/css">
+  .sidebar-nav img {
+    margin-right: 6px;
+  }
+
+  .sidebar-nav .dropdown-menu a {
+    padding-left: 6px;
+  }
+
+  .tag {
+    float: left;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  #trashCounter, #historyCounter {
+    margin-top: 3px;
+  }
+
+  .tag-counter {
+    margin-top: 2px;
+  }
+
+  .toggle-tag, .document-tags-modal-checkbox, .tags-modal-checkbox {
+    cursor: pointer;
+  }
+
+  .badge-left {
+    border-radius: 9px 0px 0px 9px;
+    padding-right: 5px;
+  }
+
+  .badge-right {
+    border-radius: 0px 9px 9px 0px;
+    padding-left: 5px;
+  }
+
+  .airy li {
+    margin-bottom: 6px;
+  }
+
+  .trash-share {
+    cursor: pointer;
+  }
+
+</style>
+
+<div class="navbar navbar-inverse navbar-fixed-top nokids">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="${ url('desktop.views.home') }">
+              <img src="/static/art/home.png" />
+              ${ _('My documents') }
+            </a>
+           </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+         <ul class="nav nav-list">
+          <li class="nav-header">${_('Actions')}</li>
+           <li class="dropdown">
+              <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
+              <ul class="dropdown-menu" role="menu">
+                % if 'beeswax' in apps:
+                <li><a href="${ url('beeswax:index') }"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive Query')}</a></li>
+                % endif
+                % if 'impala' in apps:
+                <li><a href="${ url('impala:index') }"><img src="${ apps['impala'].icon_path }"/> ${_('Impala Query')}</a></li>
+                % endif
+                % if 'pig' in apps:
+                <li><a href="${ url('beeswax:index') }"><img src="${ apps['pig'].icon_path }"/> ${_('Pig Script')}</a></li>
+                % endif
+                % if 'spark' in apps:
+                <li><a href="${ url('spark:index') }"><img src="${ apps['spark'].icon_path }"/> ${_('Spark Job')}</a></li>
+                % endif
+                % if 'oozie' in apps:
+                <li class="dropdown-submenu">
+                  <a href="#"><img src="${ apps['oozie'].icon_path }"/> ${_('Oozie Scheduler')}</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="${ url('oozie:create_workflow') }"><img src="/oozie/static/art/icon_oozie_workflow_24.png"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:create_coordinator') }"><img src="/oozie/static/art/icon_oozie_coordinator_24.png"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:create_bundle') }"><img src="/oozie/static/art/icon_oozie_bundle_24.png"/> ${_('Bundle')}</a></li>
+                  </ul>
+                </li>
+                % endif
+              </ul>
+           </li>
+           <div data-bind="template: { name: 'tag-template', data: trash }"></div>
+           <div data-bind="template: { name: 'tag-template', data: history }"></div>
+           <li class="nav-header tag-mine-header">
+             ${_('My Projects')}
+             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }">
+               <i class="fa fa-pencil" data-bind="click: editTags"></i>
+             </div>
+           </li>
+           <div data-bind="template: { name: 'tag-template', foreach: myTags }"></div>
+           <li data-bind="visible: myTags().length == 0">
+             <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
+               <i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}
+             </a>
+           </li>
+          <li class="nav-header tag-shared-header">
+            ${_('Shared with me')}
+          </li>
+          <div data-bind="template: { name: 'tag-template', foreach: sharedTags }"></div>
+          <li data-bind="visible: sharedTags().length == 0">
+            <a href="javascript:void(0)" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects shared with you.')}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="span10">
+      <div class="card card-home" style="margin-top: 0">
+        <input type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px" id="filterInput">
+        <h2 class="card-heading simple">${_('My Documents')}</h2>
+
+        <div class="card-body">
+          <p>
+          <table id="datatables" class="table table-striped table-condensed datatables" data-tablescroller-disable="true">
+            <thead>
+              <tr>
+                <th>&nbsp;</th>
+                <th>${_('Name')}</th>
+                <th>${_('Description')}</th>
+                <th>${_('Projects')}</th>
+                <th>${_('Owner')}</th>
+                <th>${_('Last Modified')}</th>
+                <th>${_('Sharing')}</th>
+              </tr>
+            </thead>
+            <tbody data-bind="template: { name: 'document-template', foreach: documents }">
+            </tbody>
+          </table>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script type="text/html" id="tag-template">
+  <li class="toggle-tag" data-bind="click: $root.filterDocs">
+    <a href="javascript:void(0)">
+      <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
+    </a>
+  </li>
+</script>
+
+<script type="text/html" id="document-template">
+  <tr>
+    <td><img data-bind="attr: { src: icon }" width="80%"></td>
+    <td><a data-bind="attr: { href: url }, text: name"></a></td>
+    <td></td>
+    <td>
+      <div class="documentTags">
+        <span class="badge">history</span>
+      </div>
+    </td>
+    <td data-bind="text: owner"></td>
+    <td data-bind="text: lastModified"></td>
+    <td>
+      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-original-title="${ _("Share My saved query") }">
+        <i data-bind="visible: isMine" class="fa fa-share-square-o"></i>
+        <i data-bind="visible: ! isMine" class="fa fa-user"></i>
+      </a>
+    </td>
+  </tr>
+</script>
+
+<div id="tagsModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Manage projects')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <div data-bind="template: { name: 'tag-edit-template', foreach: myTags }"></div>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">
+        <div class="input-append">
+          <input id="tagsNew" type="text">
+          <a id="tagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+    <a id="removeTags" href="#" class="btn btn-danger disable-feedback">${_('Remove selected')}</a>
+  </div>
+</div>
+
+
+<script type="text/html" id="tag-edit-template">
+  <div style="margin-right:10px;margin-bottom: 6px;float:left;">
+    <span class="tags-modal-checkbox badge">
+       <i class="fa fa-trash-o hide"></i> <span data-bind="text: name"></span>
+    </span>
+  </div>
+</script>
+
+<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/home.vm.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function () {
+  var viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
+  ko.applyBindings(viewModel);
+
+  $("#tagsNewBtn").on("click", function () {
+    var tag_name = $("#tagsNew").val(); // use ko var + bind enable/disable button accordingly (blank, duplicate, reserved...)?
+    $.post("/desktop/api/tag/add_tag", {
+      name: tag_name
+    }, function (data) {
+      viewModel.createTag(data);
+      $("#tagsNew").val("");
+      $(document).trigger("info", "${_('Tag created')}");
+    }).fail(function(xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+    });
+  });
+});
+
+function editTags() {
+  // reset selected tags
+  $("#tagsModal").modal("show"); 
+}
+</script>
+
+
+${ commonfooter(messages) | n,unicode }

@@ -44,11 +44,31 @@ from desktop.models import UserPreferences, Settings, Document, DocumentTag
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json, massaged_documents_for_json2, massaged_tags_for_json2
 
 
 LOG = logging.getLogger(__name__)
 
+def home2(request):
+  docs = itertools.chain(
+      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
+      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
+  )
+  docs = list(docs)
+  tags = list(set([tag for doc in docs for tag in doc.tags.all()])) # List of all personal and shared tags
+
+  apps = appmanager.get_apps_dict(request.user)
+
+  #print json.dumps(massaged_documents_for_json2(docs, request.user))
+#  for a, v in massaged_documents_for_json2(docs, request.user)['docs']['mydocs'].iteritems():
+#    print a
+#    print v
+  return render('home2.mako', request, {
+    'apps': apps,
+    'documents': massaged_documents_for_json2(docs, request.user),
+    'json_documents': json.dumps(massaged_documents_for_json2(docs, request.user)),
+    'json_tags': json.dumps(massaged_tags_for_json2(tags, request.user))
+  })
 
 def home(request):
   docs = itertools.chain(

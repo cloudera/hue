@@ -472,7 +472,9 @@ $(document).ready(function () {
     var _tags = "";
     for (var i = 0; i < JSON_TAGS.length; i++) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="fa fa-trash-o hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
+        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;">' + 
+            '<span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '" data-ismine="' + JSON_TAGS[i].isMine + '">' +
+            '<i class="fa fa-trash-o hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
       }
     }
     $("#tagsModalList").html(_tags);
@@ -487,7 +489,10 @@ $(document).ready(function () {
       for (var i = 0; i < JSON_TAGS.length; i++) {
         if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
           var _inTags = isInTags(_doc, JSON_TAGS[i].name);
-          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="fa fa-check-circle' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
+          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' +
+              (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id +
+              '" data-ismine="' + JSON_TAGS[i].isMine + '">' +
+              '<i class="fa fa-check-circle' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
         }
       }
       $("#documentTagsModalList").html(_tags);
