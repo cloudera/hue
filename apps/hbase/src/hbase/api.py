@@ -146,6 +146,10 @@ class HbaseApi(object):
   def deleteColumn(self, cluster, tableName, row, column):
     return self.deleteColumns(cluster, tableName, smart_str(row), [column])
 
+  def deleteAllRow(self, cluster, tableName, row, attributes):
+    client = self.connectCluster(cluster)
+    return client.deleteAllRow(tableName, smart_str(row), attributes)
+
   def putRow(self, cluster, tableName, row, data):
     client = self.connectCluster(cluster)
     mutations = []
