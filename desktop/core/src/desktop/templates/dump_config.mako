@@ -14,7 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## Note that this is similar to the config_dump management command.
 <%!
 from desktop.lib.conf import BoundContainer, is_anonymous
 from desktop.views import commonheader, commonfooter
@@ -24,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="about_layout.mako" />
 
 ${ commonheader(_('Configuration'), "about", user) | n,unicode }
-${layout.menubar(section='dump_config')}
+${ layout.menubar(section='dump_config') }
 
 <style type="text/css">
   #installedApps {
@@ -54,7 +53,11 @@ ${layout.menubar(section='dump_config')}
             <p>
             <ul id="installedAppsz" class="nav nav-pills">
             % for app in apps:
-                <li><a href="/${app.display_name}">${app.name}</a></li>
+                % if app.menu_index != 999:
+                  <li><a href="/${app.display_name if app.menu_index != 999 else ''}">${app.name}</a></li>
+                % else:
+                  <li><a>${app.name}</a></li>
+                % endif
             % endfor
             </ul>
            </p>
