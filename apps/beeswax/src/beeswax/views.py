@@ -37,6 +37,7 @@ from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_unicode
 from desktop.models import Document
 
 from jobsub.parameterization import find_variables
@@ -463,7 +464,8 @@ def view_results(request, id, first_row=0):
       # TODO: use Number + list comprehension
       for row in results.rows():
         escaped_row = []
-        for field in row:          
+        for field in row:
+          field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
           if isinstance(field, (int, long, float, complex, bool)):
             escaped_field = field
           elif field is None:
