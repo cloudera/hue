@@ -51,24 +51,44 @@ def list_tags(request):
   tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
-def massaged_tags_for_json2(tags, user):
+def massaged_tags_for_json2(docs, user):
+  """
+    var TAGS_DEFAULTS = {
+    'history': {'name': 'History', 'id': 1, 'docs': [1], 'type': 'history'},
+    'trash': {'name': 'Trash', 'id': 3, 'docs': [2]},
+    'mine': [{'name': 'default', 'id': 2, 'docs': [3]}, {'name': 'web', 'id': 3, 'docs': [3]}],
+    'notmine': [{'name': 'example', 'id': 20, 'docs': [10]}, {'name': 'ex2', 'id': 30, 'docs': [10, 11]}]
+  };        
+  """  
   ts = {
-    'trash': [],
-    'history': [],
+    'trash': {},
+    'history': {},
     'mine': [],
     'notmine': [],
   }
+  sharers = defaultdict(list)
   
-  ts['trash'].append(massaged_tags(DocumentTag.objects.get_trash_tag(user)))
-  ts['history'].append(massaged_tags(DocumentTag.objects.get_history_tag(user)))
+  trash_tag = DocumentTag.objects.get_trash_tag(user)
+  history_tag = DocumentTag.objects.get_history_tag(user)
+  ts['trash'] = massaged_tags(trash_tag)
+  ts['history'] = massaged_tags(history_tag)
+
+  tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and share tags
 
   for tag in tags:
     massaged_tag = massaged_tags(tag)
-    if tag.owner == user:
+    if tag == trash_tag:
+      ts['trash'] = massaged_tag
+    elif tag == history_tag:
+      ts['history'] = massaged_tag    
+    elif tag.owner == user:
       ts['mine'].append(massaged_tag)
     else:
-      ts['notmine'].append(massaged_tag)
+      sharers[tag.owner].append(massaged_tag)
+  
+  ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.iteritems()]
 
+  print ts
   return ts
 
 def massaged_tags(tag):
@@ -76,33 +96,64 @@ def massaged_tags(tag):
     'id': tag.id,
     'name': tag.tag,
     'owner': tag.owner.username,
+    'docs': list(tag.document_set.exclude(name='pig-app-hue-script').values_list('id', flat=True)) # Could get with one request groupy
   }
 
 def massaged_documents_for_json2(documents, user):
-  docs = {'mydocs': defaultdict(list), 'shared_docs': defaultdict(list),}
-  tags = {}
+  """
+  var DOCUMENTS_DEFAULTS = {
+    '1': {
+      'id': 1,
+      'name': 'my query history', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
+      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
+    },
+    '2': {
+      'id': 2,
+      'name': 'my query 2 trashed', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
+      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
+     },
+     '3': {
+       'id': 3,
+       'name': 'my query 3 tagged twice', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
+     'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
+     },
+    '10': {
+      'id': 10,
+      'name': 'my query 3 shared', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
+      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
+     },
+    '11': {
+      'id': 11,
+      'name': 'my query 4 shared', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
+      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
+     }
+  };
+  """
+  docs = {}
   
-  trash_tag = DocumentTag.objects.get_trash_tag(user)
-  history_tag = DocumentTag.objects.get_history_tag(user)
+  for document in documents:
+    perms = document.list_permissions()
+    docs[document.id] = {
+      'id': document.id,
+      'contentType': document.content_type.name,
+      'icon': document.icon,
+      'name': document.name,
+      'url': document.content_object.get_absolute_url(),
+      'description': document.description,
+      'tags': [{'id': tag.id, 'name': tag.tag} for tag in document.tags.all()],
+      'perms': { # un-used so far
+        'read': {
+          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
+          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
+        }
+      },
+      'owner': document.owner.username,
+      'isMine': document.owner.username == user.username,
+      'lastModified': document.last_modified.strftime("%x %X"),
+      'lastModifiedInMillis': time.mktime(document.last_modified.timetuple())
+   }
   
-  tags[trash_tag.id] = {'owner': trash_tag.owner.username, 'owner_id': trash_tag.owner.id, 'name': trash_tag.tag}
-  tags[history_tag.id] = {'owner': history_tag.owner.username, 'owner_id': history_tag.owner.id, 'name': history_tag.tag}
-  
-  for doc in documents:
-    if doc.is_trashed():
-      docs['mydocs'][trash_tag.id].append(massage_doc_for_json2(doc))
-    elif doc.is_historic():
-      docs['mydocs'][history_tag.id].append(massage_doc_for_json2(doc))   
-    elif doc.owner.username == user.username: 
-      for tag in doc.tags.all():
-        docs['mydocs'][tag.id].append(massage_doc_for_json2(doc))
-        tags[tag.id] = {'owner': tag.owner.username, 'owner_id': tag.owner.id, 'name': tag.tag} 
-    else:
-      for tag in doc.tags.all():
-        docs['shared_docs'][tag.id].append(massage_doc_for_json2(doc)) 
-        tags[tag.id] = {'owner': tag.owner.username, 'owner_id': tag.owner.id, 'name': tag.tag}
-      
-  return {'docs': docs, 'tags': tags}
+  return docs
 
 
 def massage_doc_for_json2(doc):

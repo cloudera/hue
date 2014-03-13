@@ -134,7 +134,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <li class="nav-header tag-shared-header">
             ${_('Shared with me')}
           </li>
-          <div data-bind="template: { name: 'tag-template', foreach: sharedTags }"></div>
+          <div data-bind="template: { name: 'tag-sharer-template', foreach: sharedTags }"></div>          
           <li data-bind="visible: sharedTags().length == 0">
             <a href="javascript:void(0)" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects shared with you.')}
             </a>
@@ -189,8 +189,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td><a data-bind="attr: { href: url }, text: name"></a></td>
     <td></td>
     <td>
-      <div class="documentTags">
-        <span class="badge">history</span>
+      <div class="documentTags" data-bind="foreach: tags">
+        <span class="badge" data-bind="text: name"></span>
       </div>
     </td>
     <td data-bind="text: owner"></td>
@@ -228,10 +228,20 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 </div>
 
 
+<script type="text/html" id="tag-sharer-template">
+  <div style="margin-right:10px;margin-bottom: 6px;float:left;">
+    <span class="tags-modal-checkbox badge">
+       <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span>
+    </span>
+    <div data-bind="template: { name: 'tag-template', foreach: projects }"></div>
+  </div>
+</script>
+
+
 <script type="text/html" id="tag-edit-template">
   <div style="margin-right:10px;margin-bottom: 6px;float:left;">
     <span class="tags-modal-checkbox badge">
-       <i class="fa fa-trash-o hide"></i> <span data-bind="text: name"></span>
+       <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span>
     </span>
   </div>
 </script>

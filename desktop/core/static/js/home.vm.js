@@ -18,14 +18,17 @@
 function HomeViewModel(json_tags, json_docs) {
   var self = this;
 
-  var TAGS_DEFAULTS = {
+  var MOCK_TAGS = {
     'history': {'name': 'History', 'id': 1, 'docs': [1], 'type': 'history'},
     'trash': {'name': 'Trash', 'id': 3, 'docs': [2]},
     'mine': [{'name': 'default', 'id': 2, 'docs': [3]}, {'name': 'web', 'id': 3, 'docs': [3]}],
-    'notmine': [{'name': 'example', 'id': 20, 'docs': [10]}, {'name': 'ex2', 'id': 30, 'docs': [10, 11]}]
+    'notmine': [
+       {'name': 'romain', 'projects': [{'name': 'example', 'id': 20, 'docs': [10]}, {'name': 'ex2', 'id': 30, 'docs': [10, 11]}]},
+       {'name': 'pai', 'projects': [{'name': 'example2', 'id': 20, 'docs': [10]}]}
+     ]
   };
 
-  var DOCUMENTS_DEFAULTS = {
+  var MOCK_DOCUMENTS = {
     '1': {
       'id': 1,
       'name': 'my query history', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
@@ -54,8 +57,9 @@ function HomeViewModel(json_tags, json_docs) {
   };
 
 
-  self.tags = ko.mapping.fromJS(TAGS_DEFAULTS);
-  self.documents = ko.observableArray([]);
+  var ALL_DOCUMENTS = json_docs;
+  self.tags = ko.mapping.fromJS(json_tags);
+  self.documents = ko.observableArray([]);  
   
   self.editTagsToCreate = ko.observableArray([]);
   self.editTagsToDelete = ko.observableArray([]);
@@ -78,7 +82,7 @@ function HomeViewModel(json_tags, json_docs) {
 
   self.filterDocs = function(tag) {
     self.documents.removeAll();
-    $.each(DOCUMENTS_DEFAULTS, function(id, doc) {
+    $.each(ALL_DOCUMENTS, function(id, doc) {
       if (tag.docs().indexOf(parseInt(id)) != -1) { // Beware, keys are strings in js
     	self.documents.push(doc); // pushall?
       }

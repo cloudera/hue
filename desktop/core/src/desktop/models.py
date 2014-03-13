@@ -200,6 +200,12 @@ class DocumentManager(models.Manager):
 
     return Document.objects.get_docs(user, model_class).exclude(tags__in=exclude).order_by('-last_modified')
 
+  def history_docs(self, model_class, user):
+    include = [DocumentTag.objects.get_history_tag(user=user)]
+    exclude = [DocumentTag.objects.get_trash_tag(user=user)]    
+
+    return Document.objects.get_docs(user, model_class).filter(tags__in=include).exclude(tags__in=exclude).order_by('-last_modified')
+
   def available(self, model_class, user, with_history=False):
     docs = self.available_docs(model_class, user, with_history)
 

@@ -62,7 +62,7 @@ class OozieApi:
       oozie_wf = _submit_workflow(self.user, self.fs, self.jt, workflow, mapping)
     finally:
       if workflow:
-        workflow.delete()
+        workflow.delete(skip_trash=True)
 
     return oozie_wf
 
