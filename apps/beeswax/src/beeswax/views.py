@@ -36,6 +36,7 @@ from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_unicode
 
 from jobsub.parameterization import find_variables, substitute_variables
 
@@ -652,6 +653,7 @@ def view_results(request, id, first_row=0):
           elif field is None:
             escaped_field = 'NULL'
           else:
+            field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
             escaped_field = escape(field)
           escaped_row.append(escaped_field)
         data.append(escaped_row)
