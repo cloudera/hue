@@ -147,3 +147,10 @@ AUTHORIZE_URL_LINKEDIN = Config(
       type=str,
       default="https://api.linkedin.com/v1/people/~"
     )
+
+WHITELISTED_DOMAINS_GOOGLE = Config(
+    key="whitelisted_domains_google",
+    help=_t("Comma-separated list of whitelisted domains."),
+    type=coerce_csv,
+    default=''
+)
