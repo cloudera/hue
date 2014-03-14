@@ -2321,6 +2321,7 @@ $(document).ready(function () {
     $('#queryContainer').hide();
     $('#resizePanel').hide();
     $('a[href="#query"]').parent().hide();
+    $('a[href="#recentTab"]').parent().hide();
     if ($('#querySide').hasClass('span10')) {
       $('#querySide').removeClass('span10');
     }
