@@ -150,7 +150,7 @@ AUTHORIZE_URL_LINKEDIN = Config(
 
 WHITELISTED_DOMAINS_GOOGLE = Config(
     key="whitelisted_domains_google",
-    help=_t("The whitelisted domains."),
-    type=list,
+    help=_t("Comma-separated list of whitelisted domains."),
+    type=coerce_csv,
     default=''
 )
