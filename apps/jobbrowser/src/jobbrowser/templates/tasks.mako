@@ -91,7 +91,7 @@ ${ comps.menubar() }
           <td>${t.taskId_short}</td>
           <td>${t.taskType}</td>
           <td>
-            <div class="bar">${ "%d" % (t.progress * 100) }%</div>
+            <div class="bar">${ "%d" % (t.progress) }%</div>
           </td>
           <td>
             <a href="${ url('jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"

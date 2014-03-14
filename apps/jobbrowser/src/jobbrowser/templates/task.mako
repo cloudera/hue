@@ -81,7 +81,7 @@ ${ comps.menubar() }
                     <tr>
                       <td data-row-selector-exclude="true"><a href="${ url('jobbrowser.views.single_task_attempt_logs', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a></td>
                       <td><a title="${_('View this attempt')}" href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
-                      <td>${"%d" % (attempt.progress * 100)}%</td>
+                      <td>${"%d" % (attempt.progress)}%</td>
                       <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
                       <td>
                         % if task.is_mr2:
@@ -145,7 +145,7 @@ ${ comps.menubar() }
                     </tr>
                     <tr>
                       <td>${_('Progress')}</td>
-                      <td>${"%d" % (task.progress * 100)}%</td>
+                      <td>${"%d" % (task.progress)}%</td>
                     </tr>
                   </tbody>
                 </table>
