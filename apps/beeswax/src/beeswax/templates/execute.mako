@@ -1136,7 +1136,7 @@ $(document).ready(function () {
           _table.find("a:eq(0)").on("click", function () {
             var tableUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table");
             $("#navigatorQuicklook").find(".tableName").text(table);
-            $("#navigatorQuicklook").find(".tableLink").attr("href", tableUrl);
+            $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.database() + "/" + table);
             $("#navigatorQuicklook").find(".sample").empty("");
             $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
             $.ajax({

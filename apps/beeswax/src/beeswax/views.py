@@ -465,13 +465,13 @@ def view_results(request, id, first_row=0):
       for row in results.rows():
         escaped_row = []
         for field in row:
-          field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
           if isinstance(field, (int, long, float, complex, bool)):
             escaped_field = field
           elif field is None:
             escaped_field = 'NULL'
           else:
-            escaped_field = escape(field)              
+            field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
+            escaped_field = escape(field)
           escaped_row.append(escaped_field)
         data.append(escaped_row)
 

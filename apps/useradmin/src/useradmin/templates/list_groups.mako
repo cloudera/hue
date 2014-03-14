@@ -42,9 +42,9 @@ ${layout.menubar(section='groups')}
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
+          <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
+              class="fa fa-plus-circle"></i> ${_('Add group')}</a>
           % if is_ldap_setup:
-            <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
-                class="fa fa-plus-circle"></i> ${_('Add group')}</a>
             <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
                 class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
           % endif
