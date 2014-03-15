@@ -199,8 +199,20 @@ class TestDocModelPermissions():
 
     # Share by user
     response = self.client.post("/desktop/api/doc/update_permissions", {
-        'doc_id': doc.id,
-        'data': json.dumps({'read': {'user_ids': [self.user.id, self.user_not_me.id], 'group_ids': []}})
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id,
+            self.user_not_me.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
@@ -212,8 +224,19 @@ class TestDocModelPermissions():
 
     # Un-share
     response = self.client.post("/desktop/api/doc/update_permissions", {
-        'doc_id': doc.id,
-        'data': json.dumps({'read': {'user_ids': [self.user.id], 'group_ids': []}})
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
@@ -227,8 +250,21 @@ class TestDocModelPermissions():
     default_group = get_default_user_group()
 
     response = self.client.post("/desktop/api/doc/update_permissions", {
-        'doc_id': doc.id,
-        'data': json.dumps({'read': {'user_ids': [self.user.id], 'group_ids': [default_group.id]}})
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': [
+            default_group.id
+          ]
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
@@ -237,3 +273,127 @@ class TestDocModelPermissions():
     assert_true(doc_id in json.loads(response.context['json_documents']))
     response = self.client_not_me.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
+
+    # Un-share
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+    response = self.client_not_me.get('/home')
+    assert_false(doc_id in json.loads(response.context['json_documents']))
+
+    # Modify by user
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [
+            self.user_not_me.id
+          ],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+    response = self.client_not_me.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+
+    # Un-share
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+    response = self.client_not_me.get('/home')
+    assert_false(doc_id in json.loads(response.context['json_documents']))
+
+    # Modify by group
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': [
+            default_group.id
+          ]
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+    response = self.client_not_me.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+
+    # Un-share
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id
+          ],
+          'group_ids': []
+        },
+        'modify': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client.get('/home')
+    assert_true(doc_id in json.loads(response.context['json_documents']))
+    response = self.client_not_me.get('/home')
+    assert_false(doc_id in json.loads(response.context['json_documents']))

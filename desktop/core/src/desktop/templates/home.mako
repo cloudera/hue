@@ -84,6 +84,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     color: #338bb8!important;
   }
 
+  #documentShareModal .modal-body {
+    overflow-y: initial;
+  }
+
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -330,26 +334,34 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   <div class="modal-body">
     <p>
       <div class="row-fluid">
-        <div class="span6">
-          <h4 class="muted" style="margin-top:0px">${_('Users')}</h4>
-          <div data-bind="visible: selectedDoc().perms.read.users.length == 0">${_('The document is not shared with any user.')}</div>
-          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
-            <li><span class="badge badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeUserShare"><i class="fa fa-times-circle"></i></span></li>
-          </ul>
-        </div>
-        <div class="span6">
-          <h4 class="muted" style="margin-top:0px">${_('Groups')}</h4>
-          <div data-bind="visible: selectedDoc().perms.read.groups.length == 0">${_('The document is not shared with any group.')}</div>
-          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
-            <li><span class="badge badge-left"><i class="fa fa-users"></i> <span data-bind="text: name"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeGroupShare"><i class="fa fa-times-circle"></i></span></li>
-          </ul>
-        </div>
+        <div data-bind="visible: permsEmpty">${_('The document is not shared with any one.')}</div>
+        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
+          <li><i class="fa fa-users"></i> ${ _('Users from') } <span data-bind="text: name"></span> ${ _('may access this document') }</span><span class="trash-share" data-bind="click: removeGroupReadShare"> <i class="fa fa-times"></i></li>
+        </ul>
+        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.groups">
+          <li><i class="fa fa-users"></i> ${ _('Users from') } <span data-bind="text: name"></span> ${ _('may modify this document') }</span><span class="trash-share" data-bind="click: removeGroupModifyShare"> <i class="fa fa-times"></i></li>
+        </ul>
+        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
+          <li><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"> ${ _('may access this document') }</span></span><span class="trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
+        </ul>
+        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.users">
+          <li><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span> ${ _('may modify this document') }</span><span class="trash-share" data-bind="click: removeUserModifyShare"> <i class="fa fa-times"></i></li>
+        </ul>
       </div>
       <div class="clearfix"></div>
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="documentShareTypeahead" type="text" style="width: 460px" placeholder="${_('You can type a username or a group')}">
-          <a id="documentShareAddBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
+          <div class="btn-group">
+            <a id="documentShareAddBtn" class="btn"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPermLabel"></span></a>
+            <a class="btn dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'read')" href="javascript:void(0)">${ _('Read') }</a></li>
+              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'modify')" href="javascript:void(0)">${ _('Modify') }</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </p>
@@ -483,10 +495,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     function handleTypeaheadSelection() {
       if (selectedUserOrGroup != null) {
         if (selectedUserOrGroup.hasOwnProperty("username")) {
-          viewModel.selectedDoc().perms.read.users.push(selectedUserOrGroup);
+          viewModel.selectedDoc().perms[viewModel.selectedPerm()].users.push(selectedUserOrGroup);
         }
         else {
-          viewModel.selectedDoc().perms.read.groups.push(selectedUserOrGroup);
+          viewModel.selectedDoc().perms[viewModel.selectedPerm()].groups.push(selectedUserOrGroup);
         }
         viewModel.selectedDoc.valueHasMutated();
         shareDocFinal();
@@ -557,7 +569,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     $("#documentShareModal").modal("show");
   }
 
-  function removeUserShare(user) {
+  function removeUserReadShare(user) {
     $(viewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
       if (item.id == user.id) {
         viewModel.selectedDoc().perms.read.users.splice(cnt, 1);
@@ -567,7 +579,17 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     shareDocFinal();
   }
 
-  function removeGroupShare(group) {
+  function removeUserModifyShare(user) {
+    $(viewModel.selectedDoc().perms.modify.users).each(function (cnt, item) {
+      if (item.id == user.id) {
+        viewModel.selectedDoc().perms.modify.users.splice(cnt, 1);
+      }
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
+  }
+
+  function removeGroupReadShare(group) {
     $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
       if (item.id == group.id) {
         viewModel.selectedDoc().perms.read.groups.splice(cnt, 1);
@@ -577,9 +599,27 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     shareDocFinal();
   }
 
+  function removeGroupModifyShare(group) {
+    $(viewModel.selectedDoc().perms.modify.groups).each(function (cnt, item) {
+      if (item.id == group.id) {
+        viewModel.selectedDoc().perms.modify.groups.splice(cnt, 1);
+      }
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
+  }
+
+  function changeDocumentSharePerm(perm) {
+    viewModel.selectedPerm(perm);
+  }
+
   function shareDocFinal() {
     var _postPerms = {
       read: {
+        user_ids: [],
+        group_ids: []
+      },
+      modify: {
         user_ids: [],
         group_ids: []
       }
@@ -591,6 +631,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
     $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
       _postPerms.read.group_ids.push(item.id);
+    });
+
+    $(viewModel.selectedDoc().perms.modify.users).each(function (cnt, item) {
+      _postPerms.modify.user_ids.push(item.id);
+    });
+
+    $(viewModel.selectedDoc().perms.modify.groups).each(function (cnt, item) {
+      _postPerms.modify.group_ids.push(item.id);
     });
 
     $.post("/desktop/api/doc/update_permissions", {

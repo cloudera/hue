@@ -644,7 +644,7 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
       return None
 
   if owner_only:
-    design.doc.get().can_write_or_exception(request.user)
+    design.doc.get().can_modify_or_exception(request.user)
   else:
     design.doc.get().can_read_or_exception(request.user)
 

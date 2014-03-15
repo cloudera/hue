@@ -128,7 +128,8 @@ def massaged_documents_for_json(documents, user):
   docs = {}
 
   for document in documents:
-    perms = document.list_permissions()
+    read_perms = document.list_permissions(perm='read')
+    modify_perms = document.list_permissions(perm='modify')
     docs[document.id] = {
       'id': document.id,
       'contentType': document.content_type.name,
@@ -139,8 +140,12 @@ def massaged_documents_for_json(documents, user):
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in document.tags.all()],
       'perms': {
         'read': {
-          'users': [{'id': friends.id, 'username': friends.username} for friends in perms.users.all()],
-          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in read_perms.groups.all()]
+        },
+        'modify': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in modify_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in modify_perms.groups.all()]
         }
       },
       'owner': document.owner.username,
@@ -153,7 +158,8 @@ def massaged_documents_for_json(documents, user):
 
 
 def massage_doc_for_json(doc, user):
-  perms = doc.list_permissions()
+  read_perms = doc.list_permissions(perm='read')
+  modify_perms = doc.list_permissions(perm='modify')
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -164,8 +170,12 @@ def massage_doc_for_json(doc, user):
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
       'perms': {
         'read': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in perms.groups.all()]
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in read_perms.groups.all()]
+        },
+        'modify': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in modify_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in modify_perms.groups.all()]
         }
       },
       'owner': doc.owner.username,
@@ -257,6 +267,7 @@ def update_permissions(request):
       response['status'] = 0
       response['doc'] = massage_doc_for_json(doc, request.user)
     except Exception, e:
+      LOG.exception(e.message)
       response['message'] = force_unicode(e)
   else:
     response['message'] = _('POST request only')

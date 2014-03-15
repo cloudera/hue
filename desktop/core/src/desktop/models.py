@@ -165,7 +165,6 @@ class DocumentTag(models.Model):
 class DocumentManager(models.Manager):
 
   def documents(self, user):
-    # Check for READ perm only, not write
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all())).distinct()
 
   def get_docs(self, user, model_class=None, extra=None):
@@ -361,11 +360,11 @@ class Document(models.Model):
 
   def is_editable(self, user):
     """Deprecated by can_read"""
-    return self.can_write(user)
+    return self.can_modify(user)
 
   def can_edit_or_exception(self, user, exception_class=PopupException):
-    """Deprecated by can_write_or_exception"""
-    return self.can_write_or_exception(user, exception_class)
+    """Deprecated by can_modify_or_exception"""
+    return self.can_modify_or_exception(user, exception_class)
 
   def add_tag(self, tag):
     self.tags.add(tag)
@@ -393,14 +392,14 @@ class Document(models.Model):
     #default_tag = DocumentTag.objects.get_default_tag(user=self.owner)
     #self.tags.remove(default_tag)
 
-  def share_to_default(self):
-    DocumentPermission.objects.share_to_default(self)
+  def share_to_default(self, name='read'):
+    DocumentPermission.objects.share_to_default(self, name=name)
 
   def can_read(self, user):
     return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
-  def can_write(self, user):
-    return user.is_superuser or self.owner == user
+  def can_modify(self, user):
+    return user.is_superuser or self.owner == user or user in self.list_permissions('modify').users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
@@ -408,11 +407,15 @@ class Document(models.Model):
     else:
       raise exception_class(_('Only superusers and %s are allowed to read this document.') % user)
 
-  def can_write_or_exception(self, user, exception_class=PopupException):
-    if self.can_write(user):
+  def can_modify_or_exception(self, user, exception_class=PopupException):
+    if self.can_modify(user):
       return True
     else:
       raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user)
+
+  def can_write_or_exception(self, user, exception_class=PopupException):
+    """ Deprecated by can_modify_or_exception """
+    return self.can_modify_or_exception(user, exception_class)
 
   def copy(self, name=None, owner=None):
     copy_doc = self
@@ -480,26 +483,40 @@ class Document(models.Model):
 
       if perm.get('group_ids'):
         groups = auth_models.Group.objects.in_bulk(perm.get('group_ids'))
+      else:
+        groups = []
 
       DocumentPermission.objects.sync(document=self, name=name, users=users, groups=groups)
 
-  def list_permissions(self):
-    return DocumentPermission.objects.list(document=self)
+  def list_permissions(self, perm='read'):
+    return DocumentPermission.objects.list(document=self, perm=perm)
 
 
 class DocumentPermissionManager(models.Manager):
 
-  def share_to_default(self, document):
+  def _check_perm(self, name):
+    perms = (DocumentPermission.READ_PERM, DocumentPermission.MODIFY_PERM)
+    if name not in perms:
+      perms_string = ' and '.join(', '.join(perms).rsplit(', ', 1))
+      raise PopupException(_('Only %s permissions are supported, not %s.') % (perms_string, name))
+
+
+  def share_to_default(self, document, name='read'):
     from useradmin.models import get_default_user_group # Remove build dependency
-    perm, created = DocumentPermission.objects.get_or_create(doc=document)
+    
+    self._check_perm(name)
+
+    if name == DocumentPermission.MODIFY_PERM:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.MODIFY_PERM)
+    else:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
     default_group = get_default_user_group()
 
     if default_group:
       perm.groups.add(default_group)
 
   def update(self, document, name='read', users=None, groups=None, add=True):
-    if name != DocumentPermission.READ_PERM:
-      raise PopupException(_('Only %s permissions is supported, not %s.') % (DocumentPermission.READ_PERM, name))
+    self._check_perm(name)
 
     perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
 
@@ -519,8 +536,7 @@ class DocumentPermissionManager(models.Manager):
       perm.delete()
 
   def sync(self, document, name='read', users=None, groups=None):
-    if name != DocumentPermission.READ_PERM:
-      raise PopupException(_('Only %s permissions is supported, not %s.') % (DocumentPermission.READ_PERM, name))
+    self._check_perm(name)
 
     perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
 
@@ -537,12 +553,12 @@ class DocumentPermissionManager(models.Manager):
     if not users and not groups:
       perm.delete()
 
-  def list(self, document):
+  def list(self, document, perm='read'):
     try:
-      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
-    except DocumentPermission.MultipleObjectsReturned, ex:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=perm)
+    except DocumentPermission.MultipleObjectsReturned:
       # We can delete duplicate perms of a document
-      dups = DocumentPermission.objects.filter(doc=document, perms=DocumentPermission.READ_PERM)
+      dups = DocumentPermission.objects.filter(doc=document, perms=perm)
       perm = dups[0]
       for dup in dups[1:]:
         LOG.warn('Deleting duplicate %s' % dup)
@@ -552,12 +568,17 @@ class DocumentPermissionManager(models.Manager):
 
 class DocumentPermission(models.Model):
   READ_PERM = 'read'
+  MODIFY_PERM = 'modify'
 
   doc = models.ForeignKey(Document)
 
   users = models.ManyToManyField(auth_models.User, db_index=True)
   groups = models.ManyToManyField(auth_models.Group, db_index=True)
-  perms = models.TextField(default=READ_PERM, choices=((READ_PERM, 'read'),))
+  # @TODO(Abe): Rename to "perm"
+  perms = models.TextField(default=READ_PERM, choices=(
+    (READ_PERM, 'read'),
+    (MODIFY_PERM, 'modify'),
+  ))
 
 
   objects = DocumentPermissionManager()
