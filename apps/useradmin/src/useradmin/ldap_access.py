@@ -308,6 +308,39 @@ class LdapConnection(object):
     else:
       return []
 
+  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=ldap.SCOPE_SUBTREE):
+    if ldap_filter and not ldap_filter.startswith('('):
+      ldap_filter = '(' + ldap_filter + ')'
+
+    # Allow wild cards on non distinguished names
+    dn = ldap.filter.escape_filter_chars(dn).replace(r'\2a', r'*')
+    # Fix issue where \, is converted to \5c,
+    dn = dn.replace(r'\5c,', r'\2c')
+
+    search_dn, _ = self._get_search_params(dn, search_attr)
+    ldap_filter = '(&%(ldap_filter)s(|(isMemberOf=%(group_dn)s)(memberOf=%(group_dn)s)))' % {'group_dn': dn, 'ldap_filter': ldap_filter}
+    attrlist = ['objectClass', 'isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', search_attr]
+
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
+    result_type, result_data = self.ldap_handle.result(ldap_result_id)
+
+    if result_type == ldap.RES_SEARCH_RESULT:
+      return result_data
+    else:
+      return []
+
+  def find_users_of_group(self, dn):
+    ldap_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
+    name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+    result_data = self.find_members_of_group(dn, name_attr, ldap_filter)
+    return self._transform_find_user_results(result_data, name_attr)
+
+  def find_groups_of_group(self, dn):
+    ldap_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
+    name_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
+    result_data = self.find_members_of_group(dn, name_attr, ldap_filter)
+    return self._transform_find_group_results(result_data, name_attr)
+
   def _get_root_dn(self):
     """
     Returns the configured base DN (DC=desktop,DC=local).

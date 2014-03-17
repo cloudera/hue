@@ -65,6 +65,8 @@ variables.
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 pytype = type
 
+from django.utils.encoding import smart_str
+
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
 import configobj
@@ -598,6 +600,11 @@ def initialize(modules, config_dir):
 
 def is_anonymous(key):
   return key == _ANONYMOUS
+
+
+def coerce_str_lowercase(value):
+  return smart_str(value).lower()
+
 
 def coerce_bool(value):
   if isinstance(value, bool):

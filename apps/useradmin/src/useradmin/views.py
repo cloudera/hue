@@ -29,6 +29,7 @@ from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from django.core.urlresolvers import reverse
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.forms.util import ErrorList
 from django.shortcuts import redirect
@@ -39,7 +40,7 @@ from desktop.conf import LDAP
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
-from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm,\
+from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm,AddLdapSuboordinateGroupsForm,\
   AddLdapUsersForm, PermissionsEditForm, GroupEditForm, SuperUserChangeForm,\
   UserChangeForm
 
@@ -348,13 +349,18 @@ def add_ldap_groups(request):
   if not request.user.is_superuser:
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
 
+  if desktop.conf.LDAP.SUBGROUPS.get() == 'suboordinate':
+    FormClass = AddLdapSuboordinateGroupsForm
+  else:
+    FormClass = AddLdapGroupsForm
+
   if request.method == 'POST':
-    form = AddLdapGroupsForm(request.POST)
+    form = FormClass(request.POST)
     if form.is_valid():
       groupname_pattern = form.cleaned_data['groupname_pattern']
       import_by_dn = form.cleaned_data['dn']
       import_members = form.cleaned_data['import_members']
-      import_members_recursive = form.cleaned_data['import_members_recursive']
+      import_members_recursive = form.cleaned_data.get('import_members_recursive', False)
       try:
         groups = import_ldap_groups(groupname_pattern, import_members=import_members, import_members_recursive=import_members_recursive, sync_users=True, import_by_dn=import_by_dn)
       except ldap.LDAPError, e:
@@ -368,7 +374,7 @@ def add_ldap_groups(request):
         errors.append(_('Could not get LDAP details for groups in pattern %s') % groupname_pattern)
 
   else:
-    form = AddLdapGroupsForm()
+    form = FormClass()
 
   return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
 
@@ -568,6 +574,37 @@ def _import_ldap_users_info(user_info, sync_groups=False, import_by_dn=False):
   return imported_users
 
 
+def _import_ldap_members(conn, group, ldap_info, count=0):
+  if count >= desktop.conf.LDAP.NESTED_MEMBERS_SEARCH_DEPTH.get():
+    return None
+
+  user_set = set()
+  group_set = set()
+
+  # Find all users and groups of group.
+  users_info = conn.find_users_of_group(ldap_info['dn'])
+  groups_info = conn.find_groups_of_group(ldap_info['dn'])
+  for user_info in users_info:
+    LOG.debug("Importing user %s" % smart_str(user_info['dn']))
+    users = _import_ldap_users(smart_str(user_info['dn']), import_by_dn=True)
+    group.user_set.add(*users)
+    user_set |= set(users)
+  for group_info in groups_info:
+    LOG.debug("Importing group %s" % smart_str(group_info['dn']))
+    group_set |= set(_import_ldap_groups(smart_str(group_info['dn']), import_by_dn=True))
+
+    # Must find all members of subgroups
+    if len(group_set) > 1:
+      LOG.warn('Found multiple groups for member %s.' % smart_str(group_info['dn']))
+    else:
+      for group in group_set:
+        new_user_set, new_group_set = _import_ldap_members(conn, group, group_info, count+1)
+        user_set |= new_user_set
+        group_set |= new_group_set
+
+  return user_set, group_set
+
+
 def _import_ldap_groups(groupname_pattern, import_members=False, recursive_import_members=False, sync_users=True, import_by_dn=False):
   """
   Import a group from LDAP. If import_members is true, this will also import any
@@ -601,21 +638,26 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
     # Find members and posix members for group and subgoups
     members = ldap_info['members']
     posix_members = ldap_info['posix_members']
-    if recursive_import_members:
-      sub_group_info = conn.find_groups(ldap_info['dn'], find_by_dn=True)
-      for sub_ldap_info in sub_group_info:
-        members.extend(sub_ldap_info['members'])
-        posix_members.extend(sub_ldap_info['posix_members'])
 
-    # Import/fetch users
-    for member in members:
-      users = []
-
+    # @TODO: Deprecate recursive_import_members as it may not be useful.
+    if desktop.conf.LDAP.SUBGROUPS.get() == 'suboordinate':
       if import_members:
-        LOG.debug("Importing user %s" % str(member))
-        users = _import_ldap_users(member, import_by_dn=True)
+        if recursive_import_members:
+          for sub_ldap_info in conn.find_groups(ldap_info['dn'], find_by_dn=True):
+            members += sub_ldap_info['members']
+            posix_members += sub_ldap_info['posix_members']
 
-      elif sync_users:
+        for member in members:
+          LOG.debug("Importing user %s" % smart_str(member))
+          group.user_set.add( *( _import_ldap_users(member, import_by_dn=True) or [] ) )
+    else:
+      # Import users and groups
+      if import_members:
+        new_users_set, new_groups_set = _import_ldap_members(conn, group, ldap_info)
+
+    # Sync users
+    if sync_users:
+      for member in members:
         user_info = conn.find_users(member, find_by_dn=True)
         if len(user_info) > 1:
           LOG.warn('Found multiple users for member %s.' % member)
@@ -623,41 +665,37 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
           for ldap_info in user_info:
             try:
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
-              users.append(user)
+              group.user_set.add(user)
             except User.DoesNotExist:
               pass
 
-      if users:
-        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(member), str(users), str(group.name)))
-        group.user_set.add(*users)
-
-
-    # Import/fetch posix users
-    for posix_member in posix_members:
-      users = []
-
+    # Import/fetch posix users and groups
+    # Posix members
+    if posix_members:
       if import_members:
-        LOG.debug("Importing user %s" % str(posix_member))
-        # posixGroup class defines 'memberUid' to be login names,
-        # which are defined by 'uid'.
-        user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-        users = _import_ldap_users_info(user_info, import_by_dn=False)
+        for posix_member in posix_members:
+          LOG.debug("Importing user %s" % str(posix_member))
+          # posixGroup class defines 'memberUid' to be login names,
+          # which are defined by 'uid'.
+          user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+          users = _import_ldap_users_info(user_info, import_by_dn=False)
 
-      elif sync_users:
-        user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-        if len(user_info) > 1:
-          LOG.warn('Found multiple users for member %s.' % member)
-        else:
-          for ldap_info in user_info:
-            try:
-              user = ldap_access.get_ldap_user(username=ldap_info['username'])
-              users.append(user)
-            except User.DoesNotExist:
-              pass
+          if users:
+            LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+            group.user_set.add(*users)
 
-      if users:
-        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
-        group.user_set.add(*users)
+      if sync_users:
+        for posix_member in posix_members:
+          user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+          if len(user_info) > 1:
+            LOG.warn('Found multiple users for member %s.' % posix_member)
+          else:
+            for ldap_info in user_info:
+              try:
+                user = ldap_access.get_ldap_user(username=ldap_info['username'])
+                group.user_set.add(user)
+              except User.DoesNotExist:
+                pass
 
     group.save()
     groups.append(group)
