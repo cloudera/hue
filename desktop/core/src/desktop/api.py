@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
 import logging
 import json
 import time
@@ -32,12 +33,21 @@ LOG = logging.getLogger(__name__)
 
 
 def list_docs(request):
-  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
+  docs = itertools.chain(
+      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
+      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
+  )
+  docs = list(docs)
   return HttpResponse(json.dumps(massaged_documents_for_json(docs, request.user)), mimetype="application/json")
 
 
 def list_tags(request):
-  tags = DocumentTag.objects.get_tags(user=request.user)
+  docs = itertools.chain(
+      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
+      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
+  )
+  docs = list(docs)
+  tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
 

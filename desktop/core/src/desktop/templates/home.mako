@@ -133,9 +133,11 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               % endif
             % endfor
           % endif
-          % if not has_tag:
-            <li><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}</a></li>
-          % endif
+          <li class="no-tags-mine
+           % if has_tag:
+            hide
+           % endif
+          "><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}</a></li>
           <li class="nav-header tag-shared-header">
             ${_('Shared with me')}
           </li>
@@ -148,9 +150,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               % endif
             % endfor
           % endif
-          % if not has_tag:
-            <li><a href="javascript:void(0)" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects shared with you.')}</a></li>
-          % endif
+          <li class="no-tags-shared
+           % if has_tag:
+            hide
+           % endif
+          "><a href="javascript:void(0)" style="line-height:24px">${_('There are currently no projects shared with you.')}</a></li>
+
         </ul>
       </div>
 
@@ -436,11 +441,13 @@ $(document).ready(function () {
       _selected = $(".toggle-tag.active").data("tag");
     }
     $(".toggle-tag").remove();
+    var _tagMineCnt = 0;
+    var _tagSharedCnt = 0;
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
         var _t = $("<li>").addClass("toggle-tag");
         _t.attr("data-tag", JSON_TAGS[i].name);
-        _t.attr("data-isMine", JSON_TAGS[i].is_mine);
+        _t.attr("data-ismine", JSON_TAGS[i].isMine);
         _t.html('<a href="javascript:void(0)"><i class="fa fa-tag"></i> ' + JSON_TAGS[i].name + '<span class="tag-counter badge pull-right">0</span></a>');
         if (JSON_TAGS[i].isMine){
           _t.insertAfter(".tag-mine-header");
