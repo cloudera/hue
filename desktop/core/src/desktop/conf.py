@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
-                             validate_path, list_of_compiled_res
+                             validate_path, list_of_compiled_res, coerce_str_lowercase
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -394,7 +394,19 @@ LDAP = ConfigSection(
     FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
       help=_("Force usernames to lowercase when creating new users from LDAP."),
       type=coerce_bool,
+      private=True,
       default=False),
+
+    SUBGROUPS = Config("subgroups",
+      private=True,
+      help=_("Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."),
+      type=coerce_str_lowercase,
+      default="nested"),
+    NESTED_MEMBERS_SEARCH_DEPTH = Config("nested_members_search_depth",
+      private=True,
+      help=_("Define the number of levels to search for nested members."),
+      type=int,
+      default=10),
 
     USERS = ConfigSection(
       key="users",
