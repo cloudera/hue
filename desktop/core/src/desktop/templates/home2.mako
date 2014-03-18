@@ -65,6 +65,16 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     cursor: pointer;
   }
 
+  .white {
+    padding: 9px 18px;
+    margin-top: 1px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #737373;
+    text-overflow: ellipsis;
+  }
+
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -117,15 +127,18 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <div data-bind="template: { name: 'tag-template', data: trash }"></div>
-           <div data-bind="template: { name: 'tag-template', data: history }"></div>
+           <!-- ko template: { name: 'tag-template', data: history } -->
+           <!-- /ko -->
+           <!-- ko template: { name: 'tag-template', data: trash } -->
+           <!-- /ko -->
            <li class="nav-header tag-mine-header">
              ${_('My Projects')}
              <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }">
                <i class="fa fa-pencil" data-bind="click: editTags"></i>
              </div>
            </li>
-           <div data-bind="template: { name: 'tag-template', foreach: myTags }"></div>
+           <!-- ko template: { name: 'tag-template', foreach: myTags } -->
+           <!-- /ko -->
            <li data-bind="visible: myTags().length == 0">
              <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
                <i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}
@@ -134,7 +147,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <li class="nav-header tag-shared-header">
             ${_('Shared with me')}
           </li>
-          <div data-bind="template: { name: 'tag-sharer-template', foreach: sharedTags }"></div>          
+          <!-- ko template: { name: 'shared-tag-template', foreach: sharedTags } -->
+          <!-- /ko -->
           <li data-bind="visible: sharedTags().length == 0">
             <a href="javascript:void(0)" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects shared with you.')}
             </a>
@@ -146,26 +160,29 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
     <div class="span10">
       <div class="card card-home" style="margin-top: 0">
-        <input type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px" id="filterInput">
+        <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px">
         <h2 class="card-heading simple">${_('My Documents')}</h2>
 
         <div class="card-body">
           <p>
-          <table id="datatables" class="table table-striped table-condensed datatables" data-tablescroller-disable="true">
+          <table class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
             <thead>
               <tr>
-                <th>&nbsp;</th>
-                <th>${_('Name')}</th>
+                <th style="width: 26px">&nbsp;</th>
+                <th style="width: 200px">${_('Name')}</th>
                 <th>${_('Description')}</th>
-                <th>${_('Projects')}</th>
-                <th>${_('Owner')}</th>
-                <th>${_('Last Modified')}</th>
-                <th>${_('Sharing')}</th>
+                <th style="width: 150px">${_('Projects')}</th>
+                <th style="width: 100px">${_('Owner')}</th>
+                <th style="width: 150px">${_('Last Modified')}</th>
+                <th style="width: 40px">${_('Sharing')}</th>
               </tr>
             </thead>
             <tbody data-bind="template: { name: 'document-template', foreach: documents }">
             </tbody>
           </table>
+          <div data-bind="visible: documents().length == 0">
+            <h4 style="color: #777; margin-bottom: 30px">${_('There are currently no documents in this project or tag.')}</h4>
+          </div>
           </p>
         </div>
       </div>
@@ -176,18 +193,31 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 <script type="text/html" id="tag-template">
-  <li class="toggle-tag" data-bind="click: $root.filterDocs">
+  <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
     <a href="javascript:void(0)">
-      <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
+      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
     </a>
   </li>
 </script>
 
+<script type="text/html" id="shared-tag-template">
+  <li class="white">
+    <i class="fa fa-user"></i> <span data-bind="text: name"></span>
+  </li>
+  <!-- ko foreach: projects-->
+  <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
+    <a href="javascript:void(0)">
+      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
+    </a>
+  </li>
+  <!-- /ko -->
+</script>
+
 <script type="text/html" id="document-template">
   <tr>
-    <td><img data-bind="attr: { src: icon }" width="80%"></td>
+    <td style="width: 26px"><img data-bind="attr: { src: icon }"></td>
     <td><a data-bind="attr: { href: url }, text: name"></a></td>
-    <td></td>
+    <td data-bind="text: description"></td>
     <td>
       <div class="documentTags" data-bind="foreach: tags">
         <span class="badge" data-bind="text: name"></span>
@@ -195,7 +225,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     </td>
     <td data-bind="text: owner"></td>
     <td data-bind="text: lastModified"></td>
-    <td>
+    <td style="width: 40px; text-align: center">
       <a rel="tooltip" data-placement="left" style="padding-left:10px" data-original-title="${ _("Share My saved query") }">
         <i data-bind="visible: isMine" class="fa fa-share-square-o"></i>
         <i data-bind="visible: ! isMine" class="fa fa-user"></i>
@@ -253,28 +283,47 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
-$(document).ready(function () {
-  var viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
-  ko.applyBindings(viewModel);
+  var viewModel;
+  $(document).ready(function () {
+    viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
+    ko.applyBindings(viewModel);
 
-  $("#tagsNewBtn").on("click", function () {
-    var tag_name = $("#tagsNew").val(); // use ko var + bind enable/disable button accordingly (blank, duplicate, reserved...)?
-    $.post("/desktop/api/tag/add_tag", {
-      name: tag_name
-    }, function (data) {
-      viewModel.createTag(data);
-      $("#tagsNew").val("");
-      $(document).trigger("info", "${_('Tag created')}");
-    }).fail(function(xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+    viewModel.selectedTag.subscribe(function (value) {
+      $.totalStorage("hueHomeSelectedTag", value.id());
+    });
+
+    if ($.totalStorage("hueHomeSelectedTag") != null) {
+      var _preselectedTag = viewModel.getTagById($.totalStorage("hueHomeSelectedTag"));
+      if (_preselectedTag != null) {
+        viewModel.filterDocs(_preselectedTag);
+      }
+    }
+    else {
+      viewModel.filterDocs(viewModel.history());
+    }
+
+    $("#searchInput").jHueDelayedInput(function () {
+      viewModel.searchDocs($("#searchInput").val());
+    });
+
+    $("#tagsNewBtn").on("click", function () {
+      var tag_name = $("#tagsNew").val(); // use ko var + bind enable/disable button accordingly (blank, duplicate, reserved...)?
+      $.post("/desktop/api/tag/add_tag", {
+        name: tag_name
+      },function (data) {
+        viewModel.createTag(data);
+        $("#tagsNew").val("");
+        $(document).trigger("info", "${_('Project created')}");
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+      });
     });
   });
-});
 
-function editTags() {
-  // reset selected tags
-  $("#tagsModal").modal("show"); 
-}
+  function editTags() {
+    // reset selected tags
+    $("#tagsModal").modal("show");
+  }
 </script>
 
 
