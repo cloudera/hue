@@ -948,7 +948,7 @@ ${layout.menubar(section='query')}
 var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent;
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
+var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
 
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   if (data != null && data.error) {
@@ -1347,6 +1347,10 @@ $(document).ready(function () {
       codeMirror.execCommand("autocomplete");
     }
   };
+
+  $(document).on("error.autocomplete", function(){
+    $(".CodeMirror-spinner").remove();
+  });
 
   function splitStatements(hql) {
     var statements = [];
