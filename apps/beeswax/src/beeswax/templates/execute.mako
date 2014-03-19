@@ -1292,7 +1292,7 @@ function reinitializeTable(max) {
 $(document).ready(function () {
   $.jHueScrollUp();
 
-  var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
+  var queryPlaceholder = $("<span>").html($("<span>").html("${_('Example: SELECT * FROM tablename, or press CTRL + space')}").text()).text();
 
   $("#executeQuery").tooltip({
     title: '${_("Press \"tab\", then \"enter\".")}'
