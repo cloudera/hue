@@ -21,6 +21,10 @@
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 <style type="text/css">
+  .sidebar-nav {
+    margin-bottom: 10px;
+  }
+
   .sidebar-nav img {
     margin-right: 6px;
   }
@@ -35,12 +39,13 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-bottom: 4px;
   }
 
-  #trashCounter, #historyCounter {
+  .tag-counter {
     margin-top: 3px;
+    margin-right: 4px;
   }
 
-  .tag-counter {
-    margin-top: 2px;
+  .fa-times-circle:hover {
+    color: #d84a38;
   }
 
   .toggle-tag, .document-tags-modal-checkbox, .tags-modal-checkbox {
@@ -133,8 +138,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            <!-- /ko -->
            <li class="nav-header tag-mine-header">
              ${_('My Projects')}
-             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }">
-               <i class="fa fa-pencil" data-bind="click: editTags"></i>
+             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Create project') }" rel="tooltip" data-placement="right">
+               <i class="fa fa-plus-circle" data-bind="click: addTag"></i>
              </div>
            </li>
            <!-- ko template: { name: 'tag-template', foreach: myTags } -->
@@ -194,8 +199,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 <script type="text/html" id="tag-template">
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
-    <a href="javascript:void(0)">
-      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
+    <a href="javascript:void(0)" style="padding-right: 4px">
+      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span>
+      <i data-bind="click: removeTag, visible: name() != 'trash' && name() != 'history'" class="pull-right fa fa-times-circle"></i>
+      <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
 </script>
@@ -207,7 +214,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   <!-- ko foreach: projects-->
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
     <a href="javascript:void(0)">
-      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right" data-bind="text: docs().length"></span>
+      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
   <!-- /ko -->
@@ -243,18 +250,47 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <p>
       <div data-bind="template: { name: 'tag-edit-template', foreach: myTags }"></div>
       <div class="clearfix"></div>
-      <div style="margin-top: 20px">
-        <div class="input-append">
-          <input id="tagsNew" type="text">
-          <a id="tagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
-        </div>
-      </div>
     </p>
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
     <a id="removeTags" href="#" class="btn btn-danger disable-feedback">${_('Remove selected')}</a>
   </div>
+</div>
+
+
+<div id="addTagModal" class="modal hide fade">
+  <form class="form-inline form-padding-fix" onsubmit="addTag()">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>${_('Create project')}</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+          <label>
+            ${_('Project name')} <input id="tagsNew" type="text" class="input-xlarge">
+          </label>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+      <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
+    </div>
+  </form>
+</div>
+
+<div id="removeTagModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Confirm Delete')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedForDelete().name"></span></strong>?</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a data-bind="click: removeTagFinal" class="btn btn-danger">${_('Yes')}</a>
+    </div>
 </div>
 
 
@@ -289,6 +325,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     ko.applyBindings(viewModel);
 
     viewModel.selectedTag.subscribe(function (value) {
+      $("#searchInput").val("");
       $.totalStorage("hueHomeSelectedTag", value.id());
     });
 
@@ -314,15 +351,42 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         viewModel.createTag(data);
         $("#tagsNew").val("");
         $(document).trigger("info", "${_('Project created')}");
+        $("#addTagModal").modal("hide");
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
       });
     });
+
+    $("a[rel='tooltip']").tooltip();
+
   });
 
-  function editTags() {
-    // reset selected tags
-    $("#tagsModal").modal("show");
+  function addTag() {
+    $("#addTagModal").modal("show");
+  }
+
+  function removeTag(tag) {
+    viewModel.selectedForDelete(tag);
+    $("#removeTagModal").modal("show");
+  }
+
+  function removeTagFinal() {
+    var tag = viewModel.selectedForDelete();
+    $.post("/desktop/api/tag/remove_tag", {
+      tag_id: tag.id()
+    }, function (response) {
+      if (response != null) {
+        if (response.status == 0) {
+          $(document).trigger("info", response.message);
+          $("#removeTagModal").modal("hide");
+          viewModel.removeTag(tag);
+          viewModel.filterDocs(viewModel.history());
+        }
+        else {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+        }
+      }
+    });
   }
 </script>
 

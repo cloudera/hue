@@ -73,6 +73,9 @@ function HomeViewModel(json_tags, json_docs) {
   self.editTagsToDelete = ko.observableArray([]);
 
   self.selectedTag = ko.observable("");
+  self.selectedForDelete = ko.observable({
+    name: ''
+  });
 
   self.trash = ko.computed(function () {
     return self.tags.trash;
@@ -146,7 +149,11 @@ function HomeViewModel(json_tags, json_docs) {
   }
 
   self.createTag = function (tag_json) {
-    var mapped_tag = ko.mapping.fromJS({'name': 'default2', 'id': 50, 'docs': [3]}); // todo
+    var mapped_tag = ko.mapping.fromJS(tag_json);
     self.tags.mine.push(mapped_tag);
+  }
+
+  self.removeTag = function (tag) {
+    self.tags.mine.remove(tag);
   }
 }

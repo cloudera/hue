@@ -88,7 +88,6 @@ def massaged_tags_for_json2(docs, user):
   
   ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.iteritems()]
 
-  print ts
   return ts
 
 def massaged_tags(tag):
@@ -229,7 +228,9 @@ def add_tag(request):
   if request.method == 'POST':
     try:
       tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
-      response['tag_id'] = tag.id
+      response['name'] = request.POST['name']
+      response['id'] = tag.id
+      response['docs'] = []
       response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
@@ -273,15 +274,13 @@ def update_tags(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def remove_tags(request):
+def remove_tag(request):
   response = {'status': -1, 'message': _('Error')}
 
   if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
     try:
-      for tag_id in request_json['tag_ids']:
-        DocumentTag.objects.delete_tag(tag_id, request.user)
-      response['message'] = _('Tag(s) removed!')
+      DocumentTag.objects.delete_tag(request.POST['tag_id'], request.user)
+      response['message'] = _('Tag removed!')
       response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
