@@ -19,6 +19,8 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
+  url(r'^index2$', 'index2', name='index2'),
+  url(r'^query2$', 'index2', name='query2'),
   url(r'^query$', 'index', name='query'),
   url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
 

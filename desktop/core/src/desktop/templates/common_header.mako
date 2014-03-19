@@ -324,7 +324,18 @@ from django.utils.translation import ugettext as _
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
     % if user.is_authenticated() and section != 'login':
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ url('desktop.views.home') }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+       <li class="dropdown">
+         <a title="${_('My documents')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle" href="${ url('desktop.views.home') }" style="padding-bottom:2px!important">
+           <i class="fa fa-home" style="font-size: 19px"></i>
+           Home
+           <b class="caret"></b>
+         </a>       
+         <ul role="menu" class="dropdown-menu">
+           <li><a href="${ url('desktop.views.home') }"><i class="fa fa-file"></i> ${_('Documents')}</a></li>
+           <li><a href="${ url('oozie:index') }"><img src="/oozie/static/art/icon_oozie_dashboard_24.png" /> ${_('Dashboards')}</a></li>
+           <li><a href="${ url('oozie:list_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_24.png" /> ${_('Reports')}</a></li>
+         </ul>
+       </li>         
        <%
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>
@@ -393,7 +404,7 @@ from django.utils.translation import ugettext as _
          <% collections = SearchController(user).get_search_collections() %>
          % if not collections:
            <li>
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
+             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">Search</a>
            </li>
          % else:
            <li class="dropdown">
@@ -405,7 +416,7 @@ from django.utils.translation import ugettext as _
              </ul>
            </li>
          % endif
-       % endif
+       % endif     
        % if other_apps:
        <li class="dropdown">
          <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>

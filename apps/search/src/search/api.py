@@ -91,6 +91,42 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+  #@demo_handler
+  def query2(self, solr_query, dd):
+
+      params = self._get_params() + (
+          ('q', solr_query['q'] or EMPTY_QUERY.get()),
+          ('wt', 'json'),
+          ('rows', solr_query['rows']),
+          ('start', solr_query['start']),
+      )
+
+      #params += hue_core.get_query(solr_query)
+      if dd:
+        params += (
+          ('facet', 'true'),
+          ('facet.mincount', 0),
+          ('facet.limit', 10),
+          ##('facet.sort', properties.get('sort')),
+        )
+        # {!ex=dt}
+        params += tuple([('facet.field', '{!ex=%s}%s' % (d['field'], d['field'])) for d in dd])
+
+
+      fqs = solr_query['fq'] #.split('|')
+      print 'fq'
+      print fqs
+      for fq, val in fqs.iteritems():
+        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:%s' % (fq, fq, val)))),)
+
+      if solr_query.get('fl'):
+        params += (('fl', urllib.unquote(utf_quoter(','.join(solr_query['fl'])))),)
+
+      response = self._root.get('%(collection)s/select' % solr_query, params)
+
+      return self._get_json(response)
+
+
   def suggest(self, solr_query, hue_core):
     try:
       params = self._get_params() + (
