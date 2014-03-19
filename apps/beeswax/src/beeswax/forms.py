@@ -104,7 +104,7 @@ class SaveResultsFileForm(forms.Form):
                                 help_text=_t("Path to file"))
   overwrite = forms.BooleanField(label=_t('Overwrite'),
                                  required=False,
-                                 help_text=_t("Overwrite the selected filed"))
+                                 help_text=_t("Overwrite the selected files"))
 
   def clean_target_file(self):
     if not self.cleaned_data['target_file'].startswith('/'):

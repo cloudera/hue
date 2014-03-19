@@ -178,7 +178,7 @@
           _toursHtml += '<li>' + _this.options.labels.NO_AVAILABLE_TOURS + '</li>';
         }
       }
-      if (_added > 0 && typeof $.totalStorage !== "undefined" && ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) && !RegExp("/accounts/login").test(location.pathname)) {
+      if (_added > 0 && typeof $.totalStorage !== "undefined" && ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) && RegExp("/home").test(location.pathname)) {
         $(document).ready(function () {
           $("#jHueTourModal").modal();
           $.totalStorage("jHueTourHideModal", true);
