@@ -1534,3 +1534,45 @@ a, a:hover, a:active, a:focus {
   -moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3) inset;
   box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3) inset;
 }
+
+.side-labels {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -sand-transform: rotate(90deg);
+  -webkit-transform-origin: 100% 0;
+  -moz-transform-origin: 100% 0;
+  -ms-transform-origin: 100% 0;
+  -o-transform-origin: 100% 0;
+  transform-origin: 100% 0;
+  display: block;
+  position: fixed;
+  top: 270px;
+  right: 30px;
+}
+
+.side-labels li {
+  font-size: 1em;
+  padding: 4px 16px !important;
+  cursor: pointer;
+  font-weight: 500;
+  border-top: 2px solid #FFF;
+}
+
+.side-labels li a {
+  color: #F0F0F0!important;
+}
+
+.side-labels li:hover a {
+  color: #FFF!important;
+  text-decoration: none;
+}
+
+.side-labels .feedback {
+  background-color: #338BB8;
+}
+
+.side-labels .feedback:hover {
+  border-top-color: #338BB8;
+}

@@ -421,6 +421,12 @@ from django.utils.translation import ugettext as _
 
 </div>
 
+% if is_demo:
+  <ul class="side-labels unstyled">
+    <li class="feedback"><a href="mailto:team@gethue.com?subject=Demo feedback"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
+  </ul>
+% endif
+
 <div id="jHueNotify" class="alert hide">
     <button class="close">&times;</button>
     <span class="message"></span>
