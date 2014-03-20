@@ -177,6 +177,7 @@ def get_design(request, design_id):
   node_dict['is_shared'] = workflow.is_shared
   node_dict['editable'] = workflow.owner.id == request.user.id
   node_dict['parameters'] = workflow.parameters
+  node_dict['description'] = workflow.description
   return render_json(node_dict, js_safe=True);
 
 
