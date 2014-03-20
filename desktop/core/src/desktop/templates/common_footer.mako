@@ -178,106 +178,10 @@ from django.template.defaultfilters import escape, escapejs
     %endif
 
 </script>
+
 % if tours_and_tutorials:
-
-<style type="text/css">
-  .steps {
-    min-height: 150px;
-  }
-</style>
-
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-  var currentStep = "tourStep1";
-
-  routie({
-    "tourStep1":function () {
-      showStep("tourStep1");
-    },
-    "tourStep2":function () {
-      showStep("tourStep2");
-    },
-    "tourStep3":function () {
-      showStep("tourStep3");
-    }
-  });
-
-  function showStep(step) {
-    currentStep = step;
-
-    $("a.tourStep").parent().removeClass("active");
-    $("a.tourStep[href=#" + step + "]").parent().addClass("active");
-    if (step == "tourStep3") {
-      $("#tourLastStep").parent().addClass("active");
-    }
-    $(".tourStepDetails").hide();
-    $("#" + step).show();
-  }
-});
-</script>
-
   <%include file="tours.mako"/>
-  <div id="jHueTourModal" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${_('Did you know?')}</h3>
-    </div>
-    <div class="modal-body">
-     <div class="row-fluid">
-       <div id="properties" class="section">
-      <ul class="nav nav-tabs" style="margin-bottom: 0">
-        <li class="active"><a href="#tourStep1" class="tourStep">${ _('Step 1:') } ${ _('Add data') }</a></li>
-        <li><a href="#tourStep2" class="tourStep">${ _('Step 2:') }  ${ _('Query data') }</a></li>
-        <li><a id="tourLastStep" href="#tourStep3" class="tourStep">${ _('Step 3:') } ${_('Do more!') }</a></li>
-      </ul>
-    </div>
-
-    <div class="tourSteps">
-      <div id="tourStep1" class="tourStepDetails">
-        <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-download"></i></div>
-        <div style="margin: 40px">
-          <p>
-            ${ _('With') }  <span class="badge badge-info"><i class="fa fa-file"></i> File Browser</span>
-            ${ _('and the apps in the') }  <span class="badge badge-info">Data Browsers <b class="caret"></b></span> ${ _('section, upload, view your data and create tables.') }
-          </p>
-          <p>
-            ${ _('Pre-installed samples are also already there.') }
-          </p>
-        </div>
-      </div>
-
-      <div id="tourStep2" class="tourStepDetails hide">
-          <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-search"></i></div>
-          <div style="margin: 40px">
-            <p>
-              ${ _('Then query and visualize the data with the') } <span class="badge badge-info">Query Editors <b class="caret"></b></span>
-               ${ _('and') }  <span class="badge badge-info">Search <b class="caret"></b></span>
-            </p>
-          </div>
-      </div>
-
-      <div id="tourStep3" class="tourStepDetails hide">
-        <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-flag-checkered"></i></div>
-        <div style="margin: 40px">
-          <p>
-            ${ _('Tours were created to guide you around.') }
-            ${ _('You can see the list of tours by clicking on the checkered flag icon') } <span class="badge badge-info"><i class="fa fa-flag-checkered"></i></span>
-            ${ ('at the top right of this page.') }
-          </p>
-          <p>
-            ${ _('More documentation is available at') } <a href="http://learn.gethue.com">learn.gethue.com</a>.
-          </p>
-        </div>
-      </div>
-     </div>
-     </div>
-     <div class="modal-footer">
-       <label class="checkbox" style="float:left"><input id="jHueTourModalChk" type="checkbox" />${_('Do not show this dialog again')}</label>
-       <a id="jHueTourModalClose" href="#" class="btn btn-primary disable-feedback">${_('Got it, prof!')}</a>
-     </div>
-   </div>
 % endif
+
   </body>
 </html>
