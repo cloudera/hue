@@ -362,7 +362,8 @@ def commonheader(title, section, user, padding="90px"):
     'title': title,
     'section': section,
     'padding': padding,
-    'user': user
+    'user': user,
+    'is_demo': desktop.conf.DEMO_ENABLED.get()
   })
 
 def commonfooter(messages=None):
