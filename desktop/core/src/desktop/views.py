@@ -67,7 +67,8 @@ def home(request):
     'documents': augment_docs(docs, request.user),
     'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
     'tags': augment_tags(tags, request.user),
-    'json_tags': json.dumps(massaged_tags_for_json(tags, request.user))
+    'json_tags': json.dumps(massaged_tags_for_json(tags, request.user)),
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
 def augment_docs(docs, user):
