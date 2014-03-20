@@ -8,7 +8,7 @@
 
     <xsl:text>[</xsl:text>
     <xsl:for-each select="*[local-name()='touchz']">
-      <xsl:text><![CDATA["]]></xsl:text><xsl:value-of select="@path" /><xsl:text><![CDATA["]]></xsl:text>
+      <xsl:text><![CDATA[{"name":"]]></xsl:text><xsl:value-of select="@path" /><xsl:text><![CDATA["}]]></xsl:text>
       <xsl:if  test="position() &lt; last()">
         <xsl:text>,</xsl:text>
       </xsl:if>

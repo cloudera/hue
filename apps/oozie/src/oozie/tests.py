@@ -2302,9 +2302,9 @@ class TestImportWorkflow04(OozieMockBase):
     node = Node.objects.get(workflow=workflow, node_type='fs').get_full_node()
     assert_equal('[{"path":"${nameNode}${output}/testfs/renamed","permissions":"700","recursive":"false"}]', node.chmods)
     assert_equal('[{"name":"${nameNode}${output}/testfs"}]', node.deletes)
-    assert_equal('["${nameNode}${output}/testfs","${nameNode}${output}/testfs/source"]', node.mkdirs)
+    assert_equal('[{"name":"${nameNode}${output}/testfs"},{"name":"${nameNode}${output}/testfs/source"}]', node.mkdirs)
     assert_equal('[{"source":"${nameNode}${output}/testfs/source","destination":"${nameNode}${output}/testfs/renamed"}]', node.moves)
-    assert_equal('["${nameNode}${output}/testfs/new_file"]', node.touchzs)
+    assert_equal('[{"name":"${nameNode}${output}/testfs/new_file"}]', node.touchzs)
     workflow.delete(skip_trash=True)
 
 
