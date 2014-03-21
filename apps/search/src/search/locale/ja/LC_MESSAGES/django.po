@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/search/api.py:81 src/search/api.py:94 src/search/api.py:105
-#: src/search/api.py:118 src/search/api.py:127 src/search/api.py:137
-#: src/search/api.py:147
+#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
+#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
+#: src/search/api.py:158 src/search/api.py:171
 msgid "Error while accessing Solr"
 msgstr "Solr へのアクセス中のエラー"
 
@@ -44,72 +44,81 @@ msgstr "パーミッションが拒否されました。管理者ではありま
 msgid "No live Solr collection or core by the name %s."
 msgstr "名前が %s のライブ Solr コレクションまたはコアがありません。"
 
-#: src/search/models.py:267
+#: src/search/models.py:261
 msgid "Solr index name pointing to"
 msgstr "Solr インデックス名が指している先"
 
-#: src/search/models.py:268
+#: src/search/models.py:262
 msgid "Friendlier name in UI"
 msgstr "UI のわかりやすい名前"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Collection with cores data"
 msgstr "コアデータを含むコレクション"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Solr json"
 msgstr "Solr JSON"
 
-#: src/search/models.py:272 src/search/templates/layout.mako:81
+#: src/search/models.py:266 src/search/templates/layout.mako:81
 msgid "Properties"
 msgstr "プロパティ"
 
-#: src/search/models.py:273
+#: src/search/models.py:267
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Hue プロパティ（例：ページ番号による結果）"
 
-#: src/search/search_controller.py:79
+#: src/search/search_controller.py:80
 #, python-format
-msgid "Collection type does not exit: %s"
+msgid "Collection type does not exist: %s"
 msgstr "コレクションタイプが存在しません：%s"
 
-#: src/search/search_controller.py:96
+#: src/search/search_controller.py:97
 msgid " (Copy)"
 msgstr " （コピー）"
 
-#: src/search/views.py:84
+#: src/search/views.py:80
 msgid "There is no collection to search."
 msgstr "検索するコレクションがありません。"
 
-#: src/search/views.py:108
+#: src/search/views.py:103
 msgid "No collection to download."
 msgstr "ダウンロードするコレクションがありません。"
 
-#: src/search/views.py:126 src/search/views.py:128
+#: src/search/views.py:121 src/search/views.py:123
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "検索結果をダウンロードできませんでした：%s"
 
-#: src/search/views.py:176
+#: src/search/views.py:171
 msgid "Collection(s) or core(s) imported successfully!"
 msgstr "コレクションまたはコアが正常にインポートされました。"
 
-#: src/search/views.py:179
+#: src/search/views.py:174
 msgid "There was an error importing the collection(s) or core(s)"
 msgstr "コレクションまたはコアのインポート中にエラーが発生しました"
 
-#: src/search/views.py:182
+#: src/search/views.py:177
 msgid "Collection(s) or core(s) partially imported"
 msgstr "コレクションまたはコアが部分的にインポートされました"
 
-#: src/search/views.py:220 src/search/views.py:234
+#: src/search/views.py:215 src/search/views.py:229
 msgid "POST request required."
 msgstr "POST 要求が必要です。"
 
-#: src/search/views.py:260
+#: src/search/views.py:255
 #, python-format
 msgid "Errors on the form: %s."
 msgstr "フォーム %s のエラー"
+
+#: src/search/views.py:295
+#, python-format
+msgid "No preview available, some facets are invalid: %s"
+msgstr "使用可能なプレビューがありません。一部のファセットが無効です：%s"
+
+#: src/search/views.py:402
+msgid "A POST request is required."
+msgstr "POST 要求が必要です。"
 
 #: src/search/templates/admin_collection_facets.mako:25
 #: src/search/templates/admin_collection_highlighting.mako:25
@@ -119,7 +128,7 @@ msgstr "フォーム %s のエラー"
 #: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
 #: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:28 src/search/templates/search.mako:59
+#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
 msgid "Search"
 msgstr "検索"
 
@@ -815,7 +824,7 @@ msgstr "コレクションは正常に削除されました。"
 msgid "Collection copied successfully."
 msgstr "コレクションは正常にコピーされました。"
 
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:55
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
 msgid "Collection manager"
 msgstr "Collection Manager"
 
@@ -864,85 +873,84 @@ msgstr "リツイート"
 msgid "It seems there is nothing to search on ..."
 msgstr "検索対象はないようです ..."
 
-#: src/search/templates/search.mako:54
+#: src/search/templates/search.mako:56
 msgid "Customize this collection"
 msgstr "このコレクションをカスタマイズ"
 
-#: src/search/templates/search.mako:211
+#: src/search/templates/search.mako:83
+msgid "XLS"
+msgstr "XLS"
+
+#: src/search/templates/search.mako:84
+msgid "CSV"
+msgstr "CSV"
+
+#: src/search/templates/search.mako:97
+msgid "A demo index is used. In order to be interactive, please "
+msgstr "デモのインデックスが使用されています。インタラクティブにするには、 "
+
+#: src/search/templates/search.mako:97
+msgid "create the indexes"
+msgstr "インデックスを"
+
+#: src/search/templates/search.mako:97
+msgid " in Solr."
+msgstr " Solr で作成してください。"
+
+#: src/search/templates/search.mako:220
 #, python-format
 msgid "Page %s of %s. Showing %s results (%s seconds)"
 msgstr "ページ %s／%s です。%s の結果を示しています（%s 秒）"
 
-#: src/search/templates/search.mako:277
+#: src/search/templates/search.mako:286
 msgid "Previous Page"
 msgstr "前のページ"
 
-#: src/search/templates/search.mako:293
+#: src/search/templates/search.mako:302
 msgid "Next Page"
 msgstr "次のページ"
 
-#: src/search/templates/search.mako:302
+#: src/search/templates/search.mako:311
 msgid "Your search"
 msgstr "検索内容"
 
-#: src/search/templates/search.mako:302
-#, python-format
+#: src/search/templates/search.mako:311
 msgid "did not match any documents."
 msgstr "一致するドキュメントがありませんでした。"
 
-#: src/search/templates/search.mako:304
+#: src/search/templates/search.mako:313
 msgid "Suggestions:"
 msgstr "提案："
 
-#: src/search/templates/search.mako:306
+#: src/search/templates/search.mako:315
 msgid "Make sure all words are spelled correctly."
 msgstr "すべての語句が正しく入力されていることを確認してください。"
 
-#: src/search/templates/search.mako:307
+#: src/search/templates/search.mako:316
 msgid "Try different keywords."
 msgstr "別のキーワードを試してみてください。"
 
-#: src/search/templates/search.mako:308
+#: src/search/templates/search.mako:317
 msgid "Try more general keywords."
 msgstr "より一般的なキーワードを試してみてください。"
 
-#: src/search/templates/search.mako:309
+#: src/search/templates/search.mako:318
 msgid "Try fewer keywords."
 msgstr "キーワードの数を減らしてみてください。"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "Show"
 msgstr "表示"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "more..."
 msgstr "詳細..."
 
-#: src/search/templates/search.mako:655
+#: src/search/templates/search.mako:654
 msgid "The graphical facets works just with numbers or dates. Please choose another field."
 msgstr "グラフィカルファセットは数値または日付についてのみ動作します。別のフィールドを選択してください。"
 
-#: src/search/templates/search.mako:659
+#: src/search/templates/search.mako:658
 msgid "There was an error initializing the graphical facet component."
 msgstr "グラフィカルファセットコンポーネントの初期化中にエラーが発生しました。"
 
-#~ msgid "Error"
-#~ msgstr "エラー"
-#~ msgid "Imported successfully"
-#~ msgstr "正常にインポートされました"
-#~ msgid "Imported with errors: "
-#~ msgstr "インポートされ次のエラーが発生しました： "
-#~ msgid "Search Admin - "
-#~ msgstr "管理者の検索 - "
-#~ msgid "Customize "
-#~ msgstr "カスタマイズ "
-#~ msgid "Template Editor "
-#~ msgstr "テンプレートエディタ "
-#~ msgid "Click on Import to add one or more."
-#~ msgstr "1 つ以上追加するには、［インポート］をクリックします。"
-#~ msgid "Sort by"
-#~ msgstr "ソートの基準"
-#~ msgid "Showing %s - %s of %s results"
-#~ msgstr "%s 件の結果の %s - %s を表示"
-#~ msgid "Beginning of List"
-#~ msgstr "リストの先頭"

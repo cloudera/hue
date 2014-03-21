@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:61
+#: src/about/views.py:68
 msgid "POST request required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 
@@ -83,6 +83,8 @@ msgstr "Alle Anwendungsbeispiele installieren"
 #: src/about/templates/admin_wizard.mako:112
 #: src/about/templates/admin_wizard.mako:120
 #: src/about/templates/admin_wizard.mako:128
+#: src/about/templates/admin_wizard.mako:136
+#: src/about/templates/admin_wizard.mako:144
 msgid "Installing..."
 msgstr "Installation wird durchgeführt..."
 
@@ -94,92 +96,93 @@ msgstr "Alle"
 msgid "Install individual application examples"
 msgstr "Spezielle Anwendungsbeispiele installieren"
 
-#: src/about/templates/admin_wizard.mako:142
+#: src/about/templates/admin_wizard.mako:158
 msgid "Create or import users"
 msgstr "Benutzer erstellen oder importieren"
 
-#: src/about/templates/admin_wizard.mako:148
+#: src/about/templates/admin_wizard.mako:164
 msgid "User Admin"
 msgstr "Benutzeradministration"
 
-#: src/about/templates/admin_wizard.mako:154
+#: src/about/templates/admin_wizard.mako:170
 msgid "Tours and tutorials"
 msgstr "Touren und Tutorials"
 
-#: src/about/templates/admin_wizard.mako:161
+#: src/about/templates/admin_wizard.mako:177
 msgid "Check to enable the tours and tutorials"
 msgstr "Aktivieren, um die Touren und Tutorials zu aktivieren"
 
-#: src/about/templates/admin_wizard.mako:162
+#: src/about/templates/admin_wizard.mako:178
 msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
 msgstr "Das Fragezeichen \"Verfügbare Touren\" anzeigen, wenn Touren für eine bestimmte Seite verfügbar sind."
 
-#: src/about/templates/admin_wizard.mako:169
+#: src/about/templates/admin_wizard.mako:185
 msgid "Anonymous usage analytics"
 msgstr "Anonyme Nutzungsanalysen"
 
-#: src/about/templates/admin_wizard.mako:173
+#: src/about/templates/admin_wizard.mako:189
 msgid "Check to enable usage analytics"
 msgstr "Aktivieren, um anonyme Nutzungsanalysen zu aktivieren"
 
-#: src/about/templates/admin_wizard.mako:174
+#: src/about/templates/admin_wizard.mako:190
 msgid "Help improve Hue with anonymous usage analytics."
 msgstr "Helfen Sie bei der Verbesserung von Hue mit anonymen Nutzungsanalysen."
 
-#: src/about/templates/admin_wizard.mako:176
+#: src/about/templates/admin_wizard.mako:192
 msgid "How does it work?"
 msgstr "Wie funktioniert es?"
 
-#: src/about/templates/admin_wizard.mako:177
+#: src/about/templates/admin_wizard.mako:193
 msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
 msgstr "Wir verwenden Google Analytics ausschließlich, um zu erkennen, wie oft eine Anwendung oder ein bestimmter Teil einer Anwendung verwendet wird."
 
-#: src/about/templates/admin_wizard.mako:188
+#: src/about/templates/admin_wizard.mako:204
 msgid "Use the applications"
 msgstr "Anwendungen verwenden"
 
-#: src/about/templates/admin_wizard.mako:192
+#: src/about/templates/admin_wizard.mako:208
 msgid "Hue Home"
 msgstr "Hue-Startseite"
 
-#: src/about/templates/admin_wizard.mako:199
+#: src/about/templates/admin_wizard.mako:215
 msgid "Skip wizard next time"
 msgstr "Assistent beim nächsten Mal überspringen"
 
-#: src/about/templates/admin_wizard.mako:206
+#: src/about/templates/admin_wizard.mako:222
 msgid "Check to skip this wizard next time."
 msgstr "Aktivieren, um diesen Assistenten beim nächsten Mal zu überspringen."
 
-#: src/about/templates/admin_wizard.mako:207
+#: src/about/templates/admin_wizard.mako:223
 msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
 msgstr "Überspringen Sie den Schnellstartassistenten bei der nächsten Anmeldung, dann gelangen Sie direkt zur Homepage."
 
-#: src/about/templates/admin_wizard.mako:221
+#: src/about/templates/admin_wizard.mako:237
 msgid "Back"
 msgstr "Zurück"
 
-#: src/about/templates/admin_wizard.mako:222
+#: src/about/templates/admin_wizard.mako:238
 msgid "Next"
 msgstr "Weiter"
 
-#: src/about/templates/admin_wizard.mako:223
+#: src/about/templates/admin_wizard.mako:239
+#: src/about/templates/admin_wizard.mako:247
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue und das Hue-Logo sind Marken von Cloudera, Inc."
 
-#: src/about/templates/admin_wizard.mako:228
+#: src/about/templates/admin_wizard.mako:244
 msgid "Learn more about Hue and Hadoop on"
 msgstr "Weitere Informationen zu Hue und Hadoop siehe"
 
-#: src/about/templates/admin_wizard.mako:277
+#: src/about/templates/admin_wizard.mako:296
 msgid "Check config failed: "
 msgstr "Prüfungskonfiguration fehlgeschlagen: "
 
-#: src/about/templates/admin_wizard.mako:286
-#: src/about/templates/admin_wizard.mako:304
+#: src/about/templates/admin_wizard.mako:305
+#: src/about/templates/admin_wizard.mako:323
 msgid "Examples refreshed"
 msgstr "Beispiele aktualisiert"
 
-#: src/about/templates/admin_wizard.mako:368
+#: src/about/templates/admin_wizard.mako:387
 msgid "Configuration updated"
 msgstr "Konfiguration aktualisiert"
 
@@ -195,14 +198,3 @@ msgstr "Konfiguration"
 msgid "Server Logs"
 msgstr "Server-Protokolle"
 
-#~ msgid "HDFS Trash Configuration"
-#~ msgstr "HDFS-Papierkorbkonfiguration"
-#~ msgid "Trash is active."
-#~ msgstr "Papierkorb ist aktiv."
-#~ msgid ""
-#~ "You can activate trash collection by "
-#~ "setting fs.trash.interval in core-site.xml:"
-#~ msgstr ""
-#~ "Sie können die Papierkorbleerung aktivieren,"
-#~ " indem Sie fs.trash.interval in core-"
-#~ "site.xml entsprechend festlegen:"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,63 +17,127 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#~ msgid "Invalid response from OAuth provider: %s"
-#~ msgstr ""
-#~ msgid "The Consumer key of the twitter application."
-#~ msgstr ""
-#~ msgid "The Consumer key of the google application."
-#~ msgstr ""
-#~ msgid "The Consumer key of the facebook application."
-#~ msgstr ""
-#~ msgid "The Consumer key of the linkedin application."
-#~ msgstr ""
-#~ msgid "The Consumer secret of the twitter application."
-#~ msgstr ""
-#~ msgid "The Consumer secret of the google application."
-#~ msgstr ""
-#~ msgid "The Consumer secret of the facebook application."
-#~ msgstr ""
-#~ msgid "The Consumer secret of the linkedin application."
-#~ msgstr ""
-#~ msgid "The Twitter Request token URL."
-#~ msgstr ""
-#~ msgid "The Google Request token URL."
-#~ msgstr ""
-#~ msgid "The Facebook Request token URL."
-#~ msgstr ""
-#~ msgid "The Linkedin Request token URL."
-#~ msgstr ""
-#~ msgid "The Twitter Access token URL."
-#~ msgstr ""
-#~ msgid "The Google Access token URL."
-#~ msgstr ""
-#~ msgid "The Facebook Access token URL."
-#~ msgstr ""
-#~ msgid "The Linkedin Access token URL."
-#~ msgstr ""
-#~ msgid "The Twitter Authorize URL."
-#~ msgstr ""
-#~ msgid "The Google Authorize URL."
-#~ msgstr ""
-#~ msgid "The Facebook Authorize URL."
-#~ msgstr ""
-#~ msgid "The Linkedin Authorize URL."
-#~ msgstr ""
-#~ msgid "Invalid request: %s"
-#~ msgstr ""
-#~ msgid "Hue - Sign up"
-#~ msgstr ""
-#~ msgid "Hue - Sign in"
-#~ msgstr ""
-#~ msgid "Visit gethue.com"
-#~ msgstr ""
-#~ msgid "Fell asleep? Visit us on gethue.com instead!"
-#~ msgstr ""
-#~ msgid "Error!"
-#~ msgstr ""
-#~ msgid "Invalid username or password."
-#~ msgstr ""
-#~ msgid "This is your first time logging in."
-#~ msgstr ""
-#~ msgid "You will become Hue superuser."
-#~ msgstr ""
+#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
+#: src/liboauth/backend.py:158 src/liboauth/backend.py:167
+#: src/liboauth/backend.py:176 src/liboauth/backend.py:250
+#, python-format
+msgid "Invalid response from OAuth provider: %s"
+msgstr "Respuesta del proveedor OAuth no válida: %s"
+
+#: src/liboauth/conf.py:26
+msgid "The Consumer key of the twitter application."
+msgstr "La clave de consumidor de la aplicación de Twitter."
+
+#: src/liboauth/conf.py:32
+msgid "The Consumer key of the google application."
+msgstr "La clave de consumidor de la aplicación de Google."
+
+#: src/liboauth/conf.py:38
+msgid "The Consumer key of the facebook application."
+msgstr "La clave de consumidor de la aplicación de Facebook."
+
+#: src/liboauth/conf.py:44
+msgid "The Consumer key of the linkedin application."
+msgstr "La clave de consumidor de la aplicación de LinkedIn."
+
+#: src/liboauth/conf.py:51
+msgid "The Consumer secret of the twitter application."
+msgstr "El secreto de consumidor de la aplicación de Twitter."
+
+#: src/liboauth/conf.py:57
+msgid "The Consumer secret of the google application."
+msgstr "El secreto de consumidor de la aplicación de Google."
+
+#: src/liboauth/conf.py:63
+msgid "The Consumer secret of the facebook application."
+msgstr "El secreto de consumidor de la aplicación de Facebook."
+
+#: src/liboauth/conf.py:69
+msgid "The Consumer secret of the linkedin application."
+msgstr "El secreto de consumidor de la aplicación de LinkedIn."
+
+#: src/liboauth/conf.py:77
+msgid "The Twitter Request token URL."
+msgstr "La URL del token de la solicitud de Twitter."
+
+#: src/liboauth/conf.py:83
+msgid "The Google Request token URL."
+msgstr "La URL del token de la solicitud de Google."
+
+#: src/liboauth/conf.py:89
+msgid "The Facebook Request token URL."
+msgstr "La URL del token de la solicitud de Facebook."
+
+#: src/liboauth/conf.py:95
+msgid "The Linkedin Request token URL."
+msgstr "La URL del token de la solicitud de LinkedIn."
+
+#: src/liboauth/conf.py:102
+msgid "The Twitter Access token URL."
+msgstr "La URL del token de acceso a Twitter."
+
+#: src/liboauth/conf.py:108
+msgid "The Google Access token URL."
+msgstr "La URL del token de acceso a Google."
+
+#: src/liboauth/conf.py:114
+msgid "The Facebook Access token URL."
+msgstr "La URL del token de acceso a Facebook."
+
+#: src/liboauth/conf.py:120
+msgid "The Linkedin Access token URL."
+msgstr "La URL del token de acceso a LinkedIn."
+
+#: src/liboauth/conf.py:128
+msgid "The Twitter Authorize URL."
+msgstr "La URL autorizada de Twitter."
+
+#: src/liboauth/conf.py:134
+msgid "The Google Authorize URL."
+msgstr "La URL autorizada de Google."
+
+#: src/liboauth/conf.py:140
+msgid "The Facebook Authorize URL."
+msgstr "La URL autorizada de Facebook."
+
+#: src/liboauth/conf.py:146
+msgid "The Linkedin Authorize URL."
+msgstr "La URL autorizada de LinkedIn."
+
+#: src/liboauth/views.py:72
+#, python-format
+msgid "Invalid request: %s"
+msgstr "Consulta no válida: %s"
+
+#: src/liboauth/templates/oauth-login.mako:25
+msgid "Hue - Sign up"
+msgstr "Hue - Registrarse"
+
+#: src/liboauth/templates/oauth-login.mako:27
+msgid "Hue - Sign in"
+msgstr "Hue - Iniciar sesión"
+
+#: src/liboauth/templates/oauth-login.mako:155
+msgid "Visit gethue.com"
+msgstr "Visite gethue.com"
+
+#: src/liboauth/templates/oauth-login.mako:155
+msgid "Fell asleep? Visit us on gethue.com instead!"
+msgstr "¿Se ha dormido? ¡Venga a vernos a gethue.com!"
+
+#: src/liboauth/templates/oauth-login.mako:169
+msgid "Error!"
+msgstr "Error."
+
+#: src/liboauth/templates/oauth-login.mako:169
+msgid "Invalid username or password."
+msgstr "Nombre de usuario o contraseña no válido."
+
+#: src/liboauth/templates/oauth-login.mako:176
+msgid "This is your first time logging in."
+msgstr "Es la primera vez que inicia sesión."
+
+#: src/liboauth/templates/oauth-login.mako:177
+msgid "You will become Hue superuser."
+msgstr "Se convertirá en un superusuario de Hue."
+

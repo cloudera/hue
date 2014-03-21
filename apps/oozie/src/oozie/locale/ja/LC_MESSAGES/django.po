@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-08-14 22:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -104,7 +104,7 @@ msgstr "ジョブを変更できるユーザー。"
 msgid "Name of the job, which must be unique per user."
 msgstr "ジョブの名前。ユーザーごとに一意にする必要があります。"
 
-#: src/oozie/models.py:113 src/oozie/models.py:631 src/oozie/models.py:1630
+#: src/oozie/models.py:113 src/oozie/models.py:636 src/oozie/models.py:1635
 #: src/oozie/templates/utils.inc.mako:131
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:186
 #: src/oozie/templates/dashboard/list_oozie_bundles.mako:63
@@ -138,7 +138,7 @@ msgstr "ジョブの名前。ユーザーごとに一意にする必要があり
 msgid "Name"
 msgstr "名前"
 
-#: src/oozie/models.py:114 src/oozie/models.py:633 src/oozie/models.py:1632
+#: src/oozie/models.py:114 src/oozie/models.py:638 src/oozie/models.py:1637
 #: src/oozie/templates/editor/edit_bundle.mako:153
 #: src/oozie/templates/editor/edit_coordinator.mako:344
 #: src/oozie/templates/editor/edit_workflow.mako:180
@@ -201,51 +201,51 @@ msgstr "ゴミ箱に移動済み"
 msgid "If this job is trashed."
 msgstr "このジョブがゴミ箱に移動された場合。"
 
-#: src/oozie/models.py:196
+#: src/oozie/models.py:201
 msgid "shared"
 msgstr "共有"
 
-#: src/oozie/models.py:198
+#: src/oozie/models.py:203
 msgid "personal"
 msgstr "個人用"
 
-#: src/oozie/models.py:326 src/oozie/models.py:850 src/oozie/models.py:918
-#: src/oozie/models.py:958 src/oozie/models.py:997 src/oozie/models.py:1036
-#: src/oozie/models.py:1096 src/oozie/models.py:1134
+#: src/oozie/models.py:331 src/oozie/models.py:855 src/oozie/models.py:923
+#: src/oozie/models.py:963 src/oozie/models.py:1002 src/oozie/models.py:1041
+#: src/oozie/models.py:1101 src/oozie/models.py:1139
 msgid "Job XML"
 msgstr "ジョブ XML"
 
-#: src/oozie/models.py:327 src/oozie/models.py:851 src/oozie/models.py:919
-#: src/oozie/models.py:959 src/oozie/models.py:1037 src/oozie/models.py:1097
-#: src/oozie/models.py:1135
+#: src/oozie/models.py:332 src/oozie/models.py:856 src/oozie/models.py:924
+#: src/oozie/models.py:964 src/oozie/models.py:1042 src/oozie/models.py:1102
+#: src/oozie/models.py:1140
 msgid "Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. Properties specified in the Job Properties element override properties specified in the files specified in the Job XML element."
 msgstr "Workflow 配置ディレクトリにバンドルされている Hadoop JobConf job.xml ファイルを参照してください。ジョブのプロパティの要素で指定されたプロパティは、ジョブ XML の要素によって指定されたファイルで指定したプロパティをオーバーライドします。"
 
-#: src/oozie/models.py:330 src/oozie/models.py:843 src/oozie/models.py:876
-#: src/oozie/models.py:913 src/oozie/models.py:953 src/oozie/models.py:992
-#: src/oozie/models.py:1031 src/oozie/models.py:1091 src/oozie/models.py:1129
-#: src/oozie/models.py:1203
+#: src/oozie/models.py:335 src/oozie/models.py:848 src/oozie/models.py:881
+#: src/oozie/models.py:918 src/oozie/models.py:958 src/oozie/models.py:997
+#: src/oozie/models.py:1036 src/oozie/models.py:1096 src/oozie/models.py:1134
+#: src/oozie/models.py:1208
 msgid "Hadoop job properties"
 msgstr "Hadoop ジョブプロパティ"
 
-#: src/oozie/models.py:331
+#: src/oozie/models.py:336
 msgid "Job configuration properties used by all the actions of the workflow (e.g. mapred.job.queue.name=production)"
 msgstr "Workflow のすべてのアクションによって使用されるジョブ設定プロパティ (例：mapred.job.queue.name=production)"
 
-#: src/oozie/models.py:400
+#: src/oozie/models.py:405
 #, python-format
 msgid "The copy of the deployment directory failed: %s."
 msgstr "配置ディレクトリのコピーに失敗しました：%s。"
 
-#: src/oozie/models.py:632
+#: src/oozie/models.py:637
 msgid "Name of the action, which must be unique by workflow."
 msgstr "アクションの名前です。Workflow 単位で一意にする必要があります。"
 
-#: src/oozie/models.py:634
+#: src/oozie/models.py:639
 msgid "The purpose of the action."
 msgstr "アクションの目的です。"
 
-#: src/oozie/models.py:635
+#: src/oozie/models.py:640
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:196
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:203
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:122
@@ -259,389 +259,389 @@ msgstr "アクションの目的です。"
 msgid "Type"
 msgstr "タイプ"
 
-#: src/oozie/models.py:636
+#: src/oozie/models.py:641
 msgid "The type of action (e.g. MapReduce, Pig...)"
 msgstr "アクションのタイプ (例：MapReduce、Pig...)"
 
-#: src/oozie/models.py:685
+#: src/oozie/models.py:690
 #, python-format
 msgid "Unknown Node type: %s. Was it set at its creation?"
 msgstr "不明なノード タイプ：%s。作成時に設定されましたか?"
 
-#: src/oozie/models.py:772
+#: src/oozie/models.py:777
 #, python-format
 msgid "%(node_type)s has not implemented the 'add_node' method."
 msgstr "%(node_type)s は 'add_node' メソッドを実装しませんでした。"
 
-#: src/oozie/models.py:839 src/oozie/models.py:872 src/oozie/models.py:898
-#: src/oozie/models.py:949 src/oozie/models.py:987 src/oozie/models.py:1026
-#: src/oozie/models.py:1087
+#: src/oozie/models.py:844 src/oozie/models.py:877 src/oozie/models.py:903
+#: src/oozie/models.py:954 src/oozie/models.py:992 src/oozie/models.py:1031
+#: src/oozie/models.py:1092
 msgid "Files"
 msgstr "ファイル"
 
-#: src/oozie/models.py:840 src/oozie/models.py:873 src/oozie/models.py:899
-#: src/oozie/models.py:950 src/oozie/models.py:988 src/oozie/models.py:1027
-#: src/oozie/models.py:1088
+#: src/oozie/models.py:845 src/oozie/models.py:878 src/oozie/models.py:904
+#: src/oozie/models.py:955 src/oozie/models.py:993 src/oozie/models.py:1032
+#: src/oozie/models.py:1093
 msgid "List of names or paths of files to be added to the distributed cache and the task running directory."
 msgstr "分散キャッシュおよびタスク実行ディレクトリに追加されるファイルの名前またはパスのリストです。"
 
-#: src/oozie/models.py:841 src/oozie/models.py:874 src/oozie/models.py:900
-#: src/oozie/models.py:951 src/oozie/models.py:989 src/oozie/models.py:1028
-#: src/oozie/models.py:1089 src/oozie/templates/editor/action_utils.mako:359
+#: src/oozie/models.py:846 src/oozie/models.py:879 src/oozie/models.py:905
+#: src/oozie/models.py:956 src/oozie/models.py:994 src/oozie/models.py:1033
+#: src/oozie/models.py:1094 src/oozie/templates/editor/action_utils.mako:359
 msgid "Archives"
 msgstr "アーカイブ"
 
-#: src/oozie/models.py:842 src/oozie/models.py:875 src/oozie/models.py:901
-#: src/oozie/models.py:952 src/oozie/models.py:990 src/oozie/models.py:1029
-#: src/oozie/models.py:1090
+#: src/oozie/models.py:847 src/oozie/models.py:880 src/oozie/models.py:906
+#: src/oozie/models.py:957 src/oozie/models.py:995 src/oozie/models.py:1034
+#: src/oozie/models.py:1095
 msgid "List of names or paths of the archives to be added to the distributed cache."
 msgstr "分散キャッシュに追加されるアーカイブの名前またはパスのリストです。"
 
-#: src/oozie/models.py:844 src/oozie/models.py:877 src/oozie/models.py:914
-#: src/oozie/models.py:954 src/oozie/models.py:993 src/oozie/models.py:1032
-#: src/oozie/models.py:1092
+#: src/oozie/models.py:849 src/oozie/models.py:882 src/oozie/models.py:919
+#: src/oozie/models.py:959 src/oozie/models.py:998 src/oozie/models.py:1037
+#: src/oozie/models.py:1097
 msgid "For the job configuration (e.g. mapred.job.queue.name=production)"
 msgstr "ジョブ設定用 (例：mapred.job.queue.name=production)"
 
-#: src/oozie/models.py:845 src/oozie/models.py:902
+#: src/oozie/models.py:850 src/oozie/models.py:907
 msgid "Jar name"
 msgstr "Jar 名"
 
-#: src/oozie/models.py:846 src/oozie/models.py:903
+#: src/oozie/models.py:851 src/oozie/models.py:908
 #, python-format
 msgid "Name or path to the %(program)s jar file on HDFS. E.g. examples.jar."
 msgstr "HDFS 上の %(program)s jar ファイルの名前またはパスです（例：examples.jar）。"
 
-#: src/oozie/models.py:847 src/oozie/models.py:915 src/oozie/models.py:955
-#: src/oozie/models.py:994 src/oozie/models.py:1033 src/oozie/models.py:1093
-#: src/oozie/models.py:1131
+#: src/oozie/models.py:852 src/oozie/models.py:920 src/oozie/models.py:960
+#: src/oozie/models.py:999 src/oozie/models.py:1038 src/oozie/models.py:1098
+#: src/oozie/models.py:1136
 msgid "Prepares"
 msgstr "準備する"
 
-#: src/oozie/models.py:848 src/oozie/models.py:916 src/oozie/models.py:956
+#: src/oozie/models.py:853 src/oozie/models.py:921 src/oozie/models.py:961
 msgid "List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup."
 msgstr "アプリケーションを開始する前に削除して作成する絶対パスのリストです。これはディレクトリのクリーンアップのためにのみ使用してください。"
 
-#: src/oozie/models.py:878
+#: src/oozie/models.py:883
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/oozie/models.py:879
+#: src/oozie/models.py:884
 msgid "The executable/script to be used as mapper."
 msgstr "mapper として使用する実行可能ファイル／スクリプトです。"
 
-#: src/oozie/models.py:880
+#: src/oozie/models.py:885
 msgid "Reducer"
 msgstr "Reducer"
 
-#: src/oozie/models.py:881
+#: src/oozie/models.py:886
 msgid "The executable/script to be used as reducer."
 msgstr "reducer として使用する実行可能ファイル／スクリプトです。"
 
-#: src/oozie/models.py:904
+#: src/oozie/models.py:909
 msgid "Main class"
 msgstr "Main class"
 
-#: src/oozie/models.py:905
+#: src/oozie/models.py:910
 msgid "Full name of the Java class. E.g. org.apache.hadoop.examples.Grep"
 msgstr "Java クラスの完全な名前です（例：org.apache.hadoop.examples.Grep）。"
 
-#: src/oozie/models.py:906 src/oozie/models.py:1067 src/oozie/models.py:1085
-#: src/oozie/models.py:1126
+#: src/oozie/models.py:911 src/oozie/models.py:1072 src/oozie/models.py:1090
+#: src/oozie/models.py:1131
 msgid "Arguments"
 msgstr "引数"
 
-#: src/oozie/models.py:907
+#: src/oozie/models.py:912
 msgid "Arguments of the main method. The value of each arg element is considered a single argument and they are passed to the main method in the same order."
 msgstr "メインメソッドの引数です。各 arg 要素の値は単一の引数と見なされ、メインメソッドに同じ順序で渡されます。"
 
-#: src/oozie/models.py:909
+#: src/oozie/models.py:914
 msgid "Java options"
 msgstr "Java オプション"
 
-#: src/oozie/models.py:910
+#: src/oozie/models.py:915
 msgid "Command-line parameters used to start the JVM that will execute the Java application. Using this element is equivalent to using the mapred.child.java.opts configuration property. E.g. -Dexample-property=hue"
 msgstr "Java アプリケーションを実行する JVM の起動に使用されるコマンドラインパラメータです。この要素を使用することは、mapred.child.java.opts 設定プロパティを使用するのと等価です。例：-Dexample-property=hue"
 
-#: src/oozie/models.py:922 src/oozie/models.py:1069 src/oozie/models.py:1100
+#: src/oozie/models.py:927 src/oozie/models.py:1074 src/oozie/models.py:1105
 msgid "Capture output"
 msgstr "出力をキャプチャ"
 
-#: src/oozie/models.py:923 src/oozie/models.py:1101
+#: src/oozie/models.py:928 src/oozie/models.py:1106
 #, python-format
 msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java Properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
 msgstr "%(program)s コマンド実行の stdout の出力をキャプチャします。%(program)s コマンドの出力は、ファイルフォーマットが Java Properties でなければならず、サイズが 2KB を超えてはなりません。%(program)s アクションノードの出力へは、Workflow 定義内から String action:output(String node, String key) 関数を使用してアクセスできます。"
 
-#: src/oozie/models.py:945 src/oozie/models.py:983
+#: src/oozie/models.py:950 src/oozie/models.py:988
 msgid "Script name"
 msgstr "スクリプト名"
 
-#: src/oozie/models.py:946
+#: src/oozie/models.py:951
 msgid "Script name or path to the Pig script. E.g. my_script.pig."
 msgstr "Pig スクリプトのスクリプト名またはパスです（例：my_script.pig）。"
 
-#: src/oozie/models.py:947 src/oozie/models.py:985 src/oozie/models.py:1023
-#: src/oozie/models.py:1735
+#: src/oozie/models.py:952 src/oozie/models.py:990 src/oozie/models.py:1028
+#: src/oozie/models.py:1740
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: src/oozie/models.py:948
+#: src/oozie/models.py:953
 msgid "The Pig parameters of the script. e.g. \"-param\", \"INPUT=${inputDir}\""
 msgstr "スクリプトの Pig パラメータです（例：\"-param\"、\"INPUT=${inputDir}\"）。"
 
-#: src/oozie/models.py:984
+#: src/oozie/models.py:989
 #, python-format
 msgid "Script name or path to the %(type)s script. E.g. my_script.sql."
 msgstr "%(type)s スクリプトのスクリプト名またはパスです（例：my_script.sql）。"
 
-#: src/oozie/models.py:986
+#: src/oozie/models.py:991
 #, python-format
 msgid "The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}"
 msgstr "スクリプトの %(type)s パラメータです（例：N=5、INPUT=${inputDir}）。"
 
-#: src/oozie/models.py:995
+#: src/oozie/models.py:1000
 msgid "List of absolute paths to delete, then create, before starting the application. This should be used exclusively for directory cleanup."
 msgstr "アプリケーションを開始する前に削除して作成する絶対パスのリストです。これはディレクトリのクリーンアップのためにのみ使用してください。"
 
-#: src/oozie/models.py:998
+#: src/oozie/models.py:1003
 msgid "Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. Pick a name different than hive-site.xml."
 msgstr "Workflow 配置ディレクトリにバンドルされている Hive hive-config.xml ファイルを参照してください。hive-site.xml とは異なる名前を選択します。"
 
-#: src/oozie/models.py:1020
+#: src/oozie/models.py:1025
 msgid "Command"
 msgstr "コマンド"
 
-#: src/oozie/models.py:1021
+#: src/oozie/models.py:1026
 #, python-format
 msgid "The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below."
 msgstr "完全な %(type)s コマンドです。このコマンドをここに挿入するか、またはスペースで区切って下の複数のパラメータとしてパーツを挿入してください。"
 
-#: src/oozie/models.py:1024
+#: src/oozie/models.py:1029
 #, python-format
 msgid "If no command is specified, split the command by spaces and insert the %(type)s parameters here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ..."
 msgstr "コマンドを指定しない場合は、コマンドをスペースで区切って %(type)s パラメータをここに挿入してください（例：import, --connect, jdbc:hsqldb:file:db.hsqldb, ...）。"
 
-#: src/oozie/models.py:1034 src/oozie/models.py:1094 src/oozie/models.py:1132
+#: src/oozie/models.py:1039 src/oozie/models.py:1099 src/oozie/models.py:1137
 msgid "List of absolute paths to delete then to create before starting the application. This should be used exclusively for directory cleanup"
 msgstr "アプリケーションを開始する前に削除して作成する絶対パスのリストです。これはディレクトリのクリーンアップのためにのみ使用してください"
 
-#: src/oozie/models.py:1061
+#: src/oozie/models.py:1066
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:132
 msgid "User"
 msgstr "ユーザー"
 
-#: src/oozie/models.py:1062
+#: src/oozie/models.py:1067
 msgid "User executing the shell command."
 msgstr "shell コマンドを実行しているユーザーです。"
 
-#: src/oozie/models.py:1063
+#: src/oozie/models.py:1068
 msgid "Host"
 msgstr "ホスト"
 
-#: src/oozie/models.py:1064
+#: src/oozie/models.py:1069
 msgid "Where the shell will be executed."
 msgstr "shell が実行される場所です。"
 
-#: src/oozie/models.py:1065 src/oozie/models.py:1083
+#: src/oozie/models.py:1070 src/oozie/models.py:1088
 #, python-format
 msgid "%(type)s command"
 msgstr "%(type)s コマンド"
 
-#: src/oozie/models.py:1066
+#: src/oozie/models.py:1071
 msgid "The command that will be executed."
 msgstr "実行するコマンドです。"
 
-#: src/oozie/models.py:1068
+#: src/oozie/models.py:1073
 #, python-format
 msgid "The arguments of the %(type)s command."
 msgstr "%(type)s コマンドの引数です。"
 
-#: src/oozie/models.py:1070
+#: src/oozie/models.py:1075
 #, python-format
 msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
 msgstr "%(program)s コマンド実行の stdout の出力をキャプチャします。%(program)s コマンドの出力は、ファイルフォーマットが Java properties でなければならず、サイズが 2KB を超えてはなりません。%(program)s アクションノードの出力へは、Workflow 定義内から String action:output(String node, String key) 関数を使用してアクセスできます。"
 
-#: src/oozie/models.py:1084
+#: src/oozie/models.py:1089
 msgid "The path of the Shell command to execute."
 msgstr "実行する Shell コマンドのパスです。"
 
-#: src/oozie/models.py:1086
+#: src/oozie/models.py:1091
 msgid "The arguments of Shell command can then be specified using one or more argument element."
 msgstr "Shell コマンドの引数は、1 つまたは複数の引数要素を使用して指定できます。"
 
-#: src/oozie/models.py:1127
+#: src/oozie/models.py:1132
 #, python-format
 msgid "The arguments of the %(type)s command. Put options first, then source paths, then destination path."
 msgstr "%(type)s コマンドの引数です。オプション、ソースパス、宛先パスの順に挿入してください。"
 
-#: src/oozie/models.py:1130
+#: src/oozie/models.py:1135
 msgid "For the job configuration (e.g. mapred.job.queue.name=production"
 msgstr "ジョブ設定用（例：mapred.job.queue.name=production"
 
-#: src/oozie/models.py:1154
+#: src/oozie/models.py:1159
 msgid "Delete path"
 msgstr "パスを削除"
 
-#: src/oozie/models.py:1155
+#: src/oozie/models.py:1160
 msgid "Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory."
 msgstr "指定されたパスを削除します。このパスがディレクトリである場合、その内容すべてが再帰的に削除され、その後、ディレクトリ自体が削除されます。"
 
-#: src/oozie/models.py:1157
+#: src/oozie/models.py:1162
 msgid "Create directory"
 msgstr "ディレクトリを作成"
 
-#: src/oozie/models.py:1158
+#: src/oozie/models.py:1163
 msgid "Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op."
 msgstr "指定されたディレクトリを作成します。パスで不足しているディレクトリもすべて作成されます。指定されたディレクトリがすでに存在する場合は何も行われません。"
 
-#: src/oozie/models.py:1160
+#: src/oozie/models.py:1165
 msgid "Move file"
 msgstr "ファイルを移動"
 
-#: src/oozie/models.py:1161
+#: src/oozie/models.py:1166
 msgid "Move a file or directory to another path."
 msgstr "ファイルまたはディレクトリを別のパスに移動します。"
 
-#: src/oozie/models.py:1162
+#: src/oozie/models.py:1167
 msgid "Change permissions"
 msgstr "パーミッションを変更"
 
-#: src/oozie/models.py:1163
+#: src/oozie/models.py:1168
 msgid "Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic representation (e.g. -rwxrw-rw-) or an octal representation (755)."
 msgstr "指定されたパスのパーミッションを変更します。パーミッションは、UNIX の記号表現（例：-rwxrw-rw-）または 8 進数表現（755）を使用して指定できます。"
 
-#: src/oozie/models.py:1165
+#: src/oozie/models.py:1170
 msgid "Create or touch a file"
 msgstr "ファイルを作成またはタッチ"
 
-#: src/oozie/models.py:1166
+#: src/oozie/models.py:1171
 msgid "Creates a zero length file in the specified path if none exists or touch it."
 msgstr "ファイルが存在しない、またはファイルをタッチした場合、指定されたパスに長さ 0 のファイルを作成します。"
 
-#: src/oozie/models.py:1189
+#: src/oozie/models.py:1194
 msgid "TO addresses"
 msgstr "送信先アドレス"
 
-#: src/oozie/models.py:1189 src/oozie/models.py:1190
+#: src/oozie/models.py:1194 src/oozie/models.py:1195
 msgid "Comma-separated values."
 msgstr "カンマ区切り値。"
 
-#: src/oozie/models.py:1190
+#: src/oozie/models.py:1195
 msgid "CC addresses (optional)"
 msgstr "cc アドレス（オプション）"
 
-#: src/oozie/models.py:1191
+#: src/oozie/models.py:1196
 msgid "Subject"
 msgstr "件名"
 
-#: src/oozie/models.py:1191 src/oozie/models.py:1192
+#: src/oozie/models.py:1196 src/oozie/models.py:1197
 msgid "Plain-text."
 msgstr "プレーンテキストです。"
 
-#: src/oozie/models.py:1192
+#: src/oozie/models.py:1197
 msgid "Body"
 msgstr "本文"
 
-#: src/oozie/models.py:1199
+#: src/oozie/models.py:1204
 msgid "Sub-workflow"
 msgstr "サブ Workflow"
 
-#: src/oozie/models.py:1200
+#: src/oozie/models.py:1205
 msgid "The sub-workflow application to include. You must own all the sub-workflows."
 msgstr "含めるサブ Workflow アプリケーションです。すべてのサブ Workflow を所有している必要があります。"
 
-#: src/oozie/models.py:1201
+#: src/oozie/models.py:1206
 msgid "Propagate configuration"
 msgstr "設定を伝達"
 
-#: src/oozie/models.py:1202
+#: src/oozie/models.py:1207
 msgid "If the workflow job configuration should be propagated to the child workflow."
 msgstr "Workflow ジョブの設定を子 Workflow に伝達すべきかどうか。"
 
-#: src/oozie/models.py:1204
+#: src/oozie/models.py:1209
 msgid "Can be used to specify the job properties that are required to run the child workflow job."
 msgstr "子 Workflow ジョブの実行に必要なジョブプロパティの指定に使用できます。"
 
-#: src/oozie/models.py:1214
+#: src/oozie/models.py:1219
 msgid "XML of the custom action"
 msgstr "カスタムアクションの XML"
 
-#: src/oozie/models.py:1215
+#: src/oozie/models.py:1220
 #, python-format
 msgid "This will be inserted verbatim in the action %(action)s. E.g. all the XML content like %(xml_action)s will be inserted into the action and produce %(full_action)s"
 msgstr "これはすべてそのままアクション %(action)s に挿入されます。たとえば、%(xml_action)s のような XML コンテンツはすべて、アクションに挿入され、%(full_action)s が生成されます"
 
-#: src/oozie/models.py:1254
+#: src/oozie/models.py:1259
 msgid "End should not have any children."
 msgstr "終了に子を設定することはできません。"
 
-#: src/oozie/models.py:1263
+#: src/oozie/models.py:1268
 msgid "Kill should not have any children."
 msgstr "強制終了に子を設定することはできません。"
 
-#: src/oozie/models.py:1371
+#: src/oozie/models.py:1376
 msgid "Minutes"
 msgstr "分"
 
-#: src/oozie/models.py:1372
+#: src/oozie/models.py:1377
 msgid "Hours"
 msgstr "時間"
 
-#: src/oozie/models.py:1373
+#: src/oozie/models.py:1378
 msgid "Days"
 msgstr "日"
 
-#: src/oozie/models.py:1374
+#: src/oozie/models.py:1379
 msgid "Months"
 msgstr "か月"
 
-#: src/oozie/models.py:1380 src/oozie/models.py:1637
+#: src/oozie/models.py:1385 src/oozie/models.py:1642
 msgid "Frequency number"
 msgstr "頻度数"
 
-#: src/oozie/models.py:1381 src/oozie/models.py:1638
+#: src/oozie/models.py:1386 src/oozie/models.py:1643
 msgid "The number of units of the rate at which data is periodically created."
 msgstr "定期的なデータの作成率の単位数です。"
 
-#: src/oozie/models.py:1383 src/oozie/models.py:1640
+#: src/oozie/models.py:1388 src/oozie/models.py:1645
 msgid "Frequency unit"
 msgstr "頻度単位"
 
-#: src/oozie/models.py:1384 src/oozie/models.py:1641
+#: src/oozie/models.py:1389 src/oozie/models.py:1646
 msgid "The unit of the rate at which data is periodically created."
 msgstr "定期的なデータの作成率の単位です。"
 
-#: src/oozie/models.py:1385 src/oozie/models.py:1646
+#: src/oozie/models.py:1390 src/oozie/models.py:1651
 #: src/oozie/templates/editor/edit_coordinator.mako:348
 msgid "Timezone"
 msgstr "タイムゾーン"
 
-#: src/oozie/models.py:1386
+#: src/oozie/models.py:1391
 msgid "The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators."
 msgstr "Coordinator のタイムゾーンです。複数の Coordinator を組み合わせる場合の夏時間の変更管理にのみ使用します。"
 
-#: src/oozie/models.py:1387 src/oozie/models.py:1634 src/oozie/models.py:1743
+#: src/oozie/models.py:1392 src/oozie/models.py:1639 src/oozie/models.py:1748
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:69
 #: src/oozie/templates/editor/dataset_utils.mako:39
 #: src/oozie/templates/editor/edit_coordinator.mako:346
 msgid "Start"
 msgstr "開始"
 
-#: src/oozie/models.py:1388
+#: src/oozie/models.py:1393
 msgid "When to start the first workflow."
 msgstr "最初の Workflow を開始する日時です。"
 
-#: src/oozie/models.py:1389
+#: src/oozie/models.py:1394
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:74
 #: src/oozie/templates/editor/dataset_utils.mako:50
 msgid "End"
 msgstr "終了"
 
-#: src/oozie/models.py:1390
+#: src/oozie/models.py:1395
 msgid "When to start the last workflow."
 msgstr "最後の Workflow を開始する日時です。"
 
-#: src/oozie/models.py:1391
+#: src/oozie/models.py:1396
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:39
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:145
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:38
@@ -653,107 +653,107 @@ msgstr "最後の Workflow を開始する日時です。"
 msgid "Workflow"
 msgstr "Workflow"
 
-#: src/oozie/models.py:1392
+#: src/oozie/models.py:1397
 msgid "The workflow to schedule repeatedly."
 msgstr "繰り返しスケジュール設定される Workflow です。"
 
-#: src/oozie/models.py:1393
+#: src/oozie/models.py:1398
 msgid "Timeout"
 msgstr "タイムアウト"
 
-#: src/oozie/models.py:1394
+#: src/oozie/models.py:1399
 msgid "Number of minutes the coordinator action will be in WAITING or READY status before giving up on its execution."
 msgstr "Coordinator アクションを WAITING または READY ステータスにしておく時間（単位は分）の上限です。指定された時間が経過すると、実行されません。"
 
-#: src/oozie/models.py:1396
+#: src/oozie/models.py:1401
 msgid "Concurrency"
 msgstr "同時実行"
 
-#: src/oozie/models.py:1397
+#: src/oozie/models.py:1402
 msgid "The number of coordinator actions that are allowed to run concurrently (RUNNING status) before the coordinator engine starts throttling them."
 msgstr "同時に実行（RUNNING ステータスに）できる Coordinator アクションの最大数です。上限を超えると、Coordinator エンジンにより、アクションのスロットルが開始されます。"
 
-#: src/oozie/models.py:1399
+#: src/oozie/models.py:1404
 msgid "Execution"
 msgstr "実行"
 
-#: src/oozie/models.py:1400
+#: src/oozie/models.py:1405
 msgid "FIFO (oldest first) default"
 msgstr "FIFO（最も古いものを先に実行）デフォルト"
 
-#: src/oozie/models.py:1401
+#: src/oozie/models.py:1406
 msgid "LIFO (newest first)"
 msgstr "LIFO（最も新しいものを先に実行）"
 
-#: src/oozie/models.py:1402
+#: src/oozie/models.py:1407
 msgid "LAST_ONLY (discards all older materializations)"
 msgstr "LAST_ONLY（古い実体化をすべて破棄）"
 
-#: src/oozie/models.py:1403
+#: src/oozie/models.py:1408
 msgid "Execution strategy of its coordinator actions when there is backlog of coordinator actions in the coordinator engine. The different execution strategies are 'oldest first', 'newest first' and 'last one only'. A backlog normally happens because of delayed input data, concurrency control or because manual re-runs of coordinator jobs."
 msgstr "Coordinator エンジンに Coordinator アクションのバックログがある場合の、Coordinator アクションの実行戦略です。指定可能な実行戦略は、「最も古いものを先に実行」、「最も新しいものを先に実行」、および「最後のものだけを実行」です。バックログは通常、入力データの遅延、同時実行制御、または Coordinator ジョブの手動による再実行が原因で起こります。"
 
-#: src/oozie/models.py:1407
+#: src/oozie/models.py:1412
 msgid "Throttle"
 msgstr "スロットル"
 
-#: src/oozie/models.py:1408
+#: src/oozie/models.py:1413
 msgid "The materialization or creation throttle value for its coordinator actions. Number of maximum coordinator actions that are allowed to be in WAITING state concurrently."
 msgstr "Coordinator アクションに対する実体化または作成スロットル値です。同時に WAITING 状態にできる Coordinator アクションの最大数を表しています。"
 
-#: src/oozie/models.py:1410
+#: src/oozie/models.py:1415
 msgid "Workflow properties"
 msgstr "Workflow のプロパティ"
 
-#: src/oozie/models.py:1411
+#: src/oozie/models.py:1416
 msgid "Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}"
 msgstr "Workflow に送信するその他のプロパティ（例：limit=100）、および EL 関数（例：username=${coord:user()}）"
 
-#: src/oozie/models.py:1616
+#: src/oozie/models.py:1621
 #, python-format
 msgid "Permission denied. %(username)s does not have the permissions to access dataset %(id)s."
 msgstr "パーミッションが拒否されました。%(username)s は、データセット %(id)s にアクセスするパーミッションを持っていません。"
 
-#: src/oozie/models.py:1623
+#: src/oozie/models.py:1628
 #, python-format
 msgid "dataset %(id)s not exist"
 msgstr "データセット %(id)s は存在しません"
 
-#: src/oozie/models.py:1631
+#: src/oozie/models.py:1636
 msgid "The name of the dataset."
 msgstr "データセットの名前です。"
 
-#: src/oozie/models.py:1633
+#: src/oozie/models.py:1638
 msgid "A description of the dataset."
 msgstr "データセットの説明です。"
 
-#: src/oozie/models.py:1635
+#: src/oozie/models.py:1640
 msgid " The UTC datetime of the initial instance of the dataset. The initial instance also provides the baseline datetime to compute instances of the dataset using multiples of the frequency."
 msgstr " データセットの初期インスタンスの UTC 日時です。初期インスタンスは、頻度の倍数を使用してデータセットのインスタンスを計算するときのベースライン日時にもなります。"
 
-#: src/oozie/models.py:1642
+#: src/oozie/models.py:1647
 #: src/oozie/templates/editor/edit_coordinator.mako:347
 msgid "URI"
 msgstr "URI"
 
-#: src/oozie/models.py:1643
+#: src/oozie/models.py:1648
 msgid "The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and configuration properties (e.g. /home/${USER}/projects/${PROJECT})"
 msgstr "データセットを識別し、特定のデータセットインスタンスを特定する具体的な URI に解決できる URI テンプレートです。URI は定数（例：${YEAR}/${MONTH}）と設定プロパティ（例：/home/${USER}/projects/${PROJECT}）で構成されます。"
 
-#: src/oozie/models.py:1647
+#: src/oozie/models.py:1652
 msgid "The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets."
 msgstr "データセットのタイムゾーンです。複数のデータセットを組み合わせる場合の夏時間の変更管理にのみ使用します。"
 
-#: src/oozie/models.py:1648
+#: src/oozie/models.py:1653
 #: src/oozie/templates/editor/edit_coordinator.mako:349
 msgid "Done flag"
 msgstr "完了フラグ"
 
-#: src/oozie/models.py:1649
+#: src/oozie/models.py:1654
 msgid "The done file for the data set. If the Done flag is not specified, then Oozie configures Hadoop to create a _SUCCESS file in the output directory. If Done flag is set to empty, then Coordinator looks for the existence of the directory itself."
 msgstr "データセットの完了ファイルです。Done フラグが指定されていない場合、Oozie は、出力ディレクトリに _SUCCESS ファイルを作成するように Hadoop を設定します。Done フラグが空に設定されている場合、Coordinator はディレクトリ自体が存在するかどうかを検索します。"
 
-#: src/oozie/models.py:1652 src/oozie/models.py:1732
+#: src/oozie/models.py:1657 src/oozie/models.py:1737
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:145
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:38
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:132
@@ -763,67 +763,67 @@ msgstr "データセットの完了ファイルです。Done フラグが指定�
 msgid "Coordinator"
 msgstr "Coordinator"
 
-#: src/oozie/models.py:1653
+#: src/oozie/models.py:1658
 msgid "The coordinator associated with this data."
 msgstr "このデータに関連付けられている Coordinator です。"
 
-#: src/oozie/models.py:1654
+#: src/oozie/models.py:1659
 msgid "Instance type"
 msgstr "インスタンスのタイプ"
 
-#: src/oozie/models.py:1655
+#: src/oozie/models.py:1660
 msgid "Customize the date instance(s), e.g. define a range of dates, use EL functions..."
 msgstr "日付のインスタンス（例：日付の範囲の定義、EL 関数の使用など）をカスタマイズします。"
 
-#: src/oozie/models.py:1656
+#: src/oozie/models.py:1661
 msgid "Start instance"
 msgstr "開始インスタンス"
 
-#: src/oozie/models.py:1657
+#: src/oozie/models.py:1662
 msgid "Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}"
 msgstr "過去および将来の開始日を取得する頻度をシフトするか、Oozie 開始インスタンスを逐語的に（例： ${coord:current(0)}）入力します"
 
-#: src/oozie/models.py:1658
+#: src/oozie/models.py:1663
 msgid "End instance"
 msgstr "終了インスタンス"
 
-#: src/oozie/models.py:1659
+#: src/oozie/models.py:1664
 msgid "Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance."
 msgstr "オプション：過去および将来の終了日を取得する頻度をシフトするか、Oozie 終了インスタンスを逐語的に入力します。"
 
-#: src/oozie/models.py:1710
+#: src/oozie/models.py:1715
 msgid "Name of an input variable in the workflow."
 msgstr "Workflow の入力変数の名前です。"
 
-#: src/oozie/models.py:1711
+#: src/oozie/models.py:1716
 msgid "The name of the variable of the workflow to automatically fill up."
 msgstr "自動的に入力される Workflow の変数の名前です。"
 
-#: src/oozie/models.py:1712
+#: src/oozie/models.py:1717
 msgid "The dataset representing format of the data input."
 msgstr "データ入力の形式を表すデータセットです。"
 
-#: src/oozie/models.py:1713
+#: src/oozie/models.py:1718
 msgid "The pattern of the input data we want to process."
 msgstr "処理する入力データのパターンです。"
 
-#: src/oozie/models.py:1720
+#: src/oozie/models.py:1725
 msgid "Name of an output variable in the workflow"
 msgstr "Workflow の出力変数の名前"
 
-#: src/oozie/models.py:1721
+#: src/oozie/models.py:1726
 msgid "The name of the variable of the workflow to automatically filled up."
 msgstr "自動的に入力される Workflow の変数の名前です。"
 
-#: src/oozie/models.py:1722
+#: src/oozie/models.py:1727
 msgid "The dataset representing the format of the data output."
 msgstr "データ出力の形式を表すデータセットです。"
 
-#: src/oozie/models.py:1723
+#: src/oozie/models.py:1728
 msgid "The pattern of the output data we want to generate."
 msgstr "生成する出力データのパターンです。"
 
-#: src/oozie/models.py:1730
+#: src/oozie/models.py:1735
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:39
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:130
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:130
@@ -832,19 +832,19 @@ msgstr "生成する出力データのパターンです。"
 msgid "Bundle"
 msgstr "Bundle"
 
-#: src/oozie/models.py:1731
+#: src/oozie/models.py:1736
 msgid "The bundle regrouping all the coordinators."
 msgstr "すべての Coordinator を再グループ化する Bundle。"
 
-#: src/oozie/models.py:1733
+#: src/oozie/models.py:1738
 msgid "The coordinator to batch with other coordinators."
 msgstr "他の Coordinator とともにバッチ処理する Coordinator。"
 
-#: src/oozie/models.py:1736
+#: src/oozie/models.py:1741
 msgid "Constants used at the submission time (e.g. market=US, oozie.use.system.libpath=true)."
 msgstr "サブミット時間に使用される定数です（例：market=US、oozie.use.system.libpath=true）。"
 
-#: src/oozie/models.py:1744
+#: src/oozie/models.py:1749
 msgid "When to start the first coordinators."
 msgstr "最初の Coordinator を開始する日時です。"
 
@@ -854,7 +854,7 @@ msgid "Could not set field %(field)s: %(exception)s"
 msgstr "フィールド %(field)s：%(exception)s を 設定できませんでした。"
 
 #: src/oozie/importlib/bundles.py:100 src/oozie/importlib/coordinators.py:165
-#: src/oozie/importlib/workflows.py:593
+#: src/oozie/importlib/workflows.py:638
 #, python-format
 msgid "Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s"
 msgstr "名前空間 %(namespace)s のタグが有効ではありません。次の名前空間のいずれかを使用してください：%(namespaces)s"
@@ -867,76 +867,76 @@ msgstr "Bundle 定義でノードが見つかりませんでした。形式に�
 msgid "Could not find any nodes in Coordinator definition. Maybe it's malformed?"
 msgstr "Coordinator 定義でノードが見つかりませんでした。形式に不備がある可能性があります。"
 
-#: src/oozie/importlib/workflows.py:110
+#: src/oozie/importlib/workflows.py:155
 #, python-format
 msgid "Node with name %s for workflow %s does not exist."
 msgstr "%s という名前のノード（Workflow %s）は存在しません。"
 
-#: src/oozie/importlib/workflows.py:140 src/oozie/importlib/workflows.py:164
-#: src/oozie/importlib/workflows.py:193 src/oozie/importlib/workflows.py:235
+#: src/oozie/importlib/workflows.py:185 src/oozie/importlib/workflows.py:209
+#: src/oozie/importlib/workflows.py:238 src/oozie/importlib/workflows.py:280
 #, python-format
 msgid "Node %s has a link that is missing 'to' attribute."
 msgstr "ノード %s には、'to' 属性が欠落しているリンクがあります。"
 
-#: src/oozie/importlib/workflows.py:148 src/oozie/importlib/workflows.py:171
-#: src/oozie/importlib/workflows.py:199
+#: src/oozie/importlib/workflows.py:193 src/oozie/importlib/workflows.py:216
+#: src/oozie/importlib/workflows.py:244
 #, python-format
 msgid "Node %s has not been defined."
 msgstr "ノード %s が定義されていません。"
 
-#: src/oozie/importlib/workflows.py:229
+#: src/oozie/importlib/workflows.py:274
 #, python-format
 msgid "Node %s has a link that is missing 'start' attribute."
 msgstr "ノード %s には、'start' 属性が欠落しているリンクがあります。"
 
-#: src/oozie/importlib/workflows.py:244
+#: src/oozie/importlib/workflows.py:289
 #, python-format
 msgid "Node %s has not been defined"
 msgstr "ノード %s が定義されていません"
 
-#: src/oozie/importlib/workflows.py:252
+#: src/oozie/importlib/workflows.py:297
 msgid "Workflow start has not been created."
 msgstr "Workflow の開始が作成されていません。"
 
-#: src/oozie/importlib/workflows.py:255
+#: src/oozie/importlib/workflows.py:300
 msgid "Workflow end has not been created."
 msgstr "Workflow の終了が作成されていません。"
 
-#: src/oozie/importlib/workflows.py:333
+#: src/oozie/importlib/workflows.py:378
 msgid "Cannot import workflows that have decision DAG leaf nodes with multiple children or no children."
 msgstr "複数の子を持つ、または子を 1 つも持たない決定 DAG リーフノードを持つ Workflow はインポートできません。"
 
-#: src/oozie/importlib/workflows.py:369 src/oozie/importlib/workflows.py:397
+#: src/oozie/importlib/workflows.py:414 src/oozie/importlib/workflows.py:442
 msgid "Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node."
 msgstr "1 つのターミナルノードに収束する複数のターミナルノードを持つ決定パスを持つ Workflow はインポートできません。"
 
-#: src/oozie/importlib/workflows.py:399
+#: src/oozie/importlib/workflows.py:444
 msgid "Cannot import workflows that have decisions paths that never end."
 msgstr "終了しない決定パスを持つ Workflow をインポートすることはできません。"
 
-#: src/oozie/importlib/workflows.py:429
+#: src/oozie/importlib/workflows.py:474
 msgid "Different ends found in fork."
 msgstr "フォークで異なる終端が見つかりました。"
 
-#: src/oozie/importlib/workflows.py:514
+#: src/oozie/importlib/workflows.py:559
 msgid "No hadoop file system to operate on."
 msgstr "操作する Hadoop ファイルシステムがありません。"
 
-#: src/oozie/importlib/workflows.py:529
+#: src/oozie/importlib/workflows.py:574
 msgid "Could not find workflow name when resolving subworkflow."
 msgstr "Subworkflow の解決時、Workflow 名を見つけることができませんでした。"
 
-#: src/oozie/importlib/workflows.py:531
+#: src/oozie/importlib/workflows.py:576
 #, python-format
 msgid "Could not find workflow with name %s extracted from subworkflow path %s"
 msgstr "名前 %s の Workflow（Subworkflow パス %s から抽出）を見つけることができませんでした"
 
-#: src/oozie/importlib/workflows.py:533
+#: src/oozie/importlib/workflows.py:578
 #, python-format
 msgid "Could not find workflow at path %s: %s"
 msgstr "パス %s で Workflow が見つかりませんでした：%s"
 
-#: src/oozie/importlib/workflows.py:627
+#: src/oozie/importlib/workflows.py:673
 msgid "Could not find any nodes in Workflow definition. Maybe it's malformed?"
 msgstr "Workflow 定義でノードが見つかりませんでした。形式に不備がある可能性があります。"
 
@@ -2930,40 +2930,45 @@ msgstr "編集"
 msgid "Convert to Decision"
 msgstr "決定に変換"
 
-#: src/oozie/templates/editor/edit_workflow.mako:595
-#: src/oozie/templates/editor/edit_workflow.mako:603
-#: src/oozie/templates/editor/edit_workflow.mako:644
-#: src/oozie/templates/editor/edit_workflow.mako:867
-#: src/oozie/templates/editor/edit_workflow.mako:889
-msgid "Received invalid response from server: "
-msgstr "サーバーから無効な応答を受信しました： "
+#: src/oozie/templates/editor/edit_workflow.mako:605
+#: src/oozie/templates/editor/edit_workflow.mako:613
+#: src/oozie/templates/editor/edit_workflow.mako:884
+#: src/oozie/templates/editor/edit_workflow.mako:906
+msgid "Received invalid response from server"
+msgstr "サーバーから無効な応答を受信しました"
 
-#: src/oozie/templates/editor/edit_workflow.mako:608
-msgid "Workflow saved"
-msgstr "Workflow が保存されました"
-
-#: src/oozie/templates/editor/edit_workflow.mako:623
+#: src/oozie/templates/editor/edit_workflow.mako:619
+#: src/oozie/templates/editor/edit_workflow.mako:631
 msgid "Could not save workflow"
 msgstr "Workflow を保存できませんでした"
 
-#: src/oozie/templates/editor/edit_workflow.mako:629
+#: src/oozie/templates/editor/edit_workflow.mako:621
+msgid "Workflow saved"
+msgstr "Workflow が保存されました"
+
+#: src/oozie/templates/editor/edit_workflow.mako:640
 msgid "Workflow is in read only mode."
 msgstr "Workflow は読み取り専用モードです。"
 
-#: src/oozie/templates/editor/edit_workflow.mako:813
+#: src/oozie/templates/editor/edit_workflow.mako:655
+#: src/oozie/templates/editor/edit_workflow.mako:662
+msgid "Error loading workflow"
+msgstr "Workflow をロード中にエラーが発生しました"
+
+#: src/oozie/templates/editor/edit_workflow.mako:830
 msgid "Confirm Delete"
 msgstr "削除を確認"
 
-#: src/oozie/templates/editor/edit_workflow.mako:814
+#: src/oozie/templates/editor/edit_workflow.mako:831
 msgid "Are you sure you want to delete "
 msgstr "次を削除してよろしいですか "
 
-#: src/oozie/templates/editor/edit_workflow.mako:865
-#: src/oozie/templates/editor/edit_workflow.mako:906
+#: src/oozie/templates/editor/edit_workflow.mako:882
+#: src/oozie/templates/editor/edit_workflow.mako:923
 msgid "Action imported at the top of the workflow."
 msgstr "アクションが Workflow の先頭にインポートされました。"
 
-#: src/oozie/templates/editor/edit_workflow.mako:928
+#: src/oozie/templates/editor/edit_workflow.mako:945
 msgid "You have unsaved changes in this workflow."
 msgstr "この Workflow には、未保存の変更があります。"
 
@@ -3217,54 +3222,54 @@ msgstr "このジョブをサブミットしますか?"
 msgid "View workflow action"
 msgstr "Workflow アクションを表示"
 
-#: src/oozie/views/api.py:53
+#: src/oozie/views/api.py:84
 msgid "Could not find node of type"
 msgstr "次のタイプのノードを見つけることができませんでした："
 
-#: src/oozie/views/api.py:70
+#: src/oozie/views/api.py:101
 msgid "links must be a list"
 msgstr "リンクはリストでなければなりません。"
 
-#: src/oozie/views/api.py:76
+#: src/oozie/views/api.py:107
 msgid "Start should have two children: 'related' to end, 'to' to any node but an end."
 msgstr "開始には、2 つの子を設定する必要があります。終了への 'related' と、終了以外の任意のノードへの 'to' です。"
 
-#: src/oozie/views/api.py:80
+#: src/oozie/views/api.py:111
 msgid "End should have no children."
 msgstr "終了に子を設定することはできません。"
 
-#: src/oozie/views/api.py:84
+#: src/oozie/views/api.py:115
 msgid "Kill should have no children."
 msgstr "強制終了に子を設定することはできません。"
 
-#: src/oozie/views/api.py:88
+#: src/oozie/views/api.py:119
 msgid "Join and Decision End should have one child: 'to' to any node."
 msgstr "参加および決定終了には、1 つの子を設定する必要があります。任意のノードへの 'to' です。"
 
-#: src/oozie/views/api.py:92
+#: src/oozie/views/api.py:123
 msgid "Fork and Decision should have at least two children: 'related' to their respective ends, 'start' to any node."
 msgstr "分岐および決定には、2 つの子を設定する必要があります。それぞれの終了への 'related' と、任意のノードへの 'start' です。"
 
-#: src/oozie/views/api.py:96
+#: src/oozie/views/api.py:127
 msgid "Actions should have two children: 'error' to kill, 'ok' to any node."
 msgstr "アクションには 2 つの子を設定する必要があります。強制終了への 'error' と任意のノードへの 'ok' です。"
 
-#: src/oozie/views/api.py:118
+#: src/oozie/views/api.py:149
 #, python-format
 msgid "%(node_type)s should have %(count)d more %(link_type)s linknode_type"
 msgstr "%(node_type)s には、あと %(count)d 個の %(link_type)s linknode_type を設定する必要があります"
 
-#: src/oozie/views/api.py:181 src/oozie/views/api.py:201
-#: src/oozie/views/api.py:296 src/oozie/views/api.py:303
+#: src/oozie/views/api.py:212 src/oozie/views/api.py:232
+#: src/oozie/views/api.py:329 src/oozie/views/api.py:336
 msgid "Error saving workflow"
 msgstr "Workflow を保存中にエラーが発生しました"
 
-#: src/oozie/views/api.py:288
+#: src/oozie/views/api.py:321
 msgid "Must be POST request."
 msgstr "POST 要求でなければなりません。"
 
-#: src/oozie/views/api.py:340 src/oozie/views/api.py:348
-#: src/oozie/views/api.py:362
+#: src/oozie/views/api.py:374 src/oozie/views/api.py:383
+#: src/oozie/views/api.py:398
 msgid "Must be GET request."
 msgstr "GET 要求でなければなりません。"
 
@@ -3391,7 +3396,6 @@ msgid "Coordinator imported"
 msgstr "Coordinator がインポートされました"
 
 #: src/oozie/views/editor.py:224
-#, python-format
 msgid "Errors on the form"
 msgstr "フォームのエラー"
 
@@ -3499,37 +3503,3 @@ msgstr "Bundle がサブミットされました。"
 msgid "Error submitting bundle %s"
 msgstr "Bundle %s のサブミット中にエラーが発生しました"
 
-#~ msgid ""
-#~ "Share workflows, coordinators and bundles "
-#~ "information with all users. If set "
-#~ "to false, they will be visible "
-#~ "only to the owner and administrators."
-#~ msgstr ""
-#~ "Workflow、Coordinator および Bundle情報をすべてのユーザーと共有します。False "
-#~ "に設定すると、所有者および管理者のみに表示されます。"
-#~ msgid "The sub-workflow could not be found: %s."
-#~ msgstr "サブ Workflow が見つかりませんでした：%s。"
-#~ msgid "Could not find app-path for subworkflow %s"
-#~ msgstr "Subworkflow %s のアプリパスを見つけることができませんでした"
-#~ msgid "Could not find subworkflow with deployment directory: %s"
-#~ msgstr "展開ディレクトリ %s で Subworkflow を見つけることができませんでした"
-#~ msgid "Subworkflow is not owned by %s"
-#~ msgstr "Subworkflow は %s によって所有されていません"
-#~ msgid "The timezone of the coordinator."
-#~ msgstr "Coordinator のタイムゾーンです。"
-#~ msgid "The timezone of the dataset."
-#~ msgstr "データセットのタイムゾーンです。"
-#~ msgid "Dashboard"
-#~ msgstr "ダッシュボード"
-#~ msgid "Filter: "
-#~ msgstr "フィルタ： "
-#~ msgid "Rerun this job?"
-#~ msgstr "このジョブを再実行しますか?"
-#~ msgid "Coordinator data"
-#~ msgstr "Coordinator データ"
-#~ msgid "Workflow Editor : "
-#~ msgstr "Workflow Editor： "
-#~ msgid "View bundles"
-#~ msgstr "Bundles の表示"
-#~ msgid "View coordinators"
-#~ msgstr "Coordinator を表示"

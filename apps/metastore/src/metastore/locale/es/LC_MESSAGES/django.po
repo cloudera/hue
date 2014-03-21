@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PROYECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -31,55 +31,55 @@ msgstr "¿Sobrescribir?"
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s [clave de partición con el tipo %(column_type)s]"
 
-#: src/metastore/views.py:47
+#: src/metastore/views.py:50
 msgid "You are not allowed to modify the metastore."
 msgstr "No tiene permiso para modificar el metastore."
 
-#: src/metastore/views.py:47
-msgid "You have metastore:read_only_access permissions"
-msgstr "Tiene metastore:read_only_access permissions"
+#: src/metastore/views.py:50
+msgid "You have must have metastore:write permissions"
+msgstr "Debe tener Metastore:permisos de escritura"
 
-#: src/metastore/views.py:88
+#: src/metastore/views.py:91
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "Error al quitar %(databases)s. Error: %(error)s"
 
-#: src/metastore/views.py:89 src/metastore/views.py:141
-#: src/metastore/views.py:189
+#: src/metastore/views.py:92 src/metastore/views.py:150
+#: src/metastore/views.py:199
 msgid "Hive Error"
 msgstr "Error de Hive"
 
-#: src/metastore/views.py:91
+#: src/metastore/views.py:94
 msgid "Do you really want to delete the database(s)?"
 msgstr "¿Está seguro de que desea eliminar las bases de datos?"
 
-#: src/metastore/views.py:188
+#: src/metastore/views.py:198
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "Error al quitar %(tables)s. Error: %(error)s"
 
-#: src/metastore/views.py:191
+#: src/metastore/views.py:201
 msgid "Do you really want to delete the table(s)?"
 msgstr "¿Está seguro de que desea eliminar las tablas?"
 
-#: src/metastore/views.py:205 src/metastore/views.py:215
+#: src/metastore/views.py:215 src/metastore/views.py:225
 msgid "Cannot read table"
 msgstr "No se puede leer la tabla"
 
-#: src/metastore/views.py:237
+#: src/metastore/views.py:247
 msgid "Can't load the data: "
 msgstr "No se pueden cargar los datos: "
 
-#: src/metastore/views.py:258
+#: src/metastore/views.py:268
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "La tabla '%(table)s' no está particionada."
 
-#: src/metastore/views.py:295
+#: src/metastore/views.py:305
 msgid "Column analysis not supportet yet"
 msgstr "El análisis de las columnas no se admite todavía"
 
-#: src/metastore/views.py:297
+#: src/metastore/views.py:307
 msgid "A POST request is required"
 msgstr "Se necesita una solicitud POST"
 
@@ -144,7 +144,7 @@ msgstr "Cancelar"
 #: src/metastore/templates/databases.mako:123
 #: src/metastore/templates/describe_table.mako:209
 #: src/metastore/templates/describe_table.mako:234
-#: src/metastore/templates/sample.mako:64
+#: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "No hay datos disponibles"
@@ -152,7 +152,7 @@ msgstr "No hay datos disponibles"
 #: src/metastore/templates/databases.mako:124
 #: src/metastore/templates/describe_table.mako:210
 #: src/metastore/templates/describe_table.mako:235
-#: src/metastore/templates/sample.mako:65
+#: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
@@ -242,7 +242,7 @@ msgid "Properties"
 msgstr "Propiedades"
 
 #: src/metastore/templates/describe_table.mako:109
-#: src/metastore/templates/sample.mako:25
+#: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "Error."
 
@@ -319,9 +319,3 @@ msgstr "Tenga en cuenta que, al cargar los datos, estos se trasladarán de su ub
 msgid "Submit"
 msgstr "Enviar"
 
-#~ msgid "Beeswax Error"
-#~ msgstr "Error de Beeswax"
-#~ msgid "Partitions"
-#~ msgstr "Particiones"
-#~ msgid "Database %s"
-#~ msgstr "Base de datos %s"

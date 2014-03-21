@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/search/api.py:81 src/search/api.py:94 src/search/api.py:105
-#: src/search/api.py:118 src/search/api.py:127 src/search/api.py:137
-#: src/search/api.py:147
+#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
+#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
+#: src/search/api.py:158 src/search/api.py:171
 msgid "Error while accessing Solr"
 msgstr "Erreur lors de l'accès à Solr"
 
@@ -44,72 +44,81 @@ msgstr "Autorisation refusée. Vous n'êtes pas un administrateur."
 msgid "No live Solr collection or core by the name %s."
 msgstr "Aucun cœur ou aucune collection Solr direct(e) nommé(e) %s."
 
-#: src/search/models.py:267
+#: src/search/models.py:261
 msgid "Solr index name pointing to"
 msgstr "Nom d'index Solr pointant vers"
 
-#: src/search/models.py:268
+#: src/search/models.py:262
 msgid "Friendlier name in UI"
 msgstr "Nom plus amical dans IU"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Collection with cores data"
 msgstr "Collection avec données de cœurs"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Solr json"
 msgstr "json Solr"
 
-#: src/search/models.py:272 src/search/templates/layout.mako:81
+#: src/search/models.py:266 src/search/templates/layout.mako:81
 msgid "Properties"
 msgstr "Propriétés"
 
-#: src/search/models.py:273
+#: src/search/models.py:267
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Propriétés Hue (par ex., les résultats par numéro de page)"
 
-#: src/search/search_controller.py:79
+#: src/search/search_controller.py:80
 #, python-format
-msgid "Collection type does not exit: %s"
+msgid "Collection type does not exist: %s"
 msgstr "Le type de collection n'existe pas : %s"
 
-#: src/search/search_controller.py:96
+#: src/search/search_controller.py:97
 msgid " (Copy)"
 msgstr " (Copier)"
 
-#: src/search/views.py:84
+#: src/search/views.py:80
 msgid "There is no collection to search."
 msgstr "Il n'existe aucune collection à rechercher."
 
-#: src/search/views.py:108
+#: src/search/views.py:103
 msgid "No collection to download."
 msgstr "Aucune collection à télécharger."
 
-#: src/search/views.py:126 src/search/views.py:128
+#: src/search/views.py:121 src/search/views.py:123
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "Impossible de télécharger les résultats de la recherche : %s"
 
-#: src/search/views.py:176
+#: src/search/views.py:171
 msgid "Collection(s) or core(s) imported successfully!"
 msgstr "Collection(s) ou cœur(s) importé(es)."
 
-#: src/search/views.py:179
+#: src/search/views.py:174
 msgid "There was an error importing the collection(s) or core(s)"
 msgstr "Une erreur est survenue lors de l'importation de la ou des collection(s)/du ou des cœur(s)"
 
-#: src/search/views.py:182
+#: src/search/views.py:177
 msgid "Collection(s) or core(s) partially imported"
 msgstr "Collection(s) ou cœur(s) partiellement importé(es)"
 
-#: src/search/views.py:220 src/search/views.py:234
+#: src/search/views.py:215 src/search/views.py:229
 msgid "POST request required."
 msgstr "Requête POST requise."
 
-#: src/search/views.py:260
+#: src/search/views.py:255
 #, python-format
 msgid "Errors on the form: %s."
 msgstr "Erreurs sur le formulaire : %s."
+
+#: src/search/views.py:295
+#, python-format
+msgid "No preview available, some facets are invalid: %s"
+msgstr "Aperçu indisponible, certaines facettes ne sont pas valides : %s"
+
+#: src/search/views.py:402
+msgid "A POST request is required."
+msgstr "Requête POST requise."
 
 #: src/search/templates/admin_collection_facets.mako:25
 #: src/search/templates/admin_collection_highlighting.mako:25
@@ -119,7 +128,7 @@ msgstr "Erreurs sur le formulaire : %s."
 #: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
 #: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:28 src/search/templates/search.mako:59
+#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
 msgid "Search"
 msgstr "Rechercher"
 
@@ -815,7 +824,7 @@ msgstr "Collection supprimée."
 msgid "Collection copied successfully."
 msgstr "Collection copiée."
 
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:55
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
 msgid "Collection manager"
 msgstr "Gestionnaire de collections"
 
@@ -864,85 +873,84 @@ msgstr "Retweeter"
 msgid "It seems there is nothing to search on ..."
 msgstr "Il semble qu'il n'y ait pas d'éléments sur lesquels baser la recherche..."
 
-#: src/search/templates/search.mako:54
+#: src/search/templates/search.mako:56
 msgid "Customize this collection"
 msgstr "Personnaliser cette collection"
 
-#: src/search/templates/search.mako:211
+#: src/search/templates/search.mako:83
+msgid "XLS"
+msgstr "XLS"
+
+#: src/search/templates/search.mako:84
+msgid "CSV"
+msgstr "CSV"
+
+#: src/search/templates/search.mako:97
+msgid "A demo index is used. In order to be interactive, please "
+msgstr "Un index de démonstration est utilisé. Pour bénéficier de l'interactivité, "
+
+#: src/search/templates/search.mako:97
+msgid "create the indexes"
+msgstr "créez les index"
+
+#: src/search/templates/search.mako:97
+msgid " in Solr."
+msgstr " dans Solr."
+
+#: src/search/templates/search.mako:220
 #, python-format
 msgid "Page %s of %s. Showing %s results (%s seconds)"
 msgstr "Page %s sur %s. %s résultats affichés (%s secondes)"
 
-#: src/search/templates/search.mako:277
+#: src/search/templates/search.mako:286
 msgid "Previous Page"
 msgstr "Page précédente"
 
-#: src/search/templates/search.mako:293
+#: src/search/templates/search.mako:302
 msgid "Next Page"
 msgstr "Page suivante"
 
-#: src/search/templates/search.mako:302
+#: src/search/templates/search.mako:311
 msgid "Your search"
 msgstr "Votre recherche"
 
-#: src/search/templates/search.mako:302
-#, python-format
+#: src/search/templates/search.mako:311
 msgid "did not match any documents."
 msgstr "ne correspond à aucun document."
 
-#: src/search/templates/search.mako:304
+#: src/search/templates/search.mako:313
 msgid "Suggestions:"
 msgstr "Suggestions :"
 
-#: src/search/templates/search.mako:306
+#: src/search/templates/search.mako:315
 msgid "Make sure all words are spelled correctly."
 msgstr "Assurez-vous que tous les mots sont bien orthographiés."
 
-#: src/search/templates/search.mako:307
+#: src/search/templates/search.mako:316
 msgid "Try different keywords."
 msgstr "Essayez différents mots-clés."
 
-#: src/search/templates/search.mako:308
+#: src/search/templates/search.mako:317
 msgid "Try more general keywords."
 msgstr "Essayez des mots-clés plus généraux."
 
-#: src/search/templates/search.mako:309
+#: src/search/templates/search.mako:318
 msgid "Try fewer keywords."
 msgstr "Essayez moins de mots-clés."
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "Show"
 msgstr "Afficher"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "more..."
 msgstr "plus..."
 
-#: src/search/templates/search.mako:655
+#: src/search/templates/search.mako:654
 msgid "The graphical facets works just with numbers or dates. Please choose another field."
 msgstr "Les facettes graphiques fonctionnent seulement avec des nombres ou des dates. Veuillez choisir un autre champ."
 
-#: src/search/templates/search.mako:659
+#: src/search/templates/search.mako:658
 msgid "There was an error initializing the graphical facet component."
 msgstr "Une erreur est survenue lors de l'initialisation du composant de facette graphique."
 
-#~ msgid "Error"
-#~ msgstr "Erreur"
-#~ msgid "Imported successfully"
-#~ msgstr "Importé avec succès"
-#~ msgid "Imported with errors: "
-#~ msgstr "Importé avec les erreurs suivantes : "
-#~ msgid "Search Admin - "
-#~ msgstr "Rechercher administrateur - "
-#~ msgid "Customize "
-#~ msgstr "Personnaliser "
-#~ msgid "Template Editor "
-#~ msgstr "Editeur de modèles "
-#~ msgid "Click on Import to add one or more."
-#~ msgstr "Cliquez sur Importer pour en ajouter une ou plusieurs."
-#~ msgid "Sort by"
-#~ msgstr "Trier par"
-#~ msgid "Showing %s - %s of %s results"
-#~ msgstr "Affichage de %s - %s sur %s résultats"
-#~ msgid "Beginning of List"
-#~ msgstr "Début de la liste"

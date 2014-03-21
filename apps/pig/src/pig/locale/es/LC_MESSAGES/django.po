@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PROYECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:234 src/pig/templates/app.mako:751
+#: src/pig/api.py:234 src/pig/templates/app.mako:750
 msgid "Unsaved script"
 msgstr "Secuencia de comandos sin guardar"
 
@@ -33,23 +33,23 @@ msgstr "Ubicación, en HDFS, en la que se almacenan los ejemplos de Pig."
 msgid "The app won't work without a running Oozie server"
 msgstr "La aplicación no funcionará sin un servidor Oozie en ejecución"
 
-#: src/pig/models.py:36
+#: src/pig/models.py:33
 msgid "Owner"
 msgstr "Propietario"
 
-#: src/pig/models.py:36
+#: src/pig/models.py:33
 msgid "User who can modify the job."
 msgstr "El usuario que puede modificar el trabajo."
 
-#: src/pig/models.py:37
+#: src/pig/models.py:34
 msgid "Is a user document, not a document submission."
 msgstr "Es un documento de usuario, no un envío de documento."
 
-#: src/pig/models.py:38
+#: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
 msgstr "Si el documento no es un trabajo enviado sino una consulta, una secuencia de comandos o workflow."
 
-#: src/pig/models.py:47
+#: src/pig/models.py:44
 #, python-format
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "Este documento solo puede ser modificado por los superusuarios y %s."
@@ -101,12 +101,12 @@ msgstr "Panel"
 msgid "Search for script name or content"
 msgstr "Buscar el nombre o el contenido de la secuencia de comandos"
 
-#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:182
-#: src/pig/templates/app.mako:339
+#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:181
+#: src/pig/templates/app.mako:338
 msgid "Run this script"
 msgstr "Ejecutar esta secuencia de comandos"
 
-#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:126
+#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:131
 msgid "Run"
 msgstr "Ejecutar"
 
@@ -114,7 +114,7 @@ msgstr "Ejecutar"
 msgid "Copy this script"
 msgstr "Copiar esta secuencia de comandos"
 
-#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:145
+#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:149
 msgid "Copy"
 msgstr "Copiar"
 
@@ -122,7 +122,7 @@ msgstr "Copiar"
 msgid "Delete this script"
 msgstr "Eliminar esta secuencia de comandos"
 
-#: src/pig/templates/app.mako:56 src/pig/templates/app.mako:150
+#: src/pig/templates/app.mako:56 src/pig/templates/app.mako:154
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -130,7 +130,7 @@ msgstr "Eliminar"
 msgid "Create a new script"
 msgstr "Crear una nueva secuencia de comandos"
 
-#: src/pig/templates/app.mako:60
+#: src/pig/templates/app.mako:60 src/pig/templates/app.mako:128
 msgid "New Script"
 msgstr "Nueva secuencia de comandos"
 
@@ -138,13 +138,13 @@ msgstr "Nueva secuencia de comandos"
 msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
 msgstr "Actualmente no hay ninguna secuencia de comandos definida. Agregue una nueva haciendo clic en \"Nueva secuencia de comandos\""
 
-#: src/pig/templates/app.mako:71 src/pig/templates/app.mako:375
-#: src/pig/templates/app.mako:424 src/pig/templates/app.mako:547
-#: src/pig/templates/app.mako:571
+#: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
+#: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
+#: src/pig/templates/app.mako:570
 msgid "Name"
 msgstr "Nombre"
 
-#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:155
+#: src/pig/templates/app.mako:72
 msgid "Script"
 msgstr "Secuencia de comandos"
 
@@ -164,304 +164,302 @@ msgstr "Propiedades"
 msgid "Save the script"
 msgstr "Guardar la secuencia de comandos"
 
-#: src/pig/templates/app.mako:123 src/pig/templates/app.mako:719
+#: src/pig/templates/app.mako:123 src/pig/templates/app.mako:718
 msgid "Save"
 msgstr "Guardar"
 
-#: src/pig/templates/app.mako:128
-msgid "Run the script"
-msgstr "Ejecutar la secuencia de comandos"
-
-#: src/pig/templates/app.mako:129
-msgid "Submit"
-msgstr "Enviar"
-
-#: src/pig/templates/app.mako:133
-msgid "Stop the script"
-msgstr "Detener la secuencia de comandos"
-
-#: src/pig/templates/app.mako:134
-msgid "Stop"
-msgstr "Detener"
-
-#: src/pig/templates/app.mako:138
-msgid "Show Logs"
-msgstr "Mostrar los registros"
-
-#: src/pig/templates/app.mako:139 src/pig/templates/app.mako:632
-msgid "Logs"
-msgstr "Registros"
-
-#: src/pig/templates/app.mako:142 src/pig/templates/app.mako:483
-msgid "File"
-msgstr "Archivo"
-
-#: src/pig/templates/app.mako:144
-msgid "Copy the script"
-msgstr "Copiar esta secuencia de comandos"
-
-#: src/pig/templates/app.mako:149
-msgid "Delete the script"
-msgstr "Eliminar la secuencia de comandos"
-
-#: src/pig/templates/app.mako:154
+#: src/pig/templates/app.mako:127
 msgid "New script"
 msgstr "Nueva secuencia de comandos"
 
-#: src/pig/templates/app.mako:164
+#: src/pig/templates/app.mako:133
+msgid "Run the script"
+msgstr "Ejecutar la secuencia de comandos"
+
+#: src/pig/templates/app.mako:134
+msgid "Submit"
+msgstr "Enviar"
+
+#: src/pig/templates/app.mako:138
+msgid "Stop the script"
+msgstr "Detener la secuencia de comandos"
+
+#: src/pig/templates/app.mako:139
+msgid "Stop"
+msgstr "Detener"
+
+#: src/pig/templates/app.mako:143
+msgid "Show Logs"
+msgstr "Mostrar los registros"
+
+#: src/pig/templates/app.mako:144 src/pig/templates/app.mako:631
+msgid "Logs"
+msgstr "Registros"
+
+#: src/pig/templates/app.mako:148
+msgid "Copy the script"
+msgstr "Copiar esta secuencia de comandos"
+
+#: src/pig/templates/app.mako:153
+msgid "Delete the script"
+msgstr "Eliminar la secuencia de comandos"
+
+#: src/pig/templates/app.mako:163
 msgid "Press CTRL + Space to autocomplete"
 msgstr "Pulse la tecla CTRL + espacio para autocompletar"
 
-#: src/pig/templates/app.mako:165
+#: src/pig/templates/app.mako:164
 msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
 msgstr "Para ejecutar la secuencia de comandos actual, pulse CTRL + ENTER o CTRL + . en el editor"
 
-#: src/pig/templates/app.mako:175
+#: src/pig/templates/app.mako:174
 msgid "Unsaved"
 msgstr "Sin guardar"
 
-#: src/pig/templates/app.mako:183 src/pig/templates/app.mako:340
-#: src/pig/templates/app.mako:513
+#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:339
+#: src/pig/templates/app.mako:512
 msgid "Stop this script"
 msgstr "Detener esta secuencia de comandos"
 
-#: src/pig/templates/app.mako:188
+#: src/pig/templates/app.mako:187
 msgid "Show the function navigator"
 msgstr "Mostrar el navegador de funciones"
 
-#: src/pig/templates/app.mako:194
+#: src/pig/templates/app.mako:193
 msgid "Hide the function navigator"
 msgstr "Ocultar el navegador de funciones"
 
-#: src/pig/templates/app.mako:195
+#: src/pig/templates/app.mako:194
 msgid "Double click on function to insert it in the editor"
 msgstr "Haga doble clic en una función para insertarla en el editor"
 
-#: src/pig/templates/app.mako:196
+#: src/pig/templates/app.mako:195
 msgid "Navigator"
 msgstr "Navigator"
 
-#: src/pig/templates/app.mako:199
+#: src/pig/templates/app.mako:198
 msgid "Function name..."
 msgstr "Nombre de función..."
 
-#: src/pig/templates/app.mako:345 src/pig/templates/app.mako:712
+#: src/pig/templates/app.mako:344 src/pig/templates/app.mako:711
 msgid "Script name"
 msgstr "Nombre de la secuencia de comandos"
 
-#: src/pig/templates/app.mako:352
-msgid "Parameters"
-msgstr "Parámetros"
+#: src/pig/templates/app.mako:351
+msgid "Pig parameters"
+msgstr "Parámetros Pig"
 
-#: src/pig/templates/app.mako:365
+#: src/pig/templates/app.mako:364
 msgid "There are currently no defined parameters."
 msgstr "Actualmente no hay ningún parámetro definido."
 
-#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:395
-#: src/pig/templates/app.mako:416 src/pig/templates/app.mako:444
-#: src/pig/templates/app.mako:465 src/pig/templates/app.mako:502
+#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:394
+#: src/pig/templates/app.mako:415 src/pig/templates/app.mako:443
+#: src/pig/templates/app.mako:464 src/pig/templates/app.mako:501
 msgid "Add"
 msgstr "Agregar"
 
-#: src/pig/templates/app.mako:376 src/pig/templates/app.mako:425
-#: src/pig/templates/app.mako:474
+#: src/pig/templates/app.mako:375 src/pig/templates/app.mako:424
+#: src/pig/templates/app.mako:473
 msgid "Value"
 msgstr "Valor"
 
-#: src/pig/templates/app.mako:389 src/pig/templates/app.mako:438
-#: src/pig/templates/app.mako:495
+#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:437
+#: src/pig/templates/app.mako:494
 msgid "Remove"
 msgstr "Quitar"
 
-#: src/pig/templates/app.mako:403
+#: src/pig/templates/app.mako:402
 msgid "Hadoop properties"
 msgstr "Propiedades de Hadoop"
 
-#: src/pig/templates/app.mako:414
+#: src/pig/templates/app.mako:413
 msgid "There are currently no defined Hadoop properties."
 msgstr "Actualmente no hay ninguna propiedad de Hadoop definida."
 
-#: src/pig/templates/app.mako:453
+#: src/pig/templates/app.mako:452
 msgid "Resources"
 msgstr "Recursos"
 
-#: src/pig/templates/app.mako:456
+#: src/pig/templates/app.mako:455
 msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
 msgstr "Ruta a un archivo HDFS o archivo zip para agregar al área de trabajo de la secuencia de comandos en ejecución"
 
-#: src/pig/templates/app.mako:463
+#: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
 msgstr "Actualmente no hay ningún recurso definido."
 
-#: src/pig/templates/app.mako:473
+#: src/pig/templates/app.mako:472
 msgid "Type"
 msgstr "Tipo"
 
-#: src/pig/templates/app.mako:484
+#: src/pig/templates/app.mako:482
+msgid "File"
+msgstr "Archivo"
+
+#: src/pig/templates/app.mako:483
 msgid "Archive"
 msgstr "Almacenamiento"
 
-#: src/pig/templates/app.mako:520
+#: src/pig/templates/app.mako:519
 msgid "Status:"
 msgstr "Estado:"
 
-#: src/pig/templates/app.mako:522
+#: src/pig/templates/app.mako:521
 msgid "Progress:"
 msgstr "Progreso:"
 
-#: src/pig/templates/app.mako:522
+#: src/pig/templates/app.mako:521
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:528
+#: src/pig/templates/app.mako:527
 msgid "No available logs."
 msgstr "No hay registros disponibles."
 
-#: src/pig/templates/app.mako:538 src/pig/templates/app.mako:1083
+#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1082
 msgid "Running"
 msgstr "En ejecución"
 
-#: src/pig/templates/app.mako:542
+#: src/pig/templates/app.mako:541
 msgid "There are currently no running scripts."
 msgstr "Actualmente no hay ninguna secuencia de comandos en ejecución."
 
-#: src/pig/templates/app.mako:548
+#: src/pig/templates/app.mako:547
 msgid "Progress"
 msgstr "Progreso"
 
-#: src/pig/templates/app.mako:549 src/pig/templates/app.mako:573
+#: src/pig/templates/app.mako:548 src/pig/templates/app.mako:572
 msgid "Created on"
 msgstr "Creado el"
 
-#: src/pig/templates/app.mako:562
+#: src/pig/templates/app.mako:561
 msgid "Completed"
 msgstr "Completados"
 
-#: src/pig/templates/app.mako:566
+#: src/pig/templates/app.mako:565
 msgid "There are currently no completed scripts."
 msgstr "Actualmente no hay ninguna secuencia de comandos completada."
 
-#: src/pig/templates/app.mako:572
+#: src/pig/templates/app.mako:571
 msgid "Status"
 msgstr "Estado"
 
-#: src/pig/templates/app.mako:586
+#: src/pig/templates/app.mako:585
 msgid "Click to edit"
 msgstr "Haga clic para editar"
 
-#: src/pig/templates/app.mako:600
+#: src/pig/templates/app.mako:599
 msgid "Click to view"
 msgstr "Haga clic para ver"
 
-#: src/pig/templates/app.mako:617
+#: src/pig/templates/app.mako:616
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
 
-#: src/pig/templates/app.mako:620
+#: src/pig/templates/app.mako:619
 msgid "Are you sure you want to delete this script?"
 msgstr "¿Está seguro de que desea eliminar esta secuencia de comandos?"
 
-#: src/pig/templates/app.mako:621
+#: src/pig/templates/app.mako:620
 msgid "Are you sure you want to delete these scripts?"
 msgstr "¿Está seguro de que desea eliminar estas secuencias de comandos?"
 
-#: src/pig/templates/app.mako:624 src/pig/templates/app.mako:658
-#: src/pig/templates/app.mako:669 src/pig/templates/app.mako:698
+#: src/pig/templates/app.mako:623 src/pig/templates/app.mako:657
+#: src/pig/templates/app.mako:668 src/pig/templates/app.mako:697
 msgid "No"
 msgstr "No"
 
-#: src/pig/templates/app.mako:625 src/pig/templates/app.mako:659
-#: src/pig/templates/app.mako:670 src/pig/templates/app.mako:699
+#: src/pig/templates/app.mako:624 src/pig/templates/app.mako:658
+#: src/pig/templates/app.mako:669 src/pig/templates/app.mako:698
 msgid "Yes"
 msgstr "Sí"
 
-#: src/pig/templates/app.mako:639
+#: src/pig/templates/app.mako:638
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/pig/templates/app.mako:646
+#: src/pig/templates/app.mako:645
 msgid "Run Script"
 msgstr "Ejecutar secuencia de comandos"
 
-#: src/pig/templates/app.mako:646 src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:645 src/pig/templates/app.mako:665
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:649
+#: src/pig/templates/app.mako:648
 msgid "Script variables"
 msgstr "Variables de la secuencia de comandos"
 
-#: src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:665
 msgid "Stop Script"
 msgstr "Detener secuencia de comandos"
 
-#: src/pig/templates/app.mako:677
+#: src/pig/templates/app.mako:676
 msgid "Choose a file"
 msgstr "Seleccionar un archivo"
 
-#: src/pig/templates/app.mako:690
+#: src/pig/templates/app.mako:689
 msgid "Are you sure?"
 msgstr "¿Está seguro?"
 
-#: src/pig/templates/app.mako:694
+#: src/pig/templates/app.mako:693
 msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
 msgstr "La secuencia de comandos actual tiene cambios sin guardar. ¿Seguro que desea descartarlos?"
 
-#: src/pig/templates/app.mako:706
+#: src/pig/templates/app.mako:705
 msgid "Save script"
 msgstr "Guardar secuencia de comandos"
 
-#: src/pig/templates/app.mako:710
+#: src/pig/templates/app.mako:709
 msgid "Give a meaningful name to this script."
 msgstr "Dé un nombre significativo a esta secuencia de comandos."
 
-#: src/pig/templates/app.mako:718
+#: src/pig/templates/app.mako:717
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/pig/templates/app.mako:747
+#: src/pig/templates/app.mako:746
 msgid "The Pig job could not be killed."
 msgstr "El job de Pig no se ha podido eliminar."
 
-#: src/pig/templates/app.mako:748
+#: src/pig/templates/app.mako:747
 msgid "Run this Pig script."
 msgstr "Ejecutar esta secuencia de comandos de Pig."
 
-#: src/pig/templates/app.mako:749
+#: src/pig/templates/app.mako:748
 msgid "Stop execution."
 msgstr "Detener ejecución."
 
-#: src/pig/templates/app.mako:750
+#: src/pig/templates/app.mako:749
 msgid "Saved"
 msgstr "Guardado"
 
-#: src/pig/templates/app.mako:1076
+#: src/pig/templates/app.mako:1075
 msgid "Saving"
 msgstr "Guardando"
 
-#: src/pig/templates/app.mako:1087
+#: src/pig/templates/app.mako:1086
 msgid "has been saved correctly."
 msgstr "se ha guardado correctamente."
 
-#: src/pig/templates/app.mako:1354
+#: src/pig/templates/app.mako:1357
 msgid "Did you know?"
 msgstr "¿Lo sabía?"
 
-#: src/pig/templates/app.mako:1361
+#: src/pig/templates/app.mako:1364
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Nombres y valores de parámetros y opciones de Pig, p. ej.,"
 
-#: src/pig/templates/app.mako:1368
+#: src/pig/templates/app.mako:1371
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Nombres y valores de propiedades de Hadoop, p. ej.,"
 
-#: src/pig/templates/app.mako:1375
+#: src/pig/templates/app.mako:1378
 msgid "Include files or compressed files"
 msgstr "Incluir archivos o archivos comprimidos"
 
-#: src/pig/templates/app.mako:1384
+#: src/pig/templates/app.mako:1387
 msgid "You have unsaved changes in this pig script."
 msgstr "Hay cambios sin guardar en esta secuencia de comandos de Pig."
 
-#~ msgid "There was an error with your request!"
-#~ msgstr "Se ha producido un error en la solicitud."

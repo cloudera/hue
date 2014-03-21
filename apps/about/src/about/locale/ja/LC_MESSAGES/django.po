@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:61
+#: src/about/views.py:68
 msgid "POST request required."
 msgstr "POST 要求が必要です。"
 
@@ -83,6 +83,8 @@ msgstr "すべてのアプリケーションサンプルをインストール"
 #: src/about/templates/admin_wizard.mako:112
 #: src/about/templates/admin_wizard.mako:120
 #: src/about/templates/admin_wizard.mako:128
+#: src/about/templates/admin_wizard.mako:136
+#: src/about/templates/admin_wizard.mako:144
 msgid "Installing..."
 msgstr "インストール中..."
 
@@ -94,92 +96,93 @@ msgstr "すべて"
 msgid "Install individual application examples"
 msgstr "個別のアプリケーションサンプルをインストール"
 
-#: src/about/templates/admin_wizard.mako:142
+#: src/about/templates/admin_wizard.mako:158
 msgid "Create or import users"
 msgstr "ユーザーの作成またはインポート"
 
-#: src/about/templates/admin_wizard.mako:148
+#: src/about/templates/admin_wizard.mako:164
 msgid "User Admin"
 msgstr "ユーザー管理者"
 
-#: src/about/templates/admin_wizard.mako:154
+#: src/about/templates/admin_wizard.mako:170
 msgid "Tours and tutorials"
 msgstr "ツアーおよびチュートリアル"
 
-#: src/about/templates/admin_wizard.mako:161
+#: src/about/templates/admin_wizard.mako:177
 msgid "Check to enable the tours and tutorials"
 msgstr "ツアーおよびチュートリアルを有効にする場合はチェック"
 
-#: src/about/templates/admin_wizard.mako:162
+#: src/about/templates/admin_wizard.mako:178
 msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
 msgstr "特定のページでツアーが使用可能な場合は、［使用可能なツアー］の疑問符を表示します。"
 
-#: src/about/templates/admin_wizard.mako:169
+#: src/about/templates/admin_wizard.mako:185
 msgid "Anonymous usage analytics"
 msgstr "匿名の使用分析"
 
-#: src/about/templates/admin_wizard.mako:173
+#: src/about/templates/admin_wizard.mako:189
 msgid "Check to enable usage analytics"
 msgstr "使用分析を有効にする場合はチェック"
 
-#: src/about/templates/admin_wizard.mako:174
+#: src/about/templates/admin_wizard.mako:190
 msgid "Help improve Hue with anonymous usage analytics."
 msgstr "匿名の使用分析で Hue の品質向上にご協力ください。"
 
-#: src/about/templates/admin_wizard.mako:176
+#: src/about/templates/admin_wizard.mako:192
 msgid "How does it work?"
 msgstr "どのような分析ですか？"
 
-#: src/about/templates/admin_wizard.mako:177
+#: src/about/templates/admin_wizard.mako:193
 msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
 msgstr "Hue では Google Analytics を使用して、アプリケーションやアプリケーションの特定のセクションが何回使用されているかを把握します。それ以上のことはありません。"
 
-#: src/about/templates/admin_wizard.mako:188
+#: src/about/templates/admin_wizard.mako:204
 msgid "Use the applications"
 msgstr "アプリケーションを使用"
 
-#: src/about/templates/admin_wizard.mako:192
+#: src/about/templates/admin_wizard.mako:208
 msgid "Hue Home"
 msgstr "Hue ホーム"
 
-#: src/about/templates/admin_wizard.mako:199
+#: src/about/templates/admin_wizard.mako:215
 msgid "Skip wizard next time"
 msgstr "次回はウィザードをスキップ"
 
-#: src/about/templates/admin_wizard.mako:206
+#: src/about/templates/admin_wizard.mako:222
 msgid "Check to skip this wizard next time."
 msgstr "次回ウィザードをスキップする場合はチェックします。"
 
-#: src/about/templates/admin_wizard.mako:207
+#: src/about/templates/admin_wizard.mako:223
 msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
 msgstr "次回ログイン時はクイックスタートウィザードをスキップして直接ホームページを表示します。"
 
-#: src/about/templates/admin_wizard.mako:221
+#: src/about/templates/admin_wizard.mako:237
 msgid "Back"
 msgstr "戻る"
 
-#: src/about/templates/admin_wizard.mako:222
+#: src/about/templates/admin_wizard.mako:238
 msgid "Next"
 msgstr "次ヘ"
 
-#: src/about/templates/admin_wizard.mako:223
+#: src/about/templates/admin_wizard.mako:239
+#: src/about/templates/admin_wizard.mako:247
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue および Hue のロゴは Cloudera, Inc. の商標です。"
 
-#: src/about/templates/admin_wizard.mako:228
+#: src/about/templates/admin_wizard.mako:244
 msgid "Learn more about Hue and Hadoop on"
 msgstr "Hue および Hadoop の詳細"
 
-#: src/about/templates/admin_wizard.mako:277
+#: src/about/templates/admin_wizard.mako:296
 msgid "Check config failed: "
 msgstr "設定の確認に失敗しました： "
 
-#: src/about/templates/admin_wizard.mako:286
-#: src/about/templates/admin_wizard.mako:304
+#: src/about/templates/admin_wizard.mako:305
+#: src/about/templates/admin_wizard.mako:323
 msgid "Examples refreshed"
 msgstr "サンプルが更新されました"
 
-#: src/about/templates/admin_wizard.mako:368
+#: src/about/templates/admin_wizard.mako:387
 msgid "Configuration updated"
 msgstr "設定が更新されました"
 
@@ -195,11 +198,3 @@ msgstr "設定"
 msgid "Server Logs"
 msgstr "サーバーログ"
 
-#~ msgid "HDFS Trash Configuration"
-#~ msgstr "HDFS ゴミ箱の設定"
-#~ msgid "Trash is active."
-#~ msgstr "ゴミ箱がアクティブです。"
-#~ msgid ""
-#~ "You can activate trash collection by "
-#~ "setting fs.trash.interval in core-site.xml:"
-#~ msgstr "core-site.xml で fs.trash.interval を設定して、ゴミ箱のコレクションをアクティブにできます："

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2013-08-26 11:01-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,9 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/zookeeper/views.py:75
+#: src/zookeeper/views.py:72
 msgid "Could not correctly connect to Zookeeper."
 msgstr "无法正确连接到 Zookeeper。"
+
+#: src/zookeeper/views.py:124 src/zookeeper/views.py:143
+#: src/zookeeper/views.py:168 src/zookeeper/views.py:191
+msgid "You are not a superuser"
+msgstr "您不是超级用户"
 
 #: src/zookeeper/templates/clients.mako:24
 msgid "Clients"
@@ -67,7 +72,7 @@ msgid "Create Znode"
 msgstr "创建 Znode"
 
 #: src/zookeeper/templates/create.mako:46 src/zookeeper/templates/edit.mako:46
-#: src/zookeeper/templates/tree.mako:115
+#: src/zookeeper/templates/tree.mako:125
 msgid "Cancel"
 msgstr "取消"
 
@@ -132,44 +137,44 @@ msgstr "Znode"
 msgid "No children available"
 msgstr "无可用子项"
 
-#: src/zookeeper/templates/tree.mako:54
+#: src/zookeeper/templates/tree.mako:56
 msgid "Add"
 msgstr "添加"
 
-#: src/zookeeper/templates/tree.mako:55
+#: src/zookeeper/templates/tree.mako:58
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "是否确定要删除 %s？"
 
-#: src/zookeeper/templates/tree.mako:55
+#: src/zookeeper/templates/tree.mako:59
 msgid "Remove current ZNode"
 msgstr "删除当前 ZNode"
 
-#: src/zookeeper/templates/tree.mako:63
+#: src/zookeeper/templates/tree.mako:69
 msgid "Text"
 msgstr "文本"
 
-#: src/zookeeper/templates/tree.mako:64
+#: src/zookeeper/templates/tree.mako:70
 msgid "Base64"
 msgstr "Base64"
 
-#: src/zookeeper/templates/tree.mako:65 src/zookeeper/templates/tree.mako:67
+#: src/zookeeper/templates/tree.mako:71 src/zookeeper/templates/tree.mako:73
 msgid "Stats"
 msgstr "状态"
 
-#: src/zookeeper/templates/tree.mako:74
+#: src/zookeeper/templates/tree.mako:81
 msgid "Edit as Text"
 msgstr "编辑为文本"
 
-#: src/zookeeper/templates/tree.mako:78
+#: src/zookeeper/templates/tree.mako:87
 msgid "Edit as Base64"
 msgstr "编辑为 Base64"
 
-#: src/zookeeper/templates/tree.mako:109
+#: src/zookeeper/templates/tree.mako:119
 msgid "Delete Znode?"
 msgstr "删除 Znode？"
 
-#: src/zookeeper/templates/tree.mako:116
+#: src/zookeeper/templates/tree.mako:126
 msgid "Yes, delete it!"
 msgstr "是，将其删除！"
 
@@ -265,5 +270,3 @@ msgstr "待定同步"
 msgid "follower"
 msgstr "追随者"
 
-#~ msgid "Cluster"
-#~ msgstr ""

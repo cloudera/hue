@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2013-07-13 20:35-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,20 +17,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hbase/api.py:47
+#: src/hbase/api.py:48
+#, python-format
+msgid "HBase Thrift 1 server cannot be contacted: %s"
+msgstr "No se puede contactar con el servidor HBase Thrift 1: %s"
+
+#: src/hbase/api.py:50
 #, python-format
 msgid "Api Error: %s"
 msgstr "Error de Api: %s"
 
-#: src/hbase/api.py:69
+#: src/hbase/api.py:72
 #, python-format
 msgid "Cluster configuration %s isn't formatted correctly."
 msgstr "La configuración del clúster %s no tiene el formato correcto."
 
-#: src/hbase/api.py:80
+#: src/hbase/api.py:83
 #, python-format
 msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "El clúster con el nombre %s no existe en la configuración."
+
+#: src/hbase/views.py:129
+msgid "A POST request is required."
+msgstr "Se necesita una solicitud POST."
 
 #: src/hbase/templates/app.mako:35
 msgid "HBase Browser"
@@ -48,307 +57,285 @@ msgstr "Actualizar fila"
 msgid "Delete Row"
 msgstr "Eliminar fila"
 
-#: src/hbase/templates/app.mako:85 src/hbase/templates/app.mako:247
+#: src/hbase/templates/app.mako:85 src/hbase/templates/app.mako:251
 msgid "Toggle Collapse Selected"
 msgstr "Alternar Contraer la selección"
 
-#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:248
+#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:252
 msgid "Select All Visible"
 msgstr "Seleccionar todos los visibles"
 
-#: src/hbase/templates/app.mako:92
+#: src/hbase/templates/app.mako:93
 msgid "Add New Column/Cell"
 msgstr "Agregar nueva columna/celda"
 
-#: src/hbase/templates/app.mako:104
+#: src/hbase/templates/app.mako:106
 msgid "Full Editor"
 msgstr "Editor completo"
 
-#: src/hbase/templates/app.mako:120
+#: src/hbase/templates/app.mako:122
 msgid "No rows to display."
 msgstr "No hay filas que mostrar."
 
-#: src/hbase/templates/app.mako:126
+#: src/hbase/templates/app.mako:128
 msgid "Sort By"
 msgstr "Clasificar por"
 
-#: src/hbase/templates/app.mako:140
+#: src/hbase/templates/app.mako:142
 msgid "Home"
 msgstr "Inicio"
 
-#: src/hbase/templates/app.mako:145
+#: src/hbase/templates/app.mako:147
 msgid "Switch Cluster"
 msgstr "Cambiar clúster"
 
-#: src/hbase/templates/app.mako:164
+#: src/hbase/templates/app.mako:166
 msgid "Search for Table Name"
 msgstr "Buscar nombre de tabla"
 
-#: src/hbase/templates/app.mako:167
+#: src/hbase/templates/app.mako:169
 msgid "Enable"
 msgstr "Activar"
 
-#: src/hbase/templates/app.mako:169
+#: src/hbase/templates/app.mako:171
 msgid "Disable"
 msgstr "Desactivar"
 
-#: src/hbase/templates/app.mako:172
+#: src/hbase/templates/app.mako:174
 msgid "Drop"
 msgstr "Descartar"
 
-#: src/hbase/templates/app.mako:175
+#: src/hbase/templates/app.mako:178
 msgid "New Table"
 msgstr "Nueva tabla"
 
-#: src/hbase/templates/app.mako:194
+#: src/hbase/templates/app.mako:198
 msgid "Create New Table"
 msgstr "Crear nueva tabla"
 
-#: src/hbase/templates/app.mako:198
+#: src/hbase/templates/app.mako:202
 msgid "Table Name"
 msgstr "Nombre de tabla"
 
-#: src/hbase/templates/app.mako:199
+#: src/hbase/templates/app.mako:203
 msgid "Column Families"
 msgstr "Familias de columnas"
 
-#: src/hbase/templates/app.mako:203
+#: src/hbase/templates/app.mako:207
 msgid "Additional Column Family"
 msgstr "Familia de columnas adicional"
 
-#: src/hbase/templates/app.mako:206 src/hbase/templates/app.mako:305
-#: src/hbase/templates/app.mako:328 src/hbase/templates/app.mako:369
-#: src/hbase/templates/app.mako:401
+#: src/hbase/templates/app.mako:210 src/hbase/templates/app.mako:311
+#: src/hbase/templates/app.mako:334 src/hbase/templates/app.mako:375
+#: src/hbase/templates/app.mako:407
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/hbase/templates/app.mako:207
+#: src/hbase/templates/app.mako:211
 msgid "Submit"
 msgstr "Enviar"
 
-#: src/hbase/templates/app.mako:219
+#: src/hbase/templates/app.mako:223
 msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
 msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
 
-#: src/hbase/templates/app.mako:229
+#: src/hbase/templates/app.mako:233
 msgid "Autocomplete Suggestions:"
 msgstr "Sugerencias de autocompletar:"
 
-#: src/hbase/templates/app.mako:241
+#: src/hbase/templates/app.mako:245
 msgid "Toggle Grid"
 msgstr "Alternar cuadrícula"
 
-#: src/hbase/templates/app.mako:243
+#: src/hbase/templates/app.mako:247
 msgid "Toggle Select All Rows"
 msgstr "Alternar Seleccionar todas las filas"
 
-#: src/hbase/templates/app.mako:243
+#: src/hbase/templates/app.mako:247
 msgid "All"
 msgstr "Todos"
 
-#: src/hbase/templates/app.mako:250
+#: src/hbase/templates/app.mako:254
 msgid "Drop Columns"
 msgstr "Descartar columnas"
 
-#: src/hbase/templates/app.mako:265
+#: src/hbase/templates/app.mako:269
 msgid "Fetched"
 msgstr "Capturado"
 
-#: src/hbase/templates/app.mako:268
+#: src/hbase/templates/app.mako:272
 msgid "starting from"
 msgstr "empezando el"
 
-#: src/hbase/templates/app.mako:273
+#: src/hbase/templates/app.mako:277
 msgid "in"
 msgstr "en"
 
-#: src/hbase/templates/app.mako:273
+#: src/hbase/templates/app.mako:277
 msgid "seconds"
 msgstr "segundos"
 
-#: src/hbase/templates/app.mako:274
+#: src/hbase/templates/app.mako:278
 msgid "Entries after"
 msgstr "Las entradas después de"
 
-#: src/hbase/templates/app.mako:274
+#: src/hbase/templates/app.mako:278
 msgid "were truncated."
 msgstr "estaban truncados."
 
-#: src/hbase/templates/app.mako:279
+#: src/hbase/templates/app.mako:283
 msgid "Drop Rows"
 msgstr "Descartar filas"
 
-#: src/hbase/templates/app.mako:281
+#: src/hbase/templates/app.mako:286
 msgid ".CSV, .TSV, etc..."
 msgstr ".CSV, .TSV, etc."
 
-#: src/hbase/templates/app.mako:281
+#: src/hbase/templates/app.mako:286
 msgid "Bulk Upload"
 msgstr "Carga en bloque"
 
-#: src/hbase/templates/app.mako:282
+#: src/hbase/templates/app.mako:287
 msgid "New Row"
 msgstr "Nueva fila"
 
-#: src/hbase/templates/app.mako:293
+#: src/hbase/templates/app.mako:299
 msgid "Insert New Row"
 msgstr "Insertar nueva fila"
 
-#: src/hbase/templates/app.mako:298
+#: src/hbase/templates/app.mako:304
 msgid "Row Key"
 msgstr "Clave de fila"
 
-#: src/hbase/templates/app.mako:302
+#: src/hbase/templates/app.mako:308
 msgid "Add Field"
 msgstr "Agregar campo"
 
-#: src/hbase/templates/app.mako:316
+#: src/hbase/templates/app.mako:322
 msgid "Create New Column"
 msgstr "Crear nueva columna"
 
-#: src/hbase/templates/app.mako:322
+#: src/hbase/templates/app.mako:328
 msgid "Column Name"
 msgstr "Nombre de columna"
 
-#: src/hbase/templates/app.mako:324 src/hbase/templates/app.mako:325
+#: src/hbase/templates/app.mako:330 src/hbase/templates/app.mako:331
 msgid "Cell Value"
 msgstr "Valor de celda"
 
-#: src/hbase/templates/app.mako:329 src/hbase/templates/app.mako:370
+#: src/hbase/templates/app.mako:335 src/hbase/templates/app.mako:376
 msgid "Upload"
 msgstr "Cargar"
 
-#: src/hbase/templates/app.mako:341
+#: src/hbase/templates/app.mako:347
 msgid "Edit Cell"
 msgstr "Editar celda"
 
-#: src/hbase/templates/app.mako:357
+#: src/hbase/templates/app.mako:363
 msgid "Cell History:"
 msgstr "Historial de celda:"
 
-#: src/hbase/templates/app.mako:371
+#: src/hbase/templates/app.mako:377
 msgid "Save"
 msgstr "Guardar"
 
-#: src/hbase/templates/app.mako:373
+#: src/hbase/templates/app.mako:379
 msgid "OK"
 msgstr "Aceptar"
 
-#: src/hbase/templates/app.mako:402 src/hbase/templates/app.mako:420
+#: src/hbase/templates/app.mako:408 src/hbase/templates/app.mako:426
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: src/hbase/templates/app.mako:414
+#: src/hbase/templates/app.mako:420
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
 
-#: src/hbase/templates/app.mako:415
+#: src/hbase/templates/app.mako:421
 msgid "Delete row "
 msgstr "Eliminar fila "
 
-#: src/hbase/templates/app.mako:416
+#: src/hbase/templates/app.mako:422
 msgid "? (This cannot be undone)"
 msgstr "? (No se puede deshacer)"
 
-#: src/hbase/templates/app.mako:417
+#: src/hbase/templates/app.mako:423
 msgid "Are you sure you want to drop this column?"
 msgstr "¿Está seguro de que desea descartar esta columna?"
 
-#: src/hbase/templates/app.mako:418
+#: src/hbase/templates/app.mako:424
 msgid "enable"
 msgstr "activar"
 
-#: src/hbase/templates/app.mako:419
+#: src/hbase/templates/app.mako:425
 msgid "disable"
 msgstr "desactivar"
 
-#: src/hbase/templates/app.mako:421
+#: src/hbase/templates/app.mako:427
 msgid "Are you sure you want to"
 msgstr "¿Está seguro de que desea"
 
-#: src/hbase/templates/app.mako:422
+#: src/hbase/templates/app.mako:428
 msgid "this table?"
 msgstr "esta tabla?"
 
-#: src/hbase/templates/app.mako:423
+#: src/hbase/templates/app.mako:429
 msgid "End Query"
 msgstr "Finalizar consulta"
 
-#: src/hbase/templates/app.mako:424
+#: src/hbase/templates/app.mako:430
 msgid "Prefix Scan"
 msgstr "Análisis de prefijos"
 
-#: src/hbase/templates/app.mako:425
+#: src/hbase/templates/app.mako:431
 msgid "Start Scan"
 msgstr "Iniciar examen"
 
-#: src/hbase/templates/app.mako:426
+#: src/hbase/templates/app.mako:432
 msgid "Start Select Columns"
 msgstr "Iniciar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:427
+#: src/hbase/templates/app.mako:433
 msgid "End Column/Family"
 msgstr "Finalizar columna/familia"
 
-#: src/hbase/templates/app.mako:428
+#: src/hbase/templates/app.mako:434
 msgid "End Select Columns"
 msgstr "Finalizar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:429
+#: src/hbase/templates/app.mako:435
 msgid "Start FilterString"
 msgstr "Iniciar FilterString"
 
-#: src/hbase/templates/app.mako:430
+#: src/hbase/templates/app.mako:436
 msgid "End FilterString"
 msgstr "Finalizar FilterString"
 
-#: src/hbase/templates/app.mako:431
+#: src/hbase/templates/app.mako:437
 msgid "Row Key Value"
 msgstr "Valor de clave de fila"
 
-#: src/hbase/templates/app.mako:432
+#: src/hbase/templates/app.mako:438
 msgid "Length of Scan or Row Key"
 msgstr "Longitud de examen o clave de fila"
 
-#: src/hbase/templates/app.mako:433
+#: src/hbase/templates/app.mako:439
 msgid "Column Family: Column Name"
 msgstr "Familia de columnas: nombre de columna"
 
-#: src/hbase/templates/app.mako:434
+#: src/hbase/templates/app.mako:440
 msgid "Rows starting with"
 msgstr "Filas que empiezan por"
 
-#: src/hbase/templates/app.mako:435
+#: src/hbase/templates/app.mako:441
 msgid "String"
 msgstr "Cadena"
 
-#: src/hbase/templates/app.mako:436
+#: src/hbase/templates/app.mako:442
 msgid "Integer"
 msgstr "Entero"
 
-#: src/hbase/templates/app.mako:437
+#: src/hbase/templates/app.mako:443
 msgid "Column Range"
 msgstr "Intervalo de columnas"
 
-#~ msgid "Notice:"
-#~ msgstr "Aviso:"
-#~ msgid " entries may be truncated with limit set at"
-#~ msgstr " entradas pueden estar truncadas con un límite establecido en"
-#~ msgid "items per set."
-#~ msgstr "elementos por set."
-#~ msgid "Query executed in"
-#~ msgstr "Solicitud ejecutada en"
-#~ msgid "rows"
-#~ msgstr "filas"
-#~ msgid ""
-#~ "row_key, row_key_prefix* + scan_length, "
-#~ "row_key [family:col1, family2:col2, family3:]"
-#~ msgstr ""
-#~ "row_key, row_key_prefix* + scan_length, "
-#~ "row_key [family:col1, family2:col2, family3:]"
-#~ msgid "Displaying"
-#~ msgstr "Mostrando"
-#~ msgid "Add Query Field"
-#~ msgstr "Agregar el campo Consulta"
-#~ msgid "Go"
-#~ msgstr "Ir"

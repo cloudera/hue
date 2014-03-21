@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSÃO DO PROJETO\n"
 "Report-Msgid-Bugs-To: ENDEREÇO DE E-MAIL\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOME COMPLETO <ENDEREÇO DE E-MAIL>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "Lista jar de aplicativos ausentes."
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
 msgstr "URL do servidor de jobs Spark."
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr "O aplicativo não funcionará sem um servidor Oozie em execução"
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
@@ -340,5 +344,3 @@ msgstr "Duração"
 msgid "Click to open"
 msgstr "Clique para abrir"
 
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr "O aplicativo não funcionará sem um servidor Ooozie em execução"
