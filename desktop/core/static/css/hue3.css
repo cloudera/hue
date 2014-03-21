@@ -1576,3 +1576,7 @@ a, a:hover, a:active, a:focus {
 .side-labels .feedback:hover {
   border-top-color: #338BB8;
 }
+
+body.modal-open {
+    overflow: hidden;
+}

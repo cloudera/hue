@@ -66,13 +66,17 @@
       </div>
 
       <div class="modal-content">
-        <fieldset class="span12">
-          % for field in form:
-            % if field.html_name in ('name', 'description'):
-              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
-            % endif
-          % endfor
-        </fieldset>
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <fieldset class="span12">
+              % for field in form:
+                % if field.html_name in ('name', 'description'):
+                  ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'class': 'input-xlarge', 'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
+                % endif
+              % endfor
+            </fieldset>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -101,18 +105,20 @@
       </div>
 
       <div class="modal-content">
-        <fieldset class="span12">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <fieldset class="span12">
           % for field in node_form:
             % if field.html_name in ('name', 'description'):
-              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
+              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'class': 'input-xlarge', 'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
             % endif
           % endfor
 
           <div class="control-group">
             <label class="control-label"></label>
             <div class="controls">
-              <div>${ _('Examples of predicates:') }</div>
-              <div class="well">
+              <div style="padding: 10px; background-color: #EEEEEE">
+                <strong>${ _('Examples of predicates:') }</strong><br/>
                 ${"${"} fs:fileSize(secondjobOutputDir) gt 10 * GB }
                 <br/>
                 ${"${"} hadoop:counters('secondjob')[RECORDS][REDUCE_OUT] lt 1000000 }
@@ -134,13 +140,13 @@
               <!-- ko foreach: links() -->
               <tr>
                 <td>
-                  ${ utils.render_field(link_form['comment'], extra_attrs={'data-bind': 'value: comment'}) }
+                  ${ utils.render_field(link_form['comment'], extra_attrs={'class': 'input-xxlarge', 'data-bind': 'value: comment'}, control_extra='style=margin-bottom:0') }
                 </td>
-                <td class="center">
+                <td class="center" style="vertical-align: middle">
                   ${ _('go to') }
                 </td>
-                <td class="right">
-                  <a class="span3 edit-node-link" data-bind="text: $parent.registry.get(child()).name()"></a>
+                <td style="vertical-align: middle">
+                  <a class="edit-node-link" data-bind="text: $parent.registry.get(child()).name()"></a>
                 </td>
               </tr>
               <!-- /ko -->
@@ -149,18 +155,18 @@
                 <!-- ko if: $data.name() == 'default' -->
                 <tr>
                   <td>
-                   <div class="control-group">
+                   <div class="control-group" style="margin-bottom: 0">
                       <label class="control-label"></label>
                       <div class="controls">
                         <div>${ _('default') }</div>
                       </div>
                     </div>
                   </td>
-                  <td class="center nowrap">
+                  <td class="center nowrap" style="vertical-align: middle">
                     ${ _('go to') }
                   </td>
-                  <td class="right">
-                    ${ utils.render_field(default_link_form['child'], extra_attrs={'data-bind': 'value: child'}) }
+                  <td>
+                    ${ utils.render_field(default_link_form['child'], extra_attrs={'class': 'input-xxlarge', 'data-bind': 'value: child'}, control_extra='style=margin-bottom:0', show_label=False) }
                   </td>
                 </tr>
                 <!-- /ko -->
@@ -169,6 +175,8 @@
           </table>
 
         </fieldset>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -205,7 +213,7 @@
               <span class="span4 required" data-bind="text: type" />
             </td>
             <td>
-              <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+              <input type="text" class="input-xxlarge required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
             </td>
             <td>
             % if 'remove' in javascript_attrs:

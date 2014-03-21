@@ -34,9 +34,13 @@
       </div>
 
       <div class="modal-content">
-        <fieldset class="span12">
-          ${ action_form_fields(action_form, node_type) }
-        </fieldset>
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <fieldset class="span12">
+              ${ action_form_fields(action_form, node_type) }
+            </fieldset>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -55,7 +59,7 @@
 % if show_primary:
   % for field in action_form:
     % if field.html_name in ('name', 'description'):
-      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
+      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'class': 'input-xlarge', 'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
     % endif
   % endfor
 
@@ -157,9 +161,9 @@
 % for field in action_form:
   % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
     % if field.html_name in ('capture_output', 'is_single', 'sub_workflow', 'propagate_configuration'):
-      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, checked: %s' % field.name}) }
+      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'class': 'span11', 'data-bind': 'disable: $root.context().read_only, checked: %s' % field.name}) }
     % else:
-      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, valueUpdate:"afterkeydown", value: %s' % field.name}) }
+      ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'class': 'span11', 'data-bind': 'disable: $root.context().read_only, valueUpdate:"afterkeydown", value: %s' % field.name}) }
     % endif
   % endif
 % endfor
@@ -335,7 +339,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <input type="text" class="span5 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: name, uniqueName: false" />
+              <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: name, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:
@@ -363,7 +367,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <input type="text" class="span5 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: name, uniqueName: false" />
+              <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: name, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:
@@ -397,8 +401,8 @@
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
-            <td><input type="text" class="span4 required propKey" data-bind="disable: $root.context().read_only, value: name, uniqueName: false" /></td>
-            <td><input type="text" class="span4 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required propKey" data-bind="disable: $root.context().read_only, value: name, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" /></td>
             <td>
             % if 'remove' in javascript_attrs:
               <a class="btn" href="#" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
@@ -431,8 +435,8 @@
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
-            <td><input type="text" class="span3 required propKey" data-bind="disable: $root.context().read_only, fileChooser: $data, value: source, uniqueName: false" /></td>
-            <td><input type="text" class="span3 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: destination, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required propKey" data-bind="disable: $root.context().read_only, fileChooser: $data, value: source, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: destination, uniqueName: false" /></td>
             <td>
             % if 'remove' in javascript_attrs:
               <a class="btn" href="#" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
@@ -466,9 +470,9 @@
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
-            <td><input type="text" class="span4 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: path, uniqueName: false" /></td>
-            <td><input type="text" class="span2 required propKey" data-bind="disable: $root.context().read_only, value: permissions, uniqueName: false" /></td>
-            <td><input type="checkbox" class="span1 required" data-bind="disable: $root.context().read_only, checked: recursive, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: path, uniqueName: false" /></td>
+            <td><input type="text" class="input-xlarge required propKey" data-bind="disable: $root.context().read_only, value: permissions, uniqueName: false" /></td>
+            <td><input type="checkbox" class="input-medium required" data-bind="disable: $root.context().read_only, checked: recursive, uniqueName: false" /></td>
             <td>
             % if 'remove' in javascript_attrs:
               <a class="btn" href="#" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
@@ -505,7 +509,7 @@
               <span class="span4 required" data-bind="text: type" />
             </td>
             <td>
-              <input type="text" class="input span4 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
+              <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
             </td>
             <td>
             % if 'remove' in javascript_attrs:
@@ -545,7 +549,7 @@
               <span class="span4 required" data-bind="text: type" />
             </td>
             <td>
-              <input type="text" class="input span4 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
+              <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:

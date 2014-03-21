@@ -200,15 +200,19 @@
 </%def>
 
 
-<%def name="render_field(field, show_label=True, extra_attrs={})">
+<%def name="render_field(field, show_label=True, extra_attrs={}, control_extra='')">
   % if not field.is_hidden:
     <% group_class = field.errors and "error" or "" %>
     <div class="control-group ${group_class}"
-      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }" ${control_extra}>
       % if show_label:
         <label class="control-label">${ field.label }</label>
       % endif
-      <div class="controls">
+      <div class="controls"
+      % if not show_label:
+        style="margin-left: 0"
+      % endif
+              >
         <% field.field.widget.attrs.update(extra_attrs) %>
         ${ field | n,unicode }
         % if field.errors:

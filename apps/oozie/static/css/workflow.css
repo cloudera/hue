@@ -145,8 +145,21 @@ ul {
 }
 
 .draggable-button a {
-  padding: 8px;
+  padding: 7px;
 }
+
+@media (max-width: 1365px) {
+  .draggable-button a {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 1260px) {
+  .draggable-button a {
+    padding: 1px;
+  }
+}
+
 
 .typeahead {
   z-index: 2000;
@@ -216,4 +229,8 @@ ul {
   padding:10px;
   border:1px solid #DDD!important;
   border-top:0!important;
+}
+
+.fileChooserBtn {
+  height: 30px;
 }
