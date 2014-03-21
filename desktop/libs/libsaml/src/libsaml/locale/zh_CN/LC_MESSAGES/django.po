@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,11 +18,15 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/libsaml/conf.py:46
-msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgid ""
+"Xmlsec1 binary path. This program should be executable by the user "
+"running Hue."
 msgstr "Xmlsec1 二进制路径。此程序应由运行 Hue 的用户执行。"
 
 #: src/libsaml/conf.py:52
-msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
+msgid ""
+"Entity ID for Hue acting as service provider. Can also accept a pattern "
+"where '<base_url>' will be replaced with server URL base."
 msgstr "用作服务提供商的 Hue 的实体 ID。也可接受 '<base_url>' 将被替换为服务器 URL 基的模式。"
 
 #: src/libsaml/conf.py:58
@@ -30,7 +34,9 @@ msgid "Create users from IdP on login."
 msgstr "登录时从 IdP 创建用户。"
 
 #: src/libsaml/conf.py:65
-msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgid ""
+"Attribute map directory contains files that map SAML attributes to "
+"pysaml2 attributes."
 msgstr "属性映射目录包含将 SAML 属性映射到 pysaml2 属性的文件。"
 
 #: src/libsaml/conf.py:72
@@ -46,19 +52,28 @@ msgid "Optional attributes to ask for from IdP."
 msgstr "IdP 要求的可选属性。"
 
 #: src/libsaml/conf.py:90
-msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgid ""
+"IdP metadata in the form of a file. This is generally an XML file "
+"containing metadata that the Identity Provider generates."
 msgstr "文件格式的 IdP 元数据。这通常是包含 Identity Provider 所生成的元数据的 XML 文件。"
 
 #: src/libsaml/conf.py:96
-msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
+msgid ""
+"key_file is the name of a PEM formatted file that contains the private "
+"key of the Hue service. This is presently used both to encrypt/sign "
+"assertions and as client key in a HTTPS session."
 msgstr "key_file 是包含 Hue 服务私钥的 PEM 格式文件的名称。这目前用于加密/签署声明以及用作 HTTPS 会话中的客户端密钥。"
 
 #: src/libsaml/conf.py:102
-msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgid ""
+"This is the public part of the service private/public key pair. cert_file"
+" must be a PEM formatted certificate chain file."
 msgstr "这是服务私钥/公钥对的公共部分。cert_file 必须是 PEM 格式的证书链文件。"
 
 #: src/libsaml/conf.py:108
-msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgid ""
+"A mapping from attributes in the response from the IdP to django user "
+"attributes."
 msgstr "从 IdP 响应中的属性到 django 用户属性的映射。"
 
 #: src/libsaml/conf.py:114

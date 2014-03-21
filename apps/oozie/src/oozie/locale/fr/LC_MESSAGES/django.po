@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-08-14 22:55-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -19,7 +19,9 @@ msgstr ""
 
 #: src/oozie/conf.py:32
 msgid "Location on local FS where the xslt files are stored for workflow import."
-msgstr "Emplacement sur le système de fichiers local où les fichiers xslt sont stockés en vue de l'importation de workflow."
+msgstr ""
+"Emplacement sur le système de fichiers local où les fichiers xslt sont "
+"stockés en vue de l'importation de workflow."
 
 #: src/oozie/conf.py:39
 msgid "Location on local filesystem where the examples are stored."
@@ -27,23 +29,35 @@ msgstr "Emplacement sur le système de fichiers local où les exemples sont stoc
 
 #: src/oozie/conf.py:46
 msgid "Location on local filesystem where the data for the examples is stored."
-msgstr "Emplacement sur le système de fichiers local où les données des exemples sont stockées."
+msgstr ""
+"Emplacement sur le système de fichiers local où les données des exemples "
+"sont stockées."
 
 #: src/oozie/conf.py:53
 msgid "Location on HDFS where the Oozie workflows are stored."
 msgstr "Emplacement sur HDFS local où les workflows Oozie sont stockés."
 
 #: src/oozie/conf.py:60
-msgid "Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call."
-msgstr "Nombre maximal de workflows, de coordinators ou de bundles Oozie à récupérer dans un appel API."
+msgid ""
+"Maximum number of Oozie workflows or coodinators or bundles to retrieve "
+"in one API call."
+msgstr ""
+"Nombre maximal de workflows, de coordinators ou de bundles Oozie à "
+"récupérer dans un appel API."
 
 #: src/oozie/conf.py:67
-msgid "Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit."
-msgstr "Utilisez le format Cron pour définir la fréquence d'un coordinator plutôt que l'ancienne fréquence qui était exprimée en nombre/unité."
+msgid ""
+"Use Cron format for defining the frequency of a Coordinator instead of "
+"the old frequency number/unit."
+msgstr ""
+"Utilisez le format Cron pour définir la fréquence d'un coordinator plutôt"
+" que l'ancienne fréquence qui était exprimée en nombre/unité."
 
 #: src/oozie/conf.py:77
 msgid "The app won't work without a running Oozie server"
-msgstr "Sans un serveur Oozie en cours d'exécution, l'application ne fonctionnera pas."
+msgstr ""
+"Sans un serveur Oozie en cours d'exécution, l'application ne fonctionnera"
+" pas."
 
 #: src/oozie/forms.py:86
 msgid "Local workflow.xml file"
@@ -62,21 +76,37 @@ msgid "Coordinator resource archive (zip)"
 msgstr "Archive de ressource du coordinator (zip)"
 
 #: src/oozie/forms.py:469 src/oozie/forms.py:482
-msgid "Used to indicate if user wants to cleanup output events for given rerun actions"
-msgstr "Utilisé pour indiquer si l'utilisateur veut nettoyer les événements de sortie pour des actions de réexécution données"
+msgid ""
+"Used to indicate if user wants to cleanup output events for given rerun "
+"actions"
+msgstr ""
+"Utilisé pour indiquer si l'utilisateur veut nettoyer les événements de "
+"sortie pour des actions de réexécution données"
 
 #: src/oozie/forms.py:470 src/oozie/forms.py:483
-msgid "Used to indicate if user wants to refresh an action's input and output events"
-msgstr "Utilisé pour indiquer si l'utilisateur veut actualiser les événements d'entrée et de sortie d'une action"
+msgid ""
+"Used to indicate if user wants to refresh an action's input and output "
+"events"
+msgstr ""
+"Utilisé pour indiquer si l'utilisateur veut actualiser les événements "
+"d'entrée et de sortie d'une action"
 
 #: src/oozie/models.py:62
-msgid "Enter a valid value: combination of 2 - 40 letters and digits starting by a letter"
-msgstr "Entrez une valeur valide, commençant par une lettre et composée de 2 à 40 caractères alphanumériques."
+msgid ""
+"Enter a valid value: combination of 2 - 40 letters and digits starting by"
+" a letter"
+msgstr ""
+"Entrez une valeur valide, commençant par une lettre et composée de 2 à 40"
+" caractères alphanumériques."
 
 #: src/oozie/models.py:91
 #, python-format
-msgid "Permission denied. %(username)s does not have the permissions required to access job %(id)s"
-msgstr "Autorisation refusée. %(username)s n'a pas l'autorisation requise pour accéder au job %(id)s"
+msgid ""
+"Permission denied. %(username)s does not have the permissions required to"
+" access job %(id)s"
+msgstr ""
+"Autorisation refusée. %(username)s n'a pas l'autorisation requise pour "
+"accéder au job %(id)s"
 
 #: src/oozie/models.py:98
 #, python-format
@@ -174,7 +204,9 @@ msgid "HDFS deployment directory"
 msgstr "Répertoire de déploiement HDFS"
 
 #: src/oozie/models.py:120
-msgid "The path on the HDFS where all the workflows and dependencies must be uploaded."
+msgid ""
+"The path on the HDFS where all the workflows and dependencies must be "
+"uploaded."
 msgstr "Chemin sur HDFS où tous les workflows et dépendances doivent être envoyés."
 
 #: src/oozie/models.py:122
@@ -190,8 +222,12 @@ msgid "Oozie parameters"
 msgstr "Paramètres Oozie"
 
 #: src/oozie/models.py:125
-msgid "Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true)."
-msgstr "Paramètres utilisés lors de l'envoi (par exemple, marché=US, oozie.use.system.libpath=true)."
+msgid ""
+"Parameters used at the submission time (e.g. market=US, "
+"oozie.use.system.libpath=true)."
+msgstr ""
+"Paramètres utilisés lors de l'envoi (par exemple, marché=US, "
+"oozie.use.system.libpath=true)."
 
 #: src/oozie/models.py:126
 msgid "Is trashed"
@@ -218,8 +254,15 @@ msgstr "Fichier XML du job"
 #: src/oozie/models.py:332 src/oozie/models.py:856 src/oozie/models.py:924
 #: src/oozie/models.py:964 src/oozie/models.py:1042 src/oozie/models.py:1102
 #: src/oozie/models.py:1140
-msgid "Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. Properties specified in the Job Properties element override properties specified in the files specified in the Job XML element."
-msgstr "Référez-vous à un fichier job.xml JobConf de Hadoop situé dans le répertoire de déploiement du workflow. Les propriétés spécifiées dans l'élément de Propriétés du job remplace les propriétés spécifiées dans l'élément Fichier XML du job."
+msgid ""
+"Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment"
+" directory. Properties specified in the Job Properties element override "
+"properties specified in the files specified in the Job XML element."
+msgstr ""
+"Référez-vous à un fichier job.xml JobConf de Hadoop situé dans le "
+"répertoire de déploiement du workflow. Les propriétés spécifiées dans "
+"l'élément de Propriétés du job remplace les propriétés spécifiées dans "
+"l'élément Fichier XML du job."
 
 #: src/oozie/models.py:335 src/oozie/models.py:848 src/oozie/models.py:881
 #: src/oozie/models.py:918 src/oozie/models.py:958 src/oozie/models.py:997
@@ -229,8 +272,12 @@ msgid "Hadoop job properties"
 msgstr "Propriétés du job Hadoop"
 
 #: src/oozie/models.py:336
-msgid "Job configuration properties used by all the actions of the workflow (e.g. mapred.job.queue.name=production)"
-msgstr "Propriétés de configuration du job utilisées pour l'ensemble des actions du flux de travail (par exemple, mapred.job.queue.name=production)"
+msgid ""
+"Job configuration properties used by all the actions of the workflow "
+"(e.g. mapred.job.queue.name=production)"
+msgstr ""
+"Propriétés de configuration du job utilisées pour l'ensemble des actions "
+"du flux de travail (par exemple, mapred.job.queue.name=production)"
 
 #: src/oozie/models.py:405
 #, python-format
@@ -282,8 +329,12 @@ msgstr "Fichiers"
 #: src/oozie/models.py:845 src/oozie/models.py:878 src/oozie/models.py:904
 #: src/oozie/models.py:955 src/oozie/models.py:993 src/oozie/models.py:1032
 #: src/oozie/models.py:1093
-msgid "List of names or paths of files to be added to the distributed cache and the task running directory."
-msgstr "Liste des noms ou chemins de fichiers à ajouter au cache distribué et au répertoire d'exécution de la tâche."
+msgid ""
+"List of names or paths of files to be added to the distributed cache and "
+"the task running directory."
+msgstr ""
+"Liste des noms ou chemins de fichiers à ajouter au cache distribué et au "
+"répertoire d'exécution de la tâche."
 
 #: src/oozie/models.py:846 src/oozie/models.py:879 src/oozie/models.py:905
 #: src/oozie/models.py:956 src/oozie/models.py:994 src/oozie/models.py:1033
@@ -294,14 +345,18 @@ msgstr "Archives"
 #: src/oozie/models.py:847 src/oozie/models.py:880 src/oozie/models.py:906
 #: src/oozie/models.py:957 src/oozie/models.py:995 src/oozie/models.py:1034
 #: src/oozie/models.py:1095
-msgid "List of names or paths of the archives to be added to the distributed cache."
+msgid ""
+"List of names or paths of the archives to be added to the distributed "
+"cache."
 msgstr "Liste de noms ou de chemins aux archives à ajouter au cache distribué."
 
 #: src/oozie/models.py:849 src/oozie/models.py:882 src/oozie/models.py:919
 #: src/oozie/models.py:959 src/oozie/models.py:998 src/oozie/models.py:1037
 #: src/oozie/models.py:1097
 msgid "For the job configuration (e.g. mapred.job.queue.name=production)"
-msgstr "Pour la configuration du job (par exemple, mapred.job.queue.name=production)"
+msgstr ""
+"Pour la configuration du job (par exemple, "
+"mapred.job.queue.name=production)"
 
 #: src/oozie/models.py:850 src/oozie/models.py:907
 msgid "Jar name"
@@ -310,7 +365,9 @@ msgstr "Nom du fichier Jar"
 #: src/oozie/models.py:851 src/oozie/models.py:908
 #, python-format
 msgid "Name or path to the %(program)s jar file on HDFS. E.g. examples.jar."
-msgstr "Nom ou chemin du fichier Jar de %(program)s sur HDFS. Par exemple, examples.jar."
+msgstr ""
+"Nom ou chemin du fichier Jar de %(program)s sur HDFS. Par exemple, "
+"examples.jar."
 
 #: src/oozie/models.py:852 src/oozie/models.py:920 src/oozie/models.py:960
 #: src/oozie/models.py:999 src/oozie/models.py:1038 src/oozie/models.py:1098
@@ -319,8 +376,12 @@ msgid "Prepares"
 msgstr "Prépare"
 
 #: src/oozie/models.py:853 src/oozie/models.py:921 src/oozie/models.py:961
-msgid "List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup."
-msgstr "Liste des chemins absolus à supprimer puis à créer avant le démarrage de l'application. A n'utiliser que pour le nettoyage des répertoires."
+msgid ""
+"List of absolute paths to delete and then to create before starting the "
+"application. This should be used exclusively for directory cleanup."
+msgstr ""
+"Liste des chemins absolus à supprimer puis à créer avant le démarrage de "
+"l'application. A n'utiliser que pour le nettoyage des répertoires."
 
 #: src/oozie/models.py:883
 msgid "Mapper"
@@ -344,7 +405,9 @@ msgstr "Classe principale"
 
 #: src/oozie/models.py:910
 msgid "Full name of the Java class. E.g. org.apache.hadoop.examples.Grep"
-msgstr "Nom complet de la classe Java (par exemple, org.apache.hadoop.examples.Grep)"
+msgstr ""
+"Nom complet de la classe Java (par exemple, "
+"org.apache.hadoop.examples.Grep)"
 
 #: src/oozie/models.py:911 src/oozie/models.py:1072 src/oozie/models.py:1090
 #: src/oozie/models.py:1131
@@ -352,16 +415,30 @@ msgid "Arguments"
 msgstr "Arguments"
 
 #: src/oozie/models.py:912
-msgid "Arguments of the main method. The value of each arg element is considered a single argument and they are passed to the main method in the same order."
-msgstr "Arguments de la méthode principale. La valeur de chaque élément arg est considérée comme un argument simple. Les arguments sont transmis à la méthode principale dans le même ordre."
+msgid ""
+"Arguments of the main method. The value of each arg element is considered"
+" a single argument and they are passed to the main method in the same "
+"order."
+msgstr ""
+"Arguments de la méthode principale. La valeur de chaque élément arg est "
+"considérée comme un argument simple. Les arguments sont transmis à la "
+"méthode principale dans le même ordre."
 
 #: src/oozie/models.py:914
 msgid "Java options"
 msgstr "Options Java"
 
 #: src/oozie/models.py:915
-msgid "Command-line parameters used to start the JVM that will execute the Java application. Using this element is equivalent to using the mapred.child.java.opts configuration property. E.g. -Dexample-property=hue"
-msgstr "Paramètres de ligne de commande utilisés pour démarrer la machine virtuelle Java qui va exécuter l'application Java. Utiliser cet élément équivaut à utiliser la propriété de configuration mapred.child.java.opts. Exemple : -Dexample-property=hue"
+msgid ""
+"Command-line parameters used to start the JVM that will execute the Java "
+"application. Using this element is equivalent to using the "
+"mapred.child.java.opts configuration property. E.g. -Dexample-"
+"property=hue"
+msgstr ""
+"Paramètres de ligne de commande utilisés pour démarrer la machine "
+"virtuelle Java qui va exécuter l'application Java. Utiliser cet élément "
+"équivaut à utiliser la propriété de configuration mapred.child.java.opts."
+" Exemple : -Dexample-property=hue"
 
 #: src/oozie/models.py:927 src/oozie/models.py:1074 src/oozie/models.py:1105
 msgid "Capture output"
@@ -369,8 +446,19 @@ msgstr "Résultat de capture"
 
 #: src/oozie/models.py:928 src/oozie/models.py:1106
 #, python-format
-msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java Properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
-msgstr "Sortie de capture stdout de l'exécution de la commande %(program)s. La sortie de la commande %(program)s doit figurer dans le format du fichier des propriétés Java mais ne doit pas dépasser 2 Ko. A partir de la définition du workflow, la sortie d'un noeud d'action %(program)s est accessible par le biais de la fonction String action:output(String node, String key)."
+msgid ""
+"Capture output of the stdout of the %(program)s command execution. The "
+"%(program)s command output must be in Java Properties file format and it "
+"must not exceed 2KB. From within the workflow definition, the output of "
+"an %(program)s action node is accessible via the String "
+"action:output(String node, String key) function"
+msgstr ""
+"Sortie de capture stdout de l'exécution de la commande %(program)s. La "
+"sortie de la commande %(program)s doit figurer dans le format du fichier "
+"des propriétés Java mais ne doit pas dépasser 2 Ko. A partir de la "
+"définition du workflow, la sortie d'un noeud d'action %(program)s est "
+"accessible par le biais de la fonction String action:output(String node, "
+"String key)."
 
 #: src/oozie/models.py:950 src/oozie/models.py:988
 msgid "Script name"
@@ -400,12 +488,21 @@ msgid "The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}"
 msgstr "Paramètres %(type)s du script, par exemple N=5, INPUT=${inputDir}"
 
 #: src/oozie/models.py:1000
-msgid "List of absolute paths to delete, then create, before starting the application. This should be used exclusively for directory cleanup."
-msgstr "Liste des chemins absolus à supprimer puis à créer avant le démarrage de l'application. A n'utiliser que pour le nettoyage des répertoires."
+msgid ""
+"List of absolute paths to delete, then create, before starting the "
+"application. This should be used exclusively for directory cleanup."
+msgstr ""
+"Liste des chemins absolus à supprimer puis à créer avant le démarrage de "
+"l'application. A n'utiliser que pour le nettoyage des répertoires."
 
 #: src/oozie/models.py:1003
-msgid "Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. Pick a name different than hive-site.xml."
-msgstr "Référez-vous à un fichier hive-config.xml de Hive situé dans le répertoire de déploiement du workflow. Choisissez un nom différent de hive-site.xml."
+msgid ""
+"Refer to a Hive hive-config.xml file bundled in the workflow deployment "
+"directory. Pick a name different than hive-site.xml."
+msgstr ""
+"Référez-vous à un fichier hive-config.xml de Hive situé dans le "
+"répertoire de déploiement du workflow. Choisissez un nom différent de "
+"hive-site.xml."
 
 #: src/oozie/models.py:1025
 msgid "Command"
@@ -413,17 +510,31 @@ msgstr "Commande"
 
 #: src/oozie/models.py:1026
 #, python-format
-msgid "The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below."
-msgstr "Commande %(type)s. Placez-la ici ou divisez-la avec des espaces et insérez chaque élément en tant que paramètres ci-dessous."
+msgid ""
+"The full %(type)s command. Either put it here or split it by spaces and "
+"insert the parts as multiple parameters below."
+msgstr ""
+"Commande %(type)s. Placez-la ici ou divisez-la avec des espaces et "
+"insérez chaque élément en tant que paramètres ci-dessous."
 
 #: src/oozie/models.py:1029
 #, python-format
-msgid "If no command is specified, split the command by spaces and insert the %(type)s parameters here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ..."
-msgstr "Si aucune commande n'est indiquée, divisez la commande avec des espaces et insérez les paramètres %(type)s ici, par exemple import, --connect, jdbc:hsqldb:file:db.hsqldb, ..."
+msgid ""
+"If no command is specified, split the command by spaces and insert the "
+"%(type)s parameters here e.g. import, --connect, "
+"jdbc:hsqldb:file:db.hsqldb, ..."
+msgstr ""
+"Si aucune commande n'est indiquée, divisez la commande avec des espaces "
+"et insérez les paramètres %(type)s ici, par exemple import, --connect, "
+"jdbc:hsqldb:file:db.hsqldb, ..."
 
 #: src/oozie/models.py:1039 src/oozie/models.py:1099 src/oozie/models.py:1137
-msgid "List of absolute paths to delete then to create before starting the application. This should be used exclusively for directory cleanup"
-msgstr "Liste des chemins absolus à supprimer puis à créer avant le démarrage de l'application. A n'utiliser que pour le nettoyage des répertoires."
+msgid ""
+"List of absolute paths to delete then to create before starting the "
+"application. This should be used exclusively for directory cleanup"
+msgstr ""
+"Liste des chemins absolus à supprimer puis à créer avant le démarrage de "
+"l'application. A n'utiliser que pour le nettoyage des répertoires."
 
 #: src/oozie/models.py:1066
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:132
@@ -458,41 +569,72 @@ msgstr "Arguments de la commande %(type)s."
 
 #: src/oozie/models.py:1075
 #, python-format
-msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
-msgstr "Sortie de capture stdout de l'exécution de la commande %(program)s. La sortie de la commande %(program)s doit figurer dans le format du fichier des propriétés Java mais ne doit pas dépasser 2 Ko. A partir de la définition du workflow, la sortie d'un noeud d'action %(program)s est accessible par le biais de la fonction String action:output(String node, String key)."
+msgid ""
+"Capture output of the stdout of the %(program)s command execution. The "
+"%(program)s command output must be in Java properties file format and it "
+"must not exceed 2KB. From within the workflow definition, the output of "
+"an %(program)s action node is accessible via the String "
+"action:output(String node, String key) function"
+msgstr ""
+"Sortie de capture stdout de l'exécution de la commande %(program)s. La "
+"sortie de la commande %(program)s doit figurer dans le format du fichier "
+"des propriétés Java mais ne doit pas dépasser 2 Ko. A partir de la "
+"définition du workflow, la sortie d'un noeud d'action %(program)s est "
+"accessible par le biais de la fonction String action:output(String node, "
+"String key)."
 
 #: src/oozie/models.py:1089
 msgid "The path of the Shell command to execute."
 msgstr "Chemin d'accès à la commande Shell à exécuter."
 
 #: src/oozie/models.py:1091
-msgid "The arguments of Shell command can then be specified using one or more argument element."
-msgstr "Les arguments de la commande de shell peuvent alors être indiqués avec un ou plusieurs éléments d'argument."
+msgid ""
+"The arguments of Shell command can then be specified using one or more "
+"argument element."
+msgstr ""
+"Les arguments de la commande de shell peuvent alors être indiqués avec un"
+" ou plusieurs éléments d'argument."
 
 #: src/oozie/models.py:1132
 #, python-format
-msgid "The arguments of the %(type)s command. Put options first, then source paths, then destination path."
-msgstr "Arguments de la commande %(type)s. Placez les options en premier, puis les chemins sources et enfin le chemin de destination."
+msgid ""
+"The arguments of the %(type)s command. Put options first, then source "
+"paths, then destination path."
+msgstr ""
+"Arguments de la commande %(type)s. Placez les options en premier, puis "
+"les chemins sources et enfin le chemin de destination."
 
 #: src/oozie/models.py:1135
 msgid "For the job configuration (e.g. mapred.job.queue.name=production"
-msgstr "Pour la configuration du job (par exemple, mapred.job.queue.name=production"
+msgstr ""
+"Pour la configuration du job (par exemple, "
+"mapred.job.queue.name=production"
 
 #: src/oozie/models.py:1159
 msgid "Delete path"
 msgstr "Supprimer le chemin"
 
 #: src/oozie/models.py:1160
-msgid "Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory."
-msgstr "Supprimer le chemin spécifié. S'il s'agit d'un répertoire, cette opération supprime le contenu du répertoire de manière récurrente, puis le répertoire lui-même."
+msgid ""
+"Delete the specified path, if it is a directory it deletes recursively "
+"all its content and then deletes the directory."
+msgstr ""
+"Supprimer le chemin spécifié. S'il s'agit d'un répertoire, cette "
+"opération supprime le contenu du répertoire de manière récurrente, puis "
+"le répertoire lui-même."
 
 #: src/oozie/models.py:1162
 msgid "Create directory"
 msgstr "Créer un répertoire"
 
 #: src/oozie/models.py:1163
-msgid "Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op."
-msgstr "Créer le répertoire spécifié. Cette opération crée tous les répertoires manquants dans le chemin. Si le répertoire existe déjà, aucune opération n'est effectuée."
+msgid ""
+"Create the specified directory, it creates all missing directories in the"
+" path. If the directory already exist it does a no-op."
+msgstr ""
+"Créer le répertoire spécifié. Cette opération crée tous les répertoires "
+"manquants dans le chemin. Si le répertoire existe déjà, aucune opération "
+"n'est effectuée."
 
 #: src/oozie/models.py:1165
 msgid "Move file"
@@ -507,16 +649,26 @@ msgid "Change permissions"
 msgstr "Modifier les autorisations"
 
 #: src/oozie/models.py:1168
-msgid "Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic representation (e.g. -rwxrw-rw-) or an octal representation (755)."
-msgstr "Modifier les autorisations pour le chemin spécifié. Les autorisations peuvent être spécifiées à l'aide de la représentation symbolique Unix (par exemple, -rwxrw-rw-) ou une représentation octale (755)."
+msgid ""
+"Change the permissions for the specified path. Permissions can be "
+"specified using the Unix Symbolic representation (e.g. -rwxrw-rw-) or an "
+"octal representation (755)."
+msgstr ""
+"Modifier les autorisations pour le chemin spécifié. Les autorisations "
+"peuvent être spécifiées à l'aide de la représentation symbolique Unix "
+"(par exemple, -rwxrw-rw-) ou une représentation octale (755)."
 
 #: src/oozie/models.py:1170
 msgid "Create or touch a file"
 msgstr "Créer un fichier ou y accéder via la commande touch"
 
 #: src/oozie/models.py:1171
-msgid "Creates a zero length file in the specified path if none exists or touch it."
-msgstr "Crée un fichier de longueur zéro dans le chemin spécifié, s'il n'en existe aucun, ou y accède via la commande touch."
+msgid ""
+"Creates a zero length file in the specified path if none exists or touch "
+"it."
+msgstr ""
+"Crée un fichier de longueur zéro dans le chemin spécifié, s'il n'en "
+"existe aucun, ou y accède via la commande touch."
 
 #: src/oozie/models.py:1194
 msgid "TO addresses"
@@ -547,20 +699,32 @@ msgid "Sub-workflow"
 msgstr "Sous-workflow"
 
 #: src/oozie/models.py:1205
-msgid "The sub-workflow application to include. You must own all the sub-workflows."
-msgstr "Application de sous-workflow à inclure. Vous devez posséder tous les sous-workflows."
+msgid ""
+"The sub-workflow application to include. You must own all the sub-"
+"workflows."
+msgstr ""
+"Application de sous-workflow à inclure. Vous devez posséder tous les "
+"sous-workflows."
 
 #: src/oozie/models.py:1206
 msgid "Propagate configuration"
 msgstr "Propager la configuration"
 
 #: src/oozie/models.py:1207
-msgid "If the workflow job configuration should be propagated to the child workflow."
-msgstr "Si la configuration du job de workflow doit être propagée au workflow enfant."
+msgid ""
+"If the workflow job configuration should be propagated to the child "
+"workflow."
+msgstr ""
+"Si la configuration du job de workflow doit être propagée au workflow "
+"enfant."
 
 #: src/oozie/models.py:1209
-msgid "Can be used to specify the job properties that are required to run the child workflow job."
-msgstr "Peut être utilisé pour spécifier les propriétés du job qui sont nécessaires à l'exécution du job du workflow enfant."
+msgid ""
+"Can be used to specify the job properties that are required to run the "
+"child workflow job."
+msgstr ""
+"Peut être utilisé pour spécifier les propriétés du job qui sont "
+"nécessaires à l'exécution du job du workflow enfant."
 
 #: src/oozie/models.py:1219
 msgid "XML of the custom action"
@@ -568,8 +732,13 @@ msgstr "XML de l'action personnalisée"
 
 #: src/oozie/models.py:1220
 #, python-format
-msgid "This will be inserted verbatim in the action %(action)s. E.g. all the XML content like %(xml_action)s will be inserted into the action and produce %(full_action)s"
-msgstr "Inséré verbatim dans l'action %(action)s : le contenu XML tel que %(xml_action)s sera inséré dans l'action et produira %(full_action)s"
+msgid ""
+"This will be inserted verbatim in the action %(action)s. E.g. all the XML"
+" content like %(xml_action)s will be inserted into the action and produce"
+" %(full_action)s"
+msgstr ""
+"Inséré verbatim dans l'action %(action)s : le contenu XML tel que "
+"%(xml_action)s sera inséré dans l'action et produira %(full_action)s"
 
 #: src/oozie/models.py:1259
 msgid "End should not have any children."
@@ -617,8 +786,13 @@ msgid "Timezone"
 msgstr "Fuseau horaire"
 
 #: src/oozie/models.py:1391
-msgid "The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators."
-msgstr "Fuseau horaire du coordinator. Uniquement utilisé pour la gestion des changements d'heure d'été/hiver lorsque plusieurs coordinators sont associés."
+msgid ""
+"The timezone of the coordinator. Only used for managing the daylight "
+"saving time changes when combining several coordinators."
+msgstr ""
+"Fuseau horaire du coordinator. Uniquement utilisé pour la gestion des "
+"changements d'heure d'été/hiver lorsque plusieurs coordinators sont "
+"associés."
 
 #: src/oozie/models.py:1392 src/oozie/models.py:1639 src/oozie/models.py:1748
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:69
@@ -662,16 +836,24 @@ msgid "Timeout"
 msgstr "Temporisation"
 
 #: src/oozie/models.py:1399
-msgid "Number of minutes the coordinator action will be in WAITING or READY status before giving up on its execution."
-msgstr "Durée en minutes pendant laquelle l'action de coordinator présente l'état WAITING ou READY avant l'abandon de son exécution."
+msgid ""
+"Number of minutes the coordinator action will be in WAITING or READY "
+"status before giving up on its execution."
+msgstr ""
+"Durée en minutes pendant laquelle l'action de coordinator présente l'état"
+" WAITING ou READY avant l'abandon de son exécution."
 
 #: src/oozie/models.py:1401
 msgid "Concurrency"
 msgstr "Simultanéité"
 
 #: src/oozie/models.py:1402
-msgid "The number of coordinator actions that are allowed to run concurrently (RUNNING status) before the coordinator engine starts throttling them."
-msgstr "Nombre d'actions de coordinator pouvant s'exécuter simultanément (état EXECUTION) avant que le moteur du coordinator ne commence à les limiter."
+msgid ""
+"The number of coordinator actions that are allowed to run concurrently "
+"(RUNNING status) before the coordinator engine starts throttling them."
+msgstr ""
+"Nombre d'actions de coordinator pouvant s'exécuter simultanément (état "
+"EXECUTION) avant que le moteur du coordinator ne commence à les limiter."
 
 #: src/oozie/models.py:1404
 msgid "Execution"
@@ -690,29 +872,54 @@ msgid "LAST_ONLY (discards all older materializations)"
 msgstr "LAST_ONLY (ignore les matérialisations plus anciennes)"
 
 #: src/oozie/models.py:1408
-msgid "Execution strategy of its coordinator actions when there is backlog of coordinator actions in the coordinator engine. The different execution strategies are 'oldest first', 'newest first' and 'last one only'. A backlog normally happens because of delayed input data, concurrency control or because manual re-runs of coordinator jobs."
-msgstr "Stratégie d'exécution de ses actions coordinator lorsque le moteur du coordinator contient une accumulation d'actions de ce type. Les stratégies d'exécution sont \"le plus ancien d'abord\", \"le plus récent d'abord\" et \"le dernier seulement\". Une accumulation se produit en raison de retards de données d'entrée, du contrôle de simultanéité ou de réexécutions manuelles de travaux du coordinator."
+msgid ""
+"Execution strategy of its coordinator actions when there is backlog of "
+"coordinator actions in the coordinator engine. The different execution "
+"strategies are 'oldest first', 'newest first' and 'last one only'. A "
+"backlog normally happens because of delayed input data, concurrency "
+"control or because manual re-runs of coordinator jobs."
+msgstr ""
+"Stratégie d'exécution de ses actions coordinator lorsque le moteur du "
+"coordinator contient une accumulation d'actions de ce type. Les "
+"stratégies d'exécution sont \"le plus ancien d'abord\", \"le plus récent "
+"d'abord\" et \"le dernier seulement\". Une accumulation se produit en "
+"raison de retards de données d'entrée, du contrôle de simultanéité ou de "
+"réexécutions manuelles de travaux du coordinator."
 
 #: src/oozie/models.py:1412
 msgid "Throttle"
 msgstr "Limite"
 
 #: src/oozie/models.py:1413
-msgid "The materialization or creation throttle value for its coordinator actions. Number of maximum coordinator actions that are allowed to be in WAITING state concurrently."
-msgstr "Valeur de la limite de création ou de matérialisation pour les actions de coordinator. Nombre maximal d'actions de coordinator autorisées à présenter l'état EN ATTENTE simultanément."
+msgid ""
+"The materialization or creation throttle value for its coordinator "
+"actions. Number of maximum coordinator actions that are allowed to be in "
+"WAITING state concurrently."
+msgstr ""
+"Valeur de la limite de création ou de matérialisation pour les actions de"
+" coordinator. Nombre maximal d'actions de coordinator autorisées à "
+"présenter l'état EN ATTENTE simultanément."
 
 #: src/oozie/models.py:1415
 msgid "Workflow properties"
 msgstr "Propriétés du workflow"
 
 #: src/oozie/models.py:1416
-msgid "Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}"
-msgstr "Propriétés supplémentaires à transmettre au workflow, par ex. limite=100, et fonctions EL, par ex. nom d'utilisateur=${coord:user()}"
+msgid ""
+"Additional properties to transmit to the workflow, e.g. limit=100, and EL"
+" functions, e.g. username=${coord:user()}"
+msgstr ""
+"Propriétés supplémentaires à transmettre au workflow, par ex. limite=100,"
+" et fonctions EL, par ex. nom d'utilisateur=${coord:user()}"
 
 #: src/oozie/models.py:1621
 #, python-format
-msgid "Permission denied. %(username)s does not have the permissions to access dataset %(id)s."
-msgstr "Autorisation refusée. %(username)s n'a pas l'autorisation d'accéder au dataset %(id)s."
+msgid ""
+"Permission denied. %(username)s does not have the permissions to access "
+"dataset %(id)s."
+msgstr ""
+"Autorisation refusée. %(username)s n'a pas l'autorisation d'accéder au "
+"dataset %(id)s."
 
 #: src/oozie/models.py:1628
 #, python-format
@@ -728,8 +935,14 @@ msgid "A description of the dataset."
 msgstr "Description du dataset."
 
 #: src/oozie/models.py:1640
-msgid " The UTC datetime of the initial instance of the dataset. The initial instance also provides the baseline datetime to compute instances of the dataset using multiples of the frequency."
-msgstr " Horodatage UTC de l'instance initiale du dataset. L'instance initiale fournit également l'horodatage de référence pour calculer les instances du dataset à l'aide de multiples de la fréquence."
+msgid ""
+" The UTC datetime of the initial instance of the dataset. The initial "
+"instance also provides the baseline datetime to compute instances of the "
+"dataset using multiples of the frequency."
+msgstr ""
+" Horodatage UTC de l'instance initiale du dataset. L'instance initiale "
+"fournit également l'horodatage de référence pour calculer les instances "
+"du dataset à l'aide de multiples de la fréquence."
 
 #: src/oozie/models.py:1647
 #: src/oozie/templates/editor/edit_coordinator.mako:347
@@ -737,12 +950,24 @@ msgid "URI"
 msgstr "URI"
 
 #: src/oozie/models.py:1648
-msgid "The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and configuration properties (e.g. /home/${USER}/projects/${PROJECT})"
-msgstr "Modèle URI qui identifie le dataset et qui peut être résolu en URI réelles afin d'identifier une instance de dataset en particulier. L'URI se compose de constantes (par exemple, ${YEAR}/${MONTH}) et de propriétés de configuration (par exemple, /home/${USER}/projects/${PROJECT})"
+msgid ""
+"The URI template that identifies the dataset and can be resolved into "
+"concrete URIs to identify a particular dataset instance. The URI consist "
+"of constants (e.g. ${YEAR}/${MONTH}) and configuration properties (e.g. "
+"/home/${USER}/projects/${PROJECT})"
+msgstr ""
+"Modèle URI qui identifie le dataset et qui peut être résolu en URI "
+"réelles afin d'identifier une instance de dataset en particulier. L'URI "
+"se compose de constantes (par exemple, ${YEAR}/${MONTH}) et de propriétés"
+" de configuration (par exemple, /home/${USER}/projects/${PROJECT})"
 
 #: src/oozie/models.py:1652
-msgid "The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets."
-msgstr "Fuseau horaire du dataset. Uniquement utilisé pour la gestion des changements d'heure d'été/hiver lorsque plusieurs datasets sont associés."
+msgid ""
+"The timezone of the dataset. Only used for managing the daylight saving "
+"time changes when combining several datasets."
+msgstr ""
+"Fuseau horaire du dataset. Uniquement utilisé pour la gestion des "
+"changements d'heure d'été/hiver lorsque plusieurs datasets sont associés."
 
 #: src/oozie/models.py:1653
 #: src/oozie/templates/editor/edit_coordinator.mako:349
@@ -750,8 +975,16 @@ msgid "Done flag"
 msgstr "Drapeau Terminé"
 
 #: src/oozie/models.py:1654
-msgid "The done file for the data set. If the Done flag is not specified, then Oozie configures Hadoop to create a _SUCCESS file in the output directory. If Done flag is set to empty, then Coordinator looks for the existence of the directory itself."
-msgstr "Fichier terminé correspondant au dataset. Si l'indicateur Terminé n'est pas spécifié, Oozie configure Hadoop pour créer un fichier _SUCCESS dans le répertoire de sortie. Si l'indicateur Terminé est vide, alors le coordinator cherche le répertoire lui-même."
+msgid ""
+"The done file for the data set. If the Done flag is not specified, then "
+"Oozie configures Hadoop to create a _SUCCESS file in the output "
+"directory. If Done flag is set to empty, then Coordinator looks for the "
+"existence of the directory itself."
+msgstr ""
+"Fichier terminé correspondant au dataset. Si l'indicateur Terminé n'est "
+"pas spécifié, Oozie configure Hadoop pour créer un fichier _SUCCESS dans "
+"le répertoire de sortie. Si l'indicateur Terminé est vide, alors le "
+"coordinator cherche le répertoire lui-même."
 
 #: src/oozie/models.py:1657 src/oozie/models.py:1737
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:145
@@ -772,24 +1005,36 @@ msgid "Instance type"
 msgstr "Type d'instance"
 
 #: src/oozie/models.py:1660
-msgid "Customize the date instance(s), e.g. define a range of dates, use EL functions..."
-msgstr "Personnalisez la ou les instance(s) de date ; par exemple définissez une plage de dates, utilisez les fonctions EL..."
+msgid ""
+"Customize the date instance(s), e.g. define a range of dates, use EL "
+"functions..."
+msgstr ""
+"Personnalisez la ou les instance(s) de date ; par exemple définissez une "
+"plage de dates, utilisez les fonctions EL..."
 
 #: src/oozie/models.py:1661
 msgid "Start instance"
 msgstr "Instance de début"
 
 #: src/oozie/models.py:1662
-msgid "Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}"
-msgstr "Changez la fréquence pour obtenir la date de début passée/future ou entrez l'instance de début Oozie exacte, par exemple ${coord:current(0)}"
+msgid ""
+"Shift the frequency for gettting past/future start date or enter verbatim"
+" the Oozie start instance, e.g. ${coord:current(0)}"
+msgstr ""
+"Changez la fréquence pour obtenir la date de début passée/future ou "
+"entrez l'instance de début Oozie exacte, par exemple ${coord:current(0)}"
 
 #: src/oozie/models.py:1663
 msgid "End instance"
 msgstr "Instance de fin"
 
 #: src/oozie/models.py:1664
-msgid "Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance."
-msgstr "Facultatif : changez la fréquence pour obtenir la date de fin passée/future ou entrez l'instance de fin Oozie exacte."
+msgid ""
+"Optional: Shift the frequency for gettting past/future end dates or enter"
+" verbatim the Oozie end instance."
+msgstr ""
+"Facultatif : changez la fréquence pour obtenir la date de fin "
+"passée/future ou entrez l'instance de fin Oozie exacte."
 
 #: src/oozie/models.py:1715
 msgid "Name of an input variable in the workflow."
@@ -841,8 +1086,12 @@ msgid "The coordinator to batch with other coordinators."
 msgstr "Coordinator à placer en lot avec d'autres coordinators."
 
 #: src/oozie/models.py:1741
-msgid "Constants used at the submission time (e.g. market=US, oozie.use.system.libpath=true)."
-msgstr "Constantes utilisées à l'heure de l'envoi (par exemple, market=US, oozie.use.system.libpath=true)."
+msgid ""
+"Constants used at the submission time (e.g. market=US, "
+"oozie.use.system.libpath=true)."
+msgstr ""
+"Constantes utilisées à l'heure de l'envoi (par exemple, market=US, "
+"oozie.use.system.libpath=true)."
 
 #: src/oozie/models.py:1749
 msgid "When to start the first coordinators."
@@ -856,16 +1105,24 @@ msgstr "Impossible de définir le champ %(field)s : %(exception)s"
 #: src/oozie/importlib/bundles.py:100 src/oozie/importlib/coordinators.py:165
 #: src/oozie/importlib/workflows.py:638
 #, python-format
-msgid "Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s"
-msgstr "La balise avec l'espace de noms %(namespace)s n'est pas valide. Veuillez utiliser l'un des espaces de noms suivants : %(namespaces)s"
+msgid ""
+"Tag with namespace %(namespace)s is not valid. Please use one of the "
+"following namespaces: %(namespaces)s"
+msgstr ""
+"La balise avec l'espace de noms %(namespace)s n'est pas valide. Veuillez "
+"utiliser l'un des espaces de noms suivants : %(namespaces)s"
 
 #: src/oozie/importlib/bundles.py:125
 msgid "Could not find any nodes in Bundle definition. Maybe it's malformed?"
-msgstr "Impossible de trouver des noeuds dans la définition de bundle. Peut-être est-elle mal formée ?"
+msgstr ""
+"Impossible de trouver des noeuds dans la définition de bundle. Peut-être "
+"est-elle mal formée ?"
 
 #: src/oozie/importlib/coordinators.py:199
 msgid "Could not find any nodes in Coordinator definition. Maybe it's malformed?"
-msgstr "Impossible de trouver des noeuds dans la définition de coordinator. Peut-être est-elle mal formée ?"
+msgstr ""
+"Impossible de trouver des noeuds dans la définition de coordinator. "
+"Peut-être est-elle mal formée ?"
 
 #: src/oozie/importlib/workflows.py:155
 #, python-format
@@ -903,16 +1160,27 @@ msgid "Workflow end has not been created."
 msgstr "La fin du workflow n'a pas été créée."
 
 #: src/oozie/importlib/workflows.py:378
-msgid "Cannot import workflows that have decision DAG leaf nodes with multiple children or no children."
-msgstr "Impossible d'importer les workflows dont les noeuds feuilles DAG de décision ont plusieurs enfants ou aucun."
+msgid ""
+"Cannot import workflows that have decision DAG leaf nodes with multiple "
+"children or no children."
+msgstr ""
+"Impossible d'importer les workflows dont les noeuds feuilles DAG de "
+"décision ont plusieurs enfants ou aucun."
 
 #: src/oozie/importlib/workflows.py:414 src/oozie/importlib/workflows.py:442
-msgid "Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node."
-msgstr "Impossible d'importer les workflows dont les chemins de décision comportent plusieurs noeuds terminaux qui convergent vers un seul noeud terminal."
+msgid ""
+"Cannot import workflows that have decisions paths with multiple terminal "
+"nodes that converge on a single terminal node."
+msgstr ""
+"Impossible d'importer les workflows dont les chemins de décision "
+"comportent plusieurs noeuds terminaux qui convergent vers un seul noeud "
+"terminal."
 
 #: src/oozie/importlib/workflows.py:444
 msgid "Cannot import workflows that have decisions paths that never end."
-msgstr "Impossible d'importer des workflows dont les chemins de décision sont sans fin."
+msgstr ""
+"Impossible d'importer des workflows dont les chemins de décision sont "
+"sans fin."
 
 #: src/oozie/importlib/workflows.py:474
 msgid "Different ends found in fork."
@@ -929,7 +1197,9 @@ msgstr "Nom de workflow introuvable lors de la résolution du sous-workflow."
 #: src/oozie/importlib/workflows.py:576
 #, python-format
 msgid "Could not find workflow with name %s extracted from subworkflow path %s"
-msgstr "Impossible de trouver de workflow nommé %s extrait du chemin d'accès de sous-workflow %s"
+msgstr ""
+"Impossible de trouver de workflow nommé %s extrait du chemin d'accès de "
+"sous-workflow %s"
 
 #: src/oozie/importlib/workflows.py:578
 #, python-format
@@ -938,7 +1208,9 @@ msgstr "Impossible de trouver le workflow au chemin d'accès %s : %s"
 
 #: src/oozie/importlib/workflows.py:673
 msgid "Could not find any nodes in Workflow definition. Maybe it's malformed?"
-msgstr "Impossible de trouver des noeuds dans la définition de workflow. Peut-être est-elle mal formée ?"
+msgstr ""
+"Impossible de trouver des noeuds dans la définition de workflow. "
+"Peut-être est-elle mal formée ?"
 
 #: src/oozie/management/commands/oozie_setup.py:52
 #, python-format
@@ -1562,13 +1834,13 @@ msgstr "Terminé"
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:468
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:167
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:204
-#: src/oozie/templates/editor/list_bundles.mako:280
-#: src/oozie/templates/editor/list_coordinators.mako:285
+#: src/oozie/templates/editor/list_bundles.mako:279
+#: src/oozie/templates/editor/list_coordinators.mako:284
 #: src/oozie/templates/editor/list_history.mako:88
 #: src/oozie/templates/editor/list_trashed_bundles.mako:233
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:235
 #: src/oozie/templates/editor/list_trashed_workflows.mako:234
-#: src/oozie/templates/editor/list_workflows.mako:298
+#: src/oozie/templates/editor/list_workflows.mako:297
 msgid "No data available"
 msgstr "Aucune donnée disponible"
 
@@ -1578,13 +1850,13 @@ msgstr "Aucune donnée disponible"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:205
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:168
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:205
-#: src/oozie/templates/editor/list_bundles.mako:281
-#: src/oozie/templates/editor/list_coordinators.mako:286
+#: src/oozie/templates/editor/list_bundles.mako:280
+#: src/oozie/templates/editor/list_coordinators.mako:285
 #: src/oozie/templates/editor/list_history.mako:89
 #: src/oozie/templates/editor/list_trashed_bundles.mako:234
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:236
 #: src/oozie/templates/editor/list_trashed_workflows.mako:235
-#: src/oozie/templates/editor/list_workflows.mako:299
+#: src/oozie/templates/editor/list_workflows.mako:298
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "Entrées Showing _START_ to _END_ of _TOTAL_"
 
@@ -1594,13 +1866,13 @@ msgstr "Entrées Showing _START_ to _END_ of _TOTAL_"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:206
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:169
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:206
-#: src/oozie/templates/editor/list_bundles.mako:282
-#: src/oozie/templates/editor/list_coordinators.mako:287
+#: src/oozie/templates/editor/list_bundles.mako:281
+#: src/oozie/templates/editor/list_coordinators.mako:286
 #: src/oozie/templates/editor/list_history.mako:90
 #: src/oozie/templates/editor/list_trashed_bundles.mako:235
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:237
 #: src/oozie/templates/editor/list_trashed_workflows.mako:236
-#: src/oozie/templates/editor/list_workflows.mako:300
+#: src/oozie/templates/editor/list_workflows.mako:299
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "Affichage des entrées 0 à 0 sur 0"
 
@@ -1610,13 +1882,13 @@ msgstr "Affichage des entrées 0 à 0 sur 0"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:207
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:170
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:207
-#: src/oozie/templates/editor/list_bundles.mako:283
-#: src/oozie/templates/editor/list_coordinators.mako:288
+#: src/oozie/templates/editor/list_bundles.mako:282
+#: src/oozie/templates/editor/list_coordinators.mako:287
 #: src/oozie/templates/editor/list_history.mako:91
 #: src/oozie/templates/editor/list_trashed_bundles.mako:236
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:238
 #: src/oozie/templates/editor/list_trashed_workflows.mako:237
-#: src/oozie/templates/editor/list_workflows.mako:301
+#: src/oozie/templates/editor/list_workflows.mako:300
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(filtrées à partir des entrées totales _MAX_)"
 
@@ -1631,13 +1903,13 @@ msgstr "(filtrées à partir des entrées totales _MAX_)"
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:469
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:171
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:208
-#: src/oozie/templates/editor/list_bundles.mako:284
-#: src/oozie/templates/editor/list_coordinators.mako:289
+#: src/oozie/templates/editor/list_bundles.mako:283
+#: src/oozie/templates/editor/list_coordinators.mako:288
 #: src/oozie/templates/editor/list_history.mako:92
 #: src/oozie/templates/editor/list_trashed_bundles.mako:237
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:239
 #: src/oozie/templates/editor/list_trashed_workflows.mako:238
-#: src/oozie/templates/editor/list_workflows.mako:302
+#: src/oozie/templates/editor/list_workflows.mako:301
 msgid "No matching records"
 msgstr "Aucun enregistrement correspondant"
 
@@ -1647,13 +1919,13 @@ msgstr "Aucun enregistrement correspondant"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:210
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:173
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:210
-#: src/oozie/templates/editor/list_bundles.mako:286
-#: src/oozie/templates/editor/list_coordinators.mako:291
+#: src/oozie/templates/editor/list_bundles.mako:285
+#: src/oozie/templates/editor/list_coordinators.mako:290
 #: src/oozie/templates/editor/list_history.mako:94
 #: src/oozie/templates/editor/list_trashed_bundles.mako:239
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:241
 #: src/oozie/templates/editor/list_trashed_workflows.mako:240
-#: src/oozie/templates/editor/list_workflows.mako:304
+#: src/oozie/templates/editor/list_workflows.mako:303
 msgid "First"
 msgstr "Premier"
 
@@ -1663,13 +1935,13 @@ msgstr "Premier"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:211
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:174
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:211
-#: src/oozie/templates/editor/list_bundles.mako:287
-#: src/oozie/templates/editor/list_coordinators.mako:292
+#: src/oozie/templates/editor/list_bundles.mako:286
+#: src/oozie/templates/editor/list_coordinators.mako:291
 #: src/oozie/templates/editor/list_history.mako:95
 #: src/oozie/templates/editor/list_trashed_bundles.mako:240
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:242
 #: src/oozie/templates/editor/list_trashed_workflows.mako:241
-#: src/oozie/templates/editor/list_workflows.mako:305
+#: src/oozie/templates/editor/list_workflows.mako:304
 msgid "Last"
 msgstr "Dernier"
 
@@ -1682,13 +1954,13 @@ msgstr "Dernier"
 #: src/oozie/templates/editor/create_coordinator.mako:126
 #: src/oozie/templates/editor/edit_bundle.mako:134
 #: src/oozie/templates/editor/edit_coordinator.mako:304
-#: src/oozie/templates/editor/list_bundles.mako:288
-#: src/oozie/templates/editor/list_coordinators.mako:293
+#: src/oozie/templates/editor/list_bundles.mako:287
+#: src/oozie/templates/editor/list_coordinators.mako:292
 #: src/oozie/templates/editor/list_history.mako:96
 #: src/oozie/templates/editor/list_trashed_bundles.mako:241
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:243
 #: src/oozie/templates/editor/list_trashed_workflows.mako:242
-#: src/oozie/templates/editor/list_workflows.mako:306
+#: src/oozie/templates/editor/list_workflows.mako:305
 msgid "Next"
 msgstr "Suivant"
 
@@ -1698,13 +1970,13 @@ msgstr "Suivant"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:213
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:176
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:213
-#: src/oozie/templates/editor/list_bundles.mako:289
-#: src/oozie/templates/editor/list_coordinators.mako:294
+#: src/oozie/templates/editor/list_bundles.mako:288
+#: src/oozie/templates/editor/list_coordinators.mako:293
 #: src/oozie/templates/editor/list_history.mako:97
 #: src/oozie/templates/editor/list_trashed_bundles.mako:242
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:244
 #: src/oozie/templates/editor/list_trashed_workflows.mako:243
-#: src/oozie/templates/editor/list_workflows.mako:307
+#: src/oozie/templates/editor/list_workflows.mako:306
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1760,7 +2032,9 @@ msgstr "Le coordinator a été détruit !"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:102
 msgid "Suspend the coordinator after finishing the current running actions"
-msgstr "Suspendre le coordinator une fois les actions en cours d'exécution terminées"
+msgstr ""
+"Suspendre le coordinator une fois les actions en cours d'exécution "
+"terminées"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:112
 msgid "Resume the coordinator"
@@ -2263,8 +2537,12 @@ msgid "Error link to"
 msgstr "Lien d'erreur vers"
 
 #: src/oozie/templates/editor/action_utils.mako:126
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
-msgstr "Tous les chemins d'accès sont relatifs par rapport au répertoire de déploiement. Ils peuvent être absolus mais cela n'est pas recommandé."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
+msgstr ""
+"Tous les chemins d'accès sont relatifs par rapport au répertoire de "
+"déploiement. Ils peuvent être absolus mais cela n'est pas recommandé."
 
 #: src/oozie/templates/editor/action_utils.mako:128
 msgid "All the paths need to be absolute."
@@ -2272,19 +2550,27 @@ msgstr "Tous les chemins d'accès doivent être absolus."
 
 #: src/oozie/templates/editor/action_utils.mako:131
 msgid "You can parameterize values using case sensitive"
-msgstr "Vous pouvez paramétrer des valeurs en utilisant des éléments sensibles à la casse"
+msgstr ""
+"Vous pouvez paramétrer des valeurs en utilisant des éléments sensibles à "
+"la casse"
 
 #: src/oozie/templates/editor/action_utils.mako:136
 msgid "The SSH server requires passwordless login"
 msgstr "Le serveur SSH requiert une connexion sans mot de passe"
 
 #: src/oozie/templates/editor/action_utils.mako:143
-msgid "The delegation token needs to be propagated from the launcher job to the MR job"
-msgstr "Le jeton de délégation doit être propagé depuis le job du programme de lancement vers le job MR."
+msgid ""
+"The delegation token needs to be propagated from the launcher job to the "
+"MR job"
+msgstr ""
+"Le jeton de délégation doit être propagé depuis le job du programme de "
+"lancement vers le job MR."
 
 #: src/oozie/templates/editor/action_utils.mako:151
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)"
-msgstr "Nécessite la présence d'une configuration de serveur SMTP (dans oozie-site.xml)"
+msgstr ""
+"Nécessite la présence d'une configuration de serveur SMTP (dans oozie-"
+"site.xml)"
 
 #: src/oozie/templates/editor/action_utils.mako:172
 msgid "Add delete"
@@ -2455,8 +2741,14 @@ msgid "advanced"
 msgstr "avancé"
 
 #: src/oozie/templates/editor/coordinator_utils.mako:39
-msgid "The time frequency at which interval a workflow should be submitted by the coordinator. For example, once a day, every Monday at midnight, every week days, every three days..."
-msgstr "La fréquence de temps à laquelle un workflow doit être envoyé par le coordinator. Par exemple, une fois par jour, chaque lundi à minuit, chaque jour de la semaine, tous les trois jours..."
+msgid ""
+"The time frequency at which interval a workflow should be submitted by "
+"the coordinator. For example, once a day, every Monday at midnight, every"
+" week days, every three days..."
+msgstr ""
+"La fréquence de temps à laquelle un workflow doit être envoyé par le "
+"coordinator. Par exemple, une fois par jour, chaque lundi à minuit, "
+"chaque jour de la semaine, tous les trois jours..."
 
 #: src/oozie/templates/editor/create_bundle.mako:26
 #: src/oozie/templates/editor/create_bundle.mako:43
@@ -2541,8 +2833,13 @@ msgstr "Planifier"
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:31
 #: src/oozie/templates/editor/edit_bundle.mako:113
 #: src/oozie/templates/editor/edit_coordinator.mako:125
-msgid "UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day."
-msgstr "Heure UTC uniquement. Par exemple, si vous voulez indiquer 22:00 heure d'hiver du Pacifique (UTC+8), ajouter 8 heures après 6:00, le jour suivant."
+msgid ""
+"UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to"
+" 6am the next day."
+msgstr ""
+"Heure UTC uniquement. Par exemple, si vous voulez indiquer 22:00 heure "
+"d'hiver du Pacifique (UTC+8), ajouter 8 heures après 6:00, le jour "
+"suivant."
 
 #: src/oozie/templates/editor/create_coordinator.mako:208
 #: src/oozie/templates/editor/edit_bundle.mako:472
@@ -2717,7 +3014,9 @@ msgstr "Entrées"
 #: src/oozie/templates/editor/edit_coordinator.mako:159
 #: src/oozie/templates/editor/edit_coordinator.mako:211
 msgid "The inputs and outputs of the workflow must be mapped to some data."
-msgstr "Les entrées et les sorties du workflow doivent être mappées à certaines données."
+msgstr ""
+"Les entrées et les sorties du workflow doivent être mappées à certaines "
+"données."
 
 #: src/oozie/templates/editor/edit_coordinator.mako:160
 #: src/oozie/templates/editor/edit_coordinator.mako:212
@@ -2803,7 +3102,9 @@ msgstr "Heure UTC uniquement."
 
 #: src/oozie/templates/editor/edit_coordinator_dataset.mako:36
 msgid "Recommended to be before the coordinator start date."
-msgstr "Il est recommandé qu'elle soit antérieure à la date de début du coordinator."
+msgstr ""
+"Il est recommandé qu'elle soit antérieure à la date de début du "
+"coordinator."
 
 #: src/oozie/templates/editor/edit_workflow.mako:28
 msgid "Edit Workflow"
@@ -2818,8 +3119,12 @@ msgid "Editor"
 msgstr "Editeur"
 
 #: src/oozie/templates/editor/edit_workflow.mako:47
-msgid "Go upload additional files and libraries to the deployment directory on HDFS"
-msgstr "Téléchargez les fichiers et les bibliothèques supplémentaires vers le répertoire de déploiement sur HDFS"
+msgid ""
+"Go upload additional files and libraries to the deployment directory on "
+"HDFS"
+msgstr ""
+"Téléchargez les fichiers et les bibliothèques supplémentaires vers le "
+"répertoire de déploiement sur HDFS"
 
 #: src/oozie/templates/editor/edit_workflow.mako:47
 msgid "Workspace"
@@ -2827,7 +3132,9 @@ msgstr "Espace de travail"
 
 #: src/oozie/templates/editor/edit_workflow.mako:52
 msgid "Click to import an Oozie workflow action or Job Designer action"
-msgstr "Cliquer pour importer une action de workflow Oozie ou une action Job Designer"
+msgstr ""
+"Cliquer pour importer une action de workflow Oozie ou une action Job "
+"Designer"
 
 #: src/oozie/templates/editor/edit_workflow.mako:52
 msgid "Import action"
@@ -2864,8 +3171,13 @@ msgid "Export"
 msgstr "Exporter"
 
 #: src/oozie/templates/editor/edit_workflow.mako:146
-msgid "If the \"to\" field has content, then the workflow editor assumes that the defined email action is to be placed before the kill action."
-msgstr "Si le champ \"A\" a une valeur, alors l'éditeur de workflow suppose que l'action de courriel définie doit être placée avant l'action de destruction."
+msgid ""
+"If the \"to\" field has content, then the workflow editor assumes that "
+"the defined email action is to be placed before the kill action."
+msgstr ""
+"Si le champ \"A\" a une valeur, alors l'éditeur de workflow suppose que "
+"l'action de courriel définie doit être placée avant l'action de "
+"destruction."
 
 #: src/oozie/templates/editor/edit_workflow.mako:151
 msgid "Action enabled: "
@@ -2880,8 +3192,12 @@ msgid "Import Action from Job Designer"
 msgstr "Importer une action depuis Job Designer"
 
 #: src/oozie/templates/editor/edit_workflow.mako:174
-msgid "Click on a row to import the design as an action in the workflow. The action will be added to the beginning of the flow."
-msgstr "Cliquez sur une ligne pour importer la conception comme une action dans le workflow. L'action sera ajoutée au début du flux."
+msgid ""
+"Click on a row to import the design as an action in the workflow. The "
+"action will be added to the beginning of the flow."
+msgstr ""
+"Cliquez sur une ligne pour importer la conception comme une action dans "
+"le workflow. L'action sera ajoutée au début du flux."
 
 #: src/oozie/templates/editor/edit_workflow.mako:184
 #: src/oozie/templates/editor/edit_workflow.mako:240
@@ -2978,12 +3294,20 @@ msgid "Import Coordinator"
 msgstr "Importer un coordinator"
 
 #: src/oozie/templates/editor/import_coordinator.mako:35
-msgid "You can import an external Oozie coordinator by providing the coordinator definition file."
-msgstr "Vous pouvez importer un coordinator Oozie externe en indiquant le fichier de définition de coordinator."
+msgid ""
+"You can import an external Oozie coordinator by providing the coordinator"
+" definition file."
+msgstr ""
+"Vous pouvez importer un coordinator Oozie externe en indiquant le fichier"
+" de définition de coordinator."
 
 #: src/oozie/templates/editor/import_coordinator.mako:37
-msgid "Supported coordinator versions are 0.2. Other versions might work depending on their complexity."
-msgstr "Les versions du coordinator prises en charge sont les versions 0.2. Les autres versions peuvent fonctionner selon leur complexité."
+msgid ""
+"Supported coordinator versions are 0.2. Other versions might work "
+"depending on their complexity."
+msgstr ""
+"Les versions du coordinator prises en charge sont les versions 0.2. Les "
+"autres versions peuvent fonctionner selon leur complexité."
 
 #: src/oozie/templates/editor/import_coordinator.mako:57
 #: src/oozie/templates/editor/import_workflow.mako:79
@@ -2998,12 +3322,20 @@ msgid "Import Workflow"
 msgstr "Importer un workflow"
 
 #: src/oozie/templates/editor/import_workflow.mako:35
-msgid "You can import an external Oozie workflow by providing the workflow definition file."
-msgstr "Vous pouvez importer un workflow Oozie externe en indiquant le fichier de définition de workflow."
+msgid ""
+"You can import an external Oozie workflow by providing the workflow "
+"definition file."
+msgstr ""
+"Vous pouvez importer un workflow Oozie externe en indiquant le fichier de"
+" définition de workflow."
 
 #: src/oozie/templates/editor/import_workflow.mako:37
-msgid "Supported workflow versions are 0.4. Other versions might work depending on their complexity."
-msgstr "Les versions du workflow prises en charge sont les versions 0.4. Les autres versions peuvent fonctionner selon leur complexité."
+msgid ""
+"Supported workflow versions are 0.4. Other versions might work depending "
+"on their complexity."
+msgstr ""
+"Les versions du workflow prises en charge sont les versions 0.4. Les "
+"autres versions peuvent fonctionner selon leur complexité."
 
 #: src/oozie/templates/editor/list_bundles.mako:38
 msgid "Bundle Manager"
@@ -3231,8 +3563,12 @@ msgid "links must be a list"
 msgstr "les liens doivent constituer une liste"
 
 #: src/oozie/views/api.py:107
-msgid "Start should have two children: 'related' to end, 'to' to any node but an end."
-msgstr "Le début doit posséder deux enfants : \"related\" à une fin, \"to\" à n'importe quel noeud, sauf les fins."
+msgid ""
+"Start should have two children: 'related' to end, 'to' to any node but an"
+" end."
+msgstr ""
+"Le début doit posséder deux enfants : \"related\" à une fin, \"to\" à "
+"n'importe quel noeud, sauf les fins."
 
 #: src/oozie/views/api.py:111
 msgid "End should have no children."
@@ -3244,15 +3580,23 @@ msgstr "L'opération Détruire ne doit avoir aucun enfant."
 
 #: src/oozie/views/api.py:119
 msgid "Join and Decision End should have one child: 'to' to any node."
-msgstr "Le raccord et la fin de décision doivent posséder un enfant : \"to\" à n'importe quel noeud."
+msgstr ""
+"Le raccord et la fin de décision doivent posséder un enfant : \"to\" à "
+"n'importe quel noeud."
 
 #: src/oozie/views/api.py:123
-msgid "Fork and Decision should have at least two children: 'related' to their respective ends, 'start' to any node."
-msgstr "L'embranchement et la décision doivent avoir au moins deux enfants : \"related\" à leurs fins respectives, \"start\" à n'importe quel noeud."
+msgid ""
+"Fork and Decision should have at least two children: 'related' to their "
+"respective ends, 'start' to any node."
+msgstr ""
+"L'embranchement et la décision doivent avoir au moins deux enfants : "
+"\"related\" à leurs fins respectives, \"start\" à n'importe quel noeud."
 
 #: src/oozie/views/api.py:127
 msgid "Actions should have two children: 'error' to kill, 'ok' to any node."
-msgstr "Les actions doivent posséder deux enfants : \"error\" pour détruire, \"ok\" à n'importe quel noeud."
+msgstr ""
+"Les actions doivent posséder deux enfants : \"error\" pour détruire, "
+"\"ok\" à n'importe quel noeud."
 
 #: src/oozie/views/api.py:149
 #, python-format
@@ -3351,13 +3695,21 @@ msgstr "Erreur lors de l'accès au job Oozie %s."
 
 #: src/oozie/views/dashboard.py:821
 #, python-format
-msgid "Permission denied. %(username)s does not have the permissions to access job %(id)s."
-msgstr "Autorisation refusée. %(username)s n'a pas l'autorisation d'accéder au job %(id)s."
+msgid ""
+"Permission denied. %(username)s does not have the permissions to access "
+"job %(id)s."
+msgstr ""
+"Autorisation refusée. %(username)s n'a pas l'autorisation d'accéder au "
+"job %(id)s."
 
 #: src/oozie/views/dashboard.py:831
 #, python-format
-msgid "Permission denied. %(username)s does not have the permissions to modify job %(id)s."
-msgstr "Autorisation refusée. %(username)s n'a pas l'autorisation de modifier le job %(id)s."
+msgid ""
+"Permission denied. %(username)s does not have the permissions to modify "
+"job %(id)s."
+msgstr ""
+"Autorisation refusée. %(username)s n'a pas l'autorisation de modifier le "
+"job %(id)s."
 
 #: src/oozie/views/editor.py:159 src/oozie/views/editor.py:217
 msgid "Archive should be a Zip."
@@ -3430,8 +3782,12 @@ msgid "Error submitting workflow %s"
 msgstr "Erreur lors de l'envoi du workflow %s"
 
 #: src/oozie/views/editor.py:374
-msgid "You already have some coordinators for this workflow. Submit one or create a new one."
-msgstr "Vous avez déjà des coordinators pour ce workflow. Envoyez-en un ou créez-en un nouveau."
+msgid ""
+"You already have some coordinators for this workflow. Submit one or "
+"create a new one."
+msgstr ""
+"Vous avez déjà des coordinators pour ce workflow. Envoyez-en un ou créez-"
+"en un nouveau."
 
 #: src/oozie/views/editor.py:428
 msgid "Coordinator(s) deleted."
@@ -3459,7 +3815,9 @@ msgstr "Dataset modifié"
 
 #: src/oozie/views/editor.py:565
 msgid "Beware: dataset start date was after the coordinator start date."
-msgstr "Attention : la date de début du dataset était postérieure à la date de début du coordinator."
+msgstr ""
+"Attention : la date de début du dataset était postérieure à la date de "
+"début du coordinator."
 
 #: src/oozie/views/editor.py:603
 msgid "Coordinator data created"

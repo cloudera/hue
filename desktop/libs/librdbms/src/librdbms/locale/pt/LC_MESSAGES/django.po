@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -30,8 +30,12 @@ msgid "Nice name of server."
 msgstr "Nome do servidor."
 
 #: src/librdbms/conf.py:38
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
-msgstr "Nome de base de dados ou caminho para o ficheiro de base de dados. Se fornecido, então a escolha de outras bases de dados não será permitida."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
+msgstr ""
+"Nome de base de dados ou caminho para o ficheiro de base de dados. Se "
+"fornecido, então a escolha de outras bases de dados não será permitida."
 
 #: src/librdbms/conf.py:44
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
@@ -62,12 +66,18 @@ msgid "Database name should not be empty for the SQLite backend."
 msgstr "O nome da base de dados não deve estar vazio para o back-end de SQLite."
 
 #: src/librdbms/conf.py:92
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
-msgstr "O nome de base de dados não deve estar vazio para o back-end de Oracle. Deve ser o SID da sua base de dados."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
+msgstr ""
+"O nome de base de dados não deve estar vazio para o back-end de Oracle. "
+"Deve ser o SID da sua base de dados."
 
 #: src/librdbms/conf.py:94
 msgid "Database name should not be empty for the PostgreSQL backend."
-msgstr "O nome de base de dados não deve estar vazio para o back-end do PostgreSQL."
+msgstr ""
+"O nome de base de dados não deve estar vazio para o back-end do "
+"PostgreSQL."
 
 #: src/librdbms/design.py:110
 msgid "No server!"
@@ -85,5 +95,7 @@ msgstr "A base de dados \"%s\" não é permitida. Utilize a base de dados \"%s\"
 #: src/librdbms/server/mysql_lib.py:107
 #, python-format
 msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
-msgstr "Não é possível localizar a base de dados %s. Tem a certeza de que a sua configuração está correcta?"
+msgstr ""
+"Não é possível localizar a base de dados %s. Tem a certeza de que a sua "
+"configuração está correcta?"
 

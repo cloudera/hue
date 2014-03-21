@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2013-07-13 20:35-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -136,8 +136,12 @@ msgid "Submit"
 msgstr "提交"
 
 #: src/hbase/templates/app.mako:223
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:233
 msgid "Autocomplete Suggestions:"

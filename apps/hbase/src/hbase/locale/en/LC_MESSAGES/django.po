@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-31 11:34-0700\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,19 +17,339 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/templates/index.mako:20
-msgid "About Hue"
+#: src/hbase/api.py:48
+#, python-format
+msgid "HBase Thrift 1 server cannot be contacted: %s"
 msgstr ""
 
-#: src/about/templates/index.mako:25
-msgid "Configuration"
+#: src/hbase/api.py:50
+#, python-format
+msgid "Api Error: %s"
 msgstr ""
 
-#: src/about/templates/index.mako:26
-msgid "Check for misconfiguration"
+#: src/hbase/api.py:72
+#, python-format
+msgid "Cluster configuration %s isn't formatted correctly."
 msgstr ""
 
-#: src/about/templates/index.mako:27
-msgid "Server Logs"
+#: src/hbase/api.py:83
+#, python-format
+msgid "Cluster by the name of %s does not exist in configuration."
 msgstr ""
+
+#: src/hbase/views.py:129
+msgid "A POST request is required."
+msgstr ""
+
+#: src/hbase/templates/app.mako:35
+msgid "HBase Browser"
+msgstr ""
+
+#: src/hbase/templates/app.mako:66
+msgid "There are no tables matching the search criteria."
+msgstr ""
+
+#: src/hbase/templates/app.mako:79
+msgid "Refresh Row"
+msgstr ""
+
+#: src/hbase/templates/app.mako:81
+msgid "Delete Row"
+msgstr ""
+
+#: src/hbase/templates/app.mako:85 src/hbase/templates/app.mako:251
+msgid "Toggle Collapse Selected"
+msgstr ""
+
+#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:252
+msgid "Select All Visible"
+msgstr ""
+
+#: src/hbase/templates/app.mako:93
+msgid "Add New Column/Cell"
+msgstr ""
+
+#: src/hbase/templates/app.mako:106
+msgid "Full Editor"
+msgstr ""
+
+#: src/hbase/templates/app.mako:122
+msgid "No rows to display."
+msgstr ""
+
+#: src/hbase/templates/app.mako:128
+msgid "Sort By"
+msgstr ""
+
+#: src/hbase/templates/app.mako:142
+msgid "Home"
+msgstr ""
+
+#: src/hbase/templates/app.mako:147
+msgid "Switch Cluster"
+msgstr ""
+
+#: src/hbase/templates/app.mako:166
+msgid "Search for Table Name"
+msgstr ""
+
+#: src/hbase/templates/app.mako:169
+msgid "Enable"
+msgstr ""
+
+#: src/hbase/templates/app.mako:171
+msgid "Disable"
+msgstr ""
+
+#: src/hbase/templates/app.mako:174
+msgid "Drop"
+msgstr ""
+
+#: src/hbase/templates/app.mako:178
+msgid "New Table"
+msgstr ""
+
+#: src/hbase/templates/app.mako:198
+msgid "Create New Table"
+msgstr ""
+
+#: src/hbase/templates/app.mako:202
+msgid "Table Name"
+msgstr ""
+
+#: src/hbase/templates/app.mako:203
+msgid "Column Families"
+msgstr ""
+
+#: src/hbase/templates/app.mako:207
+msgid "Additional Column Family"
+msgstr ""
+
+#: src/hbase/templates/app.mako:210 src/hbase/templates/app.mako:311
+#: src/hbase/templates/app.mako:334 src/hbase/templates/app.mako:375
+#: src/hbase/templates/app.mako:407
+msgid "Cancel"
+msgstr ""
+
+#: src/hbase/templates/app.mako:211
+msgid "Submit"
+msgstr ""
+
+#: src/hbase/templates/app.mako:223
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+
+#: src/hbase/templates/app.mako:233
+msgid "Autocomplete Suggestions:"
+msgstr ""
+
+#: src/hbase/templates/app.mako:245
+msgid "Toggle Grid"
+msgstr ""
+
+#: src/hbase/templates/app.mako:247
+msgid "Toggle Select All Rows"
+msgstr ""
+
+#: src/hbase/templates/app.mako:247
+msgid "All"
+msgstr ""
+
+#: src/hbase/templates/app.mako:254
+msgid "Drop Columns"
+msgstr ""
+
+#: src/hbase/templates/app.mako:269
+msgid "Fetched"
+msgstr ""
+
+#: src/hbase/templates/app.mako:272
+msgid "starting from"
+msgstr ""
+
+#: src/hbase/templates/app.mako:277
+msgid "in"
+msgstr ""
+
+#: src/hbase/templates/app.mako:277
+msgid "seconds"
+msgstr ""
+
+#: src/hbase/templates/app.mako:278
+msgid "Entries after"
+msgstr ""
+
+#: src/hbase/templates/app.mako:278
+msgid "were truncated."
+msgstr ""
+
+#: src/hbase/templates/app.mako:283
+msgid "Drop Rows"
+msgstr ""
+
+#: src/hbase/templates/app.mako:286
+msgid ".CSV, .TSV, etc..."
+msgstr ""
+
+#: src/hbase/templates/app.mako:286
+msgid "Bulk Upload"
+msgstr ""
+
+#: src/hbase/templates/app.mako:287
+msgid "New Row"
+msgstr ""
+
+#: src/hbase/templates/app.mako:299
+msgid "Insert New Row"
+msgstr ""
+
+#: src/hbase/templates/app.mako:304
+msgid "Row Key"
+msgstr ""
+
+#: src/hbase/templates/app.mako:308
+msgid "Add Field"
+msgstr ""
+
+#: src/hbase/templates/app.mako:322
+msgid "Create New Column"
+msgstr ""
+
+#: src/hbase/templates/app.mako:328
+msgid "Column Name"
+msgstr ""
+
+#: src/hbase/templates/app.mako:330 src/hbase/templates/app.mako:331
+msgid "Cell Value"
+msgstr ""
+
+#: src/hbase/templates/app.mako:335 src/hbase/templates/app.mako:376
+msgid "Upload"
+msgstr ""
+
+#: src/hbase/templates/app.mako:347
+msgid "Edit Cell"
+msgstr ""
+
+#: src/hbase/templates/app.mako:363
+msgid "Cell History:"
+msgstr ""
+
+#: src/hbase/templates/app.mako:377
+msgid "Save"
+msgstr ""
+
+#: src/hbase/templates/app.mako:379
+msgid "OK"
+msgstr ""
+
+#: src/hbase/templates/app.mako:408 src/hbase/templates/app.mako:426
+msgid "Confirm"
+msgstr ""
+
+#: src/hbase/templates/app.mako:420
+msgid "Confirm Delete"
+msgstr ""
+
+#: src/hbase/templates/app.mako:421
+msgid "Delete row "
+msgstr ""
+
+#: src/hbase/templates/app.mako:422
+msgid "? (This cannot be undone)"
+msgstr ""
+
+#: src/hbase/templates/app.mako:423
+msgid "Are you sure you want to drop this column?"
+msgstr ""
+
+#: src/hbase/templates/app.mako:424
+msgid "enable"
+msgstr ""
+
+#: src/hbase/templates/app.mako:425
+msgid "disable"
+msgstr ""
+
+#: src/hbase/templates/app.mako:427
+msgid "Are you sure you want to"
+msgstr ""
+
+#: src/hbase/templates/app.mako:428
+msgid "this table?"
+msgstr ""
+
+#: src/hbase/templates/app.mako:429
+msgid "End Query"
+msgstr ""
+
+#: src/hbase/templates/app.mako:430
+msgid "Prefix Scan"
+msgstr ""
+
+#: src/hbase/templates/app.mako:431
+msgid "Start Scan"
+msgstr ""
+
+#: src/hbase/templates/app.mako:432
+msgid "Start Select Columns"
+msgstr ""
+
+#: src/hbase/templates/app.mako:433
+msgid "End Column/Family"
+msgstr ""
+
+#: src/hbase/templates/app.mako:434
+msgid "End Select Columns"
+msgstr ""
+
+#: src/hbase/templates/app.mako:435
+msgid "Start FilterString"
+msgstr ""
+
+#: src/hbase/templates/app.mako:436
+msgid "End FilterString"
+msgstr ""
+
+#: src/hbase/templates/app.mako:437
+msgid "Row Key Value"
+msgstr ""
+
+#: src/hbase/templates/app.mako:438
+msgid "Length of Scan or Row Key"
+msgstr ""
+
+#: src/hbase/templates/app.mako:439
+msgid "Column Family: Column Name"
+msgstr ""
+
+#: src/hbase/templates/app.mako:440
+msgid "Rows starting with"
+msgstr ""
+
+#: src/hbase/templates/app.mako:441
+msgid "String"
+msgstr ""
+
+#: src/hbase/templates/app.mako:442
+msgid "Integer"
+msgstr ""
+
+#: src/hbase/templates/app.mako:443
+msgid "Column Range"
+msgstr ""
+
+#~ msgid "About Hue"
+#~ msgstr ""
+
+#~ msgid "Configuration"
+#~ msgstr ""
+
+#~ msgid "Check for misconfiguration"
+#~ msgstr ""
+
+#~ msgid "Server Logs"
+#~ msgstr ""
 

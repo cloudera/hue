@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -175,7 +175,9 @@ msgstr "액세스할 수 없음: %(path)s."
 
 #: src/filebrowser/views.py:158
 #, python-format
-msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: You are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS 수퍼 사용자(\"%(superuser)s\")는 아닙니다."
 
 #: src/filebrowser/views.py:190
@@ -248,7 +250,9 @@ msgstr "Snappy 압축 파일을 압축 해제할 수 없습니다. Snappy가 설
 
 #: src/filebrowser/views.py:667 src/filebrowser/views.py:677
 #, python-format
-msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d."
 msgstr "Snappy 압축 파일을 압축 해제할 수 없습니다. 파일 크기가 허용된 최대 snappy 압축 해제 크기(%d)보다 큽니다."
 
 #: src/filebrowser/views.py:701
@@ -297,17 +301,23 @@ msgstr "작업을 수행할 수 없습니다."
 
 #: src/filebrowser/views.py:911
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS 수퍼 사용자(\"%(superuser)s\")는 아닙니다."
 
 #: src/filebrowser/views.py:944
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:958
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:968
@@ -615,7 +625,9 @@ msgid "Directory"
 msgstr "디렉토리"
 
 #: src/filebrowser/templates/listdir.mako:109
-msgid "This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory."
+msgid ""
+"This is Hadoop trash. Files will be under a checkpoint, or timestamp "
+"named, directory."
 msgstr "Hadoop 휴지통입니다. 파일이 검사점 또는 타임스탬프 명명, 디렉토리에 있게 됩니다."
 
 #: src/filebrowser/templates/listdir_components.mako:134
@@ -729,7 +741,9 @@ msgstr "소유자/그룹 변경"
 
 #: src/filebrowser/templates/listdir_components.mako:287
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "참고: 이 파일 시스템의 Hadoop 수퍼 사용자, \"%(superuser)s\"만 파일의 소유자를 변경할 수 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:315
@@ -821,7 +835,9 @@ msgid "Specify another user."
 msgstr "다른 사용자를 지정하십시오."
 
 #: src/filebrowser/templates/listdir_components.mako:783
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
 msgstr "유용한 정보: Tab 키 또는 Ctrl + 스페이스를 사용하여 파일 및 폴더 이름을 자동으로 완성할 수 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:789

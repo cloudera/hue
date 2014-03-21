@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -123,7 +123,9 @@ msgstr "Visitez le site gethue.com"
 
 #: src/liboauth/templates/oauth-login.mako:155
 msgid "Fell asleep? Visit us on gethue.com instead!"
-msgstr "Envie d'une petite sieste ? Visitez plutôt notre site à l'adresse gethue.com."
+msgstr ""
+"Envie d'une petite sieste ? Visitez plutôt notre site à l'adresse "
+"gethue.com."
 
 #: src/liboauth/templates/oauth-login.mako:169
 msgid "Error!"

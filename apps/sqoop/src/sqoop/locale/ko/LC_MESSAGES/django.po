@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -453,11 +453,15 @@ msgid "Could not load node."
 msgstr "노드를 로드할 수 없습니다."
 
 #: src/sqoop/templates/app.mako:856
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
 msgstr "유용한 정보: tab 키 또는 Ctrl + Space를 사용하여 파일 및 폴더 이름을 자동 완성할 수 있습니다."
 
 #: src/sqoop/templates/app.mako:923
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
 msgstr "서버에 문제가 발생했습니다. 자세한 내용을 Sqoop2 server 로그를 참조하십시오."
 
 #: src/sqoop/templates/app.mako:926

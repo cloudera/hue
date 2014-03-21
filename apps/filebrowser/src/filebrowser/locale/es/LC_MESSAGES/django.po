@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -175,8 +175,12 @@ msgstr "No se puede acceder: %(path)s."
 
 #: src/filebrowser/views.py:158
 #, python-format
-msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Nota: es un administrador de Hue, pero no un superusuario de HDFS (que es \"%(superuser)s\")."
+msgid ""
+" Note: You are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Nota: es un administrador de Hue, pero no un superusuario de HDFS (que "
+"es \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:190
 #, python-format
@@ -191,7 +195,9 @@ msgstr "Archivo demasiado largo para su edición: %(path)s"
 #: src/filebrowser/views.py:204
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s."
-msgstr "El archivo no está codificado en %(encoding)s; no se puede editar: %(path)s."
+msgstr ""
+"El archivo no está codificado en %(encoding)s; no se puede editar: "
+"%(path)s."
 
 #: src/filebrowser/views.py:240
 msgid "No path specified"
@@ -244,12 +250,19 @@ msgstr "Error al descomprimir el archivo comprimido de Snappy."
 
 #: src/filebrowser/views.py:664 src/filebrowser/views.py:674
 msgid "Failed to decompress snappy compressed file. Snappy is not installed."
-msgstr "Error al descomprimir el archivo comprimido de Snappy. Snappy no está instalado."
+msgstr ""
+"Error al descomprimir el archivo comprimido de Snappy. Snappy no está "
+"instalado."
 
 #: src/filebrowser/views.py:667 src/filebrowser/views.py:677
 #, python-format
-msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
-msgstr "Error al descomprimir el archivo comprimido de Snappy. El tamaño del archivo es mayor que el tamaño máximo de descompresión de %d permitido por Snappy."
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d."
+msgstr ""
+"Error al descomprimir el archivo comprimido de Snappy. El tamaño del "
+"archivo es mayor que el tamaño máximo de descompresión de %d permitido "
+"por Snappy."
 
 #: src/filebrowser/views.py:701
 msgid "Failed to read Avro file."
@@ -297,23 +310,37 @@ msgstr "No se puede realizar la operación."
 
 #: src/filebrowser/views.py:911
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Nota: es un administrador de Hue, pero no un superusuario de HDFS (que es \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Nota: es un administrador de Hue, pero no un superusuario de HDFS (que "
+"es \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:944
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
-msgstr "No se ha podido cambiar el nombre de la carpeta \"%s\" a \"%s\": las almohadillas no están permitidas en los nombres de archivo."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
+msgstr ""
+"No se ha podido cambiar el nombre de la carpeta \"%s\" a \"%s\": las "
+"almohadillas no están permitidas en los nombres de archivo."
 
 #: src/filebrowser/views.py:958
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
-msgstr "No se ha podido dar el nombre \"%s\" a la carpeta: las barras oblicuas y las almohadillas no están permitidas en los nombres de archivo."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
+msgstr ""
+"No se ha podido dar el nombre \"%s\" a la carpeta: las barras oblicuas y "
+"las almohadillas no están permitidas en los nombres de archivo."
 
 #: src/filebrowser/views.py:968
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr "No se ha podido cambiar el nombre del archivo \"%s\": las barras oblicuas no están permitidas en los nombres de archivo."
+msgstr ""
+"No se ha podido cambiar el nombre del archivo \"%s\": las barras oblicuas"
+" no están permitidas en los nombres de archivo."
 
 #: src/filebrowser/views.py:1090 src/filebrowser/views.py:1169
 msgid "A POST request is required."
@@ -327,7 +354,9 @@ msgstr "Carga de %(destination)s satisfactoria"
 #: src/filebrowser/views.py:1115
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
-msgstr "Lo sentimos, no se pueden \"%(sep)s\" utilizar en el nombre de archivo %(name)s.sep"
+msgstr ""
+"Lo sentimos, no se pueden \"%(sep)s\" utilizar en el nombre de archivo "
+"%(name)s.sep"
 
 #: src/filebrowser/views.py:1132 src/filebrowser/views.py:1226
 #, python-format
@@ -615,8 +644,12 @@ msgid "Directory"
 msgstr "Directorio"
 
 #: src/filebrowser/templates/listdir.mako:109
-msgid "This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory."
-msgstr "Esta es la papelera de Hadoop. Los archivos estarán en un directorio de punto de control o con marca de hora."
+msgid ""
+"This is Hadoop trash. Files will be under a checkpoint, or timestamp "
+"named, directory."
+msgstr ""
+"Esta es la papelera de Hadoop. Los archivos estarán en un directorio de "
+"punto de control o con marca de hora."
 
 #: src/filebrowser/templates/listdir_components.mako:134
 msgid "Name"
@@ -707,7 +740,9 @@ msgstr "Confirmar vaciar papelera"
 
 #: src/filebrowser/templates/listdir_components.mako:240
 msgid "Are you sure you want to permanently delete all your trash?"
-msgstr "¿Está seguro de que desea eliminar permanentemente todo el contenido de la papelera?"
+msgstr ""
+"¿Está seguro de que desea eliminar permanentemente todo el contenido de "
+"la papelera?"
 
 #: src/filebrowser/templates/listdir_components.mako:245
 msgid "Delete"
@@ -729,8 +764,12 @@ msgstr "Cambiar propietario/grupo"
 
 #: src/filebrowser/templates/listdir_components.mako:287
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
-msgstr "Nota: solo el superusuario de Hadoop, \"%(superuser)s\" de este sistema de archivos puede cambiar el propietario de un archivo."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
+msgstr ""
+"Nota: solo el superusuario de Hadoop, \"%(superuser)s\" de este sistema "
+"de archivos puede cambiar el propietario de un archivo."
 
 #: src/filebrowser/templates/listdir_components.mako:315
 msgid "Change Permissions:"
@@ -821,8 +860,12 @@ msgid "Specify another user."
 msgstr "Especifique otro usuario."
 
 #: src/filebrowser/templates/listdir_components.mako:783
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "¿Sabía que puede usar el tabulador o CTRL + Espacio para autocompletar los nombres de archivo y de carpeta?"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"¿Sabía que puede usar el tabulador o CTRL + Espacio para autocompletar "
+"los nombres de archivo y de carpeta?"
 
 #: src/filebrowser/templates/listdir_components.mako:789
 msgid "There was a problem with your request."

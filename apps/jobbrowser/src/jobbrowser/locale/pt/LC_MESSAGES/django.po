@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -18,8 +18,13 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:25
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
-msgstr "Partilhar informação de trabalhos enviados com todos os utilizadores. Se definido como False, os trabalhos enviados serão visíveis apenas pelo proprietário e pelos administradores."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
+msgstr ""
+"Partilhar informação de trabalhos enviados com todos os utilizadores. Se "
+"definido como False, os trabalhos enviados serão visíveis apenas pelo "
+"proprietário e pelos administradores."
 
 #: src/jobbrowser/models.py:89
 #, python-format
@@ -77,7 +82,9 @@ msgstr "Permissão insuficiente"
 #: src/jobbrowser/views.py:200
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
-msgstr "Permissão recusada. O utilizador %(username)s não pode eliminar um trabalho do utilizador %(user)s."
+msgstr ""
+"Permissão recusada. O utilizador %(username)s não pode eliminar um "
+"trabalho do utilizador %(user)s."
 
 #: src/jobbrowser/views.py:218
 msgid "Job did not appear as killed within 15 seconds."
@@ -521,8 +528,12 @@ msgid "Loading..."
 msgstr "A carregar..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
-msgid "The application might not be running yet or there is no Node Manager or Container available."
-msgstr "A aplicação pode não estar ainda a ser executada ou não existir nenhum Node Manager ou contentor disponível."
+msgid ""
+"The application might not be running yet or there is no Node Manager or "
+"Container available."
+msgstr ""
+"A aplicação pode não estar ainda a ser executada ou não existir nenhum "
+"Node Manager ou contentor disponível."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48
 msgid "This page will be automatically refreshed."

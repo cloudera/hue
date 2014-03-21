@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -55,8 +55,12 @@ msgid "You must specify a password when creating a new user."
 msgstr "Você deve especificar uma senha quando criar um novo usuário."
 
 #: src/useradmin/forms.py:115
-msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "Obrigatório. 30 caracteres ou menos no nome de usuário. 64 caracteres ou menos com DN. Sem espaços em branco ou dois-pontos."
+msgid ""
+"Required. 30 characters or fewer with username. 64 characters or fewer "
+"with DN. No whitespaces or colons."
+msgstr ""
+"Obrigatório. 30 caracteres ou menos no nome de usuário. 64 caracteres ou "
+"menos com DN. Sem espaços em branco ou dois-pontos."
 
 #: src/useradmin/forms.py:117 src/useradmin/forms.py:155
 msgid "Distinguished name"
@@ -119,8 +123,12 @@ msgid "Create home directories"
 msgstr "Criar diretórios iniciais"
 
 #: src/useradmin/forms.py:169
-msgid "Create home directories for every member imported, if members are being imported."
-msgstr "Criar diretórios iniciais para cada membro importado, se os membros estiverem sendo importados."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
+msgstr ""
+"Criar diretórios iniciais para cada membro importado, se os membros "
+"estiverem sendo importados."
 
 #: src/useradmin/forms.py:180
 #, python-format
@@ -129,7 +137,9 @@ msgstr "Longo demais: 80 caracteres ou menos e não %s"
 
 #: src/useradmin/forms.py:202
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr "O nome do grupo pode conter somente letras, números, hífens ou sublinhados."
+msgstr ""
+"O nome do grupo pode conter somente letras, números, hífens ou "
+"sublinhados."
 
 #: src/useradmin/forms.py:217
 msgid "members"
@@ -285,8 +295,12 @@ msgstr "Ocorreu um conflito de nomes ao importar o usuário %(username)s"
 
 #: src/useradmin/views.py:592
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Houve um conflito de nomes durante a importação do grupo %(groupname)s no padrão %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr ""
+"Houve um conflito de nomes durante a importação do grupo %(groupname)s no"
+" padrão %(groupname_pattern)s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -425,7 +439,7 @@ msgid "Add/Sync group"
 msgstr "Adicionar/sincronizar grupo"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:47
+#: src/useradmin/templates/list_groups.mako:46
 msgid "Add group"
 msgstr "Adicionar grupo"
 
@@ -627,12 +641,20 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar usuários e grupos de LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Essa ação não importará nenhum usuário ou grupo que não exista no Hue. Somente usuários e grupos importados do LDAP podem ser sincronizados."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
+msgstr ""
+"Essa ação não importará nenhum usuário ou grupo que não exista no Hue. "
+"Somente usuários e grupos importados do LDAP podem ser sincronizados."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Todas as associações de informações e grupos de usuários serão atualizadas com base no estado atual do servidor LDAP."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
+msgstr ""
+"Todas as associações de informações e grupos de usuários serão "
+"atualizadas com base no estado atual do servidor LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"

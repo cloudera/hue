@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -30,7 +30,9 @@ msgid "Nice name of server."
 msgstr "적절한 서버 이름입니다."
 
 #: src/librdbms/conf.py:38
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
 msgstr "데이터베이스 파일에 대한 경로 또는 이름입니다. 지정한 경우에는 다른 데이터베이스를 선택할 수 없습니다."
 
 #: src/librdbms/conf.py:44
@@ -62,7 +64,9 @@ msgid "Database name should not be empty for the SQLite backend."
 msgstr "SQLite 백엔드에 대한 데이터베이스 이름은 비워 둘 수 없습니다."
 
 #: src/librdbms/conf.py:92
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
 msgstr "Oracle 백엔드에 대한 데이터베이스 이름은 비워 둘 수 없습니다. 데이터베이스의 SID여야 합니다."
 
 #: src/librdbms/conf.py:94

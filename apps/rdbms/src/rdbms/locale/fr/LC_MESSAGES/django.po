@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -35,7 +35,9 @@ msgstr "Le serveur spécifié n'existe pas."
 
 #: src/rdbms/api.py:331
 msgid "No databases are available. Permissions could be missing."
-msgstr "Aucune base de données n'est disponible. Des autorisations peuvent être manquantes."
+msgstr ""
+"Aucune base de données n'est disponible. Des autorisations peuvent être "
+"manquantes."
 
 #: src/rdbms/forms.py:23 src/rdbms/templates/common.mako:30
 #: src/rdbms/templates/execute.mako:62
@@ -72,8 +74,12 @@ msgid "There are currently no databases configured."
 msgstr "Il n'existe actuellement aucune base de données configurée."
 
 #: src/rdbms/templates/error.mako:35
-msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
-msgstr "Accédez à votre configuration Hue et ajoutez une base de données sous la section \"rdbms\"."
+msgid ""
+"Please go to your Hue configuration and add a database under the "
+"\"rdbms\" section."
+msgstr ""
+"Accédez à votre configuration Hue et ajoutez une base de données sous la "
+"section \"rdbms\"."
 
 #: src/rdbms/templates/execute.mako:33
 msgid "Server"
@@ -125,7 +131,9 @@ msgstr "Le serveur n'a renvoyé aucun résultat."
 
 #: src/rdbms/templates/execute.mako:152
 msgid "Double click on a table name or field to insert it in the editor"
-msgstr "Double-cliquer sur un nom de table ou un champ pour l'insérer dans l'éditeur"
+msgstr ""
+"Double-cliquer sur un nom de table ou un champ pour l'insérer dans "
+"l'éditeur"
 
 #: src/rdbms/templates/execute.mako:153
 msgid "Manually refresh the table list"

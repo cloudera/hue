@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSÃO DO PROJECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -23,7 +23,9 @@ msgstr "Script não guardado"
 
 #: src/pig/conf.py:32
 msgid "Location on local filesystem where the examples are stored."
-msgstr "Localização no sistema de ficheiros local onde os exemplos estão guardados."
+msgstr ""
+"Localização no sistema de ficheiros local onde os exemplos estão "
+"guardados."
 
 #: src/pig/conf.py:38
 msgid "Location on HDFS where the Pig examples are stored."
@@ -47,12 +49,16 @@ msgstr "É um documento do utilizador, não um envio de documento."
 
 #: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "Se o documento não é um trabalho enviado mas uma consulta, script, workflow real."
+msgstr ""
+"Se o documento não é um trabalho enviado mas uma consulta, script, "
+"workflow real."
 
 #: src/pig/models.py:44
 #, python-format
 msgid "Only superusers and %s are allowed to modify this document."
-msgstr "Apenas super-utilizadores e %s têm permissão para modificar este documento."
+msgstr ""
+"Apenas super-utilizadores e %s têm permissão para modificar este "
+"documento."
 
 #: src/pig/views.py:66 src/pig/views.py:91 src/pig/views.py:110
 #: src/pig/views.py:141 src/pig/views.py:182
@@ -135,8 +141,12 @@ msgid "New Script"
 msgstr "Novo script"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "De momento, não existem scripts definidos. Adicione um novo script, clicando em \"Novo script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
+msgstr ""
+"De momento, não existem scripts definidos. Adicione um novo script, "
+"clicando em \"Novo script\""
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
 #: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
@@ -209,7 +219,9 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "Prima CTRL + Espaço para concluir automaticamente"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "Pode executar o script actual premindo CTRL + ENTER ou CTRL + . no editor"
 
 #: src/pig/templates/app.mako:174
@@ -282,8 +294,12 @@ msgid "Resources"
 msgstr "Recursos"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "Caminho para um ficheiro HDFS ou ficheiro zip a adicionar à área de trabalho do script em execução"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+"Caminho para um ficheiro HDFS ou ficheiro zip a adicionar à área de "
+"trabalho do script em execução"
 
 #: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
@@ -404,8 +420,12 @@ msgid "Are you sure?"
 msgstr "Tem a certeza?"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "O script actual tem alterações não guardadas. Tem a certeza que deseja rejeitar estas alterações?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
+msgstr ""
+"O script actual tem alterações não guardadas. Tem a certeza que deseja "
+"rejeitar estas alterações?"
 
 #: src/pig/templates/app.mako:705
 msgid "Save script"

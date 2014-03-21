@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -125,7 +125,7 @@ msgid "Drop the selected databases"
 msgstr "선택한 데이터베이스 삭제"
 
 #: src/metastore/templates/databases.mako:50
-#: src/metastore/templates/describe_table.mako:65
+#: src/metastore/templates/describe_table.mako:69
 #: src/metastore/templates/tables.mako:61
 msgid "Drop"
 msgstr "삭제"
@@ -135,23 +135,23 @@ msgid "Database Name"
 msgstr "데이터베이스 이름"
 
 #: src/metastore/templates/databases.mako:90
-#: src/metastore/templates/describe_table.mako:179
+#: src/metastore/templates/describe_table.mako:183
 #: src/metastore/templates/tables.mako:102
 #: src/metastore/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "취소"
 
 #: src/metastore/templates/databases.mako:123
-#: src/metastore/templates/describe_table.mako:209
-#: src/metastore/templates/describe_table.mako:234
+#: src/metastore/templates/describe_table.mako:213
+#: src/metastore/templates/describe_table.mako:255
 #: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
 #: src/metastore/templates/databases.mako:124
-#: src/metastore/templates/describe_table.mako:210
-#: src/metastore/templates/describe_table.mako:235
+#: src/metastore/templates/describe_table.mako:214
+#: src/metastore/templates/describe_table.mako:256
 #: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
@@ -163,7 +163,7 @@ msgid "Table Partitions: %(tableName)s"
 msgstr "테이블 파티션: %(tableName)s"
 
 #: src/metastore/templates/describe_partitions.mako:32
-#: src/metastore/templates/describe_table.mako:59
+#: src/metastore/templates/describe_table.mako:63
 #: src/metastore/templates/tables.mako:42
 msgid "Actions"
 msgstr "작업"
@@ -191,70 +191,74 @@ msgstr "테이블"
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: src/metastore/templates/describe_table.mako:37
-#: src/metastore/templates/describe_table.mako:145
+#: src/metastore/templates/describe_table.mako:38
+#: src/metastore/templates/describe_table.mako:149
 msgid "Name"
 msgstr "이름"
 
-#: src/metastore/templates/describe_table.mako:38
+#: src/metastore/templates/describe_table.mako:39
 msgid "Type"
 msgstr "유형"
 
-#: src/metastore/templates/describe_table.mako:39
+#: src/metastore/templates/describe_table.mako:40
 msgid "Comment"
 msgstr "설명"
 
-#: src/metastore/templates/describe_table.mako:61
+#: src/metastore/templates/describe_table.mako:47
+msgid "Scroll to the column"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:65
 msgid "Import Data"
 msgstr "데이터 가져오기"
 
-#: src/metastore/templates/describe_table.mako:63
+#: src/metastore/templates/describe_table.mako:67
 #: src/metastore/templates/tables.mako:59
 msgid "Browse Data"
 msgstr "데이터 찾아보기"
 
-#: src/metastore/templates/describe_table.mako:67
+#: src/metastore/templates/describe_table.mako:71
 msgid "View File Location"
 msgstr "파일 위치 보기"
 
-#: src/metastore/templates/describe_table.mako:69
+#: src/metastore/templates/describe_table.mako:73
 msgid "Show Partitions"
 msgstr "파티션 표시"
 
-#: src/metastore/templates/describe_table.mako:80
+#: src/metastore/templates/describe_table.mako:84
 msgid "Comment:"
 msgstr "설명:"
 
-#: src/metastore/templates/describe_table.mako:84
+#: src/metastore/templates/describe_table.mako:88
 msgid "Columns"
 msgstr "열"
 
-#: src/metastore/templates/describe_table.mako:86
+#: src/metastore/templates/describe_table.mako:90
 msgid "Partition Columns"
 msgstr "파티션 열"
 
-#: src/metastore/templates/describe_table.mako:89
+#: src/metastore/templates/describe_table.mako:93
 msgid "Sample"
 msgstr "샘플"
 
-#: src/metastore/templates/describe_table.mako:91
+#: src/metastore/templates/describe_table.mako:95
 msgid "Properties"
 msgstr "속성"
 
-#: src/metastore/templates/describe_table.mako:109
+#: src/metastore/templates/describe_table.mako:113
 #: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "오류!"
 
-#: src/metastore/templates/describe_table.mako:146
+#: src/metastore/templates/describe_table.mako:150
 msgid "Value"
 msgstr "값"
 
-#: src/metastore/templates/describe_table.mako:172
+#: src/metastore/templates/describe_table.mako:176
 msgid "Drop Table"
 msgstr "테이블 삭제"
 
-#: src/metastore/templates/describe_table.mako:180
+#: src/metastore/templates/describe_table.mako:184
 msgid "Yes, drop this table"
 msgstr "예, 이 테이블 삭제"
 
@@ -312,7 +316,9 @@ msgid "Overwrite existing data"
 msgstr "기존 데이터 덮어쓰기"
 
 #: src/metastore/templates/popups/load_data.mako:55
-msgid "Note that loading data will move data from its location into the table's storage location."
+msgid ""
+"Note that loading data will move data from its location into the table's "
+"storage location."
 msgstr "데이터를 로드하면 해당 위치에서 테이블의 스토리지 위치로 데이터가 이동됩니다."
 
 #: src/metastore/templates/popups/load_data.mako:61

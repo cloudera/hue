@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -18,19 +18,27 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/libsaml/conf.py:46
-msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgid ""
+"Xmlsec1 binary path. This program should be executable by the user "
+"running Hue."
 msgstr "Xmlsec1 バイナリパスです。このプログラムは、Hue を実行しているユーザーによって実行可能であることが必要です。"
 
 #: src/libsaml/conf.py:52
-msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
-msgstr "サービスプロバイダとして動作している Hue のエンティティ ID です。'<base_url>' をサーバーの URL ベースに置き換えるパターンも受け入れられます。"
+msgid ""
+"Entity ID for Hue acting as service provider. Can also accept a pattern "
+"where '<base_url>' will be replaced with server URL base."
+msgstr ""
+"サービスプロバイダとして動作している Hue のエンティティ ID です。'<base_url>' をサーバーの URL "
+"ベースに置き換えるパターンも受け入れられます。"
 
 #: src/libsaml/conf.py:58
 msgid "Create users from IdP on login."
 msgstr "ログイン時に IdP からユーザーを作成します。"
 
 #: src/libsaml/conf.py:65
-msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgid ""
+"Attribute map directory contains files that map SAML attributes to "
+"pysaml2 attributes."
 msgstr "属性マップディレクトリに、SAML 属性を pysaml2 属性にマップするファイルが含まれています。"
 
 #: src/libsaml/conf.py:72
@@ -46,19 +54,30 @@ msgid "Optional attributes to ask for from IdP."
 msgstr "IdP に要求するオプションの属性です。"
 
 #: src/libsaml/conf.py:90
-msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgid ""
+"IdP metadata in the form of a file. This is generally an XML file "
+"containing metadata that the Identity Provider generates."
 msgstr "ファイル形式の IdP メタデータです。これは通常、Identity Provider が生成するメタデータを含む XML ファイルです。"
 
 #: src/libsaml/conf.py:96
-msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
-msgstr "key_file は、Hue サービスの秘密鍵を含む PEM 形式のファイルの名前です。これは現在、アサーションの暗号化／署名、および HTTPS セッションのクライアントキーとして使用されます。"
+msgid ""
+"key_file is the name of a PEM formatted file that contains the private "
+"key of the Hue service. This is presently used both to encrypt/sign "
+"assertions and as client key in a HTTPS session."
+msgstr ""
+"key_file は、Hue サービスの秘密鍵を含む PEM 形式のファイルの名前です。これは現在、アサーションの暗号化／署名、および HTTPS"
+" セッションのクライアントキーとして使用されます。"
 
 #: src/libsaml/conf.py:102
-msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgid ""
+"This is the public part of the service private/public key pair. cert_file"
+" must be a PEM formatted certificate chain file."
 msgstr "これは、サービスの秘密鍵／公開鍵ペアの公開部分です。cert_file は、PEM 形式の証明書チェーンファイルであることが必要です。"
 
 #: src/libsaml/conf.py:108
-msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgid ""
+"A mapping from attributes in the response from the IdP to django user "
+"attributes."
 msgstr "IdP の応答の属性から、Django ユーザー属性へのマッピングです。"
 
 #: src/libsaml/conf.py:114

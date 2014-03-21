@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,8 +18,13 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:25
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
-msgstr "Partagez les informations sur les jobs envoyés avec tous les utilisateurs. Si défini sur False, les jobs envoyés sont uniquement visibles pour le propriétaire et les administrateurs."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
+msgstr ""
+"Partagez les informations sur les jobs envoyés avec tous les "
+"utilisateurs. Si défini sur False, les jobs envoyés sont uniquement "
+"visibles pour le propriétaire et les administrateurs."
 
 #: src/jobbrowser/models.py:89
 #, python-format
@@ -68,7 +73,9 @@ msgstr "N/A"
 #: src/jobbrowser/views.py:196
 #, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
-msgstr "kill_job peut être uniquement invoqué avec un POST (une %(method)s obtenue)."
+msgstr ""
+"kill_job peut être uniquement invoqué avec un POST (une %(method)s "
+"obtenue)."
 
 #: src/jobbrowser/views.py:199
 msgid "Insufficient permission"
@@ -77,7 +84,9 @@ msgstr "Autorisation insuffisante"
 #: src/jobbrowser/views.py:200
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
-msgstr "Autorisation refusée.  L'utilisateur %(username)s ne peut pas supprimer le job de l'utilisateur %(user)s."
+msgstr ""
+"Autorisation refusée.  L'utilisateur %(username)s ne peut pas supprimer "
+"le job de l'utilisateur %(user)s."
 
 #: src/jobbrowser/views.py:218
 msgid "Job did not appear as killed within 15 seconds."
@@ -485,7 +494,9 @@ msgstr "Oui"
 
 #: src/jobbrowser/templates/job.mako:418 src/jobbrowser/templates/jobs.mako:140
 msgid "There was a problem communicating with the server. Refresh the page."
-msgstr "Un problème de communication avec le serveur s'est produit. Actualisez la page."
+msgstr ""
+"Un problème de communication avec le serveur s'est produit. Actualisez la"
+" page."
 
 #: src/jobbrowser/templates/job.mako:444 src/jobbrowser/templates/job.mako:445
 #: src/jobbrowser/templates/jobs.mako:230
@@ -521,8 +532,12 @@ msgid "Loading..."
 msgstr "Chargement en cours..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
-msgid "The application might not be running yet or there is no Node Manager or Container available."
-msgstr "L'application n'est peut-être pas encore en cours d'exécution ou il n'y a pas de gestionnaire de nœuds ou de conteneur disponible."
+msgid ""
+"The application might not be running yet or there is no Node Manager or "
+"Container available."
+msgstr ""
+"L'application n'est peut-être pas encore en cours d'exécution ou il n'y a"
+" pas de gestionnaire de nœuds ou de conteneur disponible."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48
 msgid "This page will be automatically refreshed."

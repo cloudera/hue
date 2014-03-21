@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -18,8 +18,13 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:25
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
-msgstr "Compartir información de trabajos enviados con todos los usuarios. Si se establece en false, los trabajos enviados solo están visibles para el propietario y los administradores."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
+msgstr ""
+"Compartir información de trabajos enviados con todos los usuarios. Si se "
+"establece en false, los trabajos enviados solo están visibles para el "
+"propietario y los administradores."
 
 #: src/jobbrowser/models.py:89
 #, python-format
@@ -77,7 +82,9 @@ msgstr "Permiso insuficiente"
 #: src/jobbrowser/views.py:200
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
-msgstr "Permiso denegado. El usuario %(username)s no puede eliminar el trabajo del usuario %(user)s."
+msgstr ""
+"Permiso denegado. El usuario %(username)s no puede eliminar el trabajo "
+"del usuario %(user)s."
 
 #: src/jobbrowser/views.py:218
 msgid "Job did not appear as killed within 15 seconds."
@@ -485,7 +492,9 @@ msgstr "Sí"
 
 #: src/jobbrowser/templates/job.mako:418 src/jobbrowser/templates/jobs.mako:140
 msgid "There was a problem communicating with the server. Refresh the page."
-msgstr "Se ha producido un problema al comunicar con el servidor. Actualice la página."
+msgstr ""
+"Se ha producido un problema al comunicar con el servidor. Actualice la "
+"página."
 
 #: src/jobbrowser/templates/job.mako:444 src/jobbrowser/templates/job.mako:445
 #: src/jobbrowser/templates/jobs.mako:230
@@ -521,8 +530,12 @@ msgid "Loading..."
 msgstr "Cargando..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
-msgid "The application might not be running yet or there is no Node Manager or Container available."
-msgstr "Puede que la aplicación no se esté ejecutando todavía o que no haya Node Manager o Contenedor disponible."
+msgid ""
+"The application might not be running yet or there is no Node Manager or "
+"Container available."
+msgstr ""
+"Puede que la aplicación no se esté ejecutando todavía o que no haya Node "
+"Manager o Contenedor disponible."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48
 msgid "This page will be automatically refreshed."

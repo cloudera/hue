@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0PROJEKTVERSION\n"
+"Project-Id-Version:  0PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -47,7 +47,9 @@ msgstr "Ist ein Benutzerdokument, keine Dokumentübermittlung."
 
 #: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "Wenn das Dokument kein übermittelter Job, sondern ein/e reale/r/s Anfrage, Skript oder Workflow ist"
+msgstr ""
+"Wenn das Dokument kein übermittelter Job, sondern ein/e reale/r/s "
+"Anfrage, Skript oder Workflow ist"
 
 #: src/pig/models.py:44
 #, python-format
@@ -135,8 +137,12 @@ msgid "New Script"
 msgstr "Neues Skript"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "Es sind derzeit keine Skripte definiert. Fügen Sie ein neues Skript ein, indem Sie auf \"Neues Skript\" klicken."
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
+msgstr ""
+"Es sind derzeit keine Skripte definiert. Fügen Sie ein neues Skript ein, "
+"indem Sie auf \"Neues Skript\" klicken."
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
 #: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
@@ -209,8 +215,12 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "STRG + Leertaste drücken, um automatisch abzuschließen"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
-msgstr "Sie können das aktuelle Skript ausführen, indem Sie im Editor STRG + EINGABETASTE oder STRG + . drücken."
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
+msgstr ""
+"Sie können das aktuelle Skript ausführen, indem Sie im Editor STRG + "
+"EINGABETASTE oder STRG + . drücken."
 
 #: src/pig/templates/app.mako:174
 msgid "Unsaved"
@@ -282,8 +292,12 @@ msgid "Resources"
 msgstr "Ressourcen"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "Pfad zu einer HDFS-Datei oder Zip-Datei, die in den Workspace des aktiven Skripts eingefügt werden soll"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+"Pfad zu einer HDFS-Datei oder Zip-Datei, die in den Workspace des aktiven"
+" Skripts eingefügt werden soll"
 
 #: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
@@ -404,8 +418,12 @@ msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "Das aktuelle Skript enthält nicht gespeicherte Änderungen. Möchten Sie die Änderungen wirklich verwerfen?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
+msgstr ""
+"Das aktuelle Skript enthält nicht gespeicherte Änderungen. Möchten Sie "
+"die Änderungen wirklich verwerfen?"
 
 #: src/pig/templates/app.mako:705
 msgid "Save script"

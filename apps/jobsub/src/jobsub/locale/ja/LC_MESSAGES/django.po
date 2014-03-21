@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -32,7 +32,9 @@ msgid "Name"
 msgstr "名前"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -94,7 +96,7 @@ msgstr "Workflow が見つかりません。"
 msgid "Permission denied. You are not the owner."
 msgstr "パーミッションが拒否されました。所有者ではありません。"
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "POST 要求でなければなりません。"
 
@@ -108,16 +110,16 @@ msgstr "設計 %(id)s の削除でアクセスが拒否されました。"
 msgid "Could not find design %s."
 msgstr "設計 %s が見つかりませんでした。"
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "設計 %(id)s の編集でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "設計の保存中にエラーが発生しました"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "POST 要求でなければなりません。"
 
@@ -305,11 +307,15 @@ msgid "or"
 msgstr "または"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "設計のサブミット時、次のものの実際の値を入力するように求められます： "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr "すべてのパスは、展開ディレクトリへの相対パスです。絶対パスにすることもできますが、お勧めしません。"
 
 #: src/jobsub/templates/designs.mako:311

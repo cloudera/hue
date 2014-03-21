@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -55,8 +55,12 @@ msgid "You must specify a password when creating a new user."
 msgstr "Tem de especificar uma palavra-passe ao criar um novo utilizador."
 
 #: src/useradmin/forms.py:115
-msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "Necessário. 30 caracteres ou menos com nome de utilizador. 64 caracteres ou menos com DN. Sem espaço em branco ou dois pontos."
+msgid ""
+"Required. 30 characters or fewer with username. 64 characters or fewer "
+"with DN. No whitespaces or colons."
+msgstr ""
+"Necessário. 30 caracteres ou menos com nome de utilizador. 64 caracteres "
+"ou menos com DN. Sem espaço em branco ou dois pontos."
 
 #: src/useradmin/forms.py:117 src/useradmin/forms.py:155
 msgid "Distinguished name"
@@ -119,8 +123,12 @@ msgid "Create home directories"
 msgstr "Criar directórios iniciais"
 
 #: src/useradmin/forms.py:169
-msgid "Create home directories for every member imported, if members are being imported."
-msgstr "Criar directórios iniciais para todos os membros importados, se estiverem a ser importados membros."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
+msgstr ""
+"Criar directórios iniciais para todos os membros importados, se estiverem"
+" a ser importados membros."
 
 #: src/useradmin/forms.py:180
 #, python-format
@@ -149,7 +157,9 @@ msgstr "Criar Directórios Iniciais"
 
 #: src/useradmin/forms.py:297
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr "Criar directório inicial para todos os utilizadores, caso ainda não exista."
+msgstr ""
+"Criar directório inicial para todos os utilizadores, caso ainda não "
+"exista."
 
 #: src/useradmin/models.py:128
 #, python-format
@@ -190,7 +200,9 @@ msgstr "Grupo não encontrado."
 
 #: src/useradmin/views.py:171
 msgid "You must be a superuser to add or edit another user."
-msgstr "Tem de ser um super-utilizador para poder adicionar ou editar outro utilizador."
+msgstr ""
+"Tem de ser um super-utilizador para poder adicionar ou editar outro "
+"utilizador."
 
 #: src/useradmin/views.py:191
 msgid "You cannot change a username."
@@ -259,7 +271,9 @@ msgstr "Não foi possível obter os detalhes LDAP dos grupos no padrão %s"
 
 #: src/useradmin/views.py:385
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr "Tem de ser um super-utilizador para poder sincronizar utilizadores/grupos de LDAP."
+msgstr ""
+"Tem de ser um super-utilizador para poder sincronizar utilizadores/grupos"
+" de LDAP."
 
 #: src/useradmin/views.py:412
 msgid "The import may not be complete, sync again."
@@ -285,8 +299,12 @@ msgstr "Ocorreu um conflito de nomes ao importar o utilizador %(username)s"
 
 #: src/useradmin/views.py:592
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Ocorreu um conflito de nomes ao importar o grupo %(groupname)s no padrão %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr ""
+"Ocorreu um conflito de nomes ao importar o grupo %(groupname)s no padrão "
+"%(groupname_pattern)s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -425,7 +443,7 @@ msgid "Add/Sync group"
 msgstr "Adicionar/Sinc. grupo"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:47
+#: src/useradmin/templates/list_groups.mako:46
 msgid "Add group"
 msgstr "Adicionar grupo"
 
@@ -627,12 +645,21 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar utilizadores e grupos LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Esta acção não importará nenhum utilizador ou grupo que não exista no Hue. Apenas utilizadores e grupos importados do LDAP podem ser sincronizados."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
+msgstr ""
+"Esta acção não importará nenhum utilizador ou grupo que não exista no "
+"Hue. Apenas utilizadores e grupos importados do LDAP podem ser "
+"sincronizados."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Todas as associações de informações e grupos de utilizadores serão actualizadas com base no estado actual do servidor LDAP."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
+msgstr ""
+"Todas as associações de informações e grupos de utilizadores serão "
+"actualizadas com base no estado actual do servidor LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"

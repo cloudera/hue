@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -55,8 +55,12 @@ msgid "You must specify a password when creating a new user."
 msgstr "Debe especificar una contraseña al crear un nuevo usuario."
 
 #: src/useradmin/forms.py:115
-msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "Obligatorio. Nombre de usuario de 30 caracteres o menos. Nombre de dominio de 64 caracteres o menos. Sin espacios en blanco ni dos puntos."
+msgid ""
+"Required. 30 characters or fewer with username. 64 characters or fewer "
+"with DN. No whitespaces or colons."
+msgstr ""
+"Obligatorio. Nombre de usuario de 30 caracteres o menos. Nombre de "
+"dominio de 64 caracteres o menos. Sin espacios en blanco ni dos puntos."
 
 #: src/useradmin/forms.py:117 src/useradmin/forms.py:155
 msgid "Distinguished name"
@@ -119,8 +123,12 @@ msgid "Create home directories"
 msgstr "Crear directorios de inicio"
 
 #: src/useradmin/forms.py:169
-msgid "Create home directories for every member imported, if members are being imported."
-msgstr "Crear directorios de inicio para todos los miembros importados, si se están importando miembros."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
+msgstr ""
+"Crear directorios de inicio para todos los miembros importados, si se "
+"están importando miembros."
 
 #: src/useradmin/forms.py:180
 #, python-format
@@ -129,7 +137,9 @@ msgstr "Demasiado largo: 80 caracteres o menos y no %s"
 
 #: src/useradmin/forms.py:202
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr "El nombre de grupo solo puede contener letras, números, guiones o caracteres de subrayado."
+msgstr ""
+"El nombre de grupo solo puede contener letras, números, guiones o "
+"caracteres de subrayado."
 
 #: src/useradmin/forms.py:217
 msgid "members"
@@ -285,8 +295,12 @@ msgstr "Se ha producido un conflicto de nombre al importar el usuario %(username
 
 #: src/useradmin/views.py:592
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Se ha producido un conflicto de nombre al importar el grupo %(groupname)s en el modelo %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr ""
+"Se ha producido un conflicto de nombre al importar el grupo %(groupname)s"
+" en el modelo %(groupname_pattern)s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -318,7 +332,9 @@ msgstr "GID máximo para importar (exclusivo)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:35
 msgid "Whether or not to check that the user's shell is not /bin/false."
-msgstr "Indica si se debe comprobar o no que el shell del usuario no es /bin/false."
+msgstr ""
+"Indica si se debe comprobar o no que el shell del usuario no es "
+"/bin/false."
 
 #: src/useradmin/templates/add_ldap_users.mako:25
 #: src/useradmin/templates/edit_user.mako:23
@@ -425,7 +441,7 @@ msgid "Add/Sync group"
 msgstr "Agregar/sincronizar grupo"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:47
+#: src/useradmin/templates/list_groups.mako:46
 msgid "Add group"
 msgstr "Agregar grupo"
 
@@ -627,12 +643,21 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar usuarios y grupos de LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Esta acción no importa los usuarios o los grupos que no existen en Hue. Únicamente se pueden sincronizar los usuarios y los grupos importados de LDAP."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
+msgstr ""
+"Esta acción no importa los usuarios o los grupos que no existen en Hue. "
+"Únicamente se pueden sincronizar los usuarios y los grupos importados de "
+"LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Toda la información de usuario, así como los miembros del grupo se actualizarán de acuerdo con el estado actual del servidor LDAP."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
+msgstr ""
+"Toda la información de usuario, así como los miembros del grupo se "
+"actualizarán de acuerdo con el estado actual del servidor LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"

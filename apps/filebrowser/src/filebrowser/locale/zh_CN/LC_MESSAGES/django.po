@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -175,7 +175,9 @@ msgstr "无法访问：%(path)s。"
 
 #: src/filebrowser/views.py:158
 #, python-format
-msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: You are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " \" \"\" 注：您是 Hue 管理员，但不是 HDFS 超级用户（即 \"\"%(superuser)s\"\"）。\"\"\""
 
 #: src/filebrowser/views.py:190
@@ -248,7 +250,9 @@ msgstr "无法对 Snappy 压缩的文件解压缩。未安装 Snappy。"
 
 #: src/filebrowser/views.py:667 src/filebrowser/views.py:677
 #, python-format
-msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d."
 msgstr "无法对 Snappy 压缩的文件解压缩。文件大小超出允许的最大 Snappy 解压缩大小 %d。"
 
 #: src/filebrowser/views.py:701
@@ -297,17 +301,23 @@ msgstr "无法执行操作。"
 
 #: src/filebrowser/views.py:911
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " \" \"\" 注：您是 Hue 管理员，但不是 HDFS 超级用户（即 \"\"%(superuser)s\"\"）。\"\"\""
 
 #: src/filebrowser/views.py:944
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
 msgstr "无法将文件夹 \"%s\" 重命名为 \"%s\"：文件名中不允许使用哈希。"
 
 #: src/filebrowser/views.py:958
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
 msgstr "无法将文件夹命名为 \"%s\"：文件名中不允许使用斜线或哈希。"
 
 #: src/filebrowser/views.py:968
@@ -615,7 +625,9 @@ msgid "Directory"
 msgstr "目录"
 
 #: src/filebrowser/templates/listdir.mako:109
-msgid "This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory."
+msgid ""
+"This is Hadoop trash. Files will be under a checkpoint, or timestamp "
+"named, directory."
 msgstr "这是 Hadoop 垃圾桶。文件将位于 checkpoint 或按时间戳命名的目录下。"
 
 #: src/filebrowser/templates/listdir_components.mako:134
@@ -729,7 +741,9 @@ msgstr "更改所有者/组"
 
 #: src/filebrowser/templates/listdir_components.mako:287
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "\"注：只有此文件系统上的 Hadoop 超级用户 \"\"%(superuser)s\"\" 才可更改文件的所有者。\""
 
 #: src/filebrowser/templates/listdir_components.mako:315
@@ -821,7 +835,9 @@ msgid "Specify another user."
 msgstr "指定另一位用户。"
 
 #: src/filebrowser/templates/listdir_components.mako:783
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
 msgstr "您知道吗？您可使用 Tab 键或 CTRL + 空格键自动完成文件和文件夹名称"
 
 #: src/filebrowser/templates/listdir_components.mako:789

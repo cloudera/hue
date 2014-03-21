@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -19,7 +19,9 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Localização no sistema de arquivos local onde os exemplos e modelos são armazenados."
+msgstr ""
+"Localização no sistema de arquivos local onde os exemplos e modelos são "
+"armazenados."
 
 #: src/jobsub/conf.py:34
 msgid "Location on local filesystem where sample data is stored."
@@ -32,8 +34,12 @@ msgid "Name"
 msgstr "Nome"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Permite letras, dígitos, '_',e '-'. O primeiro caractere deve ser uma letra ou '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Permite letras, dígitos, '_',e '-'. O primeiro caractere deve ser uma "
+"letra ou '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/designs.mako:160 src/jobsub/templates/designs.mako:329
@@ -94,7 +100,7 @@ msgstr "Workflow não encontrado"
 msgid "Permission denied. You are not the owner."
 msgstr "Permissão negada. Você não é o proprietário."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "Deve ser solicitação POST."
 
@@ -108,16 +114,16 @@ msgstr "Acesso negado: excluir projeto %(id)s."
 msgid "Could not find design %s."
 msgstr "Não foi possível encontrar o projeto %s."
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "Acesso negado: editar projeto %(id)s."
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "Erro ao salvar projeto"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "Deve ser solicitação POST."
 
@@ -305,16 +311,24 @@ msgid "or"
 msgstr "ou"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "Quando o projeto for enviado, será solicitado o valor real de "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
-msgstr "Todos os caminhos estão relacionados ao diretório de implantação. Eles podem ser absolutos, mas isso não é recomendado."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
+msgstr ""
+"Todos os caminhos estão relacionados ao diretório de implantação. Eles "
+"podem ser absolutos, mas isso não é recomendado."
 
 #: src/jobsub/templates/designs.mako:311
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
-msgstr "Necessita que algumas configurações do servidor SMTP estejam presentes (em oozie-site.xml)"
+msgstr ""
+"Necessita que algumas configurações do servidor SMTP estejam presentes "
+"(em oozie-site.xml)"
 
 #: src/jobsub/templates/designs.mako:312
 msgid "The ssh server requires passwordless login."

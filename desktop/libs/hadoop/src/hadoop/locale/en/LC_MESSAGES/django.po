@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/hadoop/conf.py:59
+msgid "NameNode logical name."
+msgstr ""
+
+#: src/hadoop/conf.py:90
+msgid "JobTracker logical name."
+msgstr ""
 
 #: src/hadoop/fs/hadoopfs.py:282
 #, python-format
@@ -70,93 +78,92 @@ msgstr ""
 msgid "Delete failed: %s"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:303 src/hadoop/fs/webhdfs.py:330
-msgid "Trash is not enabled."
-msgstr ""
-
-#: src/hadoop/fs/webhdfs.py:306
+#: src/hadoop/fs/webhdfs.py:303
 #, python-format
 msgid "File %s is not in trash"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:320
+#: src/hadoop/fs/webhdfs.py:317
 #, python-format
 msgid "Path %s already exists."
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:348
+#: src/hadoop/fs/webhdfs.py:342
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:362
+#: src/hadoop/fs/webhdfs.py:356
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:368 src/hadoop/fs/webhdfs.py:372
+#: src/hadoop/fs/webhdfs.py:362 src/hadoop/fs/webhdfs.py:366
 #, python-format
 msgid "'%s' is not a directory"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:486
+#: src/hadoop/fs/webhdfs.py:480
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:488
+#: src/hadoop/fs/webhdfs.py:482
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:490
+#: src/hadoop/fs/webhdfs.py:484
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:553
+#: src/hadoop/fs/webhdfs.py:551
 #, python-format
 msgid "File not found: %s"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:569
+#: src/hadoop/fs/webhdfs.py:567
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:612
+#: src/hadoop/fs/webhdfs.py:610
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:679
+#: src/hadoop/fs/webhdfs.py:677
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:697
+#: src/hadoop/fs/webhdfs.py:695
 msgid "Invalid argument to seek for whence"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:717
+#: src/hadoop/fs/webhdfs.py:715
 msgid "File not open for writing"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:763
+#: src/hadoop/fs/webhdfs.py:761
 msgid "Filesystem root '/' should be owned by 'hdfs'"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:766
+#: src/hadoop/fs/webhdfs.py:764
 msgid "Failed to access filesystem root"
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:775
+#: src/hadoop/fs/webhdfs.py:773
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr ""
 
-#: src/hadoop/fs/webhdfs.py:792
+#: src/hadoop/fs/webhdfs.py:790
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr ""
+
+#~ msgid "Trash is not enabled."
+#~ msgstr ""
 

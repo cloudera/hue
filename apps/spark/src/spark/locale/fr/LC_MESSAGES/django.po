@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PROJET\n"
 "Report-Msgid-Bugs-To: ADRESSE@MAIL\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOM COMPLET <ADRESSE@MAIL>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -48,7 +48,9 @@ msgstr "URL du serveur de job Spark."
 
 #: src/spark/conf.py:56
 msgid "The app won't work without a running Job Server"
-msgstr "Sans un serveur Job Server en cours d'exécution, l'application ne fonctionnera pas."
+msgstr ""
+"Sans un serveur Job Server en cours d'exécution, l'application ne "
+"fonctionnera pas."
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"

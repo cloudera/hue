@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -72,8 +72,12 @@ msgid "There are currently no databases configured."
 msgstr "No momento não há bancos de dados configurados."
 
 #: src/rdbms/templates/error.mako:35
-msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
-msgstr "Vá para a configuração do Hue e adicione um banco de dados na seção \"rdbms\"."
+msgid ""
+"Please go to your Hue configuration and add a database under the "
+"\"rdbms\" section."
+msgstr ""
+"Vá para a configuração do Hue e adicione um banco de dados na seção "
+"\"rdbms\"."
 
 #: src/rdbms/templates/execute.mako:33
 msgid "Server"

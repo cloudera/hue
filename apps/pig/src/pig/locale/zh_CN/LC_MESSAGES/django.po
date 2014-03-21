@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 项目版本\n"
+"Project-Id-Version:  项目版本\n"
 "Report-Msgid-Bugs-To: 电子邮件地址\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 全名 <电子邮件地址>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -135,7 +135,9 @@ msgid "New Script"
 msgstr "新建脚本"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "当前未定义脚本。请通过单击“新脚本”添加新脚本"
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
@@ -209,7 +211,9 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "按 CTRL + 空格键可自动完成"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "您可通过在编辑器中按 CTRL + ENTER 或 CTRL + . 执行当前脚本"
 
 #: src/pig/templates/app.mako:174
@@ -282,7 +286,9 @@ msgid "Resources"
 msgstr "资源"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
 msgstr "要添加到运行脚本的工作区的 HDFS 文件或 zip 文件的路径"
 
 #: src/pig/templates/app.mako:462
@@ -404,7 +410,9 @@ msgid "Are you sure?"
 msgstr "是否确定？"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr "当前脚本具有未保存的更改。是否确定要放弃更改？"
 
 #: src/pig/templates/app.mako:705

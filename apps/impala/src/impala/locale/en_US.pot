@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2013 Cloudera, Inc
+# Copyright (C) 2014 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,25 +17,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
+#: src/impala/conf.py:29
 msgid "Host of the Impala Server."
 msgstr ""
 
-#: src/impala/conf.py:31
+#: src/impala/conf.py:34
 msgid "Port of the Impala Server."
 msgstr ""
 
-#: src/impala/conf.py:37
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
-msgstr ""
-
-#: src/impala/conf.py:42
+#: src/impala/conf.py:40
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr ""
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
+#: src/impala/conf.py:46
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr ""
+
+#: src/impala/conf.py:52
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+
+#: src/impala/conf.py:62
+msgid "Timeout in seconds for Thrift calls."
+msgstr ""
+
+#: src/impala/conf.py:66
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+
+#: src/impala/conf.py:86
+msgid "No available Impalad to send queries to."
 msgstr ""
 

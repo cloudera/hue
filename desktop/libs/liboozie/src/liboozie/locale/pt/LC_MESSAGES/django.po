@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -26,8 +26,12 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Se o Oozie requer que o cliente efectue a autenticação Kerberos ou não."
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-msgstr "Localização no HDFS onde os workflows/coordinators são implementados quando submetidos por um não proprietário."
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
+msgstr ""
+"Localização no HDFS onde os workflows/coordinators são implementados "
+"quando submetidos por um não proprietário."
 
 #: src/liboozie/conf.py:68
 msgid "The Oozie server is not available"
@@ -64,5 +68,7 @@ msgstr "Permissão insuficiente."
 #: src/liboozie/types.py:361
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr "Permissão recusada. O utilizador %(username)s não pode modificar um trabalho %(user)s do utilizador."
+msgstr ""
+"Permissão recusada. O utilizador %(username)s não pode modificar um "
+"trabalho %(user)s do utilizador."
 

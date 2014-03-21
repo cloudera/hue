@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -32,7 +32,9 @@ msgid "Name"
 msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -94,7 +96,7 @@ msgstr "Workflow를 찾을 수 없음"
 msgid "Permission denied. You are not the owner."
 msgstr "권한이 거부되었습니다. 귀하는 소유자가 아닙니다."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "POST 요청이어야 합니다."
 
@@ -108,16 +110,16 @@ msgstr "액세스 거부됨: %(id)s 디자인을 삭제합니다."
 msgid "Could not find design %s."
 msgstr "디자인 %s을(를) 찾을 수 없습니다."
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "액세스 거부됨: %(id)s 디자인을 편집합니다."
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "디자인 저장 중 오류 발생."
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "POST 요청이어야 합니다."
 
@@ -305,11 +307,15 @@ msgid "or"
 msgstr "또는"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "디자인을 제출할 때 다음의 실제 값을 입력하라는 메시지가 나타납니다. "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr "모든 경로는 배포 디렉토리를 기준으로 한 상대 경로입니다. 절대 경로를 사용할 수도 있지만 이는 권장하지 않습니다."
 
 #: src/jobsub/templates/designs.mako:311

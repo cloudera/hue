@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2013 Cloudera, Inc
+# Copyright (C) 2014 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,112 +17,190 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:61
+#: src/about/views.py:68
 msgid "POST request required."
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:21
-#: src/about/templates/admin_wizard.mako:28
+#: src/about/templates/admin_wizard.mako:25 src/about/templates/header.mako:31
 msgid "Quick Start"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:29
-msgid "Configuration"
-msgstr ""
-
-#: src/about/templates/admin_wizard.mako:30
-msgid "Server Logs"
-msgstr ""
-
-#: src/about/templates/admin_wizard.mako:42
+#: src/about/templates/admin_wizard.mako:33
 msgid "Quick Start Wizard"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:54
+#: src/about/templates/admin_wizard.mako:35
+msgid "Visit the project website!"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:35
+msgid "The Hadoop UI"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:46
 msgid "Step 1:"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:54
+#: src/about/templates/admin_wizard.mako:47
 msgid "Check Configuration"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:55
+#: src/about/templates/admin_wizard.mako:48
 msgid "Step 2:"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:55
+#: src/about/templates/admin_wizard.mako:48
 msgid "Examples"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:56
+#: src/about/templates/admin_wizard.mako:49
 msgid "Step 3:"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:56
+#: src/about/templates/admin_wizard.mako:49
 msgid "Users"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:57
+#: src/about/templates/admin_wizard.mako:50
 msgid "Step 4:"
 msgstr ""
 
+#: src/about/templates/admin_wizard.mako:50
+msgid "Go!"
+msgstr ""
+
 #: src/about/templates/admin_wizard.mako:57
-msgid "Go !"
+msgid "Checking current configuration"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:67
-msgid "Check your current configuration"
+#: src/about/templates/admin_wizard.mako:74
+msgid "Install all the application examples"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:81
-msgid "Install or re-install the application examples"
-msgstr ""
-
-#: src/about/templates/admin_wizard.mako:87
-#: src/about/templates/admin_wizard.mako:94
-#: src/about/templates/admin_wizard.mako:101
-#: src/about/templates/admin_wizard.mako:108
-#: src/about/templates/admin_wizard.mako:115
+#: src/about/templates/admin_wizard.mako:80
+#: src/about/templates/admin_wizard.mako:96
+#: src/about/templates/admin_wizard.mako:104
+#: src/about/templates/admin_wizard.mako:112
+#: src/about/templates/admin_wizard.mako:120
+#: src/about/templates/admin_wizard.mako:128
+#: src/about/templates/admin_wizard.mako:136
+#: src/about/templates/admin_wizard.mako:144
 msgid "Installing..."
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:131
-msgid "Go create or import users"
+#: src/about/templates/admin_wizard.mako:81
+msgid "All"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:134
+#: src/about/templates/admin_wizard.mako:90
+msgid "Install individual application examples"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:158
+msgid "Create or import users"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:164
 msgid "User Admin"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:145
-msgid "Anonymous usage analytics"
-msgstr ""
-
-#: src/about/templates/admin_wizard.mako:152
-msgid "How does it work?"
-msgstr ""
-
-#: src/about/templates/admin_wizard.mako:167
-msgid "Go use the apps"
-msgstr ""
-
 #: src/about/templates/admin_wizard.mako:170
-msgid "Hue Home"
+msgid "Tours and tutorials"
 msgstr ""
 
 #: src/about/templates/admin_wizard.mako:177
-msgid "Back"
+msgid "Check to enable the tours and tutorials"
 msgstr ""
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "Next"
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:185
+msgid "Anonymous usage analytics"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:189
+msgid "Check to enable usage analytics"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:190
+msgid "Help improve Hue with anonymous usage analytics."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:192
+msgid "How does it work?"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:193
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:204
+msgid "Use the applications"
 msgstr ""
 
 #: src/about/templates/admin_wizard.mako:208
+msgid "Hue Home"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:215
+msgid "Skip wizard next time"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:222
+msgid "Check to skip this wizard next time."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:223
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:237
+msgid "Back"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:238
+msgid "Next"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:239
+#: src/about/templates/admin_wizard.mako:247
+msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:244
+msgid "Learn more about Hue and Hadoop on"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:296
+msgid "Check config failed: "
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:305
+#: src/about/templates/admin_wizard.mako:323
 msgid "Examples refreshed"
 msgstr ""
 
-#: src/about/templates/admin_wizard.mako:275
+#: src/about/templates/admin_wizard.mako:387
 msgid "Configuration updated"
+msgstr ""
+
+#: src/about/templates/header.mako:28
+msgid "About Hue"
+msgstr ""
+
+#: src/about/templates/header.mako:32
+msgid "Configuration"
+msgstr ""
+
+#: src/about/templates/header.mako:33
+msgid "Server Logs"
 msgstr ""
 

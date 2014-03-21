@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -270,7 +270,9 @@ msgid "Add to Date Facets"
 msgstr "날짜 패싯에 추가"
 
 #: src/search/templates/admin_collection_facets.mako:194
-msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
+msgid ""
+"There is currently no graphical facet defined. Remember, you can add just"
+" one field as graphical facet."
 msgstr "현재 정의된 그래픽 패싯이 없습니다. 한 개 필드만 그래픽 패싯으로 추가할 수 있습니다."
 
 #: src/search/templates/admin_collection_facets.mako:215
@@ -546,7 +548,9 @@ msgid "Specify on which fields and order the results are sorted by default."
 msgstr "결과가 기본적으로 정렬되는 순서 및 필드를 지정합니다."
 
 #: src/search/templates/admin_collection_sorting.mako:53
-msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
+msgid ""
+"The sorting is a combination of the \"Default sorting\" fields, from left"
+" to right."
 msgstr "정렬은 \"기본 정렬\"(왼쪽에서 오른쪽으로) 필드의 조합입니다."
 
 #: src/search/templates/admin_collection_sorting.mako:54
@@ -691,7 +695,9 @@ msgid "Shows the relative time"
 msgstr "상대 시간 표시"
 
 #: src/search/templates/admin_collection_template.mako:267
-msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
+msgid ""
+"Here you can define custom CSS classes or Javascript functions that you "
+"can use in your template."
 msgstr "여기서 템플릿에서 사용할 수 있는 사용자 지정 CSS 클래스 또는 Javascript 함수를 정의할 수 있습니다."
 
 #: src/search/templates/admin_collection_template.mako:282
@@ -910,47 +916,49 @@ msgstr "이전 페이지"
 msgid "Next Page"
 msgstr "다음 페이지"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "Your search"
 msgstr "검색 항목과"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "did not match any documents."
 msgstr "일치하는 문서가 없습니다."
 
-#: src/search/templates/search.mako:313
+#: src/search/templates/search.mako:315
 msgid "Suggestions:"
 msgstr "추천 단어:"
 
-#: src/search/templates/search.mako:315
+#: src/search/templates/search.mako:317
 msgid "Make sure all words are spelled correctly."
 msgstr "모든 단어의 맞춤법이 올바른지 확인하십시오."
 
-#: src/search/templates/search.mako:316
+#: src/search/templates/search.mako:318
 msgid "Try different keywords."
 msgstr "다른 키워드를 사용해 보십시오."
 
-#: src/search/templates/search.mako:317
+#: src/search/templates/search.mako:319
 msgid "Try more general keywords."
 msgstr "더 일반적인 키워드를 사용해 보십시오."
 
-#: src/search/templates/search.mako:318
+#: src/search/templates/search.mako:320
 msgid "Try fewer keywords."
 msgstr "키워드 수를 줄여서 시도해 보십시오."
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "Show"
 msgstr "표시"
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "more..."
 msgstr "자세히..."
 
-#: src/search/templates/search.mako:654
-msgid "The graphical facets works just with numbers or dates. Please choose another field."
+#: src/search/templates/search.mako:656
+msgid ""
+"The graphical facets works just with numbers or dates. Please choose "
+"another field."
 msgstr "그래픽 패싯에는 숫자나 날짜만 사용합니다. 다른 필드를 선택하십시오."
 
-#: src/search/templates/search.mako:658
+#: src/search/templates/search.mako:660
 msgid "There was an error initializing the graphical facet component."
 msgstr "그래픽 패싯 구성 요소를 초기화하는 중 오류가 발생했습니다."
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -135,7 +135,9 @@ msgid "New Script"
 msgstr "새 스크립트"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "현재 정의된 스크립트가 없습니다. \"새 스크립트\"를 클릭하여 새 스크립트를 추가하십시오."
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
@@ -209,7 +211,9 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "자동 완성하려면 Ctrl + Space 누르기"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "편집기에서 Ctrl + Enter 또는 Ctrl + .를 눌러 현재 스크립트를 실행할 수 있습니다."
 
 #: src/pig/templates/app.mako:174
@@ -282,7 +286,9 @@ msgid "Resources"
 msgstr "리소스"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
 msgstr "실행 중인 스크립트의 작업 영역에 추가할 HDFS 파일 또는 zip 파일에 대한 경로"
 
 #: src/pig/templates/app.mako:462
@@ -404,7 +410,9 @@ msgid "Are you sure?"
 msgstr "계속하시겠습니까?"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr "현재 스크립트에 저장되지 않은 변경 내용이 있습니다. 변경 내용을 무시하시겠습니까?"
 
 #: src/pig/templates/app.mako:705

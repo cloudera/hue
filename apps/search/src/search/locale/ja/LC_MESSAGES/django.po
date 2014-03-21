@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -270,7 +270,9 @@ msgid "Add to Date Facets"
 msgstr "日付ファセットに追加"
 
 #: src/search/templates/admin_collection_facets.mako:194
-msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
+msgid ""
+"There is currently no graphical facet defined. Remember, you can add just"
+" one field as graphical facet."
 msgstr "現在、定義されているグラフィカルファセットはありません。ただし、グラフィカルファセットとして追加できるフィールドは 1 つのみです。"
 
 #: src/search/templates/admin_collection_facets.mako:215
@@ -546,7 +548,9 @@ msgid "Specify on which fields and order the results are sorted by default."
 msgstr "結果をソートするデフォルトのフィールドおよび順序を指定します。"
 
 #: src/search/templates/admin_collection_sorting.mako:53
-msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
+msgid ""
+"The sorting is a combination of the \"Default sorting\" fields, from left"
+" to right."
 msgstr "ソートは、複数の「デフォルトソート」フィールドを左から右へと組み合わせたものです。"
 
 #: src/search/templates/admin_collection_sorting.mako:54
@@ -691,7 +695,9 @@ msgid "Shows the relative time"
 msgstr "相対時間を表示"
 
 #: src/search/templates/admin_collection_template.mako:267
-msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
+msgid ""
+"Here you can define custom CSS classes or Javascript functions that you "
+"can use in your template."
 msgstr "ここで、テンプレートで使用できるカスタム CSS クラスまたは Javascript 関数を定義できます。"
 
 #: src/search/templates/admin_collection_template.mako:282
@@ -910,47 +916,49 @@ msgstr "前のページ"
 msgid "Next Page"
 msgstr "次のページ"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "Your search"
 msgstr "検索内容"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "did not match any documents."
 msgstr "一致するドキュメントがありませんでした。"
 
-#: src/search/templates/search.mako:313
+#: src/search/templates/search.mako:315
 msgid "Suggestions:"
 msgstr "提案："
 
-#: src/search/templates/search.mako:315
+#: src/search/templates/search.mako:317
 msgid "Make sure all words are spelled correctly."
 msgstr "すべての語句が正しく入力されていることを確認してください。"
 
-#: src/search/templates/search.mako:316
+#: src/search/templates/search.mako:318
 msgid "Try different keywords."
 msgstr "別のキーワードを試してみてください。"
 
-#: src/search/templates/search.mako:317
+#: src/search/templates/search.mako:319
 msgid "Try more general keywords."
 msgstr "より一般的なキーワードを試してみてください。"
 
-#: src/search/templates/search.mako:318
+#: src/search/templates/search.mako:320
 msgid "Try fewer keywords."
 msgstr "キーワードの数を減らしてみてください。"
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "Show"
 msgstr "表示"
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "more..."
 msgstr "詳細..."
 
-#: src/search/templates/search.mako:654
-msgid "The graphical facets works just with numbers or dates. Please choose another field."
+#: src/search/templates/search.mako:656
+msgid ""
+"The graphical facets works just with numbers or dates. Please choose "
+"another field."
 msgstr "グラフィカルファセットは数値または日付についてのみ動作します。別のフィールドを選択してください。"
 
-#: src/search/templates/search.mako:658
+#: src/search/templates/search.mako:660
 msgid "There was an error initializing the graphical facet component."
 msgstr "グラフィカルファセットコンポーネントの初期化中にエラーが発生しました。"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -19,11 +19,15 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Emplacement sur le système de fichiers local où des exemples et modèles sont stockés."
+msgstr ""
+"Emplacement sur le système de fichiers local où des exemples et modèles "
+"sont stockés."
 
 #: src/jobsub/conf.py:34
 msgid "Location on local filesystem where sample data is stored."
-msgstr "Emplacement sur le système de fichiers local où des données échantillons sont stockées."
+msgstr ""
+"Emplacement sur le système de fichiers local où des données échantillons "
+"sont stockées."
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:159
@@ -32,8 +36,12 @@ msgid "Name"
 msgstr "Nom"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Autorise les lettres, chiffres, '_' et '-'. Le premier caractère doit être une lettre ou '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Autorise les lettres, chiffres, '_' et '-'. Le premier caractère doit "
+"être une lettre ou '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/designs.mako:160 src/jobsub/templates/designs.mako:329
@@ -94,7 +102,7 @@ msgstr "Workflow introuvable."
 msgid "Permission denied. You are not the owner."
 msgstr "Autorisation refusée. Vous n'êtes pas le propriétaire."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "Doit être une requête POST."
 
@@ -108,16 +116,16 @@ msgstr "Accès refusé : supprimer la conception %(id)s."
 msgid "Could not find design %s."
 msgstr "Conception %s introuvable."
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "Accès refusé : modifier la conception %(id)s."
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "Erreur lors de l'enregistrement de la conception"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "Doit être une requête POST."
 
@@ -305,16 +313,26 @@ msgid "or"
 msgstr "ou"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
-msgstr "Une fois la conception envoyée, vous serez invité à indiquer la valeur réelle de "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
+msgstr ""
+"Une fois la conception envoyée, vous serez invité à indiquer la valeur "
+"réelle de "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
-msgstr "Tous les chemins d'accès sont relatifs au répertoire de déploiement. Ils peuvent être absolus mais cela n'est pas recommandé."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
+msgstr ""
+"Tous les chemins d'accès sont relatifs au répertoire de déploiement. Ils "
+"peuvent être absolus mais cela n'est pas recommandé."
 
 #: src/jobsub/templates/designs.mako:311
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
-msgstr "Nécessite la présence d'une configuration de serveur SMTP (dans le fichier oozie-site.xml)"
+msgstr ""
+"Nécessite la présence d'une configuration de serveur SMTP (dans le "
+"fichier oozie-site.xml)"
 
 #: src/jobsub/templates/designs.mako:312
 msgid "The ssh server requires passwordless login."

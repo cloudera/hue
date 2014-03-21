@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -113,7 +113,9 @@ msgid "Check to enable the tours and tutorials"
 msgstr "选中以启用导览和教程"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
 msgstr "当导览可用于特定页面时，显示“可用导览”问号。"
 
 #: src/about/templates/admin_wizard.mako:185
@@ -133,7 +135,9 @@ msgid "How does it work?"
 msgstr "工作原理如何？"
 
 #: src/about/templates/admin_wizard.mako:193
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
 msgstr "我们正使用 Google Analytics 查看应用程序或应用程序特定部分的使用次数，就这么简单。"
 
 #: src/about/templates/admin_wizard.mako:204
@@ -153,7 +157,9 @@ msgid "Check to skip this wizard next time."
 msgstr "选中以在下次跳过此向导。"
 
 #: src/about/templates/admin_wizard.mako:223
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
 msgstr "下次登录时跳过快速启动向导并直接登录主页。"
 
 #: src/about/templates/admin_wizard.mako:237

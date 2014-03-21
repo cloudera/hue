@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -32,7 +32,9 @@ msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -94,7 +96,7 @@ msgstr "未找到 Workflow"
 msgid "Permission denied. You are not the owner."
 msgstr "权限被拒绝。您不是所有者。"
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "必须是 POST 请求。"
 
@@ -108,16 +110,16 @@ msgstr "访问被拒绝：删除设计 %(id)s。"
 msgid "Could not find design %s."
 msgstr "找不到设计 %s。"
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "访问被拒绝：编辑设计 %(id)s。"
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "保存设计时出错"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "必须是 POST 请求。"
 
@@ -305,11 +307,15 @@ msgid "or"
 msgstr "或"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "提交设计后，将提示您如下项的实际值： "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr "所有路径均与部署目录相对。它们可以是绝对路径，但是不建议如此。"
 
 #: src/jobsub/templates/designs.mako:311

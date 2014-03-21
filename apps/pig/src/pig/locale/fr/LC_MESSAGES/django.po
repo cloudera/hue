@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PROJET\n"
 "Report-Msgid-Bugs-To: ADRESSE@MAIL\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOM COMPLET <ADRESSE@MAIL>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -31,7 +31,9 @@ msgstr "Emplacement sur HDFS local où les exemples Pig sont stockés."
 
 #: src/pig/conf.py:48
 msgid "The app won't work without a running Oozie server"
-msgstr "Sans un serveur Oozie en cours d'exécution, l'application ne fonctionnera pas."
+msgstr ""
+"Sans un serveur Oozie en cours d'exécution, l'application ne fonctionnera"
+" pas."
 
 #: src/pig/models.py:33
 msgid "Owner"
@@ -47,7 +49,9 @@ msgstr "Est un document utilisateur, et non un envoi de document."
 
 #: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "Si le document n'est pas un job envoyé mais une véritable requête, ou script, ou workflow."
+msgstr ""
+"Si le document n'est pas un job envoyé mais une véritable requête, ou "
+"script, ou workflow."
 
 #: src/pig/models.py:44
 #, python-format
@@ -135,8 +139,12 @@ msgid "New Script"
 msgstr "Nouveau script"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "Il n'existe actuellement aucun script défini. Veuillez ajouter un nouveau script en cliquant sur \"Nouveau script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
+msgstr ""
+"Il n'existe actuellement aucun script défini. Veuillez ajouter un nouveau"
+" script en cliquant sur \"Nouveau script\""
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
 #: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
@@ -209,8 +217,12 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "Appuyez sur CTRL + Barre d'espace pour lancer le remplissage automatique"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
-msgstr "Vous pouvez exécuter le script actuel en appuyant sur CTRL + ENTREE ou CTRL + . dans l'éditeur"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
+msgstr ""
+"Vous pouvez exécuter le script actuel en appuyant sur CTRL + ENTREE ou "
+"CTRL + . dans l'éditeur"
 
 #: src/pig/templates/app.mako:174
 msgid "Unsaved"
@@ -282,8 +294,12 @@ msgid "Resources"
 msgstr "Ressources"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "Chemin d'accès vers un fichier HDFS ou zip pour l'ajouter à l'espace de travail du script en cours d'exécution"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+"Chemin d'accès vers un fichier HDFS ou zip pour l'ajouter à l'espace de "
+"travail du script en cours d'exécution"
 
 #: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
@@ -404,8 +420,12 @@ msgid "Are you sure?"
 msgstr "En êtes-vous sûr ?"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "Le script actuel contient des modifications non enregistrées. Voulez-vous vraiment ignorer ces modifications ?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
+msgstr ""
+"Le script actuel contient des modifications non enregistrées. Voulez-vous"
+" vraiment ignorer ces modifications ?"
 
 #: src/pig/templates/app.mako:705
 msgid "Save script"

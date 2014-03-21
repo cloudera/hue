@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -72,8 +72,12 @@ msgid "There are currently no databases configured."
 msgstr "Actualmente no hay ninguna base de datos definida."
 
 #: src/rdbms/templates/error.mako:35
-msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
-msgstr "Vaya a la configuración de Hue y agregue una base de datos en la sección \"rdbms\"."
+msgid ""
+"Please go to your Hue configuration and add a database under the "
+"\"rdbms\" section."
+msgstr ""
+"Vaya a la configuración de Hue y agregue una base de datos en la sección "
+"\"rdbms\"."
 
 #: src/rdbms/templates/execute.mako:33
 msgid "Server"
@@ -125,7 +129,9 @@ msgstr "El servidor no ha devuelto ningún resultado."
 
 #: src/rdbms/templates/execute.mako:152
 msgid "Double click on a table name or field to insert it in the editor"
-msgstr "Haga doble clic en el nombre de una tabla o en un campo para insertarlo en el editor"
+msgstr ""
+"Haga doble clic en el nombre de una tabla o en un campo para insertarlo "
+"en el editor"
 
 #: src/rdbms/templates/execute.mako:153
 msgid "Manually refresh the table list"

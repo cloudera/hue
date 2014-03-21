@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -30,7 +30,9 @@ msgid "Nice name of server."
 msgstr "服务器名称。"
 
 #: src/librdbms/conf.py:38
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
 msgstr "数据库名称或数据库文件路径。如果已提供，则不允许选择其他数据库。"
 
 #: src/librdbms/conf.py:44
@@ -62,7 +64,9 @@ msgid "Database name should not be empty for the SQLite backend."
 msgstr "对于 SQLite 后端，数据库名称不应为空。"
 
 #: src/librdbms/conf.py:92
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
 msgstr "对于 Oracle 后端，数据库名称不应为空。该名称应为数据库的 SID。"
 
 #: src/librdbms/conf.py:94

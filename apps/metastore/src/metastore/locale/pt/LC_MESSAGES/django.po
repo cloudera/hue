@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSÃO DO PROJECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -125,7 +125,7 @@ msgid "Drop the selected databases"
 msgstr "Largar as bases de dados seleccionadas"
 
 #: src/metastore/templates/databases.mako:50
-#: src/metastore/templates/describe_table.mako:65
+#: src/metastore/templates/describe_table.mako:69
 #: src/metastore/templates/tables.mako:61
 msgid "Drop"
 msgstr "Largar"
@@ -135,23 +135,23 @@ msgid "Database Name"
 msgstr "Nome da base de dados"
 
 #: src/metastore/templates/databases.mako:90
-#: src/metastore/templates/describe_table.mako:179
+#: src/metastore/templates/describe_table.mako:183
 #: src/metastore/templates/tables.mako:102
 #: src/metastore/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "Cancelar"
 
 #: src/metastore/templates/databases.mako:123
-#: src/metastore/templates/describe_table.mako:209
-#: src/metastore/templates/describe_table.mako:234
+#: src/metastore/templates/describe_table.mako:213
+#: src/metastore/templates/describe_table.mako:255
 #: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "Não existem dados disponíveis"
 
 #: src/metastore/templates/databases.mako:124
-#: src/metastore/templates/describe_table.mako:210
-#: src/metastore/templates/describe_table.mako:235
+#: src/metastore/templates/describe_table.mako:214
+#: src/metastore/templates/describe_table.mako:256
 #: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
@@ -163,7 +163,7 @@ msgid "Table Partitions: %(tableName)s"
 msgstr "Partições de tabela: %(tableName)s"
 
 #: src/metastore/templates/describe_partitions.mako:32
-#: src/metastore/templates/describe_table.mako:59
+#: src/metastore/templates/describe_table.mako:63
 #: src/metastore/templates/tables.mako:42
 msgid "Actions"
 msgstr "Acções"
@@ -191,70 +191,74 @@ msgstr "Tabela"
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: src/metastore/templates/describe_table.mako:37
-#: src/metastore/templates/describe_table.mako:145
+#: src/metastore/templates/describe_table.mako:38
+#: src/metastore/templates/describe_table.mako:149
 msgid "Name"
 msgstr "Nome"
 
-#: src/metastore/templates/describe_table.mako:38
+#: src/metastore/templates/describe_table.mako:39
 msgid "Type"
 msgstr "Tipo"
 
-#: src/metastore/templates/describe_table.mako:39
+#: src/metastore/templates/describe_table.mako:40
 msgid "Comment"
 msgstr "Comentário"
 
-#: src/metastore/templates/describe_table.mako:61
+#: src/metastore/templates/describe_table.mako:47
+msgid "Scroll to the column"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:65
 msgid "Import Data"
 msgstr "Importar dados"
 
-#: src/metastore/templates/describe_table.mako:63
+#: src/metastore/templates/describe_table.mako:67
 #: src/metastore/templates/tables.mako:59
 msgid "Browse Data"
 msgstr "Procurar dados"
 
-#: src/metastore/templates/describe_table.mako:67
+#: src/metastore/templates/describe_table.mako:71
 msgid "View File Location"
 msgstr "Ver localização do ficheiro"
 
-#: src/metastore/templates/describe_table.mako:69
+#: src/metastore/templates/describe_table.mako:73
 msgid "Show Partitions"
 msgstr "Mostrar partições"
 
-#: src/metastore/templates/describe_table.mako:80
+#: src/metastore/templates/describe_table.mako:84
 msgid "Comment:"
 msgstr "Comentário:"
 
-#: src/metastore/templates/describe_table.mako:84
+#: src/metastore/templates/describe_table.mako:88
 msgid "Columns"
 msgstr "Colunas"
 
-#: src/metastore/templates/describe_table.mako:86
+#: src/metastore/templates/describe_table.mako:90
 msgid "Partition Columns"
 msgstr "Colunas de partição"
 
-#: src/metastore/templates/describe_table.mako:89
+#: src/metastore/templates/describe_table.mako:93
 msgid "Sample"
 msgstr "Amostra"
 
-#: src/metastore/templates/describe_table.mako:91
+#: src/metastore/templates/describe_table.mako:95
 msgid "Properties"
 msgstr "Propriedades"
 
-#: src/metastore/templates/describe_table.mako:109
+#: src/metastore/templates/describe_table.mako:113
 #: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "Erro!"
 
-#: src/metastore/templates/describe_table.mako:146
+#: src/metastore/templates/describe_table.mako:150
 msgid "Value"
 msgstr "Valor"
 
-#: src/metastore/templates/describe_table.mako:172
+#: src/metastore/templates/describe_table.mako:176
 msgid "Drop Table"
 msgstr "Soltar tabela"
 
-#: src/metastore/templates/describe_table.mako:180
+#: src/metastore/templates/describe_table.mako:184
 msgid "Yes, drop this table"
 msgstr "Sim, descartar a tabela"
 
@@ -312,8 +316,12 @@ msgid "Overwrite existing data"
 msgstr "Substituir os dados existentes"
 
 #: src/metastore/templates/popups/load_data.mako:55
-msgid "Note that loading data will move data from its location into the table's storage location."
-msgstr "Note que o carregamento de dados moverá os dados do seu local para o local de armazenamento da tabela."
+msgid ""
+"Note that loading data will move data from its location into the table's "
+"storage location."
+msgstr ""
+"Note que o carregamento de dados moverá os dados do seu local para o "
+"local de armazenamento da tabela."
 
 #: src/metastore/templates/popups/load_data.mako:61
 msgid "Submit"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -113,7 +113,9 @@ msgid "Check to enable the tours and tutorials"
 msgstr "ツアーおよびチュートリアルを有効にする場合はチェック"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
 msgstr "特定のページでツアーが使用可能な場合は、［使用可能なツアー］の疑問符を表示します。"
 
 #: src/about/templates/admin_wizard.mako:185
@@ -133,8 +135,12 @@ msgid "How does it work?"
 msgstr "どのような分析ですか？"
 
 #: src/about/templates/admin_wizard.mako:193
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
-msgstr "Hue では Google Analytics を使用して、アプリケーションやアプリケーションの特定のセクションが何回使用されているかを把握します。それ以上のことはありません。"
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
+msgstr ""
+"Hue では Google Analytics "
+"を使用して、アプリケーションやアプリケーションの特定のセクションが何回使用されているかを把握します。それ以上のことはありません。"
 
 #: src/about/templates/admin_wizard.mako:204
 msgid "Use the applications"
@@ -153,7 +159,9 @@ msgid "Check to skip this wizard next time."
 msgstr "次回ウィザードをスキップする場合はチェックします。"
 
 #: src/about/templates/admin_wizard.mako:223
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
 msgstr "次回ログイン時はクイックスタートウィザードをスキップして直接ホームページを表示します。"
 
 #: src/about/templates/admin_wizard.mako:237

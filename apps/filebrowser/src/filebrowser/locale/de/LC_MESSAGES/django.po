@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -175,8 +175,12 @@ msgstr "Kann nicht zugreifen auf: %(path)s."
 
 #: src/filebrowser/views.py:158
 #, python-format
-msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist \"%(superuser)s\")."
+msgid ""
+" Note: You are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist "
+"\"%(superuser)s\")."
 
 #: src/filebrowser/views.py:190
 #, python-format
@@ -191,7 +195,9 @@ msgstr "Datei zu groß zum Bearbeiten: %(path)s"
 #: src/filebrowser/views.py:204
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s."
-msgstr "Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet werden: %(path)s."
+msgstr ""
+"Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet "
+"werden: %(path)s."
 
 #: src/filebrowser/views.py:240
 msgid "No path specified"
@@ -236,7 +242,9 @@ msgstr "Länge darf nicht weniger sein als Null."
 #: src/filebrowser/views.py:543
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes."
-msgstr "Es können keine Teile angefordert werden, die größer als %(bytes)d Bytes sind."
+msgstr ""
+"Es können keine Teile angefordert werden, die größer als %(bytes)d Bytes "
+"sind."
 
 #: src/filebrowser/views.py:659
 msgid "Failed to decompress snappy compressed file."
@@ -244,12 +252,18 @@ msgstr "Komprimierte Snappy-Datei konnte nicht dekomprimiert werden."
 
 #: src/filebrowser/views.py:664 src/filebrowser/views.py:674
 msgid "Failed to decompress snappy compressed file. Snappy is not installed."
-msgstr "Komprimierte Snappy-Datei konnte nicht dekomprimiert werden. Snappy ist nicht installiert."
+msgstr ""
+"Komprimierte Snappy-Datei konnte nicht dekomprimiert werden. Snappy ist "
+"nicht installiert."
 
 #: src/filebrowser/views.py:667 src/filebrowser/views.py:677
 #, python-format
-msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
-msgstr "Komprimierte Snappy-Datei konnte nicht dekomprimiert werden. Datei ist größer als die zugelassene maximale Snappy-Dekomprimierungsgröße von %d."
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d."
+msgstr ""
+"Komprimierte Snappy-Datei konnte nicht dekomprimiert werden. Datei ist "
+"größer als die zugelassene maximale Snappy-Dekomprimierungsgröße von %d."
 
 #: src/filebrowser/views.py:701
 msgid "Failed to read Avro file."
@@ -297,23 +311,37 @@ msgstr "Operation kann nicht durchgeführt werden."
 
 #: src/filebrowser/views.py:911
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Hinweis: Sie sind ein Hue-Administrator, aber kein HDFS-Superuser (das ist \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Hinweis: Sie sind ein Hue-Administrator, aber kein HDFS-Superuser (das "
+"ist \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:944
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
-msgstr "Ordner konnte nicht von \"%s\" in \"%s\" umbenannt werden: Rauten sind in Dateinamen nicht zulässig."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
+msgstr ""
+"Ordner konnte nicht von \"%s\" in \"%s\" umbenannt werden: Rauten sind in"
+" Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:958
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
-msgstr "Ordner konnte nicht in \"%s\" umbenannt werden: Schrägstriche oder Rauten sind in Dateinamen nicht zulässig."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
+msgstr ""
+"Ordner konnte nicht in \"%s\" umbenannt werden: Schrägstriche oder Rauten"
+" sind in Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:968
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr "Datei \"%s\" konnte nicht benannt werden: Schrägstriche sind in Dateinamen nicht zulässig."
+msgstr ""
+"Datei \"%s\" konnte nicht benannt werden: Schrägstriche sind in "
+"Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:1090 src/filebrowser/views.py:1169
 msgid "A POST request is required."
@@ -615,8 +643,12 @@ msgid "Directory"
 msgstr "Verzeichnis"
 
 #: src/filebrowser/templates/listdir.mako:109
-msgid "This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory."
-msgstr "Dies ist der Hadoop-Papierkorb. Die Dateien befinden sich unter einem Prüfpunkt oder einem Verzeichnis mit Zeitstempel."
+msgid ""
+"This is Hadoop trash. Files will be under a checkpoint, or timestamp "
+"named, directory."
+msgstr ""
+"Dies ist der Hadoop-Papierkorb. Die Dateien befinden sich unter einem "
+"Prüfpunkt oder einem Verzeichnis mit Zeitstempel."
 
 #: src/filebrowser/templates/listdir_components.mako:134
 msgid "Name"
@@ -707,7 +739,9 @@ msgstr "Leeren des Papierkorbs bestätigen"
 
 #: src/filebrowser/templates/listdir_components.mako:240
 msgid "Are you sure you want to permanently delete all your trash?"
-msgstr "Sind Sie sicher, dass Sie Ihren Papierkorb dauerhaft komplett leeren möchten?"
+msgstr ""
+"Sind Sie sicher, dass Sie Ihren Papierkorb dauerhaft komplett leeren "
+"möchten?"
 
 #: src/filebrowser/templates/listdir_components.mako:245
 msgid "Delete"
@@ -729,8 +763,12 @@ msgstr "Eigentümer/Gruppe ändern"
 
 #: src/filebrowser/templates/listdir_components.mako:287
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
-msgstr "Hinweis: Nur der Hadoop-Superuser \"%(superuser)s\" in diesem Dateisystem kann den Eigentümer einer Datei ändern."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
+msgstr ""
+"Hinweis: Nur der Hadoop-Superuser \"%(superuser)s\" in diesem Dateisystem"
+" kann den Eigentümer einer Datei ändern."
 
 #: src/filebrowser/templates/listdir_components.mako:315
 msgid "Change Permissions:"
@@ -821,8 +859,12 @@ msgid "Specify another user."
 msgstr "Geben Sie einen anderen Benutzer an."
 
 #: src/filebrowser/templates/listdir_components.mako:783
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "Wussten Sie das? Sie können die Tabulatortaste oder STRG + Leertaste verwenden, um Datei- und Ordnernamen automatisch zu vervollständigen."
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"Wussten Sie das? Sie können die Tabulatortaste oder STRG + Leertaste "
+"verwenden, um Datei- und Ordnernamen automatisch zu vervollständigen."
 
 #: src/filebrowser/templates/listdir_components.mako:789
 msgid "There was a problem with your request."

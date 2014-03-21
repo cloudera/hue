@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:25
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
 msgstr "与所有用户共享提交的作业信息。如果设置为 false，提交的作业仅对所有者和管理员可见。"
 
 #: src/jobbrowser/models.py:89
@@ -521,7 +523,9 @@ msgid "Loading..."
 msgstr "正在加载..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
-msgid "The application might not be running yet or there is no Node Manager or Container available."
+msgid ""
+"The application might not be running yet or there is no Node Manager or "
+"Container available."
 msgstr "应用程序可能尚未运行或没有可用的 Node Manager 或容器。"
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48

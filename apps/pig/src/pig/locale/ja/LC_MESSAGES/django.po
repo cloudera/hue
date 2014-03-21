@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -135,7 +135,9 @@ msgid "New Script"
 msgstr "新しいスクリプト"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "現在、スクリプトは定義されていません。［新しいスクリプト］をクリックして、新しいスクリプトを追加してください。"
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
@@ -209,7 +211,9 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "CTRL キーを押したまま Space キーを押すと、オートコンプリート"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "エディタで CTRL キーを押したまま ENTER キーを押すか、CTRL キーを押したまま「.」キーを押して、現在のスクリプトを実行できます"
 
 #: src/pig/templates/app.mako:174
@@ -282,7 +286,9 @@ msgid "Resources"
 msgstr "リソース"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
 msgstr "実行中のスクリプトのワークスペースに追加する HDFS ファイルまたは zip ファイルのパス"
 
 #: src/pig/templates/app.mako:462
@@ -404,7 +410,9 @@ msgid "Are you sure?"
 msgstr "よろしいですか？"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr "現在のスクリプトには未保存の変更があります。変更を破棄してよろしいですか？"
 
 #: src/pig/templates/app.mako:705

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -26,7 +26,9 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证。"
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
 msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。"
 
 #: src/liboozie/conf.py:68

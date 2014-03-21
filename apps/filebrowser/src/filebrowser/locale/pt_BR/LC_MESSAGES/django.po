@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -175,8 +175,12 @@ msgstr "Não é possível acessar: %(path)s."
 
 #: src/filebrowser/views.py:158
 #, python-format
-msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Nota: Você é um administrador do Hue, mas não um superusuário do HDFS (que é \"%(superuser)s\")."
+msgid ""
+" Note: You are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Nota: Você é um administrador do Hue, mas não um superusuário do HDFS "
+"(que é \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:190
 #, python-format
@@ -219,7 +223,9 @@ msgstr "Não é um arquivo: '%(path)s'"
 
 #: src/filebrowser/views.py:527
 msgid "First byte to display must be before last byte to display."
-msgstr "O primeiro byte a ser exibido deve estar antes do último byte a ser exibido."
+msgstr ""
+"O primeiro byte a ser exibido deve estar antes do último byte a ser "
+"exibido."
 
 #: src/filebrowser/views.py:537
 msgid "Mode must be one of 'binary' or 'text'."
@@ -244,12 +250,18 @@ msgstr "Falha ao descompactar arquivo compactado snappy."
 
 #: src/filebrowser/views.py:664 src/filebrowser/views.py:674
 msgid "Failed to decompress snappy compressed file. Snappy is not installed."
-msgstr "Falha ao descompactar arquivo compactado snappy. O Snappy não está instalado."
+msgstr ""
+"Falha ao descompactar arquivo compactado snappy. O Snappy não está "
+"instalado."
 
 #: src/filebrowser/views.py:667 src/filebrowser/views.py:677
 #, python-format
-msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
-msgstr "Falha ao descompactar o arquivo compactado snappy. O tamanho do arquivo é maior que o tamanho de descompactação de snappy máximo permitido de %d."
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d."
+msgstr ""
+"Falha ao descompactar o arquivo compactado snappy. O tamanho do arquivo é"
+" maior que o tamanho de descompactação de snappy máximo permitido de %d."
 
 #: src/filebrowser/views.py:701
 msgid "Failed to read Avro file."
@@ -297,23 +309,37 @@ msgstr "Não é possível realizar a operação."
 
 #: src/filebrowser/views.py:911
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Nota: Você é um administrador Hue, mas não um superusuário do HDFS (que é \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Nota: Você é um administrador Hue, mas não um superusuário do HDFS (que "
+"é \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:944
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
-msgstr "Não foi possível renomear a pasta \"%s\" para \"%s\": caracteres de sustenido não são permitidos em nomes de arquivo."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
+msgstr ""
+"Não foi possível renomear a pasta \"%s\" para \"%s\": caracteres de "
+"sustenido não são permitidos em nomes de arquivo."
 
 #: src/filebrowser/views.py:958
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
-msgstr "Não foi possível nomear a pasta de \"%s\": caracteres de sustenido não são permitidos em nomes de arquivo."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
+msgstr ""
+"Não foi possível nomear a pasta de \"%s\": caracteres de sustenido não "
+"são permitidos em nomes de arquivo."
 
 #: src/filebrowser/views.py:968
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr "Não foi possível renomear o arquivo \"%s\": barras não são permitidas em nomes de arquivo."
+msgstr ""
+"Não foi possível renomear o arquivo \"%s\": barras não são permitidas em "
+"nomes de arquivo."
 
 #: src/filebrowser/views.py:1090 src/filebrowser/views.py:1169
 msgid "A POST request is required."
@@ -615,8 +641,12 @@ msgid "Directory"
 msgstr "Diretório"
 
 #: src/filebrowser/templates/listdir.mako:109
-msgid "This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory."
-msgstr "Está na lixeira do Hadoop. Os arquivos estarão em um diretório de ponto de verificação ou com nome de carimbo de data/hora."
+msgid ""
+"This is Hadoop trash. Files will be under a checkpoint, or timestamp "
+"named, directory."
+msgstr ""
+"Está na lixeira do Hadoop. Os arquivos estarão em um diretório de ponto "
+"de verificação ou com nome de carimbo de data/hora."
 
 #: src/filebrowser/templates/listdir_components.mako:134
 msgid "Name"
@@ -729,8 +759,12 @@ msgstr "Alterar proprietário/grupo"
 
 #: src/filebrowser/templates/listdir_components.mako:287
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
-msgstr "Nota: apenas o superusuário Hadoop \"%(superuser)s\" existente neste sistema de arquivos pode alterar o proprietário de um arquivo."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
+msgstr ""
+"Nota: apenas o superusuário Hadoop \"%(superuser)s\" existente neste "
+"sistema de arquivos pode alterar o proprietário de um arquivo."
 
 #: src/filebrowser/templates/listdir_components.mako:315
 msgid "Change Permissions:"
@@ -821,8 +855,12 @@ msgid "Specify another user."
 msgstr "Especifique outro usuário."
 
 #: src/filebrowser/templates/listdir_components.mako:783
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "Você sabia? É possível usar a tecla tab ou CTRL + Espaço para preencher automaticamente nomes de pastas e arquivos"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"Você sabia? É possível usar a tecla tab ou CTRL + Espaço para preencher "
+"automaticamente nomes de pastas e arquivos"
 
 #: src/filebrowser/templates/listdir_components.mako:789
 msgid "There was a problem with your request."

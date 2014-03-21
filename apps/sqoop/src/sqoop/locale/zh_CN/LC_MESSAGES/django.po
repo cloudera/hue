@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -453,11 +453,15 @@ msgid "Could not load node."
 msgstr "无法加载节点。"
 
 #: src/sqoop/templates/app.mako:856
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
 msgstr "您知道吗？您可使用 Tab 键或 CTRL + 空格键自动完成文件和文件夹名称"
 
 #: src/sqoop/templates/app.mako:923
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
 msgstr "服务器出现问题。有关更多详情，请查看 Sqoop2 服务器日志。"
 
 #: src/sqoop/templates/app.mako:926

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -113,8 +113,12 @@ msgid "Check to enable the tours and tutorials"
 msgstr "Marcar para activar as apresentações e os tutoriais"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
-msgstr "Apresentar o ponto de interrogação \"Apresentações disponíveis\" quando estão disponíveis apresentações para uma página específica."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
+msgstr ""
+"Apresentar o ponto de interrogação \"Apresentações disponíveis\" quando "
+"estão disponíveis apresentações para uma página específica."
 
 #: src/about/templates/admin_wizard.mako:185
 msgid "Anonymous usage analytics"
@@ -133,8 +137,12 @@ msgid "How does it work?"
 msgstr "Como funciona?"
 
 #: src/about/templates/admin_wizard.mako:193
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
-msgstr "Estamos a usar o Google Analytics para vermos quantas vezes é utilizada uma aplicação ou uma secção específica de uma aplicação, nada mais."
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
+msgstr ""
+"Estamos a usar o Google Analytics para vermos quantas vezes é utilizada "
+"uma aplicação ou uma secção específica de uma aplicação, nada mais."
 
 #: src/about/templates/admin_wizard.mako:204
 msgid "Use the applications"
@@ -153,8 +161,12 @@ msgid "Check to skip this wizard next time."
 msgstr "Marcar para ignorar o assistente da próxima vez."
 
 #: src/about/templates/admin_wizard.mako:223
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
-msgstr "Ignorar o assistente de início rápido no próximo início de sessão e ir directamente para a página principal."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
+msgstr ""
+"Ignorar o assistente de início rápido no próximo início de sessão e ir "
+"directamente para a página principal."
 
 #: src/about/templates/admin_wizard.mako:237
 msgid "Back"

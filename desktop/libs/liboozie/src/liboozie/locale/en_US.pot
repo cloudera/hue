@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2013 Cloudera, Inc
+# Copyright (C) 2014 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,30 +39,31 @@ msgstr ""
 msgid "Oozie Share Lib not installed in default location."
 msgstr ""
 
-#: src/liboozie/submittion.py:68
+#: src/liboozie/submittion.py:73
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr ""
 
-#: src/liboozie/submittion.py:147
-msgid "Failed to access deployment directory."
+#: src/liboozie/submittion.py:139
+#, python-format
+msgid "Failed to create deployment directory: %s"
 msgstr ""
 
-#: src/liboozie/submittion.py:204
+#: src/liboozie/submittion.py:235
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr ""
 
-#: src/liboozie/submittion.py:209
+#: src/liboozie/submittion.py:240
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr ""
 
-#: src/liboozie/types.py:356
+#: src/liboozie/types.py:360
 msgid "Insufficient permission."
 msgstr ""
 
-#: src/liboozie/types.py:357
+#: src/liboozie/types.py:361
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr ""

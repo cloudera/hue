@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -19,11 +19,15 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Ubicación, en el sistema de archivos local, en la que se almacenan los ejemplos y las plantillas."
+msgstr ""
+"Ubicación, en el sistema de archivos local, en la que se almacenan los "
+"ejemplos y las plantillas."
 
 #: src/jobsub/conf.py:34
 msgid "Location on local filesystem where sample data is stored."
-msgstr "Ubicación, en el sistema de archivos local, en la que se almacenan los datos de ejemplo."
+msgstr ""
+"Ubicación, en el sistema de archivos local, en la que se almacenan los "
+"datos de ejemplo."
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:159
@@ -32,8 +36,12 @@ msgid "Name"
 msgstr "Nombre"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Admite letras, dígitos, '_' y '-'. El primer carácter debe ser una letra o '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Admite letras, dígitos, '_' y '-'. El primer carácter debe ser una letra "
+"o '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/designs.mako:160 src/jobsub/templates/designs.mako:329
@@ -80,7 +88,9 @@ msgstr "Lista de rutas a archivos que se van a agregar a la caché distribuida."
 
 #: src/jobsub/models.py:194 src/jobsub/models.py:243
 msgid "List of paths to archives to be added to the distributed cache."
-msgstr "Lista de rutas a almacenamientos que se van a agregar a la caché distribuida."
+msgstr ""
+"Lista de rutas a almacenamientos que se van a agregar a la caché "
+"distribuida."
 
 #: src/jobsub/models.py:199 src/jobsub/templates/designs.mako:385
 msgid "Path to jar files on HDFS."
@@ -94,7 +104,7 @@ msgstr "Workflow no encontrado"
 msgid "Permission denied. You are not the owner."
 msgstr "Permiso denegado. No es el propietario."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "Debe ser una solicitud POST."
 
@@ -108,16 +118,16 @@ msgstr "Acceso denegado: editar diseño %(id)s."
 msgid "Could not find design %s."
 msgstr "No se ha podido encontrar el diseño %s."
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "Acceso denegado: editar diseño %(id)s."
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "Error al guardar el diseño"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "Debe ser una solicitud POST."
 
@@ -305,16 +315,24 @@ msgid "or"
 msgstr "o bien"
 
 #: src/jobsub/templates/designs.mako:309
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "Cuando se envíe el diseño, se le solicitará el valor real de "
 
 #: src/jobsub/templates/designs.mako:310
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
-msgstr "Todas las rutas hacia el directorio de implementación son relativas. Pueden ser absolutas pero no es lo recomendable."
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
+msgstr ""
+"Todas las rutas hacia el directorio de implementación son relativas. "
+"Pueden ser absolutas pero no es lo recomendable."
 
 #: src/jobsub/templates/designs.mako:311
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
-msgstr "Es necesario que haya alguna configuración del servidor SMTP (en oozie-site.xml)."
+msgstr ""
+"Es necesario que haya alguna configuración del servidor SMTP (en oozie-"
+"site.xml)."
 
 #: src/jobsub/templates/designs.mako:312
 msgid "The ssh server requires passwordless login."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -55,7 +55,9 @@ msgid "You must specify a password when creating a new user."
 msgstr "新規ユーザーの作成ではパスワードを指定する必要があります。"
 
 #: src/useradmin/forms.py:115
-msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
+msgid ""
+"Required. 30 characters or fewer with username. 64 characters or fewer "
+"with DN. No whitespaces or colons."
 msgstr "必須。ユーザー名は 30 文字以下、DN は 64 文字以下とし、スペースとコロンは使用できません。"
 
 #: src/useradmin/forms.py:117 src/useradmin/forms.py:155
@@ -119,7 +121,9 @@ msgid "Create home directories"
 msgstr "ホームディレクトリを作成"
 
 #: src/useradmin/forms.py:169
-msgid "Create home directories for every member imported, if members are being imported."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
 msgstr "インポートされる各メンバーのホームディレクトリを作成してください（メンバーをインポートする場合）。"
 
 #: src/useradmin/forms.py:180
@@ -285,7 +289,9 @@ msgstr "ユーザー %(username)s のインポート中に名前の競合が発�
 
 #: src/useradmin/views.py:592
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
 msgstr "パターン %(groupname_pattern)s のグループ %(groupname)s をインポートしている間に名前の競合が発生しました"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
@@ -425,7 +431,7 @@ msgid "Add/Sync group"
 msgstr "グループを追加／同期"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:47
+#: src/useradmin/templates/list_groups.mako:46
 msgid "Add group"
 msgstr "グループを追加"
 
@@ -627,11 +633,15 @@ msgid "Sync LDAP users and groups"
 msgstr "LDAP ユーザー／グループを同期"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
 msgstr "Hue にまだ存在しないユーザーおよびグループはインポートされません。LDAP からインポートされたユーザーおよびグループのみを同期できます。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
 msgstr "すべてのユーザー情報とグループメンバーシップは、LDAP サーバーの現在の状態に基づいて更新されます。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50

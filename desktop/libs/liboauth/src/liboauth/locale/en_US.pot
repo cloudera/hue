@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-30 13:18-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboauth/backend.py:101 src/liboauth/backend.py:146
-#: src/liboauth/backend.py:154 src/liboauth/backend.py:163
-#: src/liboauth/backend.py:172 src/liboauth/backend.py:247
+#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
+#: src/liboauth/backend.py:158 src/liboauth/backend.py:167
+#: src/liboauth/backend.py:176 src/liboauth/backend.py:250
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr ""

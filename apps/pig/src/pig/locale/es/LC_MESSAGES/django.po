@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PROYECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -23,7 +23,9 @@ msgstr "Secuencia de comandos sin guardar"
 
 #: src/pig/conf.py:32
 msgid "Location on local filesystem where the examples are stored."
-msgstr "Ubicación, en el sistema de archivos local, en la que se almacenan los ejemplos."
+msgstr ""
+"Ubicación, en el sistema de archivos local, en la que se almacenan los "
+"ejemplos."
 
 #: src/pig/conf.py:38
 msgid "Location on HDFS where the Pig examples are stored."
@@ -47,7 +49,9 @@ msgstr "Es un documento de usuario, no un envío de documento."
 
 #: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "Si el documento no es un trabajo enviado sino una consulta, una secuencia de comandos o workflow."
+msgstr ""
+"Si el documento no es un trabajo enviado sino una consulta, una secuencia"
+" de comandos o workflow."
 
 #: src/pig/models.py:44
 #, python-format
@@ -135,8 +139,12 @@ msgid "New Script"
 msgstr "Nueva secuencia de comandos"
 
 #: src/pig/templates/app.mako:64
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "Actualmente no hay ninguna secuencia de comandos definida. Agregue una nueva haciendo clic en \"Nueva secuencia de comandos\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
+msgstr ""
+"Actualmente no hay ninguna secuencia de comandos definida. Agregue una "
+"nueva haciendo clic en \"Nueva secuencia de comandos\""
 
 #: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
 #: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
@@ -150,7 +158,9 @@ msgstr "Secuencia de comandos"
 
 #: src/pig/templates/app.mako:87
 msgid "There are no scripts matching the search criteria."
-msgstr "No hay ninguna secuencia de comandos que coincida con los criterios de búsqueda."
+msgstr ""
+"No hay ninguna secuencia de comandos que coincida con los criterios de "
+"búsqueda."
 
 #: src/pig/templates/app.mako:116
 msgid "Pig"
@@ -209,8 +219,12 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "Pulse la tecla CTRL + espacio para autocompletar"
 
 #: src/pig/templates/app.mako:164
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
-msgstr "Para ejecutar la secuencia de comandos actual, pulse CTRL + ENTER o CTRL + . en el editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
+msgstr ""
+"Para ejecutar la secuencia de comandos actual, pulse CTRL + ENTER o CTRL "
+"+ . en el editor"
 
 #: src/pig/templates/app.mako:174
 msgid "Unsaved"
@@ -282,8 +296,12 @@ msgid "Resources"
 msgstr "Recursos"
 
 #: src/pig/templates/app.mako:455
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "Ruta a un archivo HDFS o archivo zip para agregar al área de trabajo de la secuencia de comandos en ejecución"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+"Ruta a un archivo HDFS o archivo zip para agregar al área de trabajo de "
+"la secuencia de comandos en ejecución"
 
 #: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
@@ -404,8 +422,12 @@ msgid "Are you sure?"
 msgstr "¿Está seguro?"
 
 #: src/pig/templates/app.mako:693
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "La secuencia de comandos actual tiene cambios sin guardar. ¿Seguro que desea descartarlos?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
+msgstr ""
+"La secuencia de comandos actual tiene cambios sin guardar. ¿Seguro que "
+"desea descartarlos?"
 
 #: src/pig/templates/app.mako:705
 msgid "Save script"

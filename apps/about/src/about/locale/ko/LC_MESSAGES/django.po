@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-03-21 15:09-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -113,7 +113,9 @@ msgid "Check to enable the tours and tutorials"
 msgstr "둘러보기 및 자습서를 사용하려면 선택"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
 msgstr "특정 페이지에서 둘러보기를 수행할 수 있는 경우 \"사용 가능한 둘러보기\" 물음표를 표시합니다."
 
 #: src/about/templates/admin_wizard.mako:185
@@ -133,7 +135,9 @@ msgid "How does it work?"
 msgstr "작동 원리"
 
 #: src/about/templates/admin_wizard.mako:193
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
 msgstr "애플리케이션이나 애플리케이션의 특정 섹션이 사용된 횟수를 확인하기 위해 Google Analytics를 사용합니다."
 
 #: src/about/templates/admin_wizard.mako:204
@@ -153,7 +157,9 @@ msgid "Check to skip this wizard next time."
 msgstr "다음에 이 마법사를 건너뛰려면 선택합니다."
 
 #: src/about/templates/admin_wizard.mako:223
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
 msgstr "다음 로그인할 때 빠른 시작 마법사를 건너뛰고 홈 페이지로 직접 이동합니다."
 
 #: src/about/templates/admin_wizard.mako:237

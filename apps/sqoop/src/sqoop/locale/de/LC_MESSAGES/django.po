@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -453,12 +453,20 @@ msgid "Could not load node."
 msgstr "Knoten konnte nicht geladen werden."
 
 #: src/sqoop/templates/app.mako:856
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "Wussten Sie das? Sie können Datei- und Ordnernamen mit der Tabulatortaste oder mit STRG + Leerzeichen automatisch vervollständigen."
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"Wussten Sie das? Sie können Datei- und Ordnernamen mit der Tabulatortaste"
+" oder mit STRG + Leerzeichen automatisch vervollständigen."
 
 #: src/sqoop/templates/app.mako:923
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
-msgstr "Mit dem Server ist ein Problem aufgetreten. Die Sqoop2-Serverprotokolle enthalten weitere Informationen."
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
+msgstr ""
+"Mit dem Server ist ein Problem aufgetreten. Die Sqoop2-Serverprotokolle "
+"enthalten weitere Informationen."
 
 #: src/sqoop/templates/app.mako:926
 msgid "Unknown error."

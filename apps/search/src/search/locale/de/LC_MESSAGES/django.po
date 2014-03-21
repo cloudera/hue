@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -33,7 +33,9 @@ msgstr "Wenn kein Begriff eingegeben wird, wird eine Abfrage gesendet."
 
 #: src/search/conf.py:35
 msgid "Whether Solr requires client to perform Kerberos authentication."
-msgstr "Ob Solr für die Durchführung der Kerberos-Authentifizierung einen Client benötigt."
+msgstr ""
+"Ob Solr für die Durchführung der Kerberos-Authentifizierung einen Client "
+"benötigt."
 
 #: src/search/decorators.py:32
 msgid "Permission denied. You are not an Administrator."
@@ -96,7 +98,9 @@ msgstr "Sammlung(en) oder Kern(e) wurden erfolgreich importiert!"
 
 #: src/search/views.py:174
 msgid "There was an error importing the collection(s) or core(s)"
-msgstr "Beim Importieren der Sammlung(en) oder des/der Kern(e) ist ein Fehler aufgetreten"
+msgstr ""
+"Beim Importieren der Sammlung(en) oder des/der Kern(e) ist ein Fehler "
+"aufgetreten"
 
 #: src/search/views.py:177
 msgid "Collection(s) or core(s) partially imported"
@@ -152,7 +156,9 @@ msgstr "Facetten sind eine intuitive Möglichkeit zum Filtern der Ergebnisse."
 
 #: src/search/templates/admin_collection_facets.mako:51
 msgid "Different types of facets can be added on the following steps."
-msgstr "Mit den folgenden Schritten können verschiedene Arten von Facetten hinzugefügt werden."
+msgstr ""
+"Mit den folgenden Schritten können verschiedene Arten von Facetten "
+"hinzugefügt werden."
 
 #: src/search/templates/admin_collection_facets.mako:52
 msgid "Facets are currently disabled."
@@ -270,8 +276,12 @@ msgid "Add to Date Facets"
 msgstr "Zu Datumsfacetten hinzufügen"
 
 #: src/search/templates/admin_collection_facets.mako:194
-msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
-msgstr "Derzeit ist keine grafische Facette definiert. Sie können nur ein Feld als Grafikfacette hinzufügen."
+msgid ""
+"There is currently no graphical facet defined. Remember, you can add just"
+" one field as graphical facet."
+msgstr ""
+"Derzeit ist keine grafische Facette definiert. Sie können nur ein Feld "
+"als Grafikfacette hinzufügen."
 
 #: src/search/templates/admin_collection_facets.mako:215
 msgid "ie. 0"
@@ -480,7 +490,9 @@ msgstr "Wird hervorgehoben"
 
 #: src/search/templates/admin_collection_highlighting.mako:47
 msgid "Highlights the query keywords matching some of the fields below."
-msgstr "Hebt die Abfrageschlüsselwörter hervor, die den unten beschriebenen Feldern entsprechen."
+msgstr ""
+"Hebt die Abfrageschlüsselwörter hervor, die den unten beschriebenen "
+"Feldern entsprechen."
 
 #: src/search/templates/admin_collection_highlighting.mako:50
 msgid "Highlighting is currently disabled."
@@ -543,11 +555,17 @@ msgstr "Sortieren"
 
 #: src/search/templates/admin_collection_sorting.mako:52
 msgid "Specify on which fields and order the results are sorted by default."
-msgstr "Legen Sie fest, in welchen Feldern und mit welcher Reihenfolge die Ergebnisse standardmäßig gespeichert werden."
+msgstr ""
+"Legen Sie fest, in welchen Feldern und mit welcher Reihenfolge die "
+"Ergebnisse standardmäßig gespeichert werden."
 
 #: src/search/templates/admin_collection_sorting.mako:53
-msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
-msgstr "Die Sortierung ist eine Kombination der Felder \"Standardsortierung\" von links nach rechts."
+msgid ""
+"The sorting is a combination of the \"Default sorting\" fields, from left"
+" to right."
+msgstr ""
+"Die Sortierung ist eine Kombination der Felder \"Standardsortierung\" von"
+" links nach rechts."
 
 #: src/search/templates/admin_collection_sorting.mako:54
 msgid "Sorting is currently disabled."
@@ -691,8 +709,12 @@ msgid "Shows the relative time"
 msgstr "Zeigt die relative Zeit an"
 
 #: src/search/templates/admin_collection_template.mako:267
-msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
-msgstr "Hier können Sie spezielle CSS-Klassen oder Javascript-Funktionen für die Verwendung in Ihrer Vorlage festlegen."
+msgid ""
+"Here you can define custom CSS classes or Javascript functions that you "
+"can use in your template."
+msgstr ""
+"Hier können Sie spezielle CSS-Klassen oder Javascript-Funktionen für die "
+"Verwendung in Ihrer Vorlage festlegen."
 
 #: src/search/templates/admin_collection_template.mako:282
 #: src/search/templates/admin_collection_template.mako:392
@@ -910,47 +932,53 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "Your search"
 msgstr "Ihre Suche"
 
-#: src/search/templates/search.mako:311
+#: src/search/templates/search.mako:313
 msgid "did not match any documents."
 msgstr "hat keine Dokumente ergeben."
 
-#: src/search/templates/search.mako:313
+#: src/search/templates/search.mako:315
 msgid "Suggestions:"
 msgstr "Vorschläge:"
 
-#: src/search/templates/search.mako:315
+#: src/search/templates/search.mako:317
 msgid "Make sure all words are spelled correctly."
 msgstr "Stellen Sie sicher, dass alle Wörter richtig geschrieben sind."
 
-#: src/search/templates/search.mako:316
+#: src/search/templates/search.mako:318
 msgid "Try different keywords."
 msgstr "Versuchen Sie es mit anderen Schlüsselwörtern."
 
-#: src/search/templates/search.mako:317
+#: src/search/templates/search.mako:319
 msgid "Try more general keywords."
 msgstr "Versuchen Sie es mit allgemeineren Schlüsselwörtern."
 
-#: src/search/templates/search.mako:318
+#: src/search/templates/search.mako:320
 msgid "Try fewer keywords."
 msgstr "Versuchen Sie es mit weniger Schlüsselwörtern."
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "Show"
 msgstr "Mehr"
 
-#: src/search/templates/search.mako:370
+#: src/search/templates/search.mako:372
 msgid "more..."
 msgstr "anzeigen:"
 
-#: src/search/templates/search.mako:654
-msgid "The graphical facets works just with numbers or dates. Please choose another field."
-msgstr "Die grafische Facette funktioniert nur mit Zahlen oder Daten. Wählen Sie ein anderes Feld aus."
+#: src/search/templates/search.mako:656
+msgid ""
+"The graphical facets works just with numbers or dates. Please choose "
+"another field."
+msgstr ""
+"Die grafische Facette funktioniert nur mit Zahlen oder Daten. Wählen Sie "
+"ein anderes Feld aus."
 
-#: src/search/templates/search.mako:658
+#: src/search/templates/search.mako:660
 msgid "There was an error initializing the graphical facet component."
-msgstr "Bei der Initialisierung der Grafikfacettenkomponente ist ein Fehler aufgetreten."
+msgstr ""
+"Bei der Initialisierung der Grafikfacettenkomponente ist ein Fehler "
+"aufgetreten."
 

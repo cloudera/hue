@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-03-21 15:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -27,17 +27,37 @@ msgstr "Puerto del servidor Impala."
 
 #: src/impala/conf.py:40
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
+msgstr ""
+"Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente "
+"'hue/hostname.foo.com'."
 
 #: src/impala/conf.py:46
 msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Activar/desactivar mecanismo de suplantación al hablar con Impala."
 
 #: src/impala/conf.py:52
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
-msgstr "Número de filas iniciales de un conjunto de resultados que se le solicitará a Impala que almacene en caché para poder volver a capturarlos y descargarlos. Se establece en 0 para desactivar la opción y tener compatibilidad con versiones anteriores."
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"Número de filas iniciales de un conjunto de resultados que se le "
+"solicitará a Impala que almacene en caché para poder volver a capturarlos"
+" y descargarlos. Se establece en 0 para desactivar la opción y tener "
+"compatibilidad con versiones anteriores."
 
-#: src/impala/conf.py:72
+#: src/impala/conf.py:62
+msgid "Timeout in seconds for Thrift calls."
+msgstr ""
+
+#: src/impala/conf.py:66
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+
+#: src/impala/conf.py:86
 msgid "No available Impalad to send queries to."
 msgstr "No hay ningún Impalad disponible al que enviar las consultas."
 
