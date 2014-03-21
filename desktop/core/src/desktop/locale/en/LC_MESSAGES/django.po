@@ -1133,7 +1133,6 @@ msgstr ""
 
 #: src/desktop/templates/common_header.mako:396
 #: src/desktop/templates/common_header.mako:400
-#, fuzzy
 msgid "Search"
 msgstr ""
 

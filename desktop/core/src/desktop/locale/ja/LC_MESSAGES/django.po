@@ -157,7 +157,6 @@ msgid "Default email address to use for various automated notifications from Hue
 msgstr "Hue からのさまざまな自動通知で使用するデフォルトの電子メールアドレスです。"
 
 #: src/desktop/conf.py:221
-#, fuzzy
 msgid ""
 "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see "
@@ -197,7 +196,6 @@ msgid "Database options to send to the server when connecting."
 msgstr "接続時にサーバーに送信するデータベースオプションです。"
 
 #: src/desktop/conf.py:272
-#, fuzzy
 msgid ""
 "Configuration options for specifying the Desktop session.\n"
 "          For more info, see "
@@ -232,7 +230,6 @@ msgid ""
 msgstr "セッションの長さの cookie を使用します。ユーザーがブラウザウィンドウを閉じたらログアウトさせます。"
 
 #: src/desktop/conf.py:304
-#, fuzzy
 msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
@@ -850,7 +847,6 @@ msgid "Web server for Hue."
 msgstr "Hue の Web サーバーです。"
 
 #: src/desktop/management/commands/runpylint.py:28
-#, fuzzy
 msgid ""
 "\n"
 "  Runs pylint on desktop and app code.\n"

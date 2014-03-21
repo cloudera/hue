@@ -24,7 +24,6 @@ msgid "A POST request is required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 
 #: src/beeswax/api.py:198
-#, fuzzy, python-format
 msgid ""
 "Bad status for request %s:\n"
 "%s"
@@ -536,7 +535,6 @@ msgid "Beeswax query completed."
 msgstr "Beeswax-Abfrage abgeschlossen."
 
 #: src/beeswax/views.py:605
-#, fuzzy, python-format
 msgid ""
 "%(subject)s. See the results here: %(link)s\n"
 "\n"
@@ -1622,7 +1620,6 @@ msgid "Filter for column name or type..."
 msgstr "Filter für Spaltenname oder -typ..."
 
 #: src/beeswax/templates/execute.mako:374
-#, fuzzy
 msgid "Scroll to the column"
 msgstr "Diese Spalte löschen"
 

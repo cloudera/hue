@@ -173,7 +173,6 @@ msgstr ""
 "automatisées envoyées via Hue."
 
 #: src/desktop/conf.py:221
-#, fuzzy
 msgid ""
 "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see "
@@ -214,7 +213,6 @@ msgid "Database options to send to the server when connecting."
 msgstr "Options de base de données à envoyer au serveur lors de la connexion."
 
 #: src/desktop/conf.py:272
-#, fuzzy
 msgid ""
 "Configuration options for specifying the Desktop session.\n"
 "          For more info, see "
@@ -256,7 +254,6 @@ msgstr ""
 "à la fermeture de la fenêtre du navigateur."
 
 #: src/desktop/conf.py:304
-#, fuzzy
 msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
@@ -944,7 +941,6 @@ msgid "Web server for Hue."
 msgstr "Serveur Web pour Hue."
 
 #: src/desktop/management/commands/runpylint.py:28
-#, fuzzy
 msgid ""
 "\n"
 "  Runs pylint on desktop and app code.\n"
