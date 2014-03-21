@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -31,55 +31,55 @@ msgstr "덮어쓰시겠습니까?"
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s(유형 %(column_type)s이(가) 포함된 파티션 키)"
 
-#: src/metastore/views.py:47
+#: src/metastore/views.py:50
 msgid "You are not allowed to modify the metastore."
 msgstr "Metastore를 수정할 수 없습니다."
 
-#: src/metastore/views.py:47
-msgid "You have metastore:read_only_access permissions"
-msgstr "metastore:read_only_access 권한이 있습니다."
+#: src/metastore/views.py:50
+msgid "You have must have metastore:write permissions"
+msgstr "metastore:write 권한이 있어야 합니다."
 
-#: src/metastore/views.py:88
+#: src/metastore/views.py:91
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "%(databases)s을(를) 제거하지 못했습니다. 오류: %(error)s"
 
-#: src/metastore/views.py:89 src/metastore/views.py:141
-#: src/metastore/views.py:189
+#: src/metastore/views.py:92 src/metastore/views.py:150
+#: src/metastore/views.py:199
 msgid "Hive Error"
 msgstr "Hive 오류"
 
-#: src/metastore/views.py:91
+#: src/metastore/views.py:94
 msgid "Do you really want to delete the database(s)?"
 msgstr "데이터베이스를 삭제하시겠습니까?"
 
-#: src/metastore/views.py:188
+#: src/metastore/views.py:198
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "%(tables)s을(를) 제거하지 못했습니다. 오류: %(error)s"
 
-#: src/metastore/views.py:191
+#: src/metastore/views.py:201
 msgid "Do you really want to delete the table(s)?"
 msgstr "테이블을 삭제하시겠습니까?"
 
-#: src/metastore/views.py:205 src/metastore/views.py:215
+#: src/metastore/views.py:215 src/metastore/views.py:225
 msgid "Cannot read table"
 msgstr "테이블을 읽을 수 없음"
 
-#: src/metastore/views.py:237
+#: src/metastore/views.py:247
 msgid "Can't load the data: "
 msgstr "데이터를 로드할 수 없음: "
 
-#: src/metastore/views.py:258
+#: src/metastore/views.py:268
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "테이블 '%(table)s'이(가) 분할되지 않았습니다."
 
-#: src/metastore/views.py:295
+#: src/metastore/views.py:305
 msgid "Column analysis not supportet yet"
 msgstr "아직 열 분석이 지원되지 않음"
 
-#: src/metastore/views.py:297
+#: src/metastore/views.py:307
 msgid "A POST request is required"
 msgstr "POST 요청이 필요합니다."
 
@@ -144,7 +144,7 @@ msgstr "취소"
 #: src/metastore/templates/databases.mako:123
 #: src/metastore/templates/describe_table.mako:209
 #: src/metastore/templates/describe_table.mako:234
-#: src/metastore/templates/sample.mako:64
+#: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
@@ -152,7 +152,7 @@ msgstr "데이터를 이용할 수 없음"
 #: src/metastore/templates/databases.mako:124
 #: src/metastore/templates/describe_table.mako:210
 #: src/metastore/templates/describe_table.mako:235
-#: src/metastore/templates/sample.mako:65
+#: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
@@ -242,7 +242,7 @@ msgid "Properties"
 msgstr "속성"
 
 #: src/metastore/templates/describe_table.mako:109
-#: src/metastore/templates/sample.mako:25
+#: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "오류!"
 
@@ -319,9 +319,3 @@ msgstr "데이터를 로드하면 해당 위치에서 테이블의 스토리지 
 msgid "Submit"
 msgstr "제출"
 
-#~ msgid "Beeswax Error"
-#~ msgstr "Beeswax 오류"
-#~ msgid "Partitions"
-#~ msgstr "파티션"
-#~ msgid "Database %s"
-#~ msgstr "데이터베이스 %s"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -31,55 +31,55 @@ msgstr "上書きしますか。"
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s（%(column_type)s タイプのパーティションキー）"
 
-#: src/metastore/views.py:47
+#: src/metastore/views.py:50
 msgid "You are not allowed to modify the metastore."
 msgstr "メタストアの変更は許可されません。"
 
-#: src/metastore/views.py:47
-msgid "You have metastore:read_only_access permissions"
-msgstr "metastore:read_only_access パーミッションがあります"
+#: src/metastore/views.py:50
+msgid "You have must have metastore:write permissions"
+msgstr "metastore:write パーミッションが必要です"
 
-#: src/metastore/views.py:88
+#: src/metastore/views.py:91
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "%(databases)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:89 src/metastore/views.py:141
-#: src/metastore/views.py:189
+#: src/metastore/views.py:92 src/metastore/views.py:150
+#: src/metastore/views.py:199
 msgid "Hive Error"
 msgstr "Hive エラー"
 
-#: src/metastore/views.py:91
+#: src/metastore/views.py:94
 msgid "Do you really want to delete the database(s)?"
 msgstr "データベースを削除してもよろしいですか?"
 
-#: src/metastore/views.py:188
+#: src/metastore/views.py:198
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "%(tables)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:191
+#: src/metastore/views.py:201
 msgid "Do you really want to delete the table(s)?"
 msgstr "テーブルを削除してもよろしいですか?"
 
-#: src/metastore/views.py:205 src/metastore/views.py:215
+#: src/metastore/views.py:215 src/metastore/views.py:225
 msgid "Cannot read table"
 msgstr "テーブルを読み取ることができません"
 
-#: src/metastore/views.py:237
+#: src/metastore/views.py:247
 msgid "Can't load the data: "
 msgstr "データを読み込むことができません： "
 
-#: src/metastore/views.py:258
+#: src/metastore/views.py:268
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "テーブル '%(table)s' はパーティション化されていません。"
 
-#: src/metastore/views.py:295
+#: src/metastore/views.py:305
 msgid "Column analysis not supportet yet"
 msgstr "列の分析はまだサポートされていません"
 
-#: src/metastore/views.py:297
+#: src/metastore/views.py:307
 msgid "A POST request is required"
 msgstr "POST 要求が必要です"
 
@@ -144,7 +144,7 @@ msgstr "キャンセル"
 #: src/metastore/templates/databases.mako:123
 #: src/metastore/templates/describe_table.mako:209
 #: src/metastore/templates/describe_table.mako:234
-#: src/metastore/templates/sample.mako:64
+#: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "利用可能なデータがありません"
@@ -152,7 +152,7 @@ msgstr "利用可能なデータがありません"
 #: src/metastore/templates/databases.mako:124
 #: src/metastore/templates/describe_table.mako:210
 #: src/metastore/templates/describe_table.mako:235
-#: src/metastore/templates/sample.mako:65
+#: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
 msgstr "一致するレコードがありません"
@@ -242,7 +242,7 @@ msgid "Properties"
 msgstr "プロパティ"
 
 #: src/metastore/templates/describe_table.mako:109
-#: src/metastore/templates/sample.mako:25
+#: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "エラーが発生しました。"
 
@@ -319,9 +319,3 @@ msgstr "データを読み込むと、データの場所からテーブルの保
 msgid "Submit"
 msgstr "サブミット"
 
-#~ msgid "Beeswax Error"
-#~ msgstr "Beeswax のエラー"
-#~ msgid "Partitions"
-#~ msgstr "パーティション"
-#~ msgid "Database %s"
-#~ msgstr "データベース %s"

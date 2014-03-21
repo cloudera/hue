@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-08-14 22:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -104,7 +104,7 @@ msgstr "可修改该作业的人员。"
 msgid "Name of the job, which must be unique per user."
 msgstr "作业名称，每个用户的作业名称必须具有唯一性。"
 
-#: src/oozie/models.py:113 src/oozie/models.py:631 src/oozie/models.py:1630
+#: src/oozie/models.py:113 src/oozie/models.py:636 src/oozie/models.py:1635
 #: src/oozie/templates/utils.inc.mako:131
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:186
 #: src/oozie/templates/dashboard/list_oozie_bundles.mako:63
@@ -138,7 +138,7 @@ msgstr "作业名称，每个用户的作业名称必须具有唯一性。"
 msgid "Name"
 msgstr "名称"
 
-#: src/oozie/models.py:114 src/oozie/models.py:633 src/oozie/models.py:1632
+#: src/oozie/models.py:114 src/oozie/models.py:638 src/oozie/models.py:1637
 #: src/oozie/templates/editor/edit_bundle.mako:153
 #: src/oozie/templates/editor/edit_coordinator.mako:344
 #: src/oozie/templates/editor/edit_workflow.mako:180
@@ -201,51 +201,51 @@ msgstr "已移至垃圾桶"
 msgid "If this job is trashed."
 msgstr "如果此作业移至垃圾桶。"
 
-#: src/oozie/models.py:196
+#: src/oozie/models.py:201
 msgid "shared"
 msgstr "已共享"
 
-#: src/oozie/models.py:198
+#: src/oozie/models.py:203
 msgid "personal"
 msgstr "个人"
 
-#: src/oozie/models.py:326 src/oozie/models.py:850 src/oozie/models.py:918
-#: src/oozie/models.py:958 src/oozie/models.py:997 src/oozie/models.py:1036
-#: src/oozie/models.py:1096 src/oozie/models.py:1134
+#: src/oozie/models.py:331 src/oozie/models.py:855 src/oozie/models.py:923
+#: src/oozie/models.py:963 src/oozie/models.py:1002 src/oozie/models.py:1041
+#: src/oozie/models.py:1101 src/oozie/models.py:1139
 msgid "Job XML"
 msgstr "作业 XML"
 
-#: src/oozie/models.py:327 src/oozie/models.py:851 src/oozie/models.py:919
-#: src/oozie/models.py:959 src/oozie/models.py:1037 src/oozie/models.py:1097
-#: src/oozie/models.py:1135
+#: src/oozie/models.py:332 src/oozie/models.py:856 src/oozie/models.py:924
+#: src/oozie/models.py:964 src/oozie/models.py:1042 src/oozie/models.py:1102
+#: src/oozie/models.py:1140
 msgid "Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. Properties specified in the Job Properties element override properties specified in the files specified in the Job XML element."
 msgstr "请参考 workflow 部署目录中包含的 Hadoop JobConf job.xml 文件。作业属性元素中指定的属性优于作业 XML 元素指定文件中指定的属性。"
 
-#: src/oozie/models.py:330 src/oozie/models.py:843 src/oozie/models.py:876
-#: src/oozie/models.py:913 src/oozie/models.py:953 src/oozie/models.py:992
-#: src/oozie/models.py:1031 src/oozie/models.py:1091 src/oozie/models.py:1129
-#: src/oozie/models.py:1203
+#: src/oozie/models.py:335 src/oozie/models.py:848 src/oozie/models.py:881
+#: src/oozie/models.py:918 src/oozie/models.py:958 src/oozie/models.py:997
+#: src/oozie/models.py:1036 src/oozie/models.py:1096 src/oozie/models.py:1134
+#: src/oozie/models.py:1208
 msgid "Hadoop job properties"
 msgstr "Hadoop 作业属性"
 
-#: src/oozie/models.py:331
+#: src/oozie/models.py:336
 msgid "Job configuration properties used by all the actions of the workflow (e.g. mapred.job.queue.name=production)"
 msgstr "workflow 的所有操作使用的作业配置属性（如 mapred.job.queue.name=production）"
 
-#: src/oozie/models.py:400
+#: src/oozie/models.py:405
 #, python-format
 msgid "The copy of the deployment directory failed: %s."
 msgstr "无法复制部署目录：%s。"
 
-#: src/oozie/models.py:632
+#: src/oozie/models.py:637
 msgid "Name of the action, which must be unique by workflow."
 msgstr "操作名称，每个 workflow 的操作名称必须唯一。"
 
-#: src/oozie/models.py:634
+#: src/oozie/models.py:639
 msgid "The purpose of the action."
 msgstr "操作目的。"
 
-#: src/oozie/models.py:635
+#: src/oozie/models.py:640
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:196
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:203
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:122
@@ -259,389 +259,389 @@ msgstr "操作目的。"
 msgid "Type"
 msgstr "类型"
 
-#: src/oozie/models.py:636
+#: src/oozie/models.py:641
 msgid "The type of action (e.g. MapReduce, Pig...)"
 msgstr "操作类型（如 MapReduce, Pig...）"
 
-#: src/oozie/models.py:685
+#: src/oozie/models.py:690
 #, python-format
 msgid "Unknown Node type: %s. Was it set at its creation?"
 msgstr "未知节点类型：%s。是否在创建节点时设置？"
 
-#: src/oozie/models.py:772
+#: src/oozie/models.py:777
 #, python-format
 msgid "%(node_type)s has not implemented the 'add_node' method."
 msgstr "%(node_type)s 未实施“add_node”方法。"
 
-#: src/oozie/models.py:839 src/oozie/models.py:872 src/oozie/models.py:898
-#: src/oozie/models.py:949 src/oozie/models.py:987 src/oozie/models.py:1026
-#: src/oozie/models.py:1087
+#: src/oozie/models.py:844 src/oozie/models.py:877 src/oozie/models.py:903
+#: src/oozie/models.py:954 src/oozie/models.py:992 src/oozie/models.py:1031
+#: src/oozie/models.py:1092
 msgid "Files"
 msgstr "文件"
 
-#: src/oozie/models.py:840 src/oozie/models.py:873 src/oozie/models.py:899
-#: src/oozie/models.py:950 src/oozie/models.py:988 src/oozie/models.py:1027
-#: src/oozie/models.py:1088
+#: src/oozie/models.py:845 src/oozie/models.py:878 src/oozie/models.py:904
+#: src/oozie/models.py:955 src/oozie/models.py:993 src/oozie/models.py:1032
+#: src/oozie/models.py:1093
 msgid "List of names or paths of files to be added to the distributed cache and the task running directory."
 msgstr "要添加到分布式缓存和任务运行目录的文件名称或路径列表。"
 
-#: src/oozie/models.py:841 src/oozie/models.py:874 src/oozie/models.py:900
-#: src/oozie/models.py:951 src/oozie/models.py:989 src/oozie/models.py:1028
-#: src/oozie/models.py:1089 src/oozie/templates/editor/action_utils.mako:359
+#: src/oozie/models.py:846 src/oozie/models.py:879 src/oozie/models.py:905
+#: src/oozie/models.py:956 src/oozie/models.py:994 src/oozie/models.py:1033
+#: src/oozie/models.py:1094 src/oozie/templates/editor/action_utils.mako:359
 msgid "Archives"
 msgstr "文档"
 
-#: src/oozie/models.py:842 src/oozie/models.py:875 src/oozie/models.py:901
-#: src/oozie/models.py:952 src/oozie/models.py:990 src/oozie/models.py:1029
-#: src/oozie/models.py:1090
+#: src/oozie/models.py:847 src/oozie/models.py:880 src/oozie/models.py:906
+#: src/oozie/models.py:957 src/oozie/models.py:995 src/oozie/models.py:1034
+#: src/oozie/models.py:1095
 msgid "List of names or paths of the archives to be added to the distributed cache."
 msgstr "要添加到分布式缓存的存档的名称或路径列表。"
 
-#: src/oozie/models.py:844 src/oozie/models.py:877 src/oozie/models.py:914
-#: src/oozie/models.py:954 src/oozie/models.py:993 src/oozie/models.py:1032
-#: src/oozie/models.py:1092
+#: src/oozie/models.py:849 src/oozie/models.py:882 src/oozie/models.py:919
+#: src/oozie/models.py:959 src/oozie/models.py:998 src/oozie/models.py:1037
+#: src/oozie/models.py:1097
 msgid "For the job configuration (e.g. mapred.job.queue.name=production)"
 msgstr "对于作业配置（如 mapred.job.queue.name=production）"
 
-#: src/oozie/models.py:845 src/oozie/models.py:902
+#: src/oozie/models.py:850 src/oozie/models.py:907
 msgid "Jar name"
 msgstr "Jar 名称"
 
-#: src/oozie/models.py:846 src/oozie/models.py:903
+#: src/oozie/models.py:851 src/oozie/models.py:908
 #, python-format
 msgid "Name or path to the %(program)s jar file on HDFS. E.g. examples.jar."
 msgstr "HDFS 上 %(program)s jar 文件的名称或路径。例如示例 jar。"
 
-#: src/oozie/models.py:847 src/oozie/models.py:915 src/oozie/models.py:955
-#: src/oozie/models.py:994 src/oozie/models.py:1033 src/oozie/models.py:1093
-#: src/oozie/models.py:1131
+#: src/oozie/models.py:852 src/oozie/models.py:920 src/oozie/models.py:960
+#: src/oozie/models.py:999 src/oozie/models.py:1038 src/oozie/models.py:1098
+#: src/oozie/models.py:1136
 msgid "Prepares"
 msgstr "准备"
 
-#: src/oozie/models.py:848 src/oozie/models.py:916 src/oozie/models.py:956
+#: src/oozie/models.py:853 src/oozie/models.py:921 src/oozie/models.py:961
 msgid "List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup."
 msgstr "启用应用程序之前应删除并创建的绝对路径列表。这仅适用于目录清理。"
 
-#: src/oozie/models.py:878
+#: src/oozie/models.py:883
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/oozie/models.py:879
+#: src/oozie/models.py:884
 msgid "The executable/script to be used as mapper."
 msgstr "用作 mapper 的可执行文件/脚本。"
 
-#: src/oozie/models.py:880
+#: src/oozie/models.py:885
 msgid "Reducer"
 msgstr "Reducer"
 
-#: src/oozie/models.py:881
+#: src/oozie/models.py:886
 msgid "The executable/script to be used as reducer."
 msgstr "用作 Reducer 的可执行文件/脚本。"
 
-#: src/oozie/models.py:904
+#: src/oozie/models.py:909
 msgid "Main class"
 msgstr "Main class"
 
-#: src/oozie/models.py:905
+#: src/oozie/models.py:910
 msgid "Full name of the Java class. E.g. org.apache.hadoop.examples.Grep"
 msgstr "Java 类的全名。如 org.apache.hadoop.examples.Grep"
 
-#: src/oozie/models.py:906 src/oozie/models.py:1067 src/oozie/models.py:1085
-#: src/oozie/models.py:1126
+#: src/oozie/models.py:911 src/oozie/models.py:1072 src/oozie/models.py:1090
+#: src/oozie/models.py:1131
 msgid "Arguments"
 msgstr "参数"
 
-#: src/oozie/models.py:907
+#: src/oozie/models.py:912
 msgid "Arguments of the main method. The value of each arg element is considered a single argument and they are passed to the main method in the same order."
 msgstr "主方法的参数。每个参数元素的值被视为单个参数，并以相同的顺序传递到主方法。"
 
-#: src/oozie/models.py:909
+#: src/oozie/models.py:914
 msgid "Java options"
 msgstr "Java 选项"
 
-#: src/oozie/models.py:910
+#: src/oozie/models.py:915
 msgid "Command-line parameters used to start the JVM that will execute the Java application. Using this element is equivalent to using the mapred.child.java.opts configuration property. E.g. -Dexample-property=hue"
 msgstr "命令行参数用于启动将执行 Java 应用程序的 JVM。使用此元素等效于使用 mapred.child.java.opts 配置属性。例如，-Dexample-property=hue"
 
-#: src/oozie/models.py:922 src/oozie/models.py:1069 src/oozie/models.py:1100
+#: src/oozie/models.py:927 src/oozie/models.py:1074 src/oozie/models.py:1105
 msgid "Capture output"
 msgstr "捕获输出"
 
-#: src/oozie/models.py:923 src/oozie/models.py:1101
+#: src/oozie/models.py:928 src/oozie/models.py:1106
 #, python-format
 msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java Properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
 msgstr "%(program)s 命令执行 StdOut 的捕获输出。%(program)s 命令输出必须为 Java 属性文件格式，且不得超过 2KB。在 workflow 定义中，可通过字符串 action:output（字符串节点，字符串密钥）功能访问 %(program)s 操作节点的输出"
 
-#: src/oozie/models.py:945 src/oozie/models.py:983
+#: src/oozie/models.py:950 src/oozie/models.py:988
 msgid "Script name"
 msgstr "脚本名称"
 
-#: src/oozie/models.py:946
+#: src/oozie/models.py:951
 msgid "Script name or path to the Pig script. E.g. my_script.pig."
 msgstr "脚本名称或 Pig 脚本路径。如 my_script.pig。"
 
-#: src/oozie/models.py:947 src/oozie/models.py:985 src/oozie/models.py:1023
-#: src/oozie/models.py:1735
+#: src/oozie/models.py:952 src/oozie/models.py:990 src/oozie/models.py:1028
+#: src/oozie/models.py:1740
 msgid "Parameters"
 msgstr "参数"
 
-#: src/oozie/models.py:948
+#: src/oozie/models.py:953
 msgid "The Pig parameters of the script. e.g. \"-param\", \"INPUT=${inputDir}\""
 msgstr "脚本的 Pig 参数。如 \"-param\", \"INPUT=${inputDir}\""
 
-#: src/oozie/models.py:984
+#: src/oozie/models.py:989
 #, python-format
 msgid "Script name or path to the %(type)s script. E.g. my_script.sql."
 msgstr "脚本名称或 %(type)s 脚本路径。如 my_script.sql。"
 
-#: src/oozie/models.py:986
+#: src/oozie/models.py:991
 #, python-format
 msgid "The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}"
 msgstr "脚本的 %(type)s 参数。如 N=5，INPUT=${inputDir}"
 
-#: src/oozie/models.py:995
+#: src/oozie/models.py:1000
 msgid "List of absolute paths to delete, then create, before starting the application. This should be used exclusively for directory cleanup."
 msgstr "启用应用程序之前要删除并创建的绝对路径列表。这仅适用于目录清理。"
 
-#: src/oozie/models.py:998
+#: src/oozie/models.py:1003
 msgid "Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. Pick a name different than hive-site.xml."
 msgstr "请参考 Workflow 部署目录中包含的 Hive hive-config.xml 文件。选择不同于 hive-site.xml 的名称。"
 
-#: src/oozie/models.py:1020
+#: src/oozie/models.py:1025
 msgid "Command"
 msgstr "命令"
 
-#: src/oozie/models.py:1021
+#: src/oozie/models.py:1026
 #, python-format
 msgid "The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below."
 msgstr "完整 %(type)s 命令。将命令放在此处，或以空格对其进行拆分，然后将部分作为多参数插入下方。"
 
-#: src/oozie/models.py:1024
+#: src/oozie/models.py:1029
 #, python-format
 msgid "If no command is specified, split the command by spaces and insert the %(type)s parameters here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ..."
 msgstr "如果未指定命令，可用空格拆分该命令并在此处插入 %(type)s 参数，如 import、--connect、jdbc:hsqldb:file:db.hsqldb 等"
 
-#: src/oozie/models.py:1034 src/oozie/models.py:1094 src/oozie/models.py:1132
+#: src/oozie/models.py:1039 src/oozie/models.py:1099 src/oozie/models.py:1137
 msgid "List of absolute paths to delete then to create before starting the application. This should be used exclusively for directory cleanup"
 msgstr "启用应用程序之前应删除并创建的绝对路径列表。这仅适用于目录清理"
 
-#: src/oozie/models.py:1061
+#: src/oozie/models.py:1066
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:132
 msgid "User"
 msgstr "用户"
 
-#: src/oozie/models.py:1062
+#: src/oozie/models.py:1067
 msgid "User executing the shell command."
 msgstr "用户正在执行 shell 命令。"
 
-#: src/oozie/models.py:1063
+#: src/oozie/models.py:1068
 msgid "Host"
 msgstr "主机"
 
-#: src/oozie/models.py:1064
+#: src/oozie/models.py:1069
 msgid "Where the shell will be executed."
 msgstr "将执行 shell 的位置。"
 
-#: src/oozie/models.py:1065 src/oozie/models.py:1083
+#: src/oozie/models.py:1070 src/oozie/models.py:1088
 #, python-format
 msgid "%(type)s command"
 msgstr "%(type)s 命令"
 
-#: src/oozie/models.py:1066
+#: src/oozie/models.py:1071
 msgid "The command that will be executed."
 msgstr "将执行的命令。"
 
-#: src/oozie/models.py:1068
+#: src/oozie/models.py:1073
 #, python-format
 msgid "The arguments of the %(type)s command."
 msgstr "%(type)s 命令的自变量。"
 
-#: src/oozie/models.py:1070
+#: src/oozie/models.py:1075
 #, python-format
 msgid "Capture output of the stdout of the %(program)s command execution. The %(program)s command output must be in Java properties file format and it must not exceed 2KB. From within the workflow definition, the output of an %(program)s action node is accessible via the String action:output(String node, String key) function"
 msgstr "%(program)s 命令执行 StdOut 的捕获输出。%(program)s 命令输出必须为 Java 属性文件格式，且不得超过 2KB。在 workflow 定义中，可通过字符串 action:output（字符串节点，字符串密钥）功能访问 %(program)s 操作节点的输出"
 
-#: src/oozie/models.py:1084
+#: src/oozie/models.py:1089
 msgid "The path of the Shell command to execute."
 msgstr "要执行的 Shell 命令的路径。"
 
-#: src/oozie/models.py:1086
+#: src/oozie/models.py:1091
 msgid "The arguments of Shell command can then be specified using one or more argument element."
 msgstr "使用一个或多个参数元素可指定 Shell 命令的参数。"
 
-#: src/oozie/models.py:1127
+#: src/oozie/models.py:1132
 #, python-format
 msgid "The arguments of the %(type)s command. Put options first, then source paths, then destination path."
 msgstr "%(type)s 命令的参数。先放置选项，然后是源路径，接下来是目标路径。"
 
-#: src/oozie/models.py:1130
+#: src/oozie/models.py:1135
 msgid "For the job configuration (e.g. mapred.job.queue.name=production"
 msgstr "对于作业配置（如 mapred.job.queue.name=production"
 
-#: src/oozie/models.py:1154
+#: src/oozie/models.py:1159
 msgid "Delete path"
 msgstr "删除路径"
 
-#: src/oozie/models.py:1155
+#: src/oozie/models.py:1160
 msgid "Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory."
 msgstr "删除指定的路径，如果为目录，将递归地删除所有内容，然后删除目录。"
 
-#: src/oozie/models.py:1157
+#: src/oozie/models.py:1162
 msgid "Create directory"
 msgstr "创建目录"
 
-#: src/oozie/models.py:1158
+#: src/oozie/models.py:1163
 msgid "Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op."
 msgstr "创建指定的目录，在路径中创建所有遗漏的目录。如果目录已存在，则无操作。"
 
-#: src/oozie/models.py:1160
+#: src/oozie/models.py:1165
 msgid "Move file"
 msgstr "移动文件"
 
-#: src/oozie/models.py:1161
+#: src/oozie/models.py:1166
 msgid "Move a file or directory to another path."
 msgstr "将文件或目录移至另一个路径。"
 
-#: src/oozie/models.py:1162
+#: src/oozie/models.py:1167
 msgid "Change permissions"
 msgstr "更改权限"
 
-#: src/oozie/models.py:1163
+#: src/oozie/models.py:1168
 msgid "Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic representation (e.g. -rwxrw-rw-) or an octal representation (755)."
 msgstr "更改指定路径的权限。可使用 Unix 符号（例如  -rwxrw-rw-）或八进制数 (755) 指定权限。"
 
-#: src/oozie/models.py:1165
+#: src/oozie/models.py:1170
 msgid "Create or touch a file"
 msgstr "创建或触按文件"
 
-#: src/oozie/models.py:1166
+#: src/oozie/models.py:1171
 msgid "Creates a zero length file in the specified path if none exists or touch it."
 msgstr "如果没有文件或未触按文件，在指定的路径中创建零长度文件。"
 
-#: src/oozie/models.py:1189
+#: src/oozie/models.py:1194
 msgid "TO addresses"
 msgstr "接收地址"
 
-#: src/oozie/models.py:1189 src/oozie/models.py:1190
+#: src/oozie/models.py:1194 src/oozie/models.py:1195
 msgid "Comma-separated values."
 msgstr "用逗号分开的值。"
 
-#: src/oozie/models.py:1190
+#: src/oozie/models.py:1195
 msgid "CC addresses (optional)"
 msgstr "抄送地址（可选）"
 
-#: src/oozie/models.py:1191
+#: src/oozie/models.py:1196
 msgid "Subject"
 msgstr "主题"
 
-#: src/oozie/models.py:1191 src/oozie/models.py:1192
+#: src/oozie/models.py:1196 src/oozie/models.py:1197
 msgid "Plain-text."
 msgstr "纯文本。"
 
-#: src/oozie/models.py:1192
+#: src/oozie/models.py:1197
 msgid "Body"
 msgstr "主体"
 
-#: src/oozie/models.py:1199
+#: src/oozie/models.py:1204
 msgid "Sub-workflow"
 msgstr "子 Workflow"
 
-#: src/oozie/models.py:1200
+#: src/oozie/models.py:1205
 msgid "The sub-workflow application to include. You must own all the sub-workflows."
 msgstr "要包括的子 Workflow 应用程序。您必须拥有所有子 Workflow。"
 
-#: src/oozie/models.py:1201
+#: src/oozie/models.py:1206
 msgid "Propagate configuration"
 msgstr "传送配置"
 
-#: src/oozie/models.py:1202
+#: src/oozie/models.py:1207
 msgid "If the workflow job configuration should be propagated to the child workflow."
 msgstr "如果 workflow 作业配置应传送至子级 workflow。"
 
-#: src/oozie/models.py:1204
+#: src/oozie/models.py:1209
 msgid "Can be used to specify the job properties that are required to run the child workflow job."
 msgstr "可用来指定作业属性，以便用于运行子级 workflow 作业。"
 
-#: src/oozie/models.py:1214
+#: src/oozie/models.py:1219
 msgid "XML of the custom action"
 msgstr "自定义操作的 XML"
 
-#: src/oozie/models.py:1215
+#: src/oozie/models.py:1220
 #, python-format
 msgid "This will be inserted verbatim in the action %(action)s. E.g. all the XML content like %(xml_action)s will be inserted into the action and produce %(full_action)s"
 msgstr "这将逐字嵌入操作 %(action)s 中。例如，所有 XML 内容，如 %(xml_action)s，将嵌入操作中并产生 %(full_action)s"
 
-#: src/oozie/models.py:1254
+#: src/oozie/models.py:1259
 msgid "End should not have any children."
 msgstr "末端不应具有任何子项。"
 
-#: src/oozie/models.py:1263
+#: src/oozie/models.py:1268
 msgid "Kill should not have any children."
 msgstr "停止位置不应具有任何子项。"
 
-#: src/oozie/models.py:1371
+#: src/oozie/models.py:1376
 msgid "Minutes"
 msgstr "分钟"
 
-#: src/oozie/models.py:1372
+#: src/oozie/models.py:1377
 msgid "Hours"
 msgstr "小时"
 
-#: src/oozie/models.py:1373
+#: src/oozie/models.py:1378
 msgid "Days"
 msgstr "日"
 
-#: src/oozie/models.py:1374
+#: src/oozie/models.py:1379
 msgid "Months"
 msgstr "月"
 
-#: src/oozie/models.py:1380 src/oozie/models.py:1637
+#: src/oozie/models.py:1385 src/oozie/models.py:1642
 msgid "Frequency number"
 msgstr "频数"
 
-#: src/oozie/models.py:1381 src/oozie/models.py:1638
+#: src/oozie/models.py:1386 src/oozie/models.py:1643
 msgid "The number of units of the rate at which data is periodically created."
 msgstr "定期创建数据的速率的单位数量。"
 
-#: src/oozie/models.py:1383 src/oozie/models.py:1640
+#: src/oozie/models.py:1388 src/oozie/models.py:1645
 msgid "Frequency unit"
 msgstr "速率单位"
 
-#: src/oozie/models.py:1384 src/oozie/models.py:1641
+#: src/oozie/models.py:1389 src/oozie/models.py:1646
 msgid "The unit of the rate at which data is periodically created."
 msgstr "定期创建数据的速率的单位。"
 
-#: src/oozie/models.py:1385 src/oozie/models.py:1646
+#: src/oozie/models.py:1390 src/oozie/models.py:1651
 #: src/oozie/templates/editor/edit_coordinator.mako:348
 msgid "Timezone"
 msgstr "时区"
 
-#: src/oozie/models.py:1386
+#: src/oozie/models.py:1391
 msgid "The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators."
 msgstr "Coordinator 的时区。与几个 Coordinator 结合使用时，仅用于管理夏令时更改。"
 
-#: src/oozie/models.py:1387 src/oozie/models.py:1634 src/oozie/models.py:1743
+#: src/oozie/models.py:1392 src/oozie/models.py:1639 src/oozie/models.py:1748
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:69
 #: src/oozie/templates/editor/dataset_utils.mako:39
 #: src/oozie/templates/editor/edit_coordinator.mako:346
 msgid "Start"
 msgstr "开始"
 
-#: src/oozie/models.py:1388
+#: src/oozie/models.py:1393
 msgid "When to start the first workflow."
 msgstr "何时开始第一个 workflow。"
 
-#: src/oozie/models.py:1389
+#: src/oozie/models.py:1394
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:74
 #: src/oozie/templates/editor/dataset_utils.mako:50
 msgid "End"
 msgstr "结束"
 
-#: src/oozie/models.py:1390
+#: src/oozie/models.py:1395
 msgid "When to start the last workflow."
 msgstr "何时开始最后一个 workflow。"
 
-#: src/oozie/models.py:1391
+#: src/oozie/models.py:1396
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:39
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:145
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:38
@@ -653,107 +653,107 @@ msgstr "何时开始最后一个 workflow。"
 msgid "Workflow"
 msgstr "Workflow"
 
-#: src/oozie/models.py:1392
+#: src/oozie/models.py:1397
 msgid "The workflow to schedule repeatedly."
 msgstr "用于重复计划的 workflow。"
 
-#: src/oozie/models.py:1393
+#: src/oozie/models.py:1398
 msgid "Timeout"
 msgstr "超时"
 
-#: src/oozie/models.py:1394
+#: src/oozie/models.py:1399
 msgid "Number of minutes the coordinator action will be in WAITING or READY status before giving up on its execution."
 msgstr "放弃 Coordinator 操作执行前，Coordinator 操作将处于 WATTING 或 READY 状态的分钟数。"
 
-#: src/oozie/models.py:1396
+#: src/oozie/models.py:1401
 msgid "Concurrency"
 msgstr "并发"
 
-#: src/oozie/models.py:1397
+#: src/oozie/models.py:1402
 msgid "The number of coordinator actions that are allowed to run concurrently (RUNNING status) before the coordinator engine starts throttling them."
 msgstr "Coordinator 引擎开始限制前，允许同时运行的 Coordinator 操作（RUNNING（运行）状态）的数量。"
 
-#: src/oozie/models.py:1399
+#: src/oozie/models.py:1404
 msgid "Execution"
 msgstr "执行"
 
-#: src/oozie/models.py:1400
+#: src/oozie/models.py:1405
 msgid "FIFO (oldest first) default"
 msgstr "FIFO（先进先出）默认值"
 
-#: src/oozie/models.py:1401
+#: src/oozie/models.py:1406
 msgid "LIFO (newest first)"
 msgstr "LIFO（后进先出）"
 
-#: src/oozie/models.py:1402
+#: src/oozie/models.py:1407
 msgid "LAST_ONLY (discards all older materializations)"
 msgstr "LAST_ONLY（放弃所有更早的具体化）"
 
-#: src/oozie/models.py:1403
+#: src/oozie/models.py:1408
 msgid "Execution strategy of its coordinator actions when there is backlog of coordinator actions in the coordinator engine. The different execution strategies are 'oldest first', 'newest first' and 'last one only'. A backlog normally happens because of delayed input data, concurrency control or because manual re-runs of coordinator jobs."
 msgstr "coordinator 引擎中有 coordinator 操作的积压工作时，coordinator 操作的执行策略。不同的执行策略为 “先进先出”、“后进先出” 和 “仅最后一个”。积压工作通常由于延迟的输入数据、并发控制，或由于 coordinator 作业的手动重新运行而发生。"
 
-#: src/oozie/models.py:1407
+#: src/oozie/models.py:1412
 msgid "Throttle"
 msgstr "限制"
 
-#: src/oozie/models.py:1408
+#: src/oozie/models.py:1413
 msgid "The materialization or creation throttle value for its coordinator actions. Number of maximum coordinator actions that are allowed to be in WAITING state concurrently."
 msgstr "相应 Coordinator 操作的具体化或创建限制值。允许同时处于 WAITING（等待）状态的 Coordinator 操作的最大数量。"
 
-#: src/oozie/models.py:1410
+#: src/oozie/models.py:1415
 msgid "Workflow properties"
 msgstr "Workflow 属性"
 
-#: src/oozie/models.py:1411
+#: src/oozie/models.py:1416
 msgid "Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}"
 msgstr "要传输到 Workflow 的其他属性，如 limit=100 以及 EL 函数，如 username=${coord:user()}"
 
-#: src/oozie/models.py:1616
+#: src/oozie/models.py:1621
 #, python-format
 msgid "Permission denied. %(username)s does not have the permissions to access dataset %(id)s."
 msgstr "权限被拒绝。%(username)s 不具备访问数据集 %(id)s 的权限。"
 
-#: src/oozie/models.py:1623
+#: src/oozie/models.py:1628
 #, python-format
 msgid "dataset %(id)s not exist"
 msgstr "dataset %(id)s 不存在"
 
-#: src/oozie/models.py:1631
+#: src/oozie/models.py:1636
 msgid "The name of the dataset."
 msgstr "Dataset 的名称。"
 
-#: src/oozie/models.py:1633
+#: src/oozie/models.py:1638
 msgid "A description of the dataset."
 msgstr "数据集的描述。"
 
-#: src/oozie/models.py:1635
+#: src/oozie/models.py:1640
 msgid " The UTC datetime of the initial instance of the dataset. The initial instance also provides the baseline datetime to compute instances of the dataset using multiples of the frequency."
 msgstr " 数据集初始实例的 UTC 日期/时间。初始实例还提供基线日期/时间，以使用频率的倍数计算数据集的实例。"
 
-#: src/oozie/models.py:1642
+#: src/oozie/models.py:1647
 #: src/oozie/templates/editor/edit_coordinator.mako:347
 msgid "URI"
 msgstr "URI"
 
-#: src/oozie/models.py:1643
+#: src/oozie/models.py:1648
 msgid "The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and configuration properties (e.g. /home/${USER}/projects/${PROJECT})"
 msgstr "URI 模板可标识 dataset，并且可解析为具体的 URI 来标识特定 dataset 实例。URI 包含常量（例如，${YEAR}/${MONTH}）和配置属性（例如，/home/${USER}/projects/${PROJECT}）"
 
-#: src/oozie/models.py:1647
+#: src/oozie/models.py:1652
 msgid "The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets."
 msgstr "数据集的时区。与几个数据集结合使用时，仅用于管理夏令时更改。"
 
-#: src/oozie/models.py:1648
+#: src/oozie/models.py:1653
 #: src/oozie/templates/editor/edit_coordinator.mako:349
 msgid "Done flag"
 msgstr "完成标记"
 
-#: src/oozie/models.py:1649
+#: src/oozie/models.py:1654
 msgid "The done file for the data set. If the Done flag is not specified, then Oozie configures Hadoop to create a _SUCCESS file in the output directory. If Done flag is set to empty, then Coordinator looks for the existence of the directory itself."
 msgstr "数据集的完成文件。如果没有指定 Done（完成）标记，则 Oozie 将配置 Hadoop 以在输出目录中创建 _SUCCESS 文件。如果 Done（完成）标记设置为空，则 Coordinator 将自行查找是否存在目录。"
 
-#: src/oozie/models.py:1652 src/oozie/models.py:1732
+#: src/oozie/models.py:1657 src/oozie/models.py:1737
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:145
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:38
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:132
@@ -763,67 +763,67 @@ msgstr "数据集的完成文件。如果没有指定 Done（完成）标记，�
 msgid "Coordinator"
 msgstr "Coordinator"
 
-#: src/oozie/models.py:1653
+#: src/oozie/models.py:1658
 msgid "The coordinator associated with this data."
 msgstr "与此数据相关的 coordinator。"
 
-#: src/oozie/models.py:1654
+#: src/oozie/models.py:1659
 msgid "Instance type"
 msgstr "实例类型"
 
-#: src/oozie/models.py:1655
+#: src/oozie/models.py:1660
 msgid "Customize the date instance(s), e.g. define a range of dates, use EL functions..."
 msgstr "自定义日期实例，例如，定义日期范围，使用 EL 函数..."
 
-#: src/oozie/models.py:1656
+#: src/oozie/models.py:1661
 msgid "Start instance"
 msgstr "开始实例"
 
-#: src/oozie/models.py:1657
+#: src/oozie/models.py:1662
 msgid "Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}"
 msgstr "变换用于获取过去/将来开始日期的频率，或逐字地输入 Oozie 开始实例，如 ${coord:current(0)}"
 
-#: src/oozie/models.py:1658
+#: src/oozie/models.py:1663
 msgid "End instance"
 msgstr "结束时间"
 
-#: src/oozie/models.py:1659
+#: src/oozie/models.py:1664
 msgid "Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance."
 msgstr "可选：变换用于获取过去/将来结束日期的频率，或逐字输入 Oozie 结束实例。"
 
-#: src/oozie/models.py:1710
+#: src/oozie/models.py:1715
 msgid "Name of an input variable in the workflow."
 msgstr "workflow 中的输入变量名称。"
 
-#: src/oozie/models.py:1711
+#: src/oozie/models.py:1716
 msgid "The name of the variable of the workflow to automatically fill up."
 msgstr "workflow 自动填充的变量名称。"
 
-#: src/oozie/models.py:1712
+#: src/oozie/models.py:1717
 msgid "The dataset representing format of the data input."
 msgstr "数据集表示数据输入的格式。"
 
-#: src/oozie/models.py:1713
+#: src/oozie/models.py:1718
 msgid "The pattern of the input data we want to process."
 msgstr "我们需要处理的输入数据的模式。"
 
-#: src/oozie/models.py:1720
+#: src/oozie/models.py:1725
 msgid "Name of an output variable in the workflow"
 msgstr "Workflow 中输出变量的名称"
 
-#: src/oozie/models.py:1721
+#: src/oozie/models.py:1726
 msgid "The name of the variable of the workflow to automatically filled up."
 msgstr "要自动填充的 workflow 的变量名称。"
 
-#: src/oozie/models.py:1722
+#: src/oozie/models.py:1727
 msgid "The dataset representing the format of the data output."
 msgstr "表示数据输出格式的 dataset。"
 
-#: src/oozie/models.py:1723
+#: src/oozie/models.py:1728
 msgid "The pattern of the output data we want to generate."
 msgstr "需要生成的输出数据模式。"
 
-#: src/oozie/models.py:1730
+#: src/oozie/models.py:1735
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:39
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:130
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:130
@@ -832,19 +832,19 @@ msgstr "需要生成的输出数据模式。"
 msgid "Bundle"
 msgstr "Bundle"
 
-#: src/oozie/models.py:1731
+#: src/oozie/models.py:1736
 msgid "The bundle regrouping all the coordinators."
 msgstr "对所有 coordinator 重新分组的 bundle。"
 
-#: src/oozie/models.py:1733
+#: src/oozie/models.py:1738
 msgid "The coordinator to batch with other coordinators."
 msgstr "要与其他 coordinator 一起批处理的 coordinator。"
 
-#: src/oozie/models.py:1736
+#: src/oozie/models.py:1741
 msgid "Constants used at the submission time (e.g. market=US, oozie.use.system.libpath=true)."
 msgstr "提交时间中所用的常量（例如，market=US、oozie.use.system.libpath=true）。"
 
-#: src/oozie/models.py:1744
+#: src/oozie/models.py:1749
 msgid "When to start the first coordinators."
 msgstr "何时启动第一批 coordinator。"
 
@@ -854,7 +854,7 @@ msgid "Could not set field %(field)s: %(exception)s"
 msgstr "无法设置字段 %(field)s：%(exception)s"
 
 #: src/oozie/importlib/bundles.py:100 src/oozie/importlib/coordinators.py:165
-#: src/oozie/importlib/workflows.py:593
+#: src/oozie/importlib/workflows.py:638
 #, python-format
 msgid "Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s"
 msgstr "带命名空间 %(namespace)s 的标记无效。请使用以下任一命名空间：%(namespaces)s"
@@ -867,76 +867,76 @@ msgstr "在 Bundle 定义中找不到任何节点。是否有格式错误？"
 msgid "Could not find any nodes in Coordinator definition. Maybe it's malformed?"
 msgstr "在 Coordinator 定义中找不到任何节点。是否有格式错误？"
 
-#: src/oozie/importlib/workflows.py:110
+#: src/oozie/importlib/workflows.py:155
 #, python-format
 msgid "Node with name %s for workflow %s does not exist."
 msgstr "Workflow %s 不存在名为 %s 的节点。"
 
-#: src/oozie/importlib/workflows.py:140 src/oozie/importlib/workflows.py:164
-#: src/oozie/importlib/workflows.py:193 src/oozie/importlib/workflows.py:235
+#: src/oozie/importlib/workflows.py:185 src/oozie/importlib/workflows.py:209
+#: src/oozie/importlib/workflows.py:238 src/oozie/importlib/workflows.py:280
 #, python-format
 msgid "Node %s has a link that is missing 'to' attribute."
 msgstr "节点 %s 具有缺少“目标”属性的链接。"
 
-#: src/oozie/importlib/workflows.py:148 src/oozie/importlib/workflows.py:171
-#: src/oozie/importlib/workflows.py:199
+#: src/oozie/importlib/workflows.py:193 src/oozie/importlib/workflows.py:216
+#: src/oozie/importlib/workflows.py:244
 #, python-format
 msgid "Node %s has not been defined."
 msgstr "未定义节点 %s。"
 
-#: src/oozie/importlib/workflows.py:229
+#: src/oozie/importlib/workflows.py:274
 #, python-format
 msgid "Node %s has a link that is missing 'start' attribute."
 msgstr "节点 %s 具有缺少“起点”属性的链接。"
 
-#: src/oozie/importlib/workflows.py:244
+#: src/oozie/importlib/workflows.py:289
 #, python-format
 msgid "Node %s has not been defined"
 msgstr "未定义节点 %s"
 
-#: src/oozie/importlib/workflows.py:252
+#: src/oozie/importlib/workflows.py:297
 msgid "Workflow start has not been created."
 msgstr "未创建 Workflow 起点。"
 
-#: src/oozie/importlib/workflows.py:255
+#: src/oozie/importlib/workflows.py:300
 msgid "Workflow end has not been created."
 msgstr "未创建 Workflow 终点。"
 
-#: src/oozie/importlib/workflows.py:333
+#: src/oozie/importlib/workflows.py:378
 msgid "Cannot import workflows that have decision DAG leaf nodes with multiple children or no children."
 msgstr "无法导入具有决策 DAG 叶节点（带多个子级或无子级）的 workflow。"
 
-#: src/oozie/importlib/workflows.py:369 src/oozie/importlib/workflows.py:397
+#: src/oozie/importlib/workflows.py:414 src/oozie/importlib/workflows.py:442
 msgid "Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node."
 msgstr "无法导入具有决策路径（带多个终端节点）的 workflow，这些节点可汇聚到单个终端节点中。"
 
-#: src/oozie/importlib/workflows.py:399
+#: src/oozie/importlib/workflows.py:444
 msgid "Cannot import workflows that have decisions paths that never end."
 msgstr "无法导入具有无终点的决策路径的 workflow。"
 
-#: src/oozie/importlib/workflows.py:429
+#: src/oozie/importlib/workflows.py:474
 msgid "Different ends found in fork."
 msgstr "在分岔处找到不同的终端。"
 
-#: src/oozie/importlib/workflows.py:514
+#: src/oozie/importlib/workflows.py:559
 msgid "No hadoop file system to operate on."
 msgstr "没有要在其上操作的 hadoop 文件系统。"
 
-#: src/oozie/importlib/workflows.py:529
+#: src/oozie/importlib/workflows.py:574
 msgid "Could not find workflow name when resolving subworkflow."
 msgstr "解析子工作流时找不到工作流名称。"
 
-#: src/oozie/importlib/workflows.py:531
+#: src/oozie/importlib/workflows.py:576
 #, python-format
 msgid "Could not find workflow with name %s extracted from subworkflow path %s"
 msgstr "找不到名称为 %s 且从子 Workflow 路径中提取的 Workflow %s"
 
-#: src/oozie/importlib/workflows.py:533
+#: src/oozie/importlib/workflows.py:578
 #, python-format
 msgid "Could not find workflow at path %s: %s"
 msgstr "在路径 %s 中找不到 Workflow：%s"
 
-#: src/oozie/importlib/workflows.py:627
+#: src/oozie/importlib/workflows.py:673
 msgid "Could not find any nodes in Workflow definition. Maybe it's malformed?"
 msgstr "在 Workflow 定义中找不到任何节点。是否有格式错误？"
 
@@ -2930,40 +2930,45 @@ msgstr "编辑"
 msgid "Convert to Decision"
 msgstr "转换为决策"
 
-#: src/oozie/templates/editor/edit_workflow.mako:595
-#: src/oozie/templates/editor/edit_workflow.mako:603
-#: src/oozie/templates/editor/edit_workflow.mako:644
-#: src/oozie/templates/editor/edit_workflow.mako:867
-#: src/oozie/templates/editor/edit_workflow.mako:889
-msgid "Received invalid response from server: "
-msgstr "从服务器收到无效响应： "
+#: src/oozie/templates/editor/edit_workflow.mako:605
+#: src/oozie/templates/editor/edit_workflow.mako:613
+#: src/oozie/templates/editor/edit_workflow.mako:884
+#: src/oozie/templates/editor/edit_workflow.mako:906
+msgid "Received invalid response from server"
+msgstr "从服务器收到无效响应"
 
-#: src/oozie/templates/editor/edit_workflow.mako:608
-msgid "Workflow saved"
-msgstr "Workflow 已保存"
-
-#: src/oozie/templates/editor/edit_workflow.mako:623
+#: src/oozie/templates/editor/edit_workflow.mako:619
+#: src/oozie/templates/editor/edit_workflow.mako:631
 msgid "Could not save workflow"
 msgstr "无法保存 Workflow"
 
-#: src/oozie/templates/editor/edit_workflow.mako:629
+#: src/oozie/templates/editor/edit_workflow.mako:621
+msgid "Workflow saved"
+msgstr "Workflow 已保存"
+
+#: src/oozie/templates/editor/edit_workflow.mako:640
 msgid "Workflow is in read only mode."
 msgstr "Workflow 处于只读模式。"
 
-#: src/oozie/templates/editor/edit_workflow.mako:813
+#: src/oozie/templates/editor/edit_workflow.mako:655
+#: src/oozie/templates/editor/edit_workflow.mako:662
+msgid "Error loading workflow"
+msgstr "加载 Workflow 时出错"
+
+#: src/oozie/templates/editor/edit_workflow.mako:830
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: src/oozie/templates/editor/edit_workflow.mako:814
+#: src/oozie/templates/editor/edit_workflow.mako:831
 msgid "Are you sure you want to delete "
 msgstr "是否确定要删除 "
 
-#: src/oozie/templates/editor/edit_workflow.mako:865
-#: src/oozie/templates/editor/edit_workflow.mako:906
+#: src/oozie/templates/editor/edit_workflow.mako:882
+#: src/oozie/templates/editor/edit_workflow.mako:923
 msgid "Action imported at the top of the workflow."
 msgstr "Workflow 顶部的已导入操作"
 
-#: src/oozie/templates/editor/edit_workflow.mako:928
+#: src/oozie/templates/editor/edit_workflow.mako:945
 msgid "You have unsaved changes in this workflow."
 msgstr "您尚未保存此 Workflow 中的更改。"
 
@@ -3217,54 +3222,54 @@ msgstr "提交此作业？"
 msgid "View workflow action"
 msgstr "查看 Workflow 操作"
 
-#: src/oozie/views/api.py:53
+#: src/oozie/views/api.py:84
 msgid "Could not find node of type"
 msgstr "找不到类型节点"
 
-#: src/oozie/views/api.py:70
+#: src/oozie/views/api.py:101
 msgid "links must be a list"
 msgstr "链接必须是一个列表"
 
-#: src/oozie/views/api.py:76
+#: src/oozie/views/api.py:107
 msgid "Start should have two children: 'related' to end, 'to' to any node but an end."
 msgstr "起点必须有两个子项：对应于终点的“相关项”，对应于除终点外所有其他节点的“目标项”。"
 
-#: src/oozie/views/api.py:80
+#: src/oozie/views/api.py:111
 msgid "End should have no children."
 msgstr "终点不应有子项。"
 
-#: src/oozie/views/api.py:84
+#: src/oozie/views/api.py:115
 msgid "Kill should have no children."
 msgstr "停止不应有子项。"
 
-#: src/oozie/views/api.py:88
+#: src/oozie/views/api.py:119
 msgid "Join and Decision End should have one child: 'to' to any node."
 msgstr "联接和判定终点应有一个子项：对应于任何节点的“目标项”。"
 
-#: src/oozie/views/api.py:92
+#: src/oozie/views/api.py:123
 msgid "Fork and Decision should have at least two children: 'related' to their respective ends, 'start' to any node."
 msgstr "分叉和判定应至少有两个子项：对应于终点的“相关项”，对应于任何节点的“起点”。"
 
-#: src/oozie/views/api.py:96
+#: src/oozie/views/api.py:127
 msgid "Actions should have two children: 'error' to kill, 'ok' to any node."
 msgstr "操作应有两个子项：对应于停止的“错误”，对应于任何节点的“确定”。"
 
-#: src/oozie/views/api.py:118
+#: src/oozie/views/api.py:149
 #, python-format
 msgid "%(node_type)s should have %(count)d more %(link_type)s linknode_type"
 msgstr "%(node_type)s 应有 %(count)d 个以上的 %(link_type)s linknode_type"
 
-#: src/oozie/views/api.py:181 src/oozie/views/api.py:201
-#: src/oozie/views/api.py:296 src/oozie/views/api.py:303
+#: src/oozie/views/api.py:212 src/oozie/views/api.py:232
+#: src/oozie/views/api.py:329 src/oozie/views/api.py:336
 msgid "Error saving workflow"
 msgstr "保存 Workflow 时出错"
 
-#: src/oozie/views/api.py:288
+#: src/oozie/views/api.py:321
 msgid "Must be POST request."
 msgstr "必须是 POST 请求。"
 
-#: src/oozie/views/api.py:340 src/oozie/views/api.py:348
-#: src/oozie/views/api.py:362
+#: src/oozie/views/api.py:374 src/oozie/views/api.py:383
+#: src/oozie/views/api.py:398
 msgid "Must be GET request."
 msgstr "必须是 GET 请求。"
 
@@ -3391,7 +3396,6 @@ msgid "Coordinator imported"
 msgstr "Coordinator 已导入"
 
 #: src/oozie/views/editor.py:224
-#, python-format
 msgid "Errors on the form"
 msgstr "格式错误"
 
@@ -3499,35 +3503,3 @@ msgstr "Bundle 已提交。"
 msgid "Error submitting bundle %s"
 msgstr "提交 Bundle %s 时出错"
 
-#~ msgid ""
-#~ "Share workflows, coordinators and bundles "
-#~ "information with all users. If set "
-#~ "to false, they will be visible "
-#~ "only to the owner and administrators."
-#~ msgstr "与所有用户共享 workflow、coordinator 及 bundle 信息。如果设为 false，这些信息将仅向所有者和管理员显示。"
-#~ msgid "The sub-workflow could not be found: %s."
-#~ msgstr "无法找到子 workflow：%s。"
-#~ msgid "Could not find app-path for subworkflow %s"
-#~ msgstr "找不到子工作流 %s 的应用程序路径"
-#~ msgid "Could not find subworkflow with deployment directory: %s"
-#~ msgstr "找不到具有部署目录的子工作流：%s"
-#~ msgid "Subworkflow is not owned by %s"
-#~ msgstr "子工作流的所有者不是 %s"
-#~ msgid "The timezone of the coordinator."
-#~ msgstr "coordinator 的时区。"
-#~ msgid "The timezone of the dataset."
-#~ msgstr "数据集的时区。"
-#~ msgid "Dashboard"
-#~ msgstr "控制面板"
-#~ msgid "Filter: "
-#~ msgstr "过滤器： "
-#~ msgid "Rerun this job?"
-#~ msgstr "重新运行此作业？"
-#~ msgid "Coordinator data"
-#~ msgstr "Coordinator 数据"
-#~ msgid "Workflow Editor : "
-#~ msgstr "Workflow 编辑器： "
-#~ msgid "View bundles"
-#~ msgstr "查看 bundle"
-#~ msgid "View coordinators"
-#~ msgstr "查看 coordinator"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSÃO DO PROJECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "Lista jar de aplicação em falta."
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
 msgstr "URL do servidor de trabalho Spark."
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr "A aplicação não funciona sem um servidor Job em execução"
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
@@ -277,11 +281,11 @@ msgstr "Não existem registos correspondentes"
 
 #: src/spark/templates/editor.mako:580
 msgid "Server error occured: "
-msgstr "Ocorreu erro no servidor: "
+msgstr "Ocorreu um erro no servidor: "
 
 #: src/spark/templates/editor.mako:583
 msgid "Unmanageable server error occured: "
-msgstr "Ocorreu erro não gerível no servidor: "
+msgstr "Ocorreu um erro não gerível no servidor: "
 
 #: src/spark/templates/list_applications.mako:33
 #: src/spark/templates/list_contexts.mako:33
@@ -340,5 +344,3 @@ msgstr "Duração"
 msgid "Click to open"
 msgstr "Clique para abrir"
 
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr "A aplicação não funciona sem um servidor Oozie em execução"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PROJET\n"
 "Report-Msgid-Bugs-To: ADRESSE@MAIL\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: NOM COMPLET <ADRESSE@MAIL>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -31,55 +31,55 @@ msgstr "Remplacer ?"
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s (clé de partition avec type %(column_type)s)"
 
-#: src/metastore/views.py:47
+#: src/metastore/views.py:50
 msgid "You are not allowed to modify the metastore."
 msgstr "Vous n'êtes pas autorisé à modifier le metastore."
 
-#: src/metastore/views.py:47
-msgid "You have metastore:read_only_access permissions"
-msgstr "Vous disposez d'autorisations de type metastore:read_only_access"
+#: src/metastore/views.py:50
+msgid "You have must have metastore:write permissions"
+msgstr "Vous devez disposer de droits metastore:write"
 
-#: src/metastore/views.py:88
+#: src/metastore/views.py:91
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "Echec de la suppression de %(databases)s.  Erreur : %(error)s"
 
-#: src/metastore/views.py:89 src/metastore/views.py:141
-#: src/metastore/views.py:189
+#: src/metastore/views.py:92 src/metastore/views.py:150
+#: src/metastore/views.py:199
 msgid "Hive Error"
 msgstr "Erreur Hive"
 
-#: src/metastore/views.py:91
+#: src/metastore/views.py:94
 msgid "Do you really want to delete the database(s)?"
 msgstr "Voulez-vous vraiment supprimer la ou les base(s) de données ?"
 
-#: src/metastore/views.py:188
+#: src/metastore/views.py:198
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "Echec de la suppression de %(tables)s.  Erreur : %(error)s"
 
-#: src/metastore/views.py:191
+#: src/metastore/views.py:201
 msgid "Do you really want to delete the table(s)?"
 msgstr "Voulez-vous vraiment supprimer la ou les table(s) ?"
 
-#: src/metastore/views.py:205 src/metastore/views.py:215
+#: src/metastore/views.py:215 src/metastore/views.py:225
 msgid "Cannot read table"
 msgstr "Impossible de lire la table"
 
-#: src/metastore/views.py:237
+#: src/metastore/views.py:247
 msgid "Can't load the data: "
 msgstr "Impossible de charger les données : "
 
-#: src/metastore/views.py:258
+#: src/metastore/views.py:268
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "La table '%(table)s' n'est pas partitionnée."
 
-#: src/metastore/views.py:295
+#: src/metastore/views.py:305
 msgid "Column analysis not supportet yet"
 msgstr "L'analyse de colonne n'est pas encore prise en charge"
 
-#: src/metastore/views.py:297
+#: src/metastore/views.py:307
 msgid "A POST request is required"
 msgstr "Requête POST requise"
 
@@ -144,7 +144,7 @@ msgstr "Annuler"
 #: src/metastore/templates/databases.mako:123
 #: src/metastore/templates/describe_table.mako:209
 #: src/metastore/templates/describe_table.mako:234
-#: src/metastore/templates/sample.mako:64
+#: src/metastore/templates/sample.mako:63
 #: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "Aucune donnée disponible"
@@ -152,7 +152,7 @@ msgstr "Aucune donnée disponible"
 #: src/metastore/templates/databases.mako:124
 #: src/metastore/templates/describe_table.mako:210
 #: src/metastore/templates/describe_table.mako:235
-#: src/metastore/templates/sample.mako:65
+#: src/metastore/templates/sample.mako:64
 #: src/metastore/templates/tables.mako:136
 msgid "No matching records"
 msgstr "Aucun enregistrement correspondant"
@@ -242,7 +242,7 @@ msgid "Properties"
 msgstr "Propriétés"
 
 #: src/metastore/templates/describe_table.mako:109
-#: src/metastore/templates/sample.mako:25
+#: src/metastore/templates/sample.mako:24
 msgid "Error!"
 msgstr "Erreur !"
 
@@ -319,9 +319,3 @@ msgstr "Notez que le chargement de données déplacera des données de leur empl
 msgid "Submit"
 msgstr "Envoyer"
 
-#~ msgid "Beeswax Error"
-#~ msgstr "Erreur Beeswax"
-#~ msgid "Partitions"
-#~ msgstr "Partitions"
-#~ msgid "Database %s"
-#~ msgstr "Base de données %s"

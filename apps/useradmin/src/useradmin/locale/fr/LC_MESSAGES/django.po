@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/useradmin/forms.py:43 src/useradmin/forms.py:113
-#: src/useradmin/templates/list_users.mako:63
+#: src/useradmin/templates/list_users.mako:71
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
@@ -156,134 +156,134 @@ msgstr "Créez un répertoire racine pour chaque utilisateur s'il n'en existe pa
 msgid "You do not have permissions to %(description)s."
 msgstr "Vous n'êtes pas autorisé à %(description)s."
 
-#: src/useradmin/views.py:110
+#: src/useradmin/views.py:112
 msgid "You must be a superuser to delete users."
 msgstr "Vous devez être un superutilisateur pour pouvoir supprimer des utilisateurs."
 
-#: src/useradmin/views.py:113
+#: src/useradmin/views.py:115
 msgid "A POST request is required."
 msgstr "Requête POST requise."
 
-#: src/useradmin/views.py:120
+#: src/useradmin/views.py:122
 msgid "You cannot remove yourself."
 msgstr "Vous ne pouvez pas vous supprimer vous-même."
 
-#: src/useradmin/views.py:127
+#: src/useradmin/views.py:129
 msgid "The users were deleted."
 msgstr "Les utilisateurs ont été supprimés."
 
-#: src/useradmin/views.py:133
+#: src/useradmin/views.py:135
 msgid "You must be a superuser to delete groups."
 msgstr "Vous devez être un superutilisateur pour pouvoir supprimer des groupes."
 
-#: src/useradmin/views.py:146
+#: src/useradmin/views.py:148
 msgid "The default user group may not be deleted."
 msgstr "Le groupe d'utilisateurs par défaut peut ne pas être supprimé."
 
-#: src/useradmin/views.py:151
+#: src/useradmin/views.py:153
 msgid "The group was deleted."
 msgstr "Le groupe a été supprimé."
 
-#: src/useradmin/views.py:154
+#: src/useradmin/views.py:156
 msgid "Group not found."
 msgstr "Groupe introuvable."
 
-#: src/useradmin/views.py:169
+#: src/useradmin/views.py:171
 msgid "You must be a superuser to add or edit another user."
 msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un autre utilisateur."
 
-#: src/useradmin/views.py:189
+#: src/useradmin/views.py:191
 msgid "You cannot change a username."
 msgstr "Vous ne pouvez pas modifier un nom d'utilisateur."
 
-#: src/useradmin/views.py:191
+#: src/useradmin/views.py:193
 msgid "You cannot make yourself inactive."
 msgstr "Vous ne pouvez pas vous définir vous-même comme inactif."
 
-#: src/useradmin/views.py:203
+#: src/useradmin/views.py:205
 msgid "You cannot make yourself a superuser."
 msgstr "Vous ne pouvez pas vous définir vous-même comme un superutilisateur."
 
-#: src/useradmin/views.py:207
+#: src/useradmin/views.py:209
 msgid "User information updated"
 msgstr "Informations sur l'utilisateur mises à jour"
 
-#: src/useradmin/views.py:216 src/useradmin/views.py:323
+#: src/useradmin/views.py:218 src/useradmin/views.py:325
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "Impossible de générer le répertoire racine pour l'utilisateur %s."
 
-#: src/useradmin/views.py:244
+#: src/useradmin/views.py:246
 msgid "You must be a superuser to add or edit a group."
 msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un groupe."
 
-#: src/useradmin/views.py:255
+#: src/useradmin/views.py:257
 msgid "Group information updated"
 msgstr "Informations sur le groupe mises à jour"
 
-#: src/useradmin/views.py:278
+#: src/useradmin/views.py:280
 msgid "You must be a superuser to change permissions."
 msgstr "Vous devez être un superutilisateur pour pouvoir modifier les autorisations."
 
-#: src/useradmin/views.py:286
+#: src/useradmin/views.py:288
 msgid "Permission information updated"
 msgstr "Informations d'autorisation mises à jour"
 
-#: src/useradmin/views.py:305
+#: src/useradmin/views.py:307
 msgid "You must be a superuser to add another user."
 msgstr "Vous devez être un superutilisateur pour pouvoir ajouter un autre utilisateur."
 
-#: src/useradmin/views.py:316 src/useradmin/views.py:360
-#: src/useradmin/views.py:402
+#: src/useradmin/views.py:318 src/useradmin/views.py:362
+#: src/useradmin/views.py:404
 msgid "There was an error when communicating with LDAP"
 msgstr "Une erreur s'est produite lors de la communication avec LDAP"
 
-#: src/useradmin/views.py:327
+#: src/useradmin/views.py:329
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
 msgstr "Impossible de récupérer les détails LDAP des utilisateurs du modèle %s."
 
-#: src/useradmin/views.py:347
+#: src/useradmin/views.py:349
 msgid "You must be a superuser to add another group."
 msgstr "Vous devez être un superutilisateur pour pouvoir ajouter un autre groupe."
 
-#: src/useradmin/views.py:359
+#: src/useradmin/views.py:361
 #, python-format
 msgid "LDAP Exception: %s"
 msgstr "Exception LDAP : %s"
 
-#: src/useradmin/views.py:366
+#: src/useradmin/views.py:368
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
 msgstr "Impossible de récupérer les détails LDAP des groupes du modèle %s."
 
-#: src/useradmin/views.py:383
+#: src/useradmin/views.py:385
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "Vous devez être un superutilisateur pour pouvoir synchroniser les utilisateurs/groupes LDAP."
 
-#: src/useradmin/views.py:410
+#: src/useradmin/views.py:412
 msgid "The import may not be complete, sync again."
 msgstr "L'importation n'est peut-être pas terminée. Recommencez la Synchronisation."
 
-#: src/useradmin/views.py:431
+#: src/useradmin/views.py:433
 msgid "No active superuser configured."
 msgstr "Aucun super-utilisateur actif configuré."
 
-#: src/useradmin/views.py:433
+#: src/useradmin/views.py:435
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "Vous ne pouvez pas supprimer le dernier superutilisateur actif de la configuration."
 
-#: src/useradmin/views.py:491
+#: src/useradmin/views.py:493
 #, python-format
 msgid "Synced user %s from Unix"
 msgstr "Utilisateur %s synchronisé depuis Unix"
 
-#: src/useradmin/views.py:521
+#: src/useradmin/views.py:523
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
 msgstr "Un conflit de dénomination est survenu lors de l'importation de l'utilisateur %(username)s"
 
-#: src/useradmin/views.py:590
+#: src/useradmin/views.py:592
 #, python-format
 msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
 msgstr "Un conflit de dénomination est survenu lors de l'importation du groupe %(groupname)s dans le modèle %(groupname_pattern)s"
@@ -380,7 +380,7 @@ msgstr "Confirmer"
 
 #: src/useradmin/templates/confirm.mako:25
 #: src/useradmin/templates/delete_group.mako:26
-#: src/useradmin/templates/list_users.mako:120
+#: src/useradmin/templates/list_users.mako:128
 msgid "Yes"
 msgstr "Oui"
 
@@ -393,7 +393,7 @@ msgid "?"
 msgstr "?"
 
 #: src/useradmin/templates/delete_group.mako:25
-#: src/useradmin/templates/list_users.mako:119
+#: src/useradmin/templates/list_users.mako:127
 msgid "No"
 msgstr "Non"
 
@@ -425,7 +425,7 @@ msgid "Add/Sync group"
 msgstr "Ajouter/Synchroniser un groupe"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:46
+#: src/useradmin/templates/list_groups.mako:47
 msgid "Add group"
 msgstr "Ajouter un groupe"
 
@@ -508,12 +508,12 @@ msgstr "Utilisateurs"
 
 #: src/useradmin/templates/layout.mako:64
 #: src/useradmin/templates/list_permissions.mako:44
-#: src/useradmin/templates/list_users.mako:67
+#: src/useradmin/templates/list_users.mako:75
 msgid "Groups"
 msgstr "Groupes"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_groups.mako:63
+#: src/useradmin/templates/list_groups.mako:69
 msgid "Permissions"
 msgstr "Autorisations"
 
@@ -528,36 +528,36 @@ msgstr "Rechercher un nom, des membres, etc."
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/useradmin/templates/list_groups.mako:48
+#: src/useradmin/templates/list_groups.mako:49
 msgid "Add/Sync LDAP group"
 msgstr "Ajouter/Synchroniser un groupe LDAP"
 
-#: src/useradmin/templates/list_groups.mako:61
+#: src/useradmin/templates/list_groups.mako:67
 msgid "Group Name"
 msgstr "Nom de groupe"
 
-#: src/useradmin/templates/list_groups.mako:62
+#: src/useradmin/templates/list_groups.mako:68
 msgid "Members"
 msgstr "Membres"
 
-#: src/useradmin/templates/list_groups.mako:79
+#: src/useradmin/templates/list_groups.mako:85
 #, python-format
 msgid "Edit %(groupname)s"
 msgstr "Modifier %(groupname)s"
 
-#: src/useradmin/templates/list_groups.mako:95
+#: src/useradmin/templates/list_groups.mako:101
 msgid "There are no groups matching the search criteria."
 msgstr "Aucun groupe ne correspond aux critères de recherche."
 
-#: src/useradmin/templates/list_groups.mako:123
+#: src/useradmin/templates/list_groups.mako:129
 #: src/useradmin/templates/list_permissions.mako:91
-#: src/useradmin/templates/list_users.mako:159
+#: src/useradmin/templates/list_users.mako:167
 msgid "No data available"
 msgstr "Aucune donnée disponible"
 
-#: src/useradmin/templates/list_groups.mako:124
+#: src/useradmin/templates/list_groups.mako:130
 #: src/useradmin/templates/list_permissions.mako:92
-#: src/useradmin/templates/list_users.mako:160
+#: src/useradmin/templates/list_users.mako:168
 msgid "No matching records"
 msgstr "Aucun enregistrement correspondant"
 
@@ -585,40 +585,40 @@ msgstr "Aucune autorisation ne correspond aux critères de recherche."
 msgid "Search for name, group, etc..."
 msgstr "Rechercher un nom, un groupe, etc."
 
-#: src/useradmin/templates/list_users.mako:47
+#: src/useradmin/templates/list_users.mako:49
 msgid "Add/Sync LDAP user"
 msgstr "Ajouter/Synchroniser un utilisateur LDAP"
 
-#: src/useradmin/templates/list_users.mako:50
+#: src/useradmin/templates/list_users.mako:52
 msgid "Sync LDAP users/groups"
 msgstr "Synchroniser des utilisateurs/groupes LDAP"
 
-#: src/useradmin/templates/list_users.mako:64
+#: src/useradmin/templates/list_users.mako:72
 msgid "First Name"
 msgstr "Prénom"
 
-#: src/useradmin/templates/list_users.mako:65
+#: src/useradmin/templates/list_users.mako:73
 msgid "Last Name"
 msgstr "Nom"
 
-#: src/useradmin/templates/list_users.mako:66
+#: src/useradmin/templates/list_users.mako:74
 msgid "E-mail"
 msgstr "Courriel"
 
-#: src/useradmin/templates/list_users.mako:68
+#: src/useradmin/templates/list_users.mako:76
 msgid "Last Login"
 msgstr "Dernière connexion"
 
-#: src/useradmin/templates/list_users.mako:82
+#: src/useradmin/templates/list_users.mako:90
 #, python-format
 msgid "Edit %(username)s"
 msgstr "Modifier %(username)s"
 
-#: src/useradmin/templates/list_users.mako:101
+#: src/useradmin/templates/list_users.mako:109
 msgid "There are no users matching the search criteria."
 msgstr "Aucun utilisateur ne correspond aux critères de recherche."
 
-#: src/useradmin/templates/list_users.mako:116
+#: src/useradmin/templates/list_users.mako:124
 msgid "Are you sure you want to delete the selected user(s)?"
 msgstr "Voulez-vous vraiment supprimer le(s) utilisateur(s) sélectionné(s) ?"
 

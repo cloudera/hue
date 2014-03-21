@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "Anwendungs-JAR-Liste fehlt."
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
 msgstr "URL des Spark-Job-Servers."
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr "Die Anwendung funktioniert nicht, wenn kein Job-Server aktiv ist"
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
@@ -231,7 +235,7 @@ msgstr "Schlüssel"
 
 #: src/spark/templates/editor.mako:189
 msgid "The server returned no results."
-msgstr "Vom Server wurden keine Ergebnisse ausgegeben."
+msgstr "Der Server gab keine Ergebnisse aus."
 
 #: src/spark/templates/editor.mako:216
 msgid "Save your query"
@@ -281,7 +285,7 @@ msgstr "Serverfehler aufgetreten: "
 
 #: src/spark/templates/editor.mako:583
 msgid "Unmanageable server error occured: "
-msgstr "Unlösbarer Serverfehler aufgetreten: "
+msgstr "Unlösbarer Serverfehler: "
 
 #: src/spark/templates/list_applications.mako:33
 #: src/spark/templates/list_contexts.mako:33
@@ -340,5 +344,3 @@ msgstr "Dauer"
 msgid "Click to open"
 msgstr "Zum Öffnen hier klicken"
 
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr "Die App funktioniert nicht ohne einen aktiven Oozie-Server"

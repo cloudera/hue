@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "애플리케이션 jar 목록이 없습니다."
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
 msgstr "Spark Job Server의 URL입니다."
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr "Job Server를 실행하지 않으면 이 앱을 사용할 수 없습니다."
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
@@ -340,5 +344,3 @@ msgstr "소요 시간"
 msgid "Click to open"
 msgstr "열려면 클릭"
 
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr "Oozie Server를 실행하지 않으면 이 앱을 사용할 수 없습니다."

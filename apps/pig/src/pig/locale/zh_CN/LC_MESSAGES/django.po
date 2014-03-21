@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 项目版本\n"
 "Report-Msgid-Bugs-To: 电子邮件地址\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 全名 <电子邮件地址>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:234 src/pig/templates/app.mako:751
+#: src/pig/api.py:234 src/pig/templates/app.mako:750
 msgid "Unsaved script"
 msgstr "未保存的脚本"
 
@@ -33,23 +33,23 @@ msgstr "HDFS 中存储 Pig 示例的位置。"
 msgid "The app won't work without a running Oozie server"
 msgstr "Oozie Server 不运行的情况下应用程序不工作"
 
-#: src/pig/models.py:36
+#: src/pig/models.py:33
 msgid "Owner"
 msgstr "所有者"
 
-#: src/pig/models.py:36
+#: src/pig/models.py:33
 msgid "User who can modify the job."
 msgstr "可修改作业的用户。"
 
-#: src/pig/models.py:37
+#: src/pig/models.py:34
 msgid "Is a user document, not a document submission."
 msgstr "为用户文档，而非文档提交。"
 
-#: src/pig/models.py:38
+#: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
 msgstr "该文档不是已提交的作业，而是真正的查询、脚本、workflow。"
 
-#: src/pig/models.py:47
+#: src/pig/models.py:44
 #, python-format
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "只有超级用户和 %s 可修改此文档。"
@@ -101,12 +101,12 @@ msgstr "控制面板"
 msgid "Search for script name or content"
 msgstr "搜索脚本名称或内容"
 
-#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:182
-#: src/pig/templates/app.mako:339
+#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:181
+#: src/pig/templates/app.mako:338
 msgid "Run this script"
 msgstr "运行此脚本"
 
-#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:126
+#: src/pig/templates/app.mako:54 src/pig/templates/app.mako:131
 msgid "Run"
 msgstr "运行"
 
@@ -114,7 +114,7 @@ msgstr "运行"
 msgid "Copy this script"
 msgstr "复制此脚本"
 
-#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:145
+#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:149
 msgid "Copy"
 msgstr "复制"
 
@@ -122,7 +122,7 @@ msgstr "复制"
 msgid "Delete this script"
 msgstr "删除此脚本"
 
-#: src/pig/templates/app.mako:56 src/pig/templates/app.mako:150
+#: src/pig/templates/app.mako:56 src/pig/templates/app.mako:154
 msgid "Delete"
 msgstr "删除"
 
@@ -130,7 +130,7 @@ msgstr "删除"
 msgid "Create a new script"
 msgstr "创建新脚本"
 
-#: src/pig/templates/app.mako:60
+#: src/pig/templates/app.mako:60 src/pig/templates/app.mako:128
 msgid "New Script"
 msgstr "新建脚本"
 
@@ -138,13 +138,13 @@ msgstr "新建脚本"
 msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
 msgstr "当前未定义脚本。请通过单击“新脚本”添加新脚本"
 
-#: src/pig/templates/app.mako:71 src/pig/templates/app.mako:375
-#: src/pig/templates/app.mako:424 src/pig/templates/app.mako:547
-#: src/pig/templates/app.mako:571
+#: src/pig/templates/app.mako:71 src/pig/templates/app.mako:374
+#: src/pig/templates/app.mako:423 src/pig/templates/app.mako:546
+#: src/pig/templates/app.mako:570
 msgid "Name"
 msgstr "名称"
 
-#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:155
+#: src/pig/templates/app.mako:72
 msgid "Script"
 msgstr "脚本"
 
@@ -164,304 +164,302 @@ msgstr "属性"
 msgid "Save the script"
 msgstr "保存脚本"
 
-#: src/pig/templates/app.mako:123 src/pig/templates/app.mako:719
+#: src/pig/templates/app.mako:123 src/pig/templates/app.mako:718
 msgid "Save"
 msgstr "保存"
 
-#: src/pig/templates/app.mako:128
-msgid "Run the script"
-msgstr "运行脚本"
-
-#: src/pig/templates/app.mako:129
-msgid "Submit"
-msgstr "提交"
-
-#: src/pig/templates/app.mako:133
-msgid "Stop the script"
-msgstr "停止脚本"
-
-#: src/pig/templates/app.mako:134
-msgid "Stop"
-msgstr "停止"
-
-#: src/pig/templates/app.mako:138
-msgid "Show Logs"
-msgstr "显示日志"
-
-#: src/pig/templates/app.mako:139 src/pig/templates/app.mako:632
-msgid "Logs"
-msgstr "日志"
-
-#: src/pig/templates/app.mako:142 src/pig/templates/app.mako:483
-msgid "File"
-msgstr "文件"
-
-#: src/pig/templates/app.mako:144
-msgid "Copy the script"
-msgstr "复制脚本"
-
-#: src/pig/templates/app.mako:149
-msgid "Delete the script"
-msgstr "删除脚本"
-
-#: src/pig/templates/app.mako:154
+#: src/pig/templates/app.mako:127
 msgid "New script"
 msgstr "新建脚本"
 
-#: src/pig/templates/app.mako:164
+#: src/pig/templates/app.mako:133
+msgid "Run the script"
+msgstr "运行脚本"
+
+#: src/pig/templates/app.mako:134
+msgid "Submit"
+msgstr "提交"
+
+#: src/pig/templates/app.mako:138
+msgid "Stop the script"
+msgstr "停止脚本"
+
+#: src/pig/templates/app.mako:139
+msgid "Stop"
+msgstr "停止"
+
+#: src/pig/templates/app.mako:143
+msgid "Show Logs"
+msgstr "显示日志"
+
+#: src/pig/templates/app.mako:144 src/pig/templates/app.mako:631
+msgid "Logs"
+msgstr "日志"
+
+#: src/pig/templates/app.mako:148
+msgid "Copy the script"
+msgstr "复制脚本"
+
+#: src/pig/templates/app.mako:153
+msgid "Delete the script"
+msgstr "删除脚本"
+
+#: src/pig/templates/app.mako:163
 msgid "Press CTRL + Space to autocomplete"
 msgstr "按 CTRL + 空格键可自动完成"
 
-#: src/pig/templates/app.mako:165
+#: src/pig/templates/app.mako:164
 msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
 msgstr "您可通过在编辑器中按 CTRL + ENTER 或 CTRL + . 执行当前脚本"
 
-#: src/pig/templates/app.mako:175
+#: src/pig/templates/app.mako:174
 msgid "Unsaved"
 msgstr "未保存"
 
-#: src/pig/templates/app.mako:183 src/pig/templates/app.mako:340
-#: src/pig/templates/app.mako:513
+#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:339
+#: src/pig/templates/app.mako:512
 msgid "Stop this script"
 msgstr "停止此脚本"
 
-#: src/pig/templates/app.mako:188
+#: src/pig/templates/app.mako:187
 msgid "Show the function navigator"
 msgstr "显示函数导航器"
 
-#: src/pig/templates/app.mako:194
+#: src/pig/templates/app.mako:193
 msgid "Hide the function navigator"
 msgstr "隐藏函数导航器"
 
-#: src/pig/templates/app.mako:195
+#: src/pig/templates/app.mako:194
 msgid "Double click on function to insert it in the editor"
 msgstr "双击函数以在编辑器中插入该函数"
 
-#: src/pig/templates/app.mako:196
+#: src/pig/templates/app.mako:195
 msgid "Navigator"
 msgstr "Navigator"
 
-#: src/pig/templates/app.mako:199
+#: src/pig/templates/app.mako:198
 msgid "Function name..."
 msgstr "函数名称..."
 
-#: src/pig/templates/app.mako:345 src/pig/templates/app.mako:712
+#: src/pig/templates/app.mako:344 src/pig/templates/app.mako:711
 msgid "Script name"
 msgstr "脚本名称"
 
-#: src/pig/templates/app.mako:352
-msgid "Parameters"
-msgstr "参数"
+#: src/pig/templates/app.mako:351
+msgid "Pig parameters"
+msgstr "Pig 参数"
 
-#: src/pig/templates/app.mako:365
+#: src/pig/templates/app.mako:364
 msgid "There are currently no defined parameters."
 msgstr "当前没有已定义的参数。"
 
-#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:395
-#: src/pig/templates/app.mako:416 src/pig/templates/app.mako:444
-#: src/pig/templates/app.mako:465 src/pig/templates/app.mako:502
+#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:394
+#: src/pig/templates/app.mako:415 src/pig/templates/app.mako:443
+#: src/pig/templates/app.mako:464 src/pig/templates/app.mako:501
 msgid "Add"
 msgstr "添加"
 
-#: src/pig/templates/app.mako:376 src/pig/templates/app.mako:425
-#: src/pig/templates/app.mako:474
+#: src/pig/templates/app.mako:375 src/pig/templates/app.mako:424
+#: src/pig/templates/app.mako:473
 msgid "Value"
 msgstr "值"
 
-#: src/pig/templates/app.mako:389 src/pig/templates/app.mako:438
-#: src/pig/templates/app.mako:495
+#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:437
+#: src/pig/templates/app.mako:494
 msgid "Remove"
 msgstr "删除"
 
-#: src/pig/templates/app.mako:403
+#: src/pig/templates/app.mako:402
 msgid "Hadoop properties"
 msgstr "Hadoop 属性"
 
-#: src/pig/templates/app.mako:414
+#: src/pig/templates/app.mako:413
 msgid "There are currently no defined Hadoop properties."
 msgstr "当前没有已定义的 Hadoop 属性。"
 
-#: src/pig/templates/app.mako:453
+#: src/pig/templates/app.mako:452
 msgid "Resources"
 msgstr "资源"
 
-#: src/pig/templates/app.mako:456
+#: src/pig/templates/app.mako:455
 msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
 msgstr "要添加到运行脚本的工作区的 HDFS 文件或 zip 文件的路径"
 
-#: src/pig/templates/app.mako:463
+#: src/pig/templates/app.mako:462
 msgid "There are currently no defined resources."
 msgstr "当前没有已定义的资源。"
 
-#: src/pig/templates/app.mako:473
+#: src/pig/templates/app.mako:472
 msgid "Type"
 msgstr "类型"
 
-#: src/pig/templates/app.mako:484
+#: src/pig/templates/app.mako:482
+msgid "File"
+msgstr "文件"
+
+#: src/pig/templates/app.mako:483
 msgid "Archive"
 msgstr "存档"
 
-#: src/pig/templates/app.mako:520
+#: src/pig/templates/app.mako:519
 msgid "Status:"
 msgstr "状态："
 
-#: src/pig/templates/app.mako:522
+#: src/pig/templates/app.mako:521
 msgid "Progress:"
 msgstr "进度："
 
-#: src/pig/templates/app.mako:522
+#: src/pig/templates/app.mako:521
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:528
+#: src/pig/templates/app.mako:527
 msgid "No available logs."
 msgstr "没有可用日志。"
 
-#: src/pig/templates/app.mako:538 src/pig/templates/app.mako:1083
+#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1082
 msgid "Running"
 msgstr "正在运行"
 
-#: src/pig/templates/app.mako:542
+#: src/pig/templates/app.mako:541
 msgid "There are currently no running scripts."
 msgstr "当前没有正在运行的脚本。"
 
-#: src/pig/templates/app.mako:548
+#: src/pig/templates/app.mako:547
 msgid "Progress"
 msgstr "进度"
 
-#: src/pig/templates/app.mako:549 src/pig/templates/app.mako:573
+#: src/pig/templates/app.mako:548 src/pig/templates/app.mako:572
 msgid "Created on"
 msgstr "创建日期"
 
-#: src/pig/templates/app.mako:562
+#: src/pig/templates/app.mako:561
 msgid "Completed"
 msgstr "已完成"
 
-#: src/pig/templates/app.mako:566
+#: src/pig/templates/app.mako:565
 msgid "There are currently no completed scripts."
 msgstr "当前没有已完成的脚本。"
 
-#: src/pig/templates/app.mako:572
+#: src/pig/templates/app.mako:571
 msgid "Status"
 msgstr "状态"
 
-#: src/pig/templates/app.mako:586
+#: src/pig/templates/app.mako:585
 msgid "Click to edit"
 msgstr "单击以编辑"
 
-#: src/pig/templates/app.mako:600
+#: src/pig/templates/app.mako:599
 msgid "Click to view"
 msgstr "单击以查看"
 
-#: src/pig/templates/app.mako:617
+#: src/pig/templates/app.mako:616
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: src/pig/templates/app.mako:620
+#: src/pig/templates/app.mako:619
 msgid "Are you sure you want to delete this script?"
 msgstr "是否确定要删除此脚本？"
 
-#: src/pig/templates/app.mako:621
+#: src/pig/templates/app.mako:620
 msgid "Are you sure you want to delete these scripts?"
 msgstr "是否确定要删除这些脚本？"
 
-#: src/pig/templates/app.mako:624 src/pig/templates/app.mako:658
-#: src/pig/templates/app.mako:669 src/pig/templates/app.mako:698
+#: src/pig/templates/app.mako:623 src/pig/templates/app.mako:657
+#: src/pig/templates/app.mako:668 src/pig/templates/app.mako:697
 msgid "No"
 msgstr "否"
 
-#: src/pig/templates/app.mako:625 src/pig/templates/app.mako:659
-#: src/pig/templates/app.mako:670 src/pig/templates/app.mako:699
+#: src/pig/templates/app.mako:624 src/pig/templates/app.mako:658
+#: src/pig/templates/app.mako:669 src/pig/templates/app.mako:698
 msgid "Yes"
 msgstr "是"
 
-#: src/pig/templates/app.mako:639
+#: src/pig/templates/app.mako:638
 msgid "Close"
 msgstr "关闭"
 
-#: src/pig/templates/app.mako:646
+#: src/pig/templates/app.mako:645
 msgid "Run Script"
 msgstr "运行脚本"
 
-#: src/pig/templates/app.mako:646 src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:645 src/pig/templates/app.mako:665
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:649
+#: src/pig/templates/app.mako:648
 msgid "Script variables"
 msgstr "脚本变量"
 
-#: src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:665
 msgid "Stop Script"
 msgstr "停止脚本"
 
-#: src/pig/templates/app.mako:677
+#: src/pig/templates/app.mako:676
 msgid "Choose a file"
 msgstr "选择文件"
 
-#: src/pig/templates/app.mako:690
+#: src/pig/templates/app.mako:689
 msgid "Are you sure?"
 msgstr "是否确定？"
 
-#: src/pig/templates/app.mako:694
+#: src/pig/templates/app.mako:693
 msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
 msgstr "当前脚本具有未保存的更改。是否确定要放弃更改？"
 
-#: src/pig/templates/app.mako:706
+#: src/pig/templates/app.mako:705
 msgid "Save script"
 msgstr "保存脚本"
 
-#: src/pig/templates/app.mako:710
+#: src/pig/templates/app.mako:709
 msgid "Give a meaningful name to this script."
 msgstr "为此脚本提供一个能体现其意义的名称。"
 
-#: src/pig/templates/app.mako:718
+#: src/pig/templates/app.mako:717
 msgid "Cancel"
 msgstr "取消"
 
-#: src/pig/templates/app.mako:747
+#: src/pig/templates/app.mako:746
 msgid "The Pig job could not be killed."
 msgstr "无法停止 Pig 作业。"
 
-#: src/pig/templates/app.mako:748
+#: src/pig/templates/app.mako:747
 msgid "Run this Pig script."
 msgstr "运行此 Pig 脚本。"
 
-#: src/pig/templates/app.mako:749
+#: src/pig/templates/app.mako:748
 msgid "Stop execution."
 msgstr "停止执行。"
 
-#: src/pig/templates/app.mako:750
+#: src/pig/templates/app.mako:749
 msgid "Saved"
 msgstr "已保存"
 
-#: src/pig/templates/app.mako:1076
+#: src/pig/templates/app.mako:1075
 msgid "Saving"
 msgstr "正在保存"
 
-#: src/pig/templates/app.mako:1087
+#: src/pig/templates/app.mako:1086
 msgid "has been saved correctly."
 msgstr "已正确保存。"
 
-#: src/pig/templates/app.mako:1354
+#: src/pig/templates/app.mako:1357
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/pig/templates/app.mako:1361
+#: src/pig/templates/app.mako:1364
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig 参数和选项的名称和值，如"
 
-#: src/pig/templates/app.mako:1368
+#: src/pig/templates/app.mako:1371
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop 属性的名称和值，如"
 
-#: src/pig/templates/app.mako:1375
+#: src/pig/templates/app.mako:1378
 msgid "Include files or compressed files"
 msgstr "包括文件或压缩文件"
 
-#: src/pig/templates/app.mako:1384
+#: src/pig/templates/app.mako:1387
 msgid "You have unsaved changes in this pig script."
 msgstr "您尚未保存此 Pig 脚本中的更改。"
 
-#~ msgid "There was an error with your request!"
-#~ msgstr "您的请求有错误！"

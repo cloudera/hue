@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/search/api.py:81 src/search/api.py:94 src/search/api.py:105
-#: src/search/api.py:118 src/search/api.py:127 src/search/api.py:137
-#: src/search/api.py:147
+#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
+#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
+#: src/search/api.py:158 src/search/api.py:171
 msgid "Error while accessing Solr"
 msgstr "访问 Solr 时出错"
 
@@ -44,72 +44,81 @@ msgstr "权限被拒绝。您不是管理员。"
 msgid "No live Solr collection or core by the name %s."
 msgstr "没有名为 %s 的实时 Solr 集合或核心。"
 
-#: src/search/models.py:267
+#: src/search/models.py:261
 msgid "Solr index name pointing to"
 msgstr "Solr 索引名称指向"
 
-#: src/search/models.py:268
+#: src/search/models.py:262
 msgid "Friendlier name in UI"
 msgstr "UI 中更友好的名称"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Collection with cores data"
 msgstr "带核心数据的集合"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Solr json"
 msgstr "Solr json"
 
-#: src/search/models.py:272 src/search/templates/layout.mako:81
+#: src/search/models.py:266 src/search/templates/layout.mako:81
 msgid "Properties"
 msgstr "属性"
 
-#: src/search/models.py:273
+#: src/search/models.py:267
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Hue 属性（例如，按页码排列的结果）"
 
-#: src/search/search_controller.py:79
+#: src/search/search_controller.py:80
 #, python-format
-msgid "Collection type does not exit: %s"
+msgid "Collection type does not exist: %s"
 msgstr "集合类型不存在：%s"
 
-#: src/search/search_controller.py:96
+#: src/search/search_controller.py:97
 msgid " (Copy)"
 msgstr " （副本）"
 
-#: src/search/views.py:84
+#: src/search/views.py:80
 msgid "There is no collection to search."
 msgstr "没有要搜索的集合。"
 
-#: src/search/views.py:108
+#: src/search/views.py:103
 msgid "No collection to download."
 msgstr "没有要下载的集合。"
 
-#: src/search/views.py:126 src/search/views.py:128
+#: src/search/views.py:121 src/search/views.py:123
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "无法下载搜索结果：%s"
 
-#: src/search/views.py:176
+#: src/search/views.py:171
 msgid "Collection(s) or core(s) imported successfully!"
 msgstr "集合或核心已成功导入！"
 
-#: src/search/views.py:179
+#: src/search/views.py:174
 msgid "There was an error importing the collection(s) or core(s)"
 msgstr "导入集合或核心时出错"
 
-#: src/search/views.py:182
+#: src/search/views.py:177
 msgid "Collection(s) or core(s) partially imported"
 msgstr "集合或核心已部分导入"
 
-#: src/search/views.py:220 src/search/views.py:234
+#: src/search/views.py:215 src/search/views.py:229
 msgid "POST request required."
 msgstr "需要 POST 请求。"
 
-#: src/search/views.py:260
+#: src/search/views.py:255
 #, python-format
 msgid "Errors on the form: %s."
 msgstr "格式错误：%s。"
+
+#: src/search/views.py:295
+#, python-format
+msgid "No preview available, some facets are invalid: %s"
+msgstr "无可用预览，有些层面无效：%s"
+
+#: src/search/views.py:402
+msgid "A POST request is required."
+msgstr "需要一个 POST 请求。"
 
 #: src/search/templates/admin_collection_facets.mako:25
 #: src/search/templates/admin_collection_highlighting.mako:25
@@ -119,7 +128,7 @@ msgstr "格式错误：%s。"
 #: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
 #: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:28 src/search/templates/search.mako:59
+#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
 msgid "Search"
 msgstr "搜索"
 
@@ -815,7 +824,7 @@ msgstr "集合已成功删除。"
 msgid "Collection copied successfully."
 msgstr "集合已成功复制。"
 
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:55
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
 msgid "Collection manager"
 msgstr "Collection Manager"
 
@@ -864,85 +873,84 @@ msgstr "转推"
 msgid "It seems there is nothing to search on ..."
 msgstr "似乎没有要搜索的内容..."
 
-#: src/search/templates/search.mako:54
+#: src/search/templates/search.mako:56
 msgid "Customize this collection"
 msgstr "自定义此集合"
 
-#: src/search/templates/search.mako:211
+#: src/search/templates/search.mako:83
+msgid "XLS"
+msgstr "XLS"
+
+#: src/search/templates/search.mako:84
+msgid "CSV"
+msgstr "CSV"
+
+#: src/search/templates/search.mako:97
+msgid "A demo index is used. In order to be interactive, please "
+msgstr "使用了演示索引。为了实现交互性，请 "
+
+#: src/search/templates/search.mako:97
+msgid "create the indexes"
+msgstr "创建索引"
+
+#: src/search/templates/search.mako:97
+msgid " in Solr."
+msgstr " 在 Solr 中。"
+
+#: src/search/templates/search.mako:220
 #, python-format
 msgid "Page %s of %s. Showing %s results (%s seconds)"
 msgstr "第 %s 页（共 %s 页）。显示 %s 结果（%s 秒）"
 
-#: src/search/templates/search.mako:277
+#: src/search/templates/search.mako:286
 msgid "Previous Page"
 msgstr "上一页"
 
-#: src/search/templates/search.mako:293
+#: src/search/templates/search.mako:302
 msgid "Next Page"
 msgstr "下一页"
 
-#: src/search/templates/search.mako:302
+#: src/search/templates/search.mako:311
 msgid "Your search"
 msgstr "您的搜索"
 
-#: src/search/templates/search.mako:302
-#, python-format
+#: src/search/templates/search.mako:311
 msgid "did not match any documents."
 msgstr "与任何文档都不匹配。"
 
-#: src/search/templates/search.mako:304
+#: src/search/templates/search.mako:313
 msgid "Suggestions:"
 msgstr "建议："
 
-#: src/search/templates/search.mako:306
+#: src/search/templates/search.mako:315
 msgid "Make sure all words are spelled correctly."
 msgstr "确保所有单词拼写正确。"
 
-#: src/search/templates/search.mako:307
+#: src/search/templates/search.mako:316
 msgid "Try different keywords."
 msgstr "尝试不同关键字。"
 
-#: src/search/templates/search.mako:308
+#: src/search/templates/search.mako:317
 msgid "Try more general keywords."
 msgstr "尝试更多常见关键字。"
 
-#: src/search/templates/search.mako:309
+#: src/search/templates/search.mako:318
 msgid "Try fewer keywords."
 msgstr "尝试更少关键字。"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "Show"
 msgstr "显示"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "more..."
 msgstr "移动..."
 
-#: src/search/templates/search.mako:655
+#: src/search/templates/search.mako:654
 msgid "The graphical facets works just with numbers or dates. Please choose another field."
 msgstr "图形层面仅适用于数字或日期。请选择其他字段。"
 
-#: src/search/templates/search.mako:659
+#: src/search/templates/search.mako:658
 msgid "There was an error initializing the graphical facet component."
 msgstr "初始化图形层面组件时出错。"
 
-#~ msgid "Error"
-#~ msgstr "错误"
-#~ msgid "Imported successfully"
-#~ msgstr "成功导入"
-#~ msgid "Imported with errors: "
-#~ msgstr "导入错误： "
-#~ msgid "Search Admin - "
-#~ msgstr "搜索管理员 - "
-#~ msgid "Customize "
-#~ msgstr "自定义 "
-#~ msgid "Template Editor "
-#~ msgstr "模板编辑器 "
-#~ msgid "Click on Import to add one or more."
-#~ msgstr "单击导入添加一个或多个。"
-#~ msgid "Sort by"
-#~ msgstr "排序方式"
-#~ msgid "Showing %s - %s of %s results"
-#~ msgstr "显示 %s - %s 结果的 %s"
-#~ msgid "Beginning of List"
-#~ msgstr "列表开头"

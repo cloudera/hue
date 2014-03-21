@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/search/api.py:81 src/search/api.py:94 src/search/api.py:105
-#: src/search/api.py:118 src/search/api.py:127 src/search/api.py:137
-#: src/search/api.py:147
+#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
+#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
+#: src/search/api.py:158 src/search/api.py:171
 msgid "Error while accessing Solr"
 msgstr "Solr에 액세스하는 중 오류 발생"
 
@@ -44,72 +44,81 @@ msgstr "권한이 거부되었습니다. 관리자가 아닙니다."
 msgid "No live Solr collection or core by the name %s."
 msgstr "이름이 %s인 라이브 Solr 컬렉션이 없습니다."
 
-#: src/search/models.py:267
+#: src/search/models.py:261
 msgid "Solr index name pointing to"
 msgstr "가리키는 Solr 인덱스 이름"
 
-#: src/search/models.py:268
+#: src/search/models.py:262
 msgid "Friendlier name in UI"
 msgstr "친숙한 UI 이름"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Collection with cores data"
 msgstr "코어 데이터가 있는 컬렉션"
 
-#: src/search/models.py:270
+#: src/search/models.py:264
 msgid "Solr json"
 msgstr "Solr json"
 
-#: src/search/models.py:272 src/search/templates/layout.mako:81
+#: src/search/models.py:266 src/search/templates/layout.mako:81
 msgid "Properties"
 msgstr "속성"
 
-#: src/search/models.py:273
+#: src/search/models.py:267
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Hue 속성(예: 페이지 번호별 결과)"
 
-#: src/search/search_controller.py:79
+#: src/search/search_controller.py:80
 #, python-format
-msgid "Collection type does not exit: %s"
-msgstr "컬렉션 유형이 없습니다. %s"
+msgid "Collection type does not exist: %s"
+msgstr "컬렉션 유형 없음: %s"
 
-#: src/search/search_controller.py:96
+#: src/search/search_controller.py:97
 msgid " (Copy)"
 msgstr " (복사)"
 
-#: src/search/views.py:84
+#: src/search/views.py:80
 msgid "There is no collection to search."
 msgstr "검색할 컬렉션이 없습니다."
 
-#: src/search/views.py:108
+#: src/search/views.py:103
 msgid "No collection to download."
 msgstr "다운로드할 컬렉션이 없습니다."
 
-#: src/search/views.py:126 src/search/views.py:128
+#: src/search/views.py:121 src/search/views.py:123
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "검색 결과를 다운로드할 수 없음: %s"
 
-#: src/search/views.py:176
+#: src/search/views.py:171
 msgid "Collection(s) or core(s) imported successfully!"
 msgstr "컬렉션 또는 코어를 가져왔습니다!"
 
-#: src/search/views.py:179
+#: src/search/views.py:174
 msgid "There was an error importing the collection(s) or core(s)"
 msgstr "컬렉션 또는 코어를 가져오는 중 오류가 발생했습니다."
 
-#: src/search/views.py:182
+#: src/search/views.py:177
 msgid "Collection(s) or core(s) partially imported"
 msgstr "컬렉션 또는 코어의 일부만 가져옴"
 
-#: src/search/views.py:220 src/search/views.py:234
+#: src/search/views.py:215 src/search/views.py:229
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/search/views.py:260
+#: src/search/views.py:255
 #, python-format
 msgid "Errors on the form: %s."
 msgstr "양식 %s에서 오류가 발생했습니다."
+
+#: src/search/views.py:295
+#, python-format
+msgid "No preview available, some facets are invalid: %s"
+msgstr "사용 가능한 미리 보기 없음. 일부 패싯이 올바르지 않음: %s"
+
+#: src/search/views.py:402
+msgid "A POST request is required."
+msgstr "POST 요청이 필요합니다."
 
 #: src/search/templates/admin_collection_facets.mako:25
 #: src/search/templates/admin_collection_highlighting.mako:25
@@ -119,7 +128,7 @@ msgstr "양식 %s에서 오류가 발생했습니다."
 #: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
 #: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:28 src/search/templates/search.mako:59
+#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
 msgid "Search"
 msgstr "검색"
 
@@ -815,7 +824,7 @@ msgstr "컬렉션이 삭제되었습니다."
 msgid "Collection copied successfully."
 msgstr "컬렉션이 복사되었습니다."
 
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:55
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
 msgid "Collection manager"
 msgstr "컬렉션 관리자"
 
@@ -864,85 +873,84 @@ msgstr "Twitter에 다시 올리기"
 msgid "It seems there is nothing to search on ..."
 msgstr "검색할 항목이 없는 것 같습니다..."
 
-#: src/search/templates/search.mako:54
+#: src/search/templates/search.mako:56
 msgid "Customize this collection"
 msgstr "이 컬렉션 사용자 지정"
 
-#: src/search/templates/search.mako:211
+#: src/search/templates/search.mako:83
+msgid "XLS"
+msgstr "XLS"
+
+#: src/search/templates/search.mako:84
+msgid "CSV"
+msgstr "CSV"
+
+#: src/search/templates/search.mako:97
+msgid "A demo index is used. In order to be interactive, please "
+msgstr "데모 인덱스가 사용됩니다. 상호 작용하려면 "
+
+#: src/search/templates/search.mako:97
+msgid "create the indexes"
+msgstr "Solr에서 인덱스를"
+
+#: src/search/templates/search.mako:97
+msgid " in Solr."
+msgstr " 생성하십시오."
+
+#: src/search/templates/search.mako:220
 #, python-format
 msgid "Page %s of %s. Showing %s results (%s seconds)"
 msgstr "%s/%s 페이지. %s개 결과 표시(%s초)"
 
-#: src/search/templates/search.mako:277
+#: src/search/templates/search.mako:286
 msgid "Previous Page"
 msgstr "이전 페이지"
 
-#: src/search/templates/search.mako:293
+#: src/search/templates/search.mako:302
 msgid "Next Page"
 msgstr "다음 페이지"
 
-#: src/search/templates/search.mako:302
+#: src/search/templates/search.mako:311
 msgid "Your search"
 msgstr "검색 항목과"
 
-#: src/search/templates/search.mako:302
-#, python-format
+#: src/search/templates/search.mako:311
 msgid "did not match any documents."
 msgstr "일치하는 문서가 없습니다."
 
-#: src/search/templates/search.mako:304
+#: src/search/templates/search.mako:313
 msgid "Suggestions:"
 msgstr "추천 단어:"
 
-#: src/search/templates/search.mako:306
+#: src/search/templates/search.mako:315
 msgid "Make sure all words are spelled correctly."
 msgstr "모든 단어의 맞춤법이 올바른지 확인하십시오."
 
-#: src/search/templates/search.mako:307
+#: src/search/templates/search.mako:316
 msgid "Try different keywords."
 msgstr "다른 키워드를 사용해 보십시오."
 
-#: src/search/templates/search.mako:308
+#: src/search/templates/search.mako:317
 msgid "Try more general keywords."
 msgstr "더 일반적인 키워드를 사용해 보십시오."
 
-#: src/search/templates/search.mako:309
+#: src/search/templates/search.mako:318
 msgid "Try fewer keywords."
 msgstr "키워드 수를 줄여서 시도해 보십시오."
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "Show"
 msgstr "표시"
 
-#: src/search/templates/search.mako:361
+#: src/search/templates/search.mako:370
 msgid "more..."
 msgstr "자세히..."
 
-#: src/search/templates/search.mako:655
+#: src/search/templates/search.mako:654
 msgid "The graphical facets works just with numbers or dates. Please choose another field."
 msgstr "그래픽 패싯에는 숫자나 날짜만 사용합니다. 다른 필드를 선택하십시오."
 
-#: src/search/templates/search.mako:659
+#: src/search/templates/search.mako:658
 msgid "There was an error initializing the graphical facet component."
 msgstr "그래픽 패싯 구성 요소를 초기화하는 중 오류가 발생했습니다."
 
-#~ msgid "Error"
-#~ msgstr "오류"
-#~ msgid "Imported successfully"
-#~ msgstr "가져오기 성공"
-#~ msgid "Imported with errors: "
-#~ msgstr "가져오기에 오류 발생: "
-#~ msgid "Search Admin - "
-#~ msgstr "관리자 검색 - "
-#~ msgid "Customize "
-#~ msgstr "사용자 지정 "
-#~ msgid "Template Editor "
-#~ msgstr "템플릿 편집기 "
-#~ msgid "Click on Import to add one or more."
-#~ msgstr "하나 이상을 추가하려면 가져오기를 클릭하십시오."
-#~ msgid "Sort by"
-#~ msgstr "정렬 기준:"
-#~ msgid "Showing %s - %s of %s results"
-#~ msgstr "%s - %s/%s개 결과 표시 중"
-#~ msgid "Beginning of List"
-#~ msgstr "목록 시작"

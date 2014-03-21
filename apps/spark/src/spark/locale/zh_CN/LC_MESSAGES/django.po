@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 项目版本\n"
 "Report-Msgid-Bugs-To: 电子邮件地址\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 全名 <电子邮件地址>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "缺少应用程序 jar 列表。"
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
 msgstr "Spark 作业服务器的 URL。"
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr "Job Server 不运行的情况下应用程序不工作"
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
@@ -277,11 +281,11 @@ msgstr "没有匹配记录"
 
 #: src/spark/templates/editor.mako:580
 msgid "Server error occured: "
-msgstr "发生服务器错误： "
+msgstr "出现服务器错误： "
 
 #: src/spark/templates/editor.mako:583
 msgid "Unmanageable server error occured: "
-msgstr "发生无法管理的服务器错误： "
+msgstr "出现无法管理的服务器错误： "
 
 #: src/spark/templates/list_applications.mako:33
 #: src/spark/templates/list_contexts.mako:33
@@ -340,5 +344,3 @@ msgstr "持续时间"
 msgid "Click to open"
 msgstr "单击以打开"
 
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr "Oozie Server 不运行的情况下应用程序不工作"

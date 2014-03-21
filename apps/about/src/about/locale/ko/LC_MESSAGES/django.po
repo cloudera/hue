@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-10 09:18-0800\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:61
+#: src/about/views.py:68
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
@@ -83,6 +83,8 @@ msgstr "애플리케이션 예제 모두 설치"
 #: src/about/templates/admin_wizard.mako:112
 #: src/about/templates/admin_wizard.mako:120
 #: src/about/templates/admin_wizard.mako:128
+#: src/about/templates/admin_wizard.mako:136
+#: src/about/templates/admin_wizard.mako:144
 msgid "Installing..."
 msgstr "설치하는 중..."
 
@@ -94,92 +96,93 @@ msgstr "모두"
 msgid "Install individual application examples"
 msgstr "개별 애플리케이션 예제 설치"
 
-#: src/about/templates/admin_wizard.mako:142
+#: src/about/templates/admin_wizard.mako:158
 msgid "Create or import users"
 msgstr "사용자 생성 또는 가져오기"
 
-#: src/about/templates/admin_wizard.mako:148
+#: src/about/templates/admin_wizard.mako:164
 msgid "User Admin"
 msgstr "관리 사용자"
 
-#: src/about/templates/admin_wizard.mako:154
+#: src/about/templates/admin_wizard.mako:170
 msgid "Tours and tutorials"
 msgstr "둘러보기 및 자습서"
 
-#: src/about/templates/admin_wizard.mako:161
+#: src/about/templates/admin_wizard.mako:177
 msgid "Check to enable the tours and tutorials"
 msgstr "둘러보기 및 자습서를 사용하려면 선택"
 
-#: src/about/templates/admin_wizard.mako:162
+#: src/about/templates/admin_wizard.mako:178
 msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
 msgstr "특정 페이지에서 둘러보기를 수행할 수 있는 경우 \"사용 가능한 둘러보기\" 물음표를 표시합니다."
 
-#: src/about/templates/admin_wizard.mako:169
+#: src/about/templates/admin_wizard.mako:185
 msgid "Anonymous usage analytics"
 msgstr "익명 사용 현황 분석"
 
-#: src/about/templates/admin_wizard.mako:173
+#: src/about/templates/admin_wizard.mako:189
 msgid "Check to enable usage analytics"
 msgstr "사용 현황 분석을 사용하려면 선택"
 
-#: src/about/templates/admin_wizard.mako:174
+#: src/about/templates/admin_wizard.mako:190
 msgid "Help improve Hue with anonymous usage analytics."
 msgstr "익명 사용 현황 분석으로 Hue 제품을 개선합니다."
 
-#: src/about/templates/admin_wizard.mako:176
+#: src/about/templates/admin_wizard.mako:192
 msgid "How does it work?"
 msgstr "작동 원리"
 
-#: src/about/templates/admin_wizard.mako:177
+#: src/about/templates/admin_wizard.mako:193
 msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
 msgstr "애플리케이션이나 애플리케이션의 특정 섹션이 사용된 횟수를 확인하기 위해 Google Analytics를 사용합니다."
 
-#: src/about/templates/admin_wizard.mako:188
+#: src/about/templates/admin_wizard.mako:204
 msgid "Use the applications"
 msgstr "애플리케이션 사용"
 
-#: src/about/templates/admin_wizard.mako:192
+#: src/about/templates/admin_wizard.mako:208
 msgid "Hue Home"
 msgstr "Hue 홈"
 
-#: src/about/templates/admin_wizard.mako:199
+#: src/about/templates/admin_wizard.mako:215
 msgid "Skip wizard next time"
 msgstr "다음에 마법사 건너뛰기"
 
-#: src/about/templates/admin_wizard.mako:206
+#: src/about/templates/admin_wizard.mako:222
 msgid "Check to skip this wizard next time."
 msgstr "다음에 이 마법사를 건너뛰려면 선택합니다."
 
-#: src/about/templates/admin_wizard.mako:207
+#: src/about/templates/admin_wizard.mako:223
 msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
 msgstr "다음 로그인할 때 빠른 시작 마법사를 건너뛰고 홈 페이지로 직접 이동합니다."
 
-#: src/about/templates/admin_wizard.mako:221
+#: src/about/templates/admin_wizard.mako:237
 msgid "Back"
 msgstr "뒤로"
 
-#: src/about/templates/admin_wizard.mako:222
+#: src/about/templates/admin_wizard.mako:238
 msgid "Next"
 msgstr "다음"
 
-#: src/about/templates/admin_wizard.mako:223
+#: src/about/templates/admin_wizard.mako:239
+#: src/about/templates/admin_wizard.mako:247
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue 및 Hue 로고는 Cloudera, Inc.의 상표입니다."
 
-#: src/about/templates/admin_wizard.mako:228
+#: src/about/templates/admin_wizard.mako:244
 msgid "Learn more about Hue and Hadoop on"
 msgstr "Hue 및 Hadoop에 대해 자세히 알아보기"
 
-#: src/about/templates/admin_wizard.mako:277
+#: src/about/templates/admin_wizard.mako:296
 msgid "Check config failed: "
 msgstr "구성 확인 실패: "
 
-#: src/about/templates/admin_wizard.mako:286
-#: src/about/templates/admin_wizard.mako:304
+#: src/about/templates/admin_wizard.mako:305
+#: src/about/templates/admin_wizard.mako:323
 msgid "Examples refreshed"
 msgstr "예제 새로 고쳐짐"
 
-#: src/about/templates/admin_wizard.mako:368
+#: src/about/templates/admin_wizard.mako:387
 msgid "Configuration updated"
 msgstr "구성 업데이트됨"
 
@@ -195,11 +198,3 @@ msgstr "구성"
 msgid "Server Logs"
 msgstr "서버 로그"
 
-#~ msgid "HDFS Trash Configuration"
-#~ msgstr "HDFS 휴지통 구성"
-#~ msgid "Trash is active."
-#~ msgstr "휴지통이 활성 상태입니다."
-#~ msgid ""
-#~ "You can activate trash collection by "
-#~ "setting fs.trash.interval in core-site.xml:"
-#~ msgstr "core-site.xml에서 fs.trash.interval을 설정하여 휴지통 수집을 활성화할 수 있습니다."
