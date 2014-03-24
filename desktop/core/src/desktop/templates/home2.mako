@@ -44,10 +44,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-right: 4px;
   }
 
-  .fa-times-circle:hover {
-    color: #d84a38;
-  }
-
   .toggle-tag, .document-tags-modal-checkbox, .tags-modal-checkbox {
     cursor: pointer;
   }
@@ -78,6 +74,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     line-height: 1.4;
     color: #737373;
     text-overflow: ellipsis;
+  }
+
+  .baseShared {
+    color: #999;
+  }
+
+  .isShared {
+    color: #338bb8!important;
   }
 
 </style>
@@ -249,30 +253,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td data-bind="text: owner"></td>
     <td data-bind="text: lastModified"></td>
     <td style="width: 40px; text-align: center">
-      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-bind="click: $root.shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, visible: isMine">
+      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, css:{'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length > 0}">
         <i class="fa fa-users"></i>
       </a>
     </td>
   </tr>
 </script>
-
-<div id="tagsModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Manage projects')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <div data-bind="template: { name: 'tag-edit-template', foreach: myTags }"></div>
-      <div class="clearfix"></div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="removeTags" href="#" class="btn btn-danger disable-feedback">${_('Remove selected')}</a>
-  </div>
-</div>
-
 
 <div id="addTagModal" class="modal hide fade">
   <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
@@ -309,6 +295,44 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 </div>
 
 
+<div id="documentShareModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Sharing settings')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <div class="row-fluid">
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Users')}</h4>
+          <div data-bind="visible: selectedDoc().perms.read.users.length == 0">${_('The document is not shared with any user.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
+            <li><span class="badge badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeUserShare"><i class="fa fa-times-circle"></i></span></li>
+          </ul>
+        </div>
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Groups')}</h4>
+          <div data-bind="visible: selectedDoc().perms.read.groups.length == 0">${_('The document is not shared with any group.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
+            <li><span class="badge badge-left"><i class="fa fa-users"></i> <span data-bind="text: name"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeGroupShare"><i class="fa fa-times-circle"></i></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">
+        <div class="input-append">
+          <input id="documentShareTypeahead" type="text" style="width: 460px" placeholder="${_('You can type a username or a group')}">
+          <a id="documentShareAddBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Done')}</a>
+  </div>
+</div>
+
+
 <script type="text/html" id="tag-sharer-template">
   <div style="margin-right:10px;margin-bottom: 6px;float:left;">
     <span class="tags-modal-checkbox badge">
@@ -334,11 +358,82 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
-  var viewModel;
+  var viewModel, JSON_USERS_GROUPS;
+
+  function prettifyUsername(userId) {
+    var _user = null;
+    for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
+      if (JSON_USERS_GROUPS.users[i].id == userId) {
+        _user = JSON_USERS_GROUPS.users[i];
+      }
+    }
+    if (_user != null) {
+      return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
+    }
+    return "";
+  }
 
   $(document).ready(function () {
     viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
     ko.applyBindings(viewModel);
+
+    var selectedUserOrGroup, map, dropdown = null;
+    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+      JSON_USERS_GROUPS = data;
+      dropdown = [];
+      map = {};
+
+      $.each(JSON_USERS_GROUPS.users, function (i, user) {
+        var _display = prettifyUsername(user.id);
+        map[_display] = user;
+        dropdown.push(_display);
+      });
+
+      $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+        map[group.name] = group;
+        dropdown.push(group.name);
+      });
+
+      $("#documentShareTypeahead").typeahead({
+        source: function (query, process) {
+          process(dropdown);
+        },
+        matcher: function (item) {
+          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+            return true;
+          }
+        },
+        sorter: function (items) {
+          return items.sort();
+        },
+        highlighter: function (item) {
+          var _icon = "fa";
+          var _display = "";
+          if (map[item].hasOwnProperty("username")) {
+            _icon += " fa-user";
+          }
+          else {
+            _icon += " fa-users";
+          }
+          var regex = new RegExp('(' + this.query + ')', 'gi');
+          return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
+        },
+        updater: function (item) {
+          selectedUserOrGroup = map[item];
+          return item;
+        }
+      });
+
+      $("#documentShareTypeahead").on("keyup", function (e) {
+        var _code = (e.keyCode ? e.keyCode : e.which);
+        if (_code == 13) {
+          handleTypeaheadSelection();
+        }
+      });
+
+
+    });
+
 
     viewModel.selectedTag.subscribe(function (value) {
       $("#searchInput").val("");
@@ -373,6 +468,25 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       });
     });
 
+    $("#documentShareAddBtn").on("click", function () {
+      handleTypeaheadSelection();
+    });
+
+    function handleTypeaheadSelection() {
+      if (selectedUserOrGroup != null) {
+        if (selectedUserOrGroup.hasOwnProperty("username")) {
+          viewModel.selectedDoc().perms.read.users.push(selectedUserOrGroup);
+        }
+        else {
+          viewModel.selectedDoc().perms.read.groups.push(selectedUserOrGroup);
+        }
+        viewModel.selectedDoc.valueHasMutated();
+        shareDocFinal();
+      }
+      selectedUserOrGroup = null;
+      $("#documentShareTypeahead").val("");
+    }
+
     $("a[rel='tooltip']").tooltip();
 
   });
@@ -401,6 +515,60 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         else {
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
+      }
+    });
+  }
+
+  function shareDoc(doc) {
+    viewModel.selectedDoc(doc);
+    $("#documentShareModal").modal("show");
+  }
+
+  function removeUserShare(user) {
+    $(viewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
+      if (item.id == user.id) {
+        viewModel.selectedDoc().perms.read.users.splice(cnt, 1);
+      }
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
+  }
+
+  function removeGroupShare(group) {
+    $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
+      if (item.id == group.id) {
+        viewModel.selectedDoc().perms.read.groups.splice(cnt, 1);
+      }
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
+  }
+
+  function shareDocFinal() {
+    var _postPerms = {
+      read: {
+        user_ids: [],
+        group_ids: []
+      }
+    }
+
+    $(viewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
+      _postPerms.read.user_ids.push(item.id);
+    });
+
+    $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
+      _postPerms.read.group_ids.push(item.id);
+    });
+
+    $.post("/desktop/api/doc/update_permissions", {
+      doc_id: viewModel.selectedDoc().id,
+      data: JSON.stringify(_postPerms)
+    }, function (response) {
+      if (response != null) {
+        if (response.status != 0) {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+        }
+        viewModel.documents.valueHasMutated();
       }
     });
   }

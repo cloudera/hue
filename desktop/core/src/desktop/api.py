@@ -281,7 +281,7 @@ def remove_tag(request):
   if request.method == 'POST':
     try:
       DocumentTag.objects.delete_tag(request.POST['tag_id'], request.user)
-      response['message'] = _('Tag removed!')
+      response['message'] = _('Project removed!')
       response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)

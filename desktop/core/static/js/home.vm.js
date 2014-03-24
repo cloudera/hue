@@ -71,8 +71,14 @@ function HomeViewModel(json_tags, json_docs) {
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
 
-  self.editTagsToCreate = ko.observableArray([]);
-  self.editTagsToDelete = ko.observableArray([]);
+  self.selectedDoc = ko.observable(ko.mapping.fromJS({
+    perms: {
+      read: {
+        users: [],
+        groups: []
+      }
+    }
+  }));
 
   self.selectedTag = ko.observable({});
   self.selectedForDelete = ko.observable({
@@ -148,15 +154,15 @@ function HomeViewModel(json_tags, json_docs) {
     self.page(1);
   });
 
-  self.getTagById = function (tag_id) {
+  self.getTagById = function (tagId) {
     var _tag = null;
     $.each(self.allTags(), function (id, tag) {
-      if (tag.hasOwnProperty("id") && tag.id() == tag_id) {
+      if (tag.hasOwnProperty("id") && tag.id() == tagId) {
         _tag = tag;
       }
       if (tag.hasOwnProperty("projects")) {
         $.each(tag.projects(), function (iid, itag) {
-          if (itag.hasOwnProperty("id") && itag.id() == tag_id) {
+          if (itag.hasOwnProperty("id") && itag.id() == tagId) {
             _tag = itag;
           }
         });
@@ -202,4 +208,5 @@ function HomeViewModel(json_tags, json_docs) {
   self.deleteTag = function (tag) {
     self.tags.mine.remove(tag);
   }
+
 }
