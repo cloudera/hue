@@ -870,6 +870,19 @@ $(document).ready(function(){
     $(".tourStepDetails").hide();
     $("#" + step).show();
   }
+  
+  if ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) {
+    $("#jHueTourModal").modal();
+    $.totalStorage("jHueTourHideModal", true);
+    $("#jHueTourModalChk").attr("checked", "checked");
+    $("#jHueTourModalChk").on("change", function () {
+      $.totalStorage("jHueTourHideModal", $(this).is(":checked"));
+    });
+    $("#jHueTourModalClose").on("click", function () {
+      $("#jHueTourFlag").click();
+      $("#jHueTourModal").modal("hide");
+    });
+  }  
 });
 </script>
 
