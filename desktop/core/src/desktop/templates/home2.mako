@@ -182,9 +182,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th style="width: 26px">&nbsp;</th>
                 <th style="width: 200px">${_('Name')}</th>
                 <th>${_('Description')}</th>
-                <th style="width: 150px">${_('Projects')}</th>
-                <th style="width: 100px">${_('Owner')}</th>
                 <th style="width: 150px">${_('Last Modified')}</th>
+                <th style="width: 80px; text-align: center">${_('Project')}</th>
                 <th style="width: 40px">${_('Sharing')}</th>
               </tr>
             </thead>
@@ -245,17 +244,21 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td style="width: 26px"><img data-bind="attr: { src: icon }"></td>
     <td><a data-bind="attr: { href: url }, text: name"></a></td>
     <td data-bind="text: description"></td>
-    <td>
-      <div class="documentTags" data-bind="foreach: tags">
-        <span class="badge" data-bind="text: name"></span>
-      </div>
-    </td>
-    <td data-bind="text: owner"></td>
     <td data-bind="text: lastModified"></td>
+    <td style="text-align: center; white-space: nowrap">
+      <a href="javascript:void(0)" rel="tooltip" data-placement="left" data-bind="click: moveDoc, attr: {'data-original-title': '${ _("Change project for") } '+name}" style="padding-left:8px; padding-right: 8px">
+        <span data-bind="foreach: tags">
+          <!-- ko if: name != 'trash'-->
+          <span class="badge" data-bind="text: name"></span>
+          <!-- /ko -->
+        </span>
+      </a>
+    </td>
     <td style="width: 40px; text-align: center">
-      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, css:{'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length > 0}">
+      <a rel="tooltip" data-placement="left" style="padding-left:10px; padding-right: 10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, visible: isMine , css:{'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length > 0}">
         <i class="fa fa-users"></i>
       </a>
+      <i class="fa fa-ban" style="padding-left:8px; padding-right: 8px" data-bind="visible: !isMine"></i>
     </td>
   </tr>
 </script>
@@ -286,11 +289,35 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         <h3>${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
-        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
+        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">${_('No')}</a>
         <a data-bind="click: removeTagFinal" class="btn btn-danger">${_('Yes')}</a>
+    </div>
+</div>
+
+<div id="documentMoveModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Move to a project')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+          ${_('Select the project you want to move this document to')}
+          <ul class="unstyled">
+            <!-- ko foreach: myTags -->
+              <li>
+                <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
+                  <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
+                </a>
+              </li>
+            <!-- /ko -->
+          </ul>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
     </div>
 </div>
 
@@ -331,25 +358,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Done')}</a>
   </div>
 </div>
-
-
-<script type="text/html" id="tag-sharer-template">
-  <div style="margin-right:10px;margin-bottom: 6px;float:left;">
-    <span class="tags-modal-checkbox badge">
-       <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span>
-    </span>
-    <div data-bind="template: { name: 'tag-template', foreach: projects }"></div>
-  </div>
-</script>
-
-
-<script type="text/html" id="tag-edit-template">
-  <div style="margin-right:10px;margin-bottom: 6px;float:left;">
-    <span class="tags-modal-checkbox badge">
-       <i class="fa fa-trash-o"></i> <span data-bind="text: name"></span>
-    </span>
-  </div>
-</script>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -496,12 +504,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   }
 
   function removeTag() {
-    viewModel.selectedForDelete(viewModel.selectedTag());
+    viewModel.selectedTagForDelete(viewModel.selectedTag());
     $("#removeTagModal").modal("show");
   }
 
   function removeTagFinal() {
-    var tag = viewModel.selectedForDelete();
+    var tag = viewModel.selectedTagForDelete();
     $.post("/desktop/api/tag/remove_tag", {
       tag_id: tag.id()
     }, function (response) {
@@ -517,6 +525,26 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         }
       }
     });
+  }
+
+  function moveDoc(doc) {
+    viewModel.selectedDoc(doc);
+    $("#documentMoveModal").modal("show");
+  }
+
+  function moveDocFinal(tag) {
+    $.post("/desktop/api/doc/update_tags", {
+      data: JSON.stringify({
+        doc_id: viewModel.selectedDoc().id,
+        tag_ids: [tag.id()]
+      })
+    }, function (response) {
+      if (response.doc != null) {
+        $(document).trigger("info", "${ _("Project updated successfully.") }");
+        viewModel.updateDoc(response.doc);
+      }
+      $("#documentMoveModal").modal("hide");
+    })
   }
 
   function shareDoc(doc) {
@@ -568,7 +596,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         if (response.status != 0) {
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
-        viewModel.documents.valueHasMutated();
+        else {
+          viewModel.updateDoc(response.doc);
+        }
       }
     });
   }

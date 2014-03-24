@@ -18,53 +18,6 @@
 function HomeViewModel(json_tags, json_docs) {
   var self = this;
 
-  var MOCK_TAGS = {
-    'history': {'name': 'History', 'id': 1, 'docs': [1], 'type': 'history'},
-    'trash': {'name': 'Trash', 'id': 3, 'docs': [2]},
-    'mine': [
-      {'name': 'default', 'id': 2, 'docs': [3]},
-      {'name': 'web', 'id': 3, 'docs': [3]}
-    ],
-    'notmine': [
-      {'name': 'romain', 'projects': [
-        {'name': 'example', 'id': 20, 'docs': [10]},
-        {'name': 'ex2', 'id': 30, 'docs': [10, 11]}
-      ]},
-      {'name': 'pai', 'projects': [
-        {'name': 'example2', 'id': 20, 'docs': [10]}
-      ]}
-    ]
-  };
-
-  var MOCK_DOCUMENTS = {
-    '1': {
-      'id': 1,
-      'name': 'my query history', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
-      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
-    },
-    '2': {
-      'id': 2,
-      'name': 'my query 2 trashed', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
-      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
-    },
-    '3': {
-      'id': 3,
-      'name': 'my query 3 tagged twice', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
-      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
-    },
-    '10': {
-      'id': 10,
-      'name': 'my query 3 shared', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
-      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
-    },
-    '11': {
-      'id': 11,
-      'name': 'my query 4 shared', 'description': '', 'url': '/beeswax/execute/design/83', 'icon': '/beeswax/static/art/icon_beeswax_24.png',
-      'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
-    }
-  };
-
-
   var ALL_DOCUMENTS = json_docs;
   self.tags = ko.mapping.fromJS(json_tags);
   self.documents = ko.observableArray([]);
@@ -81,7 +34,7 @@ function HomeViewModel(json_tags, json_docs) {
   }));
 
   self.selectedTag = ko.observable({});
-  self.selectedForDelete = ko.observable({
+  self.selectedTagForDelete = ko.observable({
     name: ''
   });
 
@@ -169,7 +122,26 @@ function HomeViewModel(json_tags, json_docs) {
       }
     });
     return _tag;
-  };
+  }
+
+  self.getDocById = function (docId) {
+    var _doc = null;
+    $.each(ALL_DOCUMENTS, function (id, doc) {
+      if (doc.id == docId) {
+        _doc = doc;
+      }
+    });
+    return _doc;
+  }
+
+  self.updateDoc = function (doc) {
+    $.each(ALL_DOCUMENTS, function (id, iDoc) {
+      if (iDoc.id == doc.id) {
+        ALL_DOCUMENTS[id] = doc;
+      }
+    });
+    self.filterDocs(self.selectedTag());
+  }
 
   self.filterDocs = function (tag) {
     self.documents.removeAll();
