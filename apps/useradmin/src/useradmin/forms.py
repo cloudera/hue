@@ -165,6 +165,10 @@ class AddLdapGroupsForm(forms.Form):
                                                 help_text=_t('Create home directories for every member imported, if members are being imported.'),
                                                 initial=True,
                                                 required=False)
+  import_members_recursive = forms.BooleanField(label=_t('Import new members from all subgroups'),
+                                                help_text=_t('Import unimported or new users from the all subgroups.'),
+                                                initial=False,
+                                                required=False)
 
   def clean(self):
     cleaned_data = super(AddLdapGroupsForm, self).clean()
@@ -179,13 +183,6 @@ class AddLdapGroupsForm(forms.Form):
         raise forms.ValidationError(msg)
 
     return cleaned_data
-
-
-class AddLdapSuboordinateGroupsForm(AddLdapGroupsForm):
-  import_members_recursive = forms.BooleanField(label=_t('Import new members from all subgroups'),
-                                                help_text=_t('Import unimported or new users from the all subgroups.'),
-                                                initial=False,
-                                                required=False)
 
 
 class GroupEditForm(forms.ModelForm):
