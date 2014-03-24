@@ -138,8 +138,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            <!-- /ko -->
            <li class="nav-header tag-mine-header">
              ${_('My Projects')}
-             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Create project') }" rel="tooltip" data-placement="right">
-               <i class="fa fa-plus-circle" data-bind="click: addTag"></i>
+             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px">
+               <i class="fa fa-plus-circle" data-bind="click: addTag" title="${ _('Create project') }" rel="tooltip" data-placement="right"></i>
+               <i class="fa fa-minus-circle" data-bind="click: removeTag, visible: $root.selectedTag().hasOwnProperty('owner') && $root.selectedTag().owner() == '${user}' && $root.selectedTag().name() != 'history'  && $root.selectedTag().name() != 'trash'  && $root.selectedTag().name() != 'default'"
+                       title="${ _('Remove selected project') }" rel="tooltip" data-placement="right"></i>
              </div>
            </li>
            <!-- ko template: { name: 'tag-template', foreach: myTags } -->
@@ -170,7 +172,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
         <div class="card-body">
           <p>
-          <table class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
+          <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
             <thead>
               <tr>
                 <th style="width: 26px">&nbsp;</th>
@@ -182,8 +184,23 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th style="width: 40px">${_('Sharing')}</th>
               </tr>
             </thead>
-            <tbody data-bind="template: { name: 'document-template', foreach: documents }">
+            <tbody data-bind="template: { name: 'document-template', foreach: renderableDocuments}">
             </tbody>
+            <tfoot data-bind="visible: documents().length > 0">
+              <tr>
+                <td colspan="7">
+                  <div class="pull-right" style="margin-top: 10px" data-bind="visible: hasPrevious() || hasNext()">
+                    <span>${_('Page')} <input type="number" class="input-mini" style="text-align: center" data-bind="value: page"> ${_('of')} <span data-bind="text: totalPages"></span></span>
+                  </div>
+                  <div class="pagination">
+                    <ul>
+                      <li><a data-bind="click: previousPage, visible: hasPrevious">${_('Previous')}</a></li>
+                      <li><a data-bind="click: nextPage, visible: hasNext">${_('Next')}</a></li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
           </table>
           <div data-bind="visible: documents().length == 0">
             <h4 style="color: #777; margin-bottom: 30px">${_('There are currently no documents in this project or tag.')}</h4>
@@ -201,7 +218,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
     <a href="javascript:void(0)" style="padding-right: 4px">
       <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span>
-      <i data-bind="click: removeTag, visible: name() != 'trash' && name() != 'history'" class="pull-right fa fa-times-circle"></i>
       <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
@@ -213,7 +229,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </li>
   <!-- ko foreach: projects-->
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
-    <a href="javascript:void(0)">
+    <a href="javascript:void(0)" style="padding-right: 4px">
       &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
@@ -233,9 +249,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td data-bind="text: owner"></td>
     <td data-bind="text: lastModified"></td>
     <td style="width: 40px; text-align: center">
-      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-original-title="${ _("Share My saved query") }">
-        <i data-bind="visible: isMine" class="fa fa-share-square-o"></i>
-        <i data-bind="visible: ! isMine" class="fa fa-user"></i>
+      <a rel="tooltip" data-placement="left" style="padding-left:10px" data-bind="click: $root.shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, visible: isMine">
+        <i class="fa fa-users"></i>
       </a>
     </td>
   </tr>
@@ -260,7 +275,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 <div id="addTagModal" class="modal hide fade">
-  <form class="form-inline form-padding-fix" onsubmit="addTag()">
+  <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       <h3>${_('Create project')}</h3>
@@ -285,7 +300,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         <h3>${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
-        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedForDelete().name"></span></strong>?</p>
+        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">${_('No')}</a>
@@ -320,6 +335,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   var viewModel;
+
   $(document).ready(function () {
     viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
     ko.applyBindings(viewModel);
@@ -365,8 +381,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     $("#addTagModal").modal("show");
   }
 
-  function removeTag(tag) {
-    viewModel.selectedForDelete(tag);
+  function removeTag() {
+    viewModel.selectedForDelete(viewModel.selectedTag());
     $("#removeTagModal").modal("show");
   }
 
@@ -379,7 +395,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         if (response.status == 0) {
           $(document).trigger("info", response.message);
           $("#removeTagModal").modal("hide");
-          viewModel.removeTag(tag);
+          viewModel.deleteTag(tag);
           viewModel.filterDocs(viewModel.history());
         }
         else {

@@ -68,11 +68,13 @@ function HomeViewModel(json_tags, json_docs) {
   var ALL_DOCUMENTS = json_docs;
   self.tags = ko.mapping.fromJS(json_tags);
   self.documents = ko.observableArray([]);
+  self.page = ko.observable(1);
+  self.documentsPerPage = ko.observable(50);
 
   self.editTagsToCreate = ko.observableArray([]);
   self.editTagsToDelete = ko.observableArray([]);
 
-  self.selectedTag = ko.observable("");
+  self.selectedTag = ko.observable({});
   self.selectedForDelete = ko.observable({
     name: ''
   });
@@ -100,6 +102,50 @@ function HomeViewModel(json_tags, json_docs) {
     _all = _all.concat(self.tags.mine());
     _all = _all.concat(self.tags.notmine());
     return _all;
+  });
+
+  self.renderableDocuments = ko.computed(function () {
+    return self.documents().slice((self.page() * 1 - 1) * self.documentsPerPage(), (self.page() * self.documentsPerPage()) - 1);
+  });
+
+  self.totalPages = ko.computed(function () {
+    return Math.ceil(self.documents().length / self.documentsPerPage());
+  });
+
+  self.hasPrevious = ko.computed(function () {
+    return self.page() > 1;
+  });
+
+  self.hasNext = ko.computed(function () {
+    return self.page() < self.totalPages();
+  });
+
+  self.page.subscribe(function (value) {
+    if (isNaN(value * 1)) {
+      self.page(1);
+    }
+    if (value > self.totalPages()) {
+      self.page(self.totalPages());
+    }
+    if (value < 1) {
+      self.page(1);
+    }
+  });
+
+  self.nextPage = function () {
+    if (self.hasNext()) {
+      self.page(self.page() + 1);
+    }
+  }
+
+  self.previousPage = function () {
+    if (self.hasPrevious()) {
+      self.page(self.page() - 1);
+    }
+  }
+
+  self.documents.subscribe(function () {
+    self.page(1);
   });
 
   self.getTagById = function (tag_id) {
@@ -153,7 +199,7 @@ function HomeViewModel(json_tags, json_docs) {
     self.tags.mine.push(mapped_tag);
   }
 
-  self.removeTag = function (tag) {
+  self.deleteTag = function (tag) {
     self.tags.mine.remove(tag);
   }
 }

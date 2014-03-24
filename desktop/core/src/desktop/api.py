@@ -231,6 +231,7 @@ def add_tag(request):
       response['name'] = request.POST['name']
       response['id'] = tag.id
       response['docs'] = []
+      response['owner'] = request.user.username
       response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
