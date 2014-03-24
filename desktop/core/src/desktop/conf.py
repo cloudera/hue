@@ -398,12 +398,10 @@ LDAP = ConfigSection(
       default=False),
 
     SUBGROUPS = Config("subgroups",
-      private=True,
       help=_("Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."),
       type=coerce_str_lowercase,
       default="suboordinate"),
     NESTED_MEMBERS_SEARCH_DEPTH = Config("nested_members_search_depth",
-      private=True,
       help=_("Define the number of levels to search for nested members."),
       type=int,
       default=10),

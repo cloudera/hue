@@ -189,6 +189,12 @@ class LdapTestConnection(object):
                         'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
                         'posix_members':[]
                       },
+                      'NestedPosixGroups': {
+                        'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
+                        'name':'NestedPosixGroups',
+                        'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
+                        'posix_members':[]
+                      },
                       'PosixGroup': {
                         'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
                         'name':'PosixGroup',
@@ -568,7 +574,7 @@ def test_useradmin_ldap_user_group_membership_sync():
     settings.MIDDLEWARE_CLASSES.remove('desktop.middleware.UserGroupSynchronizationMiddleware')
 
 
-def test_useradmin_ldap_group_integration():
+def test_useradmin_ldap_suboordinate_group_integration():
   reset_all_users()
   reset_all_groups()
 
@@ -668,6 +674,7 @@ def test_useradmin_ldap_nested_group_integration():
     assert_equal(test_admins.user_set.all()[0].username, larry.username)
 
     # Only sync already imported
+    assert_equal(test_users.user_set.all().count(), 3)
     ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
     import_ldap_groups('TestUsers', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
     assert_equal(test_users.user_set.all().count(), 2)
@@ -686,13 +693,22 @@ def test_useradmin_ldap_nested_group_integration():
     assert_equal(test_users.user_set.all().count(), 3)
 
     # Nested group import
+    # First without recursive import, then with.
     import_ldap_groups('NestedGroups', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
     nested_groups = Group.objects.get(name='NestedGroups')
     nested_group = Group.objects.get(name='NestedGroup')
     assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
     assert_true(LdapGroup.objects.filter(group=nested_group).exists())
-    assert_equal(nested_groups.user_set.all().count(), 0)
-    assert_equal(nested_group.user_set.all().count(), 1)
+    assert_equal(nested_groups.user_set.all().count(), 0, nested_groups.user_set.all())
+    assert_equal(nested_group.user_set.all().count(), 0, nested_group.user_set.all())
+
+    import_ldap_groups('NestedGroups', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+    nested_groups = Group.objects.get(name='NestedGroups')
+    nested_group = Group.objects.get(name='NestedGroup')
+    assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
+    assert_true(LdapGroup.objects.filter(group=nested_group).exists())
+    assert_equal(nested_groups.user_set.all().count(), 0, nested_groups.user_set.all())
+    assert_equal(nested_group.user_set.all().count(), 1, nested_group.user_set.all())
 
     # Make sure Hue groups with naming collisions don't get marked as LDAP groups
     hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -707,7 +723,7 @@ def test_useradmin_ldap_nested_group_integration():
       finish()
 
 
-def test_useradmin_ldap_posix_group_integration():
+def test_useradmin_ldap_suboordinate_posix_group_integration():
   reset_all_users()
   reset_all_groups()
 
@@ -758,6 +774,82 @@ def test_useradmin_ldap_posix_group_integration():
     test_users = Group.objects.get(name='PosixGroup')
     assert_true(LdapGroup.objects.filter(group=test_users).exists())
     assert_equal(test_users.user_set.all().count(), 3)
+
+    # Make sure Hue groups with naming collisions don't get marked as LDAP groups
+    hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
+    hue_group = Group.objects.create(name='OtherGroup')
+    hue_group.user_set.add(hue_user)
+    hue_group.save()
+    import_ldap_groups('OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+    assert_false(LdapGroup.objects.filter(group=hue_group).exists())
+    assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+  finally:
+    for finish in reset:
+      finish()
+
+
+def test_useradmin_ldap_nested_posix_group_integration():
+  reset_all_users()
+  reset_all_groups()
+
+  reset = []
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  # Test nested groups
+  reset.append(desktop.conf.LDAP.SUBGROUPS.set_for_testing("nested"))
+
+  try:
+    # Import groups only
+    import_ldap_groups('PosixGroup', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+    test_users = Group.objects.get(name='PosixGroup')
+    assert_true(LdapGroup.objects.filter(group=test_users).exists())
+    assert_equal(test_users.user_set.all().count(), 0)
+
+    # Import all members of TestUsers
+    import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+    test_users = Group.objects.get(name='PosixGroup')
+    assert_true(LdapGroup.objects.filter(group=test_users).exists())
+    assert_equal(test_users.user_set.all().count(), 2)
+
+    # Should import a group, but will only sync already-imported members
+    import_ldap_groups('Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+    assert_equal(User.objects.all().count(), 2, User.objects.all())
+    assert_equal(Group.objects.all().count(), 2, Group.objects.all())
+    test_admins = Group.objects.get(name='Test Administrators')
+    assert_equal(test_admins.user_set.all().count(), 1)
+    larry = User.objects.get(username='lårry')
+    assert_equal(test_admins.user_set.all()[0].username, larry.username)
+
+    # Only sync already imported
+    ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
+    import_ldap_groups('PosixGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+    assert_equal(test_users.user_set.all().count(), 1)
+    assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
+
+    # Import missing user
+    ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
+    import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+    assert_equal(test_users.user_set.all().count(), 2)
+    assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
+
+    # Import all members of PosixGroup and members of subgroups (there should be no subgroups)
+    import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+    test_users = Group.objects.get(name='PosixGroup')
+    assert_true(LdapGroup.objects.filter(group=test_users).exists())
+    assert_equal(test_users.user_set.all().count(), 2)
+
+    # Import all members of NestedPosixGroups and members of subgroups
+    reset_all_users()
+    reset_all_groups()
+    import_ldap_groups('NestedPosixGroups', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+    test_users = Group.objects.get(name='NestedPosixGroups')
+    assert_true(LdapGroup.objects.filter(group=test_users).exists())
+    assert_equal(test_users.user_set.all().count(), 0)
+    test_users = Group.objects.get(name='PosixGroup')
+    assert_true(LdapGroup.objects.filter(group=test_users).exists())
+    assert_equal(test_users.user_set.all().count(), 2)
 
     # Make sure Hue groups with naming collisions don't get marked as LDAP groups
     hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
