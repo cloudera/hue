@@ -19,3 +19,5 @@ Ryan Niemeyer (https://github.com/rniemeyer/knockout-sortable)
 This product includes software developed by
 Arnaud Buathier (http://www.arnapou.net/2012-07-jquery-cron/)
 
+This product includes software developed by
+Mark Pilgrim (https://github.com/sigmavirus24/charade)

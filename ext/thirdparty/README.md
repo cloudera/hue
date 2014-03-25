@@ -9,6 +9,7 @@ Checked-in third party dependencies
 |--------------|-------|-------|-------|----------|
 |Y|A Midsummer Nights Dream by Shakespeare|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext98/2ws1710.txt|
 |Y|Avro|1.5.0|ASL2|http://avro.apache.org/|
+|Y|Charade|1.0.3|LGPLv2.1|https://github.com/sigmavirus24/charade/|
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
@@ -35,6 +36,7 @@ Checked-in third party dependencies
 |Y|Python-paste|1.7.2|MIT|http://pythonpaste.org|
 |Y|pytidylib|0.2.1|MIT|http://cloud.github.com/downloads/countergram/pytidylib/pytidylib-0.2.1.tar.gz|
 |Y|PyYAML|3.09|MIT|http://pyyaml.org/wiki/PyYAML|
+|Y|requests|2.0.0|ASL2|https://github.com/kennethreitz/requests/|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
