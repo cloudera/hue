@@ -153,8 +153,8 @@ class Task:
     setattr(self, 'mostRecentState', self.state)
     setattr(self, 'execStartTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'execFinishTimeFormatted', format_unixtime_ms(self.finishTime))
-    setattr(self, 'startTimeFormatted', self.startTime)
-
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'progress', self.progress / 100)
   @property
   def attempts(self):
     # We can cache as we deal with history server
@@ -198,13 +198,14 @@ class Attempt:
     setattr(self, 'attemptId', self.id)
     setattr(self, 'attemptId_short', self.id)
     setattr(self, 'taskTrackerId', getattr(self, 'assignedContainerId', None))
-    setattr(self, 'startTimeFormatted', self.startTime)
-    setattr(self, 'finishTimeFormatted', self.finishTime)
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'outputSize', None)
     setattr(self, 'phase', None)
     setattr(self, 'shuffleFinishTimeFormatted', None)
     setattr(self, 'sortFinishTimeFormatted', None)
     setattr(self, 'mapFinishTimeFormatted', None)
+    setattr(self, 'progress', self.progress / 100)
     if not hasattr(self, 'diagnostics'):
       self.diagnostics = ''
     if not hasattr(self, 'assignedContainerId'):
