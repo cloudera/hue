@@ -821,6 +821,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
         }
       );
       codeMirror.focus();
+      logGA('navigator/click');
     });
 
     $("#navigatorSearch").jHueDelayedInput(function(){
@@ -1129,6 +1130,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
     $(document).on("stopError", function () {
       $.jHueNotify.error(LABELS.KILL_ERROR);
+      logGA('stop');
     });
 
     var _resizeTimeout = -1;
@@ -1244,8 +1246,8 @@ ${ commonheader(None, "pig", user) | n,unicode }
         $("#" + mainSection).show();
         highlightMainMenu(mainSection);
       }
-      if (typeof trackOnGA == 'function' && includeGA == undefined){
-        trackOnGA(mainSection);
+      if (includeGA == undefined){
+        logGA(mainSection);
       }
     }
 
@@ -1257,9 +1259,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
         highlightMenu(section);
       }
 
-      if (typeof trackOnGA == 'function'){
-        trackOnGA(mainSection + "/" + section);
-      }
+      logGA(mainSection + "/" + section);
     }
 
     function highlightMainMenu(mainSection) {
@@ -1284,7 +1284,6 @@ ${ commonheader(None, "pig", user) | n,unicode }
       "dashboard": function () {
         showMainSection("dashboard");
       },
-
       "edit": function () {
         showSection("editor", "edit");
       },
@@ -1400,6 +1399,12 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
   function showAlert(msg) {
     $(document).trigger("info", msg);
+  }
+
+  function logGA(page) {
+    if (typeof trackOnGA == 'function'){
+      trackOnGA('pig/' + page);
+    }
   }
 </script>
 
