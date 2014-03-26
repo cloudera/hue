@@ -148,7 +148,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                        title="${ _('Remove selected project') }" rel="tooltip" data-placement="right"></i>
              </div>
            </li>
-           <!-- ko template: { name: 'tag-template', foreach: nyTags } -->
+           <!-- ko template: { name: 'tag-template', foreach: myTags } -->
            <!-- /ko -->
            <li data-bind="visible: myTags().length == 0">
              <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
@@ -463,7 +463,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     });
 
     $("#tagsNewBtn").on("click", function () {
-      var tag_name = $("#tagsNew").val(); // use ko var + bind enable/disable button accordingly (blank, duplicate, reserved...)?
+      var tag_name = $("#tagsNew").val();
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {

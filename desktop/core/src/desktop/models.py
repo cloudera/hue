@@ -202,7 +202,7 @@ class DocumentManager(models.Manager):
 
   def history_docs(self, model_class, user):
     include = [DocumentTag.objects.get_history_tag(user=user)]
-    exclude = [DocumentTag.objects.get_trash_tag(user=user)]    
+    exclude = [DocumentTag.objects.get_trash_tag(user=user)]
 
     return Document.objects.get_docs(user, model_class).filter(tags__in=include).exclude(tags__in=exclude).order_by('-last_modified')
 

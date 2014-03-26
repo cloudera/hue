@@ -78,7 +78,7 @@ def massaged_tags_for_json(docs, user):
 
   ts['trash'] = massaged_tags(trash_tag, tag_doc_mapping)
   ts['history'] = massaged_tags(history_tag, tag_doc_mapping)
-  tags = list(set(tag_doc_mapping.keys() + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and share tags
+  tags = list(set(tag_doc_mapping.keys() + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and shared tags
 
   for tag in tags:
     massaged_tag = massaged_tags(tag, tag_doc_mapping)
@@ -195,7 +195,7 @@ def massage_doc_for_json(doc, user):
         }
       },
       'owner': doc.owner.username,
-      'isMine': doc.owner.username == user.username and True or False,
+      'isMine': doc.owner.username == user.username,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
