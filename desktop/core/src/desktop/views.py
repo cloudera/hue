@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
 import json
 import logging
 import os
@@ -34,30 +33,26 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 import django.views.debug
 
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json
+import desktop.conf
+import desktop.log.log_buffer
+
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json,\
+  _get_docs
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences, Settings, Document, DocumentTag
+from desktop.models import UserPreferences, Settings
 from desktop import appmanager
-import desktop.conf
-import desktop.log.log_buffer
 
 
 LOG = logging.getLogger(__name__)
 
 
 def home(request):
-  history_tag = DocumentTag.objects.get_history_tag(request.user)  
-  trash_tag = DocumentTag.objects.get_trash_tag(request.user)
-  docs = itertools.chain(
-      Document.objects.get_docs(request.user).exclude(tags__in=[trash_tag]).filter(tags__in=[history_tag]).order_by('-last_modified')[:500],
-      Document.objects.get_docs(request.user).exclude(tags__in=[history_tag]).order_by('-last_modified')[:100]
-  )
-  docs = list(docs)
+  docs = _get_docs(request.user)
 
   apps = appmanager.get_apps_dict(request.user)
 

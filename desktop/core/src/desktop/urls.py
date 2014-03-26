@@ -81,8 +81,6 @@ dynamic_patterns += patterns('desktop.api',
   # Tags
   (r'^desktop/api/tag/add_tag$', 'add_tag'),
   (r'^desktop/api/tag/remove_tag$', 'remove_tag'),
-  (r'^desktop/api/tag/list_tags$', 'list_tags'),
-  (r'^desktop/api/doc/list_docs$', 'list_docs'),
   (r'^desktop/api/doc/tag$', 'tag'),
   (r'^desktop/api/doc/update_tags$', 'update_tags'),
 

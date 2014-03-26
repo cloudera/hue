@@ -171,8 +171,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
     <div class="span10">
       <div class="card card-home" style="margin-top: 0">
-        <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px">
-        <h2 class="card-heading simple">${_('My Documents')}</h2>
+        <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
+        ##<h2 class="card-heading simple">${_('My Documents')}</h2>
 
         <div class="card-body">
           <p>

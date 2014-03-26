@@ -144,6 +144,7 @@ function HomeViewModel(json_tags, json_docs) {
           $(doc.tags).each(function (cnt, item) {
             if (tag.id() == item.id && tag.docs().indexOf(doc.id) == -1) {
               tag.docs().push(doc.id);
+              tag.docs.valueHasMutated();
             }
             if (tag.docs().indexOf(doc.id) > -1 && tag.id() == item.id) {
               _removeDocFromTag = false;
@@ -151,6 +152,7 @@ function HomeViewModel(json_tags, json_docs) {
           });
           if (_removeDocFromTag) {
             tag.docs().splice(tag.docs().indexOf(doc.id), 1);
+            tag.docs.valueHasMutated();
           }
         });
       }
@@ -195,5 +197,4 @@ function HomeViewModel(json_tags, json_docs) {
   self.deleteTag = function (tag) {
     self.tags.mine.remove(tag);
   }
-
 }

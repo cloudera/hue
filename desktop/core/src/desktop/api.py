@@ -33,23 +33,15 @@ from desktop.models import Document, DocumentTag
 LOG = logging.getLogger(__name__)
 
 
-def list_docs(request):
+def _get_docs(user):
+  history_tag = DocumentTag.objects.get_history_tag(user)  
+  trash_tag = DocumentTag.objects.get_trash_tag(user)
   docs = itertools.chain(
-      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
-      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
+      Document.objects.get_docs(user).exclude(tags__in=[trash_tag]).filter(tags__in=[history_tag]).order_by('-last_modified')[:500],
+      Document.objects.get_docs(user).exclude(tags__in=[history_tag]).order_by('-last_modified')[:100]
   )
-  docs = list(docs)
-  return HttpResponse(json.dumps(massaged_documents_for_json_old(docs, request.user)), mimetype="application/json")
+  return list(docs)  
 
-
-def list_tags(request):
-  docs = itertools.chain(
-      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
-      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
-  )
-  docs = list(docs)
-  tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
-  return HttpResponse(json.dumps(massaged_tags_for_json_old(tags, request.user)), mimetype="application/json")
 
 def massaged_tags_for_json(docs, user):
   """
@@ -160,24 +152,6 @@ def massaged_documents_for_json(documents, user):
   return docs
 
 
-def massage_doc_for_json_new(doc):
-  return {
-      'id': doc.id,
-      'contentType': doc.content_type.name,
-      'icon': doc.icon,
-      'name': doc.name,
-      'url': doc.content_object.get_absolute_url(),
-      'description': doc.description,
-      'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
-      'owner': doc.owner.username,
-      'lastModified': doc.last_modified.strftime("%x %X"),
-      'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
-    }
-
-def massaged_documents_for_json_old(documents, user):
-  return [massage_doc_for_json(doc, user) for doc in documents]
-
-
 def massage_doc_for_json(doc, user):
   perms = doc.list_permissions()
   return {
@@ -200,24 +174,6 @@ def massage_doc_for_json(doc, user):
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
 
-def massaged_tags_for_json_old(tags, user):
-  ts = []
-  trash = DocumentTag.objects.get_trash_tag(user)
-  history = DocumentTag.objects.get_history_tag(user)
-
-  for tag in tags:
-    massaged_tag = {
-      'id': tag.id,
-      'name': tag.tag,
-      'owner': tag.owner.username,
-      'isTrash': tag.id == trash.id,
-      'isHistory': tag.id == history.id,
-      'isExample': tag.tag == DocumentTag.EXAMPLE,
-      'isMine': tag.owner.username == user.username
-    }
-    ts.append(massaged_tag)
-
-  return ts
 
 def add_tag(request):
   response = {'status': -1, 'message': ''}
