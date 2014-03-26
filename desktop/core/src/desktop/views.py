@@ -90,12 +90,12 @@ def home(request):
 
 def augment_docs(docs, user):
   for doc in docs:
-    doc.is_mine = doc.owner.username == user.username
+    doc.is_mine = doc.owner == user
   return docs
 
 def augment_tags(tags, user):
   for tag in tags:
-    tag.is_mine = tag.owner.username == user.username
+    tag.is_mine = tag.owner == user
   return tags
 
 

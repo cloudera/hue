@@ -58,8 +58,8 @@ def massaged_tags_for_json2(docs, user):
     'trash': {'name': 'Trash', 'id': 3, 'docs': [2]},
     'mine': [{'name': 'default', 'id': 2, 'docs': [3]}, {'name': 'web', 'id': 3, 'docs': [3]}],
     'notmine': [{'name': 'example', 'id': 20, 'docs': [10]}, {'name': 'ex2', 'id': 30, 'docs': [10, 11]}]
-  };        
-  """  
+  };
+  """
   ts = {
     'trash': {},
     'history': {},
@@ -67,35 +67,40 @@ def massaged_tags_for_json2(docs, user):
     'notmine': [],
   }
   sharers = defaultdict(list)
-  
+
   trash_tag = DocumentTag.objects.get_trash_tag(user)
   history_tag = DocumentTag.objects.get_history_tag(user)
-  ts['trash'] = massaged_tags(trash_tag)
-  ts['history'] = massaged_tags(history_tag)
 
-  tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and share tags
+  tag_doc_mapping = defaultdict(set) # List of documents available in each tag
+  for doc in docs:
+    for tag in doc.tags.all():
+      tag_doc_mapping[tag].add(doc)
+
+  ts['trash'] = massaged_tags(trash_tag, tag_doc_mapping)
+  ts['history'] = massaged_tags(history_tag, tag_doc_mapping)
+  tags = list(set(tag_doc_mapping.keys() + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and share tags
 
   for tag in tags:
-    massaged_tag = massaged_tags(tag)
+    massaged_tag = massaged_tags(tag, tag_doc_mapping)
     if tag == trash_tag:
       ts['trash'] = massaged_tag
     elif tag == history_tag:
-      ts['history'] = massaged_tag    
+      ts['history'] = massaged_tag
     elif tag.owner == user:
       ts['mine'].append(massaged_tag)
     else:
       sharers[tag.owner].append(massaged_tag)
-  
+
   ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.iteritems()]
 
   return ts
 
-def massaged_tags(tag):
+def massaged_tags(tag, tag_doc_mapping):
   return {
     'id': tag.id,
     'name': tag.tag,
     'owner': tag.owner.username,
-    'docs': list(tag.document_set.exclude(name='pig-app-hue-script').values_list('id', flat=True)) # Could get with one request groupy
+    'docs': [doc.id for doc in tag_doc_mapping[tag]] # Could get with one request groupy
   }
 
 def massaged_documents_for_json2(documents, user):
@@ -129,7 +134,7 @@ def massaged_documents_for_json2(documents, user):
   };
   """
   docs = {}
-  
+
   for document in documents:
     perms = document.list_permissions()
     docs[document.id] = {
@@ -140,24 +145,22 @@ def massaged_documents_for_json2(documents, user):
       'url': document.content_object.get_absolute_url(),
       'description': document.description,
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in document.tags.all()],
-      'perms': { # un-used so far
+      'perms': {
         'read': {
-          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
+          'users': [{'id': friends.id, 'username': friends.username} for friends in perms.users.all()],
           'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
         }
       },
       'owner': document.owner.username,
-      'isMine': document.owner.username == user.username,
+      'isMine': document.owner == user,
       'lastModified': document.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(document.last_modified.timetuple())
    }
-  
+
   return docs
 
 
 def massage_doc_for_json2(doc):
-  perms = doc.list_permissions()
-  
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -166,12 +169,6 @@ def massage_doc_for_json2(doc):
       'url': doc.content_object.get_absolute_url(),
       'description': doc.description,
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
-      'perms': {
-#        'read': {
-#          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
-#          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
-#        }
-      },
       'owner': doc.owner.username,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
