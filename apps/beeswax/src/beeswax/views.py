@@ -76,6 +76,7 @@ def save_design(request, form, type_, design, explicit_save):
   Need to return a SavedQuery because we may end up with a different one.
   Assumes that form.saveform is the SaveForm, and that it is valid.
   """
+  authorized_get_design(request, design.id, owner_only=True)
   assert form.saveform.is_valid()
   sub_design_form = form # Beeswax/Impala case
 
