@@ -34,6 +34,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 import django.views.debug
 
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render
@@ -44,13 +45,12 @@ from desktop.models import UserPreferences, Settings, Document, DocumentTag
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json, massaged_documents_for_json2, massaged_tags_for_json2
 
 
 LOG = logging.getLogger(__name__)
 
 
-def home2(request):
+def home(request):
   history_tag = DocumentTag.objects.get_history_tag(request.user)  
   trash_tag = DocumentTag.objects.get_trash_tag(request.user)
   docs = itertools.chain(
@@ -61,42 +61,12 @@ def home2(request):
 
   apps = appmanager.get_apps_dict(request.user)
 
-  return render('home2.mako', request, {
-    'apps': apps,
-    'json_documents': json.dumps(massaged_documents_for_json2(docs, request.user)),
-    'json_tags': json.dumps(massaged_tags_for_json2(docs, request.user))
-  })
-
-def home(request):
-  docs = itertools.chain(
-      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
-      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
-  )
-  docs = list(docs)
-  trash = DocumentTag.objects.get_trash_tag(request.user)
-  history = DocumentTag.objects.get_history_tag(request.user)  
-  tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
-
-  apps = appmanager.get_apps_dict(request.user)
-
   return render('home.mako', request, {
     'apps': apps,
-    'documents': augment_docs(docs, request.user),
     'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
-    'tags': augment_tags(tags, request.user),
-    'json_tags': json.dumps(massaged_tags_for_json(tags, request.user)),
+    'json_tags': json.dumps(massaged_tags_for_json(docs, request.user)),
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
-
-def augment_docs(docs, user):
-  for doc in docs:
-    doc.is_mine = doc.owner == user
-  return docs
-
-def augment_tags(tags, user):
-  for tag in tags:
-    tag.is_mine = tag.owner == user
-  return tags
 
 
 @access_log_level(logging.WARN)

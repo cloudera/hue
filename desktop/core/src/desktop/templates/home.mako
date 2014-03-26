@@ -21,6 +21,10 @@
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 <style type="text/css">
+  .sidebar-nav {
+    margin-bottom: 10px;
+  }
+
   .sidebar-nav img {
     margin-right: 6px;
   }
@@ -35,12 +39,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-bottom: 4px;
   }
 
-  #trashCounter, #historyCounter {
-    margin-top: 3px;
-  }
-
   .tag-counter {
-    margin-top: 2px;
+    margin-top: 3px;
+    margin-right: 4px;
   }
 
   .toggle-tag, .document-tags-modal-checkbox, .tags-modal-checkbox {
@@ -63,6 +64,24 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
   .trash-share {
     cursor: pointer;
+  }
+
+  .white {
+    padding: 9px 18px;
+    margin-top: 1px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #737373;
+    text-overflow: ellipsis;
+  }
+
+  .baseShared {
+    color: #999;
+  }
+
+  .isShared {
+    color: #338bb8!important;
   }
 
 </style>
@@ -117,45 +136,34 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <li class="view-trash toggable-section">
-             <a href="javascript:void(0)"><i class="fa fa-trash-o"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a>
+           <!-- ko template: { name: 'tag-template', data: history } -->
+           <!-- /ko -->
+           <!-- ko template: { name: 'tag-template', data: trash } -->
+           <!-- /ko -->
+           <li class="nav-header tag-mine-header">
+             ${_('My Projects')}
+             <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px">
+               <i class="fa fa-plus-circle" data-bind="click: addTag" title="${ _('Create project') }" rel="tooltip" data-placement="right"></i>
+               <i class="fa fa-minus-circle" data-bind="click: removeTag, visible: $root.selectedTag().hasOwnProperty('owner') && $root.selectedTag().owner() == '${user}' && $root.selectedTag().name() != 'history'  && $root.selectedTag().name() != 'trash'  && $root.selectedTag().name() != 'default'"
+                       title="${ _('Remove selected project') }" rel="tooltip" data-placement="right"></i>
+             </div>
            </li>
-           <li class="viewHistory toggable-section">
-             <a href="javascript:void(0)"><i class="fa fa-clock-o"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
+           <!-- ko template: { name: 'tag-template', foreach: myTags } -->
+           <!-- /ko -->
+           <li data-bind="visible: myTags().length == 0">
+             <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
+               <i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}
+             </a>
            </li>
-          <li class="nav-header tag-mine-header">${_('My Projects')} <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="fa fa-pencil"></i></div> </li>
-          <% has_tag = False %>
-          % if len(tags) > 2:
-            % for tag in tags:
-              % if tag.tag not in ('trash', 'history') and tag.is_mine:
-              <% has_tag = True %>
-              <li class="toggle-tag" data-tag="${ tag.tag }" data-ismine="true"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
-              % endif
-            % endfor
-          % endif
-          <li class="no-tags-mine
-           % if has_tag:
-            hide
-           % endif
-          "><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}</a></li>
           <li class="nav-header tag-shared-header">
             ${_('Shared with me')}
           </li>
-           <% has_tag = False %>
-           % if len(tags) > 2:
-            % for tag in tags:
-              % if tag.tag not in ('trash', 'history') and not tag.is_mine:
-              <% has_tag = True %>
-              <li class="toggle-tag" data-tag="${ tag.tag }" data-ismine="false" rel="tooltip" title="${_('Shared by %s' % tag.owner)}" data-placement="right"><a href="javascript:void(0)"><i class="fa fa-tag"></i> ${ tag.tag }<span class="tag-counter badge pull-right">0</span></a></li>
-              % endif
-            % endfor
-          % endif
-          <li class="no-tags-shared
-           % if has_tag:
-            hide
-           % endif
-          "><a href="javascript:void(0)" style="line-height:24px">${_('There are currently no projects shared with you.')}</a></li>
-
+          <!-- ko template: { name: 'shared-tag-template', foreach: sharedTags } -->
+          <!-- /ko -->
+          <li data-bind="visible: sharedTags().length == 0">
+            <a href="javascript:void(0)" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects shared with you.')}
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -163,24 +171,43 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
     <div class="span10">
       <div class="card card-home" style="margin-top: 0">
-        <input type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px" id="filterInput">
+        <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query pull-right" style="margin-right: 10px;margin-top: 3px">
         <h2 class="card-heading simple">${_('My Documents')}</h2>
 
         <div class="card-body">
           <p>
-          <table class="table table-striped table-condensed datatables" data-tablescroller-disable="true">
+          <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
             <thead>
               <tr>
-                <th>&nbsp;</th>
-                <th>${_('Name')}</th>
+                <th style="width: 26px">&nbsp;</th>
+                <th style="width: 200px">${_('Name')}</th>
                 <th>${_('Description')}</th>
-                <th>${_('Projects')}</th>
-                <th>${_('Owner')}</th>
-                <th>${_('Last Modified')}</th>
-                <th>${_('Sharing')}</th>
+                <th style="width: 150px">${_('Last Modified')}</th>
+                <th style="width: 80px; text-align: center">${_('Project')}</th>
+                <th style="width: 40px">${_('Sharing')}</th>
               </tr>
             </thead>
+            <tbody data-bind="template: { name: 'document-template', foreach: renderableDocuments}">
+            </tbody>
+            <tfoot data-bind="visible: documents().length > 0">
+              <tr>
+                <td colspan="7">
+                  <div class="pull-right" style="margin-top: 10px" data-bind="visible: hasPrevious() || hasNext()">
+                    <span>${_('Page')} <input type="number" class="input-mini" style="text-align: center" data-bind="value: page"> ${_('of')} <span data-bind="text: totalPages"></span></span>
+                  </div>
+                  <div class="pagination">
+                    <ul>
+                      <li><a data-bind="click: previousPage, visible: hasPrevious">${_('Previous')}</a></li>
+                      <li><a data-bind="click: nextPage, visible: hasNext">${_('Next')}</a></li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
           </table>
+          <div data-bind="visible: documents().length == 0">
+            <h4 style="color: #777; margin-bottom: 30px">${_('There are currently no documents in this project or tag.')}</h4>
+          </div>
           </p>
         </div>
       </div>
@@ -189,524 +216,363 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
 </div>
 
-<div id="documentTagsModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Projects for ')}<span id="documentTagsModalName"></span></h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <div id="documentTagsModalList"></div>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">
-        <div class="input-append">
-          <input id="documentTagsNew" type="text">
-          <a id="documentTagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
-        </div>
-      </div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="saveDocumentTags" href="#" class="btn btn-primary disable-feedback">${_('Save projects')}</a>
-  </div>
+
+<script type="text/html" id="tag-template">
+  <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
+    <a href="javascript:void(0)" style="padding-right: 4px">
+      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span>
+      <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
+    </a>
+  </li>
+</script>
+
+<script type="text/html" id="shared-tag-template">
+  <li class="white">
+    <i class="fa fa-user"></i> <span data-bind="text: name"></span>
+  </li>
+  <!-- ko foreach: projects-->
+  <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
+    <a href="javascript:void(0)" style="padding-right: 4px">
+      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
+    </a>
+  </li>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="document-template">
+  <tr>
+    <td style="width: 26px"><img data-bind="attr: { src: icon }"></td>
+    <td><a data-bind="attr: { href: url }, text: name"></a></td>
+    <td data-bind="text: description"></td>
+    <td data-bind="text: lastModified"></td>
+    <td style="text-align: center; white-space: nowrap">
+      <a href="javascript:void(0)" rel="tooltip" data-placement="left" data-bind="click: moveDoc, attr: {'data-original-title': '${ _("Change project for") } '+name}" style="padding-left:8px; padding-right: 8px">
+        <span data-bind="foreach: tags">
+          <!-- ko if: name != 'trash'-->
+          <span class="badge" data-bind="text: name"></span>
+          <!-- /ko -->
+        </span>
+      </a>
+    </td>
+    <td style="width: 40px; text-align: center">
+      <a rel="tooltip" data-placement="left" style="padding-left:10px; padding-right: 10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, visible: isMine , css:{'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length > 0}">
+        <i class="fa fa-users"></i>
+      </a>
+      <i class="fa fa-ban" style="padding-left:8px; padding-right: 8px" data-bind="visible: !isMine"></i>
+    </td>
+  </tr>
+</script>
+
+<div id="addTagModal" class="modal hide fade">
+  <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>${_('Create project')}</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+          <label>
+            ${_('Project name')} <input id="tagsNew" type="text" class="input-xlarge">
+          </label>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+      <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
+    </div>
+  </form>
 </div>
 
-<div id="tagsModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Manage projects')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <div id="tagsModalList"></div>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">
-        <div class="input-append">
-          <input id="tagsNew" type="text">
-          <a id="tagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
-        </div>
-      </div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="removeTags" href="#" class="btn btn-danger disable-feedback">${_('Remove selected')}</a>
-  </div>
+<div id="removeTagModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Confirm Delete')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a data-bind="click: removeTagFinal" class="btn btn-danger">${_('Yes')}</a>
+    </div>
 </div>
+
+<div id="documentMoveModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Move to a project')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+          ${_('Select the project you want to move this document to')}
+          <ul class="unstyled">
+            <!-- ko foreach: myTags -->
+              <li>
+                <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
+                  <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
+                </a>
+              </li>
+            <!-- /ko -->
+          </ul>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    </div>
+</div>
+
 
 <div id="documentShareModal" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Share ')}<span id="documentShareModalName"></span></h3>
+    <h3>${_('Sharing settings')}</h3>
   </div>
   <div class="modal-body">
     <p>
-      <h4 id="documentShareNoShare" class="muted" style="margin-top:0px">${_('Not shared yet.')}</h4>
-      <ul id="documentShareList" class="unstyled inline airy hide">
-      </ul>
+      <div class="row-fluid">
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Users')}</h4>
+          <div data-bind="visible: selectedDoc().perms.read.users.length == 0">${_('The document is not shared with any user.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
+            <li><span class="badge badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeUserShare"><i class="fa fa-times-circle"></i></span></li>
+          </ul>
+        </div>
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Groups')}</h4>
+          <div data-bind="visible: selectedDoc().perms.read.groups.length == 0">${_('The document is not shared with any group.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
+            <li><span class="badge badge-left"><i class="fa fa-users"></i> <span data-bind="text: name"></span></span><span class="badge badge-important badge-right trash-share" data-bind="click: removeGroupShare"><i class="fa fa-times-circle"></i></span></li>
+          </ul>
+        </div>
+      </div>
       <div class="clearfix"></div>
       <div style="margin-top: 20px">
         <div class="input-append">
-          <input id="documentShareAdd" type="text" class="input-large" placeholder="${_('You can type a username or a group')}">
+          <input id="documentShareTypeahead" type="text" style="width: 460px" placeholder="${_('You can type a username or a group')}">
           <a id="documentShareAddBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
   </div>
   <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="saveDocumentShare" href="#" class="btn btn-primary disable-feedback">${_('Update')}</a>
+    <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Done')}</a>
   </div>
 </div>
 
-
-
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/home.vm.js"></script>
+
+
 <script type="text/javascript" charset="utf-8">
+  var viewModel, JSON_USERS_GROUPS;
 
-var JSON_DOCS = ${json_documents | n,unicode};
-var JSON_TAGS = ${json_tags | n,unicode};
-var JSON_USERS_GROUPS;
-var documentsTable;
-
-$(document).ready(function () {
-  var selectedUserOrGroup, map, dropdown = null;
-  $.getJSON('/desktop/api/users/autocomplete', function (data) {
-    JSON_USERS_GROUPS = data;
-    dropdown = [];
-    map = {};
-
-    $.each(JSON_USERS_GROUPS.users, function (i, user) {
-      map[user.username] = user;
-      dropdown.push(user.username);
-    });
-
-    $.each(JSON_USERS_GROUPS.groups, function (i, group) {
-      map[group.name] = group;
-      dropdown.push(group.name);
-    });
-
-    $("#documentShareAdd").typeahead({
-      source: function (query, process) {
-        process(dropdown);
-      },
-      matcher: function (item) {
-        if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
-          return true;
-        }
-      },
-      sorter: function (items) {
-        return items.sort();
-      },
-      highlighter: function (item) {
-        var _icon = map[item].username ? "fa fa-user" : "fa fa-group";
-        var regex = new RegExp('(' + this.query + ')', 'gi');
-        return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
-      },
-      updater: function (item) {
-        selectedUserOrGroup = map[item];
-        return item;
+  function prettifyUsername(userId) {
+    var _user = null;
+    for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
+      if (JSON_USERS_GROUPS.users[i].id == userId) {
+        _user = JSON_USERS_GROUPS.users[i];
       }
-    });
-  });
-
-  documentsTable = $(".datatables").dataTable({
-    "sPaginationType": "bootstrap",
-    "iDisplayLength": 50,
-    "bLengthChange": false,
-    "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
-    "aoColumns": [
-      { "bSortable": false, "sWidth": "26px" },
-      null,
-      null,
-      { "sClass": "row-selector-exclude"},
-      null,
-      { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "100px" },
-      { "bSortable": false, "sClass": "row-selector-exclude", "sWidth": "20px"}
-    ],
-    "aaSorting": [
-      [ 5, "desc" ]
-    ],
-    "oLanguage": {
-      "sEmptyTable": "${_('No data available')}",
-      "sInfo": "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-      "sInfoEmpty": "${_('Showing 0 to 0 of 0 entries')}",
-      "sInfoFiltered": "${_('(filtered from _MAX_ total entries)')}",
-      "sZeroRecords": "${_('No matching records')}",
-      "oPaginate": {
-        "sFirst": "${_('First')}",
-        "sLast": "${_('Last')}",
-        "sNext": "${_('Next')}",
-        "sPrevious": "${_('Previous')}"
-      }
-    },
-    "fnDrawCallback": function (oSettings) {
-      $("a[data-row-selector='true']").jHueRowSelector();
     }
-  });
-
-  $("#filterInput").keydown(function (e) {
-    if (e.which == 13) {
-      e.preventDefault();
-      return false;
+    if (_user != null) {
+      return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
     }
-  });
-
-  $("#filterInput").keyup(function () {
-    documentsTable.fnFilter($(this).val());
-    documentsTable.fnDraw();
-  });
-
-  $(".view-trash").on("click", function () {
-    $(".viewHistory").removeClass("active");
-    toggleSpecificSection($(this), "trash", true);
-  });
-
-  $(".viewHistory").on("click", function () {
-    $(".view-trash").removeClass("active");
-    toggleSpecificSection($(this), "history", true);
-  });
-
-  function toggleSpecificSection(section, filter, isMine){
-    section.siblings().removeClass("active");
-    populateTable(filter, isMine);
-    section.addClass("active");
+    return "";
   }
 
-  $(document).on("click", ".toggle-tag", function (e) {
-    var _this = $(this);
-    _this.siblings().removeClass("active");
-    _this.blur();
-    _this.addClass("active");
-    populateTable($(".toggle-tag.active").data("tag"), $(".toggle-tag.active").data("ismine"));
-  });
+  $(document).ready(function () {
+    viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
+    ko.applyBindings(viewModel);
 
-  function updateTagCounters(){
-    // update tag counters
-    var _tagCounters = {};
-    $(JSON_DOCS).each(function (cnt, doc) {
-      if (doc.tags != null) {
-        for (var i = 0; i < doc.tags.length; i++) {
-          if (doc.tags[i].name == "trash" || doc.tags[i].name == "history" || (!isInTags(doc, "trash") && !isInTags(doc, "history"))) {
-            _tagCounters[doc.tags[i].name] = (_tagCounters[doc.tags[i].name] == null) ? 1 : _tagCounters[doc.tags[i].name] + 1;
+    var selectedUserOrGroup, map, dropdown = null;
+    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+      JSON_USERS_GROUPS = data;
+      dropdown = [];
+      map = {};
+
+      $.each(JSON_USERS_GROUPS.users, function (i, user) {
+        var _display = prettifyUsername(user.id);
+        map[_display] = user;
+        dropdown.push(_display);
+      });
+
+      $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+        map[group.name] = group;
+        dropdown.push(group.name);
+      });
+
+      $("#documentShareTypeahead").typeahead({
+        source: function (query, process) {
+          process(dropdown);
+        },
+        matcher: function (item) {
+          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+            return true;
           }
+        },
+        sorter: function (items) {
+          return items.sort();
+        },
+        highlighter: function (item) {
+          var _icon = "fa";
+          var _display = "";
+          if (map[item].hasOwnProperty("username")) {
+            _icon += " fa-user";
+          }
+          else {
+            _icon += " fa-users";
+          }
+          var regex = new RegExp('(' + this.query + ')', 'gi');
+          return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
+        },
+        updater: function (item) {
+          selectedUserOrGroup = map[item];
+          return item;
         }
-      }
-    });
-    $("#trashCounter").text(_tagCounters["trash"]);
-    $("#historyCounter").text(_tagCounters["history"]);
-    $("li[data-tag]").each(function () {
-      if (_tagCounters[$(this).data("tag")] != null) {
-        $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
-      }
-    });
-    _tagCounters = null;
-  }
+      });
 
-  updateTagCounters();
+      $("#documentShareTypeahead").on("keyup", function (e) {
+        var _code = (e.keyCode ? e.keyCode : e.which);
+        if (_code == 13) {
+          handleTypeaheadSelection();
+        }
+      });
 
-  if ($.totalStorage("hueHomeTags") == null){
-    if ($("li[data-tag='default']").length > 0){
-      $("li[data-tag='default']").click(); // for new users show default tag
-    }
-    else if ($("li[data-tag='example']").length > 0){
-      $("li[data-tag='example']").click(); // for new users show example tag if default is not available
+
+    });
+
+
+    viewModel.selectedTag.subscribe(function (value) {
+      $("#searchInput").val("");
+      $.totalStorage("hueHomeSelectedTag", value.id());
+    });
+
+    if ($.totalStorage("hueHomeSelectedTag") != null) {
+      var _preselectedTag = viewModel.getTagById($.totalStorage("hueHomeSelectedTag"));
+      if (_preselectedTag != null) {
+        viewModel.filterDocs(_preselectedTag);
+      }
     }
     else {
-      $(".viewHistory").click();
+      viewModel.filterDocs(viewModel.history());
     }
-  }
-  else {
-    if ($.totalStorage("hueHomeTags") == "history") {
-      $(".viewHistory").click();
-    }
-    else if ($.totalStorage("hueHomeTags") == "trash") {
-      $(".view-trash").click();
-    }
-    else {
-      $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
-    }
-  }
 
+    $("#searchInput").jHueDelayedInput(function () {
+      viewModel.searchDocs($("#searchInput").val());
+    });
 
-  $(document).on("click", ".documentTags", function () {
-    $("#documentTagsModal").data("document-id", $(this).data("document-id"));
-    renderDocumentTagsModal();
-  });
+    $("#tagsNewBtn").on("click", function () {
+      var tag_name = $("#tagsNew").val(); // use ko var + bind enable/disable button accordingly (blank, duplicate, reserved...)?
+      $.post("/desktop/api/tag/add_tag", {
+        name: tag_name
+      },function (data) {
+        viewModel.createTag(data);
+        $("#tagsNew").val("");
+        $(document).trigger("info", "${_('Project created')}");
+        $("#addTagModal").modal("hide");
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+      });
+    });
 
-  function renderTags() {
-    var _selected = "";
-    if ($(".toggle-tag.active").length > 0){
-      _selected = $(".toggle-tag.active").data("tag");
-    }
-    $(".toggle-tag").remove();
-    var _tagMineCnt = 0;
-    var _tagSharedCnt = 0;
-    for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
-      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
-        var _t = $("<li>").addClass("toggle-tag");
-        _t.attr("data-tag", JSON_TAGS[i].name);
-        _t.attr("data-ismine", JSON_TAGS[i].isMine);
-        _t.html('<a href="javascript:void(0)"><i class="fa fa-tag"></i> ' + JSON_TAGS[i].name + '<span class="tag-counter badge pull-right">0</span></a>');
-        if (JSON_TAGS[i].isMine){
-          _t.insertAfter(".tag-mine-header");
+    $("#documentShareAddBtn").on("click", function () {
+      handleTypeaheadSelection();
+    });
+
+    function handleTypeaheadSelection() {
+      if (selectedUserOrGroup != null) {
+        if (selectedUserOrGroup.hasOwnProperty("username")) {
+          viewModel.selectedDoc().perms.read.users.push(selectedUserOrGroup);
         }
         else {
-          _t.tooltip({
-            placement: "right",
-            title: "${_('Shared by')} " + JSON_TAGS[i].owner
-          });
-          _t.insertAfter(".tag-shared-header");
+          viewModel.selectedDoc().perms.read.groups.push(selectedUserOrGroup);
         }
+        viewModel.selectedDoc.valueHasMutated();
+        shareDocFinal();
       }
+      selectedUserOrGroup = null;
+      $("#documentShareTypeahead").val("");
     }
-    if (_selected != ""){
-      $(".toggle-tag[data-tag='"+_selected+"']").click();
-    }
-    updateTagCounters();
+
     $("a[rel='tooltip']").tooltip();
+
+  });
+
+  function addTag() {
+    $("#addTagModal").modal("show");
   }
 
-  function renderTagsModal() {
-    var _tags = "";
-    for (var i = 0; i < JSON_TAGS.length; i++) {
-      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;">' + 
-            '<span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '" data-ismine="' + JSON_TAGS[i].isMine + '">' +
-            '<i class="fa fa-trash-o hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
-      }
-    }
-    $("#tagsModalList").html(_tags);
+  function removeTag() {
+    viewModel.selectedTagForDelete(viewModel.selectedTag());
+    $("#removeTagModal").modal("show");
   }
 
-  function renderDocumentTagsModal() {
-    var _doc = getDocById($("#documentTagsModal").data("document-id"));
-    if (_doc != null) {
-      $("#documentTagsModalList").empty();
-      $("#documentTagsModalName").text(_doc.name);
-      var _tags = "";
-      for (var i = 0; i < JSON_TAGS.length; i++) {
-        if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-          var _inTags = isInTags(_doc, JSON_TAGS[i].name);
-          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' +
-              (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id +
-              '" data-ismine="' + JSON_TAGS[i].isMine + '">' +
-              '<i class="fa fa-check-circle' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
+  function removeTagFinal() {
+    var tag = viewModel.selectedTagForDelete();
+    $.post("/desktop/api/tag/remove_tag", {
+      tag_id: tag.id()
+    }, function (response) {
+      if (response != null) {
+        if (response.status == 0) {
+          $(document).trigger("info", response.message);
+          $("#removeTagModal").modal("hide");
+          viewModel.deleteTag(tag);
+          viewModel.filterDocs(viewModel.history());
+        }
+        else {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
       }
-      $("#documentTagsModalList").html(_tags);
-      $("#documentTagsModal").modal("show");
-    }
-  }
-
-  $("#documentTagsModal").modal({
-    show: false
-  });
-
-  $("#tagsModal").modal({
-    show: false
-  });
-
-  $("#documentShareModal").modal({
-    show: false
-  });
-
-  $("#documentTagsNewBtn").on("click", function () {
-    addTag($("#documentTagsNew").val(), function () {
-      $("#documentTagsNew").val("");
-      renderDocumentTagsModal();
-    });
-  });
-
-  $("#tagsNewBtn").on("click", function () {
-    addTag($("#tagsNew").val(), function () {
-      $("#tagsNew").val("");
-      renderTagsModal();
-    });
-  });
-
-
-  function addTag(value, callback) {
-    $.post("/desktop/api/tag/add_tag", {
-      name: value
-    }, function (data) {
-      $("#documentTagsNew").val("");
-      $.getJSON("/desktop/api/tag/list_tags", function (data) {
-        JSON_TAGS = data;
-        renderTags();
-        callback();
-      })
     });
   }
 
-  $(document).on("click", ".document-tags-modal-checkbox", function () {
-    var _this = $(this);
-    if (_this.hasClass("selected")) {
-      _this.removeClass("selected").removeClass("badge-info");
-      _this.find(".fa-check-circle").addClass("hide");
-    }
-    else {
-      _this.addClass("selected").addClass("badge-info");
-      _this.find(".fa-check-circle").removeClass("hide");
-    }
-  });
+  function moveDoc(doc) {
+    viewModel.selectedDoc(doc);
+    $("#documentMoveModal").modal("show");
+  }
 
-
-  $(".edit-tags").on("click", function () {
-    renderTagsModal();
-    $("#tagsModal").modal("show");
-  });
-
-  $(document).on("click", ".tags-modal-checkbox", function () {
-    var _this = $(this);
-    if (_this.hasClass("selected")) {
-      _this.removeClass("selected").removeClass("badge-important");
-      _this.find(".fa-trash-o").addClass("hide");
-    }
-    else {
-      _this.addClass("selected").addClass("badge-important");
-      _this.find(".fa-trash-o").removeClass("hide");
-    }
-  });
-
-  $("#saveDocumentTags").on("click", function () {
-    $(this).attr("data-loading-text", $(this).text() + " ...");
-    $(this).button("loading");
-    var _tags = [];
-    $(".document-tags-modal-checkbox.selected").each(function () {
-      var _this = $(this);
-      _tags.push(_this.data("value"));
-    });
+  function moveDocFinal(tag) {
     $.post("/desktop/api/doc/update_tags", {
       data: JSON.stringify({
-        doc_id: $("#documentTagsModal").data("document-id"),
-        tag_ids: _tags
+        doc_id: viewModel.selectedDoc().id,
+        tag_ids: [tag.id()]
       })
     }, function (response) {
       if (response.doc != null) {
-        $(document).trigger("info", "${ _("Projects updated successfully.") }");
-        var _doc = response.doc;
-        var _dtNodes = documentsTable.fnGetNodes();
-        $(_dtNodes).each(function (iNode, node) {
-          if ($(node).children("td").eq(3).find(".documentTags").data("document-id") == _doc.id) {
-            var _tags = "";
-            for (var i = 0; i < _doc.tags.length; i++) {
-              _tags += '<span class="badge">' + _doc.tags[i].name + '</span> ';
-            }
-            documentsTable.fnUpdate('<div class="documentTags" data-document-id="' + _doc.id + '">' + _tags + '</div>', node, 3, false);
-            updateDoc(_doc);
-            $("#saveDocumentTags").button("reset");
-            renderTags();
-          }
-        });
+        $(document).trigger("info", "${ _("Project updated successfully.") }");
+        viewModel.updateDoc(response.doc);
       }
-      $("#documentTagsModal").modal("hide");
+      $("#documentMoveModal").modal("hide");
     })
-  });
+  }
 
-  $("#removeTags").on("click", function () {
-    $(this).attr("data-loading-text", $(this).text() + " ...");
-    $(this).button("loading");
-    var _tags = [];
-    $(".tags-modal-checkbox.selected").each(function () {
-      var _this = $(this);
-      _tags.push(_this.data("value"));
-    });
-    $.post("/desktop/api/tag/remove_tags", {
-      data: JSON.stringify({
-        tag_ids: _tags
-      })
-    }, function (response) {
-        if (response!=null){
-          if (response.status == 0){
-            $(document).trigger("info", response.message);
-            $.getJSON("/desktop/api/tag/list_tags", function (data) {
-              JSON_TAGS = data;
-              renderTags();
-              renderTagsModal();
-              renderDocs(function () {
-                $("#removeTags").button("reset");
-                $("#tagsModal").modal("hide");
-              });
-            });
-          }
-          else {
-            $(document).trigger("error", "${_("There was an error processing your action: ")}"+response.message);
-          }
-        }
-    });
-  });
+  function shareDoc(doc) {
+    viewModel.selectedDoc(doc);
+    $("#documentShareModal").modal("show");
+  }
 
-  $(document).on("click", ".shareDocument", function () {
-    var _doc = getDocById($(this).data("document-id"));
-    if (_doc != null) {
-      if (_doc.perms != null && _doc.perms.read != null){
-        if (_doc.perms.read.users != null){
-          for (var i=0; i < _doc.perms.read.users.length; i++){
-            addToShareList(map[_doc.perms.read.users[i].username]);
-          }
-        }
-        if (_doc.perms.read.groups != null){
-          for (var i=0; i < _doc.perms.read.groups.length; i++){
-            addToShareList(map[_doc.perms.read.groups[i].name]);
-          }
-        }
+  function removeUserShare(user) {
+    $(viewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
+      if (item.id == user.id) {
+        viewModel.selectedDoc().perms.read.users.splice(cnt, 1);
       }
-      $("#documentShareModal").data("document-id", _doc.id);
-      $("#documentShareAdd").val("");
-      $("#documentShareModalName").text(_doc.name);
-      renderShareList();
-      $("#documentShareModal").modal("show");
-    }
-  });
-
-  $("#documentShareAddBtn").on("click", function () {
-    handleTypeaheadSelection();
-  });
-
-  function handleTypeaheadSelection() {
-    if (selectedUserOrGroup != null) {
-      addToShareList(selectedUserOrGroup);
-      renderShareList();
-    }
-    selectedUserOrGroup = null;
-    $("#documentShareAdd").val("");
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
   }
 
-  var shareList = {};
-
-  function addToShareList(item) {
-    shareList[item.id] = item;
-  }
-
-  function renderShareList() {
-    var _html = "";
-    for (var id in shareList) {
-      if (shareList.hasOwnProperty(id)) {
-        var _obj = shareList[id];
-        var _icon = _obj.username != null ? "fa fa-user" : "fa fa-group";
-        var _label = _obj.username != null ? _obj.username : _obj.name;
-        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trash-share"><i class="fa fa-trash-o"></i></span></li>';
+  function removeGroupShare(group) {
+    $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
+      if (item.id == group.id) {
+        viewModel.selectedDoc().perms.read.groups.splice(cnt, 1);
       }
-    }
-    if (_html != "") {
-      $("#documentShareList").removeClass("hide").empty();
-      $("#documentShareList").html(_html);
-      $("#documentShareNoShare").addClass("hide");
-    }
-    else {
-      $("#documentShareList").addClass("hide");
-      $("#documentShareNoShare").removeClass("hide");
-    }
+    });
+    viewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
   }
 
-  $(document).on("click", ".trash-share", function () {
-    delete shareList[$(this).parent().data("object-id")];
-    renderShareList();
-  });
-
-  $("#saveDocumentShare").on("click", function () {
+  function shareDocFinal() {
     var _postPerms = {
       read: {
         user_ids: [],
@@ -714,129 +580,28 @@ $(document).ready(function () {
       }
     }
 
-    for (var id in shareList) {
-      if (shareList.hasOwnProperty(id)) {
-        var _obj = shareList[id];
-        if (_obj.username != null) {
-          _postPerms.read.user_ids.push(id);
-        }
-        else {
-          _postPerms.read.group_ids.push(id);
-        }
-      }
-    }
+    $(viewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
+      _postPerms.read.user_ids.push(item.id);
+    });
+
+    $(viewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
+      _postPerms.read.group_ids.push(item.id);
+    });
 
     $.post("/desktop/api/doc/update_permissions", {
-        doc_id: $("#documentShareModal").data("document-id"),
-        data: JSON.stringify(_postPerms)
-      }, function (response) {
-      $("#documentShareModal").modal("hide");
-      if (response!=null){
-        if (response.status == 0){
-          $(document).trigger("info", response.message);
-          updateDoc(response.doc);
+      doc_id: viewModel.selectedDoc().id,
+      data: JSON.stringify(_postPerms)
+    }, function (response) {
+      if (response != null) {
+        if (response.status != 0) {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
         else {
-          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+          viewModel.updateDoc(response.doc);
         }
       }
     });
-  });
-
-});
-
-function renderDocs(callback) {
-  $.getJSON("/desktop/api/doc/list_docs", function (data) {
-    JSON_DOCS = data;
-    populateTable();
-    if (callback != null) {
-      callback();
-    }
-  });
-}
-
-function isInTags(doc, tag) {
-  if (doc.tags == null) {
-    return false;
   }
-  var _inTags = false;
-  for (var i = 0; i < doc.tags.length; i++) {
-    if (doc.tags[i].name == tag) {
-      _inTags = true;
-    }
-  }
-  return _inTags;
-}
-
-function populateTable(tag, isMine) {
-  if (tag == null || tag == "") {
-    tag = "default"; // force default tag in case of empty
-  }
-  if (isMine === undefined ) {
-    isMine = true; // default owner is current user
-  }
-
-  $.totalStorage("hueHomeTags", tag);
-  documentsTable.fnClearTable();
-  documentsTable.fnDraw();
-
-  $(JSON_DOCS).each(function (cnt, doc) {
-    // Need to simplify this
-    if (isMine == doc.isMine && ((tag == ("trash") || tag == "history") || (tag != "trash" && tag != "history" && !isInTags(doc, "trash") && !isInTags(doc, "history"))) && isInTags(doc, tag)) {
-      addRow(doc);
-    }
-  });
-  documentsTable.fnDraw();
-  $("a[rel='tooltip']").tooltip();
-}
-
-function addRow(doc) {
-  try {
-    var _tags = "";
-    for (var i = 0; i < doc.tags.length; i++) {
-      _tags += '<span class="badge">' + doc.tags[i].name + '</span> ';
-    }
-    var _addedRow = documentsTable.fnAddData([
-      '<img src="' + doc.icon + '" width="80%"/>',
-      '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
-      emptyStringIfNull(doc.description),
-      doc.isMine ? '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>' : '<div class="documentTags">' + _tags + '</div>',
-      emptyStringIfNull(doc.owner),
-      emptyStringIfNull(doc.lastModified),
-      doc.isMine ? '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' +
-        doc.name + '" data-placement="left" style="padding-left:10px"><i class="fa fa-share-square-o"></i></a>' : '<i class="fa fa-user"></i>',
-    ], false);
-    $("td", documentsTable.fnGetNodes(_addedRow[0]))[5].setAttribute("data-sort-value", doc.lastModifiedInMillis); // a bit of black magic.
-  }
-  catch (error) {
-    $(document).trigger("error", error);
-  }
-}
-
-function getDocById(id) {
-  var _doc = null;
-  $(JSON_DOCS).each(function (cnt, doc) {
-    if (doc.id == id) {
-      _doc = doc;
-    }
-  });
-  return _doc;
-}
-
-function updateDoc(updatedDoc) {
-  $(JSON_DOCS).each(function (cnt, doc) {
-    if (doc.id == updatedDoc.id) {
-      JSON_DOCS[cnt] = updatedDoc;
-    }
-  });
-}
-
-function emptyStringIfNull(obj) {
-  if (obj != null && typeof obj != "undefined") {
-    return obj;
-  }
-  return "";
-}
 </script>
 
 

@@ -39,7 +39,7 @@ def list_docs(request):
       Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
   )
   docs = list(docs)
-  return HttpResponse(json.dumps(massaged_documents_for_json(docs, request.user)), mimetype="application/json")
+  return HttpResponse(json.dumps(massaged_documents_for_json_old(docs, request.user)), mimetype="application/json")
 
 
 def list_tags(request):
@@ -49,9 +49,9 @@ def list_tags(request):
   )
   docs = list(docs)
   tags = list(set([tag for doc in docs for tag in doc.tags.all()] + [tag for tag in DocumentTag.objects.get_tags(user=request.user)])) # List of all personal and share tags
-  return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
+  return HttpResponse(json.dumps(massaged_tags_for_json_old(tags, request.user)), mimetype="application/json")
 
-def massaged_tags_for_json2(docs, user):
+def massaged_tags_for_json(docs, user):
   """
     var TAGS_DEFAULTS = {
     'history': {'name': 'History', 'id': 1, 'docs': [1], 'type': 'history'},
@@ -103,7 +103,7 @@ def massaged_tags(tag, tag_doc_mapping):
     'docs': [doc.id for doc in tag_doc_mapping[tag]] # Could get with one request groupy
   }
 
-def massaged_documents_for_json2(documents, user):
+def massaged_documents_for_json(documents, user):
   """
   var DOCUMENTS_DEFAULTS = {
     '1': {
@@ -160,7 +160,7 @@ def massaged_documents_for_json2(documents, user):
   return docs
 
 
-def massage_doc_for_json2(doc):
+def massage_doc_for_json(doc):
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -174,11 +174,11 @@ def massage_doc_for_json2(doc):
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
 
-def massaged_documents_for_json(documents, user):
+def massaged_documents_for_json_old(documents, user):
   return [massage_doc_for_json(doc, user) for doc in documents]
 
 
-def massage_doc_for_json(doc, user):
+def massage_doc_for_json_old(doc, user):
   perms = doc.list_permissions()
   return {
       'id': doc.id,
@@ -200,7 +200,7 @@ def massage_doc_for_json(doc, user):
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
 
-def massaged_tags_for_json(tags, user):
+def massaged_tags_for_json_old(tags, user):
   ts = []
   trash = DocumentTag.objects.get_trash_tag(user)
   history = DocumentTag.objects.get_history_tag(user)
