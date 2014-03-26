@@ -148,7 +148,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                        title="${ _('Remove selected project') }" rel="tooltip" data-placement="right"></i>
              </div>
            </li>
-           <!-- ko template: { name: 'tag-template', foreach: myTags } -->
+           <!-- ko template: { name: 'tag-template', foreach: nyTags } -->
            <!-- /ko -->
            <li data-bind="visible: myTags().length == 0">
              <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
@@ -539,9 +539,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         tag_ids: [tag.id()]
       })
     }, function (response) {
-      if (response.doc != null) {
-        $(document).trigger("info", "${ _("Project updated successfully.") }");
-        viewModel.updateDoc(response.doc);
+      if (response != null){
+        if (response.status != 0) {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+        }
+        else {
+          $(document).trigger("info", "${ _("Project updated successfully.") }");
+          viewModel.updateDoc(response.doc);
+        }
       }
       $("#documentMoveModal").modal("hide");
     })

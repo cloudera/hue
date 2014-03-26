@@ -160,7 +160,7 @@ def massaged_documents_for_json(documents, user):
   return docs
 
 
-def massage_doc_for_json(doc):
+def massage_doc_for_json_new(doc):
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -178,7 +178,7 @@ def massaged_documents_for_json_old(documents, user):
   return [massage_doc_for_json(doc, user) for doc in documents]
 
 
-def massage_doc_for_json_old(doc, user):
+def massage_doc_for_json(doc, user):
   perms = doc.list_permissions()
   return {
       'id': doc.id,
@@ -190,12 +190,12 @@ def massage_doc_for_json_old(doc, user):
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
       'perms': {
         'read': {
-          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
-          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in perms.groups.all()]
         }
       },
       'owner': doc.owner.username,
-      'isMine': doc.owner.username == user.username,
+      'isMine': doc.owner.username == user.username and True or False,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }

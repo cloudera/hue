@@ -138,6 +138,21 @@ function HomeViewModel(json_tags, json_docs) {
     $.each(ALL_DOCUMENTS, function (id, iDoc) {
       if (iDoc.id == doc.id) {
         ALL_DOCUMENTS[id] = doc;
+
+        $(self.tags.mine()).each(function (iCnt, tag) {
+          var _removeDocFromTag = true;
+          $(doc.tags).each(function (cnt, item) {
+            if (tag.id() == item.id && tag.docs().indexOf(doc.id) == -1) {
+              tag.docs().push(doc.id);
+            }
+            if (tag.docs().indexOf(doc.id) > -1 && tag.id() == item.id) {
+              _removeDocFromTag = false;
+            }
+          });
+          if (_removeDocFromTag) {
+            tag.docs().splice(tag.docs().indexOf(doc.id), 1);
+          }
+        });
       }
     });
     self.filterDocs(self.selectedTag());
