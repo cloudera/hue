@@ -101,7 +101,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   </div>
 </div>
 
-<div class="card card-toolbar" data-bind="slideVisible: isEditing">TOOLBAR</div>
+<div class="card card-toolbar" data-bind="slideVisible: isEditing">TOOLBAR <a href="javascript: addBar()">Add bar widget</a></div>
 
 <div class="dashboard">
   <div class="container-fluid">
@@ -147,29 +147,66 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     </h2>
     <div class="card-body">
       <p>
-        The widget content.
+        <div data-bind="template: { name: function() { return widgetType(); }, data: properties }"></div>
       </p>
     </div>
   </div>
 </script>
 
+<script type="text/html" id="empty-widget">
+  Hic sunt leones.
+</script>
 
+<script type="text/html" id="resultset-widget">
+  This is the resultset widget
+</script>
+
+<script type="text/html" id="timeline-widget">
+  This is the TIMELINE widget
+</script>
+
+<script type="text/html" id="bar-widget">
+  This is the bar widget
+  <div id="barsample"></div>
+</script>
+
+<script type="text/html" id="pie-widget">
+  This is the pie widget
+</script>
+
+<script type="text/html" id="map-widget">
+  This is the map widget
+</script>
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 
+<link href="/static/ext/css/leaflet.css" rel="stylesheet">
+
+<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.blueprint.js"></script>
+
 <script type="text/javascript">
+
+  var d1 = [];
+		for (var i = 0; i < 14; i += 0.5) {
+			d1.push([i, Math.sin(i)]);
+		}
+  var d6 = [];
+  for (var i = 0; i < 14; i += 0.5 + Math.random()) {
+    d6.push([i, Math.sqrt(2*i + Math.sin(i) + 5)]);
+  }
 
   ko.bindingHandlers.slideVisible = {
     init: function(element, valueAccessor) {
-        // Initially set the element to be instantly visible/hidden depending on the value
         var value = valueAccessor();
-        $(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+        $(element).toggle(ko.unwrap(value));
     },
     update: function(element, valueAccessor) {
-        // Whenever the value subsequently changes, slowly fade the element in or out
         var value = valueAccessor();
         ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
     }
@@ -233,11 +270,14 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     }
   }
 
-  var Widget = function (size, name, offset) {
+  var Widget = function (size, name, type, properties, offset) {
     var self = this;
     self.name = ko.observable(name);
     self.size = ko.observable(size);
     self.offset = ko.observable(typeof offset != "undefined" && offset!=null? offset: 0);
+    self.widgetType = ko.observable(typeof type != "undefined" && type!=null? type: "empty-widget");
+    self.properties = ko.observable(typeof properties != "undefined" && properties!=null? properties: {});
+
     self.klass = ko.computed(function(){
       return "card card-widget span" + self.size() + (self.offset() > 0?" offset" + self.offset():"");
     });
@@ -294,10 +334,27 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     viewModel.columns(_cols);
   }
 
+  function addBar(){
+    var w = new Widget(6, "Paiiiiii", "bar-widget");
+    viewModel.columns()[1].rows()[1].addWidget(w);
+    $("#barsample").jHueBlueprint({
+    data: d6,
+    type: $.jHueBlueprint.TYPES.BARCHART,
+    color: $.jHueBlueprint.COLORS.GREEN,
+    fill: true
+  });
+  $("#barsample").jHueBlueprint("add", {
+    data: d1,
+    type: $.jHueBlueprint.TYPES.BARCHART,
+    color: $.jHueBlueprint.COLORS.ORANGE,
+    fill: false
+  });
+  }
+
   $(document).ready(function () {
     var _wid = [];
-    _wid.push(new Widget(4, "Hello world"));
-    _wid.push(new Widget(4, "Hello world 2 "));
+    _wid.push(new Widget(4, "Hello world", "timeline-widget"));
+    _wid.push(new Widget(4, "Hello world 2 ", "resultset-widget"));
 
     leftColumnLayout();
     viewModel.columns()[0].addRow(new Row([new Widget(12, "moo")]));
@@ -305,6 +362,8 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
     viewModel.columns()[1].addRow();
     viewModel.columns()[1].rows()[0].widgets(_wid);
+
+
   });
 </script>
 
