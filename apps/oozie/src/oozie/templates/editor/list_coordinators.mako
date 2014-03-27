@@ -292,6 +292,9 @@ ${ layout.menubar(section='coordinators') }
           "sNext":"${_('Next')}",
           "sPrevious":"${_('Previous')}"
         }
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
 

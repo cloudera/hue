@@ -96,15 +96,19 @@ ${ layout.menubar(section='history') }
                 "sNext":     "${_('Next')}",
                 "sPrevious": "${_('Previous')}"
             }
-         }
-      });
-
-      $("#filterInput").keyup(function() {
-         oTable.fnFilter($(this).val());
-      });
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
+      }
     });
 
-  $("a[data-row-selector='true']").jHueRowSelector();
+    $("#filterInput").keyup(function() {
+       oTable.fnFilter($(this).val());
+    });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }
