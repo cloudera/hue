@@ -95,6 +95,9 @@ def index(request):
     'json': json,
   })
 
+def dashboard(request):
+  return render('dashboard.mako', request, {})
+
 
 def download(request, format):
   hue_collections = SearchController(request.user).get_search_collections()

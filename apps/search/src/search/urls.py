@@ -22,6 +22,8 @@ urlpatterns = patterns('search.views',
   url(r'^query$', 'index', name='query'),
   url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
 
+  url(r'^dashboard$', 'dashboard', name='dashboard'),
+
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
   url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),
 
