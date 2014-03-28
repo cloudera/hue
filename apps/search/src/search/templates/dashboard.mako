@@ -60,6 +60,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
   .card-column {
     border: none;
+    min-height: 400px!important;
   }
 
   .card-widget {
@@ -77,6 +78,44 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     background-color: #F6F6F6;
     display: inline;
     padding: 4px;
+  }
+
+  #emptyHint {
+    position: absolute;
+    right: 14px;
+    top: 80px;
+    color: #666;
+    font-size: 20px;
+  }
+
+  .preview-row {
+    background-color: #DDD;
+    min-height: 400px!important;
+    margin-top: 30px;
+  }
+
+  .draggable-widget {
+    width: 100px;
+    text-align: center;
+    float: left;
+    border: 1px solid #CCC;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: move;
+  }
+  .draggable-widget a {
+    font-size: 58px;
+    line-height: 76px;
+    cursor: move;
+  }
+
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
 </style>
@@ -101,9 +140,51 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   </div>
 </div>
 
-<div class="card card-toolbar" data-bind="slideVisible: isEditing">TOOLBAR <a href="javascript: addBar()">Add bar widget</a></div>
+<div class="card card-toolbar" data-bind="slideVisible: isEditing">
+  <div style="float: left">
+    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
+    <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdleft.png" /></a>
+    <a href="javascript: halfLayout()" onmouseover="viewModel.previewColumns('half')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_half.png" /></a>
+    <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a>
+    <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_full.png" /></a>
+  </div>
 
-<div class="dashboard">
+  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
+    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('WIDGETS')}</div>
+    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Field Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tasks"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-bar-chart-o"></i></a></div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+
+<div id="emptyHint" data-bind="visible: !isEditing() && columns().length == 0">
+  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Click on the pencil to get started with your dashboard!')}</div>
+  <img src="/search/static/art/hint_arrow.png" />
+</div>
+
+<div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0">
+  <div class="container-fluid">
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
+      <div class="span3 preview-row"></div>
+      <div class="span9 preview-row"></div>
+    </div>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'half'">
+      <div class="span6 preview-row"></div>
+      <div class="span6 preview-row"></div>
+    </div>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdRight'">
+      <div class="span9 preview-row"></div>
+      <div class="span3 preview-row"></div>
+    </div>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
+      <div class="span12 preview-row">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div data-bind="css: {'dashboard': true, 'unselectable': isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
@@ -131,7 +212,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-trash-o"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, dragged: tempBarChart}">
     </div>
   </div>
 </script>
@@ -156,6 +237,11 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 <script type="text/html" id="empty-widget">
   Hic sunt leones.
 </script>
+
+<script type="text/html" id="facet-widget">
+  This is the facet widget
+</script>
+
 
 <script type="text/html" id="resultset-widget">
   This is the resultset widget
@@ -193,31 +279,54 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 <script type="text/javascript">
 
   var d1 = [];
-		for (var i = 0; i < 14; i += 0.5) {
-			d1.push([i, Math.sin(i)]);
-		}
+  for (var i = 0; i < 14; i += 0.5) {
+    d1.push([i, Math.sin(i)]);
+  }
   var d6 = [];
   for (var i = 0; i < 14; i += 0.5 + Math.random()) {
-    d6.push([i, Math.sqrt(2*i + Math.sin(i) + 5)]);
+    d6.push([i, Math.sqrt(2 * i + Math.sin(i) + 5)]);
   }
 
+  function tempBarChart() {
+    window.setTimeout(function () {
+      $("#barsample").jHueBlueprint({
+        data: d6,
+        type: $.jHueBlueprint.TYPES.BARCHART,
+        color: $.jHueBlueprint.COLORS.GREEN,
+        fill: true
+      });
+      $("#barsample").jHueBlueprint("add", {
+        data: d1,
+        type: $.jHueBlueprint.TYPES.BARCHART,
+        color: $.jHueBlueprint.COLORS.ORANGE,
+        fill: false
+      });
+
+    }, 50)
+  }
+
+
   ko.bindingHandlers.slideVisible = {
-    init: function(element, valueAccessor) {
-        var value = valueAccessor();
-        $(element).toggle(ko.unwrap(value));
+    init: function (element, valueAccessor) {
+      var value = valueAccessor();
+      $(element).toggle(ko.unwrap(value));
     },
-    update: function(element, valueAccessor) {
-        var value = valueAccessor();
-        ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
+    update: function (element, valueAccessor) {
+      var value = valueAccessor();
+      ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
     }
-};
+  };
 
 
   var DashBoardViewModel = function () {
     var self = this;
+    self.previewColumns = ko.observable("");
     self.columns = ko.observableArray([]);
     self.isEditing = ko.observable(true);
-    self.toggleEditing = function() {
+    self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
+    self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
+    self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
+    self.toggleEditing = function () {
       self.isEditing(!self.isEditing());
     };
   }
@@ -229,11 +338,11 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     self.klass = ko.computed(function () {
       return "card card-home card-column span" + self.size();
     });
-    self.addEmptyRow = function() {
+    self.addEmptyRow = function () {
       self.addRow();
     };
     self.addRow = function (row) {
-      if (typeof row == "undefined" || row == null){
+      if (typeof row == "undefined" || row == null) {
         row = new Row([]);
       }
       self.rows.push(row);
@@ -248,71 +357,84 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
       self.widgets.push(widget);
     };
 
-    self.move = function (from, to){
+    self.move = function (from, to) {
       try {
         viewModel.columns()[to].addRow(self);
         viewModel.columns()[from].rows.remove(self);
       }
-      catch (exception){}
+      catch (exception) {
+      }
     }
 
-    self.moveDown = function (){
-
-    }
-
-    self.moveUp = function (){
+    self.moveDown = function () {
 
     }
 
-    self.remove = function (col, row){
+    self.moveUp = function () {
+
+    }
+
+    self.remove = function (col, row) {
       col.rows.remove(row);
       console.log(row);
     }
   }
 
-  var Widget = function (size, name, type, properties, offset) {
+  var Widget = function (size, name, widgetType, properties, offset) {
     var self = this;
-    self.name = ko.observable(name);
     self.size = ko.observable(size);
-    self.offset = ko.observable(typeof offset != "undefined" && offset!=null? offset: 0);
-    self.widgetType = ko.observable(typeof type != "undefined" && type!=null? type: "empty-widget");
-    self.properties = ko.observable(typeof properties != "undefined" && properties!=null? properties: {});
+    self.name = ko.observable(name);
+    self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
+    self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
+    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0);
 
-    self.klass = ko.computed(function(){
-      return "card card-widget span" + self.size() + (self.offset() > 0?" offset" + self.offset():"");
+    self.klass = ko.computed(function () {
+      return "card card-widget span" + self.size() + (self.offset() > 0 ? " offset" + self.offset() : "");
     });
 
-    self.expand = function(){
+    self.expand = function () {
       self.size(self.size() + 1);
     }
-    self.compress = function(){
-      self.size(self.size() -1);
+    self.compress = function () {
+      self.size(self.size() - 1);
     }
 
-    self.moveLeft = function(){
+    self.moveLeft = function () {
       self.offset(self.offset() - 1);
     }
-    self.moveRight = function(){
+    self.moveRight = function () {
       self.offset(self.offset() + 1);
     }
   }
+
+  Widget.prototype.clone = function () {
+    return new Widget(this.size(), this.name(), this.widgetType());
+  };
 
   var viewModel = new DashBoardViewModel()
   ko.applyBindings(viewModel);
 
 
-  function oneColumnLayout() {
+  function fullLayout() {
     setLayout([12]);
   }
 
-  function leftColumnLayout() {
+  function halfLayout() {
+    setLayout([6, 6]);
+  }
+
+  function oneThirdLeftLayout() {
     setLayout([3, 9]);
+  }
+
+  function oneThirdRightLayout() {
+    setLayout([9, 3]);
   }
 
   function setLayout(colSizes) {
     // save previous widgets
     var _allRows = [];
-    $(viewModel.columns()).each(function (cnt, col){
+    $(viewModel.columns()).each(function (cnt, col) {
       _allRows = _allRows.concat(col.rows());
     });
 
@@ -321,34 +443,17 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
       idx: -1,
       size: -1
     };
-    $(colSizes).each(function (cnt, size){
+    $(colSizes).each(function (cnt, size) {
       _cols.push(new Column(size, []));
-      if (size > _highestCol.size){
+      if (size > _highestCol.size) {
         _highestCol.idx = cnt;
         _highestCol.size = size;
       }
     });
-    if (_allRows.length > 0 && _highestCol.idx > -1){
+    if (_allRows.length > 0 && _highestCol.idx > -1) {
       _cols[_highestCol.idx].rows(_allRows);
     }
     viewModel.columns(_cols);
-  }
-
-  function addBar(){
-    var w = new Widget(6, "Paiiiiii", "bar-widget");
-    viewModel.columns()[1].rows()[1].addWidget(w);
-    $("#barsample").jHueBlueprint({
-    data: d6,
-    type: $.jHueBlueprint.TYPES.BARCHART,
-    color: $.jHueBlueprint.COLORS.GREEN,
-    fill: true
-  });
-  $("#barsample").jHueBlueprint("add", {
-    data: d1,
-    type: $.jHueBlueprint.TYPES.BARCHART,
-    color: $.jHueBlueprint.COLORS.ORANGE,
-    fill: false
-  });
   }
 
   $(document).ready(function () {
@@ -356,12 +461,12 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     _wid.push(new Widget(4, "Hello world", "timeline-widget"));
     _wid.push(new Widget(4, "Hello world 2 ", "resultset-widget"));
 
-    leftColumnLayout();
-    viewModel.columns()[0].addRow(new Row([new Widget(12, "moo")]));
-
-
-    viewModel.columns()[1].addRow();
-    viewModel.columns()[1].rows()[0].widgets(_wid);
+    ##    leftColumnLayout();
+    ##    viewModel.columns()[0].addRow(new Row([new Widget(12, "moo")]));
+    ##
+    ##
+    ##    viewModel.columns()[1].addRow();
+    ##    viewModel.columns()[1].rows()[0].widgets(_wid);
 
 
   });
