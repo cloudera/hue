@@ -35,7 +35,7 @@ DEFAULT_USER = 'hue'
 
 
 def utf_quoter(what):
-  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
+  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
 
 class SolrApi(object):
@@ -92,39 +92,41 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   #@demo_handler
-  def query2(self, solr_query, dd):
+  def query2(self, solr_query, collection):
+    params = self._get_params() + (
+        ('q', solr_query['q'] or EMPTY_QUERY.get()),
+        ('wt', 'json'),
+        ('rows', solr_query['rows']),
+        ('start', solr_query['start']),
+    )
 
-      params = self._get_params() + (
-          ('q', solr_query['q'] or EMPTY_QUERY.get()),
-          ('wt', 'json'),
-          ('rows', solr_query['rows']),
-          ('start', solr_query['start']),
+    if collection['facets']:
+      params += (
+        ('facet', 'true'),
+        ('facet.mincount', 0),
+        ('facet.limit', 10),
+        ##('facet.sort', properties.get('sort')),
       )
+      params += tuple([('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])) for facet in collection['facets']])
 
-      #params += hue_core.get_query(solr_query)
-      if dd:
-        params += (
-          ('facet', 'true'),
-          ('facet.mincount', 0),
-          ('facet.limit', 10),
-          ##('facet.sort', properties.get('sort')),
-        )
-        # {!ex=dt}
-        params += tuple([('facet.field', '{!ex=%s}%s' % (d['field'], d['field'])) for d in dd])
+    fqs = solr_query['fq']
+    for fq, val in fqs.iteritems():
+      params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq, fq, val)))),)
 
+#    if collection['fields']:
+      # If we do this, need to parse the template and fill up the fields list
+      #params += (('fl', urllib.unquote(utf_quoter(','.join(collection['fields'])))),)
+    params += (('fl', '*'),)
+    # To parameterize
+    params += (
+      ('hl', 'true'),
+      ('hl.fl', '*'),
+      ('hl.snippets', 3)
+    )
 
-      fqs = solr_query['fq'] #.split('|')
-      print 'fq'
-      print fqs
-      for fq, val in fqs.iteritems():
-        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:%s' % (fq, fq, val)))),)
+    response = self._root.get('%(collection)s/select' % solr_query, params)
 
-      if solr_query.get('fl'):
-        params += (('fl', urllib.unquote(utf_quoter(','.join(solr_query['fl'])))),)
-
-      response = self._root.get('%(collection)s/select' % solr_query, params)
-
-      return self._get_json(response)
+    return self._get_json(response)
 
 
   def suggest(self, solr_query, hue_core):
@@ -205,3 +207,24 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def luke(self, core):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
+      return self._get_json(response)    
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def schema_fields(self, core):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
+      return self._get_json(response)    
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+    

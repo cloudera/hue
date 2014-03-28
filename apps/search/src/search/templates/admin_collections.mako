@@ -142,7 +142,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/collections.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 

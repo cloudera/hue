@@ -18,6 +18,7 @@
 import itertools
 import json
 import logging
+import math
 import re
 
 from django.db import models
@@ -205,6 +206,12 @@ class CollectionManager(models.Manager):
     try:
       return self.get(name=name), False
     except Collection.DoesNotExist:
+#      id_field = ''
+#      schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)      
+#      for name, props in schema_fields['schema']['fields'].iteritems():
+#        if props['stored'] and props['required'] and props['multiValued']:
+#          id_field = name
+
       facets = Facet.objects.create(data=json.dumps({
                    'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
                    'ranges': [],
@@ -256,7 +263,6 @@ em {
 
 
 class Collection(models.Model):
-  # Perms coming with https://issues.cloudera.org/browse/HUE-950
   enabled = models.BooleanField(default=True)
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
@@ -273,6 +279,28 @@ class Collection(models.Model):
 
   objects = CollectionManager()
 
+  def get_c(self, user):
+    TEMPLATE = {
+      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": ["body"],
+      "properties": {"highlighting_enabled": True},
+      "template": "{{user_screen_name}} {{user_name}} {{text}}", "isGridLayout": True,
+      "fields": ["user_screen_name", "user_name", "text"]
+    };
+    FACETS = {"dates": [], "fields": [{
+         "uuid": "f6618a5c-bbba-2886-1886-bbcaf01409ca", "verbatim": "", "isVerbatim": False, "label": "Location", 
+         "field": "to", "type": "field"
+       }
+       ],
+       "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
+    };  
+  
+    m = {
+      'id': self.id, 'name': self.name, 'template': TEMPLATE, 'facets': FACETS['fields'], 
+      'fields': self.fields(user)
+    };
+    
+    return json.dumps(m)
+
   def get_query(self, client_query=None):
     return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params(client_query)
 
@@ -285,12 +313,6 @@ class Collection(models.Model):
   def fields_data(self, user):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
-
-    dynamic_fields = []
-#    dynamic_fields = SolrApi(SOLR_URL.get(), user).fields(self.name, dynamic=True)
-#    dynamic_fields = dynamic_fields['fields']
-
-    schema_fields.update(dynamic_fields)
 
     return sorted([{'name': str(field), 'type': str(attributes.get('type', ''))}
                   for field, attributes in schema_fields.iteritems()])
@@ -394,20 +416,11 @@ def is_chart_field(field, charts):
   return found
 
 
-def augment_solr_response2(response, facets, solr_query):
+def augment_solr_response2(response, collection, solr_query):
   augmented = response
   augmented['normalized_facets'] = []
 
-  normalized_facets = {}
-  default_facets = []
-
-#  chart_facets = facets.get('charts', [])
-
-  def pairwise(iterable):
-      "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-      a, b = itertools.tee(iterable)
-      next(b, None)
-      return list(itertools.izip(a, b))
+  normalized_facets = []
 
   def pairwise2(cat, fq, iterable):
       pairs = []
@@ -425,67 +438,57 @@ def augment_solr_response2(response, facets, solr_query):
         facet = {
           'field': cat,
           'type': 'field',
-          'label': get_facet_field_label(cat, facets),
+          'label': get_facet_field_label(cat, collection['facets']),
           'counts': pairwise2(cat, selected_field, response['facet_counts']['facet_fields'][cat]),
         }
-        uuid = '' #get_facet_field_uuid(cat, 'field', facets)
-        if uuid == '':
-          default_facets.append(facet)
-        else:
-          normalized_facets[uuid] = facet
+        normalized_facets.append(facet)
 
-#    if response['facet_counts']['facet_ranges']:
-#      for cat in response['facet_counts']['facet_ranges']:
-#        facet = {
-#          'field': cat,
-#          'type': 'chart' if is_chart_field(cat, chart_facets) else 'range',
-#          'label': get_facet_field_label(cat, 'range', facets),
-#          'counts': response['facet_counts']['facet_ranges'][cat]['counts'],
-#          'start': response['facet_counts']['facet_ranges'][cat]['start'],
-#          'end': response['facet_counts']['facet_ranges'][cat]['end'],
-#          'gap': response['facet_counts']['facet_ranges'][cat]['gap'],
-#        }
-#        uuid = get_facet_field_uuid(cat, 'range', facets)
-#        if uuid == '':
-#          default_facets.append(facet)
-#        else:
-#          normalized_facets[uuid] = facet
-#
-#    if response['facet_counts']['facet_dates']:
-#      for cat in response['facet_counts']['facet_dates']:
-#        facet = {
-#          'field': cat,
-#          'type': 'date',
-#          'label': get_facet_field_label(cat, 'date', facets),
-#          'format': get_facet_field_format(cat, 'date', facets),
-#          'start': response['facet_counts']['facet_dates'][cat]['start'],
-#          'end': response['facet_counts']['facet_dates'][cat]['end'],
-#          'gap': response['facet_counts']['facet_dates'][cat]['gap'],
-#        }
-#        counts = []
-#        for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-#          if date not in ('start', 'end', 'gap'):
-#            counts.append(date)
-#            counts.append(count)
-#        facet['counts'] = counts
-#
-#        uuid = get_facet_field_uuid(cat, 'date', facets)
-#        if uuid == '':
-#          default_facets.append(facet)
-#        else:
-#          normalized_facets[uuid] = facet
+  # TODO HTML escape docs!
 
-#  for ordered_uuid in facets.get('order', []):
-#    try:
-#      augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
-#    except:
-#      pass
+  highlighted_fields = response.get('highlighting', [])
+  if highlighted_fields:
+    for doc in response['response']['docs']:
+      # TODO: Beware, schema requires an 'id' field, silently do nothing
+      if 'message_id' in doc and doc['message_id'] in highlighted_fields:
+        doc.update(response['highlighting'][doc['message_id']])
+        
+  response['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
+  response['search_time'] = response['responseHeader']['QTime']
 
-  if default_facets:
-    augmented['normalized_facets'].extend(default_facets)
+  if normalized_facets:
+    augmented['normalized_facets'].extend(normalized_facets)
 
   return augmented
 
+def augment_solr_exception(response, collection, solr_query):
+  response.update(
+  {
+    "facet_counts": {   
+    },
+    "highlighting": {
+    },
+    "normalized_facets": [
+      {
+        "field": facet['field'],
+        "counts": [],
+        "type": facet['type'],
+        "label": facet['label']
+      }
+      for facet in collection['facets']
+    ],
+    "responseHeader": {
+      "status": -1,
+      "QTime": 0,
+      "params": {
+      }
+    },
+    "response": {
+      "start": 0,
+      "numFound": 0,
+      "docs": [
+      ]
+    }
+  }) 
 
 def augment_solr_response(response, facets, solr_query):
   augmented = response

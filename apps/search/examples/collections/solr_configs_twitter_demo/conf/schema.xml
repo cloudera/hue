@@ -123,6 +123,7 @@
    <field name="in_reply_to_status_id" type="long" indexed="true" stored="true" multiValued="true"/>
    <field name="media_url_https" type="string" indexed="false" stored="true" />
    <field name="expanded_url" type="string" indexed="false" stored="true" />
+   <dynamicField name="*_i" type="int" indexed="true" stored="true"/>
 
    <!-- file metadata -->   
 <!--

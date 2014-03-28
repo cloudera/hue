@@ -21,6 +21,7 @@ urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^index2$', 'index2', name='index2'),
   url(r'^query2$', 'index2', name='query2'),
+  url(r'^search$', 'search', name='search'),
   url(r'^query$', 'index', name='query'),
   url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
 
@@ -38,10 +39,13 @@ urlpatterns = patterns('search.views',
 
   # Ajax
   url(r'^suggest/(?P<collection_id>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
+  url(r'^index/(?P<collection_id>\w+)/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
   url(r'^admin/collection/(?P<collection_id>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),
   url(r'^admin/collection/(?P<collection_id>\w+)/solr_properties$', 'admin_collection_solr_properties', name='admin_collection_solr_properties'),
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
   url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
+  
+  
   
   url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
