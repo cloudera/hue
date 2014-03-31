@@ -269,7 +269,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
 <script type="text/html" id="facet-widget">
       <span class="pull-right">
-        <a id="showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+        <a data-bind="click: showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
       </span>
 
       ## Need to pick the facet ID from norm_facets instead of looping on all
@@ -373,7 +373,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Back')}</a>
-    <a id="submitAddFacetModal" class="btn btn-primary disable-feedback">${_('Ok')}</a>
+    <a data-bind="click: submitAddFacetModal" class="btn btn-primary disable-feedback">${_('Ok')}</a>
   </div>
 </div>
 
@@ -495,18 +495,17 @@ $(document).ready(function () {
   viewModel.isEditing(true);
   viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());  
   viewModel.search();
-  
-  
-  $("#showAddFacetModal").click(function() {
-    $("#addFacetModal").modal("show");
-  });
+});
 
-  $("#submitAddFacetModal").click(function() {
+  function showAddFacetModal(facet) {
+    $("#addFacetModal").modal("show");
+  };
+
+  function submitAddFacetModal(facet) {
     viewModel.collection.addFacet({'name': $("#facetName").val()});
     $('#addFacetModal').modal("hide");
     viewModel.search();
-  });
-});
+  };
 
   function editTemplate(facet) {
     $("#editTemplateModal").modal("show");
