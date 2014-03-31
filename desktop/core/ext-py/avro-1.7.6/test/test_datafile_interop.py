@@ -24,12 +24,12 @@ class TestDataFileInterop(unittest.TestCase):
     print 'TEST INTEROP'
     print '============'
     print ''
-    for f in os.listdir('/home/cutting/src/avro/release-1.5.0-rc2/lang/py/../../build/interop/data'):
+    for f in os.listdir('/home/cutting/src/avro/release-1.7.6-rc0/lang/py/../../build/interop/data'):
       print 'READING %s' % f
       print ''
 
       # read data in binary from file
-      reader = open(os.path.join('/home/cutting/src/avro/release-1.5.0-rc2/lang/py/../../build/interop/data', f), 'rb')
+      reader = open(os.path.join('/home/cutting/src/avro/release-1.7.6-rc0/lang/py/../../build/interop/data', f), 'rb')
       datum_reader = io.DatumReader()
       dfr = datafile.DataFileReader(reader, datum_reader)
       for datum in dfr:

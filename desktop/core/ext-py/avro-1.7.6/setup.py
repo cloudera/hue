@@ -19,16 +19,22 @@ try:
   from setuptools import setup
 except ImportError:
   from distutils.core import setup
+from sys import version_info
+
+install_requires = []
+if version_info[:2] <= (2, 5):
+    install_requires.append('simplejson >= 2.0.9')
 
 setup(
   name = 'avro',
-  version = '1.5.0',
+  version = '1.7.6',
   packages = ['avro',],
   package_dir = {'avro': 'src/avro'},
+  scripts = ["./scripts/avro"],
 
   # Project uses simplejson, so ensure that it gets installed or upgraded
   # on the target machine
-  install_requires = ['simplejson >= 2.0.9'],
+  install_requires = install_requires,
 
   # metadata for upload to PyPI
   author = 'Apache Avro',
@@ -37,4 +43,7 @@ setup(
   license = 'Apache License 2.0',
   keywords = 'avro serialization rpc',
   url = 'http://hadoop.apache.org/avro',
+  extras_require = {
+    'snappy': ['python-snappy'],
+  },
 )

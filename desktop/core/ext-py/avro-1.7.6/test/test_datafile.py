@@ -52,6 +52,11 @@ SCHEMAS_TO_VALIDATE = (
 
 FILENAME = 'test_datafile.out'
 CODECS_TO_VALIDATE = ('null', 'deflate')
+try:
+  import snappy
+  CODECS_TO_VALIDATE += ('snappy',)
+except ImportError:
+  print 'Snappy not present, will skip testing it.'
 
 # TODO(hammer): clean up written files with ant, not os.remove
 class TestDataFile(unittest.TestCase):
@@ -144,6 +149,54 @@ class TestDataFile(unittest.TestCase):
         print ''
     os.remove(FILENAME)
     self.assertEquals(correct, len(CODECS_TO_VALIDATE)*len(SCHEMAS_TO_VALIDATE))
+
+  def test_context_manager(self):
+    # Context manager was introduced as a first class
+    # member only in Python 2.6 and above.
+    import sys
+    if sys.version_info < (2,6):
+      print 'Skipping context manager tests on this Python version.'
+      return
+    # Test the writer with a 'with' statement.
+    writer = open(FILENAME, 'wb')
+    datum_writer = io.DatumWriter()
+    sample_schema, sample_datum = SCHEMAS_TO_VALIDATE[1]
+    schema_object = schema.parse(sample_schema)
+    with datafile.DataFileWriter(writer, datum_writer, schema_object) as dfw:
+      dfw.append(sample_datum)
+    self.assertTrue(writer.closed)
+
+    # Test the reader with a 'with' statement.
+    datums = []
+    reader = open(FILENAME, 'rb')
+    datum_reader = io.DatumReader()
+    with datafile.DataFileReader(reader, datum_reader) as dfr:
+      for datum in dfr:
+        datums.append(datum)
+    self.assertTrue(reader.closed)
+
+  def test_metadata(self):
+    # Test the writer with a 'with' statement.
+    writer = open(FILENAME, 'wb')
+    datum_writer = io.DatumWriter()
+    sample_schema, sample_datum = SCHEMAS_TO_VALIDATE[1]
+    schema_object = schema.parse(sample_schema)
+    with datafile.DataFileWriter(writer, datum_writer, schema_object) as dfw:
+      dfw.set_meta('test.string', 'foo')
+      dfw.set_meta('test.number', '1')
+      dfw.append(sample_datum)
+    self.assertTrue(writer.closed)
+
+    # Test the reader with a 'with' statement.
+    datums = []
+    reader = open(FILENAME, 'rb')
+    datum_reader = io.DatumReader()
+    with datafile.DataFileReader(reader, datum_reader) as dfr:
+      self.assertEquals('foo', dfr.get_meta('test.string'))
+      self.assertEquals('1', dfr.get_meta('test.number'))
+      for datum in dfr:
+        datums.append(datum)
+    self.assertTrue(reader.closed)
 
 if __name__ == '__main__':
   unittest.main()

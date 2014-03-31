@@ -123,7 +123,7 @@ class Protocol(object):
   def to_json(self):
     to_dump = {}
     to_dump['protocol'] = self.name
-    names = schema.Names()
+    names = schema.Names(default_namespace=self.namespace)
     if self.namespace: 
       to_dump['namespace'] = self.namespace
     if self.types:
@@ -186,9 +186,11 @@ class Message(object):
     self.props[key] = value  
 
   def __str__(self):
-    return json.dumps(self.to_json(schema.Names()))
+    return json.dumps(self.to_json())
 
-  def to_json(self, names):
+  def to_json(self, names=None):
+    if names is None:
+      names = schema.Names()
     to_dump = {}
     to_dump['request'] = self.request.to_json(names)
     to_dump['response'] = self.response.to_json(names)
