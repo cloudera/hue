@@ -156,9 +156,9 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div style="font-weight: bold; color: #999; padding-left: 8px">${_('WIDGETS')}</div>
-    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-desc"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-th-large"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
+    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-desc"></i></a></div>    
+    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableArea" title="${_('Area Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-area-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Line Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-line-chart"></i></a></div>
@@ -202,7 +202,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     <div data-bind="template: { name: 'row-template', foreach: rows}">
     </div>
     <div style="height: 50px; padding-left: 6px" data-bind="visible: $root.isEditing">
-      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-table"></i> ${_('Add Row')}</a>
+      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-plus"></i> ${_('Add Row')}</a>
     </div>
   </div>
 </script>
@@ -215,7 +215,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   </div>
   <div class="container-fluid">
     <div class="row-header" data-bind="visible: $root.isEditing">
-      <span class="muted"><i class="fa fa-table"></i> ${_('Row')}</span>
+      <span class="muted"><i class="fa fa-ellipsis-h"></i> ${_('Row')}</span>
       <div style="display: inline; margin-left: 60px">
         <a href="javascript:void(0)" data-bind="visible:$index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
         <a href="javascript:void(0)" data-bind="visible:$index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
@@ -249,7 +249,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
           <li> Size: <input type="text" data-bind="value: size" /></li>
           <li> Offset: <input type="text" data-bind="value: offset" /></li>
         </ul>
-  </div>
+      </div>
     </div>
   </div>
 </script>
@@ -305,7 +305,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 <script src="/static/js/jquery.blueprint.js"></script>
 
 <script type="text/javascript">
-
   ko.bindingHandlers.slideVisible = {
     init: function (element, valueAccessor) {
       var value = valueAccessor();
@@ -415,12 +414,12 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   var Widget = function (size, name, widgetType, properties, offset) {
     var self = this;
     self.size = ko.observable(size).extend({ numeric: 0 });
-    ;
+
     self.name = ko.observable(name);
     self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
     self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
     self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
-    ;
+
 
     self.klass = ko.computed(function () {
       return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
@@ -443,7 +442,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     self.remove = function (row, widget) {
       row.widgets.remove(widget);
     }
-  }
+  };
 
   Widget.prototype.clone = function () {
     return new Widget(this.size(), this.name(), this.widgetType());
@@ -504,6 +503,8 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   }
 
   $(document).ready(function () {
+    fullLayout();
+    viewModel.isEditing(true);
   });
 </script>
 

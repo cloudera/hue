@@ -206,12 +206,6 @@ class CollectionManager(models.Manager):
     try:
       return self.get(name=name), False
     except Collection.DoesNotExist:
-#      id_field = ''
-#      schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)      
-#      for name, props in schema_fields['schema']['fields'].iteritems():
-#        if props['stored'] and props['required'] and props['multiValued']:
-#          id_field = name
-
       facets = Facet.objects.create(data=json.dumps({
                    'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
                    'ranges': [],
@@ -254,7 +248,7 @@ em {
     <div class="span12">%s</div>
   </div>
   <br/>
-</div>""" % ' '.join(['{{%s}}' % field for field in collection.fields(user)])
+</div>""" % ' '.join(['{{%s}}' % field['name'] for field in collection.fields_data(user)])
 
       result.update_from_post({'template': json.dumps(template)})
       result.save()
@@ -280,23 +274,30 @@ class Collection(models.Model):
   objects = CollectionManager()
 
   def get_c(self, user):
+    fields = self.fields_data(user)
+    id_field = [field.name for field in fields if field.get('isId')]
+    if not id_field:
+      id_field = 'id'
+    fields = [field.get('name') for field in self.fields_data(user)]
+  
     TEMPLATE = {
       "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": ["body"],
       "properties": {"highlighting_enabled": True},
       "template": "{{user_screen_name}} {{user_name}} {{text}}", "isGridLayout": True,
-      "fields": ["user_screen_name", "user_name", "text"]
+      "fields": fields
     };
-    FACETS = {"dates": [], "fields": [{
-         "uuid": "f6618a5c-bbba-2886-1886-bbcaf01409ca", "verbatim": "", "isVerbatim": False, "label": "Location", 
-         "field": "to", "type": "field"
-       }
+    FACETS = {"dates": [], "fields": [
+#                                      {
+#         "uuid": "f6618a5c-bbba-2886-1886-bbcaf01409ca", "verbatim": "", "isVerbatim": False, "label": "Location", 
+#         "field": "user_location", "type": "field"
+#       }
        ],
        "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
     };  
-  
+    
     m = {
       'id': self.id, 'name': self.name, 'template': TEMPLATE, 'facets': FACETS['fields'], 
-      'fields': self.fields(user)
+      'fields': fields, 'idField': id_field
     };
     
     return json.dumps(m)
@@ -314,7 +315,9 @@ class Collection(models.Model):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
 
-    return sorted([{'name': str(field), 'type': str(attributes.get('type', ''))}
+    return sorted([{'name': str(field), 'type': str(attributes.get('type', '')),
+                    'isId': attributes.get('stored') and attributes.get('required') and attributes.get('multiValued')
+                  }
                   for field, attributes in schema_fields.iteritems()])
 
   @property
@@ -444,13 +447,17 @@ def augment_solr_response2(response, collection, solr_query):
         normalized_facets.append(facet)
 
   # TODO HTML escape docs!
-
+  
   highlighted_fields = response.get('highlighting', [])
   if highlighted_fields:
-    for doc in response['response']['docs']:
-      # TODO: Beware, schema requires an 'id' field, silently do nothing
-      if 'message_id' in doc and doc['message_id'] in highlighted_fields:
-        doc.update(response['highlighting'][doc['message_id']])
+    id_field = collection.get('idField')    
+    if id_field:
+      for doc in response['response']['docs']:
+        if id_field in doc and doc[id_field] in highlighted_fields:
+          doc.update(response['highlighting'][doc[id_field]])
+    else:
+      response['warning'] = _("The Solr schema requires an 'id' field for performing the result highlighting")
+      
         
   response['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
   response['search_time'] = response['responseHeader']['QTime']

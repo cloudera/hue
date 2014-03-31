@@ -14,6 +14,154 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// Start dashboard lib to move out
+
+var Column = function (size, rows) {
+    var self = this;
+    self.size = ko.observable(size);
+    self.rows = ko.observableArray(rows);
+    self.klass = ko.computed(function () {
+      return "card card-home card-column span" + self.size();
+    });
+    self.addEmptyRow = function () {
+      self.addRow();
+    };
+    self.addRow = function (row) {
+      if (typeof row == "undefined" || row == null) {
+        row = new Row([]);
+      }
+      self.rows.push(row);
+    };
+  }
+
+  var Row = function (widgets) {
+    var self = this;
+    self.widgets = ko.observableArray(widgets);
+
+    self.addWidget = function (widget) {
+      self.widgets.push(widget);
+    };
+
+    self.move = function (from, to) {
+      try {
+        viewModel.columns()[to].addRow(self);
+        viewModel.columns()[from].rows.remove(self);
+      }
+      catch (exception) {
+      }
+    }
+
+    self.moveDown = function (col, row) {
+      var _i = col.rows().indexOf(row);
+      if (_i < col.rows().length - 1) {
+        var _arr = col.rows();
+        col.rows.splice(_i, 2, _arr[_i + 1], _arr[_i]);
+      }
+    }
+
+    self.moveUp = function (col, row) {
+      var _i = col.rows().indexOf(row);
+      if (_i >= 1) {
+        var _arr = col.rows();
+        col.rows.splice(_i - 1, 2, _arr[_i], _arr[_i - 1]);
+      }
+    }
+
+    self.remove = function (col, row) {
+      col.rows.remove(row);
+    }
+  }
+
+  var Widget = function (size, name, widgetType, properties, offset) {
+    var self = this;
+    self.size = ko.observable(size).extend({ numeric: 0 });
+
+    self.name = ko.observable(name);
+    self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
+    self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
+    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
+
+
+    self.klass = ko.computed(function () {
+      return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
+    });
+
+    self.expand = function () {
+      self.size(self.size() + 1);
+    }
+    self.compress = function () {
+      self.size(self.size() - 1);
+    }
+
+    self.moveLeft = function () {
+      self.offset(self.offset() - 1);
+    }
+    self.moveRight = function () {
+      self.offset(self.offset() + 1);
+    }
+
+    self.remove = function (row, widget) {
+      row.widgets.remove(widget);
+    }
+  };
+
+  Widget.prototype.clone = function () {
+    return new Widget(this.size(), this.name(), this.widgetType());
+  };
+
+  function fullLayout() {
+    setLayout([12]);
+  }
+
+  function oneThirdLeftLayout() {
+    setLayout([3, 9]);
+  }
+
+  function oneThirdRightLayout() {
+    setLayout([9, 3]);
+  }
+
+  function setLayout(colSizes) {
+    // save previous widgets
+    var _allRows = [];
+    $(viewModel.columns()).each(function (cnt, col) {
+      var _tRows = [];
+      $(col.rows()).each(function (icnt, row) {
+        if (row.widgets().length > 0) {
+          _tRows.push(row);
+        }
+      });
+      _allRows = _allRows.concat(_tRows);
+    });
+
+    var _cols = [];
+    var _highestCol = {
+      idx: -1,
+      size: -1
+    };
+    $(colSizes).each(function (cnt, size) {
+      _cols.push(new Column(size, []));
+      if (size > _highestCol.size) {
+        _highestCol.idx = cnt;
+        _highestCol.size = size;
+      }
+    });
+    if (_allRows.length > 0 && _highestCol.idx > -1) {
+      _cols[_highestCol.idx].rows(_allRows);
+    }
+
+    $(_cols).each(function (cnt, col) {
+      if (col.rows().length == 0) {
+        col.rows([new Row([])]);
+      }
+    });
+
+    viewModel.columns(_cols);
+  }
+
+// End dashboard lib
+  
 var Query = function (vm, query) {
   var self = this;
 
@@ -31,22 +179,13 @@ var Query = function (vm, query) {
   }
 };
 
-var FieldFacet = function(vm, props) {
-  self.id = props.id;  
-  self.label = props.name;
-  self.field = props.name;
-  self.type = "field";
-}
-
-// FieldListFacet
-// RangeFacet
-
 
 var Collection = function (vm, collection) {
   var self = this;
 
   self.id = collection.id;
   self.name = collection.name;
+  self.idField = collection.idField;
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fields.subscribe(function() {
 	vm.search();
@@ -99,11 +238,27 @@ var SearchViewModel = function (collection_json, query_json) {
   
   self.selectedFacet = ko.observable();
 
+  self.previewColumns = ko.observable("");
+  self.columns = ko.observableArray([]); // load back? 
+  self.isEditing = ko.observable(false);
+  self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
+  self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
+  self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
+  self.draggableArea = ko.observable(new Widget(12, "Area Chart", "area-widget"));
+  self.draggableMap = ko.observable(new Widget(12, "Map", "map-widget"));
+  self.draggableLine = ko.observable(new Widget(12, "Line Chart", "line-widget"));
+  self.draggablePie = ko.observable(new Widget(12, "Pie Chart", "pie-widget"));
+  self.toggleEditing = function () {
+    self.isEditing(!self.isEditing());
+  };  
+  
+  
   self.search = function () {
 	$(".jHueNotify").hide();
     $.post("/search/search", {
         collection: ko.mapping.toJSON(self.collection),
         query: ko.mapping.toJSON(self.query),
+        layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
        self.response(data); // If error we should probably update only the facets
    	   self.results.removeAll(); 

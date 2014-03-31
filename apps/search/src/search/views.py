@@ -129,7 +129,6 @@ def search(request):
   print request.POST
   print collection
     
- 
   if collection:
     solr_query = {}    
     try:

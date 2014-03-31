@@ -26,10 +26,110 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 
+<style type="text/css">
+  .dashboard .container-fluid {
+    padding: 10px;
+  }
+
+  .row-container {
+    width: 100%;
+    min-height: 70px;
+  }
+
+  .ui-sortable {
+    background-color: #F6F6F6;
+  }
+
+  .ui-sortable h2 {
+    padding-left: 10px!important;
+  }
+
+  .ui-sortable h2 ul {
+    float: left;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  .ui-sortable:not(.ui-sortable-disabled) h2 {
+    cursor: move;
+  }
+
+  .ui-sortable-disabled {
+    background-color: #FFF;
+  }
+
+  .card-column {
+    border: none;
+    min-height: 400px!important;
+  }
+
+  .card-widget {
+    padding-top: 0;
+  }
+
+  .card-toolbar {
+    margin: 0;
+    padding: 4px;
+    padding-top: 10px;
+  }
+
+  .row-header {
+    background-color: #F6F6F6;
+    display: inline;
+    padding: 4px;
+  }
+
+  #emptyDashboard {
+    position: absolute;
+    right: 14px;
+    top: 80px;
+    color: #666;
+    font-size: 20px;
+  }
+
+  .emptyRow {
+    margin-top: 10px;
+    margin-left: 140px;
+    color: #666;
+    font-size: 18px;
+  }
+
+  .preview-row {
+    background-color: #DDD;
+    min-height: 400px!important;
+    margin-top: 30px;
+  }
+
+  .draggable-widget {
+    width: 100px;
+    text-align: center;
+    float: left;
+    border: 1px solid #CCC;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: move;
+  }
+  .draggable-widget a {
+    font-size: 58px;
+    line-height: 76px;
+    cursor: move;
+  }
+
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+</style>
 
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 6px; margin-right: 40px">
+      <button type="button" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>    
       <a class="change-settings" href="#"><i class="fa fa-save"></i> ${ _('Save') }</a> &nbsp;&nbsp;
       <a href="${ url('search:admin_collections') }"><i class="fa fa-sitemap"></i> ${ _('Collection manager') }</a>
     </div>
@@ -55,27 +155,125 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </form>
 </div>
 
-    <div>
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#tourStep1" class="tourStep">${ _('Search') }</a></li>
-        <li><a href="#tourStep2" class="tourStep">${ _('Visualization') }</a></li>
-        <li><a id="tourLastStep" href="#tourStep3" class="tourStep">${ _('Data') }</a></li>
-      </ul>
+<div class="card card-toolbar" data-bind="slideVisible: isEditing">
+  <div style="float: left">
+    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
+    <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdleft.png" /></a>
+    <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a>
+    <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_full.png" /></a>
+  </div>
+
+  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
+    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('WIDGETS')}</div>
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
+    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-desc"></i></a></div>    
+    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableArea" title="${_('Area Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-area-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Line Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-line-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+
+<div id="emptyDashboard" data-bind="visible: !isEditing() && columns().length == 0">
+  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Click on the pencil to get started with your dashboard!')}</div>
+  <img src="/search/static/art/hint_arrow.png" />
+</div>
+
+<div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0">
+  <div class="container-fluid">
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
+      <div class="span3 preview-row"></div>
+      <div class="span9 preview-row"></div>
     </div>
-    
-    <div class="tourSteps">
-      <div id="tourStep1" class="tourStepDetails">
-
-<div class="container results">
-
-  <div id="mainContent" class="row">
-    <div class="span2 results">
-      <div class="row">
-        <span class="pull-right">
-          <a id="showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-        </span>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdRight'">
+      <div class="span9 preview-row"></div>
+      <div class="span3 preview-row"></div>
+    </div>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
+      <div class="span12 preview-row">
       </div>
-      <div class="row" data-bind="foreach: norm_facets">
+    </div>
+  </div>
+</div>
+
+<div data-bind="css: {'dashboard': true, 'unselectable': isEditing()}">
+  <div class="container-fluid">
+    <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
+    </div>
+    <div class="clearfix"></div>
+  </div>
+</div>
+
+<script type="text/html" id="column-template">
+  <div data-bind="css: klass">
+    <div data-bind="template: { name: 'row-template', foreach: rows}">
+    </div>
+    <div style="height: 50px; padding-left: 6px" data-bind="visible: $root.isEditing">
+      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-plus"></i> ${_('Row')}</a>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="row-template">
+  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index()==0 && $root.isEditing() && $parent.size() > 4">
+    <img src="/search/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
+    <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="container-fluid">
+    <div class="row-header" data-bind="visible: $root.isEditing">
+      <span class="muted"><i class="fa fa-minus"></i> ${_('Row')}</span>
+      <div style="display: inline; margin-left: 60px">
+        <a href="javascript:void(0)" data-bind="visible:$index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
+        <a href="javascript:void(0)" data-bind="visible:$index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
+        <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing}">
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="widget-template">
+  <div data-bind="css: klass">
+    <h2 class="card-heading simple">
+      <ul class="inline" data-bind="visible: $root.isEditing">
+        <li><a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a></li>
+        <li><a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a></li>
+        <li><a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a></li>
+      </ul>
+      <span data-bind="text: name"></span>
+    </h2>
+    <div class="card-body">
+      <p>
+        <div data-bind="template: { name: function() { return widgetType(); }, data: properties }"></div>
+      </p>
+      <div data-bind="visible: $root.isEditing()">
+        This is visible just when we edit.<br/>
+        Common properties:
+        <ul>
+          <li> Name: <input type="text" data-bind="value: name" /></li>
+          <li> Size: <input type="text" data-bind="value: size" /></li>
+          <li> Offset: <input type="text" data-bind="value: offset" /></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="empty-widget">
+  This is an empty widget.
+</script>
+
+<script type="text/html" id="facet-widget">
+      <span class="pull-right">
+        <a id="showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+      </span>
+
+      ## Need to pick the facet ID from norm_facets instead of looping on all
+      <div class="row" data-bind="foreach: $root.norm_facets">
         <span class="pull-right">
           <a href="javascript:void(0)" data-bind="click: editFacet"><i class="fa fa-pencil"></i></a>
           <a href="javascript:void(0)" data-bind="click: $root.removeFacet"><i class="fa fa-times"></i></a>
@@ -94,23 +292,17 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             </a>
           </div>
         </div>
-      </div>            
-      
-    </div> 
-    
-    <div class="span10 results">
+      </div>    
+
+</script>
+
+<script type="text/html" id="resultset-widget">
       <div class="row">
         <span class="pull-right">
-          <i class="fa fa-plus" id="edit-timeline"></i>
+          <a data-bind="click: editTemplate" href="javascript:void(0)"><i class="fa fa-pencil"></i></a>
         </span>
       </div>
-    
-      <div class="row">
-        <span class="pull-right">
-          <a id="edit-template" href="javascript:void(0)"><i class="fa fa-pencil"></i></a>
-        </span>
-      </div>
-      
+  
       <!-- ko if: $root.collection.template.isGridLayout() -->
       <table id="result-container">        
         <thead>
@@ -118,7 +310,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             <th data-bind="text: $data"></th>
           </tr>
         </thead>
-        <tbody data-bind="foreach: results">
+        <tbody data-bind="foreach: $root.results">
           <tr class="result-row" data-bind="foreach: $data">
             <td data-bind="html: $data"></td>
           </tr>
@@ -126,34 +318,36 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       </table>
       <!-- /ko -->
       <!-- ko if: ! $root.collection.template.isGridLayout() -->
-      <div id="result-container" data-bind="foreach: results">
+      <div id="result-container" data-bind="foreach: $root.results">
         <div class="result-row" data-bind="html: $data"></div>
       </div>
-      <!-- /ko -->
-      
-      </div>
-    </div>
-
-  </div>
-</div>
-        </div>
-      </div>      
-
-
-## unsused
-<script type="text/html" id="error-template">
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="alert alert-error">
-        <h4 data-bind="text: title"></h4>
-        <br/>
-        <span class="decodeError" data-bind="text: message"></span>
-      </div>
-    </div>
-  </div>
-</div>
+      <!-- /ko -->  
 </script>
+
+<script type="text/html" id="timeline-widget">
+  This is the timeline widget
+</script>
+
+<script type="text/html" id="bar-widget">
+  This is the bar widget
+</script>
+
+<script type="text/html" id="pie-widget">
+  This is the pie widget
+</script>
+
+<script type="text/html" id="area-widget">
+  This is the area widget
+</script>
+
+<script type="text/html" id="line-widget">
+  This is the line widget
+</script>
+
+<script type="text/html" id="map-widget">
+  This is the map widget
+</script>
+
 
 <style type="text/css">
   em {
@@ -241,17 +435,68 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/mustache.js"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+
+<link href="/static/ext/css/leaflet.css" rel="stylesheet">
+<link href="/static/ext/css/hue-charts.css" rel="stylesheet">
+
+<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.blueprint.js"></script>
+
 <script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
 
 $(document).ready(function () {
+
+  ko.bindingHandlers.slideVisible = {
+    init: function (element, valueAccessor) {
+      var value = valueAccessor();
+      $(element).toggle(ko.unwrap(value));
+    },
+    update: function (element, valueAccessor) {
+      var value = valueAccessor();
+      ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
+    }
+  };
+
+  ko.extenders.numeric = function (target, precision) {
+    var result = ko.computed({
+      read: target,
+      write: function (newValue) {
+        var current = target(),
+                roundingMultiplier = Math.pow(10, precision),
+                newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
+                valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+
+        if (valueToWrite !== current) {
+          target(valueToWrite);
+        } else {
+          if (newValue !== current) {
+            target.notifySubscribers(valueToWrite);
+          }
+        }
+      }
+    }).extend({ notify: 'always' });
+    result(target());
+    return result;
+  };
+
+
   viewModel = new SearchViewModel(${ hue_collection.get_c(user) | n,unicode }, ${ hue_query | n,unicode });
   ko.applyBindings(viewModel);
   
+  
+  fullLayout();
+  viewModel.isEditing(true);
+  viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());  
   viewModel.search();
-
+  
+  
   $("#showAddFacetModal").click(function() {
     $("#addFacetModal").modal("show");
   });
@@ -261,11 +506,11 @@ $(document).ready(function () {
     $('#addFacetModal').modal("hide");
     viewModel.search();
   });
-
-  $("#edit-template").click(function() {
-    $("#editTemplateModal").modal("show");
-  });
 });
+
+  function editTemplate(facet) {
+    $("#editTemplateModal").modal("show");
+  };
 
   function editFacet(facet) {
     viewModel.selectSingleFacet(facet);

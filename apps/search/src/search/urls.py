@@ -18,7 +18,7 @@
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('search.views',
-  url(r'^$', 'index', name='index'),
+  url(r'^$', 'index2', name='index'),
   url(r'^index2$', 'index2', name='index2'),
   url(r'^query2$', 'index2', name='query2'),
   url(r'^search$', 'search', name='search'),
