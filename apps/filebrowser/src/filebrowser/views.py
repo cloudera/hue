@@ -612,20 +612,15 @@ def read_contents(codec_type, path, fs, offset, length):
         fhandle = fs.open(path)
         stats = fs.stats(path)
 
-        # Auto codec detection for [gzip, avro, snappy, snappy avro, none]
-        if codec_type == 'avro' and snappy_installed() and detect_snappy(fhandle.read()):
-            codec_type = 'snappy_avro'
-        elif not codec_type:
+        # Auto codec detection for [gzip, avro, snappy, none]
+        if not codec_type:
             contents = fhandle.read(3)
             codec_type = 'none'
             if path.endswith('.gz') and detect_gzip(contents):
                 codec_type = 'gzip'
                 offset = 0
-            elif path.endswith('.avro'):
-                if detect_avro(contents):
-                    codec_type = 'avro'
-                if snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(contents + fhandle.read()):
-                    codec_type = 'snappy_avro'
+            elif path.endswith('.avro') and detect_avro(contents):
+                codec_type = 'avro'
             elif snappy_installed() and path.endswith('.snappy'):
                 codec_type = 'snappy'
             elif snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(contents + fhandle.read()):
@@ -637,8 +632,6 @@ def read_contents(codec_type, path, fs, offset, length):
             contents = _read_gzip(fhandle, path, offset, length, stats)
         elif codec_type == 'avro':
             contents = _read_avro(fhandle, path, offset, length, stats)
-        elif codec_type == 'snappy_avro':
-            contents = _read_snappy_avro(fhandle, path, offset, length, stats)
         elif codec_type == 'snappy':
             contents = _read_snappy(fhandle, path, offset, length, stats)
         else:
@@ -667,16 +660,6 @@ def _read_snappy(fhandle, path, offset, length, stats):
         raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
 
     return _read_simple(StringIO(_decompress_snappy(fhandle.read())), path, offset, length, stats)
-
-
-def _read_snappy_avro(fhandle, path, offset, length, stats):
-    if not snappy_installed():
-        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed.'))
-
-    if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
-        raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
-
-    return _read_avro(StringIO(_decompress_snappy(fhandle.read())), path, offset, length, stats)
 
 
 def _read_avro(fhandle, path, offset, length, stats):
