@@ -64,7 +64,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   }
 
   .card-widget {
-##    margin: 4px!important;
     padding-top: 0;
   }
 
@@ -223,7 +222,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, dragged: tempBarChart}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing}">
     </div>
   </div>
 </script>
@@ -307,34 +306,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
 <script type="text/javascript">
 
-  var d1 = [];
-  for (var i = 0; i < 14; i += 0.5) {
-    d1.push([i, Math.sin(i)]);
-  }
-  var d6 = [];
-  for (var i = 0; i < 14; i += 0.5 + Math.random()) {
-    d6.push([i, Math.sqrt(2 * i + Math.sin(i) + 5)]);
-  }
-
-  function tempBarChart() {
-    window.setTimeout(function () {
-      $("#barsample").jHueBlueprint({
-        data: d6,
-        type: $.jHueBlueprint.TYPES.BARCHART,
-        color: $.jHueBlueprint.COLORS.GREEN,
-        fill: true
-      });
-      $("#barsample").jHueBlueprint("add", {
-        data: d1,
-        type: $.jHueBlueprint.TYPES.BARCHART,
-        color: $.jHueBlueprint.COLORS.ORANGE,
-        fill: false
-      });
-
-    }, 50)
-  }
-
-
   ko.bindingHandlers.slideVisible = {
     init: function (element, valueAccessor) {
       var value = valueAccessor();
@@ -346,32 +317,25 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     }
   };
 
-  ko.extenders.numeric = function(target, precision) {
-    //create a writeable computed observable to intercept writes to our observable
+  ko.extenders.numeric = function (target, precision) {
     var result = ko.computed({
-        read: target,  //always return the original observables value
-        write: function(newValue) {
-            var current = target(),
+      read: target,
+      write: function (newValue) {
+        var current = target(),
                 roundingMultiplier = Math.pow(10, precision),
                 newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
                 valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
 
-            //only write if it changed
-            if (valueToWrite !== current) {
-                target(valueToWrite);
-            } else {
-                //if the rounded value is the same, but a different value was written, force a notification for the current field
-                if (newValue !== current) {
-                    target.notifySubscribers(valueToWrite);
-                }
-            }
+        if (valueToWrite !== current) {
+          target(valueToWrite);
+        } else {
+          if (newValue !== current) {
+            target.notifySubscribers(valueToWrite);
+          }
         }
+      }
     }).extend({ notify: 'always' });
-
-    //initialize with current value to make sure it is rounded appropriately
     result(target());
-
-    //return the new computed observable
     return result;
   };
 
@@ -379,7 +343,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     var self = this;
     self.previewColumns = ko.observable("");
     self.columns = ko.observableArray([]);
-    self.isEditing = ko.observable(true);
+    self.isEditing = ko.observable(false);
     self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
     self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
     self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
@@ -431,7 +395,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
       var _i = col.rows().indexOf(row);
       if (_i < col.rows().length - 1) {
         var _arr = col.rows();
-        col.rows.splice(_i, 2, _arr[_i+1], _arr[_i]);
+        col.rows.splice(_i, 2, _arr[_i + 1], _arr[_i]);
       }
     }
 
@@ -439,7 +403,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
       var _i = col.rows().indexOf(row);
       if (_i >= 1) {
         var _arr = col.rows();
-        col.rows.splice(_i-1, 2, _arr[_i], _arr[_i-1]);
+        col.rows.splice(_i - 1, 2, _arr[_i], _arr[_i - 1]);
       }
     }
 
@@ -450,14 +414,16 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
   var Widget = function (size, name, widgetType, properties, offset) {
     var self = this;
-    self.size = ko.observable(size).extend({ numeric: 0 });;
+    self.size = ko.observable(size).extend({ numeric: 0 });
+    ;
     self.name = ko.observable(name);
     self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
     self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
-    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });;
+    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
+    ;
 
     self.klass = ko.computed(function () {
-      return "card card-widget span" + self.size() + (self.offset()*1 > 0 ? " offset" + self.offset() : "");
+      return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
     });
 
     self.expand = function () {
@@ -491,10 +457,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     setLayout([12]);
   }
 
-  function halfLayout() {
-    setLayout([6, 6]);
-  }
-
   function oneThirdLeftLayout() {
     setLayout([3, 9]);
   }
@@ -508,8 +470,8 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     var _allRows = [];
     $(viewModel.columns()).each(function (cnt, col) {
       var _tRows = [];
-      $(col.rows()).each(function(icnt, row){
-        if (row.widgets().length > 0){
+      $(col.rows()).each(function (icnt, row) {
+        if (row.widgets().length > 0) {
           _tRows.push(row);
         }
       });
@@ -533,7 +495,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     }
 
     $(_cols).each(function (cnt, col) {
-      if (col.rows().length == 0){
+      if (col.rows().length == 0) {
         col.rows([new Row([])]);
       }
     });
@@ -542,18 +504,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   }
 
   $(document).ready(function () {
-    var _wid = [];
-    _wid.push(new Widget(4, "Hello world", "timeline-widget"));
-    _wid.push(new Widget(4, "Hello world 2 ", "resultset-widget"));
-
-    ##    leftColumnLayout();
-    ##    viewModel.columns()[0].addRow(new Row([new Widget(12, "moo")]));
-    ##
-    ##
-    ##    viewModel.columns()[1].addRow();
-    ##    viewModel.columns()[1].rows()[0].widgets(_wid);
-
-
   });
 </script>
 
