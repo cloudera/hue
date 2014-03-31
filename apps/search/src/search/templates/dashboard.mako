@@ -64,7 +64,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   }
 
   .card-widget {
-    margin: 4px!important;
+##    margin: 4px!important;
     padding-top: 0;
   }
 
@@ -80,12 +80,19 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     padding: 4px;
   }
 
-  #emptyHint {
+  #emptyDashboard {
     position: absolute;
     right: 14px;
     top: 80px;
     color: #666;
     font-size: 20px;
+  }
+
+  .emptyRow {
+    margin-top: 10px;
+    margin-left: 140px;
+    color: #666;
+    font-size: 18px;
   }
 
   .preview-row {
@@ -144,21 +151,24 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   <div style="float: left">
     <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
     <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdleft.png" /></a>
-    <a href="javascript: halfLayout()" onmouseover="viewModel.previewColumns('half')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_half.png" /></a>
     <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a>
     <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_full.png" /></a>
   </div>
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div style="font-weight: bold; color: #999; padding-left: 8px">${_('WIDGETS')}</div>
-    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Field Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tasks"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-bar-chart-o"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-desc"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-th-large"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableArea" title="${_('Area Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-area-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Line Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-line-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>
   </div>
   <div class="clearfix"></div>
 </div>
 
-<div id="emptyHint" data-bind="visible: !isEditing() && columns().length == 0">
+<div id="emptyDashboard" data-bind="visible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Click on the pencil to get started with your dashboard!')}</div>
   <img src="/search/static/art/hint_arrow.png" />
 </div>
@@ -168,10 +178,6 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
       <div class="span3 preview-row"></div>
       <div class="span9 preview-row"></div>
-    </div>
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'half'">
-      <div class="span6 preview-row"></div>
-      <div class="span6 preview-row"></div>
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdRight'">
       <div class="span9 preview-row"></div>
@@ -188,28 +194,33 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
+    <div class="clearfix"></div>
   </div>
 </div>
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass">
-    <div style="height: 30px; text-align: right" data-bind="visible: $root.isEditing">
-      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-plus-circle"></i> Add row</a>
-    </div>
-    <h4 style="text-align: center" class="muted" data-bind="visible: rows().length == 0">I'm your blank canvas.<br/>Please fill me up with widgets!</h4>
     <div data-bind="template: { name: 'row-template', foreach: rows}">
+    </div>
+    <div style="height: 50px; padding-left: 6px" data-bind="visible: $root.isEditing">
+      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-table"></i> ${_('Add Row')}</a>
     </div>
   </div>
 </script>
 
 <script type="text/html" id="row-template">
+  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index()==0 && $root.isEditing() && $parent.size() > 4">
+    <img src="/search/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
+    <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
+    <div class="clearfix"></div>
+  </div>
   <div class="container-fluid">
     <div class="row-header" data-bind="visible: $root.isEditing">
-      <i class="fa fa-th-list muted"></i>
+      <span class="muted"><i class="fa fa-table"></i> ${_('Row')}</span>
       <div style="display: inline; margin-left: 60px">
-        <a href="javascript:void(0)" data-bind="click: moveDown"><i class="fa fa-chevron-down"></i></a>
-        <a href="javascript:void(0)" data-bind="click: moveUp"><i class="fa fa-chevron-up"></i></a>
-        <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-trash-o"></i></a>
+        <a href="javascript:void(0)" data-bind="visible:$index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
+        <a href="javascript:void(0)" data-bind="visible:$index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
+        <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
     <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, dragged: tempBarChart}">
@@ -221,25 +232,35 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
   <div data-bind="css: klass">
     <h2 class="card-heading simple">
       <ul class="inline" data-bind="visible: $root.isEditing">
-      <li><a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a></li>
-      <li><a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a></li>
-    </ul>
+        <li><a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a></li>
+        <li><a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a></li>
+        <li><a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a></li>
+      </ul>
       <span data-bind="text: name"></span>
     </h2>
     <div class="card-body">
       <p>
         <div data-bind="template: { name: function() { return widgetType(); }, data: properties }"></div>
       </p>
+      <div data-bind="visible: $root.isEditing()">
+        This is visible just when we edit.<br/>
+        Common properties:
+        <ul>
+          <li> Name: <input type="text" data-bind="value: name" /></li>
+          <li> Size: <input type="text" data-bind="value: size" /></li>
+          <li> Offset: <input type="text" data-bind="value: offset" /></li>
+        </ul>
+  </div>
     </div>
   </div>
 </script>
 
 <script type="text/html" id="empty-widget">
-  Hic sunt leones.
+  This is an empty widget.
 </script>
 
 <script type="text/html" id="facet-widget">
-  This is the facet widget
+  This is the facet widget.
 </script>
 
 
@@ -248,16 +269,23 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 </script>
 
 <script type="text/html" id="timeline-widget">
-  This is the TIMELINE widget
+  This is the timeline widget
 </script>
 
 <script type="text/html" id="bar-widget">
   This is the bar widget
-  <div id="barsample"></div>
 </script>
 
 <script type="text/html" id="pie-widget">
   This is the pie widget
+</script>
+
+<script type="text/html" id="area-widget">
+  This is the area widget
+</script>
+
+<script type="text/html" id="line-widget">
+  This is the line widget
 </script>
 
 <script type="text/html" id="map-widget">
@@ -270,6 +298,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 <script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
+<link href="/static/ext/css/hue-charts.css" rel="stylesheet">
 
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
@@ -317,6 +346,34 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     }
   };
 
+  ko.extenders.numeric = function(target, precision) {
+    //create a writeable computed observable to intercept writes to our observable
+    var result = ko.computed({
+        read: target,  //always return the original observables value
+        write: function(newValue) {
+            var current = target(),
+                roundingMultiplier = Math.pow(10, precision),
+                newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
+                valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+
+            //only write if it changed
+            if (valueToWrite !== current) {
+                target(valueToWrite);
+            } else {
+                //if the rounded value is the same, but a different value was written, force a notification for the current field
+                if (newValue !== current) {
+                    target.notifySubscribers(valueToWrite);
+                }
+            }
+        }
+    }).extend({ notify: 'always' });
+
+    //initialize with current value to make sure it is rounded appropriately
+    result(target());
+
+    //return the new computed observable
+    return result;
+  };
 
   var DashBoardViewModel = function () {
     var self = this;
@@ -326,6 +383,10 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
     self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
     self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
+    self.draggableArea = ko.observable(new Widget(12, "Area Chart", "area-widget"));
+    self.draggableMap = ko.observable(new Widget(12, "Map", "map-widget"));
+    self.draggableLine = ko.observable(new Widget(12, "Line Chart", "line-widget"));
+    self.draggablePie = ko.observable(new Widget(12, "Pie Chart", "pie-widget"));
     self.toggleEditing = function () {
       self.isEditing(!self.isEditing());
     };
@@ -366,30 +427,37 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
       }
     }
 
-    self.moveDown = function () {
-
+    self.moveDown = function (col, row) {
+      var _i = col.rows().indexOf(row);
+      if (_i < col.rows().length - 1) {
+        var _arr = col.rows();
+        col.rows.splice(_i, 2, _arr[_i+1], _arr[_i]);
+      }
     }
 
-    self.moveUp = function () {
-
+    self.moveUp = function (col, row) {
+      var _i = col.rows().indexOf(row);
+      if (_i >= 1) {
+        var _arr = col.rows();
+        col.rows.splice(_i-1, 2, _arr[_i], _arr[_i-1]);
+      }
     }
 
     self.remove = function (col, row) {
       col.rows.remove(row);
-      console.log(row);
     }
   }
 
   var Widget = function (size, name, widgetType, properties, offset) {
     var self = this;
-    self.size = ko.observable(size);
+    self.size = ko.observable(size).extend({ numeric: 0 });;
     self.name = ko.observable(name);
     self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
     self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
-    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0);
+    self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });;
 
     self.klass = ko.computed(function () {
-      return "card card-widget span" + self.size() + (self.offset() > 0 ? " offset" + self.offset() : "");
+      return "card card-widget span" + self.size() + (self.offset()*1 > 0 ? " offset" + self.offset() : "");
     });
 
     self.expand = function () {
@@ -404,6 +472,10 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     }
     self.moveRight = function () {
       self.offset(self.offset() + 1);
+    }
+
+    self.remove = function (row, widget) {
+      row.widgets.remove(widget);
     }
   }
 
@@ -435,7 +507,13 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     // save previous widgets
     var _allRows = [];
     $(viewModel.columns()).each(function (cnt, col) {
-      _allRows = _allRows.concat(col.rows());
+      var _tRows = [];
+      $(col.rows()).each(function(icnt, row){
+        if (row.widgets().length > 0){
+          _tRows.push(row);
+        }
+      });
+      _allRows = _allRows.concat(_tRows);
     });
 
     var _cols = [];
@@ -453,6 +531,13 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
     if (_allRows.length > 0 && _highestCol.idx > -1) {
       _cols[_highestCol.idx].rows(_allRows);
     }
+
+    $(_cols).each(function (cnt, col) {
+      if (col.rows().length == 0){
+        col.rows([new Row([])]);
+      }
+    });
+
     viewModel.columns(_cols);
   }
 

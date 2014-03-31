@@ -1,0 +1,48 @@
+@font-face {
+	font-family: 'HueCharts';
+	src:url('../fonts/huecharts-regular.eot?121z71');
+	src:url('../fonts/huecharts-regular.eot?#iefix121z71') format('embedded-opentype'),
+		url('../fonts/huecharts-regular.woff?121z71') format('woff'),
+		url('../fonts/huecharts-regular.ttf?121z71') format('truetype'),
+		url('../fonts/huecharts-regular.svg?121z71#filetypes') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.hcha {
+  display: inline-block;
+  font-family: HueCharts;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hcha-bar-chart:before {
+  content: "\f016";
+}
+
+.hcha-pie-chart:before {
+  content: "\f017";
+}
+
+.hcha-map-chart:before {
+  content: "\f018";
+}
+
+.hcha-map-chart-o:before {
+  content: "\f019";
+}
+
+.hcha-area-chart:before {
+  content: "\f01a";
+}
+
+.hcha-line-chart:before {
+  content: "\f01b";
+}
+
+.hcha-timeline-chart:before {
+  content: "\f01c";
+}
