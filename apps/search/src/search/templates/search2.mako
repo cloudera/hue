@@ -335,10 +335,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   </div>
 
   <!-- ko if: $root.collection.template.isGridLayout() -->
-  <div style="float:left; margin-right: 10px" >
+  <div data-bind="visible: $root.isEditing" style="float:left; margin-right: 10px" >
     <span>
       ## Todo add a toggle to show fields or not in non edit mode
       <strong>${ _('Fields') }</strong>
+      &nbsp;<a href="javascript: void(0)" id="selectAll" class="btn btn-inverse" data-bind="click: function(){$root.collection.template.fields([]); $('#selectAll').removeClass('btn-inverse')}"><i class="fa fa-check"></i></a>
       <div data-bind="foreach: $root.collection.fields">
         <input type="checkbox" data-bind="value: $data, checked: $root.collection.template.fields" />
         <span data-bind="text: '&nbsp;' + $data"></span>
