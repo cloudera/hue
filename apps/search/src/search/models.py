@@ -250,7 +250,6 @@ class Collection(models.Model):
 
   def get_c(self, user):
     props = self.properties_dict
-    print props
     if 'collection' not in props:
       props['collection'] = self.get_default(user)
     
@@ -258,9 +257,9 @@ class Collection(models.Model):
 
   def get_default(self, user):      
     fields = self.fields_data(user)
-    id_field = [field.name for field in fields if field.get('isId')]
-    if not id_field:
-      id_field = 'id'
+    id_field = [field['name'] for field in fields if field.get('isId')]
+    if id_field:
+      id_field = id_field[0]
     fields = [field.get('name') for field in self.fields_data(user)]
   
     TEMPLATE = {
@@ -299,7 +298,7 @@ class Collection(models.Model):
     schema_fields = schema_fields['schema']['fields']
 
     return sorted([{'name': str(field), 'type': str(attributes.get('type', '')),
-                    'isId': attributes.get('stored') and attributes.get('required') and attributes.get('multiValued')
+                    'isId': attributes.get('required') and attributes.get('uniqueKey')
                   }
                   for field, attributes in schema_fields.iteritems()])
 
@@ -441,7 +440,7 @@ def augment_solr_response2(response, collection, solr_query):
 
   # TODO HTML escape docs!
   
-  highlighted_fields = response.get('highlighting', [])
+  highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields:
     id_field = collection.get('idField')    
     if id_field:
@@ -449,7 +448,7 @@ def augment_solr_response2(response, collection, solr_query):
         if id_field in doc and doc[id_field] in highlighted_fields:
           doc.update(response['highlighting'][doc[id_field]])
     else:
-      response['warning'] = _("The Solr schema requires an 'id' field for performing the result highlighting")
+      response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
       
         
   response['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
