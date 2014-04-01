@@ -208,7 +208,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }
@@ -232,7 +232,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }
@@ -260,7 +260,7 @@ class TestDocModelPermissions():
             default_group.id
           ]
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }
@@ -284,7 +284,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }
@@ -308,7 +308,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [
             self.user_not_me.id
           ],
@@ -334,7 +334,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }
@@ -358,7 +358,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': [
             default_group.id
@@ -384,7 +384,7 @@ class TestDocModelPermissions():
           ],
           'group_ids': []
         },
-        'modify': {
+        'write': {
           'user_ids': [],
           'group_ids': []
         }

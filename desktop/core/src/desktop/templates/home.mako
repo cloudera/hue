@@ -352,12 +352,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
         <div class="span6">
           <h4 class="muted" style="margin-top:0px">${_('Read and Modify')}</h4>
-          <div data-bind="visible: (selectedDoc().perms.modify.users.length == 0 && selectedDoc().perms.modify.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
-          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.users">
-            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserModifyShare"> <i class="fa fa-times"></i></li>
+          <div data-bind="visible: (selectedDoc().perms.write.users.length == 0 && selectedDoc().perms.write.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.users">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></li>
           </ul>
-          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.groups">
-            <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupModifyShare"> <i class="fa fa-times"></i></li>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.groups">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupWriteShare"> <i class="fa fa-times"></i></li>
           </ul>
         </div>
 
@@ -373,7 +373,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
             </a>
             <ul class="dropdown-menu">
               <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'read')" href="javascript:void(0)">${ _('Read') }</a></li>
-              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'modify')" href="javascript:void(0)">${ _('Read and Modify') }</a></li>
+              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'write')" href="javascript:void(0)">${ _('Read and Modify') }</a></li>
             </ul>
           </div>
         </div>
@@ -593,10 +593,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     shareDocFinal();
   }
 
-  function removeUserModifyShare(user) {
-    $(viewModel.selectedDoc().perms.modify.users).each(function (cnt, item) {
+  function removeUserWriteShare(user) {
+    $(viewModel.selectedDoc().perms.write.users).each(function (cnt, item) {
       if (item.id == user.id) {
-        viewModel.selectedDoc().perms.modify.users.splice(cnt, 1);
+        viewModel.selectedDoc().perms.write.users.splice(cnt, 1);
       }
     });
     viewModel.selectedDoc.valueHasMutated();
@@ -613,10 +613,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     shareDocFinal();
   }
 
-  function removeGroupModifyShare(group) {
-    $(viewModel.selectedDoc().perms.modify.groups).each(function (cnt, item) {
+  function removeGroupWriteShare(group) {
+    $(viewModel.selectedDoc().perms.write.groups).each(function (cnt, item) {
       if (item.id == group.id) {
-        viewModel.selectedDoc().perms.modify.groups.splice(cnt, 1);
+        viewModel.selectedDoc().perms.write.groups.splice(cnt, 1);
       }
     });
     viewModel.selectedDoc.valueHasMutated();
@@ -633,7 +633,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         user_ids: [],
         group_ids: []
       },
-      modify: {
+      write: {
         user_ids: [],
         group_ids: []
       }
@@ -647,12 +647,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       _postPerms.read.group_ids.push(item.id);
     });
 
-    $(viewModel.selectedDoc().perms.modify.users).each(function (cnt, item) {
-      _postPerms.modify.user_ids.push(item.id);
+    $(viewModel.selectedDoc().perms.write.users).each(function (cnt, item) {
+      _postPerms.write.user_ids.push(item.id);
     });
 
-    $(viewModel.selectedDoc().perms.modify.groups).each(function (cnt, item) {
-      _postPerms.modify.group_ids.push(item.id);
+    $(viewModel.selectedDoc().perms.write.groups).each(function (cnt, item) {
+      _postPerms.write.group_ids.push(item.id);
     });
 
     $.post("/desktop/api/doc/update_permissions", {

@@ -37,7 +37,7 @@ var PigScript = function (pigScript) {
   self.id = ko.observable(pigScript.id);
   self.isDesign = ko.observable(pigScript.isDesign);
   self.name = ko.observable(pigScript.name);
-  self.can_modify = ko.observable(pigScript.can_modify);
+  self.can_write = ko.observable(pigScript.can_write);
   self.script = ko.observable(pigScript.script);
   self.scriptSumup = ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100));
   self.isRunning = ko.observable(false);
@@ -207,7 +207,7 @@ var PigViewModel = function (props) {
     resources: self.LABELS.NEW_SCRIPT_RESOURCES,
     hadoopProperties: self.LABELS.NEW_SCRIPT_HADOOP_PROPERTIES,
     parentModel: self,
-    can_modify: true
+    can_write: true
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));

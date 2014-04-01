@@ -360,11 +360,11 @@ class Document(models.Model):
 
   def is_editable(self, user):
     """Deprecated by can_read"""
-    return self.can_modify(user)
+    return self.can_write(user)
 
   def can_edit_or_exception(self, user, exception_class=PopupException):
-    """Deprecated by can_modify_or_exception"""
-    return self.can_modify_or_exception(user, exception_class)
+    """Deprecated by can_write_or_exception"""
+    return self.can_write_or_exception(user, exception_class)
 
   def add_tag(self, tag):
     self.tags.add(tag)
@@ -398,8 +398,8 @@ class Document(models.Model):
   def can_read(self, user):
     return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
-  def can_modify(self, user):
-    return user.is_superuser or self.owner == user or user in self.list_permissions('modify').users.all()
+  def can_write(self, user):
+    return user.is_superuser or self.owner == user or user in self.list_permissions('write').users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
@@ -407,15 +407,11 @@ class Document(models.Model):
     else:
       raise exception_class(_('Only superusers and %s are allowed to read this document.') % user)
 
-  def can_modify_or_exception(self, user, exception_class=PopupException):
-    if self.can_modify(user):
+  def can_write_or_exception(self, user, exception_class=PopupException):
+    if self.can_write(user):
       return True
     else:
-      raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user)
-
-  def can_write_or_exception(self, user, exception_class=PopupException):
-    """ Deprecated by can_modify_or_exception """
-    return self.can_modify_or_exception(user, exception_class)
+      raise exception_class(_('Only superusers and %s are allowed to write this document.') % user)
 
   def copy(self, name=None, owner=None):
     copy_doc = self
@@ -495,7 +491,7 @@ class Document(models.Model):
 class DocumentPermissionManager(models.Manager):
 
   def _check_perm(self, name):
-    perms = (DocumentPermission.READ_PERM, DocumentPermission.MODIFY_PERM)
+    perms = (DocumentPermission.READ_PERM, DocumentPermission.WRITE_PERM)
     if name not in perms:
       perms_string = ' and '.join(', '.join(perms).rsplit(', ', 1))
       raise PopupException(_('Only %s permissions are supported, not %s.') % (perms_string, name))
@@ -506,8 +502,8 @@ class DocumentPermissionManager(models.Manager):
     
     self._check_perm(name)
 
-    if name == DocumentPermission.MODIFY_PERM:
-      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.MODIFY_PERM)
+    if name == DocumentPermission.WRITE_PERM:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.WRITE_PERM)
     else:
       perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
     default_group = get_default_user_group()
@@ -568,7 +564,7 @@ class DocumentPermissionManager(models.Manager):
 
 class DocumentPermission(models.Model):
   READ_PERM = 'read'
-  MODIFY_PERM = 'modify'
+  WRITE_PERM = 'write'
 
   doc = models.ForeignKey(Document)
 
@@ -577,7 +573,7 @@ class DocumentPermission(models.Model):
   # @TODO(Abe): Rename to "perm"
   perms = models.TextField(default=READ_PERM, choices=(
     (READ_PERM, 'read'),
-    (MODIFY_PERM, 'modify'),
+    (WRITE_PERM, 'write'),
   ))
 
 

@@ -129,7 +129,7 @@ def massaged_documents_for_json(documents, user):
 
   for document in documents:
     read_perms = document.list_permissions(perm='read')
-    modify_perms = document.list_permissions(perm='modify')
+    write_perms = document.list_permissions(perm='write')
     docs[document.id] = {
       'id': document.id,
       'contentType': document.content_type.name,
@@ -143,9 +143,9 @@ def massaged_documents_for_json(documents, user):
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
           'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in read_perms.groups.all()]
         },
-        'modify': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in modify_perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in modify_perms.groups.all()]
+        'write': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in write_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in write_perms.groups.all()]
         }
       },
       'owner': document.owner.username,
@@ -159,7 +159,7 @@ def massaged_documents_for_json(documents, user):
 
 def massage_doc_for_json(doc, user):
   read_perms = doc.list_permissions(perm='read')
-  modify_perms = doc.list_permissions(perm='modify')
+  write_perms = doc.list_permissions(perm='write')
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -173,9 +173,9 @@ def massage_doc_for_json(doc, user):
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
           'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in read_perms.groups.all()]
         },
-        'modify': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in modify_perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in modify_perms.groups.all()]
+        'write': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in write_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in write_perms.groups.all()]
         }
       },
       'owner': doc.owner.username,

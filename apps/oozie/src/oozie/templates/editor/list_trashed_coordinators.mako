@@ -182,8 +182,8 @@ ${ layout.menubar(section='coordinators') }
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
       var selector = $(".hueCheckbox[checked='checked']");
-      var can_modify = $(".hueCheckbox[checked='checked'][data-coordinator-id]");
-      if (can_modify.length >= 1 && can_modify.length == selector.length) {
+      var can_write = $(".hueCheckbox[checked='checked'][data-coordinator-id]");
+      if (can_write.length >= 1 && can_write.length == selector.length) {
         $("#destroy-btn").removeAttr("disabled");
         $("#restore-btn").removeAttr("disabled");
       }

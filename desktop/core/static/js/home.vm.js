@@ -30,7 +30,7 @@ function HomeViewModel(json_tags, json_docs) {
         users: [],
         groups: []
       },
-      modify: {
+      write: {
         users: [],
         groups: []
       }
@@ -39,7 +39,11 @@ function HomeViewModel(json_tags, json_docs) {
 
   self.selectedPerm = ko.observable('read');
   self.selectedPermLabel = ko.computed(function() {
-    return self.selectedPerm().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    if (self.selectedPerm() == 'write') {
+      return 'Modify';
+    } else {
+      return 'Read';
+    }
   });
 
   self.selectedTag = ko.observable({});
