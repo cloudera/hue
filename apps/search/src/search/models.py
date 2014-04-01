@@ -206,29 +206,9 @@ class CollectionManager(models.Manager):
     try:
       return self.get(name=name), False
     except Collection.DoesNotExist:
-      facets = Facet.objects.create(data=json.dumps({
-                   'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
-                   'ranges': [],
-                   'fields': [],
-                   'dates': []
-                }))
-      result = Result.objects.create(data=json.dumps({
-                  'template': '',
-                  'highlighting': [],
-                  'properties': {'highlighting_enabled': False},
-                  'extracode':
-                  """
-<style>
-em {
-  color: red;
-}
-</style>
-
-<script>
-</script>
-                  """
-              }))
-      sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
+      facets = Facet.objects.create()
+      result = Result.objects.create()      
+      sorting = Sorting.objects.create()
       cores = json.dumps(solr_properties)
 
       collection = Collection.objects.create(
@@ -242,18 +222,10 @@ em {
           sorting=sorting
       )
 
-      template = """
-<div class="row-fluid">
-  <div class="row-fluid">
-    <div class="span12">%s</div>
-  </div>
-  <br/>
-</div>""" % ' '.join(['{{%s}}' % field['name'] for field in collection.fields_data(user)])
+      collection.update_properties({'collection': collection.get_default(user)})
+      collection.save()
 
-      result.update_from_post({'template': json.dumps(template)})
-      result.save()
-
-      return collection, True
+      return collection, True      
 
 
 class Collection(models.Model):
@@ -271,9 +243,20 @@ class Collection(models.Model):
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
 
+  _ATTRIBUTES = ['collection', 'autocomplete']
+  ICON = '/search/static/art/icon_search_24.png'
+
   objects = CollectionManager()
 
   def get_c(self, user):
+    props = self.properties_dict
+    print props
+    if 'collection' not in props:
+      props['collection'] = self.get_default(user)
+    
+    return json.dumps(props['collection'])
+
+  def get_default(self, user):      
     fields = self.fields_data(user)
     id_field = [field.name for field in fields if field.get('isId')]
     if not id_field:
@@ -281,32 +264,32 @@ class Collection(models.Model):
     fields = [field.get('name') for field in self.fields_data(user)]
   
     TEMPLATE = {
-      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": ["body"],
+      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": [""],
       "properties": {"highlighting_enabled": True},
-      "template": "{{user_screen_name}} {{user_name}} {{text}}", "isGridLayout": True,
+      "template": """
+      <div class="row-fluid">
+        <div class="row-fluid">
+          <div class="span12">%s</div>
+        </div>
+        <br/>
+      </div>""" % ' '.join(['{{%s}}' % field for field in fields]), 
+      "isGridLayout": True,
       "fields": fields
-    };
-    FACETS = {"dates": [], "fields": [
-#                                      {
-#         "uuid": "f6618a5c-bbba-2886-1886-bbcaf01409ca", "verbatim": "", "isVerbatim": False, "label": "Location", 
-#         "field": "user_location", "type": "field"
-#       }
-       ],
+    }
+    
+    FACETS = {"dates": [], "fields": [],
        "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
     };  
     
-    m = {
+    collection_properties = {
       'id': self.id, 'name': self.name, 'template': TEMPLATE, 'facets': FACETS['fields'], 
       'fields': fields, 'idField': id_field
-    };
+    };      
     
-    return json.dumps(m)
-
-  def get_query(self, client_query=None):
-    return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params(client_query)
+    return collection_properties
 
   def get_absolute_url(self):
-    return reverse('search:admin_collection', kwargs={'collection_id': self.id})
+    return reverse('search:index') + '?collection=%s' % self.id
 
   def fields(self, user):
     return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
@@ -328,7 +311,17 @@ class Collection(models.Model):
     # Backward compatibility
     if 'autocomplete' not in properties_python:
       properties_python['autocomplete'] = False
+    # TODO: Should convert old format here
     return properties_python
+
+  def update_properties(self, post_data):
+    prop_dict = self.properties_dict
+
+    for attr in Collection._ATTRIBUTES:
+      if post_data.get(attr) is not None:
+        prop_dict[attr] = post_data[attr]
+
+    self.properties = json.dumps(prop_dict)
 
   @property
   def autocomplete(self):

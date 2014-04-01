@@ -128,10 +128,12 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
 <div class="search-bar">
   % if user.is_superuser:
-    <div class="pull-right" style="margin-top: 6px; margin-right: 40px">
-      <button type="button" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>    
-      <a class="change-settings" href="#"><i class="fa fa-save"></i> ${ _('Save') }</a> &nbsp;&nbsp;
-      <a href="${ url('search:admin_collections') }"><i class="fa fa-sitemap"></i> ${ _('Collection manager') }</a>
+    <div class="pull-right" style="margin-top: 6px; padding-right:50px">
+      <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
+      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cogs"></i></button>    
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
+      <button type="button" title="${ _('History') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-archive"></i></button>
+      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
     </div>
   % endif
   
@@ -139,10 +141,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
-        <span class="current-collection"></span>
-        <ul class="unstyled">
-          <li><a class="dropdown-collection" href="#" data-value="${ hue_collection.id }" data-settings-url="${ hue_collection.get_absolute_url() }">${ hue_collection.label }</a></li>
-        </ul>
+        <span class="current-collection">${ collection.label }</span>        
       </div>
 
       <input data-bind="value: query.q" name="query" maxlength="256" type="text" class="search-query input-xxlarge" id="id_query" style="cursor: auto;">
@@ -240,11 +239,14 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   <div data-bind="css: klass">
     <h2 class="card-heading simple">
       <ul class="inline" data-bind="visible: $root.isEditing">
-        <li><a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a></li>
+        <li><a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-pencil"></i></a></li>
         <li><a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a></li>
         <li><a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a></li>
       </ul>
       <span data-bind="text: name"></span>
+      <div class="inline pull-right" data-bind="visible: $root.isEditing">
+        <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
+      </div>
     </h2>
     <div class="card-body">
       <p>
@@ -268,60 +270,80 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
-      <span class="pull-right">
-        <a data-bind="click: showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-      </span>
+  <span class="pull-right">
+    <a data-bind="click: showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  </span>
 
-      ## Need to pick the facet ID from norm_facets instead of looping on all
-      <div class="row" data-bind="foreach: $root.norm_facets">
-        <span class="pull-right">
-          <a href="javascript:void(0)" data-bind="click: editFacet"><i class="fa fa-pencil"></i></a>
-          <a href="javascript:void(0)" data-bind="click: $root.removeFacet"><i class="fa fa-times"></i></a>
-        </span>
-        <div data-bind="text: label"></div>
-        <div data-bind="foreach: counts">
-          <div>
-            <a href="script:void(0)">
-            <!-- ko if: selected -->
-              <span data-bind="text: value, click: $root.query.unselectFacet"></span>
-              <i data-bind="click: $root.query.unselectFacet" class="fa fa-times"></i>            
-            <!-- /ko -->
-            <!-- ko if: !selected -->           
-              <span data-bind="text: value, click: $root.query.selectFacet"></span> (<span data-bind="text: count, click: $root.query.selectFacet"></span>)            
-            <!-- /ko -->
-            </a>
-          </div>
-        </div>
-      </div>    
-
+  ## Need to pick the facet ID from norm_facets instead of looping on all
+  <div class="row" data-bind="foreach: $root.norm_facets">
+    <span class="pull-right">
+      <a href="javascript:void(0)" data-bind="click: editFacet"><i class="fa fa-pencil"></i></a>
+      <a href="javascript:void(0)" data-bind="click: $root.removeFacet"><i class="fa fa-times"></i></a>
+    </span>
+    <div data-bind="text: label"></div>
+    <div data-bind="foreach: counts">
+      <div>
+        <a href="script:void(0)">
+        <!-- ko if: selected -->
+          <span data-bind="text: value, click: $root.query.unselectFacet"></span>
+          <i data-bind="click: $root.query.unselectFacet" class="fa fa-times"></i>            
+        <!-- /ko -->
+        <!-- ko if: !selected -->           
+          <span data-bind="text: value, click: $root.query.selectFacet"></span> (<span data-bind="text: count, click: $root.query.selectFacet"></span>)            
+        <!-- /ko -->
+        </a>
+      </div>
+    </div>
+  </div>
 </script>
 
-<script type="text/html" id="resultset-widget">
-      <div class="row">
-        <span class="pull-right">
-          <a data-bind="click: editTemplate" href="javascript:void(0)"><i class="fa fa-pencil"></i></a>
-        </span>
+<script type="text/html" id="resultset-widget">  
+  <div class="row">
+    <div class="span2">
+    <p>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">        
+        <p data-bind="visible: $root.isEditing">
+          ${ _('Grid result') }: <input type="checkbox" data-bind="checked: $root.collection.template.isGridLayout" />
+        </p>
+        
+        <!-- ko if: $root.collection.template.isGridLayout() -->
+        <p>
+          ## Todo add a toggle to show fields or not in non edit mode
+          ${ _('Fields') }
+          <select data-bind="options: $root.collection.fields, selectedOptions: $root.collection.template.fields" size="5" multiple="true"></select>
+        </p>  
+        <!-- /ko -->
+        
+        <!-- ko if: !$root.collection.template.isGridLayout() && $root.isEditing() -->
+        <textarea data-bind="value: $root.collection.template.template, valueUpdate:'afterkeydown'"></textarea>
+        <!-- /ko -->
       </div>
-  
-      <!-- ko if: $root.collection.template.isGridLayout() -->
-      <table id="result-container">        
-        <thead>
-          <tr data-bind="foreach: $root.collection.template.fields">
-            <th data-bind="text: $data"></th>
-          </tr>
-        </thead>
-        <tbody data-bind="foreach: $root.results">
-          <tr class="result-row" data-bind="foreach: $data">
-            <td data-bind="html: $data"></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- /ko -->
-      <!-- ko if: ! $root.collection.template.isGridLayout() -->
-      <div id="result-container" data-bind="foreach: $root.results">
-        <div class="result-row" data-bind="html: $data"></div>
-      </div>
-      <!-- /ko -->  
+    </p>
+    </div>
+    
+    <div class="span10">
+	  <!-- ko if: $root.collection.template.isGridLayout() -->
+	  <table id="result-container">        
+	    <thead>
+	      <tr data-bind="foreach: $root.collection.template.fields">
+	        <th data-bind="text: $data"></th>
+	      </tr>
+	    </thead>
+	    <tbody data-bind="foreach: $root.results">
+	      <tr class="result-row" data-bind="foreach: $data">
+	        <td data-bind="html: $data"></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <!-- /ko -->
+	  <!-- ko if: ! $root.collection.template.isGridLayout() -->
+	  <div id="result-container" data-bind="foreach: $root.results">
+	    <div class="result-row" data-bind="html: $data"></div>
+	  </div>
+	  <!-- /ko -->  
+    </span>
+  </span>
 </script>
 
 <script type="text/html" id="timeline-widget">
@@ -401,37 +423,6 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 </div>
 
 
-<div id="editTemplateModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Edit Template')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">        
-        <p>
-          ${ _('Grid result') }: <input type="checkbox" data-bind="checked: collection.template.isGridLayout" />
-        </p>
-        
-        <!-- ko if: $root.collection.template.isGridLayout() -->
-        <p>
-          ${ _('Fields') }
-          <select data-bind="options: collection.fields, selectedOptions: collection.template.fields" size="5" multiple="true"></select>
-        </p>  
-        <!-- /ko -->
-        
-        <!-- ko if: ! $root.collection.template.isGridLayout() -->
-        <textarea data-bind="value: collection.template.template, valueUpdate:'afterkeydown'"></textarea>
-        <!-- /ko -->
-      </div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Ok')}</a>
-  </div>
-</div>
-
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/mustache.js"></script>
@@ -487,14 +478,15 @@ $(document).ready(function () {
   };
 
 
-  viewModel = new SearchViewModel(${ hue_collection.get_c(user) | n,unicode }, ${ hue_query | n,unicode });
+  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
   ko.applyBindings(viewModel);
   
-  
+  % if not layout:
   fullLayout();
   viewModel.isEditing(true);
   viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());  
   viewModel.search();
+  % endif
 });
 
   function showAddFacetModal(facet) {
@@ -505,10 +497,6 @@ $(document).ready(function () {
     viewModel.collection.addFacet({'name': $("#facetName").val()});
     $('#addFacetModal').modal("hide");
     viewModel.search();
-  };
-
-  function editTemplate(facet) {
-    $("#editTemplateModal").modal("show");
   };
 
   function editFacet(facet) {

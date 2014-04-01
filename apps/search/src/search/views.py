@@ -17,7 +17,6 @@
 
 import json
 import logging
-import math
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -34,8 +33,7 @@ from search.data_export import download as export_download
 from search.decorators import allow_admin_only
 from search.forms import QueryForm, CollectionForm
 from search.management.commands import search_setup
-from search.models import Collection, augment_solr_response, augment_solr_response2,\
-  augment_solr_exception
+from search.models import Collection, augment_solr_response2, augment_solr_exception
 from search.search_controller import SearchController
 
 from django.utils.encoding import force_unicode
@@ -49,93 +47,47 @@ def initial_collection(request, hue_collections):
   return hue_collections[0].id
 
 
-def index(request):
-  hue_collections = SearchController(request.user).get_search_collections()
-
-  if not hue_collections:
-    if request.user.is_superuser:
-      return admin_collections(request, True)
-    else:
-      return no_collections(request)
-
-  init_collection = initial_collection(request, hue_collections)
-
-  search_form = QueryForm(request.GET, initial_collection=init_collection)
-  response = {}
-  error = {}
-  solr_query = {}
-
-  if search_form.is_valid():
-    try:
-      collection_id = search_form.cleaned_data['collection']
-      hue_collection = Collection.objects.get(id=collection_id)
-
-      solr_query = search_form.solr_query_dict
-      response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
-
-      solr_query['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
-      solr_query['search_time'] = response['responseHeader']['QTime']
-    except Exception, e:
-      error['title'] = force_unicode(e.title) if hasattr(e, 'title') else ''
-      error['message'] = force_unicode(str(e))
-  else:
-    error['message'] = _('There is no collection to search.')
-
-  if hue_collection is not None:
-    response = augment_solr_response(response, hue_collection.facets.get_data(), solr_query)
-
-  if request.GET.get('format') == 'json':
-    return HttpResponse(json.dumps(response), mimetype="application/json")
-
-  return render('search.mako', request, {
-    'search_form': search_form,
-    'response': response,
-    'error': error,
-    'solr_query': solr_query,
-    'hue_collection': hue_collection,
-    'current_collection': collection_id,
-    'json': json,
-  })
-
 def dashboard(request):
   return render('dashboard.mako', request, {})
 
 
-def index2(request):
+def index(request):
   hue_collections = SearchController(request.user).get_search_collections()
-
-  if not hue_collections:
+  collection_id = request.GET.get('collection')
+  
+  if not hue_collections or not collection_id:
     if request.user.is_superuser:
       return admin_collections(request, True)
     else:
       return no_collections(request)
 
-  collection_id = request.GET.get('collection')
-  hue_collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
-  hue_query = {'q': '', 'fq': {}}
+  collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
+  query = {'q': '', 'fq': {}}
 
   return render('search2.mako', request, {
-    'hue_collection': hue_collection,
-    'hue_query': hue_query,
+    'collection': collection,
+    'query': query,
+    'layout': {},
   })
 
 
 def search(request):
   response = {}  
   
-  collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
+  collection = json.loads(request.POST.get('collection', '{}')) # TODO decorator with doc model perms
   query = json.loads(request.POST.get('query', '{}'))
+  hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
+  # collection['name']=
   
   print request.POST
   print collection
     
   if collection:
     solr_query = {}    
-    try:
-      hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
+    try:      
       solr_query = {}      
       
-      solr_query['collection'] = collection['name'] # TODO perms
+      solr_query['collection'] = collection['name']
       solr_query['rows'] = 10
       solr_query['start'] = 0
       solr_query['fq'] = query['fq']
@@ -157,6 +109,24 @@ def search(request):
 
   if 'error' in response:
     augment_solr_exception(response, collection, solr_query)
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def save(request):
+  response = {'status': -1}  
+  
+  collection = json.loads(request.POST.get('collection', '{}')) # TODO perms decorator
+    
+  if collection:
+    hue_collection = Collection.objects.get(id=collection['id'])
+    hue_collection.update_properties({'collection': collection})
+    # Todo update certain atttributes like, label, enabled...
+    hue_collection.save()
+    response['status'] = 0
+    response['message'] = _('Page saved !')
+  else:
+    response['message'] = _('There is no collection to search.')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

@@ -102,6 +102,7 @@ var Column = function (size, rows) {
     }
 
     self.remove = function (row, widget) {
+      // widget.remove() --> callback to removeFacet() or other depending on type of widget
       row.widgets.remove(widget);
     }
   };
@@ -216,8 +217,7 @@ var Collection = function (vm, collection) {
 	  }).fail(function(xhr, textStatus, errorThrown) {}
 	);
   }
-    
-  // Init
+
   self.addDynamicFields();
 };
 
@@ -288,6 +288,7 @@ var SearchViewModel = function (collection_json, query_json) {
      });
   };
     
+  // To move to collection
   self.selectSingleFacet = function(normalized_facet_json) {
 	$.each(self.collection.facets(), function(index, facet) {
       if (facet.field() == normalized_facet_json.field) {
@@ -304,4 +305,19 @@ var SearchViewModel = function (collection_json, query_json) {
 	});
 	self.search();
   }
+  
+  self.save = function () {
+    $.post("/search/save", {
+        collection: ko.mapping.toJSON(self.collection),
+        layout: ko.mapping.toJSON(self.columns)
+      }, function (data) {
+   	   if (data.status == 0) {
+   		 $(document).trigger("info", data.message);
+   	   } else {
+   		$(document).trigger("error", data.message);
+   	   }
+     }).fail(function(xhr, textStatus, errorThrown) {    	
+       $(document).trigger("error", xhr.responseText);
+     });
+  };
 };
