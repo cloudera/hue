@@ -273,7 +273,9 @@ ${layout.menubar(section='query')}
             <button data-bind="click: tryExecuteNextStatement, visible: !$root.design.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
             <button data-bind="click: tryExecuteQuery, visible: !$root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Restart')}</button>
 
+            % if can_edit:
             <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
+            % endif
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
             <button data-bind="click: tryExplainQuery, visible: $root.canExecute" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
             &nbsp; ${_('or create a')} &nbsp;

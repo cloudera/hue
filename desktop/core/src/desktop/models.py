@@ -414,8 +414,6 @@ class Document(models.Model):
   def copy(self, name=None, owner=None):
     copy_doc = self
 
-    tags = self.tags.all() # Don't copy tags
-
     copy_doc.pk = None
     copy_doc.id = None
     if name is not None:
@@ -424,8 +422,7 @@ class Document(models.Model):
       copy_doc.owner = owner
     copy_doc.save()
 
-    #tags = filter(lambda tag: tag.tag != DocumentTag.EXAMPLE, tags)
-    #if not tags:
+    # Don't copy tags
     default_tag = DocumentTag.objects.get_default_tag(copy_doc.owner)
     tags = [default_tag]
     copy_doc.tags.add(*tags)

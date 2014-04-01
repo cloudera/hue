@@ -89,24 +89,20 @@ ${ layout.menubar(section='saved queries') }
     <tbody>
       % for design in page.object_list:
         <%
-          may_edit = user == design.owner
+          may_edit = design.doc.get().can_write(user)
         %>
       <tr>
         <td data-row-selector-exclude="true">
           <div class="hueCheckbox savedCheck fa"
-            % if may_edit:
               data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
-              data-delete-name="${ design.id }"
               data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
+            % if may_edit:
+              data-delete-name="${ design.id }"
             % endif
             data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
         </td>
         <td>
-        % if may_edit:
           <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
-        % else:
-          ${ force_unicode(design.name) }
-        % endif
         </td>
         <td>
         % if design.desc:
@@ -207,7 +203,7 @@ ${ layout.menubar(section='saved queries') }
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
 
-      var selector = $(".hueCheckbox[checked='checked']");
+      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
       if (selector.length == 1) {
         if (selector.data("edit-url")) {
           $("#editBtn").removeAttr("disabled").click(function () {
@@ -225,7 +221,9 @@ ${ layout.menubar(section='saved queries') }
           });
         }
       }
-      if (selector.length >= 1) {
+
+      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-name]");
+      if (can_delete.length > 0 && can_delete.length == selector.length) {
         $("#trashQueryBtn").removeAttr("disabled");
         $("#trashQueryCaretBtn").removeAttr("disabled");
       }

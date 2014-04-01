@@ -51,7 +51,7 @@ import beeswax.views
 
 from beeswax import conf, hive_site
 from beeswax.conf import HIVE_SERVER_HOST
-from beeswax.views import collapse_whitespace
+from beeswax.views import collapse_whitespace, _save_design
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   HIVE_SERVER_TEST_PORT, fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
@@ -63,6 +63,7 @@ from beeswax.server.hive_server2_lib import HiveServerClient,\
   PartitionValueCompatible, HiveServerTable
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswax.hive_site import get_metastore
+from desktop.lib.exceptions_renderable import PopupException
 
 
 
@@ -1840,6 +1841,9 @@ class TestWithMockedServer(object):
     dbms.HiveServer2Dbms = MockDbms
 
     self.client = make_logged_in_client(is_superuser=False)
+    self.client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    self.user = User.objects.get(username='test')
+    self.user_not_me = User.objects.get(username='not_me')
     grant_access("test", "test", "beeswax")
 
   def tearDown(self):
@@ -1891,6 +1895,63 @@ class TestWithMockedServer(object):
     resp = self.client.get('/beeswax/list_designs')
     ids_page_1 = set([query.id for query in resp.context['page'].object_list])
     assert_equal(0, sum([query_id in ids_page_1 for query_id in ids]))
+
+  def test_save_design(self):
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 1', desc='My Description')
+    content = json.loads(response.content)
+    design_id = content['design_id']
+
+    design = SavedQuery.objects.get(id=design_id)
+    design_obj = hql_query('SELECT')
+
+    # Save his own query
+    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+    assert_equal('test_save_design', saved_design.name)
+    assert_equal('test_save_design desc', saved_design.desc)
+    assert_equal('test_save_design', saved_design.doc.get().name)
+    assert_equal('test_save_design desc', saved_design.doc.get().description)
+    assert_false(saved_design.doc.get().is_historic())
+
+    # Execute it as auto
+    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=False, name='test_save_design', desc='test_save_design desc')
+    assert_equal('test_save_design (new)', saved_design.name)
+    assert_equal('test_save_design desc', saved_design.desc)
+    assert_equal('test_save_design (new)', saved_design.doc.get().name)
+    assert_equal('test_save_design desc', saved_design.doc.get().description)
+    assert_true(saved_design.doc.get().is_historic())
+
+    # not_me user can't modify it
+    try:
+      _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+      assert_true(False, 'not_me is not allowed')
+    except PopupException:
+      pass
+
+    saved_design.doc.get().share_to_default()
+
+    try:
+      _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+      assert_true(False, 'not_me is not allowed')
+    except PopupException:
+      pass
+
+    # not_me can execute it as auto
+    saved_design = _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=False, name='test_save_design', desc='test_save_design desc')
+    assert_equal('test_save_design (new)', saved_design.name)
+    assert_equal('test_save_design desc', saved_design.desc)
+    assert_equal('test_save_design (new)', saved_design.doc.get().name)
+    assert_equal('test_save_design desc', saved_design.doc.get().description)
+    assert_true(saved_design.doc.get().is_historic())
+
+    # not_me can save as a new design
+    design = SavedQuery(owner=self.user_not_me, type=HQL)
+
+    saved_design = _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+    assert_equal('test_save_design', saved_design.name)
+    assert_equal('test_save_design desc', saved_design.desc)
+    assert_equal('test_save_design', saved_design.doc.get().name)
+    assert_equal('test_save_design desc', saved_design.doc.get().description)
+    assert_false(saved_design.doc.get().is_historic())
 
 
 class TestDesign():

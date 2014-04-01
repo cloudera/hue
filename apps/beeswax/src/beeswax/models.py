@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import base64
 import datetime
 import logging
@@ -253,12 +252,11 @@ class SavedQuery(models.Model):
       pass
 
   def clone(self):
-    """clone() -> A new SavedQuery with a deep copy of the same data"""
     design = SavedQuery(type=self.type, owner=self.owner)
-    design.data = copy.deepcopy(self.data)
-    design.name = copy.deepcopy(self.name)
-    design.desc = copy.deepcopy(self.desc)
-    design.is_auto = copy.deepcopy(self.is_auto)
+    design.data = self.data
+    design.name = self.name
+    design.desc = self.desc
+    design.is_auto = self.is_auto
     return design
 
   @classmethod
