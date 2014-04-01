@@ -423,8 +423,22 @@ from django.utils.translation import ugettext as _
 
 % if is_demo:
   <ul class="side-labels unstyled">
-    <li class="feedback"><a href="mailto:team@gethue.com?subject=Demo feedback"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
+    <li class="feedback"><a href="javascript:showClassicWidget()"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
   </ul>
+
+  <!-- UserVoice JavaScript SDK -->
+  <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script>
+  UserVoice = window.UserVoice || [];
+  function showClassicWidget() {
+    UserVoice.push(['showLightbox', 'classic_widget', {
+      mode: 'feedback',
+      primary_color: '#338cb8',
+      link_color: '#338cb8',
+      forum_id: 247008
+    }]);
+  }
+  </script>
 % endif
 
 <div id="jHueNotify" class="alert hide">
