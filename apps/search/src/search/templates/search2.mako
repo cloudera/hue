@@ -19,7 +19,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
+${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <link href="/static/ext/css/hue-filetypes.css" rel="stylesheet">
@@ -67,10 +67,21 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     padding-top: 0;
   }
 
+  .card-widget .card-heading {
+    font-size: 16px!important;
+  }
+
+  .card-widget .card-body {
+    margin-top: 0;
+  }
+
   .card-toolbar {
     margin: 0;
     padding: 4px;
     padding-top: 10px;
+    top: 70px;
+    position: fixed;
+    width: 100%;
   }
 
   .row-header {
@@ -81,7 +92,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
   #emptyDashboard {
     position: absolute;
-    right: 14px;
+    right: 164px;
     top: 80px;
     color: #666;
     font-size: 20px;
@@ -124,11 +135,24 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     user-select: none;
   }
 
+  .search-bar {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .with-top-margin {
+    margin-top: 130px;
+  }
+
+  .widget-settings-section {
+    display: none;
+  }
+
 </style>
 
 <div class="search-bar">
   % if user.is_superuser:
-    <div class="pull-right" style="margin-top: 6px; padding-right:50px">
+    <div class="pull-right" style="padding-right:50px">
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cogs"></i></button>    
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
@@ -180,7 +204,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   <img src="/search/static/art/hint_arrow.png" />
 </div>
 
-<div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0">
+<div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
       <div class="span3 preview-row"></div>
@@ -197,7 +221,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </div>
 </div>
 
-<div data-bind="css: {'dashboard': true, 'unselectable': isEditing()}">
+<div data-bind="css: {'dashboard': true, 'unselectable': isEditing(), 'with-top-margin': isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
@@ -230,7 +254,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, dragged: function(){viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -238,27 +262,30 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 <script type="text/html" id="widget-template">
   <div data-bind="css: klass">
     <h2 class="card-heading simple">
-      <ul class="inline" data-bind="visible: $root.isEditing">
-        <li><a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-pencil"></i></a></li>
-        <li><a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a></li>
-        <li><a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a></li>
-      </ul>
+      <span data-bind="visible: $root.isEditing">
+        <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
+        <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
+        &nbsp;
+      </span>
       <span data-bind="text: name"></span>
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </h2>
-    <div class="card-body">
-      <p>
-        <div data-bind="template: { name: function() { return widgetType(); }, data: properties }"></div>
-      </p>
-      <div data-bind="visible: $root.isEditing()">
-        This is visible just when we edit.<br/>
-        Common properties:
-        <ul>
-          <li> Name: <input type="text" data-bind="value: name" /></li>
-          <li> Size: <input type="text" data-bind="value: size" /></li>
-          <li> Offset: <input type="text" data-bind="value: offset" /></li>
+    <div class="card-body" style="padding: 5px;">
+      <ul class="nav nav-pills" data-bind="visible: $root.isEditing()">
+        <li class="active">
+          <a href="javascript: void(0)" class="widget-main-pill">${_('Preview')}</a>
+        </li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Widget settings')}</a></li>
+      </ul>
+
+      <div data-bind="template: { name: function() { return widgetType(); }, data: properties }" class="widget-main-section"></div>
+      <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
+        <ul class="unstyled" style="margin: 10px">
+          <li> Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
+          <li> Size: <input type="text" data-bind="value: size" class="input-mini" /></li>
+          <li> Offset: <input type="text" data-bind="value: offset" class="input-mini" /></li>
         </ul>
       </div>
     </div>
@@ -270,17 +297,19 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
-  <span class="pull-right">
-    <a data-bind="click: showAddFacetModal" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-  </span>
+
+  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+    ${_('Add field')}
+    &nbsp;<a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  </div>
 
   ## Need to pick the facet ID from norm_facets instead of looping on all
-  <div class="row" data-bind="foreach: $root.norm_facets">
+  <div class="row-fluid" data-bind="foreach: $root.norm_facets">
     <span class="pull-right">
       <a href="javascript:void(0)" data-bind="click: editFacet"><i class="fa fa-pencil"></i></a>
       <a href="javascript:void(0)" data-bind="click: $root.removeFacet"><i class="fa fa-times"></i></a>
     </span>
-    <div data-bind="text: label"></div>
+    <div data-bind="text: label" style="font-weight: bold"></div>
     <div data-bind="foreach: counts">
       <div>
         <a href="script:void(0)">
@@ -297,53 +326,58 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="resultset-widget">  
-  <div class="row">
-    <div class="span2">
-    <p>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">        
-        <p data-bind="visible: $root.isEditing">
-          ${ _('Grid result') }: <input type="checkbox" data-bind="checked: $root.collection.template.isGridLayout" />
-        </p>
-        
-        <!-- ko if: $root.collection.template.isGridLayout() -->
-        <p>
-          ## Todo add a toggle to show fields or not in non edit mode
-          ${ _('Fields') }
-          <select data-bind="options: $root.collection.fields, selectedOptions: $root.collection.template.fields" size="5" multiple="true"></select>
-        </p>  
-        <!-- /ko -->
-        
-        <!-- ko if: !$root.collection.template.isGridLayout() && $root.isEditing() -->
-        <textarea data-bind="value: $root.collection.template.template, valueUpdate:'afterkeydown'"></textarea>
-        <!-- /ko -->
+<script type="text/html" id="resultset-widget">
+
+  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      ${_('Results type')}
+      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
+      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-magic"></i></a>
+  </div>
+
+  <!-- ko if: $root.collection.template.isGridLayout() -->
+  <div style="float:left; margin-right: 10px" >
+    <span>
+      ## Todo add a toggle to show fields or not in non edit mode
+      <strong>${ _('Fields') }</strong>
+      <div data-bind="foreach: $root.collection.fields">
+        <input type="checkbox" data-bind="value: $data, checked: $root.collection.template.fields" />
+        <span data-bind="text: '&nbsp;' + $data"></span>
+        <br/>
       </div>
-    </p>
-    </div>
-    
-    <div class="span10">
+    </span>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: !$root.collection.template.isGridLayout() && $root.isEditing() -->
+    <textarea data-bind="value: $root.collection.template.template, valueUpdate:'afterkeydown'" class="span12" style="height: 100px"></textarea>
+    <br/>
+  <!-- /ko -->
+
+  <div style="overflow-x: auto">
 	  <!-- ko if: $root.collection.template.isGridLayout() -->
-	  <table id="result-container">        
-	    <thead>
-	      <tr data-bind="foreach: $root.collection.template.fields">
-	        <th data-bind="text: $data"></th>
-	      </tr>
-	    </thead>
-	    <tbody data-bind="foreach: $root.results">
-	      <tr class="result-row" data-bind="foreach: $data">
-	        <td data-bind="html: $data"></td>
-	      </tr>
-	    </tbody>
-	  </table>
+    <table id="result-container" data-bind="visible: !($root.isRetrievingResults())" style="margin-top: 0">
+      <thead>
+        <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fields">
+          <th data-bind="text: $data"></th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: $root.results">
+        <tr class="result-row" data-bind="foreach: $data">
+          <td data-bind="html: $data"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding: 10px" data-bind="visible: $root.isRetrievingResults()">
+      <!--[if !IE]> --><i class="fa fa-spinner fa-spin" style="font-size:20px;color: #999"></i><!-- <![endif]-->
+      <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    </div>
 	  <!-- /ko -->
 	  <!-- ko if: ! $root.collection.template.isGridLayout() -->
 	  <div id="result-container" data-bind="foreach: $root.results">
 	    <div class="result-row" data-bind="html: $data"></div>
 	  </div>
-	  <!-- /ko -->  
-    </span>
-  </span>
+	  <!-- /ko -->
+  </div>
 </script>
 
 <script type="text/html" id="timeline-widget">
@@ -444,6 +478,20 @@ var viewModel;
 
 $(document).ready(function () {
 
+  $(document).on("click", ".widget-settings-pill", function(){
+    $(this).parents(".card-body").find(".widget-main-section").hide();
+    $(this).parents(".card-body").find(".widget-settings-section").show();
+    $(this).parent().siblings().removeClass("active");
+    $(this).parent().addClass("active");
+  });
+
+  $(document).on("click", ".widget-main-pill", function(){
+    $(this).parents(".card-body").find(".widget-settings-section").hide();
+    $(this).parents(".card-body").find(".widget-main-section").show();
+    $(this).parent().siblings().removeClass("active");
+    $(this).parent().addClass("active");
+  });
+
   ko.bindingHandlers.slideVisible = {
     init: function (element, valueAccessor) {
       var value = valueAccessor();
@@ -482,10 +530,10 @@ $(document).ready(function () {
   ko.applyBindings(viewModel);
   
   % if not layout:
-  fullLayout();
-  viewModel.isEditing(true);
-  viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());  
-  viewModel.search();
+##  fullLayout();
+##  viewModel.isEditing(true);
+##  viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());
+##  viewModel.search();
   % endif
 });
 
