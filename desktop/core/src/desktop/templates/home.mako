@@ -51,11 +51,16 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   .badge-left {
     border-radius: 9px 0px 0px 9px;
     padding-right: 5px;
+    font-weight: normal;
   }
 
   .badge-right {
     border-radius: 0px 9px 9px 0px;
     padding-left: 5px;
+  }
+
+  .badge-right:hover {
+    background-color: #b94a48;
   }
 
   .airy li {
@@ -334,19 +339,28 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   <div class="modal-body">
     <p>
       <div class="row-fluid">
-        <div data-bind="visible: permsEmpty">${_('The document is not shared with any one.')}</div>
-        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
-          <li><i class="fa fa-users"></i> ${ _('Users from') } <span data-bind="text: name"></span> ${ _('may access this document') }</span><span class="trash-share" data-bind="click: removeGroupReadShare"> <i class="fa fa-times"></i></li>
-        </ul>
-        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.groups">
-          <li><i class="fa fa-users"></i> ${ _('Users from') } <span data-bind="text: name"></span> ${ _('may modify this document') }</span><span class="trash-share" data-bind="click: removeGroupModifyShare"> <i class="fa fa-times"></i></li>
-        </ul>
-        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
-          <li><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"> ${ _('may access this document') }</span></span><span class="trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
-        </ul>
-        <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.users">
-          <li><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span> ${ _('may modify this document') }</span><span class="trash-share" data-bind="click: removeUserModifyShare"> <i class="fa fa-times"></i></li>
-        </ul>
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
+          <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
+          </ul>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupReadShare"> <i class="fa fa-times"></i></li>
+          </ul>
+        </div>
+
+        <div class="span6">
+          <h4 class="muted" style="margin-top:0px">${_('Read and Modify')}</h4>
+          <div data-bind="visible: (selectedDoc().perms.modify.users.length == 0 && selectedDoc().perms.modify.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.users">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserModifyShare"> <i class="fa fa-times"></i></li>
+          </ul>
+          <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.modify.groups">
+            <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupModifyShare"> <i class="fa fa-times"></i></li>
+          </ul>
+        </div>
+
       </div>
       <div class="clearfix"></div>
       <div style="margin-top: 20px">
@@ -359,7 +373,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
             </a>
             <ul class="dropdown-menu">
               <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'read')" href="javascript:void(0)">${ _('Read') }</a></li>
-              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'modify')" href="javascript:void(0)">${ _('Modify') }</a></li>
+              <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'modify')" href="javascript:void(0)">${ _('Read and Modify') }</a></li>
             </ul>
           </div>
         </div>

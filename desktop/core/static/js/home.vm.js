@@ -36,19 +36,10 @@ function HomeViewModel(json_tags, json_docs) {
       }
     }
   }));
+
   self.selectedPerm = ko.observable('read');
   self.selectedPermLabel = ko.computed(function() {
     return self.selectedPerm().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-  });
-  self.permsEmpty = ko.computed(function() {
-    for (var perm in self.selectedDoc().perms) {
-      if ($.isFunction(self.selectedDoc().perms[perm].users)) {
-        return !!self.selectedDoc().perms[perm].users();
-      } else{
-        return !!self.selectedDoc().perms[perm].users;
-      }
-    }
-    return true;
   });
 
   self.selectedTag = ko.observable({});
