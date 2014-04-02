@@ -194,6 +194,9 @@ var Collection = function (vm, collection) {
   self.template.template.subscribe(function () {
     vm.search();
   });
+  self.template.isGridLayout.subscribe(function () {
+    vm.search();
+  });
   self.facets = ko.mapping.fromJS(collection.facets);
 
   self.fields = ko.observableArray(collection.fields);

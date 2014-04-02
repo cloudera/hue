@@ -277,15 +277,13 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <li class="active">
           <a href="javascript: void(0)" class="widget-main-pill">${_('Preview')}</a>
         </li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Widget settings')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Settings')}</a></li>
       </ul>
 
       <div data-bind="template: { name: function() { return widgetType(); }, data: properties }" class="widget-main-section"></div>
       <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
         <ul class="unstyled" style="margin: 10px">
           <li> Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
-          <li> Size: <input type="text" data-bind="value: size" class="input-mini" /></li>
-          <li> Offset: <input type="text" data-bind="value: offset" class="input-mini" /></li>
         </ul>
       </div>
     </div>
@@ -318,7 +316,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
           <i data-bind="click: $root.query.unselectFacet" class="fa fa-times"></i>            
         <!-- /ko -->
         <!-- ko if: !selected -->           
-          <span data-bind="text: value, click: $root.query.selectFacet"></span> (<span data-bind="text: count, click: $root.query.selectFacet"></span>)            
+          <span data-bind="text: value, click: $root.query.selectFacet"></span> <span data-bind="click: $root.query.selectFacet">(</span><span data-bind="text: count, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet">)</span>
         <!-- /ko -->
         </a>
       </div>
