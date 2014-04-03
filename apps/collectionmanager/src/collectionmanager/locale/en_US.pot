@@ -1,0 +1,35 @@
+# Translations template for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-09-11 13:35-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/about/templates/index.mako:20
+msgid "About Hue"
+msgstr ""
+
+#: src/about/templates/index.mako:25
+msgid "Configuration"
+msgstr ""
+
+#: src/about/templates/index.mako:26
+msgid "Check for misconfiguration"
+msgstr ""
+
+#: src/about/templates/index.mako:27
+msgid "Server Logs"
+msgstr ""
+

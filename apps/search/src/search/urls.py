@@ -28,6 +28,9 @@ urlpatterns = patterns('search.views',
 
   # All admin is deprecated
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
+
+  url(r'^admin/collections_create_manual$', 'admin_collections_create_manual', name='admin_collections_create_manual'),
+  url(r'^admin/collections_create_file$', 'admin_collections_create_file', name='admin_collections_create_file'),
   url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),
 
   url(r'^admin/collection/(?P<collection_id>\d+)$', 'admin_collection_template', name='admin_collection'),
@@ -38,6 +41,7 @@ urlpatterns = patterns('search.views',
   url(r'^admin/collection/(?P<collection_id>\d+)/sorting$', 'admin_collection_sorting', name='admin_collection_sorting'),
 
   # Ajax
+  url(r'^fields/parse$', 'parse_fields', name='parse_fields'),
   url(r'^suggest/(?P<collection_id>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
   url(r'^index/(?P<collection_id>\w+)/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
   url(r'^template/new_facet$', 'new_facet', name='new_facet'),

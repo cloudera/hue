@@ -29,6 +29,8 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 from django.utils.translation import ugettext as _
 
+from libsolr.api import SolrApi as BaseSolrApi
+
 from search.examples import demo_handler
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
@@ -123,35 +125,17 @@ def _zoom_range_facet(solr_api, collection, facet_field, direction='out'):
   return properties
 
 
-class SolrApi(object):
+class SolrApi(BaseSolrApi):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
   def __init__(self, solr_url, user):
-    self._url = solr_url
-    self._user = user
-    self._client = HttpClient(self._url, logger=LOG)
-    self.security_enabled = SECURITY_ENABLED.get()
-    if self.security_enabled:
-      self._client.set_kerberos_auth()
-    self._root = resource.Resource(self._client)
+    super(SolrApi, self).__init__(solr_url, user, SECURITY_ENABLED.get())
 
   def _get_params(self):
     if self.security_enabled:
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
-
-  @classmethod
-  def _get_json(cls, response):
-    if type(response) != dict:
-      # Got 'plain/text' mimetype instead of 'application/json'
-      try:
-        response = json.loads(response)
-      except ValueError, e:
-        # Got some null bytes in the response
-        LOG.error('%s: %s' % (unicode(e), repr(response)))
-        response = json.loads(response.replace('\x00', ''))
-    return response
 
   @demo_handler
   def query(self, solr_query, hue_core):

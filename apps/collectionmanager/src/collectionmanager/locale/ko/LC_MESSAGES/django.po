@@ -1,0 +1,956 @@
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
+#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
+#: src/search/api.py:158 src/search/api.py:171
+msgid "Error while accessing Solr"
+msgstr "Solr에 액세스하는 중 오류 발생"
+
+#: src/search/conf.py:25
+msgid "URL of the Solr Server."
+msgstr "Solr Server의 URL입니다."
+
+#: src/search/conf.py:30
+msgid "Query sent when no term is entered."
+msgstr "기간을 입력하지 않은 경우 보낸 쿼리입니다."
+
+#: src/search/conf.py:35
+msgid "Whether Solr requires client to perform Kerberos authentication."
+msgstr "Solr에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
+
+#: src/search/decorators.py:32
+msgid "Permission denied. You are not an Administrator."
+msgstr "권한이 거부되었습니다. 관리자가 아닙니다."
+
+#: src/search/forms.py:95
+#, python-format
+msgid "No live Solr collection or core by the name %s."
+msgstr "이름이 %s인 라이브 Solr 컬렉션이 없습니다."
+
+#: src/search/models.py:261
+msgid "Solr index name pointing to"
+msgstr "가리키는 Solr 인덱스 이름"
+
+#: src/search/models.py:262
+msgid "Friendlier name in UI"
+msgstr "친숙한 UI 이름"
+
+#: src/search/models.py:264
+msgid "Collection with cores data"
+msgstr "코어 데이터가 있는 컬렉션"
+
+#: src/search/models.py:264
+msgid "Solr json"
+msgstr "Solr json"
+
+#: src/search/models.py:266 src/search/templates/layout.mako:81
+msgid "Properties"
+msgstr "속성"
+
+#: src/search/models.py:267
+msgid "Hue properties (e.g. results by pages number)"
+msgstr "Hue 속성(예: 페이지 번호별 결과)"
+
+#: src/search/search_controller.py:80
+#, python-format
+msgid "Collection type does not exist: %s"
+msgstr "컬렉션 유형 없음: %s"
+
+#: src/search/search_controller.py:97
+msgid " (Copy)"
+msgstr " (복사)"
+
+#: src/search/views.py:80
+msgid "There is no collection to search."
+msgstr "검색할 컬렉션이 없습니다."
+
+#: src/search/views.py:103
+msgid "No collection to download."
+msgstr "다운로드할 컬렉션이 없습니다."
+
+#: src/search/views.py:121 src/search/views.py:123
+#, python-format
+msgid "Could not download search results: %s"
+msgstr "검색 결과를 다운로드할 수 없음: %s"
+
+#: src/search/views.py:171
+msgid "Collection(s) or core(s) imported successfully!"
+msgstr "컬렉션 또는 코어를 가져왔습니다!"
+
+#: src/search/views.py:174
+msgid "There was an error importing the collection(s) or core(s)"
+msgstr "컬렉션 또는 코어를 가져오는 중 오류가 발생했습니다."
+
+#: src/search/views.py:177
+msgid "Collection(s) or core(s) partially imported"
+msgstr "컬렉션 또는 코어의 일부만 가져옴"
+
+#: src/search/views.py:215 src/search/views.py:229
+msgid "POST request required."
+msgstr "POST 요청이 필요합니다."
+
+#: src/search/views.py:255
+#, python-format
+msgid "Errors on the form: %s."
+msgstr "양식 %s에서 오류가 발생했습니다."
+
+#: src/search/views.py:295
+#, python-format
+msgid "No preview available, some facets are invalid: %s"
+msgstr "사용 가능한 미리 보기 없음. 일부 패싯이 올바르지 않음: %s"
+
+#: src/search/views.py:402
+msgid "A POST request is required."
+msgstr "POST 요청이 필요합니다."
+
+#: src/search/templates/admin_collection_facets.mako:25
+#: src/search/templates/admin_collection_highlighting.mako:25
+#: src/search/templates/admin_collection_highlighting.mako:140
+#: src/search/templates/admin_collection_properties.mako:27
+#: src/search/templates/admin_collection_sorting.mako:25
+#: src/search/templates/admin_collection_template.mako:25
+#: src/search/templates/admin_collections.mako:25
+#: src/search/templates/no_collections.mako:25
+#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
+msgid "Search"
+msgstr "검색"
+
+#: src/search/templates/admin_collection_facets.mako:29
+msgid "Facets for"
+msgstr "패싯"
+
+#: src/search/templates/admin_collection_facets.mako:46
+#: src/search/templates/admin_collection_highlighting.mako:43
+#: src/search/templates/admin_collection_sorting.mako:48
+msgid "Enabled"
+msgstr "설정됨"
+
+#: src/search/templates/admin_collection_facets.mako:49
+msgid "Facets"
+msgstr "패싯"
+
+#: src/search/templates/admin_collection_facets.mako:50
+msgid "Facets provide an intuitive way to filter the results."
+msgstr "패싯은 결과를 필터링할 직관적인 방식을 제공합니다."
+
+#: src/search/templates/admin_collection_facets.mako:51
+msgid "Different types of facets can be added on the following steps."
+msgstr "다른 유형의 패싯은 다음 단계에서 추가할 수 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:52
+msgid "Facets are currently disabled."
+msgstr "패싯이 현재 해제되어 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:58
+msgid "Step 1: General"
+msgstr "1단계: 일반"
+
+#: src/search/templates/admin_collection_facets.mako:59
+msgid "Step 2: Field Facets"
+msgstr "2단계: 필드 패싯"
+
+#: src/search/templates/admin_collection_facets.mako:60
+msgid "Step 3: Range Facets"
+msgstr "3단계: 범위 패싯"
+
+#: src/search/templates/admin_collection_facets.mako:61
+msgid "Step 4: Date Facets"
+msgstr "4단계: 날짜 패싯"
+
+#: src/search/templates/admin_collection_facets.mako:62
+msgid "Step 5: Graphical Facet"
+msgstr "5단계: 그래픽 패싯"
+
+#: src/search/templates/admin_collection_facets.mako:63
+msgid "Step 6: Facets Order"
+msgstr "6단계: 패싯 순서"
+
+#: src/search/templates/admin_collection_facets.mako:68
+msgid "Limit"
+msgstr "제한"
+
+#: src/search/templates/admin_collection_facets.mako:74
+msgid "Mincount"
+msgstr "최소 수"
+
+#: src/search/templates/admin_collection_facets.mako:80
+msgid "Sort"
+msgstr "정렬"
+
+#: src/search/templates/admin_collection_facets.mako:92
+msgid "There are currently no field facets defined."
+msgstr "현재 정의된 필드 패싯이 없습니다."
+
+#: src/search/templates/admin_collection_facets.mako:103
+#: src/search/templates/admin_collection_facets.mako:130
+#: src/search/templates/admin_collection_facets.mako:164
+#: src/search/templates/admin_collection_facets.mako:208
+#: src/search/templates/admin_collection_sorting.mako:74
+msgid "Field"
+msgstr "필드"
+
+#: src/search/templates/admin_collection_facets.mako:105
+#: src/search/templates/admin_collection_facets.mako:132
+#: src/search/templates/admin_collection_facets.mako:166
+#: src/search/templates/admin_collection_facets.mako:210
+#: src/search/templates/admin_collection_sorting.mako:76
+msgid "Label"
+msgstr "레이블"
+
+#: src/search/templates/admin_collection_facets.mako:109
+msgid "Add to Field Facets"
+msgstr "필드 패싯에 추가"
+
+#: src/search/templates/admin_collection_facets.mako:110
+msgid "The field you are trying to add is already in the list."
+msgstr "추가하려는 필드가 이미 목록에 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:116
+msgid "There are currently no range facets defined."
+msgstr "현재 정의된 범위 패싯이 없습니다."
+
+#: src/search/templates/admin_collection_facets.mako:136
+#: src/search/templates/admin_collection_facets.mako:214
+msgid "Start"
+msgstr "시작"
+
+#: src/search/templates/admin_collection_facets.mako:138
+#: src/search/templates/admin_collection_facets.mako:216
+msgid "End"
+msgstr "종료"
+
+#: src/search/templates/admin_collection_facets.mako:140
+#: src/search/templates/admin_collection_facets.mako:218
+msgid "Gap"
+msgstr "차이"
+
+#: src/search/templates/admin_collection_facets.mako:144
+msgid "Add to Range Facets"
+msgstr "범위 패싯에 추가"
+
+#: src/search/templates/admin_collection_facets.mako:150
+msgid "There are currently no date facets defined."
+msgstr "현재 정의된 날짜 패싯이 없습니다."
+
+#: src/search/templates/admin_collection_facets.mako:171
+msgid "Range from"
+msgstr "시작 범위"
+
+#: src/search/templates/admin_collection_facets.mako:175
+msgid "before today until"
+msgstr "지금까지"
+
+#: src/search/templates/admin_collection_facets.mako:179
+msgid "before today. Goes up by increments of"
+msgstr "지금까지. 단위로 증가합니다."
+
+#: src/search/templates/admin_collection_facets.mako:184
+msgid "Date format"
+msgstr "날짜 형식"
+
+#: src/search/templates/admin_collection_facets.mako:188
+msgid "Add to Date Facets"
+msgstr "날짜 패싯에 추가"
+
+#: src/search/templates/admin_collection_facets.mako:194
+msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
+msgstr "현재 정의된 그래픽 패싯이 없습니다. 한 개 필드만 그래픽 패싯으로 추가할 수 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:215
+msgid "ie. 0"
+msgstr "예: 0"
+
+#: src/search/templates/admin_collection_facets.mako:215
+msgid "ie. NOW-12HOURS/MINUTES"
+msgstr "예: NOW-12HOURS/MINUTES"
+
+#: src/search/templates/admin_collection_facets.mako:217
+msgid "ie. 100"
+msgstr "예: 100"
+
+#: src/search/templates/admin_collection_facets.mako:217
+msgid "ie. NOW"
+msgstr "예: NOW"
+
+#: src/search/templates/admin_collection_facets.mako:219
+msgid "ie. 10"
+msgstr "예: 10"
+
+#: src/search/templates/admin_collection_facets.mako:219
+msgid "ie. +30MINUTES"
+msgstr "예: +30MINUTES"
+
+#: src/search/templates/admin_collection_facets.mako:220
+msgid "If empty this will be treated as a simple Field Facet."
+msgstr "비어 있으면 단일 필드 패싯으로 처리됩니다."
+
+#: src/search/templates/admin_collection_facets.mako:220
+msgid "Read more about facets..."
+msgstr "패싯에 대한 자세한 정보..."
+
+#: src/search/templates/admin_collection_facets.mako:223
+msgid "Set as Graphical Facet"
+msgstr "그래픽 패싯으로 설정"
+
+#: src/search/templates/admin_collection_facets.mako:224
+#: src/search/templates/admin_collection_facets.mako:225
+msgid "You can add just one field as graphical facet"
+msgstr "한 개 필드만 그래픽 패싯으로 추가할 수 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:231
+msgid "There are currently no Facets defined."
+msgstr "현재 정의된 패싯이 없습니다."
+
+#: src/search/templates/admin_collection_facets.mako:259
+msgid "Back"
+msgstr "뒤로"
+
+#: src/search/templates/admin_collection_facets.mako:260
+msgid "Next"
+msgstr "다음"
+
+#: src/search/templates/admin_collection_facets.mako:261
+#: src/search/templates/admin_collection_highlighting.mako:61
+#: src/search/templates/admin_collection_properties.mako:75
+#: src/search/templates/admin_collection_sorting.mako:93
+#: src/search/templates/admin_collection_template.mako:276
+msgid "Save"
+msgstr "저장"
+
+#: src/search/templates/admin_collection_facets.mako:272
+msgid "Format Help"
+msgstr "서식 도움말"
+
+#: src/search/templates/admin_collection_facets.mako:276
+msgid "You can specify here how you want the date to be formatted."
+msgstr "여기서 날짜 서식 지정 방식을 지정할 수 있습니다."
+
+#: src/search/templates/admin_collection_facets.mako:278
+msgid "Use a predefined format:"
+msgstr "미리 정의된 서식 사용:"
+
+#: src/search/templates/admin_collection_facets.mako:312
+msgid "or any combination of these fields:"
+msgstr "또는 다음 필드 조합:"
+
+#: src/search/templates/admin_collection_facets.mako:318
+msgid "Token"
+msgstr "토큰"
+
+#: src/search/templates/admin_collection_facets.mako:319
+msgid "Output"
+msgstr "출력"
+
+#: src/search/templates/admin_collection_facets.mako:322
+msgid "Relative time"
+msgstr "상대 시간"
+
+#: src/search/templates/admin_collection_facets.mako:324
+msgid "9 hours ago"
+msgstr "9시간 전"
+
+#: src/search/templates/admin_collection_facets.mako:327
+msgid "Month"
+msgstr "월"
+
+#: src/search/templates/admin_collection_facets.mako:344
+msgid "Jan Feb ... Nov Dec"
+msgstr "1월 2월 ... 11월 12월"
+
+#: src/search/templates/admin_collection_facets.mako:349
+msgid "January February ... November December"
+msgstr "1월 2월 ... 11월 12월"
+
+#: src/search/templates/admin_collection_facets.mako:352
+msgid "Day of Month"
+msgstr "날짜"
+
+#: src/search/templates/admin_collection_facets.mako:359
+msgid "1st 2nd ... 30th 31st"
+msgstr "1 2 ... 30 31"
+
+#: src/search/templates/admin_collection_facets.mako:367
+msgid "Day of Year"
+msgstr "연간 일자"
+
+#: src/search/templates/admin_collection_facets.mako:374
+msgid "1st 2nd ... 364th 365th"
+msgstr "1일 2일 ... 364일 365일"
+
+#: src/search/templates/admin_collection_facets.mako:382
+msgid "Day of Week"
+msgstr "요일"
+
+#: src/search/templates/admin_collection_facets.mako:389
+msgid "0th 1st ... 5th 6th"
+msgstr "0번째 1일 ... 5일 6일"
+
+#: src/search/templates/admin_collection_facets.mako:394
+msgid "Sun Mon ... Fri Sat"
+msgstr "일 월 ... 금 토"
+
+#: src/search/templates/admin_collection_facets.mako:399
+msgid "Sunday Monday ... Friday Saturday"
+msgstr "일요일 월요일 ... 금요일 토요일"
+
+#: src/search/templates/admin_collection_facets.mako:402
+msgid "Week of Year"
+msgstr "연간 주"
+
+#: src/search/templates/admin_collection_facets.mako:409
+#: src/search/templates/admin_collection_facets.mako:424
+msgid "1st 2nd ... 52nd 53rd"
+msgstr "1주 2주 ... 52주 53주"
+
+#: src/search/templates/admin_collection_facets.mako:417
+msgid "ISO Week of Year"
+msgstr "연간 ISO 주"
+
+#: src/search/templates/admin_collection_facets.mako:432
+msgid "Year"
+msgstr "년"
+
+#: src/search/templates/admin_collection_facets.mako:452
+msgid "Hour"
+msgstr "시간"
+
+#: src/search/templates/admin_collection_facets.mako:472
+msgid "Minute"
+msgstr "분"
+
+#: src/search/templates/admin_collection_facets.mako:482
+msgid "Second"
+msgstr "초"
+
+#: src/search/templates/admin_collection_facets.mako:492
+msgid "Fractional Second"
+msgstr "소수 자릿수 초"
+
+#: src/search/templates/admin_collection_facets.mako:512
+msgid "Unix Timestamp"
+msgstr "Unix 타임스탬프"
+
+#: src/search/templates/admin_collection_facets.mako:521
+msgid "Close"
+msgstr "닫기"
+
+#: src/search/templates/admin_collection_facets.mako:598
+msgid "There was an error parsing your input"
+msgstr "입력 내용을 구문 분석하는 중 오류가 발생했습니다."
+
+#: src/search/templates/admin_collection_facets.mako:942
+msgid "Facets updated"
+msgstr "패싯 업데이트됨"
+
+#: src/search/templates/admin_collection_facets.mako:946
+#: src/search/templates/admin_collection_highlighting.mako:118
+#: src/search/templates/admin_collection_sorting.mako:211
+#: src/search/templates/admin_collection_template.mako:692
+msgid "Error: "
+msgstr "오류: "
+
+#: src/search/templates/admin_collection_facets.mako:1036
+msgid "This field is required."
+msgstr "이 필드는 필수 항목입니다."
+
+#: src/search/templates/admin_collection_highlighting.mako:29
+msgid "Highlighting for"
+msgstr "강조 표시"
+
+#: src/search/templates/admin_collection_highlighting.mako:46
+msgid "Highlighting"
+msgstr "강조 표시"
+
+#: src/search/templates/admin_collection_highlighting.mako:47
+msgid "Highlights the query keywords matching some of the fields below."
+msgstr "아래의 일부 필드에 일치하는 쿼리 키워드를 강조 표시합니다."
+
+#: src/search/templates/admin_collection_highlighting.mako:50
+msgid "Highlighting is currently disabled."
+msgstr "강조 표시가 현재 해제되어 있습니다."
+
+#: src/search/templates/admin_collection_highlighting.mako:115
+msgid "Updated"
+msgstr "업데이트"
+
+#: src/search/templates/admin_collection_highlighting.mako:139
+msgid "Select all"
+msgstr "모두 선택"
+
+#: src/search/templates/admin_collection_highlighting.mako:141
+msgid "No fields found."
+msgstr "필드가 없습니다."
+
+#: src/search/templates/admin_collection_properties.mako:43
+msgid "Properties of"
+msgstr "속성"
+
+#: src/search/templates/admin_collection_properties.mako:54
+#: src/search/templates/layout.mako:79
+msgid "Collection"
+msgstr "컬렉션"
+
+#: src/search/templates/admin_collection_properties.mako:57
+msgid "Schema"
+msgstr "스키마"
+
+#: src/search/templates/admin_collection_properties.mako:60
+msgid "Indexes"
+msgstr "인덱스"
+
+#: src/search/templates/admin_collection_properties.mako:71
+msgid "Autocomplete and suggest queries"
+msgstr "쿼리 자동 완성 및 제안"
+
+#: src/search/templates/admin_collection_properties.mako:80
+#: src/search/templates/admin_collection_properties.mako:84
+msgid "Loading..."
+msgstr "로드 중..."
+
+#: src/search/templates/admin_collection_properties_solr_properties.mako:30
+msgid "Property"
+msgstr "속성"
+
+#: src/search/templates/admin_collection_properties_solr_properties.mako:31
+msgid "Value"
+msgstr "값"
+
+#: src/search/templates/admin_collection_sorting.mako:29
+msgid "Sorting for"
+msgstr "정렬"
+
+#: src/search/templates/admin_collection_sorting.mako:51
+#: src/search/templates/admin_collection_sorting.mako:78
+msgid "Sorting"
+msgstr "정렬"
+
+#: src/search/templates/admin_collection_sorting.mako:52
+msgid "Specify on which fields and order the results are sorted by default."
+msgstr "결과가 기본적으로 정렬되는 순서 및 필드를 지정합니다."
+
+#: src/search/templates/admin_collection_sorting.mako:53
+msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
+msgstr "정렬은 \"기본 정렬\"(왼쪽에서 오른쪽으로) 필드의 조합입니다."
+
+#: src/search/templates/admin_collection_sorting.mako:54
+msgid "Sorting is currently disabled."
+msgstr "정렬은 현재 해제되어 있습니다."
+
+#: src/search/templates/admin_collection_sorting.mako:60
+msgid "There are currently no fields defined."
+msgstr "현재 정의된 필드가 없습니다."
+
+#: src/search/templates/admin_collection_sorting.mako:67
+msgid "Default sorting"
+msgstr "기본 정렬"
+
+#: src/search/templates/admin_collection_sorting.mako:84
+msgid "Include in default sorting"
+msgstr "기본 정렬에 포함"
+
+#: src/search/templates/admin_collection_sorting.mako:88
+msgid "Add to Sorting"
+msgstr "정렬에 추가"
+
+#: src/search/templates/admin_collection_sorting.mako:208
+msgid "Sorting updated"
+msgstr "정렬 업데이트됨"
+
+#: src/search/templates/admin_collection_template.mako:140
+msgid "Snippet editor for"
+msgstr "Snippet 편집기"
+
+#: src/search/templates/admin_collection_template.mako:149
+msgid "Visual Editor"
+msgstr "Visual 편집기"
+
+#: src/search/templates/admin_collection_template.mako:150
+msgid "Preview"
+msgstr "미리 보기"
+
+#: src/search/templates/admin_collection_template.mako:151
+msgid "Source"
+msgstr "소스"
+
+#: src/search/templates/admin_collection_template.mako:152
+msgid "Advanced"
+msgstr "고급"
+
+#: src/search/templates/admin_collection_template.mako:162
+msgid "Cloud Template"
+msgstr "클라우드 템플릿"
+
+#: src/search/templates/admin_collection_template.mako:167
+msgid "Layout"
+msgstr "레이아웃"
+
+#: src/search/templates/admin_collection_template.mako:174
+#: src/search/templates/admin_collection_template.mako:220
+msgid "Available Fields"
+msgstr "사용 가능한 필드"
+
+#: src/search/templates/admin_collection_template.mako:178
+#: src/search/templates/admin_collection_template.mako:202
+#: src/search/templates/admin_collection_template.mako:224
+#: src/search/templates/admin_collection_template.mako:248
+msgid "Click on this button to add the field"
+msgstr "필드를 추가하려면 이 버튼 클릭"
+
+#: src/search/templates/admin_collection_template.mako:186
+#: src/search/templates/admin_collection_template.mako:232
+msgid "Available Functions"
+msgstr "사용 가능한 기능"
+
+#: src/search/templates/admin_collection_template.mako:189
+msgid "Formats date or timestamp in DD-MM-YYYY"
+msgstr "DD-MM-YYYY로 날짜 또는 타임스탬프 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:190
+msgid "Formats date or timestamp in HH:mm:ss"
+msgstr "HH:mm:ss로 날짜 또는 타임스탬프 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:191
+msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
+msgstr "DD-MM-YYYY HH:mm:ss로 날짜 또는 타임스탬프 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:192
+#: src/search/templates/admin_collection_template.mako:238
+msgid "Formats a date in the full format"
+msgstr "전체 형식으로 날짜 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:193
+#: src/search/templates/admin_collection_template.mako:239
+msgid "Formats a date as a Unix timestamp"
+msgstr "Unix 타임스탬프로 날짜 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:194
+msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
+msgstr "Unix 타임스탬프를 Ns, Nmin, Ndays... 전으로 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:195
+#: src/search/templates/admin_collection_template.mako:241
+msgid "Downloads and embed the file in the browser"
+msgstr "브라우저에서 파일을 다운로드하여 포함"
+
+#: src/search/templates/admin_collection_template.mako:196
+#: src/search/templates/admin_collection_template.mako:242
+msgid "Downloads the linked file"
+msgstr "연결된 파일 다운로드"
+
+#: src/search/templates/admin_collection_template.mako:197
+#: src/search/templates/admin_collection_template.mako:243
+msgid "Preview file in File Browser"
+msgstr "파일 브라우저에서 파일 미리 보기"
+
+#: src/search/templates/admin_collection_template.mako:198
+#: src/search/templates/admin_collection_template.mako:244
+msgid "Truncate a value after 100 characters"
+msgstr "100자 이후의 값 자르기"
+
+#: src/search/templates/admin_collection_template.mako:199
+#: src/search/templates/admin_collection_template.mako:245
+msgid "Truncate a value after 250 characters"
+msgstr "250자 이후의 값 자르기"
+
+#: src/search/templates/admin_collection_template.mako:200
+#: src/search/templates/admin_collection_template.mako:246
+msgid "Truncate a value after 500 characters"
+msgstr "500자 이후의 값 자르기"
+
+#: src/search/templates/admin_collection_template.mako:235
+msgid "Formats a date in the DD-MM-YYYY format"
+msgstr "DD-MM-YYYY 형식으로 날짜 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:236
+msgid "Formats a date in the HH:mm:ss format"
+msgstr "HH:mm:ss 형식으로 날짜 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:237
+msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
+msgstr "DD-MM-YYYY HH:mm:ss 형식으로 날짜 형식 지정"
+
+#: src/search/templates/admin_collection_template.mako:240
+msgid "Shows the relative time"
+msgstr "상대 시간 표시"
+
+#: src/search/templates/admin_collection_template.mako:267
+msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
+msgstr "여기서 템플릿에서 사용할 수 있는 사용자 지정 CSS 클래스 또는 Javascript 함수를 정의할 수 있습니다."
+
+#: src/search/templates/admin_collection_template.mako:282
+#: src/search/templates/admin_collection_template.mako:392
+msgid "Insert layout"
+msgstr "레이아웃 삽입"
+
+#: src/search/templates/admin_collection_template.mako:391
+#: src/search/templates/admin_collection_template.mako:407
+#: src/search/templates/admin_collections.mako:100
+msgid "Cancel"
+msgstr "취소"
+
+#: src/search/templates/admin_collection_template.mako:399
+msgid "Load a template"
+msgstr "템플릿 로드"
+
+#: src/search/templates/admin_collection_template.mako:408
+msgid "Load template"
+msgstr "템플릿 로드"
+
+#: src/search/templates/admin_collection_template.mako:662
+msgid "Start with this!"
+msgstr "다음으로 시작!"
+
+#: src/search/templates/admin_collection_template.mako:663
+msgid "You can add a layout from here"
+msgstr "여기서 레이아웃을 추가할 수 잇습니다."
+
+#: src/search/templates/admin_collection_template.mako:689
+msgid "Template updated"
+msgstr "템플릿 업데이트됨"
+
+#: src/search/templates/admin_collections.mako:31
+#: src/search/templates/layout.mako:32
+msgid "Search page"
+msgstr "페이지 검색"
+
+#: src/search/templates/admin_collections.mako:33
+msgid "Collection Manager"
+msgstr "컬렉션 관리자"
+
+#: src/search/templates/admin_collections.mako:41
+msgid "Filter collections by name..."
+msgstr "이름을 기준으로 컬렉션 필터링..."
+
+#: src/search/templates/admin_collections.mako:45
+msgid "Import"
+msgstr "가져오기"
+
+#: src/search/templates/admin_collections.mako:52
+msgid "There are currently no collections defined."
+msgstr "현재 정의된 컬렉션이 없습니다."
+
+#: src/search/templates/admin_collections.mako:52
+msgid "Click here to add"
+msgstr "추가하려면 여기 클릭"
+
+#: src/search/templates/admin_collections.mako:52
+msgid "one or more."
+msgstr "하나 이상."
+
+#: src/search/templates/admin_collections.mako:70
+msgid "Click to edit"
+msgstr "편집하려면 클릭"
+
+#: src/search/templates/admin_collections.mako:72
+msgid "Copy"
+msgstr "복사"
+
+#: src/search/templates/admin_collections.mako:73
+msgid "Delete"
+msgstr "삭제"
+
+#: src/search/templates/admin_collections.mako:85
+msgid "Import Collections and Cores"
+msgstr "컬렉션 및 코어 가져오기"
+
+#: src/search/templates/admin_collections.mako:90
+msgid "Collections"
+msgstr "컬렉션"
+
+#: src/search/templates/admin_collections.mako:91
+msgid "All available collections from the Solr URL in hue.ini have been imported."
+msgstr "hue.ini에 있는 Solr URL에서 사용 가능한 모든 컬렉션을 가져왔습니다."
+
+#: src/search/templates/admin_collections.mako:94
+msgid "Cores"
+msgstr "코어"
+
+#: src/search/templates/admin_collections.mako:95
+msgid "All available cores from the Solr URL in hue.ini have been imported."
+msgstr "hue.ini에 있는 Solr URL에서 사용 가능한 모든 코어를 가져왔습니다."
+
+#: src/search/templates/admin_collections.mako:101
+msgid "Import Selected"
+msgstr "선택한 항목 가져오기"
+
+#: src/search/templates/admin_collections.mako:117
+msgid "Confirm Delete"
+msgstr "삭제 확인"
+
+#: src/search/templates/admin_collections.mako:120
+msgid "Are you sure you want to delete this collection?"
+msgstr "이 컬렉션을 삭제하시겠습니까?"
+
+#: src/search/templates/admin_collections.mako:123
+msgid "No"
+msgstr "아니요"
+
+#: src/search/templates/admin_collections.mako:124
+msgid "Yes"
+msgstr "예"
+
+#: src/search/templates/admin_collections.mako:213
+#: src/search/templates/admin_collections.mako:216
+msgid "Imported: "
+msgstr "가져옴: "
+
+#: src/search/templates/admin_collections.mako:216
+#: src/search/templates/admin_collections.mako:219
+msgid "Not imported: "
+msgstr "가져오지 않음: "
+
+#: src/search/templates/admin_collections.mako:232
+msgid "Collection deleted successfully."
+msgstr "컬렉션이 삭제되었습니다."
+
+#: src/search/templates/admin_collections.mako:236
+msgid "Collection copied successfully."
+msgstr "컬렉션이 복사되었습니다."
+
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
+msgid "Collection manager"
+msgstr "컬렉션 관리자"
+
+#: src/search/templates/layout.mako:40
+msgid "Search Admin"
+msgstr "검색 관리"
+
+#: src/search/templates/layout.mako:84
+msgid "Search it"
+msgstr "검색 항목"
+
+#: src/search/templates/layout.mako:87
+msgid "Template"
+msgstr "템플릿"
+
+#: src/search/templates/layout.mako:89
+msgid "1. Snippet"
+msgstr "1. 조각"
+
+#: src/search/templates/layout.mako:92
+msgid "2. Facets"
+msgstr "2. 패싯"
+
+#: src/search/templates/layout.mako:95
+msgid "3. Sorting"
+msgstr "3. 정렬"
+
+#: src/search/templates/layout.mako:98
+msgid "4. Highlighting"
+msgstr "4. 강조 표시"
+
+#: src/search/templates/macros.mako:197
+#, python-format
+msgid "Retweeted %s times"
+msgstr "%s회 Twitter에 다시 올림"
+
+#: src/search/templates/macros.mako:207
+msgid "Reply"
+msgstr "회신"
+
+#: src/search/templates/macros.mako:213
+msgid "Retweet"
+msgstr "Twitter에 다시 올리기"
+
+#: src/search/templates/no_collections.mako:47
+msgid "It seems there is nothing to search on ..."
+msgstr "검색할 항목이 없는 것 같습니다..."
+
+#: src/search/templates/search.mako:56
+msgid "Customize this collection"
+msgstr "이 컬렉션 사용자 지정"
+
+#: src/search/templates/search.mako:83
+msgid "XLS"
+msgstr "XLS"
+
+#: src/search/templates/search.mako:84
+msgid "CSV"
+msgstr "CSV"
+
+#: src/search/templates/search.mako:97
+msgid "A demo index is used. In order to be interactive, please "
+msgstr "데모 인덱스가 사용됩니다. 상호 작용하려면 "
+
+#: src/search/templates/search.mako:97
+msgid "create the indexes"
+msgstr "Solr에서 인덱스를"
+
+#: src/search/templates/search.mako:97
+msgid " in Solr."
+msgstr " 생성하십시오."
+
+#: src/search/templates/search.mako:220
+#, python-format
+msgid "Page %s of %s. Showing %s results (%s seconds)"
+msgstr "%s/%s 페이지. %s개 결과 표시(%s초)"
+
+#: src/search/templates/search.mako:286
+msgid "Previous Page"
+msgstr "이전 페이지"
+
+#: src/search/templates/search.mako:302
+msgid "Next Page"
+msgstr "다음 페이지"
+
+#: src/search/templates/search.mako:311
+msgid "Your search"
+msgstr "검색 항목과"
+
+#: src/search/templates/search.mako:311
+msgid "did not match any documents."
+msgstr "일치하는 문서가 없습니다."
+
+#: src/search/templates/search.mako:313
+msgid "Suggestions:"
+msgstr "추천 단어:"
+
+#: src/search/templates/search.mako:315
+msgid "Make sure all words are spelled correctly."
+msgstr "모든 단어의 맞춤법이 올바른지 확인하십시오."
+
+#: src/search/templates/search.mako:316
+msgid "Try different keywords."
+msgstr "다른 키워드를 사용해 보십시오."
+
+#: src/search/templates/search.mako:317
+msgid "Try more general keywords."
+msgstr "더 일반적인 키워드를 사용해 보십시오."
+
+#: src/search/templates/search.mako:318
+msgid "Try fewer keywords."
+msgstr "키워드 수를 줄여서 시도해 보십시오."
+
+#: src/search/templates/search.mako:370
+msgid "Show"
+msgstr "표시"
+
+#: src/search/templates/search.mako:370
+msgid "more..."
+msgstr "자세히..."
+
+#: src/search/templates/search.mako:654
+msgid "The graphical facets works just with numbers or dates. Please choose another field."
+msgstr "그래픽 패싯에는 숫자나 날짜만 사용합니다. 다른 필드를 선택하십시오."
+
+#: src/search/templates/search.mako:658
+msgid "There was an error initializing the graphical facet component."
+msgstr "그래픽 패싯 구성 요소를 초기화하는 중 오류가 발생했습니다."
+
