@@ -43,7 +43,9 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
       % if traceback:
         <a href="javascript:toggleDisplay('#traceback');"><i class="fa fa-share"></i> ${_('More Info')}</a>
         &nbsp;
+        % if user.is_superuser:
         <a href="/logs" target="_new">${_('View Logs')}</a>
+        % endif
         <br />
         <br />
         <div id="traceback" class="hide">
@@ -67,7 +69,9 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
           </table>
         </div>
       % else:
+        % if user.is_superuser:
         <a href="/logs" target="_new">${_('View Logs')}</a>
+        % endif
         <br />
         <br />
       % endif
