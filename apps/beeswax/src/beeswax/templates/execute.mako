@@ -703,7 +703,7 @@ ${layout.menubar(section='query')}
 
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/leaflet/leaflet-src.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
 
 
