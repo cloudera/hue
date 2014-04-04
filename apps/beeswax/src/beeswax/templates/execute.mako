@@ -703,7 +703,7 @@ ${layout.menubar(section='query')}
 
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/leaflet/leaflet-src.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
 
 
@@ -1623,6 +1623,7 @@ function isStringColumn(type) {
   return !isNumericColumn(type) && !isDateTimeColumn(type);
 }
 
+var map;
 var graphHasBeenPredicted = false;
 // Logs
 var logsAtEnd = true;
@@ -1665,20 +1666,25 @@ $(document).ready(function () {
       [lats[0], lngs[0]] // south-west
     ]
   }
-  var map;
+
   function generateGraph(graphType) {
+    $("#chart").height(Math.max($(window).height() - $("#blueprint").offset().top + 30, 500));
     $("#chart .alert").addClass("hide");
     if (graphType != "") {
-      if (map != null) {
+      if (map != null){
         try {
           map.remove();
         }
-        catch (err) { // do nothing
+        catch (err) {
+          if (typeof console != "undefined") {
+            console.error(err);
+          }
         }
       }
       $("#blueprint").attr("class", "").attr("style", "").empty();
       $("#blueprint").data("plugin_jHueBlueprint", null);
       if (graphType == $.jHueBlueprint.TYPES.MAP) {
+        L.DomUtil.get("blueprint")._leaflet = false;
         if ($("#blueprintLat").val() != "-1" && $("#blueprintLng").val() != "-1") {
           var _latCol = $("#blueprintLat").val() * 1;
           var _lngCol = $("#blueprintLng").val() * 1;
@@ -1692,29 +1698,35 @@ $(document).ready(function () {
             _lngs.push($.trim($(this).text()) * 1);
           });
           $("#blueprint").height($("#blueprint").parent().height() - 100);
-          map = L.map("blueprint").fitBounds(getMapBounds(_lats, _lngs));
+          try {
+            map = L.map("blueprint").fitBounds(getMapBounds(_lats, _lngs));
 
-          L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
+            L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
-          $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
-            if (cnt < 1000) {
-              if (_descCol != "-1") {
-                L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
+            $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+              if (cnt < 1000) {
+                if (_descCol != "-1") {
+                  L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
+                }
+                else {
+                  L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
+                }
               }
-              else {
-                L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
-              }
+            });
+          }
+          catch (err) {
+            if (typeof console != "undefined") {
+              console.error(err);
             }
-          });
+          }
           if ($("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
             $("#chart .alert").removeClass("hide");
           }
-
         }
         else {
-          $("#blueprint").addClass("empty").text("${_("Please select the latitude and longitude columns.")}");
+          $("#blueprint").addClass("empty").css("text-align", "center").text("${_("Please select the latitude and longitude columns.")}");
         }
       }
       else {
@@ -1738,7 +1750,7 @@ $(document).ready(function () {
             isCategories: true,
             fill: true,
             enableSelection: false,
-            height: 250
+            height: $("#blueprint").parent().height() - 100
           });
           if (_data.length > 30){
             $(".flot-x-axis .flot-tick-label").hide();
