@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
+from desktop.lib.i18n import smart_str
 from desktop.lib.view_util import format_duration_in_millis
 from filebrowser.views import location_to_url
 from jobbrowser.views import job_single_logs
@@ -77,7 +78,7 @@ class OozieApi:
 
     script_path = workflow.deployment_dir + '/script.pig'
     if self.fs: # For testing, difficult to mock
-      self.fs.do_as_user(self.user.username, self.fs.create, script_path, data=pig_script.dict['script'])
+      self.fs.do_as_user(self.user.username, self.fs.create, script_path, data=smart_str(pig_script.dict['script']))
 
     files = []
     archives = []

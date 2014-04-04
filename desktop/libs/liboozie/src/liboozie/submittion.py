@@ -23,6 +23,7 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 
@@ -242,9 +243,9 @@ class Submission(object):
         raise IOError(ex.errno, msg)
 
     if not self.fs.exists(path):
-      self._do_as(self.user.username , self.fs.mkdir, path, perms)
+      self._do_as(self.user.username, self.fs.mkdir, path, perms)
 
-    self._do_as(self.user.username , self.fs.chmod, path, perms)
+    self._do_as(self.user.username, self.fs.chmod, path, perms)
 
     return path
 
@@ -254,7 +255,7 @@ class Submission(object):
     This should run as the workflow user.
     """
     xml_path = self.fs.join(deployment_dir, self.job.get_application_filename())
-    self.fs.create(xml_path, overwrite=True, permission=0644, data=oozie_xml)
+    self.fs.create(xml_path, overwrite=True, permission=0644, data=smart_str(oozie_xml))
     LOG.debug("Created %s" % (xml_path,))
 
     # List jar files
