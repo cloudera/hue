@@ -223,6 +223,7 @@ class Attempt:
     log_link = attempt['logsLink']
     # Get MR task logs
     log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
+    log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
