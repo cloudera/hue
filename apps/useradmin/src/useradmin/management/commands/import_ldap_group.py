@@ -20,7 +20,7 @@ from useradmin.views import import_ldap_groups
 
 from django.core.management.base import BaseCommand, CommandError
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 class Command(BaseCommand):
   """
@@ -32,17 +32,17 @@ class Command(BaseCommand):
   """
 
   option_list = BaseCommand.option_list + (
-      make_option("--dn", help=_("Whether or not the user should be imported by "
+      make_option("--dn", help=_t("Whether or not the user should be imported by "
                                "distinguished name."),
                           action="store_true",
                           default=False),
-      make_option("--import-members", help=_("Import users from the group."),
+      make_option("--import-members", help=_t("Import users from the group."),
                                       action="store_true",
                                       default=False),
-      make_option("--import-members-recursive", help=_("Import users from the group, but also do so recursively."),
+      make_option("--import-members-recursive", help=_t("Import users from the group, but also do so recursively."),
                                       action="store_true",
                                       default=False),
-      make_option("--sync-users", help=_("Sync users in the group."),
+      make_option("--sync-users", help=_t("Sync users in the group."),
                                       action="store_true",
                                       default=False),
    )
