@@ -16,7 +16,7 @@
 # limitations under the License.
 from optparse import make_option
 
-from useradmin.views import import_ldap_user
+from useradmin.views import import_ldap_users
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -34,6 +34,9 @@ class Command(BaseCommand):
                                "distinguished name."),
                           action="store_true",
                           default=False),
+      make_option("--sync-groups", help=_("Sync groups of the users."),
+                                   action="store_true",
+                                   default=False),
   )
 
   args = "username"
@@ -43,4 +46,5 @@ class Command(BaseCommand):
       raise CommandError(_("A username must be provided."))
 
     import_by_dn = options['dn']
-    import_ldap_user(user, import_by_dn)
+    sync_groups = options['sync_groups']
+    import_ldap_users(user, sync_groups, import_by_dn)

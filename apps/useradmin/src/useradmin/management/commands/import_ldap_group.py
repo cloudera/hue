@@ -16,7 +16,7 @@
 # limitations under the License.
 from optparse import make_option
 
-from useradmin.views import import_ldap_group
+from useradmin.views import import_ldap_groups
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -39,6 +39,12 @@ class Command(BaseCommand):
       make_option("--import-members", help=_("Import users from the group."),
                                       action="store_true",
                                       default=False),
+      make_option("--import-members-recursive", help=_("Import users from the group, but also do so recursively."),
+                                      action="store_true",
+                                      default=False),
+      make_option("--sync-users", help=_("Sync users in the group."),
+                                      action="store_true",
+                                      default=False),
    )
 
   args = "group-name"
@@ -49,4 +55,6 @@ class Command(BaseCommand):
 
     import_members = options['import_members']
     import_by_dn = options['dn']
-    import_ldap_group(group, import_members, import_by_dn)
+    import_members_recursive = options['import_members_recursive']
+    sync_users = options['sync_users']
+    import_ldap_groups(group, import_members, import_members_recursive, sync_users, import_by_dn)
