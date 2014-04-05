@@ -160,7 +160,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            <!-- ko template: { name: 'tag-template', foreach: myTags } -->
            <!-- /ko -->
            <li data-bind="visible: myTags().length == 0">
-             <a href="javascript:void(0)" class="edit-tags" style="line-height:24px">
+             <a href="javascript:void(0)" class="edit-tags" style="line-height:24px" data-bind="click: addTag">
                <i class="fa fa-plus-circle"></i> ${_('You currently own no projects. Click here to add one now!')}
              </a>
            </li>

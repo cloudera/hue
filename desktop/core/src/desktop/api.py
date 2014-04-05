@@ -34,13 +34,13 @@ LOG = logging.getLogger(__name__)
 
 
 def _get_docs(user):
-  history_tag = DocumentTag.objects.get_history_tag(user)  
+  history_tag = DocumentTag.objects.get_history_tag(user)
   trash_tag = DocumentTag.objects.get_trash_tag(user)
   docs = itertools.chain(
-      Document.objects.get_docs(user).exclude(tags__in=[trash_tag]).filter(tags__in=[history_tag]).order_by('-last_modified')[:500],
-      Document.objects.get_docs(user).exclude(tags__in=[history_tag]).order_by('-last_modified')[:100]
+      Document.objects.get_docs(user).exclude(tags__in=[trash_tag]).filter(tags__in=[history_tag]).select_related('DocumentTag', 'User', 'DocumentPermission').order_by('-last_modified')[:500],
+      Document.objects.get_docs(user).exclude(tags__in=[history_tag]).select_related('DocumentTag', 'User', 'DocumentPermission').order_by('-last_modified')[:100]
   )
-  return list(docs)  
+  return list(docs)
 
 
 def massaged_tags_for_json(docs, user):
@@ -84,6 +84,10 @@ def massaged_tags_for_json(docs, user):
       sharers[tag.owner].append(massaged_tag)
 
   ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.iteritems()]
+  # Remove from my tags the trashed and history ones
+  mine_filter = set(ts['trash']['docs'] + ts['history']['docs'])
+  for tag in ts['mine']:
+    tag['docs'] = [doc_id for doc_id in tag['docs'] if doc_id not in mine_filter]
 
   return ts
 

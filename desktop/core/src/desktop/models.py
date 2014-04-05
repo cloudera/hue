@@ -389,8 +389,6 @@ class Document(models.Model):
   def add_to_history(self):
     tag = DocumentTag.objects.get_history_tag(user=self.owner)
     self.tags.add(tag)
-    #default_tag = DocumentTag.objects.get_default_tag(user=self.owner)
-    #self.tags.remove(default_tag)
 
   def share_to_default(self, name='read'):
     DocumentPermission.objects.share_to_default(self, name=name)
@@ -570,8 +568,7 @@ class DocumentPermission(models.Model):
 
   users = models.ManyToManyField(auth_models.User, db_index=True)
   groups = models.ManyToManyField(auth_models.Group, db_index=True)
-  # @TODO(Abe): Rename to "perm"
-  perms = models.TextField(default=READ_PERM, choices=(
+  perms = models.TextField(default=READ_PERM, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
   ))

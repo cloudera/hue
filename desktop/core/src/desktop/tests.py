@@ -20,6 +20,7 @@ import desktop
 import desktop.urls
 import desktop.conf
 import logging
+import json
 import os
 import time
 
@@ -37,6 +38,7 @@ from django.db.models import query, CharField, SmallIntegerField
 
 from useradmin.models import GroupPermission
 
+from beeswax.conf import HIVE_SERVER_HOST
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
@@ -44,8 +46,9 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
+from desktop.models import Document
 from desktop.views import check_config, home
-from beeswax.conf import HIVE_SERVER_HOST
+from pig.models import PigScript
 
 
 def setup_test_environment():
@@ -81,11 +84,51 @@ def teardown_test_environment():
   django_mako.render_to_string = django_mako.render_to_string_normal
 teardown_test_environment.__test__ = False
 
-def test_home():
-  c = make_logged_in_client()
-  response = c.get(reverse(home))
 
+def test_home():
+  c = make_logged_in_client(username="test_home", groupname="test_home", recreate=True, is_superuser=False)
+  user = User.objects.get(username="test_home")
+
+  response = c.get(reverse(home))
+  assert_equal(["notmine", "trash", "mine", "history"], json.loads(response.context['json_tags']).keys())
   assert_equal(200, response.status_code)
+
+  script, created = PigScript.objects.get_or_create(owner=user)
+  doc = Document.objects.link(script, owner=script.owner, name='test_home')
+
+  response = c.get(reverse(home))
+  assert_true(str(doc.id) in json.loads(response.context['json_documents']))
+
+  response = c.get(reverse(home))
+  tags = json.loads(response.context['json_tags'])
+  assert_equal([doc.id], tags['mine'][0]['docs'], tags)
+  assert_equal([], tags['trash']['docs'], tags)
+  assert_equal([], tags['history']['docs'], tags)
+
+  doc.send_to_trash()
+
+  response = c.get(reverse(home))
+  tags = json.loads(response.context['json_tags'])
+  assert_equal([], tags['mine'][0]['docs'], tags)
+  assert_equal([doc.id], tags['trash']['docs'], tags)
+  assert_equal([], tags['history']['docs'], tags)
+
+  doc.restore_from_trash()
+
+  response = c.get(reverse(home))
+  tags = json.loads(response.context['json_tags'])
+  assert_equal([doc.id], tags['mine'][0]['docs'], tags)
+  assert_equal([], tags['trash']['docs'], tags)
+  assert_equal([], tags['history']['docs'], tags)
+
+  doc.add_to_history()
+
+  response = c.get(reverse(home))
+  tags = json.loads(response.context['json_tags'])
+  assert_equal([], tags['mine'][0]['docs'], tags)
+  assert_equal([], tags['trash']['docs'], tags)
+  assert_equal([doc.id], tags['history']['docs'], tags)
+
 
 def test_skip_wizard():
   c = make_logged_in_client() # is_superuser
