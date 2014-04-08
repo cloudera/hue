@@ -218,11 +218,13 @@ class Attempt:
 
   def get_task_log(self, offset=0):
     logs = []
-    attempt = self.task.job.job_attempts['jobAttempt'][0]
+    attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
     # Get MR task logs
-    log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
-    log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
+    if self.assignedContainerId:
+      log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
+    if hasattr(self, 'nodeHttpAddress'):
+      log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
