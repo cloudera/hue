@@ -193,7 +193,7 @@
 
 <%def name="get_container_link(status, node_manager_http_address, container_id)">
     ## As soon as the job finishes the container disappears
-    % if status.lower() in ('running', 'prep', 'accepted', 'finishing'):
+    % if status.lower() in ('running', 'accepted', 'ready', 'prep', 'waiting', 'suspended', 'prepsuspended', 'preppaused', 'paused', 'submitted', 'suspendedwitherror', 'pausedwitherror', 'finishing', 'started'):
         <a href="${ url('jobbrowser.views.container', node_manager_http_address=node_manager_http_address, containerid=container_id) }" class="task_tracker_link">${ container_id }</a>
     % else:
         ${ container_id }

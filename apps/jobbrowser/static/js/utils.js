@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var Utils = {
+  SUCCEEDED_ARRAY: ['SUCCEEDED', 'OK', 'DONE'],
+  RUNNING_ARRAY: ['RUNNING', 'ACCEPTED', 'READY',
+    'PREP', 'WAITING', 'SUSPENDED',
+    'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',
+    'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR', 'FINISHING', 'STARTED']
+};
+
 function initLogsElement(element) {
   element.data("logsAtEnd", true);
   element.scroll(function () {
@@ -66,13 +74,10 @@ function getStatusClass(status, prefix) {
     prefix = "label-";
   }
   var klass = "";
-  if (['SUCCEEDED', 'OK', 'DONE'].indexOf(status) > -1) {
+  if (Utils.SUCCEEDED_ARRAY.indexOf(status) > -1) {
     klass = prefix + "success";
   }
-  else if (['RUNNING', 'ACCEPTED', 'READY',
-    'PREP', 'WAITING', 'SUSPENDED',
-    'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',
-    'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR', 'FINISHING', 'STARTED'].indexOf(status) > -1) {
+  else if (Utils.RUNNING_ARRAY.indexOf(status) > -1) {
     klass = prefix + "warning";
   }
   else {

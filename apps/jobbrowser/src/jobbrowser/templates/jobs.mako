@@ -182,7 +182,7 @@ ${ components.menubar() }
         // Update updateableRows.
         for(var i = 0; i < data.length; ++i) {
           var job = data[i];
-          if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(job.status.toUpperCase()) > -1) {
+          if (Utils.RUNNING_ARRAY.indexOf(job.status.toUpperCase()) > -1) {
             updateableRows[job.shortId] = job;
 
             var nNodes = jobTable.fnGetNodes();
