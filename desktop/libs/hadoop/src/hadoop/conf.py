@@ -142,7 +142,6 @@ def config_validator(user):
   """
   from hadoop.fs import webhdfs
   from hadoop import job_tracker
-  from hadoop.yarn import tests
 
   res = []
   submit_to = []
@@ -172,7 +171,7 @@ def config_validator(user):
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(tests.test_yarn_configurations())
+      res.extend(test_yarn_configurations())
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:
@@ -180,3 +179,21 @@ def config_validator(user):
                 "Yarn clusters with `submit_to=true' in order to run jobs."))
 
   return res
+
+
+def test_yarn_configurations():
+  # Single cluster for now
+  from hadoop.yarn.resource_manager_api import get_resource_manager
+
+  result = []
+
+  try:
+    url = ''
+    api = get_resource_manager()
+    url = api._url
+    api.apps()
+  except Exception, e:
+    msg = 'Failed to contact Resource Manager at %s: %s' % (url, e)
+    result.append(('Resource Manager', msg))
+
+  return result

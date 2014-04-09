@@ -19,28 +19,10 @@ import logging
 
 from nose.tools import assert_true, assert_equal, assert_not_equal
 
-from hadoop.yarn.resource_manager_api import get_resource_manager
 from hadoop.yarn import clients
 
 
 LOG = logging.getLogger(__name__)
-
-
-def test_yarn_configurations():
-  # Single cluster for now
-
-  result = []
-
-  try:
-    url = ''
-    api = get_resource_manager()
-    url = api._url
-    api.apps()
-  except Exception, e:
-    msg = 'Failed to contact Resource Manager at %s: %s' % (url, e)
-    result.append(('Resource Manager', msg))
-
-  return result
 
 
 def test_get_log_client():
