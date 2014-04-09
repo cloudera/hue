@@ -21,6 +21,7 @@ import select
 import socket
 from django.utils.translation import ugettext as _
 from desktop import conf
+from desktop.lib.i18n import smart_str
 
 
 __all__ = ['CaseInsensitiveDict', 'create_synchronous_io_multiplexer']
@@ -95,3 +96,23 @@ def find_unused_port():
   _, port = sock.getsockname()
   sock.close()
   return port
+
+
+def force_dict_to_strings(dictionary):
+  if not dictionary:
+    return dictionary
+
+  new_dict = {}
+  for k in dictionary:
+    new_key = smart_str(k)
+    if isinstance(dictionary[k], basestring):
+      # Strings should not be unicode.
+      new_dict[new_key] = smart_str(dictionary[k])
+    elif isinstance(dictionary[k], dict):
+      # Recursively force dicts to strings.
+      new_dict[new_key] = force_dict_to_strings(dictionary[k])
+    else:
+      # Normal objects, or other literals, should not be converted.
+      new_dict[new_key] = dictionary[k]
+
+  return new_dict

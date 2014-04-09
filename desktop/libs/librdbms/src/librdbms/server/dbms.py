@@ -17,7 +17,7 @@
 
 import logging
 
-from desktop.lib.i18n import smart_str
+from desktop.lib.python_util import force_dict_to_strings
 
 from librdbms.conf import DATABASES
 
@@ -28,26 +28,6 @@ MYSQL = 'mysql'
 POSTGRESQL = 'postgresql'
 SQLITE = 'sqlite'
 ORACLE = 'oracle'
-
-
-def force_dict_to_strings(dictionary):
-  if not dictionary:
-    return dictionary
-
-  new_dict = {}
-  for k in dictionary:
-    new_key = smart_str(k)
-    if isinstance(dictionary[k], basestring):
-      # Strings should not be unicode.
-      new_dict[new_key] = smart_str(dictionary[k])
-    elif isinstance(dictionary[k], dict):
-      # Recursively force dicts to strings.
-      new_dict[new_key] = force_dict_to_strings(dictionary[k])
-    else:
-      # Normal objects, or other literals, should not be converted.
-      new_dict[new_key] = dictionary[k]
-
-  return new_dict
 
 
 def get(user, query_server=None):

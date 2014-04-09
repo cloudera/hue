@@ -20,7 +20,7 @@ import datetime
 
 from nose.tools import assert_true, assert_equal, assert_not_equal
 
-from desktop.lib.python_util import CaseInsensitiveDict
+from desktop.lib.python_util import CaseInsensitiveDict, force_dict_to_strings
 
 
 class TestPythonUtil(object):
@@ -33,3 +33,14 @@ class TestPythonUtil(object):
     assert_equal("Test", d['test'])
     assert_not_equal("test", d['Test'])
     assert_not_equal("test", d['test'])
+
+  def test_force_dict_to_strings(self):
+    unicode_dict = {u'test': u'test'}
+    string_dict = {'test': 'test'}
+    transformed_dict = force_dict_to_strings(unicode_dict)
+    assert_equal(string_dict, transformed_dict)
+
+    unicode_dict = {u'test': {u'test': u'test'}}
+    string_dict = {'test': {'test': 'test'}}
+    transformed_dict = force_dict_to_strings(unicode_dict)
+    assert_equal(string_dict, transformed_dict)

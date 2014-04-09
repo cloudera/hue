@@ -28,6 +28,7 @@ import pkg_resources
 import desktop.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
+from desktop.lib.python_util import force_dict_to_strings
 
 
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
@@ -271,7 +272,7 @@ else:
     "PASSWORD" : desktop.conf.DATABASE.PASSWORD.get(),
     "HOST" : desktop.conf.DATABASE.HOST.get(),
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
-    "OPTIONS": desktop.conf.DATABASE.OPTIONS.get(),
+    "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
     "TEST_NAME" : get_desktop_root('desktop-test.db')
   }
