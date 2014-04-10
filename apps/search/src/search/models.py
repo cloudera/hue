@@ -273,6 +273,7 @@ class Collection(models.Model):
         <br/>
       </div>""" % ' '.join(['{{%s}}' % field for field in fields]), 
       "isGridLayout": True,
+      "showFieldList": True,
       "fields": fields
     }
     
@@ -310,7 +311,9 @@ class Collection(models.Model):
     # Backward compatibility
     if 'autocomplete' not in properties_python:
       properties_python['autocomplete'] = False
-    # TODO: Should convert old format here
+    # TODO: Should convert old Hue 3.5 format here
+    if 'showFieldList' not in properties_python['collection']['template']:
+      properties_python['collection']['template']['showFieldList'] = True
     return properties_python
 
   def update_properties(self, post_data):

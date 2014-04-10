@@ -243,7 +243,7 @@ var SearchViewModel = function (collection_json, query_json) {
   self.selectedFacet = ko.observable();
 
   self.previewColumns = ko.observable("");
-  self.columns = ko.observableArray([]); // load back? 
+  self.columns = ko.observableArray([]); // aka 'layout'
   self.isEditing = ko.observable(false);
   self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));

@@ -333,10 +333,21 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   </div>
 
   <!-- ko if: $root.collection.template.isGridLayout() -->
-  <div data-bind="visible: $root.isEditing" style="float:left; margin-right: 10px" >
-    <span>
-      ## Todo add a toggle to show fields or not in non edit mode
-      <strong>${ _('Fields') }</strong>
+  <div style="float:left; margin-right: 10px" >
+    <span data-bind="visible: ! $root.collection.template.showFieldList()">
+      <a href="javascript: void(0)" class="btn"
+        data-bind="click: $root.collection.template.showFieldList(true)">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+    </span>
+  </div>
+  <div data-bind="visible: $root.isEditing() || $root.collection.template.showFieldList()" style="float:left; margin-right: 10px" >
+    <span data-bind="visible: $root.collection.template.showFieldList()">
+      <a href="javascript: void(0)" class="btn"
+        data-bind="click: $root.collection.template.showFieldList(false)">
+        <i class="fa fa-chevron-left"></i>
+      </a>
+      <strong>${ _('Fields') }</strong>      
       &nbsp;
       <a href="javascript: void(0)" class="btn"
         data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
