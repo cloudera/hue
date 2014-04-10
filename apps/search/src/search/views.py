@@ -95,6 +95,7 @@ def search(request):
       
       response = SolrApi(SOLR_URL.get(), request.user).query2(solr_query, collection)
       response = augment_solr_response2(response, collection, solr_query)
+      print response
     except RestException, e:
       try:
         response['error'] = json.loads(e.message)['error']['msg']

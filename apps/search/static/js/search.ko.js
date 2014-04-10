@@ -276,9 +276,15 @@ var SearchViewModel = function (collection_json, query_json) {
           // Table view
           $.each(data.response.docs, function (index, item) {
             var row = [];
-            $.each(self.collection.template.fields(), function (index, column) {
-              row.push(item[column]); // TODO: if null + some escaping
-            });
+            var fields = self.collection.template.fields();
+            // Field selection or whole record
+            if (fields.length != 0) {
+              $.each(self.collection.template.fields(), function (index, column) {
+                row.push(item[column]);
+              });
+            } else {
+              row.push(ko.mapping.toJSON(item)); 
+            }
             self.results.push(row);
           });
         }

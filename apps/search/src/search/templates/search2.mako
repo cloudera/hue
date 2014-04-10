@@ -337,7 +337,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <span>
       ## Todo add a toggle to show fields or not in non edit mode
       <strong>${ _('Fields') }</strong>
-      &nbsp;<a href="javascript: void(0)" id="selectAll" class="btn btn-inverse" data-bind="click: function(){$root.collection.template.fields([]); $('#selectAll').removeClass('btn-inverse')}"><i class="fa fa-check"></i></a>
+      &nbsp;
+      <a href="javascript: void(0)" id="selectAll" class="btn btn-inverse"
+        data-bind="click: function(){$root.collection.template.fields([]); $('#selectAll').removeClass('btn-inverse')}">
+        <i class="fa fa-square-o"></i>
+      </a>
       <div data-bind="foreach: $root.collection.fields">
         <input type="checkbox" data-bind="value: $data, checked: $root.collection.template.fields" />
         <span data-bind="text: '&nbsp;' + $data"></span>
@@ -358,6 +362,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <thead>
         <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fields">
           <th data-bind="text: $data"></th>
+        </tr>
+        <tr data-bind="visible: $root.collection.template.fields().length == 0">
+          <th>${ ('Document') }</th>
         </tr>
       </thead>
       <tbody data-bind="foreach: $root.results">
