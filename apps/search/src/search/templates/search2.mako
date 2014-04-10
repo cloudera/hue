@@ -338,8 +338,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ## Todo add a toggle to show fields or not in non edit mode
       <strong>${ _('Fields') }</strong>
       &nbsp;
-      <a href="javascript: void(0)" id="selectAll" class="btn btn-inverse"
-        data-bind="click: function(){$root.collection.template.fields([]); $('#selectAll').removeClass('btn-inverse')}">
+      <a href="javascript: void(0)" class="btn"
+        data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
         <i class="fa fa-square-o"></i>
       </a>
       <div data-bind="foreach: $root.collection.fields">
@@ -536,12 +536,20 @@ $(document).ready(function () {
   ko.applyBindings(viewModel);
   
   % if not layout:
-##  fullLayout();
-##  viewModel.isEditing(true);
-##  viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());
-##  viewModel.search();
+    fullLayout();
+    viewModel.isEditing(true);
+    viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());
+    viewModel.search();
   % endif
 });
+
+  function toggleGridFieldsSelection() {
+    if (viewModel.collection.template.fields().length > 0) {
+      viewModel.collection.template.fields([])
+    } else {
+      viewModel.collection.template.fields(viewModel.collection.fields());
+    };
+  };  
 
   function showAddFacetModal(facet) {
     $("#addFacetModal").modal("show");
