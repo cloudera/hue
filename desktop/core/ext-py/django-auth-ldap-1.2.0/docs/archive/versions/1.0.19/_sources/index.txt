@@ -75,6 +75,20 @@ efficient) equivalent::
 
     AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=users,dc=example,dc=com"
 
+LDAP is fairly flexible when it comes to matching DNs.
+:class:`~django_auth_ldap.backend.LDAPBackend` make an effort to accommodate
+this by forcing usernames to lower case when creating Django users and trimming
+whitespace when authenticating.
+
+By default, all LDAP operations are performed with the :ref:`AUTH_LDAP_BIND_DN`
+and :ref:`AUTH_LDAP_BIND_PASSWORD` credentials, not with the user's. Otherwise,
+the LDAP connection would be bound as the authenticating user during login
+requests and as the default credentials during other requests, so you would see
+inconsistent LDAP attributes depending on the nature of the Django view. If
+you're willing to accept the inconsistency in order to retrieve attributes
+while bound as the authenticating user. see
+:ref:`AUTH_LDAP_BIND_AS_AUTHENTICATING_USER`.
+
 By default, LDAP connections are unencrypted and make no attempt to protect
 sensitive information, such as passwords. When communicating with an LDAP server
 on localhost or on a local network, this might be fine. If you need a secure
@@ -127,7 +141,7 @@ configuration must be of this type and part of the search results.
 
     import ldap
     from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
-    
+
     AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=groups,dc=example,dc=com",
         ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
     )
@@ -135,9 +149,13 @@ configuration must be of this type and part of the search results.
 
 The simplest use of groups is to limit the users who are allowed to log in. If
 :ref:`AUTH_LDAP_REQUIRE_GROUP` is set, then only users who are members of that
-group will successfully authenticate::
+group will successfully authenticate. :ref:`AUTH_LDAP_DENY_GROUP` is the
+reverse: if given, members of this group will be rejected.
+
+.. code-block:: python
 
     AUTH_LDAP_REQUIRE_GROUP = "cn=enabled,ou=groups,dc=example,dc=com"
+    AUTH_LDAP_DENY_GROUP = "cn=disabled,ou=groups,dc=example,dc=com"
 
 More advanced uses of groups are covered in the next two sections.
 
@@ -148,7 +166,11 @@ User objects
 Authenticating against an external source is swell, but Django's auth module is
 tightly bound to the :class:`django.contrib.auth.models.User` model. Thus, when
 a user logs in, we have to create a :class:`~django.contrib.auth.models.User`
-object to represent him in the database.
+object to represent him in the database. Because the LDAP search is
+case-insenstive, the default implementation also searches for existing Django
+users with an iexact query and new users are created with lowercase usernames.
+See :meth:`~django_auth_ldap.backend.LDAPBackend.get_or_create_user` if you'd
+like to override this behavior.
 
 The only required field for a user is the username, which we obviously have. The
 :class:`~django.contrib.auth.models.User` model is picky about the characters
@@ -170,8 +192,8 @@ LDAP directories tend to contain much more information about users that you may
 wish to propagate. A pair of settings, :ref:`AUTH_LDAP_USER_ATTR_MAP` and
 :ref:`AUTH_LDAP_PROFILE_ATTR_MAP`, serve to copy directory information into
 :class:`~django.contrib.auth.models.User` and profile objects. These are
-dictionaries that map user and profile model keys, respectively, to LDAP
-attribute names::
+dictionaries that map user and profile model keys, respectively, to
+(case-insensitive) LDAP attribute names::
 
     AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName", "last_name": "sn"}
     AUTH_LDAP_PROFILE_ATTR_MAP = {"home_directory": "homeDirectory"}
@@ -185,26 +207,46 @@ group membership::
         "is_superuser": "cn=superuser,ou=groups,dc=example,dc=com"
     }
 
+    AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
+        "is_awesome": "cn=awesome,ou=django,ou=groups,dc=example,dc=com"
+    }
+
 By default, all mapped user fields will be updated each time the user logs in.
 To disable this, set :ref:`AUTH_LDAP_ALWAYS_UPDATE_USER` to ``False``. If you
 need to populate a user outside of the authentication process—for example, to
 create associated model objects before the user logs in for the first time—you
 can call :meth:`django_auth_ldap.backend.LDAPBackend.populate_user`. You'll
 need an instance of :class:`~django_auth_ldap.backend.LDAPBackend`, which you
-can create yourself if necessary.
+should feel free to create yourself.
+:meth:`~django_auth_ldap.backend.LDAPBackend.populate_user` returns the new
+:class:`~django.contrib.auth.models.User` or `None` if the user could not be
+found in LDAP.
 
 If you need to access multi-value attributes or there is some other reason that
 the above is inadequate, you can also access the user's raw LDAP attributes.
-``user.ldap_user`` is an object with two public properties:
+``user.ldap_user`` is an object with four public properties. The group
+properties are, of course, only valid if groups are configured.
 
     * ``dn``: The user's distinguished name.
     * ``attrs``: The user's LDAP attributes as a dictionary of lists of string
-      values.
+      values. The dictionaries are modified to use case-insensitive keys.
+    * ``group_dns``: The set of groups that this user belongs to, as DNs.
+    * ``group_names``: The set of groups that this user belongs to, as simple
+      names. These are the names that will be used if
+      :ref:`AUTH_LDAP_MIRROR_GROUPS` is used.
 
 Python-ldap returns all attribute values as utf8-encoded strings. For
 convenience, this module will try to decode all values into Unicode strings. Any
 string that can not be successfully decoded will be left as-is; this may apply
 to binary values such as Active Directory's objectSid.
+
+If you would like to perform any additional population of user or profile
+objects, django_auth_ldap exposes two custom signals to help:
+:data:`~django_auth_ldap.backend.populate_user` and
+:data:`~django_auth_ldap.backend.populate_user_profile`. These are sent after
+the backend has finished populating the respective objects and before they are
+saved to the database. You can use this to propagate additional information from
+the LDAP directory to the user and profile objects any way you like.
 
 .. note::
 
@@ -378,8 +420,9 @@ and arguments are included for completeness.
     )
     AUTH_LDAP_GROUP_TYPE = GroupOfNamesType(name_attr="cn")
 
-    # Only users in this group can log in.
+    # Simple group restrictions
     AUTH_LDAP_REQUIRE_GROUP = "cn=enabled,ou=django,ou=groups,dc=example,dc=com"
+    AUTH_LDAP_DENY_GROUP = "cn=disabled,ou=django,ou=groups,dc=example,dc=com"
 
     # Populate the Django user from the LDAP directory.
     AUTH_LDAP_USER_ATTR_MAP = {
@@ -397,10 +440,14 @@ and arguments are included for completeness.
         "is_staff": "cn=staff,ou=django,ou=groups,dc=example,dc=com",
         "is_superuser": "cn=superuser,ou=django,ou=groups,dc=example,dc=com"
     }
-    
+
+    AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
+        "is_awesome": "cn=awesome,ou=django,ou=groups,dc=example,dc=com",
+    }
+
     # This is the default, but I like to be explicit.
     AUTH_LDAP_ALWAYS_UPDATE_USER = True
-    
+
     # Use LDAP group membership to calculate group permissions.
     AUTH_LDAP_FIND_GROUP_PERMS = True
 
@@ -447,6 +494,24 @@ If ``True``, :class:`~django_auth_ldap.backend.LDAPBackend` will be able furnish
 permissions for any Django user, regardless of which backend authenticated it.
 
 
+.. _AUTH_LDAP_BIND_AS_AUTHENTICATING_USER:
+
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``False``
+
+If ``True``, authentication will leave the LDAP connection bound as the
+authenticating user, rather than forcing it to re-bind with the default
+credentials after authentication succeeds. This may be desirable if you do not
+have global credentials that are able to access the user's attributes.
+django-auth-ldap never stores the user's password, so this only applies to
+requests where the user is authenticated. Thus, the downside to this setting is
+that LDAP results may vary based on whether the user was authenticated earlier
+in the Django view, which could be surprising to code not directly concerned
+with authentication.
+
+
 .. _AUTH_LDAP_BIND_DN:
 
 AUTH_LDAP_BIND_DN
@@ -460,7 +525,7 @@ anonymous bind. To authenticate a user, we will bind with that user's DN and
 password, but for all other LDAP operations, we will be bound as the DN in this
 setting. For example, if :ref:`AUTH_LDAP_USER_DN_TEMPLATE` is not set, we'll use
 this to search for the user. If :ref:`AUTH_LDAP_FIND_GROUP_PERMS` is ``True``,
-we'll also use it to determine group membership on subsequent requests.
+we'll also use it to determine group membership.
 
 
 .. _AUTH_LDAP_BIND_PASSWORD:
@@ -496,15 +561,15 @@ A dictionary of options to pass to each connection to the LDAP server via
 ``LDAPObject.set_option()``. Keys are ``ldap.OPT_*`` constants.
 
 
-.. _AUTH_LDAP_GROUP_CACHE_TIMEOUT:
+.. _AUTH_LDAP_DENY_GROUP:
 
-AUTH_LDAP_GROUP_CACHE_TIMEOUT
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AUTH_LDAP_DENY_GROUP
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Default: ``None``
 
-If :ref:`AUTH_LDAP_CACHE_GROUPS` is ``True``, this is the cache timeout for
-group memberships. If ``None``, the global cache timeout will be used.
+The distinguished name of a group; authentication will fail for any user
+that belongs to this group.
 
 
 .. _AUTH_LDAP_FIND_GROUP_PERMS:
@@ -528,6 +593,17 @@ Default: ``{}``
 
 A dictionary of options to pass to ``ldap.set_option()``. Keys are
 ``ldap.OPT_*`` constants.
+
+
+.. _AUTH_LDAP_GROUP_CACHE_TIMEOUT:
+
+AUTH_LDAP_GROUP_CACHE_TIMEOUT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``None``
+
+If :ref:`AUTH_LDAP_CACHE_GROUPS` is ``True``, this is the cache timeout for
+group memberships. If ``None``, the global cache timeout will be used.
 
 
 .. _AUTH_LDAP_GROUP_SEARCH:
@@ -578,6 +654,18 @@ A mapping from user profile field names to LDAP attribute names. A user's
 profile will be populated from his LDAP attributes at login.
 
 
+.. _AUTH_LDAP_PROFILE_FLAGS_BY_GROUP:
+
+AUTH_LDAP_PROFILE_FLAGS_BY_GROUP
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``{}``
+
+A mapping from boolean profile field names to distinguished names of LDAP
+groups. The corresponding field in a user's profile is set to ``True`` or
+``False`` according to whether the user is a member of the group.
+
+
 .. _AUTH_LDAP_REQUIRE_GROUP:
 
 AUTH_LDAP_REQUIRE_GROUP
@@ -585,8 +673,8 @@ AUTH_LDAP_REQUIRE_GROUP
 
 Default: ``None``
 
-The distinguished name of a group that a user must belong to in order to
-successfully authenticate.
+The distinguished name of a group; authentication will fail for any user that
+does not belong to this group.
 
 
 .. _AUTH_LDAP_SERVER_URI:
@@ -663,6 +751,20 @@ in the directory. The filter parameter should contain the placeholder
 authentication to succeed.
 
 
+Module Properties
+-----------------
+
+.. module:: django_auth_ldap
+
+.. data:: version
+
+    The library's current version number as a 3-tuple.
+
+.. data:: version_string
+
+    The library's current version number as a string.
+
+
 Configuration
 -------------
 
@@ -683,9 +785,9 @@ Configuration
     The base class for objects that will determine group membership for various
     LDAP grouping mechanisms. Implementations are provided for common group
     types or you can write your own. See the source code for subclassing notes.
-    
+
     .. method:: __init__(name_attr='cn')
-        
+
         By default, LDAP groups will be mapped to Django groups by taking the
         first value of the cn attribute. You can specify a different attribute
         with ``name_attr``.
@@ -704,9 +806,9 @@ Configuration
     A concrete subclass of
     :class:`~django_auth_ldap.config.LDAPGroupType` that handles grouping
     mechanisms wherein the group object contains a list of its member DNs.
-    
+
     .. method:: __init__(member_attr, name_attr='cn')
-    
+
         * ``member_attr``: The attribute on the group object that contains a
           list of member DNs. 'member' and 'uniqueMember' are common examples.
 
@@ -718,7 +820,7 @@ Configuration
     traversed to determine membership.
 
     .. method:: __init__(member_attr, name_attr='cn')
-    
+
         As above.
 
 
@@ -784,6 +886,28 @@ Backend
 
 .. module:: django_auth_ldap.backend
 
+.. data:: populate_user
+
+    This is a Django signal that is sent when clients should perform additional
+    customization of a :class:`~django.contrib.auth.models.User` object. It is
+    sent after a user has been authenticated and the backend has finished
+    populating it, and just before it is saved. The client may take this
+    opportunity to populate additional model fields, perhaps based on
+    ``ldap_user.attrs``. This signal has two keyword arguments: ``user`` is the
+    :class:`~django.contrib.auth.models.User` object and ``ldap_user`` is the
+    same as ``user.ldap_user``. The sender is the
+    :class:`~django_auth_ldap.backend.LDAPBackend` class.
+
+.. data:: populate_user_profile
+
+    Like :data:`~django_auth_ldap.backend.populate_user`, but sent for the user
+    profile object. This will only be sent if the user has an existing profile.
+    As with :data:`~django_auth_ldap.backend.populate_user`, it is sent after the
+    backend has finished setting properties and before the object is saved. This
+    signal has two keyword arguments: ``profile`` is the user profile object and
+    ``ldap_user`` is the same as ``user.ldap_user``. The sender is the
+    :class:`~django_auth_ldap.backend.LDAPBackend` class.
+
 .. class:: LDAPBackend
 
     :class:`~django_auth_ldap.backend.LDAPBackend` has one method that may be
@@ -806,12 +930,13 @@ Backend
         ``ldap_user.attrs``. The return value must be the same as
         ``User.objects.get_or_create()``: a (User, created) two-tuple.
 
-        The default implementation simply calls ``User.objects.get_or_create()``
-        with the username. Subclasses are welcome to associate LDAP users to
-        Django users any way they like.
+        The default implementation calls ``User.objects.get_or_create()``, using
+        a case-insensitive query and creating new users with lowercase
+        usernames. Subclasses are welcome to associate LDAP users to Django
+        users any way they like.
 
     .. method:: ldap_to_django_username(username)
-    
+
         Returns a valid Django username based on the given LDAP username (which
         is what the user enters). By default, ``username`` is returned
         unchanged. This can be overriden by subclasses.

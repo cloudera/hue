@@ -1,0 +1,5 @@
+include README LICENSE CHANGES
+
+recursive-include docs *
+prune docs/build
+global-exclude *.pyc .DS_Store .workon

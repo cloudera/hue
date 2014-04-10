@@ -1,0 +1,70 @@
+v1.2 - 2014-04-10
+-----------------
+
+- django-auth-ldap now provides experimental Python 3 support. Python 2.5 was
+  dropped.
+
+  To sum up, django-auth-ldap works with Python 2.6, 2.7, 3.3 and 3.4.
+
+  Since python-ldap isn't making progress toward Python 3, if you're using
+  Python 3, you need to install a fork::
+
+      $ pip install git+https://github.com/rbarrois/python-ldap.git@py3
+
+  Thanks to `Aymeric Augustin <https://myks.org/en/>`_ for making this happen.
+
+
+v1.1.8 - 2014-02-01
+-------------------
+
+* Fix `#43`_: Update :class:`~django_auth_ldap.config.LDAPSearchUnion` to work for
+  group searches in addition to user searches.
+
+* Tox no longer supports Python 2.5, so our tests now run on 2.6 and 2.7 only.
+
+.. _#43: https://bitbucket.org/psagers/django-auth-ldap/issue/43/
+
+
+v1.1.7 - 2013-11-19
+-------------------
+
+* Bug fix: :setting:`AUTH_LDAP_GLOBAL_OPTIONS` could be ignored in some cases
+  (such as :func:`~django_auth_ldap.backend.LDAPBackend.populate_user`).
+
+
+v1.1.5 - 2013-10-25
+-------------------
+
+* Fix `#41`_: Support POSIX group permissions with no gidNumber attribute.
+
+* Support multiple group DNs for \*_FLAGS_BY_GROUP.
+
+
+.. _#41: https://bitbucket.org/psagers/django-auth-ldap/issue/41/
+
+
+v1.1.4 - 2013-03-09
+-------------------
+
+* Add support for Django 1.5's custom user models.
+
+
+v1.1.3 - 2013-01-05
+-------------------
+
+* Fix `#33`_: Reject empty passwords by default.
+
+  Unless :setting:`AUTH_LDAP_PERMIT_EMPTY_PASSWORD` is set to True,
+  LDAPBackend.authenticate() will immediately return None if the password is
+  empty. This is technically backwards-incompatible, but it's a more secure
+  default for those LDAP servers that are configured such that binds without
+  passwords always succeed.
+
+* Fix `#39`_: Add support for pickling LDAP-authenticated users.
+
+
+.. _#33: https://bitbucket.org/psagers/django-auth-ldap/issue/33/
+.. _#39: https://bitbucket.org/psagers/django-auth-ldap/issue/39/
+
+
+.. vim: ft=rst nospell tw=80
