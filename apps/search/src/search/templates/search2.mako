@@ -337,7 +337,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div style="float:left; margin-right: 10px" >
     <span data-bind="visible: ! $root.collection.template.showFieldList()">
       <a href="javascript: void(0)" class="btn"
-        data-bind="click: $root.collection.template.showFieldList(true)">
+        data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
         <i class="fa fa-chevron-right"></i>
       </a>
     </span>
@@ -345,7 +345,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div data-bind="visible: $root.isEditing() || $root.collection.template.showFieldList()" style="float:left; margin-right: 10px" >
     <span data-bind="visible: $root.collection.template.showFieldList()">
       <a href="javascript: void(0)" class="btn"
-        data-bind="click: $root.collection.template.showFieldList(false)">
+        data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
         <i class="fa fa-chevron-left"></i>
       </a>
       <strong>${ _('Fields') }</strong>      
