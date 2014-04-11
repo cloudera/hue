@@ -233,7 +233,9 @@ var Collection = function (vm, collection) {
     },function (data) {
       if (data.status == 0) {
         $.each(data.dynamic_fields, function (index, field) {
-          self.fields.push(field);
+          if (self.fields.indexOf(field) == -1) {
+            self.fields.push(field);
+          }
         });
       }
     }).fail(function (xhr, textStatus, errorThrown) {
