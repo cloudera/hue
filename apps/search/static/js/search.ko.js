@@ -73,11 +73,12 @@ var Row = function (widgets) {
   }
 }
 
-var Widget = function (size, name, widgetType, properties, offset) {
+var Widget = function (size, id, name, widgetType, properties, offset) {
   var self = this;
   self.size = ko.observable(size).extend({ numeric: 0 });
 
   self.name = ko.observable(name);
+  self.id = ko.observable(id);
   self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
   self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
   self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
@@ -90,6 +91,7 @@ var Widget = function (size, name, widgetType, properties, offset) {
   self.expand = function () {
     self.size(self.size() + 1);
   }
+  
   self.compress = function () {
     self.size(self.size() - 1);
   }
@@ -97,18 +99,19 @@ var Widget = function (size, name, widgetType, properties, offset) {
   self.moveLeft = function () {
     self.offset(self.offset() - 1);
   }
+  
   self.moveRight = function () {
     self.offset(self.offset() + 1);
   }
 
   self.remove = function (row, widget) {
-	viewModel.removeWidget(widget);
+    viewModel.removeWidget(widget);
     row.widgets.remove(widget);
   }
 };
 
 Widget.prototype.clone = function () {
-  return new Widget(this.size(), this.name(), this.widgetType());
+  return new Widget(this.size(), UUID(), this.name(), this.widgetType());
 };
 
 function fullLayout() {
@@ -165,11 +168,11 @@ function loadLayout(viewModel, json_layout) {
   var _columns = [];
   
   $(json_layout).each(function (cnt, json_col) { 
-	var _rows = [];
+    var _rows = [];
     $(json_col.rows).each(function (rcnt, json_row) {
       var row = new Row();
       $(json_row.widgets).each(function (wcnt, widget) {
-    	row.addWidget(new Widget(widget.size, widget.name, widget.widgetType, widget.properties, widget.offset));
+        row.addWidget(new Widget(widget.size, widget.id, widget.name, widget.widgetType, widget.properties, widget.offset));
       });
       _rows.push(row);
     });
@@ -222,18 +225,25 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     self.facets.push(ko.mapping.fromJS({
-      "uuid": "f6618a5c-bbba-2886-1886-bbcaf01409ca",
-      "verbatim": "", "isVerbatim": false, "label": facet_json.name,
+      "id": facet_json.widget_id,
+      "label": facet_json.name,
       "field": facet_json.name, "type": "field"
     }));
   }
 
-  self.getSingleFacet = function (normalized_facet_json) {
-	normalized_facet_json = 'user_location';
-	var _facet = null;
+  self.removeFacet = function (widget_id) {
+    $.each(self.facets(), function (index, item) {
+      if (item.id() == widget_id()) {
+        self.facets.remove(item);
+      }
+    });
+  }  
+  
+  self.getFacetById = function (facet_id) {
+    var _facet = null;
     $.each(self.facets(), function (index, facet) {
-      if (facet.field() == normalized_facet_json) {
-    	  _facet = facet;
+      if (facet.id() == facet_id) {
+        _facet = facet;
       }      
     });
     return _facet;
@@ -241,7 +251,7 @@ var Collection = function (vm, collection) {
   
   self.addDynamicFields = function () {
     $.post("/search/index/" + self.id + "/fields/dynamic", {
-    },function (data) {
+      }, function (data) {
       if (data.status == 0) {
         $.each(data.dynamic_fields, function (index, field) {
           if (self.fields.indexOf(field) == -1) {
@@ -269,30 +279,35 @@ var SearchViewModel = function (collection_json, query_json) {
   self.norm_facets = ko.computed(function () {
     return self.response().normalized_facets;
   });
-  self.getFacet = function (name) { // todo
-	return self.norm_facets() !== undefined ? self.norm_facets()[0] : false;
+  self.getFacetFromQuery = function (facet_id) {	
+    var _facet = null;
+    if (self.norm_facets() !== undefined) {
+	  $.each(self.norm_facets(), function (index, norm_facet) {//alert(ko.mapping.toJSON(norm_facet.id + " " + facet_id()));  
+	    if (norm_facet.id == facet_id()) {
+	      _facet = norm_facet;
+	    }      
+	  });
+    }
+    return _facet;	  
   };
-
-  self.selectedFacet = ko.observable(); //deprecated
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable({});
-  loadLayout(self, collection_json.layout);
+  loadLayout(self, collection_json.layout); // move to init + load dynamic fields?
   
   self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
-	  
-  self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
-  self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
-  self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
-  self.draggableArea = ko.observable(new Widget(12, "Area Chart", "area-widget"));
-  self.draggableMap = ko.observable(new Widget(12, "Map", "map-widget"));
-  self.draggableLine = ko.observable(new Widget(12, "Line Chart", "line-widget"));
-  self.draggablePie = ko.observable(new Widget(12, "Pie Chart", "pie-widget"));
-
+    
+  self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
+  self.draggableResultset = ko.observable(new Widget(12, UUID(), "Results", "resultset-widget"));
+  self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
+  self.draggableArea = ko.observable(new Widget(12, UUID(), "Area Chart", "area-widget"));
+  self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
+  self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
+  self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
   
 
   self.search = function () {
@@ -302,7 +317,7 @@ var SearchViewModel = function (collection_json, query_json) {
       collection: ko.mapping.toJSON(self.collection),
       query: ko.mapping.toJSON(self.query),
       layout: ko.mapping.toJSON(self.columns)
-    },function (data) {
+    }, function (data) {
       self.response(data); // If error we should probably update only the facets
       self.results.removeAll();
       if (data.error) {
@@ -339,30 +354,11 @@ var SearchViewModel = function (collection_json, query_json) {
       $(document).trigger("error", xhr.responseText);
     });
   };
-
-  // deprecated
-  // To move to collection
-  self.selectSingleFacet = function (normalized_facet_json) {
-    $.each(self.collection.facets(), function (index, facet) {
-      if (facet.field() == normalized_facet_json.field) {
-        self.selectedFacet(facet);
-      }
-    });
-  }
-
-  // widget.remove() --> callback to removeFacet() or other depending on type of widget  
-  self.removeWidget = function (facet_json) {
-	self.removeFacet({'field': 'user_location'}); 
-  }  
   
-  self.removeFacet = function (facet_json) {
-    $.each(self.collection.facets(), function (index, item) {
-      if (item.field() == facet_json.field) {
-        self.collection.facets.remove(item);
-      }
-    });
+  self.removeWidget = function (widget_json) {
+    self.collection.removeFacet(widget_json.id); 
     self.search();
-  }
+  }  
 
   self.save = function () {
     $.post("/search/save", {

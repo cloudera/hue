@@ -281,10 +281,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Settings')}</a></li>
       </ul>
 
-      <div data-bind="template: { name: function() { return widgetType(); }, data: properties }" class="widget-main-section"></div>
+      <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
       <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
         <ul class="unstyled" style="margin: 10px">
-          <li> Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
+          <li>Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
+          ## Could add here extra non widget settings like facet or see for a nice popover
         </ul>
       </div>
     </div>
@@ -296,12 +297,15 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
-  <!-- ko if: $root.getFacet() -->
-  <div class="row-fluid" data-bind="with: $root.getFacet">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getSingleFacet()" style="margin-bottom: 20px">
-      ##${_('Add field')}
-      ##&nbsp;<a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>      
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
@@ -366,7 +370,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- /ko -->
 
   <div style="overflow-x: auto">
-	  <!-- ko if: $root.collection.template.isGridLayout() -->
+	<!-- ko if: $root.collection.template.isGridLayout() -->
     <table id="result-container" data-bind="visible: !($root.isRetrievingResults())" style="margin-top: 0">
       <thead>
         <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fields">
@@ -391,7 +395,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 	  <div id="result-container" data-bind="foreach: $root.results">
 	    <div class="result-row" data-bind="html: $data"></div>
 	  </div>
-	  <!-- /ko -->
+	<!-- /ko -->
   </div>
 </script>
 
@@ -438,6 +442,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="facetName" type="text">
+          <input id="widgetId" type="hidden">
         </div>
       </div>
     </p>
@@ -533,12 +538,13 @@ $(document).ready(function () {
     };
   };  
 
-  function showAddFacetModal(facet) {
+  function showAddFacetModal(widget) {
+    $("#widgetId").val(widget.id());
     $("#addFacetModal").modal("show");
   };
 
-  function submitAddFacetModal(facet) {
-    viewModel.collection.addFacet({'name': $("#facetName").val()});
+  function submitAddFacetModal() {
+    viewModel.collection.addFacet({'name': $("#facetName").val(), 'widget_id': $("#widgetId").val()});
     $('#addFacetModal').modal("hide");
     viewModel.search();
   };

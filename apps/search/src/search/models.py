@@ -250,11 +250,13 @@ class Collection(models.Model):
 
   def get_c(self, user):
     props = self.properties_dict
-    print props
+
     if 'collection' not in props:
       props['collection'] = self.get_default(user)
     if 'layout' not in props:
       props['layout'] = []    
+#    props['collection'] = self.get_default(user) # to reset
+#    props['layout'] = []  
 
     return json.dumps(props)
 
@@ -280,8 +282,9 @@ class Collection(models.Model):
       "fields": fields
     }
     
-    FACETS = {"dates": [], "fields": [],
-       "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
+    FACETS = {
+      "dates": [], "fields": [],
+      "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
     };  
     
     collection_properties = {
@@ -344,12 +347,11 @@ class Collection(models.Model):
     if self.name == 'twitter_demo':
       return '/search/static/art/icon_twitter.png'
     elif self.name == 'yelp_demo':
-          return '/search/static/art/icon_yelp.png'
+      return '/search/static/art/icon_yelp.png'
     elif self.name == 'log_demo':
-          return '/search/static/art/icon_logs.png'
+      return '/search/static/art/icon_logs.png'
     else:
-          return '/search/static/art/icon_search_24.png'
-
+      return '/search/static/art/icon_search_24.png'
 
 def get_facet_field_format(field, type, facets):
   format = ""
@@ -369,6 +371,13 @@ def get_facet_field_format(field, type, facets):
   except:
     pass
   return format
+
+def get_facet_field(field, facets):
+  facets = filter(lambda facet: facet['type'] == 'field' and facet['field'] == field, facets)
+  if facets:
+    return facets[0]
+  else:
+    return None
 
 def get_facet_field_label(field, facets):
   label = field
@@ -437,7 +446,9 @@ def augment_solr_response2(response, collection, solr_query):
     if response['facet_counts']['facet_fields']:
       for cat in response['facet_counts']['facet_fields']:
         selected_field = fq.get(cat, '')
+        collection_facet = get_facet_field(cat, collection['facets'])
         facet = {
+          'id': collection_facet['id'],
           'field': cat,
           'type': 'field',
           'label': get_facet_field_label(cat, collection['facets']),
