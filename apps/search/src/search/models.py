@@ -315,8 +315,9 @@ class Collection(models.Model):
     if 'autocomplete' not in properties_python:
       properties_python['autocomplete'] = False
     # TODO: Should convert old Hue 3.5 format here
-    if 'showFieldList' not in properties_python['collection']['template']:
-      properties_python['collection']['template']['showFieldList'] = True
+    if 'collection' in properties_python:
+      if 'showFieldList' not in properties_python['collection']['template']:
+        properties_python['collection']['template']['showFieldList'] = True
     return properties_python
 
   def update_properties(self, post_data):
