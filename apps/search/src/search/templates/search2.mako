@@ -296,18 +296,15 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
+  <!-- ko if: $root.getFacet() -->
+  <div class="row-fluid" data-bind="with: $root.getFacet">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getSingleFacet()" style="margin-bottom: 20px">
+      ##${_('Add field')}
+      ##&nbsp;<a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      ${ _('Field') }: <input type="text" data-bind="value: field" />
+    </div>  
 
-  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    ${_('Add field')}
-    &nbsp;<a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-  </div>
-
-  ## Need to pick the facet ID from norm_facets instead of looping on all
-  <div class="row-fluid" data-bind="foreach: $root.norm_facets">
-    <span class="pull-right">
-      <a href="javascript:void(0)" data-bind="click: editFacet"><i class="fa fa-pencil"></i></a>
-      <a href="javascript:void(0)" data-bind="click: $root.removeFacet"><i class="fa fa-times"></i></a>
-    </span>
     <div data-bind="text: label" style="font-weight: bold"></div>
     <div data-bind="foreach: counts">
       <div>
@@ -323,10 +320,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       </div>
     </div>
   </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="resultset-widget">
-
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       ${_('Results type')}
       &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
@@ -452,29 +449,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </div>
 
 
-<div id="editFacetModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Edit Facet')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">        
-        <!-- ko if: selectedFacet() -->
-        <p>
-          ${ _('Label') }: <input type="text" data-bind="value: selectedFacet().label" />
-        </p>
-        <!-- /ko -->
-      </div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn" data-bind="click: search">${_('Ok')}</a>
-  </div>
-</div>
-
-
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/mustache.js"></script>
@@ -547,7 +521,7 @@ $(document).ready(function () {
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
   ko.applyBindings(viewModel);
 
-  //viewModel.isEditing(true);
+  viewModel.isEditing(true);
   viewModel.search();
 });
 
@@ -567,11 +541,6 @@ $(document).ready(function () {
     viewModel.collection.addFacet({'name': $("#facetName").val()});
     $('#addFacetModal').modal("hide");
     viewModel.search();
-  };
-
-  function editFacet(facet) {
-    viewModel.selectSingleFacet(facet);
-    $("#editFacetModal").modal("show");
   };
 </script>
 

@@ -102,7 +102,7 @@ var Widget = function (size, name, widgetType, properties, offset) {
   }
 
   self.remove = function (row, widget) {
-    // widget.remove() --> callback to removeFacet() or other depending on type of widget
+	viewModel.removeWidget(widget);
     row.widgets.remove(widget);
   }
 };
@@ -124,7 +124,7 @@ function oneThirdRightLayout() {
 }
 
 function setLayout(colSizes) {
-  // save previous widgets
+  // Save previous widgets
   var _allRows = [];
   $(viewModel.columns()).each(function (cnt, col) {
     var _tRows = [];
@@ -228,6 +228,17 @@ var Collection = function (vm, collection) {
     }));
   }
 
+  self.getSingleFacet = function (normalized_facet_json) {
+	normalized_facet_json = 'user_location';
+	var _facet = null;
+    $.each(self.facets(), function (index, facet) {
+      if (facet.field() == normalized_facet_json) {
+    	  _facet = facet;
+      }      
+    });
+    return _facet;
+  }  
+  
   self.addDynamicFields = function () {
     $.post("/search/index/" + self.id + "/fields/dynamic", {
     },function (data) {
@@ -238,9 +249,7 @@ var Collection = function (vm, collection) {
           }
         });
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      }
-    );
+    }).fail(function (xhr, textStatus, errorThrown) {});
   }
 
   self.addDynamicFields();
@@ -260,14 +269,22 @@ var SearchViewModel = function (collection_json, query_json) {
   self.norm_facets = ko.computed(function () {
     return self.response().normalized_facets;
   });
+  self.getFacet = function (name) { // todo
+	return self.norm_facets() !== undefined ? self.norm_facets()[0] : false;
+  };
 
-  self.selectedFacet = ko.observable();
+  self.selectedFacet = ko.observable(); //deprecated
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable({});
   loadLayout(self, collection_json.layout);
   
   self.isEditing = ko.observable(false);
+  self.toggleEditing = function () {
+    self.isEditing(!self.isEditing());
+  };
+  self.isRetrievingResults = ko.observable(false);
+	  
   self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));
   self.draggableBar = ko.observable(new Widget(12, "Bar Chart", "bar-widget"));
@@ -275,11 +292,8 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableMap = ko.observable(new Widget(12, "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, "Pie Chart", "pie-widget"));
-  self.toggleEditing = function () {
-    self.isEditing(!self.isEditing());
-  };
-  self.isRetrievingResults = ko.observable(false);
 
+  
 
   self.search = function () {
     self.isRetrievingResults(true);
@@ -326,6 +340,7 @@ var SearchViewModel = function (collection_json, query_json) {
     });
   };
 
+  // deprecated
   // To move to collection
   self.selectSingleFacet = function (normalized_facet_json) {
     $.each(self.collection.facets(), function (index, facet) {
@@ -335,6 +350,11 @@ var SearchViewModel = function (collection_json, query_json) {
     });
   }
 
+  // widget.remove() --> callback to removeFacet() or other depending on type of widget  
+  self.removeWidget = function (facet_json) {
+	self.removeFacet({'field': 'user_location'}); 
+  }  
+  
   self.removeFacet = function (facet_json) {
     $.each(self.collection.facets(), function (index, item) {
       if (item.field() == facet_json.field) {
