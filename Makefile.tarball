@@ -23,6 +23,7 @@ PROD_INCLUDES := \
 	desktop \
 	ext/thirdparty \
 	LICENSE.txt \
+	NOTICE.txt \
 	Makefile* \
 	maven \
 	tools/app_reg \
@@ -41,7 +42,6 @@ PROD_EXCLUDES := \
 	desktop/devtools.mk \
 	desktop/libs/hadoop/regenerate-thrift.sh \
 	ext/thirdparty/js/manifest.json \
-	ext/thirdparty/README.md \
         Makefile.tarball
 
 # Macro to remove things we don't want to package
