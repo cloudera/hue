@@ -67,7 +67,6 @@ def index(request):
   return render('search2.mako', request, {
     'collection': collection,
     'query': query,
-    'layout': {},
   })
 
 
@@ -118,10 +117,12 @@ def save(request):
   response = {'status': -1}  
   
   collection = json.loads(request.POST.get('collection', '{}')) # TODO perms decorator
+  layout = json.loads(request.POST.get('layout', '{}')) 
     
   if collection:
     hue_collection = Collection.objects.get(id=collection['id'])
     hue_collection.update_properties({'collection': collection})
+    hue_collection.update_properties({'layout': layout})
     # Todo update certain atttributes like, label, enabled...
     hue_collection.save()
     response['status'] = 0

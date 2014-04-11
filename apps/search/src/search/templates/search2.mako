@@ -195,6 +195,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Line Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-line-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha tachometer"></i></a></div>
   </div>
   <div class="clearfix"></div>
 </div>
@@ -329,7 +330,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       ${_('Results type')}
       &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
-      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-magic"></i></a>
+      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-code"></i></a>
   </div>
 
   <!-- ko if: $root.collection.template.isGridLayout() -->
@@ -545,13 +546,9 @@ $(document).ready(function () {
 
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
   ko.applyBindings(viewModel);
-  
-  % if not layout:
-    fullLayout();
-    viewModel.isEditing(true);
-    viewModel.columns()[0].rows()[0].addWidget(viewModel.draggableResultset());
-    viewModel.search();
-  % endif
+
+  //viewModel.isEditing(true);
+  viewModel.search();
 });
 
   function toggleGridFieldsSelection() {

@@ -161,6 +161,25 @@ function setLayout(colSizes) {
   viewModel.columns(_cols);
 }
 
+function loadLayout(viewModel, json_layout) {
+  var _columns = [];
+  
+  $(json_layout).each(function (cnt, json_col) { 
+	var _rows = [];
+    $(json_col.rows).each(function (rcnt, json_row) {
+      var row = new Row();
+      $(json_row.widgets).each(function (wcnt, widget) {
+    	row.addWidget(new Widget(widget.size, widget.name, widget.widgetType, widget.properties, widget.offset));
+      });
+      _rows.push(row);
+    });
+    var column = new Column(json_col.size, _rows);
+    _columns = _columns.concat(column);
+  });
+
+  viewModel.columns(_columns);
+}
+
 // End dashboard lib
 
 var Query = function (vm, query) {
@@ -230,7 +249,7 @@ var SearchViewModel = function (collection_json, query_json) {
   var self = this;
 
   // Models
-  self.collection = new Collection(self, collection_json);
+  self.collection = new Collection(self, collection_json.collection);
   self.query = new Query(self, query_json);
 
   // UI
@@ -243,7 +262,9 @@ var SearchViewModel = function (collection_json, query_json) {
   self.selectedFacet = ko.observable();
 
   self.previewColumns = ko.observable("");
-  self.columns = ko.observableArray([]); // aka 'layout'
+  self.columns = ko.observable({});
+  loadLayout(self, collection_json.layout);
+  
   self.isEditing = ko.observable(false);
   self.draggableFacet = ko.observable(new Widget(12, "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, "Results", "resultset-widget"));

@@ -243,17 +243,20 @@ class Collection(models.Model):
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
 
-  _ATTRIBUTES = ['collection', 'autocomplete']
+  _ATTRIBUTES = ['collection', 'layout', 'autocomplete']
   ICON = '/search/static/art/icon_search_24.png'
 
   objects = CollectionManager()
 
   def get_c(self, user):
     props = self.properties_dict
+    print props
     if 'collection' not in props:
       props['collection'] = self.get_default(user)
-    
-    return json.dumps(props['collection'])
+    if 'layout' not in props:
+      props['layout'] = []    
+
+    return json.dumps(props)
 
   def get_default(self, user):      
     fields = self.fields_data(user)
