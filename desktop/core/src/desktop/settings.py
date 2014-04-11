@@ -345,6 +345,9 @@ if OAUTH_AUTHENTICATION:
 if desktop.conf.REDIRECT_WHITELIST.get():
   MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
 
+#Support HTTPS load-balancing
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
 ############################################################
 
 # Necessary for South to not fuzz with tests.  Fixed in South 0.7.1
