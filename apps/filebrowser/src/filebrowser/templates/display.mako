@@ -115,7 +115,7 @@ ${ fb_components.menubar() }
               <br/>
             </div>
           % else:
-          %if 'contents' in view and view['masked_binary_data']:
+          % if 'contents' in view and view['masked_binary_data']:
             <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
           % endif
             <div id="fileArea" data-bind="css: {'loading': isLoading}">

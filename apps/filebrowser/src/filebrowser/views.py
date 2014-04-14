@@ -20,6 +20,7 @@ import logging
 import json
 import mimetypes
 import operator
+import parquet
 import posixpath
 import re
 import shutil
@@ -81,6 +82,14 @@ INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|appli
                                      'application/vnd\.openxmlformats')
 
 logger = logging.getLogger(__name__)
+
+
+class ParquetOptions(object):
+    def __init__(self, col=None, format='json', no_headers=True, limit=-1):
+        self.col = col
+        self.format = format
+        self.no_headers = no_headers
+        self.limit = limit
 
 
 def index(request):
@@ -616,15 +625,18 @@ def read_contents(codec_type, path, fs, offset, length):
         # Auto codec detection for [gzip, avro, snappy, none]
         if not codec_type:
             contents = fhandle.read(3)
+            fhandle.seek(0)
             codec_type = 'none'
             if path.endswith('.gz') and detect_gzip(contents):
                 codec_type = 'gzip'
                 offset = 0
             elif path.endswith('.avro') and detect_avro(contents):
                 codec_type = 'avro'
+            elif path.endswith('.parquet') and detect_parquet(fhandle):
+                codec_type = 'parquet'
             elif path.endswith('.snappy'):
                 codec_type = 'snappy'
-            elif stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(contents + fhandle.read()):
+            elif stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(fhandle.read()):
                 codec_type = 'snappy'
 
         fhandle.seek(0)
@@ -633,6 +645,8 @@ def read_contents(codec_type, path, fs, offset, length):
             contents = _read_gzip(fhandle, path, offset, length, stats)
         elif codec_type == 'avro':
             contents = _read_avro(fhandle, path, offset, length, stats)
+        elif codec_type == 'parquet':
+            contents = _read_parquet(fhandle, path, offset, length, stats)
         elif codec_type == 'snappy':
             contents = _read_snappy(fhandle, path, offset, length, stats)
         else:
@@ -679,6 +693,17 @@ def _read_avro(fhandle, path, offset, length, stats):
     return contents
 
 
+def _read_parquet(fhandle, path, offset, length, stats):
+    try:
+        dumped_data = StringIO()
+        parquet._dump(fhandle, ParquetOptions(), out=dumped_data)
+        dumped_data.seek(offset)
+        return dumped_data.read()
+    except:
+        logging.warn("Could not read parquet file at %s" % path, exc_info=True)
+        raise PopupException(_("Failed to read Parquet file."))
+
+
 def _read_gzip(fhandle, path, offset, length, stats):
     contents = ''
     if offset and offset != 0:
@@ -723,6 +748,13 @@ def detect_snappy(contents):
         return snappy.isValidCompressed(contents)
     except:
         return False
+
+
+def detect_parquet(fhandle):
+    """
+    Detect parquet from magic header bytes.
+    """
+    return parquet._check_header_magic_bytes(fhandle)
 
 
 def _calculate_navigation(offset, length, size):
