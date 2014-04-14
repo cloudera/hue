@@ -370,6 +370,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- /ko -->
 
   <div style="overflow-x: auto">
+    <div data-bind="visible: $root.results().length == 0">
+      ${ _('Your search did not match any documents.') }
+    </div>
+    
 	<!-- ko if: $root.collection.template.isGridLayout() -->
     <table id="result-container" data-bind="visible: !($root.isRetrievingResults())" style="margin-top: 0">
       <thead>
