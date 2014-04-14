@@ -23,6 +23,7 @@ import operator
 import posixpath
 import re
 import shutil
+import snappy
 import stat as stat_module
 import os
 
@@ -621,9 +622,9 @@ def read_contents(codec_type, path, fs, offset, length):
                 offset = 0
             elif path.endswith('.avro') and detect_avro(contents):
                 codec_type = 'avro'
-            elif snappy_installed() and path.endswith('.snappy'):
+            elif path.endswith('.snappy'):
                 codec_type = 'snappy'
-            elif snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(contents + fhandle.read()):
+            elif stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(contents + fhandle.read()):
                 codec_type = 'snappy'
 
         fhandle.seek(0)
@@ -645,17 +646,10 @@ def read_contents(codec_type, path, fs, offset, length):
 
 
 def _decompress_snappy(compressed_content):
-    try:
-        import snappy
-        return snappy.decompress(compressed_content)
-    except Exception, e:
-        raise PopupException(_('Failed to decompress snappy compressed file.'), detail=e)
+    return snappy.decompress(compressed_content)
 
 
 def _read_snappy(fhandle, path, offset, length, stats):
-    if not snappy_installed():
-        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed.'))
-
     if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
         raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
 
@@ -726,17 +720,7 @@ def detect_snappy(contents):
     This will also return false if snappy decompression if we do not have the library available.
     '''
     try:
-        import snappy
         return snappy.isValidCompressed(contents)
-    except:
-        return False
-
-
-def snappy_installed():
-    '''Snappy is library that isn't supported by python2.4'''
-    try:
-        import snappy
-        return True
     except:
         return False
 

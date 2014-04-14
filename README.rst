@@ -85,6 +85,7 @@ your system:
       * python-dev
       * python-simplejson
       * python-setuptools
+      * libsnappy-dev
 
     CentOS:
       * ant
@@ -104,6 +105,7 @@ your system:
       * python-devel
       * python-simplejson
       * sqlite-devel
+      * snappy-devel
 
     MacOS (mac port):
       * liblxml
@@ -112,6 +114,7 @@ your system:
       * mysql5-devel
       * simplejson (easy_install)
       * sqlite3
+      * snappy
 
 
 File Layout
