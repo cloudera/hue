@@ -325,11 +325,11 @@ def read_dictionary_page(fo, page_header, column_metadata):
     return dict_items
 
 
-def dump(filename, options, out=sys.stdout):
+def _dump(fo, options, out=sys.stdout):
     def println(value):
         out.write(value + "\n")
 
-    footer = read_footer(filename)
+    footer = _read_footer(fo)
     schema_helper = schema.SchemaHelper(footer.schema)
     total_count = 0
     for rg in footer.row_groups:
@@ -341,34 +341,34 @@ def dump(filename, options, out=sys.stdout):
             # skip if the list of columns is specified and this isn't in it
             if options.col and not ".".join(cmd.path_in_schema) in options.col:
                 continue
-            with open(filename, 'rb') as fo:
-                offset = _get_offset(cmd)
-                fo.seek(offset, 0)
-                values_seen = 0
-                logger.debug("reading column chunk of type: %s",
-                             _get_name(Type, cmd.type))
-                while values_seen < row_group_rows:
-                    ph = _read_page_header(fo)
-                    logger.debug("Reading page (type=%s, "
-                                 "uncompressed=%s bytes, "
-                                 "compressed=%s bytes)",
-                                 _get_name(PageType, ph.type),
-                                 ph.uncompressed_page_size,
-                                 ph.compressed_page_size)
 
-                    if ph.type == PageType.DATA_PAGE:
-                        values = read_data_page(fo, schema_helper, ph, cmd,
-                                                dict_items)
-                        res[".".join(cmd.path_in_schema)] += values
-                        values_seen += cmd.num_values
-                    elif ph.type == PageType.DICTIONARY_PAGE:
-                        logger.debug(ph)
-                        assert dict_items == []
-                        dict_items = read_dictionary_page(fo, ph, cmd)
-                        logger.debug("Dictionary: %s", str(dict_items))
-                    else:
-                        logger.warn("Skipping unknown page type={0}".format(
-                            _get_name(PageType, ph.type)))
+            offset = _get_offset(cmd)
+            fo.seek(offset, 0)
+            values_seen = 0
+            logger.debug("reading column chunk of type: %s",
+                         _get_name(Type, cmd.type))
+            while values_seen < row_group_rows:
+                ph = _read_page_header(fo)
+                logger.debug("Reading page (type=%s, "
+                             "uncompressed=%s bytes, "
+                             "compressed=%s bytes)",
+                             _get_name(PageType, ph.type),
+                             ph.uncompressed_page_size,
+                             ph.compressed_page_size)
+
+                if ph.type == PageType.DATA_PAGE:
+                    values = read_data_page(fo, schema_helper, ph, cmd,
+                                            dict_items)
+                    res[".".join(cmd.path_in_schema)] += values
+                    values_seen += cmd.num_values
+                elif ph.type == PageType.DICTIONARY_PAGE:
+                    logger.debug(ph)
+                    assert dict_items == []
+                    dict_items = read_dictionary_page(fo, ph, cmd)
+                    logger.debug("Dictionary: %s", str(dict_items))
+                else:
+                    logger.warn("Skipping unknown page type={0}".format(
+                        _get_name(PageType, ph.type)))
         keys = options.col if options.col else [s.name for s in
                                                 footer.schema if s.name in res]
         if options.format == "csv" and not options.no_headers:
@@ -381,3 +381,8 @@ def dump(filename, options, out=sys.stdout):
             elif options.format == "json":
                 println(json.dumps(dict([(k, res[k][i]) for k in keys])))
         total_count += rg.num_rows
+
+
+def dump(filename, options, out=sys.stdout):
+    with open(filename, 'rb') as fo:
+        return _dump(fo, options=options, out=out)
