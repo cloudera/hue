@@ -319,7 +319,7 @@ var SearchViewModel = function (collection_json, query_json) {
       query: ko.mapping.toJSON(self.query),
       layout: ko.mapping.toJSON(self.columns)
     }, function (data) {
-      self.response(data); // If error we should probably update only the facets
+      self.response(data); // Content not observable for performance
       self.results.removeAll();
       if (data.error) {
         $(document).trigger("error", data.error);

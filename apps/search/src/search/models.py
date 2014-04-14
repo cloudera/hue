@@ -594,6 +594,23 @@ def augment_solr_response(response, facets, solr_query):
         else:
           normalized_facets[uuid] = facet
 
+    if response and response.get('response'):
+      pages_to_show = 5 # always use an odd number since we do it symmetrically
+
+#      beginning = 0
+#      previous = int(solr_query["start"]) - int(solr_query["rows"])
+#      next = int(solr_query["start"]) + int(solr_query["rows"])
+#
+#      pages_after = (pages_to_show - 1) / 2
+#      pages_total = solr_query['total_pages']+1
+#      real_pages_after =  pages_total - solr_query["current_page"]
+#      symmetric_start = solr_query["current_page"] < pages_total - pages_after
+#      symmetric_end = solr_query["current_page"] > pages_after
+#
+#      pagination_start = solr_query["current_page"] > (pages_to_show - 1)/2 and (symmetric_start and solr_query["current_page"] - (pages_to_show - 1)/2 or solr_query["current_page"] - pages_to_show + real_pages_after ) or 1
+#      pagination_end = solr_query["current_page"] < solr_query['total_pages']+1-(pages_to_show - 1)/2 and (symmetric_end and solr_query["current_page"] + (pages_to_show - 1)/2 + 1 or solr_query["current_page"] + (pages_to_show - solr_query["current_page"]) + 1) or solr_query['total_pages']+1
+      
+
   for ordered_uuid in facets.get('order', []):
     try:
       augmented['normalized_facets'].append(normalized_facets[ordered_uuid])

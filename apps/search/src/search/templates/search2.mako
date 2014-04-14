@@ -285,7 +285,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
         <ul class="unstyled" style="margin: 10px">
           <li>Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
-          ## Could add here extra non widget settings like facet or see for a nice popover
         </ul>
       </div>
     </div>
@@ -329,9 +328,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="resultset-widget">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      ${_('Results type')}
-      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
-      &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-code"></i></a>
+    ${_('Results type')}
+    &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
+    &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-code"></i></a>
   </div>
 
   <!-- ko if: $root.collection.template.isGridLayout() -->
@@ -374,6 +373,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Your search did not match any documents.') }
     </div>
     
+    <!-- ko if: $root.response().response -->
+      <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
+    <!-- /ko -->
+    
 	<!-- ko if: $root.collection.template.isGridLayout() -->
     <table id="result-container" data-bind="visible: !($root.isRetrievingResults())" style="margin-top: 0">
       <thead>
@@ -401,6 +404,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 	  </div>
 	<!-- /ko -->
   </div>
+</script>
+
+<script type="text/html" id="resultset-pagination">
+  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } 
 </script>
 
 <script type="text/html" id="timeline-widget">
