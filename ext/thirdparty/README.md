@@ -27,6 +27,7 @@ Checked-in third party dependencies
 |Y|Markdown|2.0.3|BSD|http://pypi.python.org/packages/source/M/Markdown/Markdown-2.0.3.tar.gz|
 |Y|MarkupSafe|0.9.3|BSD|http://pypi.python.org/pypi/MarkupSafe|
 |Y|MySQL for Python|1.2.3c1|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
+|Y|parquet-python||ASL2|https://github.com/jcrobak/parquet-python|
 |Y|Pygments|1.3.1|BSD|http://pypi.python.org/pypi/Pygments|
 |Y|PyOpenSSL|0.13|ASL2|https://launchpad.net/pyopenssl|
 |Y|pysqlite|2.55|zlib/libpng|http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/|
