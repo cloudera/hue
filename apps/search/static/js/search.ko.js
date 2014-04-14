@@ -73,6 +73,7 @@ var Row = function (widgets) {
   }
 }
 
+// A widget is generic. It has an id that refer to another object (e.g. facet) with the same id.
 var Widget = function (size, id, name, widgetType, properties, offset) {
   var self = this;
   self.size = ko.observable(size).extend({ numeric: 0 });
@@ -122,7 +123,7 @@ function oneThirdLeftLayout() {
   setLayout([3, 9]);
 }
 
-function oneThirdRightLayout() {
+function oneThirdRightLayout() { // instead --> full with 1 row = timeline, 2 = 3 pies, 3 = grid result
   setLayout([9, 3]);
 }
 

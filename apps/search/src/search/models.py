@@ -255,14 +255,19 @@ class Collection(models.Model):
       props['collection'] = self.get_default(user)
     if 'layout' not in props:
       props['layout'] = []    
-#    props['collection'] = self.get_default(user) # to reset
-#    props['layout'] = []  
 
+# to reset collection:
+#    props['collection'] = self.get_default(user) # to reset
+#    props['layout'] = []
+    
+    # Adding dynamic properties
+    props['collection']['template']['extended_fields'] = self.fields_data(user)
+   
     return json.dumps(props)
 
   def get_default(self, user):      
-    fields = self.fields_data(user)
-    id_field = [field['name'] for field in fields if field.get('isId')]
+    extended_fields = self.fields_data(user)
+    id_field = [field['name'] for field in extended_fields if field.get('isId')]
     if id_field:
       id_field = id_field[0]
     fields = [field.get('name') for field in self.fields_data(user)]
@@ -289,7 +294,7 @@ class Collection(models.Model):
     
     collection_properties = {
       'id': self.id, 'name': self.name, 'template': TEMPLATE, 'facets': FACETS['fields'], 
-      'fields': fields, 'idField': id_field
+      'fields': fields, 'idField': id_field, 
     };      
     
     return collection_properties
@@ -321,6 +326,7 @@ class Collection(models.Model):
     if 'collection' in properties_python:
       if 'showFieldList' not in properties_python['collection']['template']:
         properties_python['collection']['template']['showFieldList'] = True
+
     return properties_python
 
   def update_properties(self, post_data):
