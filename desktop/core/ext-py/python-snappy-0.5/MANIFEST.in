@@ -1,0 +1,1 @@
+include *.py AUTHORS README.rst *.h MANIFEST.in
