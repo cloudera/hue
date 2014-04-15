@@ -260,17 +260,17 @@ class Collection(models.Model):
 #    props['collection'] = self.get_default(user) # to reset
 #    props['layout'] = []
     
-    # Adding dynamic properties
-    props['collection']['template']['extended_fields'] = self.fields_data(user)
+    # TODO: Adding dynamic properties, merge smartly
+    # props['collection']['template']['extended_fields'] = self.fields_data(user)
    
     return json.dumps(props)
 
   def get_default(self, user):      
-    extended_fields = self.fields_data(user)
-    id_field = [field['name'] for field in extended_fields if field.get('isId')]
+    fields = self.fields_data(user)
+    id_field = [field['name'] for field in fields if field.get('isId')]
     if id_field:
       id_field = id_field[0]
-    fields = [field.get('name') for field in self.fields_data(user)]
+#    fields = [field.get('name') for field in self.fields_data(user)]
   
     TEMPLATE = {
       "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": [""],
@@ -281,10 +281,11 @@ class Collection(models.Model):
           <div class="span12">%s</div>
         </div>
         <br/>
-      </div>""" % ' '.join(['{{%s}}' % field for field in fields]), 
+      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]), 
       "isGridLayout": True,
       "showFieldList": True,
-      "fields": fields
+      "fieldsAttributes": [{'name': field['name'], 'sort': {'direction': None}} for field in fields], # sort priority, asc/desc/none
+      "fieldsSelected": [field['name'] for field in fields],
     }
     
     FACETS = {
@@ -310,7 +311,7 @@ class Collection(models.Model):
     schema_fields = schema_fields['schema']['fields']
 
     return sorted([{'name': str(field), 'type': str(attributes.get('type', '')),
-                    'isId': attributes.get('required') and attributes.get('uniqueKey')
+                    'isId': attributes.get('required') and attributes.get('uniqueKey'),
                   }
                   for field, attributes in schema_fields.iteritems()])
 
@@ -595,6 +596,9 @@ def augment_solr_response(response, facets, solr_query):
           normalized_facets[uuid] = facet
 
     if response and response.get('response'):
+      
+      # Todo, and not as ugly as below, probably simplify to go back beginning + < >
+      
       pages_to_show = 5 # always use an odd number since we do it symmetrically
 
 #      beginning = 0

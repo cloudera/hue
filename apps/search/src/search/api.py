@@ -105,7 +105,6 @@ class SolrApi(object):
         ('facet', 'true'),
         ('facet.mincount', 0),
         ('facet.limit', 10),
-        ##('facet.sort', properties.get('sort')),
       )
       params += tuple([('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])) for facet in collection['facets']])
 
@@ -113,7 +112,7 @@ class SolrApi(object):
     for fq, val in fqs.iteritems():
       params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq, fq, val)))),)
 
-#    if collection['fields']:
+#    if collection['template']['fields']:
       # If we do this, need to parse the template and fill up the fields list
       #params += (('fl', urllib.unquote(utf_quoter(','.join(collection['fields'])))),)
     params += (('fl', '*'),)
@@ -123,6 +122,18 @@ class SolrApi(object):
       ('hl.fl', '*'),
       ('hl.snippets', 3)
     )
+
+    if collection['template']['fieldsSelected']:
+      fields = []
+      for field in collection['template']['fieldsSelected']:
+        attribute_field = filter(lambda attribute: field == attribute['name'], collection['template']['fieldsAttributes'])
+        if attribute_field:
+          if attribute_field[0]['sort']['direction']:
+            fields.append('%s %s' % (field, attribute_field[0]['sort']['direction']))
+      if fields:
+        params += (         
+          ('sort', ','.join(fields)),
+        )
 
     response = self._root.get('%(collection)s/select' % solr_query, params)
 

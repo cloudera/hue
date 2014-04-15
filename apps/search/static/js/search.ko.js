@@ -211,7 +211,7 @@ var Collection = function (vm, collection) {
   self.name = collection.name;
   self.idField = collection.idField;
   self.template = ko.mapping.fromJS(collection.template);
-  self.template.fields.subscribe(function () {
+  self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
   self.template.template.subscribe(function () {
@@ -222,13 +222,14 @@ var Collection = function (vm, collection) {
   });
   self.facets = ko.mapping.fromJS(collection.facets);
 
-  self.fields = ko.observableArray(collection.fields);
+  self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
     self.facets.push(ko.mapping.fromJS({
       "id": facet_json.widget_id,
       "label": facet_json.name,
-      "field": facet_json.name, "type": "field"
+      "field": facet_json.name,
+      "type": "field"
     }));
   }
 
@@ -250,6 +251,17 @@ var Collection = function (vm, collection) {
     return _facet;
   }  
   
+  self.template.fields = ko.computed(function () {
+    var _fields = [];
+    $.each(self.template.fieldsAttributes(), function (index, field) {
+      var position = self.template.fieldsSelected.indexOf(field.name());
+      if (position != -1) {
+    	_fields[position] = field;
+      }      
+    });
+    return _fields;
+  });    
+  
   self.addDynamicFields = function () {
     $.post("/search/index/" + self.id + "/fields/dynamic", {
       }, function (data) {
@@ -263,7 +275,19 @@ var Collection = function (vm, collection) {
     }).fail(function (xhr, textStatus, errorThrown) {});
   }
 
-  self.addDynamicFields();
+  self.toggleSortColumnGridLayout = function (template_field) {
+	 if (! template_field.sort.direction()) {
+	   template_field.sort.direction('desc');
+	 } else if (template_field.sort.direction() == 'desc') {
+	   template_field.sort.direction('asc');
+	 } else {
+	   template_field.sort.direction(null); 
+	 }
+
+	 vm.search();
+  };
+
+  //self.addDynamicFields(); + update fields in case
 };
 
 
@@ -294,7 +318,7 @@ var SearchViewModel = function (collection_json, query_json) {
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable({});
-  loadLayout(self, collection_json.layout); // move to init + load dynamic fields?
+  loadLayout(self, collection_json.layout); // move to init + load dynamic fields?  
   
   self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
@@ -329,11 +353,11 @@ var SearchViewModel = function (collection_json, query_json) {
           // Table view
           $.each(data.response.docs, function (index, item) {
             var row = [];
-            var fields = self.collection.template.fields();
+            var fields = self.collection.template.fieldsSelected();
             // Field selection or whole record
             if (fields.length != 0) {
-              $.each(self.collection.template.fields(), function (index, column) {
-                row.push(item[column]);
+              $.each(self.collection.template.fieldsSelected(), function (index, field) {//alert(ko.mapping.toJSON(field));  
+                row.push(item[field]);
               });
             } else {
               row.push(ko.mapping.toJSON(item)); 

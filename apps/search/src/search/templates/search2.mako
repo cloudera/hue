@@ -354,9 +354,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
         <i class="fa fa-square-o"></i>
       </a>
-      <div data-bind="foreach: $root.collection.fields">
-        <input type="checkbox" data-bind="value: $data, checked: $root.collection.template.fields" />
-        <span data-bind="text: '&nbsp;' + $data"></span>
+      <div data-bind="foreach: $root.collection.template.fieldsAttributes">
+        <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
+        <span data-bind="text: '&nbsp;' + name()"></span>
         <br/>
       </div>
     </span>
@@ -364,7 +364,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- /ko -->
 
   <!-- ko if: !$root.collection.template.isGridLayout() && $root.isEditing() -->
-    <textarea data-bind="value: $root.collection.template.template, valueUpdate:'afterkeydown'" class="span12" style="height: 100px"></textarea>
+    <textarea data-bind="value: $root.collection.template.template, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
     <br/>
   <!-- /ko -->
 
@@ -378,12 +378,17 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!-- /ko -->
     
 	<!-- ko if: $root.collection.template.isGridLayout() -->
-    <table id="result-container" data-bind="visible: !($root.isRetrievingResults())" style="margin-top: 0">
+    <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
       <thead>
         <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fields">
-          <th data-bind="text: $data"></th>
+          <th>
+            <a href="javascript: void(0)" title="${ _('Sort') }">
+              <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+              <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
+            </a>
+          </th>
         </tr>
-        <tr data-bind="visible: $root.collection.template.fields().length == 0">
+        <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
           <th>${ ('Document') }</th>
         </tr>
       </thead>
@@ -407,7 +412,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-pagination">
-  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } 
+  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } <i class="fa fa-arrow-right"></i>
 </script>
 
 <script type="text/html" id="timeline-widget">
@@ -419,7 +424,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="pie-widget">
-  This is the pie widget
+  This is the pai widget
 </script>
 
 <script type="text/html" id="area-widget">
@@ -537,15 +542,21 @@ $(document).ready(function () {
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
   ko.applyBindings(viewModel);
 
+  
+
   viewModel.isEditing(true);
   viewModel.search();
 });
 
   function toggleGridFieldsSelection() {
     if (viewModel.collection.template.fields().length > 0) {
-      viewModel.collection.template.fields([])
+      viewModel.collection.template.fieldsSelected([])
     } else {
-      viewModel.collection.template.fields(viewModel.collection.fields());
+      var _fields = [];
+      $.each(viewModel.collection.fields(), function (index, field) {
+        _fields.push(field.name());
+      });
+      viewModel.collection.template.fieldsSelected(_fields);
     };
   };  
 
