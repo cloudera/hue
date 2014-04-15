@@ -429,10 +429,8 @@ class HiveServerClient:
       return res
 
 
-  def close_session(self):
-    session = Session.objects.get_session(self.user, self.query_server['server_name']).get_handle()
-
-    req = TCloseSessionReq(sessionHandle=session)
+  def close_session(self, sessionHandle):
+    req = TCloseSessionReq(sessionHandle=sessionHandle)
     return self._client.CloseSession(req)
 
 
@@ -720,6 +718,11 @@ class HiveServerClientCompatible(object):
   def close_operation(self, handle):
     operationHandle = handle.get_rpc_handle()
     return self._client.close_operation(operationHandle)
+
+
+  def close_session(self, session):
+    operationHandle = session.get_handle()
+    return self._client.close_session(operationHandle)
 
 
   def dump_config(self):
