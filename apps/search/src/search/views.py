@@ -70,13 +70,25 @@ def index(request):
   })
 
 
+def new_search(request):
+  collection = Collection(name='twitter_demo', label='New Twitter Template', enabled=True)
+  query = {'q': '', 'fq': {}}
+
+  return render('search2.mako', request, {
+    'collection': collection,
+    'query': query,
+  })
+
+
 def search(request):
   response = {}  
   
   collection = json.loads(request.POST.get('collection', '{}')) # TODO decorator with doc model perms
   query = json.loads(request.POST.get('query', '{}'))
-  hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
-  # collection['name']=
+
+  if collection['id']:
+    hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
+    # collection['name']=
   
   print request.POST
   print collection

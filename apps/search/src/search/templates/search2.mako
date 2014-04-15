@@ -157,6 +157,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cogs"></i></button>    
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <button type="button" title="${ _('History') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-archive"></i></button>
+      &nbsp;&nbsp;&nbsp;            
+      <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
       <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
     </div>
   % endif

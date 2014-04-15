@@ -21,6 +21,7 @@ urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^search$', 'search', name='search'),
   url(r'^save$', 'save', name='save'),
+  url(r'^new_search', 'new_search', name='new_search'),
   url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
 
   url(r'^dashboard$', 'dashboard', name='dashboard'),

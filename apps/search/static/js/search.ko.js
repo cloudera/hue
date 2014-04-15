@@ -307,7 +307,7 @@ var SearchViewModel = function (collection_json, query_json) {
   self.getFacetFromQuery = function (facet_id) {	
     var _facet = null;
     if (self.norm_facets() !== undefined) {
-	  $.each(self.norm_facets(), function (index, norm_facet) {//alert(ko.mapping.toJSON(norm_facet.id + " " + facet_id()));  
+	  $.each(self.norm_facets(), function (index, norm_facet) {  
 	    if (norm_facet.id == facet_id()) {
 	      _facet = norm_facet;
 	    }      
