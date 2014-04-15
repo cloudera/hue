@@ -159,6 +159,9 @@ class HiveServer2Dbms(object):
   def open_session(self, user):
     return self.client.open_session(user)
 
+  def close_session(self, session):
+    return self.client.close_session(session)
+
   def cancel_operation(self, query_handle):
     resp = self.client.cancel_operation(query_handle)
     if self.client.query_server['server_name'] == 'impala':
