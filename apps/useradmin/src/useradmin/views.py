@@ -77,7 +77,7 @@ def list_for_autocomplete(request):
     user_groups = request.user.groups.all()
     response = {
       'users': massage_users_for_json(User.objects.filter(groups__in=user_groups).exclude(pk=request.user.pk)),
-      'groups': massage_groups_for_json(user_groups)
+      'groups': massage_groups_for_json(Group.objects.all())
     }
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
