@@ -660,7 +660,10 @@ def read_contents(codec_type, path, fs, offset, length):
 
 
 def _decompress_snappy(compressed_content):
-    return snappy.decompress(compressed_content)
+    try:
+        return snappy.decompress(compressed_content)
+    except Exception, e:
+        raise PopupException(_('Failed to decompress snappy compressed file.'), detail=e)
 
 
 def _read_snappy(fhandle, path, offset, length, stats):
