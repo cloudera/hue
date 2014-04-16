@@ -100,13 +100,17 @@ class SolrApi(object):
         ('start', solr_query['start']),
     )
 
-    if collection['facets']:
+    if any(collection['facets']):
       params += (
         ('facet', 'true'),
         ('facet.mincount', 0),
         ('facet.limit', 10),
       )
-      params += tuple([('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])) for facet in collection['facets']])
+      for facet in collection['facets']:
+        if facet['type'] == 'query':
+          params += (('facet.query', '%s' % facet['field']),)
+        elif facet['type'] == 'field':
+          params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
 
     fqs = solr_query['fq']
     for fq, val in fqs.iteritems():

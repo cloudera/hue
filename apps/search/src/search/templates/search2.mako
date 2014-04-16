@@ -193,7 +193,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableArea" title="${_('Line Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-area-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
@@ -295,6 +295,25 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="empty-widget">
   This is an empty widget.
+</script>
+
+
+<script type="text/html" id="hit-widget">
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>      
+      ${ _('Field') }: <input type="text" data-bind="value: field" />
+    </div>  
+
+    ${ _('Hits') }: <span data-bind="text: count" />
+  </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="facet-widget">
@@ -461,6 +480,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <div class="input-append">
           <input id="facetName" type="text">
           <input id="widgetId" type="hidden">
+          <input id="widgetType" type="hidden">
         </div>
       </div>
     </p>
@@ -523,9 +543,9 @@ $(document).ready(function () {
       read: target,
       write: function (newValue) {
         var current = target(),
-                roundingMultiplier = Math.pow(10, precision),
-                newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
-                valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+          roundingMultiplier = Math.pow(10, precision),
+          newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
+          valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
 
         if (valueToWrite !== current) {
           target(valueToWrite);
@@ -561,11 +581,12 @@ $(document).ready(function () {
 
   function showAddFacetModal(widget) {
     $("#widgetId").val(widget.id());
+    $("#widgetType").val(widget.widgetType());        
     $("#addFacetModal").modal("show");
   };
 
   function submitAddFacetModal() {
-    viewModel.collection.addFacet({'name': $("#facetName").val(), 'widget_id': $("#widgetId").val()});
+    viewModel.collection.addFacet({'name': $("#facetName").val(), 'widget_id': $("#widgetId").val(), 'widgetType': $("#widgetType").val()});
     $('#addFacetModal').modal("hide");
     viewModel.search();
   };

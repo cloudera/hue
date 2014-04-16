@@ -226,28 +226,32 @@ var Collection = function (vm, collection) {
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
+	var facetType = facet_json.widgetType == 'hit-widget' ? 'query' : 'field';
+
     self.facets.push(ko.mapping.fromJS({
       "id": facet_json.widget_id,
       "label": facet_json.name,
       "field": facet_json.name,
-      "type": "field"
+      "type": facetType
     }));
-  }
+  };
 
   self.removeFacet = function (widget_id) {
-    $.each(self.facets(), function (index, item) {
-      if (item.id() == widget_id()) {
-        self.facets.remove(item);
+    $.each(self.facets(), function (index, facet) {	
+      if (facet.id() == widget_id()) {
+        self.facets.remove(facet);
+        return false;
       }
     });
   }  
   
   self.getFacetById = function (facet_id) {
     var _facet = null;
-    $.each(self.facets(), function (index, facet) {
+    $.each(self.facets(), function (index, facet) {//alert(ko.mapping.toJSON(category));
       if (facet.id() == facet_id) {
         _facet = facet;
-      }      
+        return false;
+      }
     });
     return _facet;
   }  
@@ -258,6 +262,7 @@ var Collection = function (vm, collection) {
       var position = self.template.fieldsSelected.indexOf(field.name());
       if (position != -1) {
     	_fields[position] = field;
+    	return false;
       }      
     });
     return _fields;
@@ -324,7 +329,8 @@ var SearchViewModel = function (collection_json, query_json) {
     self.isEditing(!self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
-    
+      
+  self.draggableHit = ko.observable(new Widget(12, UUID(), "Hit Count", "hit-widget"));
   self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, UUID(), "Results", "resultset-widget"));
   self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
@@ -361,7 +367,7 @@ var SearchViewModel = function (collection_json, query_json) {
             var fields = self.collection.template.fieldsSelected();
             // Field selection or whole record
             if (fields.length != 0) {
-              $.each(self.collection.template.fieldsSelected(), function (index, field) {//alert(ko.mapping.toJSON(field));  
+              $.each(self.collection.template.fieldsSelected(), function (index, field) {  
                 row.push(item[field]);
               });
             } else {
@@ -396,6 +402,7 @@ var SearchViewModel = function (collection_json, query_json) {
       layout: ko.mapping.toJSON(self.columns)
     },function (data) {
       if (data.status == 0) {
+    	collection.id(data.id);
         $(document).trigger("info", data.message);
       }
       else {

@@ -305,16 +305,13 @@ class Collection(models.Model):
       "fieldsSelected": [field['name'] for field in fields],
     }
     
-    FACETS = {
-      "dates": [], "fields": [],
-      "charts": [], "properties": {"sort": "count", "mincount": 1, "isEnabled": True, "limit": 10, 'schemd_id_field': 'id'}, "ranges": [], "order": []
-    };  
-    
+    FACETS = []
+
     collection_properties = {
       'id': self.id, 'name': self.name, 'label': self.label,
-      'template': TEMPLATE, 'facets': FACETS['fields'], 
+      'template': TEMPLATE, 'facets': FACETS, 
       'fields': fields, 'idField': id_field, 
-    };      
+    }      
     
     return collection_properties
 
@@ -397,8 +394,8 @@ def get_facet_field_format(field, type, facets):
     pass
   return format
 
-def get_facet_field(field, facets):
-  facets = filter(lambda facet: facet['type'] == 'field' and facet['field'] == field, facets)
+def get_facet_field(category, field, facets):
+  facets = filter(lambda facet: facet['type'] == category and facet['field'] == field, facets)
   if facets:
     return facets[0]
   else:
@@ -468,17 +465,30 @@ def augment_solr_response2(response, collection, solr_query):
   fq = solr_query['fq']
 
   if response and response.get('facet_counts'):
+    category = 'field'
     if response['facet_counts']['facet_fields']:
-      for cat in response['facet_counts']['facet_fields']:
-        selected_field = fq.get(cat, '')
-        collection_facet = get_facet_field(cat, collection['facets'])
+      for name in response['facet_counts']['facet_fields']:
+        selected_field = fq.get(name, '')
+        collection_facet = get_facet_field(category, name, collection['facets'])
         facet = {
           'id': collection_facet['id'],
-          'field': cat,
-          'type': 'field',
-          'label': get_facet_field_label(cat, collection['facets']),
-          'counts': pairwise2(cat, selected_field, response['facet_counts']['facet_fields'][cat]),
+          'field': name,
+          'type': category,
+          'label': collection_facet['label'],
+          'counts': pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name]),
         }
+        normalized_facets.append(facet)
+    if response['facet_counts']['facet_queries']:
+      category = 'query'
+      for name, value in response['facet_counts']['facet_queries'].iteritems():
+        collection_facet = get_facet_field(category, name, collection['facets'])
+        facet = {
+          'id': collection_facet['id'],
+          'query': name,
+          'type': category,
+          'label': name,
+          'count': value,
+        }        
         normalized_facets.append(facet)
 
   # TODO HTML escape docs!
@@ -516,7 +526,7 @@ def augment_solr_exception(response, collection, solr_query):
         "type": facet['type'],
         "label": facet['label']
       }
-      for facet in collection['facets']
+      for categories in collection['facets'].values() for facet in categories
     ],
     "responseHeader": {
       "status": -1,

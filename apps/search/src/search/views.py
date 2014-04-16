@@ -141,6 +141,7 @@ def save(request):
     # Todo update certain atttributes like, label, enabled...
     hue_collection.save()
     response['status'] = 0
+    response['id'] = hue_collection.id
     response['message'] = _('Page saved !')
   else:
     response['message'] = _('There is no collection to search.')
