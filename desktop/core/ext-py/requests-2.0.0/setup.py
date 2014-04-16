@@ -17,11 +17,13 @@ if sys.argv[-1] == 'publish':
 packages = [
     'requests',
     'requests.packages',
-    'requests.packages.charade',
     'requests.packages.urllib3',
     'requests.packages.urllib3.packages',
     'requests.packages.urllib3.contrib',
-    'requests.packages.urllib3.packages.ssl_match_hostname'
+    'requests.packages.urllib3.packages.ssl_match_hostname',
+    'bs4',
+    'bs4.builder',
+    'bs4.tests',
 ]
 
 requires = []
@@ -37,7 +39,7 @@ setup(
     url='http://python-requests.org',
     packages=packages,
     package_data={'': ['LICENSE', 'NOTICE'], 'requests': ['*.pem']},
-    package_dir={'requests': 'requests'},
+    package_dir={'requests': 'requests', 'bs4': 'requests/packages/bs4'},
     include_package_data=True,
     install_requires=requires,
     license=open('LICENSE').read(),

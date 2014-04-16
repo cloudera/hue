@@ -28,7 +28,7 @@ from .utils import (
     iter_slices, guess_json_utf, super_len, to_native_string)
 from .compat import (
     cookielib, urlunparse, urlsplit, urlencode, str, bytes, StringIO,
-    is_py2, chardet, json, builtin_str, basestring, IncompleteRead)
+    is_py2, json, builtin_str, basestring, IncompleteRead)
 
 CONTENT_CHUNK_SIZE = 10 * 1024
 ITER_CHUNK_SIZE = 512
@@ -551,7 +551,8 @@ class Response(object):
     def apparent_encoding(self):
         """The apparent encoding, provided by the lovely Charade library
         (Thanks, Ian!)."""
-        return chardet.detect(self.content)['encoding']
+        from bs4 import UnicodeDammit
+        return UnicodeDammit(self.content).original_encoding
 
     def iter_content(self, chunk_size=1, decode_unicode=False):
         """Iterates over the response data.  When stream=True is set on the
