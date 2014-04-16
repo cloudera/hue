@@ -71,7 +71,7 @@ def index(request):
 
 
 def new_search(request):
-  collection = Collection(name='twitter_demo', label='New Twitter Template', enabled=True)
+  collection = Collection(name='twitter_demo', label='New Twitter Template')
   query = {'q': '', 'fq': {}}
 
   return render('search2.mako', request, {
@@ -132,7 +132,10 @@ def save(request):
   layout = json.loads(request.POST.get('layout', '{}')) 
     
   if collection:
-    hue_collection = Collection.objects.get(id=collection['id'])
+    if collection['id']:
+      hue_collection = Collection.objects.get(id=collection['id'])
+    else:
+      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'])
     hue_collection.update_properties({'collection': collection})
     hue_collection.update_properties({'layout': layout})
     # Todo update certain atttributes like, label, enabled...
@@ -445,14 +448,15 @@ def query_suggest(request, collection_id, query=""):
 
 
 # TODO security
-def index_fields_dynamic(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
+def index_fields_dynamic(request, collection_id):  
   result = {'status': -1, 'message': 'Error'}
 
   solr_query = {}
-  solr_query['collection'] = hue_collection.name
-
+  
   try:
+    hue_collection = Collection.objects.get(id=collection_id)
+    solr_query['collection'] = hue_collection.name
+    
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
     result['message'] = ''
     result['dynamic_fields'] = [name for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]

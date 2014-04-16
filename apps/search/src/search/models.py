@@ -227,6 +227,24 @@ class CollectionManager(models.Manager):
 
       return collection, True      
 
+  def create2(self, name, label):
+    facets = Facet.objects.create()
+    result = Result.objects.create()      
+    sorting = Sorting.objects.create()
+    cores = json.dumps({})
+
+    collection = Collection.objects.create(
+        name=name,
+        label=label,
+        cores=cores,
+        is_core_only=False,
+        facets=facets,
+        result=result,
+        sorting=sorting
+    )
+
+    return collection
+
 
 class Collection(models.Model):
   enabled = models.BooleanField(default=True)
@@ -270,7 +288,6 @@ class Collection(models.Model):
     id_field = [field['name'] for field in fields if field.get('isId')]
     if id_field:
       id_field = id_field[0]
-#    fields = [field.get('name') for field in self.fields_data(user)]
   
     TEMPLATE = {
       "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": [""],
@@ -294,7 +311,8 @@ class Collection(models.Model):
     };  
     
     collection_properties = {
-      'id': self.id, 'name': self.name, 'template': TEMPLATE, 'facets': FACETS['fields'], 
+      'id': self.id, 'name': self.name, 'label': self.label,
+      'template': TEMPLATE, 'facets': FACETS['fields'], 
       'fields': fields, 'idField': id_field, 
     };      
     

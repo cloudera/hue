@@ -544,10 +544,7 @@ $(document).ready(function () {
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
   ko.applyBindings(viewModel);
 
-  
-
-  viewModel.isEditing(true);
-  viewModel.search();
+  viewModel.init();
 });
 
   function toggleGridFieldsSelection() {

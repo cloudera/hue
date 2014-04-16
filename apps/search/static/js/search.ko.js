@@ -209,6 +209,7 @@ var Collection = function (vm, collection) {
 
   self.id = collection.id;
   self.name = collection.name;
+  self.label = collection.label;
   self.idField = collection.idField;
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
@@ -286,8 +287,6 @@ var Collection = function (vm, collection) {
 
 	 vm.search();
   };
-
-  //self.addDynamicFields(); + update fields in case
 };
 
 
@@ -318,8 +317,8 @@ var SearchViewModel = function (collection_json, query_json) {
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable({});
-  loadLayout(self, collection_json.layout); // move to init + load dynamic fields?  
-  
+  loadLayout(self, collection_json.layout);
+
   self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
@@ -333,7 +332,13 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
-  
+
+  self.init = function () {
+	//self.collection.addDynamicFields();
+
+	self.isEditing(true);
+	self.search();	
+  }
 
   self.search = function () {
     self.isRetrievingResults(true);
