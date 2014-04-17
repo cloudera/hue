@@ -193,7 +193,7 @@ var Query = function (vm, query) {
   self.fq = query.fq
 
   self.selectFacet = function (facet_json) {
-    self.fq[facet_json.cat] = facet_json.value;
+    self.fq[facet_json.cat] = facet_json.value; // need to add facet id too
     vm.search();
   }
 
@@ -222,18 +222,27 @@ var Collection = function (vm, collection) {
     vm.search();
   });
   self.facets = ko.mapping.fromJS(collection.facets);
+  $.each(self.facets(), function (index, facet) {
+    facet.field.subscribe(function () {
+      vm.search();
+    });
+  });
+
 
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
 	var facetType = facet_json.widgetType == 'hit-widget' ? 'query' : 'field';
-
-    self.facets.push(ko.mapping.fromJS({
-      "id": facet_json.widget_id,
-      "label": facet_json.name,
-      "field": facet_json.name,
-      "type": facetType
-    }));
+    var facet = ko.mapping.fromJS({
+        "id": facet_json.widget_id,
+        "label": facet_json.name,
+        "field": facet_json.name,
+        "type": facetType
+    });
+    facet.field.subscribe(function () {
+      vm.search();
+    });
+    self.facets.push(facet);
   };
 
   self.removeFacet = function (widget_id) {

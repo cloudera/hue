@@ -445,7 +445,21 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="pie-widget">
-  This is the pai widget
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>      
+      ${ _('Field') }: <input type="text" data-bind="value: field" />
+    </div>  
+
+    <span data-bind="text: query" />: <span data-bind="text: count" />
+  </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="area-widget">

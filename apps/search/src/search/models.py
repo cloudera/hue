@@ -394,6 +394,14 @@ def get_facet_field_format(field, type, facets):
     pass
   return format
 
+
+def get_facet_field(category, field, facets):
+  facets = filter(lambda facet: facet['type'] == category and facet['field'] == field, facets)
+  if facets:
+    return facets[0]
+  else:
+    return None
+
 def get_facet_field(category, field, facets):
   facets = filter(lambda facet: facet['type'] == category and facet['field'] == field, facets)
   if facets:
@@ -455,7 +463,7 @@ def augment_solr_response2(response, collection, solr_query):
 
   normalized_facets = []
 
-  def pairwise2(cat, fq, iterable):
+  def pairwise2(cat, selected_field, iterable):
       pairs = []
       a, b = itertools.tee(iterable)
       for element in a:
@@ -465,8 +473,11 @@ def augment_solr_response2(response, collection, solr_query):
   fq = solr_query['fq']
 
   if response and response.get('facet_counts'):
-    category = 'field'
+    # [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
+    #for facet in collection['facets']:
+    category = 'field' # pie
     if response['facet_counts']['facet_fields']:
+      # text, pie, graph
       for name in response['facet_counts']['facet_fields']:
         selected_field = fq.get(name, '')
         collection_facet = get_facet_field(category, name, collection['facets'])
