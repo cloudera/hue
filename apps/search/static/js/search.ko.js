@@ -262,7 +262,6 @@ var Collection = function (vm, collection) {
       var position = self.template.fieldsSelected.indexOf(field.name());
       if (position != -1) {
     	_fields[position] = field;
-    	return false;
       }      
     });
     return _fields;

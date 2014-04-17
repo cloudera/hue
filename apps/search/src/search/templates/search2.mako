@@ -311,7 +311,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
-    ${ _('Hits') }: <span data-bind="text: count" />
+    <span data-bind="text: query" />: <span data-bind="text: count" />
   </div>
   <!-- /ko -->
 </script>
@@ -338,7 +338,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
           <i data-bind="click: $root.query.unselectFacet" class="fa fa-times"></i>            
         <!-- /ko -->
         <!-- ko if: !selected -->           
-          <span data-bind="text: value, click: $root.query.selectFacet"></span> <span data-bind="click: $root.query.selectFacet">(</span><span data-bind="text: count, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet">)</span>
+          <span data-bind="text: value, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet"> (</span><span data-bind="text: count, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet">)</span>
         <!-- /ko -->
         </a>
       </div>
