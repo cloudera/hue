@@ -134,6 +134,12 @@ REDIRECT_WHITELIST = Config(
   type=list_of_compiled_res(skip_empty=True),
   default='')
 
+SECURE_PROXY_SSL_HEADER = Config(
+  key="secure_proxy_ssl_header",
+  help=_("Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."),
+  type=coerce_bool,
+  default=False)
+
 APP_BLACKLIST = Config(
   key='app_blacklist',
   default='',
