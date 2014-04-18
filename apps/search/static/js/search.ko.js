@@ -276,7 +276,7 @@ var Collection = function (vm, collection) {
     return _fields;
   });    
   
-  self.addDynamicFields = function () {
+  self.addDynamicFields = function () { // + Adding merge smartly if schema updated
     $.post("/search/index/" + self.id + "/fields/dynamic", {
       }, function (data) {
       if (data.status == 0) {
@@ -410,7 +410,7 @@ var SearchViewModel = function (collection_json, query_json) {
       layout: ko.mapping.toJSON(self.columns)
     },function (data) {
       if (data.status == 0) {
-    	collection.id(data.id);
+    	self.collection.id = data.id;
         $(document).trigger("info", data.message);
       }
       else {

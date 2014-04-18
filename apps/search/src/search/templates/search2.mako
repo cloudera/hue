@@ -457,7 +457,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
-    <span data-bind="text: query" />: <span data-bind="text: count" />
+    <span data-bind="text: ko.toJSON(counts)" />
   </div>
   <!-- /ko -->
 </script>

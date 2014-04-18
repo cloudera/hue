@@ -273,14 +273,16 @@ class Collection(models.Model):
       props['collection'] = self.get_default(user)
     if 'layout' not in props:
       props['layout'] = []    
+      
+    if self.id:
+      props['collection']['id'] = self.id
+    if self.name:
+      props['collection']['name'] = self.name
+    if self.label:
+      props['collection']['label'] = self.label
+    # fields
+    # idField
 
-# to reset collection:
-#    props['collection'] = self.get_default(user) # to reset
-#    props['layout'] = []
-    
-    # TODO: Adding dynamic properties, merge smartly
-    # props['collection']['template']['extended_fields'] = self.fields_data(user)
-   
     return json.dumps(props)
 
   def get_default(self, user):      
@@ -474,33 +476,37 @@ def augment_solr_response2(response, collection, solr_query):
 
   if response and response.get('facet_counts'):
     # [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
-    #for facet in collection['facets']:
-    category = 'field' # pie
-    if response['facet_counts']['facet_fields']:
-      # text, pie, graph
-      for name in response['facet_counts']['facet_fields']:
-        selected_field = fq.get(name, '')
-        collection_facet = get_facet_field(category, name, collection['facets'])
-        facet = {
-          'id': collection_facet['id'],
-          'field': name,
-          'type': category,
-          'label': collection_facet['label'],
-          'counts': pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name]),
-        }
-        normalized_facets.append(facet)
-    if response['facet_counts']['facet_queries']:
-      category = 'query'
-      for name, value in response['facet_counts']['facet_queries'].iteritems():
-        collection_facet = get_facet_field(category, name, collection['facets'])
-        facet = {
-          'id': collection_facet['id'],
-          'query': name,
-          'type': category,
-          'label': name,
-          'count': value,
-        }        
-        normalized_facets.append(facet)
+    for facet in collection['facets']:
+      category = facet['type']
+      if category == 'pie-widget': # could be facet_range
+        category = 'field'
+        
+      if category == 'field' and response['facet_counts']['facet_fields']:
+        for name in response['facet_counts']['facet_fields']:
+          selected_field = fq.get(name, '') # todo with multi
+          collection_facet = get_facet_field(category, name, collection['facets'])
+          facet = {
+            'id': collection_facet['id'],
+            'field': name,
+            'type': category,
+            'label': collection_facet['label'],
+            'counts': pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name]),
+            # add total result count?
+          }
+          normalized_facets.append(facet)
+      elif category == 'range' and response['facet_counts']['facet_ranges']:
+        pass
+      elif category == 'query' and response['facet_counts']['facet_queries']:
+        for name, value in response['facet_counts']['facet_queries'].iteritems():
+          collection_facet = get_facet_field(category, name, collection['facets'])
+          facet = {
+            'id': collection_facet['id'],
+            'query': name,
+            'type': category,
+            'label': name,
+            'count': value,
+          }        
+          normalized_facets.append(facet)          
 
   # TODO HTML escape docs!
   
