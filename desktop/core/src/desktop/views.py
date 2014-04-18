@@ -252,6 +252,20 @@ def threads(request):
     out.append("")
   return HttpResponse("\n".join(out), content_type="text/plain")
 
+@access_log_level(logging.WARN)
+def memory(request):
+  """Dumps out server threads.  Useful for debugging."""
+  if not request.user.is_superuser:
+    return HttpResponse(_("You must be a superuser."))
+
+  heap = settings.MEMORY_PROFILER.heap()
+  heap = heap[int(request.GET.get('from', 0)):int(request.GET.get('to', len(heap)))]
+  if 'index' in request.GET:
+    heap = heap[int(request.GET['index'])]
+  if 'type' in request.GET:
+    heap = getattr(heap, request.GET['type'])
+  return HttpResponse(str(heap), content_type="text/plain")
+
 def jasmine(request):
   return render('jasmine.mako', request, None)
 
