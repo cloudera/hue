@@ -73,6 +73,6 @@ class Command(BaseCommand):
           query.last_state = QueryHistory.STATE.expired.index
           query.save()
         else:
-          self.stdout.write('Error: %s\n' % e)
+          self.stdout.write('Info: %s\n' % e)
 
     self.stdout.write('%s queries closed.\n' % n)

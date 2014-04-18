@@ -62,10 +62,10 @@ class Command(BaseCommand):
       try:
           resp = dbms.get(user=session.owner).close_session(session)
           if not 'Session does not exist!' in str(resp):
-            self.stdout.write('Error: %s\n' % resp)
+            self.stdout.write('Info: %s\n' % resp)
             n += 1
       except Exception, e:
         if not 'Session does not exist!' in str(e):
-          self.stdout.write('Error: %s\n' % e)
+          self.stdout.write('Info: %s\n' % e)
 
     self.stdout.write('%s sessions closed.\n' % n)
