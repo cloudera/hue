@@ -1,0 +1,136 @@
+This is Guppy-PE version 0.1.10
+
+A Python Programming Environment.
+
+CONTENTS
+
+This distribution provides a root package, guppy, with the following
+subpackages:
+
+doc	Documentation data files: *.html, *.jpg, and help support.
+
+etc	Support modules. Contains especially the Glue protocol module.
+
+gsl	The Guppy Specification Language implementation. This can
+	be used to create documents and tests from a common source.
+
+heapy	The heap analysis toolset. It can be used to find information
+	about the objects in the heap and display the information
+	in various ways.
+
+sets	Bitsets and 'nodesets' implemented in C.
+
+The following files are not in packages but on the toplevel:
+
+gsl-mode-0.1.el		Emacs mode for GSL
+specs/*.gsl		Specifications
+specs/genguppydoc.py	Regenerates the doc/*.html files from specs/*.gsl
+
+REQUIREMENTS
+
+You should have Python 2.3, 2.4, 2.5 or 2.6
+
+To build the system so you can use Heapy, you should have what is
+needed to build extension modules from source code. The extension
+modules are used not only in Heapy but also in GSL in some
+situations. (The test generator uses bitsets to speed up an
+algorithm.)
+
+To use the graphical browser, Tkinter is needed.
+To use the remote monitor, threading must be available.
+
+INSTALLATION
+
+Extract the files from the .tar.gz file, in Linux for example by:
+
+tar xzf guppy-x.y.z.tar.gz
+
+where x.y.z is the current version number. This will create the
+directory guppy-x.y.z .  You should then cd into this directory.  You
+can then compile the extension modules by:
+
+python setup.py build
+
+And to install you can do, for example, as follows to install to the
+default location (when you are super-user):
+
+python setup.py install
+
+NOTE that you typically must LEAVE the guppy-x.y.z directory to use
+Heapy, since the current directory is usually in the Python search
+path, and then Python will find the guppy directory there FIRST and
+will NOT find the extension modules. This may be a somewhat common
+problem -- so I am noting it here for lack of a suitable fix at the
+moment.
+
+I also note that the documentation files and emacs-mode are not
+automatically installed.
+
+HEAPY USAGE EXAMPLE
+
+The following example shows
+
+1. How to create the session context: h=hpy()
+2. How to show the reachable objects in the heap: h.heap()
+3. How to create and show a set of objects: h.iso(1,[],{})
+4. How to show the shortest paths from the root to x: h.iso(x).sp
+
+>>> from guppy import hpy; h=hpy()
+>>> h.heap()
+Partition of a set of 48477 objects. Total size = 3265516 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0  25773  53  1612820  49   1612820  49 str
+     1  11699  24   483960  15   2096780  64 tuple
+     2    174   0   241584   7   2338364  72 dict of module
+     3   3478   7   222592   7   2560956  78 types.CodeType
+     4   3296   7   184576   6   2745532  84 function
+     5    401   1   175112   5   2920644  89 dict of class
+     6    108   0    81888   3   3002532  92 dict (no owner)
+     7    114   0    79632   2   3082164  94 dict of type
+     8    117   0    51336   2   3133500  96 type
+     9    667   1    24012   1   3157512  97 __builtin__.wrapper_descriptor
+<76 more rows. Type e.g. '_.more' to view.>
+>>> h.iso(1,[],{})
+Partition of a set of 3 objects. Total size = 176 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0      1  33      136  77       136  77 dict (no owner)
+     1      1  33       28  16       164  93 list
+     2      1  33       12   7       176 100 int
+>>> x=[]
+>>> h.iso(x).sp
+ 0: h.Root.i0_modules['__main__'].__dict__['x']
+>>> 
+
+TEST
+
+To test if the heapy build and installation was ok, you can do:
+
+>>> from guppy import hpy
+>>> hpy().test()
+Testing sets
+Test #0
+Test #1
+Test #2
+...
+
+There will be several more tests. Some tests may take a while.
+
+Caveat 1: Some tests may be somewhat picky, and may have to be relaxed
+to pass in different installations.
+
+Caveat 2: All tests don't currently work always in Python 2.7
+
+LICENSE
+
+Copyright (C) 2005 -- 2008 Sverker Nilsson, S. Nilsson Computer System AB
+
+The right is granted to copy, use, modify and redistribute this code
+according to the rules in what is commonly referred to as an MIT
+license.
+
+*** USE AT YOUR OWN RISK AND BE AWARE THAT THIS IS AN EARLY RELEASE ***
+
+CONTACT INFORMATION
+
+Sverker Nilsson <sn@sncs.se> (Homepage: http://sncs.se)
+Guppy-PE homepage: http://guppy-pe.sourceforge.net

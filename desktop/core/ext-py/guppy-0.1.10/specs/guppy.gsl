@@ -1,0 +1,74 @@
+.import:: guppy, guppy_Root
+..from: kindnames
+
+.import:: Any+, boolean+, Guppy Glue+
+..from: kindnames
+
+.import:: Use
+..from: heapykinds
+
+.and: guppy
+..method:: hpy
+
+...d: Create a new heapy object that may be used for accessing all of
+the heapy functionality. Methods and modules are imported by this
+object on demand when needed.
+....c: Where the methods actually are implemented is an implementation detail.
+....t: Two commonly used methods are heap and iso.
+
+...d: An example:
+....pre
+>>> from guppy import hpy
+>>> hpy().heap() # Show current reachable heap
+Partition of a set of 28719 objects. Total size = 1984808 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0  15368  54   935952  47    935952  47 str
+\...
+     9    794   3    28584   1   1842168  93 __builtin__.wrapper_descriptor
+<101 more rows. Type e.g. '_.more' to view.>
+>>> 
+...d: To see more about how the heapy object may be used, follow the
+link on the return kind.
+
+...returns: Use
+...d: Normally no arguments need to be given. The arguments that may
+be given are for special cases. 
+...draw
+....key arg: ht: Any+
+.....d: The hiding tag to use. It may be useful to specify this
+in some cases when using multiple heapy instances, when you
+want to see the data in some of the other instances.
+.....default: will be set to the same unique object each
+time. In this way, different heapy instances will not see each
+other's data.
+....c
+.....key arg: gt: boolean+
+......d: If true, the method will fetch objects from gc.get_objects
+before creating the heapy instance. This may have been useful in some
+situations but there is other functionality that may be superceding
+this option.
+.....key arg: rh: boolean+
+......d: If true, the heapy instance will be initialized to have
+a .relheap set that contains the initial view of the heap. Subsequent
+calls to .heap() will then only show the new objects allocated later
+that are not in .relheap.
+
+..method:: Root
+...d: Create a new guppy Root object.
+
+....p: All functionality in the system may be accessed from this
+object. Modules are imported on demand when accessed. Other objects
+may be created or imported on demand using
+.....ref: .myfile.Guppy Glue+
+.....t: directives.
+
+....p: As this is a general access point, the heapy functionality may
+be accessed from here as well as via the hpy() method. How it is done
+is beyond the scope of this documentation, and is to be regarded an
+implementation detail, but you can of course look at the source code
+for the hpy method.
+
+....p: There is currently no arguments to this constructor, I may think
+of adding some options in the future, but it has not yet been needed.
+
+...returns: guppy_Root

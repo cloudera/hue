@@ -1,0 +1,101 @@
+.import:: int+
+..from: kindnames
+
+.import:: ReferencePattern, IdentitySetNotEmpty
+..from: heapykinds
+
+.import:: IdentitySet
+..from: heapy_UniSet
+
+.and: ReferencePattern
+..constructor: IdentitySet.rp
+..constructor: IdentitySet.get_rp
+
+..d
+
+This is an object representing a reference pattern. It is a condensed
+form of the graph formed by all direct and indirect referrer
+objects. Given a starting set of objects, a reference pattern groups
+the direct referrers by similar kind by a given classifier, and
+continues recursively with the referrers of the direct referrers and
+so on until a certain depth is reached, an already seen set of objects
+is reached or the objects of a set are all of some kind defined in a
+stop criterium. The result is generally a graph which is per default
+presented in depth first form.
+
+...p:
+
+The string representation of a reference pattern is designed to be
+displayed in textual form and also to be like what would be shown
+graphically.  It is printed as a depth first spanning tree.  Each node
+of the printed tree represents a set of objects of the same kind, as
+defined by the classifier used. A [-] sign means the node has referrer
+nodes, which are printed on subsequent lines, indented one step. A [+]
+sign means the node has referrers that are not printed because the
+maximum depth is reached. Some kinds of objects may be specified to
+not be followed to their referrers, because they are standard kinds of
+objects which are referred to in known ways. For example, the
+referrers of modules are not followed by default. Such nodes are
+indicated by a [S] sign. Some nodes may have already been seen in the
+spanning tree, and this is indicated by [^ x] where x is the index of
+the node as previously printed.
+
+...p:
+
+The contents of the set of objects representing a node, is printed in
+a condensed form designed to usually fit on a single line. It is
+possible to select particular nodes of the reference pattern, to get
+the underlying set of objects for further examination. Selecting such
+a node may be done either by the numeric index printed at the start of
+each node line or by the tree selection node name which is printed
+after the index. Selecting by index is done by indexing 'x[index]'
+while the selection by node name is done by getting the attribute
+'x.abc'.
+
+...dwh: Example
+....pre
+>>> from guppy import hpy
+>>> h=hpy()
+>>> x=[]
+>>> y=[[x] for i in range(1000)]
+>>> z=[(x,) for i in range(1000)]
+>>> p=h.iso(x).rp
+>>> p
+Reference Pattern by <[dict of] class>.
+ 0: _ --- [-] 1 list: 0xb7a3ac4c*0
+ 1: a      [-] 1000 list: 0xb79d06ec*1, 0xb79d070c*1, 0xb79d072c*1...
+ 2: aa ---- [-] 1 list: 0xb7a3a38c*1000
+ 3: a3       [S] 1 dict of module: __main__
+ 4: b ---- [-] 1000 tuple: 0xb77b270c*1, 0xb77b27ac*1, 0xb77b2b8c*1...
+ 5: ba      [-] 1 list: 0xb7d67a0c*1000
+ 6: baa ---- [^ 3] 1 dict of module: __main__
+ 7: c      [^ 3] 1 dict of module: __main__
+>>> p._ == p[0] == h.iso(x)
+True
+>>> p._.referrers == p.a | p.b | p.c
+True
+...c: end pre
+
+..dwh: See also
+...t: Section XXX.
+
+..fop: repr
+...d: Convert to a printable string, the same as by
+....ref: .mykind.str
+....t: . See the general reference pattern description for an
+explanation and example.
+
+..fop: str
+
+...d: Convert to a printable string, the same as by
+....ref: .mykind.repr
+....t: . See the general reference pattern description for an
+explanation and example.
+
+..getitem
+...arg: index:int+
+...returns: IdentitySetNotEmpty
+...d
+
+Indexes the reference pattern by a numerical index. See the general
+reference pattern description for an explanation and example.

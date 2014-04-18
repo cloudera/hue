@@ -1,0 +1,794 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html lang=en>
+ <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <title></title></head>
+ <body>
+  <div><a name='heapykinds.Use'>
+   <h1>.tgt.heapykinds.Use</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>Use</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><big><strong>Constructor</strong></big></dt>
+     <dd>
+      <dl>
+       <dt><a href='guppy.html#kindnames.guppy'>guppy</a><big><code>.</code><a href='guppy.html#kindnames.guppy.hpy'>hpy</a></big>( [<code>ht</code><strong>&nbsp;=&nbsp;</strong><em>Any+</em>]) <strong>-></strong> <a href='#heapykinds.Use'>Use</a></dt></dl></dd>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd><big><a href='#heapykinds.Use.findex'>findex</a></big>( <sup><strong>0..*:</strong></sup><var>kind</var><code>:</code>&nbsp;<em>Kind+</em>) <strong>-></strong>  (
+      <dl>
+       <dd><em>Subkind of: </em><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.findex.-60-0-62-.-60-2-62-.-60-0-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>index</var><code>:</code>&nbsp;<em>notnegative+</em>)</dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.heap'>heap</a></big>() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd><big><a href='#heapykinds.Use.heapg'>heapg</a></big>() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd><big><a href='#heapykinds.Use.heapu'>heapu</a></big>() <strong>-></strong> <em>Stat</em></dd>
+     <dd><big><a href='#heapykinds.Use.idset'>idset</a></big>(<var>nodes</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd><big><a href='#heapykinds.Use.iso'>iso</a></big>( <sup><strong>0..*:</strong></sup><var>node</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd><big><a href='#heapykinds.Use.load'>load</a></big>( <sup><strong>alt:</strong></sup>[<var>fn</var><code>:</code>&nbsp;<em>loadablefilenamestring+</em><sup><strong> or </strong></sup><var>fn</var><code>:</code>&nbsp;<em>loadableiterableofstrings+</em>]  [<code>use_readline</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em>]) <strong>-></strong> <em>Stat</em></dd>
+     <dd><big><a href='#heapykinds.Use.monitor'>monitor</a></big>()</dd>
+     <dd><big><a href='#heapykinds.Use.pb'>pb</a></big>( [<var>filename</var><code>:</code>&nbsp;<em>profilefilename+</em>])</dd>
+     <dd><big><a href='#heapykinds.Use.setref'>setref</a></big>()</dd>
+     <dd><big><a href='#heapykinds.Use.setrelheap'>setrelheap</a></big>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])</dd>
+     <dd><big><a href='#heapykinds.Use.setrelheapg'>setrelheapg</a></big>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])</dd>
+     <dd><big><a href='#heapykinds.Use.setrelheapu'>setrelheapu</a></big>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])</dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd><big><a href='#heapykinds.Use.Anything'>Anything</a></big><code>:</code>&nbsp;<a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+     <dd><big><a href='#heapykinds.Use.Nothing'>Nothing</a></big><code>:</code>&nbsp;<a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd><big><a href='#heapykinds.Use.Class'>Class</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Class.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>tc</var><code>:</code>&nbsp;<em>typeorclass+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfClassFamily'>KindOfClassFamily</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Clodo'>Clodo</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Clodo.-60-3-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>alt:</strong></sup>[<var>tc</var><code>:</code>&nbsp;<em>typeorclassexceptdict+</em><sup><strong> or </strong></sup><code>dictof</code><strong>&nbsp;=&nbsp;</strong><em>typeorclassoremptytuple+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Id'>Id</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Id.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>address</var><code>:</code>&nbsp;<em>objectaddress+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Module'>Module</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Module.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>draw:</strong></sup>[<code>name</code><strong>&nbsp;=&nbsp;</strong><em>modulename+</em> , <code>at</code><strong>&nbsp;=&nbsp;</strong><em>moduleaddress+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Rcs'>Rcs</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Rcs.-60-4-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>0..*:</strong></sup> <sup><strong>alt:</strong></sup>[<var>kind</var><code>:</code>&nbsp;<em>ClodoKind+</em><sup><strong> or </strong></sup><var>sok</var><code>:</code>&nbsp;<em>SetOfClodoKind+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfRetClaSetFamily'>KindOfRetClaSetFamily</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Root'>Root</a></big><code>:</code>&nbsp;<a href='heapy_RootState.html#heapykinds.RootStateType'>RootStateType</a></dd>
+     <dd><big><a href='#heapykinds.Use.Size'>Size</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Size.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>size</var><code>:</code>&nbsp;<em>notnegative+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfSizeFamily'>KindOfSizeFamily</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Type'>Type</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Type.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>type</var><code>:</code>&nbsp;<em>type+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfTypeFamily'>KindOfTypeFamily</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Unity'>Unity</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Unity.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.Via'>Via</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+       <dd><a href='#heapy_Use.Use.Via.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>0..*:</strong></sup><var>rel</var><code>:</code>&nbsp;<em>relationname+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfInViaFamily'>KindOfInViaFamily</a></dd>
+       <dd> )</dd></dl></dd>
+     <dd><big><a href='#heapykinds.Use.doc'>doc</a></big><code>:</code>&nbsp;<strong> anything</strong></dd></dl></dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='heapykinds.Use.findex'><strong><big>findex</big></strong></a>( <sup><strong>0..*:</strong></sup><var>kind</var><code>:</code>&nbsp;<em>Kind+</em>) <strong>-></strong>  (
+    <dl>
+     <dd><em>Subkind of: </em><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.findex.-60-0-62-.-60-2-62-.-60-0-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>index</var><code>:</code>&nbsp;<em>notnegative+</em>)
+      <dl>
+       <dd> Calling the returned equivalence relation creates an equivalence class.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Argument</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>index</var><code>:</code>&nbsp;<em>notnegative+</em></dt>
+           <dd>
+ The position of the matching kind in the sequence of kinds.
+The first one has index 0. Specifying the length of the sequence
+means that the equivalence class returned is the one where none
+of the kinds in the sequence matched.</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl>
+    <dl>
+     <dd>
+ Create an equivalence relation based on a sequence of kinds.  The
+name is a combination of find and index.  The classification of each
+objects is done as follows:
+
+      <p>
+ For each kind in the sequence, check whether the object is an
+element of that kind. If it is, the classification is the index of
+that kind in the sequence. If the end of the sequence is reached, the
+classification is the length of the sequence.
+</p></dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>kind</var><code>:</code>&nbsp;<em>Kind+</em></dt>
+         <dd> Each argument specifies the kind in that position in the sequence.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Bugs</strong></dt>
+       <dd>
+
+Though the Kind objects representing the equivalence classes work with
+set operations such as intersection and union, the tests such as
+subset and equality do not generally give the expected result.</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.heap'><strong><big>heap</big></strong></a>() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a>
+    <dl>
+     <dd>
+ Traverse the heap from a root to find all reachable
+and visible objects.</dd>
+     <dd>
+ The objects that belong to an heapy instance are normally made
+invisible. This may be modified in various ways.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.Use.setref'>setref</a></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> The ht argument to <em>guppy.hpy</em></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.heapg'><strong><big>heapg</big></strong></a>() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method is depreciated. The <a href='#heapykinds.Use.heapu'>heapu</a>
+ method is the recommended replacement.
+</dd></dl></dd>
+     <dd>
+ Finds the objects in the heap that remain after garbage
+collection but are<em> not</em>
+ reachable from the root except possibly via containers created
+by heapy.
+</dd>
+     <dd>
+ This can be used to find objects in extension modules that remain
+in memory even though they are gc-collectable and not reachable.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.Use.setrelheapg'>setrelheapg</a></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Bug</strong></dt>
+       <dd>
+Sometimes it shows objects in the reachable heap as well, if they
+are contained in sets created by a previous call to .heapg().
+It was tricky to separate out those objects reachable only via
+the heapy containers.</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.heapu'><strong><big>heapu</big></strong></a>() <strong>-></strong> <em>Stat</em>
+    <dl>
+     <dd>
+ Finds the objects in the heap that remain after garbage
+collection but are<em> not</em>
+ reachable from the root.
+</dd>
+     <dd>
+ This can be used to find objects in extension modules that remain
+in memory even though they are gc-collectable and not reachable.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ an object containing a statistical summary of the objects found - not the objects themselves. This is to avoid making the objects reachable.
+</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.Use.setref'>setref</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.idset'><strong><big>idset</big></strong></a>(<var>nodes</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a>
+    <dl>
+     <dd> Create a set of objects based on identity.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>nodes</var><code>:</code>&nbsp;<em>iterable+</em></dt>
+         <dd> The argument must be an iterable and may yield any kind of objects.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method is the same as <a href='#heapykinds.Use.iso'>iso</a>
+ except for the argument. 
+</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.iso'><strong><big>iso</big></strong></a>( <sup><strong>0..*:</strong></sup><var>node</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a>
+    <dl>
+     <dd><strong> AKA</strong><em> is object</em> or<em> identity set of objects</em>.</dd>
+     <dd> Create a set of objects based on identity.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>node</var><code>:</code>&nbsp;<em>Any+</em></dt>
+         <dd> Any kind of objects are valid arguments.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Example</strong></dt>
+       <dd>
+        <pre>
+&gt;&gt;&gt; from guppy import hpy
+&gt;&gt;&gt; hpy().iso(1, 1, 1.0, [], [], {})
+Partition of a set of 5 objects. Total size = 220 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0      1  20      136  62       136  62 dict (no owner)
+     1      2  40       56  25       192  87 list
+     2      1  20       16   7       208  95 float
+     3      1  20       12   5       220 100 int
+&gt;&gt;&gt; </pre></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method is the same as <a href='#heapykinds.Use.idset'>idset</a>
+ except for the argument.
+</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.load'><strong><big>load</big></strong></a>( <sup><strong>alt:</strong></sup>[<var>fn</var><code>:</code>&nbsp;<em>loadablefilenamestring+</em><sup><strong> or </strong></sup><var>fn</var><code>:</code>&nbsp;<em>loadableiterableofstrings+</em>]  [<code>use_readline</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em>]) <strong>-></strong> <em>Stat</em>
+    <dl>
+     <dd>
+ Load heapy-related data from a serialized form.
+Currently it handles data generated by <em>Stat.dump</em>.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>fn</var><code>:</code>&nbsp;<em>loadablefilenamestring+</em></dt>
+         <dd> A string argument is treated as a file name.</dd>
+         <dt><var>fn</var><code>:</code>&nbsp;<em>loadableiterableofstrings+</em></dt>
+         <dd>
+ An open file or an iterator will be iterated over enough
+to read one package of data, and another call to load will
+read the next package.</dd>
+         <dt><code>use_readline</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em></dt>
+         <dd>
+ If true, the method will use .readline() instead of
+iteration, which may be necessary in case the input comes from a pipe
+since otherwise the Python runtime would try to read ahead a big block
+before returning the first package of data.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd><small>
+ Why it is not always using readline is that AFAIK
+iteration should normally be used since it is faster as well
+as more general.
+</small></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> typically, one package of statistical data.</dt>
+       <dd>
+ Maybe it may return other kinds of data (in the future)
+since there is a directive in the file format to choose an
+alternative loader.
+</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.monitor'><strong><big>monitor</big></strong></a>()
+    <dl>
+     <dd>
+ Start an interactive remote monitor.
+
+      <p>
+ This can be used to get information about the state, in
+particular the memory usage, of separately running Python
+processes. It can connect to such processes, and bring up an
+interactive console in each process in which Python can be used much
+as it is normally used, while the target process under observation
+continues to execute as usual, typically under user control in another
+window. By observing and comparing the content of the heap of the
+target process at different times it is possible to find problems such
+as memory leaks, and then investigate the reasons for the alleged
+misbehaviours. It is sometimes also possible to test a fix in the
+running target process before updating its source code and restarting
+it.
+</p>
+      <p>
+ The target process needs to be enabled to accept remote
+monitoring. This is implemented via a thread that tries to connect to a
+particular socket. This thread can be started in the following way:
+</p>
+      <p><code>import guppy.heapy.RM</code></p>
+      <p>
+
+It is possible to put that command in the<code>
+ sitecustomize.py
+</code>
+ file of the installation. This may be practical so that all
+Python processes can be monitored, but there may be security issues to
+consider since any process with access to the monitoring socket can
+take over the processes that accept remote monitoring.
+</p>
+      <p>
+ A process may disable remote monitoring of itself in the
+following way:
+</p>
+      <p><code>
+
+from guppy.heapy.Remote import off; off()</code></p></dd>
+     <dd>
+      <dl>
+       <dt><strong>Example</strong></dt>
+       <dd>
+        <pre>
+nicosys [175] solitaire.py &amp;
+[1] 25928
+nicosys [176] python -c &quot;from guppy import hpy;hpy().monitor()&quot;
+&lt;Monitor&gt; 
+*** Connection 1 opened ***
+&lt;Monitor&gt; h
+
+Documented commands (type help &lt;topic&gt;):
+========================================
+exit  h  help  int  lc  q  sc
+
+&lt;Monitor&gt; lc
+CID PID   ARGV
+  1 25928 ['/home/nilsson/bin/solitaire.py']
+&lt;Monitor&gt; sc 1
+Remote connection 1. To return to Monitor, type &lt;Ctrl-C&gt; or .&lt;RETURN&gt;
+&lt;Annex&gt; h
+
+Documented commands (type help &lt;topic&gt;):
+========================================
+close  h  help  int  isolatest  q  reset  stat
+
+&lt;Annex&gt; stat
+Target overview
+------------------------------------
+target.sys.executable   = /usr/local/bin/python
+target.sys.argv         = ['/home/nilsson/bin/solitaire.py']
+target.wd               = /var/tmp
+target.pid              = 25928
+&lt;Annex&gt; int
+Interactive console. To return to Annex, type '-'.
+&gt;&gt;&gt; hp.heap()
+Partition of a set of 21919 objects. Total size = 1558688 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0  11467  52   739904  47    739904  47 str
+...
+     9     52   0    27040   2   1436516  92 dict of __main__.Card
+&lt;62 more rows. Type e.g. '_.more' to view.&gt;
+&gt;&gt;&gt; .
+&lt;Monitor&gt; exit</pre></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.pb'><strong><big>pb</big></strong></a>( [<var>filename</var><code>:</code>&nbsp;<em>profilefilename+</em>])
+    <dl>
+     <dd> Create a Profile Browser window.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>filename</var><code>:</code>&nbsp;<em>profilefilename+</em></dt>
+         <dd>
+ The name of a file containing profile data. The data should
+be in the format as generated by the <em>Stat</em>
+.dump method. For example, you can generate the data file by
+doing the following from time to time:
+          <pre>
+
+&gt;&gt; from guppy import hpy
+&gt;&gt; hpy().heap().stat.dump(filename)</pre>
+ The dump method appends a sample to the end of the file,
+containing a summary description of the current heap contents. The
+sequence of such samples can be browsed in the Profile Browser window.
+</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd>
+        <ul>
+         <li><a href='ProfileBrowser.html'> Heapy Profile Browser</a></li>
+         <li><a href='pbscreen.jpg'> Screenshot</a></li></ul></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.setref'><strong><big>setref</big></strong></a>()
+    <dl>
+     <dd> Set a reference point for heap usage measurement.</dd>
+     <dd> This applies to both the <a href='#heapykinds.Use.heap'>heap</a> and <a href='#heapykinds.Use.heapu'>heapu</a>
+ methods. The heap() method will only show the objects allocated
+after the time setref was called. The heapu() method, since it deals
+with summary data and not actual objects, will show the difference of
+sizes and counts compared to when setref was called.
+</dd></dl></dd>
+   <dd><a name='heapykinds.Use.setrelheap'><strong><big>setrelheap</big></strong></a>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method may become depreciated or reserved for internal use; the <a href='#heapykinds.Use.setref'>setref</a> method is the preferred public interface.</dd></dl></dd>
+     <dd> Set relative heap view.</dd>
+     <dd>
+ With no argument, set a variable in self to the current set of 
+objects in the heap. This set will be subtracted from
+the returned set in subsequent calls to <a href='#heapykinds.Use.heap'>heap</a>
+. In this way, it will show the heap relative
+to its contents when setrelheap was called, so that only
+newly allocated objects are included.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>reference</var><code>:</code>&nbsp;<em>UniSet+</em></dt>
+         <dd>
+ Pass an alternative set here to set the relative heap reference
+to that value instead of the current heap. For example, pass <a href='#heapykinds.Use.Nothing'>Nothing</a>
+ to make the heap view show all visible objects again.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.setrelheapg'><strong><big>setrelheapg</big></strong></a>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method is depreciated. Use <a href='#heapykinds.Use.setref'>setref</a> or <a href='#heapykinds.Use.setrelheapu'>setrelheapu</a>
+ instead.
+</dd></dl></dd>
+     <dd> Equivalent to <a href='#heapykinds.Use.setrelheap'>setrelheap</a> except it applies to <a href='#heapykinds.Use.heapg'>heapg</a>
+ instead. I may consider combining these
+methods to one.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapykinds.Use.setrelheapu'><strong><big>setrelheapu</big></strong></a>( [<var>reference</var><code>:</code>&nbsp;<em>UniSet+</em>])
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>This method may become depreciated or reserved for internal use; the <a href='#heapykinds.Use.setref'>setref</a> method is the preferred public interface.</dd></dl></dd>
+     <dd> Equivalent to <a href='#heapykinds.Use.setrelheap'>setrelheap</a> except it applies to <a href='#heapykinds.Use.heapu'>heapu</a> instead. Both of these methods are combined in the <a href='#heapykinds.Use.setref'>setref</a>
+ method.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='heapykinds.Use.Anything'><strong><big>Anything</big></strong></a><code>:</code>&nbsp;<a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ A kind that represents all kinds of objects.
+</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Nothing'><strong><big>Nothing</big></strong></a><code>:</code>&nbsp;<a href='heapy_UniSet.html#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The empty set.
+</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Class'><strong><big>Class</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ Equivalence relation by class. It defines objects to
+to be equivalent when their builtin __class__ attributes are identical.</dd></dl></dd>
+   <dd><strong><big>Class</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Class.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>tc</var><code>:</code>&nbsp;<em>typeorclass+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfClassFamily'>KindOfClassFamily</a>
+      <dl>
+       <dd>
+ Create a Kind object that represent an equivalence class
+of Class.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Argument</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>tc</var><code>:</code>&nbsp;<em>typeorclass+</em></dt>
+           <dd>
+ The Python type or class object that the Kind object will represent.
+</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Clodo'><strong><big>Clodo</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd> Equivalence relation by class or dict owner.</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+ It defines objects to be be equivalent
+when their classifications, as defined below, are equal.
+      <ol>
+       <li>
+If the object is an instance of a class, the
+	classification will be the class.</li>
+       <li>
+If the object is not a dictionary,
+	the classification will be the type of the object.</li>
+       <li>
+The object is a dictionary. The referrers of the
+	object are searched to find one that 'owns' the
+	dictionary. That is, the dict is a builtin
+	__dict__ attribute of the owner. If no such
+	owner is found, the object will be the classified
+	as a dict with no owner. If the owner is found, it will
+	be classified in its turn, by class as defined in <a href='#heapykinds.Use.Class'>Class</a>
+. The object will be classified as a dict
+	owned by such a kind of object.
+
+</li></ol></dd></dl></dd>
+   <dd><strong><big>Clodo</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Clodo.-60-3-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>alt:</strong></sup>[<var>tc</var><code>:</code>&nbsp;<em>typeorclassexceptdict+</em><sup><strong> or </strong></sup><code>dictof</code><strong>&nbsp;=&nbsp;</strong><em>typeorclassoremptytuple+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a>
+      <dl>
+       <dd> Creates an equivalence class of Clodo.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Arguments</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>tc</var><code>:</code>&nbsp;<em>typeorclassexceptdict+</em></dt>
+           <dd>
+ If this argument is specified,
+it must be or represent a Python type or class object, except that
+it may not be the type dict, and the resulting Kind will be the
+same as that returned from <a href='#heapykinds.Use.Class'>Class</a>(tc).</dd>
+           <dt><code>dictof</code><strong>&nbsp;=&nbsp;</strong><em>typeorclassoremptytuple+</em></dt>
+           <dd>
+ If this argument is specified, and is an empty tuple,
+the result will be a kind representing a dict that has no owner.
+Otherwise the owner kind will be created as by <a href='#heapykinds.Use.Class'>Class</a>
+(dictof),
+and the result will be a kind representing a dict that is owned
+by that class.
+</dd>
+           <dd></dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Id'><strong><big>Id</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ This equivalence relation defines objects to be equivalent
+only if they are identical, i.e. have the same address.</dd></dl></dd>
+   <dd><strong><big>Id</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Id.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>address</var><code>:</code>&nbsp;<em>objectaddress+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a>
+      <dl>
+       <dd> Creates an equivalence class.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Argument</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>address</var><code>:</code>&nbsp;<em>objectaddress+</em></dt>
+           <dd> The argument should be the address of an object.</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Module'><strong><big>Module</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ This equivalence relation defines objects to be equivalent if
+they are the same module, or if none of them is a module. Partitioning
+a set of objects using this equivalence relation will therefore
+result in one singleton set for each module and one set containing all
+other objects.
+</dd></dl></dd>
+   <dd><strong><big>Module</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Module.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>draw:</strong></sup>[<code>name</code><strong>&nbsp;=&nbsp;</strong><em>modulename+</em> , <code>at</code><strong>&nbsp;=&nbsp;</strong><em>moduleaddress+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a>
+      <dl>
+       <dd> Create a Kind that matches objects to the given module.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Arguments</strong></dt>
+         <dd>
+          <dl>
+           <dt><code>name</code><strong>&nbsp;=&nbsp;</strong><em>modulename+</em></dt>
+           <dd> The name may be specified as a string.</dd>
+           <dt><code>at</code><strong>&nbsp;=&nbsp;</strong><em>moduleaddress+</em></dt>
+           <dd>
+ The address may also be specified, as an
+alternative or together with the name.
+</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Rcs'><strong><big>Rcs</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd> (Referrer classification set.)</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+ In this equivalence relation, objects are classified by
+classifying their referrers.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+ The classification of the referrers is done using the classifier
+of the <a href='#heapykinds.Use.Clodo'>Clodo</a>
+ equivalence relation. The classifications of the
+referrers are collected in a set. This set represents the classification
+of the object.
+</dd></dl></dd>
+   <dd><strong><big>Rcs</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Rcs.-60-4-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>0..*:</strong></sup> <sup><strong>alt:</strong></sup>[<var>kind</var><code>:</code>&nbsp;<em>ClodoKind+</em><sup><strong> or </strong></sup><var>sok</var><code>:</code>&nbsp;<em>SetOfClodoKind+</em>]) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfRetClaSetFamily'>KindOfRetClaSetFamily</a>
+      <dl>
+       <dd>
+ Create an equivalence class from user-specified classification arguments.
+The arguments should together specify a set of Kind objects, each of
+which must represent an equivalence class of <a href='#heapykinds.Use.Clodo'>Clodo</a>.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Arguments</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>kind</var><code>:</code>&nbsp;<em>ClodoKind+</em></dt>
+           <dd> This adds a single Kind to the set of Kinds of referrers.</dd>
+           <dt><var>sok</var><code>:</code>&nbsp;<em>SetOfClodoKind+</em></dt>
+           <dd> This adds each Kind in the sok argument to the total set of Kinds of referrers.</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Root'><strong><big>Root</big></strong></a><code>:</code>&nbsp;<a href='heapy_RootState.html#heapykinds.RootStateType'>RootStateType</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ This attribute is a symbolic root containing attributes from
+which all reachable objects in the heap can be reached. It is the only
+value (a singleton) of its kind; see <a href='heapy_RootState.html#heapykinds.RootStateType'>heapykinds.RootStateType</a>
+ for a description of its attributes.
+</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Size'><strong><big>Size</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ In this equivalence relation, objects are classified by memory
+size, so each equivalence class represents a particular size of object.
+</dd></dl></dd>
+   <dd><strong><big>Size</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Size.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>size</var><code>:</code>&nbsp;<em>notnegative+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfSizeFamily'>KindOfSizeFamily</a>
+      <dl>
+       <dd> Create a Kind representing a particular size.</dd>
+       <dd>
+        <dl></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Type'><strong><big>Type</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ In this equivalence relation, objects are classified by type
+so each equivalence class represents objects of a particular type.
+</dd></dl></dd>
+   <dd><strong><big>Type</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Type.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;(<var>type</var><code>:</code>&nbsp;<em>type+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfTypeFamily'>KindOfTypeFamily</a>
+      <dl>
+       <dd> Create a Kind representing a particular type.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Argument</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>type</var><code>:</code>&nbsp;<em>type+</em></dt>
+           <dd> A Python type object or a representation of it.</dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Unity'><strong><big>Unity</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ In this equivalence relation, all objects are considered equivalent.
+There is only one equivalence class.</dd></dl></dd>
+   <dd><strong><big>Unity</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Unity.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;() <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.Kind'>Kind</a>
+      <dl>
+       <dd>
+        <dl>
+         <dt><strong>Returns </strong> the equivalence class, which is <a href='#heapykinds.Use.Anything'>Anything</a>
+.
+</dt></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.Via'><strong><big>Via</big></strong></a></dd>
+   <dd>
+    <dl>
+     <dd>
+ In this equivalence relation, objects are classified by how
+they are referred from their referrers, so each equivalence class
+represents objects that have a particular set of relations to
+their referrers.
+</dd></dl></dd>
+   <dd><strong><big>Via</big></strong><code>:</code>&nbsp; (
+    <dl>
+     <dd><a href='heapy_UniSet.html#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a name='heapy_Use.Use.Via.-60-2-62-'><strong>callable</strong></a><code>:</code>&nbsp;( <sup><strong>0..*:</strong></sup><var>rel</var><code>:</code>&nbsp;<em>relationname+</em>) <strong>-></strong> <a href='heapy_UniSet.html#heapykinds.KindOfInViaFamily'>KindOfInViaFamily</a>
+      <dl>
+       <dd>
+ Create a Kind representing a particular set of referrer
+relations.</dd>
+       <dd>
+        <dl>
+         <dt><strong>Argument</strong></dt>
+         <dd>
+          <dl>
+           <dt><var>rel</var><code>:</code>&nbsp;<em>relationname+</em></dt>
+           <dd>
+ Each argument specifies one referrer relation.
+The arguments should be strings and can be of any of the
+following forms.
+            <p></p>
+            <table>
+             <tr>
+              <th><code> [expression]</code></th>
+              <td>
+ Indexing of a dict, list, tuple (etc). The expression
+must be a Python expression that can be evaluated in a local
+environment. The environment will contain the builtins and a name
+'hp' that is bound to the current <em>Use</em> instance.</td></tr>
+             <tr>
+              <th><code> .attribute</code></th>
+              <td>
+ Getting an attribute from a builtin type or
+a slot of a slotted type. (I.E. not an attribute that
+is in a dict of an object.)</td></tr>
+             <tr>
+              <th><code> .f_locals[&quot;name&quot;]</code></th>
+              <td> A local variable of a frame.</td></tr>
+             <tr>
+              <th><code> .f_locals</code>&nbsp;<code> [&quot;name&quot;]</code></th>
+              <td>
+ A variable in a CELL of a frame.
+Note the space between&nbsp;<code> f_locals</code> and<code> [</code>
+. This is
+to distinguish it from ordinary locals, and still
+use a syntax that could be used to access those variables directly from Python.</td></tr>
+             <tr>
+              <th><code> .keys()[integer]</code></th>
+              <td> A key in a dictionary, at the indicated place in its keys().</td></tr></table></dd></dl></dd></dl></dd></dl></dd>
+     <dd> )</dd></dl></dd>
+   <dd><a name='heapykinds.Use.doc'><strong><big>doc</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd>
+
+Overview documentation for top level Heapy object.
+Provides a listing of the available attributes.
+Accessing the attribute name on the doc objects gives further info, eg:
+
+      <pre>&gt;&gt;&gt; hp.doc.heap</pre>
+
+gives doc for the heap method when hp is the top level Heapy object.
+
+References may be embedded in the documentations. To access a
+reference, opening up a web browser with the doc for it one can do eg:
+
+      <pre>&gt;&gt;&gt; hp.doc.heap[1]</pre>
+
+The reference number 0 is special. If it is provided, it is the
+reference to the html doc for the described object itself. So to see
+in the web browser the doc for the heap method one can do:
+
+      <pre>
+&gt;&gt;&gt; hp.doc.heap[0]
+</pre></dd></dl></dd></dl>
+  <hr>Generated by <a href="http://guppy-pe.sourceforge.net/gsl.html">GSL-HTML 0.1.5</a> on Sat Jul  4 13:25:11 2009</div></body></html>
