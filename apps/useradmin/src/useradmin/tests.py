@@ -905,7 +905,8 @@ def test_list_for_autocomplete():
   groups = [user['name'] for user in content['groups']]
 
   assert_equal(['test_list_for_autocomplete2'], users)
-  assert_equal(['test_list_for_autocomplete'], groups)
+  assert_true('test_list_for_autocomplete' in groups, groups)
+  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
   # c2 is in the same group as c1
   response = c2_same_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -915,9 +916,10 @@ def test_list_for_autocomplete():
   groups = [user['name'] for user in content['groups']]
 
   assert_equal(['test_list_for_autocomplete'], users)
-  assert_equal(['test_list_for_autocomplete'], groups)
+  assert_true('test_list_for_autocomplete' in groups, groups)
+  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
-  # c3 is alone
+  # c3 is alone except for groups
   response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   content = json.loads(response.content)
 
@@ -925,4 +927,5 @@ def test_list_for_autocomplete():
   groups = [user['name'] for user in content['groups']]
 
   assert_equal([], users)
-  assert_equal(['test_list_for_autocomplete_other_group'], groups)
+  assert_true('test_list_for_autocomplete' in groups, groups)
+  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
