@@ -32,24 +32,31 @@ class Command(BaseCommand):
   Closing (all=True) queries older than 7 days...
   0 queries closed.
   """
-  args = '<age_in_days> <hive,impala,all> (default is 7 and hive)'
+  args = '<age_in_days> <all> (default is 7)'
   help = 'Close finished Hive queries older than 7 days. If \'all\' is specified, also close the Impala ones.'
 
   def handle(self, *args, **options):
     days = int(args[0]) if len(args) >= 1 else 7
-    query_type = args[1] if len(args) >= 2 else None
-    if query_type == 'hive' or query_type is None:
-      query_type = 'beeswax'
+    close_all = args[1] == 'all' if len(args) >= 2 else False
 
-    self.stdout.write('Closing (all=%s) HiveServer2/Impala sessions older than %s days...\n' % (query_type, days))
+    self.stdout.write('Closing (all=%s) HiveServer2/Impala sessions older than %s days...\n' % (close_all, days))
 
     n = 0
     sessions = Session.objects.all()
 
-    if query_type != 'all':
-      sessions = sessions.filter(application=query_type)
+    if not close_all:
+      sessions = sessions.filter(application='beeswax')
 
     sessions = sessions.filter(last_used__lte=datetime.today() - timedelta(days=days))
+
+    import os
+    import beeswax
+    from beeswax import conf
+    from beeswax import hive_site
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
+
+    hive_site.reset()
+    hive_site.get_conf()
 
     for session in sessions:
       try:
