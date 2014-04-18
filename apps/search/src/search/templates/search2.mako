@@ -257,7 +257,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, dragged: function(){viewModel.search()}}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2'}, dragged: function(){viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -457,7 +457,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
-    <span data-bind="text: ko.toJSON(counts)" />
+    <div data-bind="pieChart: counts" />
   </div>
   <!-- /ko -->
 </script>
@@ -554,6 +554,50 @@ $(document).ready(function () {
     update: function (element, valueAccessor) {
       var value = valueAccessor();
       ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
+    }
+  };
+
+  ko.bindingHandlers.pieChart = {
+    init: function (element, valueAccessor) {
+      var value = valueAccessor();
+      var _data = [];
+      $(value).each(function (cnt, item) {
+        _data.push({
+          label: item.value,
+          value: item.count,
+          obj: item
+        });
+      });
+
+      nv.addGraph(function () {
+        var chart = nv.models.pieChart()
+            .x(function (d) {
+              return d.label
+            })
+            .y(function (d) {
+              return d.value
+            })
+            .height($(element).width())
+            .showLabels(true).showLegend(false);
+
+        var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+
+        _d3.datum(_data)
+            .transition().duration(350)
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+        $(element).height($(element).width());
+        return chart;
+      }, function () {
+        d3.selectAll(".nv-slice").on('click',
+            function (d, i) {
+              viewModel.query.selectFacet(d.data.obj);
+            });
+      });
+    },
+    update: function (element, valueAccessor) {
+      var value = valueAccessor();
+      // do something with the updated value
     }
   };
 
