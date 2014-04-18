@@ -1,0 +1,81 @@
+.import:: guppy
+..from: guppy
+
+.import:: Use
+..from: heapy_Use
+
+.import:: UniSet, Kind, KindWithAlt, KindOfTypeFamily, KindOfClassFamily,KindOfSizeFamily,
+KindOfRetClaSetFamily,KindOfInViaFamily,IdentitySet,IdentitySetNotEmpty,IdentitySetSingleton
+..from: heapy_UniSet
+
+.import:: EquivalenceRelation, EquivalenceRelationByDictOwner
+..from: heapy_ER
+
+.import:: RootStateType
+..from: heapy_RootState
+
+.c
+..import:: ReferencePattern
+..from: heapy_RefPat
+
+.document: heapy_UniSet
+..output: html
+..man page of: UniSet
+..man page of: Kind
+..man page of: KindWithAlt
+..man page of: KindOfTypeFamily
+..man page of: KindOfClassFamily
+..man page of: KindOfSizeFamily
+..man page of: KindOfRetClaSetFamily
+..man page of: KindOfInViaFamily
+..man page of: IdentitySet
+..man page of: IdentitySetNotEmpty
+..man page of: IdentitySetSingleton
+..man page of: EquivalenceRelation
+..man page of: EquivalenceRelationByDictOwner
+
+.document: heapy_Use
+..output: html
+..man page of: Use
+
+.document: test_heapy
+..output: tester
+..test of: Use
+
+.document: heapy_RootState
+..output: html
+..man page of: RootStateType
+
+.c
+..document: heapy_ReferencePattern
+...output: html
+...man page of: ReferencePattern
+
+.document: guppy
+..output: html
+..man page of: guppy
+
+.document: test_guppy
+..output: tester
+..test of: guppy
+
+.c
+..context:: H
+...python:
+from guppy import hpy
+h=hpy()
+
+.import:: Kind+
+..from: heapykinds
+
+.c
+..and: Kind+
+...eg: h.Anything
+....in context: H
+
+.c
+..document: test_Use
+...output: tester
+...test of: Use
+
+

@@ -1,0 +1,659 @@
+2011-05-24  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* src/heapy/hv_cli_dictof.c (hv_get_objects): New function that
+	emulates gc_get_objects because of optimizations to the dict
+	implementation which made them non-gc-tracked sometimes.
+	
+	(hv_cli_dictof_update_new_method): Relies on new function
+	hv_get_objects to get at all dict objects in the heap.
+
+2011-02-24  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/Part.py : Removed a failing assert in lack of a
+	better solution. The result may perhaps differ sometimes from
+	the true result, depending on the definition heap before/after.
+	
+
+2010-06-08  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* src/sets/bitset.c (mutbitset_iop_PyLongObject): Don't multiply
+	with SHIFT if _PyLong_Frexp is used
+	
+	* guppy/heapy/test/test_Part.py (MixedCase.test_1): Changed the
+	test result if sys.version >= 2.7; because the size of strings
+	was optimized 8 bytes. (How ? )
+
+	* src/sets/bitset.c (mutbitset_iop_PyLongObject): Used
+	_PyLong_Frexp instead of _PyLong_AsScaledDouble if
+	PY_VERSION_HEX >= 0x02070000 . (_PyLong_AsScaledDouble disappeared
+	but I think I should complain, couldn't figure out how to add an
+	issue with the tracker.)
+
+2010-02-16  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/sets/test.py (Test.test16.tsv): Expected OverflowError
+	instead of ValueError, an inconsequential change to do with
+	possiboe test error reporting.
+
+2010-02-15  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/test/test_Classifiers.py
+	(SpecialCases.test_dictowner, SpecialCases.test_alt_retclaset):
+	Changed to use clock() instead of time() for cpu time
+	measurements. Added adaptive loop count as the time in some cases
+	were down to 0.01 s - which may be the resolution of clock(). Now
+	makes the time be about 0.5-1 s regardless of CPU speed.
+
+	* guppy/heapy/test/test_Path.py (NewTestCase.test_1): 
+	Changed to use clock() instead of time() for cpu time measurements
+	in a test that is not currently used, just in case we begin to use it.
+	
+	
+2010-02-14  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* src/sets/nodeset.c (nodeset_op_set): Just an inconsequential
+	change, it had two returns after each other.
+
+	* src/sets/bitset.c (mutbitset_iop_PyLongObject): 
+	In the latest change where a loop over pos was added, changed type
+	from int to NyBit.
+	
+	* src/sets/bitset.h: Checks endianness and defines macros to
+	handle it.
+	* src/sets/bitset.c (immbitset_long): 
+	* src/sets/bitset.c (mutbitset_iop_PyLongObject): 
+	Changes to work with big endian.
+	
+2010-01-02  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/etc/KnuthBendix.py
+	(KnuthBendix.make_confluent.add_reduction): Added missing argument
+	to % in error message
+
+2009-08-30  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/Use.py (_GLUECLAMP_): Added loadall method
+
+	Version 0.1.9
+	
+2009-06-23  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* specs/index.gsl: download mentions today's date
+
+	* guppy/sets/test.py: Made it try numpy.random instead of
+	RandomArray; revert to random if no numpy.random could be
+	installed so more tests can get done albeit slower.
+
+	* MANIFEST.in: added specs/*.py
+
+	* ANNOUNCE : Added advertisement for http://sncs.se
+
+2009-06-18  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* specs/index.gsl: Changed wording of tested pythons to exclude
+	having tested with python2.3 in 32 bit mode.
+
+	* src/sets/bitset.c (bits_first,bits_last): Changed to use #if
+	directive to get rid of warnings in 32-bit mode.
+
+	* src/sets/bitset.h (NyBits_N): Changed definition to use
+	ULONG_MAX to be able to use it in preprocessor #if directive.
+
+	* README (TEST): changed sample output to begin with test of sets.
+
+	* setup.py (doit): long_description now starts with newline to
+	look better in PKG-INFO
+
+	* ANNOUNCE: added wordings about heapy_tutorial, pop bug and test.
+
+	* guppy/heapy/test/test_all.py: added dependencies test
+
+	* specs/index.gsl: Added heapy_tutorial link
+
+	* specs/genguppydoc.py (GenGuppyDoc.gengsl): generate heapy_tutorial
+
+	* specs/heapy_tutorial.gsl: new file
+
+	* guppy/heapy/test/test_dependencies.py : new file
+
+2009-06-16  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* specs/index.gsl: Added interactive help to example which was
+	moved to documentation section.
+
+	* src/sets/bitset.c (mutbitset_pop): changed type of i from NyBit to
+	int to work in 64 bits with test7 in sets/test.py .
+	(bits_last): made it work with 64 bits by testing the upper 32-bit half
+	(bits_first): made it use NyBits_N instead of NyBits_64 
+	(bits_last):  made it use NyBits_N instead of NyBits_64 , NyBits_32
+	(NyMutBitSet_pop): changed 1<<i to 1l<<i to work with 64 bits with
+	test12 of test.py.
+
+2009-06-12  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* ANNOUNCE: Tells about interactive help with example.
+
+	* specs/index.gsl: Download section updated for 0.1.9. Credits
+	added Yaroslav Halchenko.
+
+2009-04-07  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/Monitor.py: made import readline optional
+
+	* setup.py (doit): package_data uses *.html & *.jpg
+
+2009-03-08  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* ANNOUNCE: news for 0.1.9
+
+2009-01-09  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/gsl/Tester.py (TestOf.make_cat.get_example_expr): Made the
+	example values be regenerated each time. (Unless 0 is true.)
+	Affects speed sometimes (an extra function call per arg) but may
+	also be faster.
+
+	* guppy/heapy/Use.py (_GLUECLAMP_.load): changed usereadline to
+	use_readline to correspond to doc .
+
+	* guppy/heapy/Prof.py (Menu.delete): Removed commented-out lines
+	to delete commands.
+
+2008-11-03  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/UniSet.py (UniSet & IdentitySet): Removed several
+	_get_xxx methods and put the definitions directly in properties as
+	lambdas with docstrings (to clean up result of help()) . 
+
+2008-10-31  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/Prof.py (_GLUECLAMP.pb_): Added docstring
+
+	* guppy/heapy/Monitor.py (monitor): Added docstring
+
+	* guppy/heapy/UniSet.py (UniSet etc): Made the docstrings of _get_ 
+	wording in terms of attributes rather than methods.
+
+	* guppy/heapy/Use.py (_GLUECLAMP_): Added more dir/help
+
+	* guppy/doc/__init__.py : Added more dir support
+
+2008-10-28  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* src/sets/bitset.c (mutbitset_iop_PyLongObject): Made explit long
+	cast to long for num_poses, to get rid of warning from MSVC.
+
+	* setup.py: Removed extra_compile_args and extra_link_args vars.
+
+	* src/heapy/heapy.h: Removed DL_IMPORT macro usage.
+
+	* src/sets/sets_internal.h: Removed all DL_IMPORT macros.
+	  to get rid of warning from MSVC about inconsistent linkage.
+
+2008-10-25  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* setup.py: Removed the extra compile args for MSWindows -
+	  they were only there for debugging.
+
+2008-10-24  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* Added debug parameter to hpy().test() and made all test_main
+	  functions take that parameter. When true, it will be possible
+	  to look into the failure stack with pdb.pm() .
+
+	* Added Chad Austin's patch for MSWINDOWS
+	  Made a temp os-determination. Have to check this out.
+	  Changed macro FILL to return -1 to get rid of warning in a set init.
+	  Made the initfunc in heapyc return an int to get rid of new warning.
+	  Moved & renamed macro to NYFILL in new file src/include/guppy.h
+	  which is intended to host general public guppy related includes.
+	  Made corresponding changes FILL->NYFILL where used.
+	
+2008-06-18  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/doc/__init__.py (Tab): Added tabs for different help
+	browsing environments. 
+
+2008-06-17  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/doc/__init__.py (_GLUECLAMP_.help_instance): Added
+	method. Also added Subject class.
+
+	* guppy/heapy/UniSet.py (UniSet and subclasses): Added _help_url_
+	attributes and _get_help which uses this via help_instance, but I
+	began to think they should perhaps refer to the gsl kindnames
+	instead. 
+
+	* guppy/doc/__init__.py (Document): Added class Document, various
+	restructurings in progress
+
+2008-05-22  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* README (License): Added modify and redistribute wording to
+	the License for clarity, still refers to MIT license.
+
+	* Removed ihelp pkg. Changes to various files to reflect
+	ihelp->doc .
+	
+	* Moved ihelp.__init__.py into guppy/doc
+	
+	* Moved top-level doc dir into guppy package
+	
+	*  ihelp.__init__.py : continued improving text html rendering
+
+2008-05-21  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/Spec.py: 
+
+	* guppy/gsl/Filer.py: 
+
+	* guppy/gsl/DottedTree.py: 
+
+	* guppy (docstring): Changed quotes to """ from ''' because I
+	found pydoc.gui() (in Python 2.5) didn't recognize it otherwise.
+
+	* guppy/etc/Glue.py (Share.getattr2): Made it try getattr3 with
+	the CLAMP first even if it was a package.
+
+2008-05-20  Sverker Nilsson  <sverker@sverker-laptop>
+
+	*  (Default): Made ihelp directory and made guppy.help work first
+	version. 
+
+	* guppy/etc/PrettyPrintHTML.py: Added
+
+	* guppy/gsl/Html.py (Node2Html): visit_comment: Made it not
+	output anything to the XHTML file.
+
+2008-05-14  Sverker Nilsson  <sverker@sverker-laptop>
+
+	*  (specs/index.gsl): Added external resources documentation
+	section and two external links.
+
+2008-04-09  Sverker Nilsson  <sverker@sverker-laptop>
+
+	*  (changelog): Renamed to ChangeLog since Emacs insists on having
+	it as default name.
+
+	* MANIFEST: added specs/genguppydoc.py
+
+	* specs/index.gsl: Made it use css, improved table layout for doc
+	and download.
+	Added doc/css/guppy.css
+	
+	
+	Version 0.1.8
+
+
+2008-04-08  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/gsl/Main.py (find_aspects_inseq): as->as_
+	  Several other GSL-related files as -> as_
+	  untabified setup.py to look better in pypi
+	
+
+	Version 0.1.7
+
+2008-04-07  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/test/test_View.py (FirstCasetest_cal_hiding): as->as_
+
+	* guppy/heapy/test/test_UniSet.py (FirstCase): as->asrt
+
+	* guppy/sets/test.py (test_set_operations and others): as->as_
+
+	* guppy/heapy/test/test_Classifiers.py (SpecialCases.test_2): as->asrt
+
+	* guppy/heapy/Classifiers.py (SoKind.__hash__): added
+
+	* For Python 2.6a2 ^^^
+	
+	* specs/index.gsl: Added commentary in download section
+	referringing to svn as source of latest changes esp. 64 bit.
+	
+
+	* Added specs/genguppydoc.py, to be able to regenerate docs from
+	svn'd files.
+
+2008-04-05  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* guppy/heapy/test/test_Classifiers.py (SpecialCases): 
+	Relaxed the timing test in test_alt_retclaset with a factor 2
+	from 2 to 4.
+	
+	* guppy/heapy/test/test_heapyc.py (TestHeapView):
+	in test_timing:
+	it failed in python2.3 64 bit, I removed the check for now,
+	may check into this later...
+
+	* src/sets/bitset.c (bits_first): Removed xxx etc from comment, no 
+	problem with being hardcoded for size and now tested with 64 bits.
+	(sf_realloc): changed the update of v->lo and v->hi to use better
+	defined pointer-arithmetic within allocated arrays. This solved a
+	problem with 64 bit mode in (at least) Python 2.4. May be a
+	coincidence that it seemed to work with 2.5.
+
+2008-03-17  Sverker Nilsson  <sverker@sverker-laptop>
+
+	* Several files, to make it complie without warnings in 32 bit
+	  mode. 
+	  NyBit is now defined as Py_intptr_t and limits are calculated
+	  a'la pyport.h .
+
+	* src/sets/bitset.h: using __LP64__ macro to indirectly define internal
+	  conditional flags, NyBits_32 resp. NyBits_64
+	
+	*  guppy/heapy/__init__.py : checked sys.maxint to detmine arch
+	   some size-dependent tests are relaxed if not 32-bit arch
+	*  guppy/heapy/test_heapyc.py : relaxed a timing test
+	
+	* src/sets/nodeset.c &c. changed some more occurences of int to NyBit
+	  or perhaps they just became long in some place.
+
+2008-03-13  Sverker Nilsson  <sverker@sverker-laptop>
+	*  Starting modifications to work with 64 bits.
+	*  guppy/src/sets/ (bitset.h, nodeset.c, bitset.c), maybe others,
+	changes to especially the index type used as bit number in bitsets.
+	Defining type NyBit for this and also NySize. They are just
+	longs right now. Testing with Ubuntu 7.10 / AMD 64. 
+
+2007-02-16  Sverker Nilsson  <sverker@localhost>
+
+	* Put it under svn. Changed to call it 0.1.7 in README and ANNOUNCE
+
+2007-01-31  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/gsl/XHTML.py (Node2XHTML.visit_comment): Made it not
+	output anything to the XHTML file.
+
+2007-01-25  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/gsl/Document.py (_GLUECLAMP_.output_handlers): Added XHTML entry
+	(Document.visit_output): Made the output mode specification case-insensitive.
+
+	* guppy/gsl: Added XHTML.py module - initially a copy of Html.py.
+	I am changing to be more conventional(?) - to use all upper case
+	in the XHTML name since that is how it is written looks in
+	documents on the web. (Is this contrary to Python conventions to
+	use Capitalized names?) But it would be too weird to write Xhtml
+	(or even worse XHtml) vs XHTML. 
+	
+2006-11-08  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/gsl/Html.py (Node2Html.__init__): Changed (default,
+	still fixed) encoding to utf-8.
+
+
+	Version 0.1.6
+	
+2006-10-13  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/heapy/Use.py (_GLUECLAMP_._get_Root): This is what the
+	method should have been called, not get_RS that it became
+	yesterday.
+
+	Version 0.1.5
+	
+2006-10-12  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/gsl/Document.py: Made some changes wrt dl/dt/dd to make
+	the generated HTML code be more standards compliant, fixing
+	rendering problems occuring AFAIK at least using Firefox.
+	
+	* guppy/gsl/Html.py: Fixed a problem with generated comments.
+	
+	* guppy/heapy/Remote.py (on): Made the site module be imported
+	before Remote, to make it work in a normal installation when
+	PYTHONPATH does not contain the guppy package. Had to change the
+	recursion stopping flag to not be in the Remote module; now put in
+	sys.
+
+	(Annex) made h be a shorthand for hp in the remote interpreter, to
+	be consistent with new abridged example style.
+	
+	* guppy/heapy/UniSet.py: Made sp be a shorthand for shpaths,
+	because it is such a commonly used attribute.
+	
+	* guppy/heapy/[test_Path,test_ER].py : Made check of test results
+	fit changes made to Path.py resp. Use.py
+	
+	* guppy/heapy/Use.py : Added RS attribute, to work with changes
+	in Path.py. Changed default reprefix to be 'hpy().' , to be more
+	meaningful in most cases.
+	
+	* guppy/heapy/Path.py (_GLUECLAMP_.shpgraph): Made the source name
+	be derived from the Root attribute of the global hpy() instance in
+	the normal case when the root is RootSTate -- to describe the path
+	unambiguosly and show how it may be used.
+
+	Version 0.1.4
+	
+2006-10-11  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/heapy/View.py (obj_at): Uses new obj_at method in
+	immnodeset objects, to handle compatibility issues between Python
+	versions and also be much faster.
+
+	(referrers): After updating referrers, now checks that the domain
+	of referrer graph was really covering the objects it should, and
+	otherwise prints an error message and calls the debugger. -- I
+	don't know when this should happen, the problem might have been
+	due to a compilation version error, but I am letting the check
+	left in.
+	
+	* guppy/etc/Glue.py: Checked ImportError message to see if it was
+	a clean ImportError (No module named %s) in which case it proceeds
+	as usual but otherwise the error is reported (showing the cause of
+	the error)
+
+	Changed '0x%x' to hex() to get rid of a compatibility warning
+	
+	Added more informative message text when an AttributeError is
+	raised from getting an attribute from a module.
+	
+	* src/heapy/stdtypes.c (frame_relate): Replaced use of f_nlocals,
+	f_ncells and f_nfreevars with values calculated from tuple sizes
+	and co_nlocals, because in 2.5 the fields are removed in frames.
+	(frame_traverse): Similarly removed use of f_nlocals.
+	
+	(type_traverse and type_relate): Changed name of slots to ht_slots
+	if Python version >= 2.5.
+
+	* src/sets/bitset.c: Removed use of type intintargfunc which is
+	depreciated in Python2.5. 
+
+	* src/sets/immnodeset.c: Added obj_at method to immutable
+	nodesets, to solve problems occuring when using id() in different
+	versions of Python (2.5 sometimes returns long ints) in the obj_at
+	method in View.py; the C method is cleaner and much faster based
+	on binary search.
+
+	* src/sets/nodeset.c: Made a pointer comparison compare cast to
+	Py_uintptr_t instead of pointers directly, to be more well defined
+	since the pointers are to different objects.
+	Removed the use of type intintargfunc which is depreciated in
+	Python2.5. 
+
+
+2006-10-09  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/heapy/test/test_Classifiers.py: Increased the number of
+	loops in a time test from 10 to 100 to get better precision on
+	faster machines. Removed a few tests that failed in newer Python
+	depending on different object representation. Changed the use of 
+	er.classifier.partition(li.nodes) to li.by(er).partition to make
+	a testcloser to what would be used by the user. Added a debug
+	parameter to test_main.
+	
+	* guppy/heapy/test/test_ER.py: Removed / commented out the many
+	printouts, added missing tests when feasible, changed assert
+	statements to self.assert_ calls, changed initial comments in test
+	methods to doc strings to make test printout more informative.
+	
+
+	* guppy/heapy/test/test_heapyc.py: Removed some timing
+	printouts. I think I could add some tests there instead but it is
+	tricky to be portable and stable.
+	
+
+	* guppy/heapy/test/test_Path.py (chkrel): Made it handle the case
+	where several relation edges were found, despite only one was
+	originally expected, because this happened because of sharing
+	introduced (likely by some optimization) in Python 2.5. Added
+	debug parameter to test_main and run_test.
+
+	* guppy/heapy/test/Use.py: Added test() method which will test all
+	of heapy - easier to remember and write than ... whatever I had to
+	write before.
+	
+2006-10-05  Sverker Nilsson  <sverker@localhost>
+
+	* guppy/heapy/Classifiers.py: Uses str2int for conversion to
+	handle differences between Python versions.
+
+	* guppy/etc/etc.py: Added str2int function to have a single place
+	to handle conversion of (hexadecimal) strings to integers - as it
+	became more complicated when handling all Python versions 2.3 -
+	2.5.
+
+	
+2006-10-02  Sverker Nilsson  <sverker@localhost>
+	
+	* guppy/gsl/SpecNodes.py: Added get_arg method. Changed a use of 0
+	to False for clarity. Corrected context handling in
+	errmsg_context. Made get_line open a read from a file when
+	possible. 
+	
+2006-07-21  Sverker Nilsson  <sverker@localhost>
+
+	* Changed the comment in docexample so as to show that comments do
+	not need to have .c at the beginning of each line.
+	( Noting that the generated document seems a bit 'naked' can use
+	some more heading and some back-link to top, next etc.
+
+2006-06-22  Sverker Nilsson  <sverker@localhost>
+
+	* In gsl/Html.py, generalized the handling of header tags
+	to allow for spec of links. Added charset specification
+	to comply with W3C tests.
+
+	Version 0.1.3
+	
+2006-03-02  Sverker Nilsson  <sverker@localhost>
+
+	* In View, changed usage ArgSet -> Kind
+
+2006-02-17  Sverker Nilsson  <sverker@localhost>
+
+	* In Remote.py, changed the on() function to not do anything if it
+	was called from within the annex thread itself. Changed RM.py to
+	NOT do this check. (Structural/implementation cleanup details.)
+
+	* In UniSet, changed name ArgSet -> Kind
+	  (Implementation / documentation detail)
+
+2006-02-14  Sverker Nilsson  <sverker@localhost>
+
+	* Fixed bug with array sizing for Python 2.4 (in stdtypes.h)
+	  Added test for this case (to test_View.py)
+	
+2006-02-07  Sverker Nilsson  <sverker@localhost>
+
+	*  Added type_traverse to stdtypes
+	   because the GC one didnt work with 2.4.2 in debug mode 
+	   (It checked for heap type with assert.)
+	* Changed usages of '0x%x'%addr to hex(addr) to make valid
+	  hex literals in Python2.4.
+
+2006-02-06  Sverker Nilsson  <sverker@localhost>
+
+	* Added Monitor command to interrupt the remote process.
+	  (The ki command.) It can still not interrupt it at all times.
+
+	* Made end of file exit the monitor. (Otherwise may be infinite
+	  loop for file input)
+
+	* Made Monitor use threading rather than thread because the
+	  program exited more cleanly in newer Pythons for some reason.
+	
+	
+2006-02-05  Sverker Nilsson  <sverker@localhost>
+
+	* Reverted the change to heapg but added a depreciated warning
+	* Added the heapu method - a slightly better name
+	  It finds the referred objects i.e. strings as well
+	* Made the representation of a Stat indicate itself as such
+	  to differentiate from repr of sets.
+	* Made the sort order of stat diff be what it claimed (largest
+	first)
+	* Fixed Monitor so it passes empty commands along
+	  so multi-line commands can be used in remote interpreter.
+	* Changed the command string for quitting an interactive console
+	  since 'q' is valid syntax
+	  changed to: '-'
+	
+2006-02-03  Sverker Nilsson  <sverker@localhost>
+	
+	* Added priming of list and tuple iterators
+	  so their slot wrappers dont suddenly show up unreachable.
+	* Made heapg return just  .byclass.stat
+	  to safeguard against common subtle problems.
+	* Added one-time initialization in View.heap
+	* Added ref option to reference pattern creator
+	* Dropped the usage of 'observation containers' in heapg
+	  since it is too brittle.
+	* Uncommented call to deletecommand in fixed Menu in Prof.py
+	* Added dump method to IdentitySet
+	* Added Use.setrel
+	
+2006-02-01  Sverker Nilsson  <sverker@localhost>
+
+	* Made help text of get_rp use shorter lines and added some
+	  missing help text. Wrapped some other program lines.
+	* Stopkind in rp should be independent on classifier
+	  try eg using er=h.Type. Change to RefPat.
+	
+2006-01-23  Sverker Nilsson  <sverker@localhost>
+
+	* Added some comments to C code (heapdef.h)
+	* Have added some method to SpecNode (copy)
+	
+
+	0.1.2
+	
+2006-01-17  Sverker Nilsson  <sverker.is@home.se>
+
+	Primary Bugs
+
+	* Fixed a pointer comparison bug in nodegraph.c ,
+	  which made a test fail in my new system
+	  (with Linux 2.6.12-9-386) and could effect the outcome
+	  of algorithms such as the shortest path.
+
+	* Fixed the address comparison in View.obj_at so it
+	  handles unsigned addresses.
+
+	Test Portability Issues
+
+	* Made test_via in test_Classifiers work in Python 2.4
+	  getting around the optimization of tuple constants.
+	* Relaxed guppy.heapy.test.test_Classifiers.RenderCase
+	  since it was picky and list size changed in Python 2.4 .
+	* Relaxed test_Path.test_nodeset_relation
+	  since it wasn't portable across different kernel versions.
+	* Fixed a test bug in sets/test.py where the range
+	  step became zero with faster=0.
+
+	
+guppy-0.1.1
+	
+2005-12-01  Sverker Nilsson  <sverker.is@home.se>
+	*  Changed C code to be ANSI compatible
+	*  Changed some outdated help text
+	
+guppy-0.1
+	
+2005-11-25  Sverker Nilsson  <sverker.is@home.se>
+	*  Initial version
+
+

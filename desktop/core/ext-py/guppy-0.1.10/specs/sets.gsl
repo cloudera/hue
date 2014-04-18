@@ -1,0 +1,277 @@
+.import:: CommonSet, NodeSet, NodeSet+, ImmNodeSet, MutNodeSet, iterable+, Any+, boolean,
+	 iterator, int
+..from: kindnames
+
+.kind:: module_sets
+..method:: mutnodeset
+...optionals
+....arg: elements:iterable+
+...returns: MutNodeSet
+....d: a new mutable nodeset with specified elements.
+
+..method:: immnodeset
+...optionals
+....arg: elements:iterable+
+...returns: ImmNodeSet
+....d: a new immutable nodeset with specified elements.
+
+.and: CommonSet
+
+..condition:: contains
+...arg: x
+...arg: y
+...d: True if the set x contains the element y.
+...python code: y in x
+
+..condition:: empty
+...self: x
+...d: True if the set x is empty.
+...python code: not x
+
+..condition:: equalset
+...arg: x
+...arg: y
+...d: True if x contains the same elements as y.
+...python code: immnodeset(x) == immnodeset(y)
+....in context: from guppy.sets import immnodeset
+
+..condition:: istrue
+...arg: x
+...d: True if the argument is true in the Python sense.
+...python code: bool(x)
+
+..condition:: subset
+...arg: x
+...arg: y
+...d: True if x represents a non-strict subset of y:
+...d: all elements in x are also in y.
+...python code: immnodeset(x) <= immnodeset(y)
+....in context: from guppy.sets import immnodeset
+
+.and: NodeSet
+..d
+A nodeset is a set of objects with equality based on heap address.
+
+..self: x
+
+..op: &
+...d:
+Intersection: the set of objects that are in both x and y.
+...arg: y: iterable+
+...returns: ImmNodeSet
+...postcondition: CommonSet.subset(<returned value>, x)
+...postcondition: CommonSet.subset(<returned value>, y)
+
+..op: |
+...d:
+Union: the set of objects that are in either x or y.
+...arg: y: iterable+
+...returns: ImmNodeSet
+...postcondition: CommonSet.subset(x, <returned value>)
+...postcondition: CommonSet.subset(y, <returned value>)
+
+..op: ^
+...d:
+Symmetric set difference: the set of objects that are in exactly one of x and y.
+...arg: y: iterable+
+...returns: ImmNodeSet
+
+..op: -
+...d:
+Set difference: the set of objects that are in x but not in y.
+...arg: y: iterable+
+...returns: ImmNodeSet
+
+..iop: &=
+...d:
+In-place intersection.
+...arg: y: iterable+
+...returns: NodeSet
+...postcondition: CommonSet.subset(<returned value>, x)
+...postcondition: CommonSet.subset(<returned value>, y)
+
+..iop: |=
+...d:
+In-place union.
+...arg: y: iterable+
+...returns: NodeSet
+...postcondition: CommonSet.subset(x, <returned value>)
+...postcondition: CommonSet.subset(y, <returned value>)
+
+..iop: ^=
+...d:
+In-place symmetric set difference.
+...arg: y: iterable+
+...returns: NodeSet
+
+..iop: -=
+...d:
+In-place set difference.
+...arg: y: iterable+
+...returns: NodeSet
+
+..rop: in
+...d:
+Inclusion test.
+...arg: y: Any+
+...returns: boolean
+
+
+..op: ==
+...d:
+Equal:
+    x and y contain the same elements.
+
+...arg: y: NodeSet+
+...returns: boolean
+
+..op: !=
+...d:
+Not equal:
+             x and y do not contain the same elements.
+
+...arg: y: NodeSet+
+...returns: boolean
+
+..op: <=
+...d:
+Subset, non-strict:
+             all elements in x are also in y.
+...arg: y: NodeSet+
+...returns: boolean
+
+..op: <
+...d:
+Subset, strict:
+             all elements in x are also in y,
+             and y contains some element not in x.
+
+...arg: y: NodeSet+
+...returns: boolean
+
+..op: >=
+...d:
+Superset, non-strict:
+             all elements in y are also in x.
+
+...arg: y: NodeSet+
+...returns: boolean
+
+..op: >
+...d:
+Superset, strict:
+             all elements in y are also in x,
+             and x contains some element not in y.
+
+...arg: y: NodeSet+
+...returns: boolean
+
+..fop: iter
+...d: Iteration
+...returns: iterator
+....d:an iterator yielding the elements of x.
+....d:(The order is implementation dependent.)
+...postcondition: CommonSet.equalset(<returned value>, x)
+
+..fop: len
+...d: Length
+...returns: int
+....d:the number of elements in x.
+
+.and: MutNodeSet
+..d: A mutable nodeset is a nodeset object that can be updated in place. 
+..subkind of: NodeSet
+...d: All operations from the NodeSet kind are inherited.
+...d: The in-place operators (&=, |= etc) update the target set in place
+and return the same object.
+...d: It is unspecified what happens when trying to update a mutable nodeset
+for which an iterator object (from the iter() function) is active.
+
+..self: S
+
+..constructor: module_sets.mutnodeset
+
+..attr:: add
+...mapping
+....d: Add e to S; no effect if e was already in S.
+....arg: e:Any+
+....postcondition: CommonSet.contains(S, e)
+....postcondition: not CommonSet.empty(S)
+
+..attr:: append
+...mapping
+....d: Add e to S, or raise ValueError if e was already in S.
+....arg: e:Any+
+....precondition: not CommonSet.contains(S, e)
+....postcondition: CommonSet.contains(S, e)
+....postcondition: not CommonSet.empty(S)
+
+..attr:: clear
+...mapping
+....d: Remove all elements from S, and compact its storage.
+....postcondition: CommonSet.empty(S)
+
+..attr:: discard
+...mapping
+....d: Remove e from S; no effect if e was not in S.
+....arg: e:Any+
+....postcondition: not CommonSet.contains(S, e)
+
+..attr:: pop
+...mapping
+....d: Remove and return some object from S, or raise ValueError if S was empty.
+....precondition: not CommonSet.empty(S)
+....postcondition: not CommonSet.contains(S, <returned value>)
+
+..attr:: remove
+...mapping
+....d: Remove e from S, or raise ValueError if e was not in S.
+....arg: e:Any+
+....precondition: CommonSet.contains(S, e)
+....postcondition: not CommonSet.contains(S, e)
+
+..attr:: tas
+...mapping
+....d: Test and Set.
+....d: If e is in S return True,
+....d: else add e to S and return False.
+....arg: e:Any+
+....returns: boolean
+....postcondition: CommonSet.contains(S, e)
+....postcondition: not CommonSet.empty(S)
+....equation:
+.....precondition: CommonSet.contains(S, e)
+.....postcondition: CommonSet.istrue(<returned value>)
+
+..attr:: tac
+...mapping
+....d: Test and Clear.
+....d: If e is in S, remove e from S and return True,
+....d: else return False.
+....arg: e:Any+
+....returns: boolean
+....postcondition: not CommonSet.contains(S, e)
+....equation:
+.....precondition: CommonSet.contains(S, e)
+.....postcondition: CommonSet.istrue(<returned value>)
+
+
+.and: ImmNodeSet
+..d: An immutable nodeset is a nodeset object that is guaranteed to always
+contain the same elements after it has been created.
+
+..subkind of: NodeSet
+...d: An immutable nodeset inherits the operations defined for NodeSet.
+...d: The in-place operations (&=, |= etc) will not really update the
+target set in place, but will return an updated copy. It is yet formally
+unspecified whether this returned copy is mutable or immutable.
+
+..self: x
+
+..constructor: module_sets.immnodeset
+
+..fop: hash
+...d: Hashing
+...returns: int
+....d: a hash value based on the addresses of the elements.
+

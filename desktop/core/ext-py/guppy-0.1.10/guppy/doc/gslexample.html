@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html lang=en>
+ <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <title></title></head>
+ <body>
+  <div>
+  <h1> GSL Document and Test Example</h1>
+  <ul>
+   <li><a href='#source'> Source Code</a></li>
+   <li><a href='#test'> Generated Test Class</a></li>
+   <li><a href='docexample.html'> Generated Document</a></li></ul><a name='source'>
+   <h2> Source Code</h2></a>
+  <pre>
+
+.kind:: example_kind
+..d: A kind specifying some example attributes and methods.
+
+.c: This is a comment on the outer level. The comment extends to the
+next line beginning with a dot.
+
+We have left the scope of example_kind for now.
+
+The superkinds below are used for argument specification and provide
+values to the generated tests.
+
+They are not (necessarily) included in the generated document.
+
+.superkind:: int+
+..eg: 1
+
+.superkind:: string+
+..eg: 'abc'
+
+.superkind:: list+
+..eg: []
+
+.kind:: list_of_integers
+
+..d: A kind with no formal properties. In this example, I am not
+specifying anything about this kind. It is to be understood from its
+name and context what it means. More specifications can be added later
+as a system description evolves.
+
+.and: example_kind
+..c: Here continues the specification of example_kind.
+..c: It can be split in several parts, the first one must
+..c: be a .kind, and the others .and.
+..c: This can be useful to specify recursive kinds.
+
+..attr:: a_nokind
+...d: An attribute named a_nokind, with unspecified kind.
+
+..method:: m_noargs
+...d: A method that takes no arguments, and returns an unspecified kind.
+
+..method:: m_returns
+...d: A method which returns objects of kind
+....ref: .myfile.example_kind
+....t: again.
+...returns: example_kind
+
+..method:: m_one
+...d: A method with one argument.
+...arg: a: int+
+....d: A positional argument of kind
+.....ref: .myfile.int+
+.....t:. The
+.....ref: .mykind.int+
+.....t: kind is a so called
+.....em: superkind
+.....t:  because an API with this specification,
+is expected to accept values according to the specification of
+
+.....ref: .mykind.int+
+.....t:, but it is allowed to accept other kinds of arguments as well. A
+.....em: compatible
+
+.....t: new specification could add these alternative kinds of
+arguments as allowed arguments, but it would still have to accept the
+
+.....ref: .mykind.int+
+.....t: kind of argument.
+...dwh: Note
+The + in the int+ name is a convention to indicate that it is a
+....em: superkind
+....t:.
+...dwh: Note
+The name of the argument, a, does
+....em: not
+
+....t: mean that it can be specified as a keyword argument with that
+name.  It is only when keyword arguments are specifically specified
+that they are actually keyword arguments.
+
+..method:: m_opt
+
+...d: A method with optional arguments.  Square brackets without a
+preceding modifier means that the contents is optional.  So in this
+case, either no argument must be given, or if one argument is given it
+is a, or if two arguments are given, it is a and b in that order.
+
+...optionals
+....arg: a: int+
+....arg: b: string+
+
+..method:: m_alt
+...d: A method with alternative arguments.
+An
+....sup:
+.....strong: alt:
+
+....t: before the bracket is a modifier that means that there is a
+choice of alternatives. The argument is required and should be either
+an int+, string+ or list+.
+
+...alt
+....arg: a: int+
+.....d: Description for an int argument.
+....arg: a: string+
+.....d: Description for a string argument.
+....arg: a: list+
+.....d: Description for a list argument.
+
+..method:: m_repeat
+...d: A method with repeated arguments.
+A modifier
+....sup:
+.....strong: m..n:
+
+....t: before the argument, where m and n are integers, means an
+argument that may be repeated at least m times and at most n
+times. Instead of n, * may be specified and means any number of times.
+
+...repeat: 0..*
+....arg: a: int+
+
+.....d: This argument may be repeated any number of times as long as
+it is of of kind int+.
+
+...repeat: 2..4
+....arg: b: string+
+.....d: The final arguments must be of kind string+ and be repeated 2,
+3 or 4 times.
+
+..method:: m_draw_keywords
+...d: A method with optional keyword arguments.
+...d: The modifier
+....sup
+.....strong: draw:
+
+....t: means to 'draw' any combination of arguments from within the
+brackets.  Keyword arguments by them self would not be optional, but
+would be mandatory, in the current specification system.
+
+...draw
+....key arg: a : int+
+....key arg: b : int+
+....key arg: c : string+
+
+..method:: range
+...d: A method combining different argument specifications.
+
+...d: The modifier
+....sup
+.....strong: seq
+
+....t: means arguments that are specified by the
+....em: sequence
+....t: of arguments within the following brackets.
+
+....p: Create a range of numbers.
+...alt
+....arg: stop: int+
+....seq
+.....arg: start: int+
+......d: The first value of the range.
+......default: 0
+Starts with first value.
+.....arg: stop: int+
+......d: The value just beyond the last value of the range.
+.....optionals
+......arg: step: int+
+.......d: Positive or negative, steps values up or down.
+.......default: 1
+...returns: list_of_integers
+....d: a list containing an arithmetic progression of integers.
+
+.document: docexample
+..output: html, tester
+..man page of: list_of_integers
+..man page of: example_kind
+..test of: example_kind
+
+
+</pre><a name='test'>
+   <h2> Generated Test Class</h2></a>
+  <pre>
+# Tests generated by: guppy.gsl.Tester
+# Main source file: /home/sverker/guppy/specs/docexample.gsl
+# Date: Sat Jul  4 13:25:11 2009
+class Tester:
+    tests = {}
+    def test_example_kind(self, arg):
+        t0 = arg.m_returns()
+        t1 = t0.range(1)
+        t2 = t0.range(1, 1)
+        t3 = t0.range(1, 1, 1)
+        t4 = t0.a_nokind
+        t5 = t0.m_alt([])
+        t6 = t0.m_repeat('abc', 'abc')
+        t7 = t0.m_repeat(1, 'abc', 'abc')
+        t8 = t0.m_repeat('abc', 'abc', 'abc')
+        t9 = t0.m_repeat(1, 'abc', 'abc', 'abc')
+        t10 = t0.m_repeat('abc', 'abc', 'abc', 'abc')
+        t11 = t0.m_repeat(1, 'abc', 'abc', 'abc', 'abc')
+        t12 = t0.m_draw_keywords()
+        t13 = t0.m_draw_keywords(a=1)
+        t14 = t0.m_draw_keywords(b=1)
+        t15 = t0.m_noargs()
+        t16 = t0.m_draw_keywords(a=1, b=1)
+        t17 = t0.m_draw_keywords(c='abc')
+        t18 = t0.m_draw_keywords(a=1, c='abc')
+        t19 = t0.m_draw_keywords(b=1, c='abc')
+        t20 = t0.m_draw_keywords(a=1, b=1, c='abc')
+        t21 = t0.m_one(1)
+        t22 = t0.m_opt()
+        t23 = t0.m_opt(1)
+        t24 = t0.m_opt(1, 'abc')
+        t25 = t0.m_alt(1)
+        t26 = t0.m_alt('abc')
+        t27 = arg.range(1)
+        t28 = arg.range(1, 1)
+        t29 = arg.range(1, 1, 1)
+        t30 = arg.a_nokind
+        t31 = arg.m_alt([])
+        t32 = arg.m_repeat('abc', 'abc')
+        t33 = arg.m_repeat(1, 'abc', 'abc')
+        t34 = arg.m_repeat('abc', 'abc', 'abc')
+        t35 = arg.m_repeat(1, 'abc', 'abc', 'abc')
+        t36 = arg.m_repeat('abc', 'abc', 'abc', 'abc')
+        t37 = arg.m_repeat(1, 'abc', 'abc', 'abc', 'abc')
+        t38 = arg.m_draw_keywords()
+        t39 = arg.m_draw_keywords(a=1)
+        t40 = arg.m_draw_keywords(b=1)
+        t41 = arg.m_noargs()
+        t42 = arg.m_draw_keywords(a=1, b=1)
+        t43 = arg.m_draw_keywords(c='abc')
+        t44 = arg.m_draw_keywords(a=1, c='abc')
+        t45 = arg.m_draw_keywords(b=1, c='abc')
+        t46 = arg.m_draw_keywords(a=1, b=1, c='abc')
+        t47 = arg.m_one(1)
+        t48 = arg.m_opt()
+        t49 = arg.m_opt(1)
+        t50 = arg.m_opt(1, 'abc')
+        t51 = arg.m_alt(1)
+        t52 = arg.m_alt('abc')
+    tests['.tgt.docexample.example_kind'] = test_example_kind
+</pre>
+  <hr>Generated by <a href="http://guppy-pe.sourceforge.net/gsl.html">GSL-HTML 0.1.5</a> on Sat Jul  4 13:25:11 2009</div></body></html>
