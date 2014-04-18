@@ -480,10 +480,10 @@ def augment_solr_response2(response, collection, solr_query):
       category = facet['type']
       if category == 'pie-widget': # could be facet_range
         category = 'field'
-        
+      
       if category == 'field' and response['facet_counts']['facet_fields']:
-        for name in response['facet_counts']['facet_fields']:
-          selected_field = fq.get(name, '') # todo with multi
+        for name in response['facet_counts']['facet_fields']: # todo get from the list
+          selected_field = fq.get(name, '') # todo with multi filter
           collection_facet = get_facet_field(category, name, collection['facets'])
           facet = {
             'id': collection_facet['id'],
@@ -495,7 +495,16 @@ def augment_solr_response2(response, collection, solr_query):
           }
           normalized_facets.append(facet)
       elif category == 'range' and response['facet_counts']['facet_ranges']:
-        pass
+          name = facet['field']
+          collection_facet = get_facet_field(category, name, collection['facets'])          
+          facet = {
+            'id': collection_facet['id'],
+            'field': name,
+            'type': category,
+            'label': collection_facet['label'],
+            'counts': response['facet_counts']['facet_ranges'][name]['counts'],
+          }
+          normalized_facets.append(facet)
       elif category == 'query' and response['facet_counts']['facet_queries']:
         for name, value in response['facet_counts']['facet_queries'].iteritems():
           collection_facet = get_facet_field(category, name, collection['facets'])

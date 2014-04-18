@@ -109,6 +109,17 @@ class SolrApi(object):
       for facet in collection['facets']:
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
+        if facet['type'] == 'range':
+          if not facet['properties']:
+            facet['properties']['start'] = '2014-02-25T15:00:00Z'
+            facet['properties']['end'] = '2014-02-26T12:00:00Z'
+            facet['properties']['gap'] = '+1HOURS'
+          params += tuple([
+             ('facet.range', facet['field']),
+             ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
+             ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
+             ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),]
+          )          
         elif facet['type'] == 'field':
           params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
 
@@ -120,7 +131,7 @@ class SolrApi(object):
       # If we do this, need to parse the template and fill up the fields list
       #params += (('fl', urllib.unquote(utf_quoter(','.join(collection['fields'])))),)
     params += (('fl', '*'),)
-    # To parameterize
+
     params += (
       ('hl', 'true'),
       ('hl.fl', '*'),

@@ -232,12 +232,13 @@ var Collection = function (vm, collection) {
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
-	var facetType = facet_json.widgetType == 'hit-widget' ? 'query' : 'field';
+	var facetType = facet_json.widgetType == 'hit-widget' ? 'query' : (facet_json.widgetType == 'histogram-widget' ? 'range' : 'field');
     var facet = ko.mapping.fromJS({
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
-        "type": facetType
+        "type": facetType,
+        "properties": {}
     });
     facet.field.subscribe(function () {
       vm.search();
@@ -341,7 +342,7 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableHit = ko.observable(new Widget(12, UUID(), "Hit Count", "hit-widget"));
   self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, UUID(), "Results", "resultset-widget"));
-  self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
+  self.draggableHistogram = ko.observable(new Widget(12, UUID(), "Histogram", "histogram-widget"));
   self.draggableArea = ko.observable(new Widget(12, UUID(), "Area Chart", "area-widget"));
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
