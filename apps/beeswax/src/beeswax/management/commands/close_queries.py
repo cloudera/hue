@@ -49,6 +49,16 @@ class Command(BaseCommand):
 
     queries = queries.filter(submission_date__lte=datetime.today() - timedelta(days=days))
 
+    import os
+    import beeswax
+    from beeswax import conf
+    from beeswax import hive_site
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
+
+    hive_site.reset()
+    hive_site.get_conf()
+
+
     for query in queries:
       try:
         query_history = HiveServerQueryHistory.objects.get(id=query.id)
