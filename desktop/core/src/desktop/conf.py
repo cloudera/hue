@@ -788,8 +788,8 @@ def config_validator(user):
 
   if LDAP.LDAP_SERVERS.get():
     for ldap_record_key in LDAP.LDAP_SERVERS.get():
-      res.update(validate_ldap(user, LDAP.LDAP_SERVERS.get()[ldap_record_key]))
+      res.extend(validate_ldap(user, LDAP.LDAP_SERVERS.get()[ldap_record_key]))
   else:
-    res.update(validate_ldap(user, LDAP))
+    res.extend(validate_ldap(user, LDAP))
 
   return res
