@@ -447,7 +447,14 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <br/>      
       ${ _('Field') }: <input type="text" data-bind="value: field" />
+      <br/>
+      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div>  
+
+    <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
     <span data-bind="text: counts" />
   </div>

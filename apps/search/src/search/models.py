@@ -515,7 +515,8 @@ def augment_solr_response2(response, collection, solr_query):
             'label': name,
             'count': value,
           }        
-          normalized_facets.append(facet)          
+          normalized_facets.append(facet)
+      # pivot_facet          
 
   # TODO HTML escape docs!
   
@@ -552,7 +553,7 @@ def augment_solr_exception(response, collection, solr_query):
         "type": facet['type'],
         "label": facet['label']
       }
-      for categories in collection['facets'].values() for facet in categories
+      for facet in collection['facets']
     ],
     "responseHeader": {
       "status": -1,

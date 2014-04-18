@@ -232,18 +232,21 @@ var Collection = function (vm, collection) {
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
-	var facetType = facet_json.widgetType == 'hit-widget' ? 'query' : (facet_json.widgetType == 'histogram-widget' ? 'range' : 'field');
-    var facet = ko.mapping.fromJS({
+    $.post("/search/template/" + self.id + "/new_facet", {
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
-        "type": facetType,
-        "properties": {}
-    });
-    facet.field.subscribe(function () {
-      vm.search();
-    });
-    self.facets.push(facet);
+        "widget_type": facet_json.widgetType
+      }, function (data) {
+      if (data.status == 0) {
+	    var facet = ko.mapping.fromJS(data.facet);
+	    facet.field.subscribe(function () {
+	      vm.search();
+	    });
+	    self.facets.push(facet);
+	    vm.search();
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.removeFacet = function (widget_id) {

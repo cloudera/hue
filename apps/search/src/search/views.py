@@ -468,6 +468,58 @@ def index_fields_dynamic(request, collection_id):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+# TODO security
+def new_facet(request, collection_id):  
+  result = {'status': -1, 'message': 'Error'}
+
+  solr_query = {}
+  
+  try:
+    hue_collection = Collection.objects.get(id=collection_id)
+    solr_query['collection'] = hue_collection.name
+    
+    facet_id = request.POST['id']
+    facet_label = request.POST['label']
+    facet_field = request.POST['field']
+    widget_type = request.POST['widget_type']
+    
+    if widget_type == 'hit-widget':
+      facet_type = 'query'
+    elif widget_type == 'histogram-widget':
+      facet_type = 'range'
+    else:
+      facet_type = 'field'      
+
+    SLOTS = 50            
+            # todo: dates
+            #datetime.strptime('2013-06-05T00:00Z', '%Y-%m-%dT%H:%MZ'), coordinator.end)            
+#            facet['properties']['start'] = '2014-02-25T15:00:00Z'
+#            facet['properties']['end'] = '2014-02-26T12:00:00Z'
+#            facet['properties']['gap'] = '+1HOURS'    
+    
+    stats_json = SolrApi(SOLR_URL.get(), request.user).stats(hue_collection.name, [facet_field])
+    
+    stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
+    stats_max = int(float(stats_json['stats']['stats_fields'][facet_field]['max']))
+    
+    result['message'] = ''
+    result['facet'] = {
+      'id': facet_id,
+      'label': facet_label,
+      'field': facet_field,
+      'type': facet_type,
+      'properties': {
+          'start': stats_min,
+          'end': stats_max,
+          'gap': (stats_max - stats_min) / SLOTS,
+      }
+    }
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
 
 def install_examples(request):
   result = {'status': -1, 'message': ''}

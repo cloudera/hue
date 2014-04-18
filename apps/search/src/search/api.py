@@ -110,10 +110,6 @@ class SolrApi(object):
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
         if facet['type'] == 'range':
-          if not facet['properties']:
-            facet['properties']['start'] = '2014-02-25T15:00:00Z'
-            facet['properties']['end'] = '2014-02-26T12:00:00Z'
-            facet['properties']['gap'] = '+1HOURS'
           params += tuple([
              ('facet.range', facet['field']),
              ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
@@ -251,6 +247,20 @@ class SolrApi(object):
       )
       response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
       return self._get_json(response)    
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+    
+  def stats(self, core, fields):
+    try:
+      params = (
+          ('q', EMPTY_QUERY.get()),
+          ('wt', 'json'),
+          ('rows', 0),
+          ('stats', 'true'),
+      )      
+      params += tuple([('stats.field', field) for field in fields])
+      response = self._root.get('%(core)s/select' % {'core': core}, params=params)
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
     

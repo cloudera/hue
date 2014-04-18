@@ -23,7 +23,7 @@ urlpatterns = patterns('search.views',
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),
   url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
-
+  
   url(r'^dashboard$', 'dashboard', name='dashboard'),
 
   # All admin is deprecated
@@ -40,12 +40,13 @@ urlpatterns = patterns('search.views',
   # Ajax
   url(r'^suggest/(?P<collection_id>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
   url(r'^index/(?P<collection_id>\w+)/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
+  url(r'^template/(?P<collection_id>\w+)/new_facet$', 'new_facet', name='new_facet'),
+  
+  # old
   url(r'^admin/collection/(?P<collection_id>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),
   url(r'^admin/collection/(?P<collection_id>\w+)/solr_properties$', 'admin_collection_solr_properties', name='admin_collection_solr_properties'),
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
   url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
-  
-  
-  
+
   url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
