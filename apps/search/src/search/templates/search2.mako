@@ -522,6 +522,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
+
+
 <script type="text/javascript" charset="utf-8">
 var viewModel;
 
