@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 import pkg_resources
+from guppy import hpy
 
 import desktop.conf
 import desktop.log
@@ -357,3 +358,7 @@ SKIP_SOUTH_TESTS = True
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
+
+# Memory
+MEMORY_PROFILER = hpy()
+MEMORY_PROFILER.setrelheap()
