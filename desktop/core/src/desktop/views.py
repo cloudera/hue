@@ -258,6 +258,9 @@ def memory(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
+  if not hasattr(settings, 'MEMORY_PROFILER'):
+    return HttpResponse(_("You must enable the memory profiler via the memory_profiler config in the hue.ini."))
+
   heap = settings.MEMORY_PROFILER.heap()
   heap = heap[int(request.GET.get('from', 0)):int(request.GET.get('to', len(heap)))]
   if 'index' in request.GET:

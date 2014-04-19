@@ -598,6 +598,12 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
+MEMORY_PROFILER = Config(
+  key='memory_profiler',
+  help=_('Enable or disable memory profiling.'),
+  type=coerce_bool,
+  default=False)
+
 AUDIT_EVENT_LOG_DIR = Config(
   key="audit_event_log_dir",
   help=_("The directory where to store the auditing logs. Auditing is disable if the value is empty."),
