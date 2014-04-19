@@ -360,5 +360,6 @@ SKIP_SOUTH_TESTS = True
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
 
 # Memory
-MEMORY_PROFILER = hpy()
-MEMORY_PROFILER.setrelheap()
+if desktop.conf.MEMORY_PROFILER.get():
+  MEMORY_PROFILER = hpy()
+  MEMORY_PROFILER.setrelheap()
