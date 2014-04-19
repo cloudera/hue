@@ -24,7 +24,6 @@ import parquet
 import posixpath
 import re
 import shutil
-import snappy
 import stat as stat_module
 import os
 
@@ -634,9 +633,9 @@ def read_contents(codec_type, path, fs, offset, length):
                 codec_type = 'avro'
             elif path.endswith('.parquet') and detect_parquet(fhandle):
                 codec_type = 'parquet'
-            elif path.endswith('.snappy'):
+            elif snappy_installed() and path.endswith('.snappy'):
                 codec_type = 'snappy'
-            elif stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(fhandle.read()):
+            elif snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(fhandle.read()):
                 codec_type = 'snappy'
 
         fhandle.seek(0)
@@ -661,12 +660,16 @@ def read_contents(codec_type, path, fs, offset, length):
 
 def _decompress_snappy(compressed_content):
     try:
+        import snappy
         return snappy.decompress(compressed_content)
     except Exception, e:
         raise PopupException(_('Failed to decompress snappy compressed file.'), detail=e)
 
 
 def _read_snappy(fhandle, path, offset, length, stats):
+    if not snappy_installed():
+        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed.'))
+
     if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
         raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
 
@@ -748,6 +751,7 @@ def detect_snappy(contents):
     This will also return false if snappy decompression if we do not have the library available.
     '''
     try:
+        import snappy
         return snappy.isValidCompressed(contents)
     except:
         return False
@@ -758,6 +762,15 @@ def detect_parquet(fhandle):
     Detect parquet from magic header bytes.
     """
     return parquet._check_header_magic_bytes(fhandle)
+
+
+def snappy_installed():
+    '''Snappy is library that isn't supported by python2.4'''
+    try:
+        import snappy
+        return True
+    except:
+        return False
 
 
 def _calculate_navigation(offset, length, size):

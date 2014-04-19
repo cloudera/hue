@@ -20,7 +20,6 @@ import json
 import logging
 import os
 import re
-import snappy
 import urlparse
 from avro import schema, datafile, io
 
@@ -36,6 +35,7 @@ from filebrowser.views import location_to_url
 
 from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
+from views import snappy_installed
 
 
 LOG = logging.getLogger(__name__)
@@ -583,6 +583,10 @@ def test_chooser():
 
 @attr('requires_hadoop')
 def test_view_snappy_compressed():
+  if not snappy_installed():
+    raise SkipTest
+  import snappy
+
   cluster = pseudo_hdfs4.shared_cluster()
   finish = []
   try:
@@ -635,6 +639,10 @@ def test_view_snappy_compressed():
 
 @attr('requires_hadoop')
 def test_view_snappy_compressed_avro():
+  if not snappy_installed():
+    raise SkipTest
+  import snappy
+
   cluster = pseudo_hdfs4.shared_cluster()
   finish = []
   try:
