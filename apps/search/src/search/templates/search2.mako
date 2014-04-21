@@ -456,7 +456,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="barChart: {data: counts, field: field}" />
+    <div data-bind="barChart: {data: counts, field: field, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -478,7 +478,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
-    <div data-bind="pieChart: {data: counts}" />
+    <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -547,9 +547,34 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 
+<script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
+
+function pieChartDataTransformer(data) {
+  var _data = [];
+  $(data).each(function (cnt, item) {
+    _data.push({
+      label: item.value,
+      value: item.count,
+      obj: item
+    });
+  });
+  return _data;
+}
+
+function barChartDataTransformer(data) {
+  var _data = [];
+  for (var i = 0; i < data.length; i = i + 2) {
+    _data.push({
+      series: 0,
+      x: data[i],
+      y: data[i + 1]
+    });
+  }
+  return _data;
+}
 
 $(document).ready(function () {
 
@@ -575,109 +600,6 @@ $(document).ready(function () {
     update: function (element, valueAccessor) {
       var value = valueAccessor();
       ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
-    }
-  };
-
-
-  ko.bindingHandlers.pieChart = {
-    init: function (element, valueAccessor) {
-      var _options = valueAccessor();
-      var _data = [];
-      $(_options.data).each(function (cnt, item) {
-        _data.push({
-          label: item.value,
-          value: item.count,
-          obj: item
-        });
-      });
-
-      nv.addGraph(function () {
-        var chart = nv.models.pieChart()
-                .x(function (d) {
-                  return d.label
-                })
-                .y(function (d) {
-                  return d.value
-                })
-                .height($(element).width())
-                .showLabels(true).showLegend(false);
-
-        var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
-
-        _d3.datum(_data)
-                .transition().duration(350)
-                .call(chart);
-        nv.utils.windowResize(chart.update);
-        $(element).height($(element).width());
-        return chart;
-      }, function () {
-        d3.selectAll(".nv-slice").on('click',
-                function (d, i) {
-                  viewModel.query.selectFacet(d.data.obj);
-                });
-      });
-    },
-    update: function (element, valueAccessor) {
-      var value = valueAccessor();
-      // do something with the updated value
-    }
-  };
-
-  ko.bindingHandlers.barChart = {
-    init: function (element, valueAccessor) {
-      var _options = valueAccessor();
-      var _data = [];
-      for (var i = 0; i < _options.data.length; i = i + 2) {
-        _data.push({
-          series: 0,
-          x: _options.data[i],
-          y: _options.data[i + 1]
-        });
-      }
-      $(element).height(300);
-
-      nv.addGraph(function () {
-        var chart = nv.models.multiBarChart()
-                .margin({bottom: 100})
-                .transitionDuration(300);
-
-        chart.multibar
-                .hideable(true);
-
-        chart.xAxis
-                .showMaxMin(true)
-                .tickFormat(d3.format(',0f'));
-
-        chart.yAxis
-                .tickFormat(d3.format(',0f'));
-
-        var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
-        _d3.datum([
-                  {
-                    key: _options.field,
-                    values: _data
-                  }
-                ])
-                .call(chart);
-
-        nv.utils.windowResize(chart.update);
-
-        return chart;
-      }, function () {
-        d3.selectAll(".nv-bar").on('click',
-                function (d, i) {
-                  viewModel.query.selectFacet({
-                    count: d.y,
-                    selected: false,
-                    value: d.x,
-                    cat: _options.field
-                  });
-                });
-      });
-    },
-    update: function (element, valueAccessor) {
-      var value = valueAccessor();
-      // do something with the updated value
     }
   };
 
