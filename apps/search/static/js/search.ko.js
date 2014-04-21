@@ -245,6 +245,8 @@ var Collection = function (vm, collection) {
 	    });
 	    self.facets.push(facet);
 	    vm.search();
+      } else {
+         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };

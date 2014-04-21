@@ -18,6 +18,9 @@
 import json
 import logging
 
+from datetime import datetime
+from time import mktime
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.encoding import smart_str
@@ -38,6 +41,7 @@ from search.search_controller import SearchController
 
 from django.utils.encoding import force_unicode
 from desktop.lib.rest.http_client import RestException
+
 
 
 LOG = logging.getLogger(__name__)
@@ -475,7 +479,7 @@ def new_facet(request, collection_id):
   solr_query = {}
   
   try:
-    hue_collection = Collection.objects.get(id=collection_id)
+    hue_collection = Collection.objects.get(id=collection_id) # security + optional if no id
     solr_query['collection'] = hue_collection.name
     
     facet_id = request.POST['id']
@@ -491,17 +495,31 @@ def new_facet(request, collection_id):
       facet_type = 'field'      
 
     SLOTS = 50            
-            # todo: dates
-            #datetime.strptime('2013-06-05T00:00Z', '%Y-%m-%dT%H:%MZ'), coordinator.end)            
-#            facet['properties']['start'] = '2014-02-25T15:00:00Z'
-#            facet['properties']['end'] = '2014-02-26T12:00:00Z'
-#            facet['properties']['gap'] = '+1HOURS'    
     
     stats_json = SolrApi(SOLR_URL.get(), request.user).stats(hue_collection.name, [facet_field])
     
-    stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
-    stats_max = int(float(stats_json['stats']['stats_fields'][facet_field]['max']))
-    
+    if 'T' in stats_json['stats']['stats_fields'][facet_field]['min']:
+      stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
+      stats_max = int(float(stats_json['stats']['stats_fields'][facet_field]['max']))
+      gap = (stats_max - stats_min) / SLOTS
+    else:
+      stats_min = stats_json['stats']['stats_fields'][facet_field]['min']
+      stats_max = stats_json['stats']['stats_fields'][facet_field]['max']
+      difference = (mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
+
+      if difference < 1:
+        unit = 'SECONDS'
+      elif difference < 60:
+        unit = 'MINUTES'
+      elif difference < 3600:
+        unit = 'HOURS'
+      elif difference < 3600 * 24:
+        unit = 'DAYS'
+      else:
+        unit = 'MONTHS'
+
+      gap = '+1' + unit      
+        
     result['message'] = ''
     result['facet'] = {
       'id': facet_id,
@@ -511,7 +529,7 @@ def new_facet(request, collection_id):
       'properties': {
           'start': stats_min,
           'end': stats_max,
-          'gap': (stats_max - stats_min) / SLOTS,
+          'gap': gap,
       }
     }
     result['status'] = 0

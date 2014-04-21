@@ -280,7 +280,7 @@ class Collection(models.Model):
       props['collection']['name'] = self.name
     if self.label:
       props['collection']['label'] = self.label
-    # fields
+    # fields updated
     # idField
 
     return json.dumps(props)
