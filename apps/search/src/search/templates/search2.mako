@@ -194,7 +194,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableArea" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>    
@@ -462,7 +462,28 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="bar-widget">
-  This is the bar widget
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>      
+      ${ _('Field') }: <input type="text" data-bind="value: field" />
+      <br/>
+      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+    </div>  
+
+    <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
+
+    <div data-bind="barChart: {data: counts, field: field, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
+  </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="pie-widget">

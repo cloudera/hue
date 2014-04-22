@@ -233,6 +233,7 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     $.post("/search/template/" + self.id + "/new_facet", {
+    	"collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
@@ -254,7 +255,7 @@ var Collection = function (vm, collection) {
   self.removeFacet = function (widget_id) {
     $.each(self.facets(), function (index, facet) {	
       if (facet.id() == widget_id()) {
-        self.facets.remove(facet);
+        self.facets.remove(facet); 
         return false;
       }
     });
@@ -348,7 +349,7 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, UUID(), "Results", "resultset-widget"));
   self.draggableHistogram = ko.observable(new Widget(12, UUID(), "Histogram", "histogram-widget"));
-  self.draggableArea = ko.observable(new Widget(12, UUID(), "Area Chart", "area-widget"));
+  self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));

@@ -17,6 +17,7 @@
 
 import json
 import logging
+import numbers
 
 from datetime import datetime
 from time import mktime
@@ -475,50 +476,57 @@ def index_fields_dynamic(request, collection_id):
 # TODO security
 def new_facet(request, collection_id):  
   result = {'status': -1, 'message': 'Error'}
-
-  solr_query = {}
   
   try:
-    hue_collection = Collection.objects.get(id=collection_id) # security + optional if no id
-    solr_query['collection'] = hue_collection.name
+    collection = json.loads(request.POST.get('collection', '{}')) # TODO perms decorator
     
     facet_id = request.POST['id']
     facet_label = request.POST['label']
     facet_field = request.POST['field']
     widget_type = request.POST['widget_type']
+    properties = {}
     
     if widget_type == 'hit-widget':
       facet_type = 'query'
     elif widget_type == 'histogram-widget':
       facet_type = 'range'
+    elif widget_type == 'bar-widget':
+      facet_type = 'range'
     else:
       facet_type = 'field'      
 
-    SLOTS = 50            
-    
-    stats_json = SolrApi(SOLR_URL.get(), request.user).stats(hue_collection.name, [facet_field])
-    
-    if 'T' in stats_json['stats']['stats_fields'][facet_field]['min']:
-      stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
-      stats_max = int(float(stats_json['stats']['stats_fields'][facet_field]['max']))
-      gap = (stats_max - stats_min) / SLOTS
-    else:
-      stats_min = stats_json['stats']['stats_fields'][facet_field]['min']
-      stats_max = stats_json['stats']['stats_fields'][facet_field]['max']
-      difference = (mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
-
-      if difference < 1:
-        unit = 'SECONDS'
-      elif difference < 60:
-        unit = 'MINUTES'
-      elif difference < 3600:
-        unit = 'HOURS'
-      elif difference < 3600 * 24:
-        unit = 'DAYS'
+    if facet_type == 'range':
+      SLOTS = 50            
+      
+      stats_json = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [facet_field])
+      
+      if isinstance(stats_json['stats']['stats_fields'][facet_field]['min'], numbers.Number):
+        stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
+        stats_max = int(stats_json['stats']['stats_fields'][facet_field]['max'])
+        gap = (stats_max - stats_min) / SLOTS
       else:
-        unit = 'MONTHS'
+        stats_min = stats_json['stats']['stats_fields'][facet_field]['min']
+        stats_max = stats_json['stats']['stats_fields'][facet_field]['max']
+        difference = (mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
+  
+        if difference < 1:
+          unit = 'SECONDS'
+        elif difference < 60:
+          unit = 'MINUTES'
+        elif difference < 3600:
+          unit = 'HOURS'
+        elif difference < 3600 * 24:
+          unit = 'DAYS'
+        else:
+          unit = 'MONTHS'
+  
+        gap = '+1' + unit      
 
-      gap = '+1' + unit      
+      properties = {
+        'start': stats_min,
+        'end': stats_max,
+        'gap': gap,
+      }
         
     result['message'] = ''
     result['facet'] = {
@@ -526,11 +534,7 @@ def new_facet(request, collection_id):
       'label': facet_label,
       'field': facet_field,
       'type': facet_type,
-      'properties': {
-          'start': stats_min,
-          'end': stats_max,
-          'gap': gap,
-      }
+      'properties': properties
     }
     result['status'] = 0
   except Exception, e:
