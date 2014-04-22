@@ -21,7 +21,7 @@ ko.bindingHandlers.pieChart = {
       var _data = _options.transformer(_options.data);
 
       nv.addGraph(function () {
-        var chart = nv.models.pieChart()
+        var _chart = nv.models.pieChart()
                 .x(function (d) {
                   return d.label
                 })
@@ -35,10 +35,10 @@ ko.bindingHandlers.pieChart = {
 
         _d3.datum(_data)
                 .transition().duration(350)
-                .call(chart);
-        nv.utils.windowResize(chart.update);
+                .call(_chart);
+        nv.utils.windowResize(_chart.update);
         $(element).height($(element).width());
-        return chart;
+        return _chart;
       }, function () {
         d3.selectAll(".nv-slice").on('click',
                 function (d, i) {
@@ -52,49 +52,72 @@ ko.bindingHandlers.pieChart = {
     }
   };
 
-  ko.bindingHandlers.barChart = {
-    init: function (element, valueAccessor) {
-      var _options = valueAccessor();
-      var _data = _options.transformer(_options.data);
+ko.bindingHandlers.barChart = {
+  init: function (element, valueAccessor) {
+    barChart(element, valueAccessor(), false);
+  },
+  update: function (element, valueAccessor) {
+    var value = valueAccessor();
+    // do something with the updated value
+  }
+};
 
-      $(element).height(300);
+ko.bindingHandlers.timelineChart = {
+  init: function (element, valueAccessor) {
+    barChart(element, valueAccessor(), true);
+  },
+  update: function (element, valueAccessor) {
+    var value = valueAccessor();
+    // do something with the updated value
+  }
+};
 
-      nv.addGraph(function () {
-        var chart = nv.models.multiBarChart()
-                .margin({bottom: 100})
-                .transitionDuration(300);
+function barChart(element, options, isTimeline) {
 
-        chart.multibar
-                .hideable(true);
+  var _data = options.transformer(options.data);
+  $(element).height(300);
 
-        chart.xAxis
-                .showMaxMin(true)
-                .tickFormat(d3.format(',0f'));
+  if (isTimeline) {
+    console.log(_data);
+  }
 
-        chart.yAxis
-                .tickFormat(d3.format(',0f'));
+  nv.addGraph(function () {
+    var _chart = nv.models.multiBarChart()
+        .margin({bottom: 100})
+        .transitionDuration(300);
 
-        var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
-        _d3.datum([
-                  {
-                    key: _options.field,
-                    values: _data
-                  }
-                ])
-                .call(chart);
-
-        nv.utils.windowResize(chart.update);
-
-        return chart;
-      }, function () {
-        d3.selectAll(".nv-bar").on('click',
-                function (d, i) {
-                  _options.onClick(d);
-                });
-      });
-    },
-    update: function (element, valueAccessor) {
-      var value = valueAccessor();
-      // do something with the updated value
+    _chart.multibar
+        .hideable(true);
+    if (isTimeline) {
+      _chart.xAxis
+          .showMaxMin(true)
+          .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
     }
-  };
+    else {
+      _chart.xAxis
+          .showMaxMin(true)
+          .tickFormat(d3.format(',0f'));
+    }
+    _chart.yAxis
+        .tickFormat(d3.format(',0f'));
+
+    var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+    _d3.datum([
+          {
+            key: options.label,
+            values: _data
+          }
+        ])
+        .call(_chart);
+
+    nv.utils.windowResize(_chart.update);
+
+    return _chart;
+  }, function () {
+    d3.selectAll(".nv-bar").on('click',
+        function (d, i) {
+          options.onClick(d);
+        });
+  });
+
+}

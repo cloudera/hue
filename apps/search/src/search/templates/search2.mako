@@ -243,7 +243,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="row-template">
-  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index()==0 && $root.isEditing() && $parent.size() > 4">
+  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index()==0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
     <img src="/search/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
@@ -456,7 +456,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="barChart: {data: counts, field: field, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
+    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -481,7 +481,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="barChart: {data: counts, field: field, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
+    <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -591,6 +591,18 @@ function barChartDataTransformer(data) {
     _data.push({
       series: 0,
       x: data[i],
+      y: data[i + 1]
+    });
+  }
+  return _data;
+}
+
+function timelineChartDataTransformer(data) {
+  var _data = [];
+  for (var i = 0; i < data.length; i = i + 2) {
+    _data.push({
+      series: 0,
+      x: new Date(moment(data[i]).valueOf()),
       y: data[i + 1]
     });
   }
