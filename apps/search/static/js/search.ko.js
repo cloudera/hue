@@ -239,16 +239,19 @@ var Collection = function (vm, collection) {
         "field": facet_json.name,
         "widget_type": facet_json.widgetType
       }, function (data) {
-      if (data.status == 0) {
-	    var facet = ko.mapping.fromJS(data.facet);
-	    facet.field.subscribe(function () {
+        if (data.status == 0) {
+	      var facet = ko.mapping.fromJS(data.facet);
+	      facet.field.subscribe(function () {
+	        vm.search();
+	      });
+	      facet.isRange.subscribe(function () {
+	        vm.search();
+	      });	    
+	      self.facets.push(facet);
 	      vm.search();
-	    });
-	    self.facets.push(facet);
-	    vm.search();
-      } else {
-         $(document).trigger("error", data.message);
-      }
+        } else {
+          $(document).trigger("error", data.message);
+        }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
 

@@ -109,9 +109,9 @@ class SolrApi(object):
       for facet in collection['facets']:
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
-        if facet['type'] == 'range':
+        elif facet['type'] == 'range':
           params += tuple([
-             ('facet.range', facet['field']),
+             ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
              ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
              ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
              ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),]

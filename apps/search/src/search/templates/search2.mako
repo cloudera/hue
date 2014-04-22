@@ -193,7 +193,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div>
+    <!-- <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
     <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
@@ -325,8 +325,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
       ${ _('Field') }: <input type="text" data-bind="value: field" />
+      <br/>
+      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />
+      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-alpha-asc"></i></a>
+      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-numeric-asc"></i></a>
+      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-numeric-desc"></i></a>
     </div>  
 
     <div data-bind="text: label" style="font-weight: bold"></div>
@@ -470,8 +474,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
       ${ _('Field') }: <input type="text" data-bind="value: field" />
+      <br/>
+      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />      
       <br/>
       ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
       ${ _('End') }: <input type="text" data-bind="value: properties.end" />
@@ -495,8 +500,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
       ${ _('Field') }: <input type="text" data-bind="value: field" />
+      <br/>
+      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />      
     </div>  
 
     <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}}" />

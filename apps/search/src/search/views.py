@@ -478,36 +478,33 @@ def new_facet(request, collection_id):
   result = {'status': -1, 'message': 'Error'}
   
   try:
-    collection = json.loads(request.POST.get('collection', '{}')) # TODO perms decorator
+    collection = json.loads(request.POST.get('collection', '{}'))
     
     facet_id = request.POST['id']
     facet_label = request.POST['label']
     facet_field = request.POST['field']
     widget_type = request.POST['widget_type']
     properties = {}
-    
-    if widget_type == 'hit-widget':
-      facet_type = 'query'
-    elif widget_type == 'histogram-widget':
-      facet_type = 'range'
-    elif widget_type == 'bar-widget':
-      facet_type = 'range'
-    else:
-      facet_type = 'field'      
+    is_range = False
 
-    if facet_type == 'range':
-      SLOTS = 50            
-      
+    try:
+      SLOTS = 50
       stats_json = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [facet_field])
+      stat_facet = stats_json['stats']['stats_fields'][facet_field]
       
-      if isinstance(stats_json['stats']['stats_fields'][facet_field]['min'], numbers.Number):
-        stats_min = int(stats_json['stats']['stats_fields'][facet_field]['min']) # if field is int, cast as int
-        stats_max = int(stats_json['stats']['stats_fields'][facet_field]['max'])
+      if isinstance(stat_facet['min'], numbers.Number):
+        stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
+        stats_max = int(stat_facet['max'])
         gap = (stats_max - stats_min) / SLOTS
-      else:
-        stats_min = stats_json['stats']['stats_fields'][facet_field]['min']
-        stats_max = stats_json['stats']['stats_fields'][facet_field]['max']
-        difference = (mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
+        if gap < 1:
+          gap = 1
+        is_range = True
+      elif 'T' in stat_facet['min']:
+        stats_min = stat_facet['min']
+        stats_max = stat_facet['max']
+        difference = (
+            mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - 
+            mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
   
         if difference < 1:
           unit = 'SECONDS'
@@ -519,14 +516,29 @@ def new_facet(request, collection_id):
           unit = 'DAYS'
         else:
           unit = 'MONTHS'
-  
         gap = '+1' + unit      
-
+        is_range = True
+    except Exception, e:
+      # stats not supported on all the fields, like text
+      pass
+                
+    if is_range:
+      facet_type = 'range'
       properties = {
         'start': stats_min,
         'end': stats_max,
         'gap': gap,
-      }
+      }       
+#    elif widget_type == 'hit-widget':
+#      facet_type = 'query'
+#    elif widget_type == 'histogram-widget':
+#      facet_type = 'range'
+#    elif widget_type == 'bar-widget':
+#      facet_type = 'range'
+#    elif widget_type == 'pie-widget':
+#      facet_type = 'range'      
+    else:
+      facet_type = 'field'        
         
     result['message'] = ''
     result['facet'] = {
@@ -534,6 +546,8 @@ def new_facet(request, collection_id):
       'label': facet_label,
       'field': facet_field,
       'type': facet_type,
+      'widgetType': widget_type,
+      'isRange': is_range,
       'properties': properties
     }
     result['status'] = 0

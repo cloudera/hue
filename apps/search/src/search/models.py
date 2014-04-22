@@ -304,7 +304,7 @@ class Collection(models.Model):
       "isGridLayout": True,
       "showFieldList": True,
       "fieldsAttributes": [{'name': field['name'], 'sort': {'direction': None}} for field in fields], # sort priority, asc/desc/none
-      "fieldsSelected": [field['name'] for field in fields],
+      "fieldsSelected": [],
     }
     
     FACETS = []
@@ -404,12 +404,6 @@ def get_facet_field(category, field, facets):
   else:
     return None
 
-def get_facet_field(category, field, facets):
-  facets = filter(lambda facet: facet['type'] == category and facet['field'] == field, facets)
-  if facets:
-    return facets[0]
-  else:
-    return None
 
 def get_facet_field_label(field, facets):
   label = field
@@ -478,8 +472,6 @@ def augment_solr_response2(response, collection, solr_query):
     # [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
     for facet in collection['facets']:
       category = facet['type']
-      if category == 'pie-widget': # could be facet_range
-        category = 'field'
       
       if category == 'field' and response['facet_counts']['facet_fields']:
         for name in response['facet_counts']['facet_fields']: # todo get from the list
@@ -496,13 +488,17 @@ def augment_solr_response2(response, collection, solr_query):
           normalized_facets.append(facet)
       elif category == 'range' and response['facet_counts']['facet_ranges']:
           name = facet['field']
-          collection_facet = get_facet_field(category, name, collection['facets'])          
+          collection_facet = get_facet_field(category, name, collection['facets'])
+          counts = response['facet_counts']['facet_ranges'][name]['counts']
+          if facet['widgetType'] == 'facet-widget':
+            selected_field = fq.get(name, '') # todo with multi filter
+            counts = pairwise2(name, selected_field, counts)
           facet = {
             'id': collection_facet['id'],
             'field': name,
             'type': category,
             'label': collection_facet['label'],
-            'counts': response['facet_counts']['facet_ranges'][name]['counts'],
+            'counts': counts,
           }
           normalized_facets.append(facet)
       elif category == 'query' and response['facet_counts']['facet_queries']:
