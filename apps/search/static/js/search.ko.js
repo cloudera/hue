@@ -123,8 +123,13 @@ function oneThirdLeftLayout() {
   setLayout([3, 9]);
 }
 
-function oneThirdRightLayout() { // instead --> full with 1 row = timeline, 2 = 3 pies, 3 = grid result
+function oneThirdRightLayout() {
   setLayout([9, 3]);
+}
+
+function magicLayout() {
+  setLayout([3, 9]);
+  alert('Hue picked a timeline, filter, result, pie bar, widgets...');
 }
 
 function setLayout(colSizes) {

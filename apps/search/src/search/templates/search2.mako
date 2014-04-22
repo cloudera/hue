@@ -184,8 +184,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div style="float: left">
     <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
     <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdleft.png" /></a>
-    <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a>
+    <!-- <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a> -->    
     <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_full.png" /></a>
+    <a data-bind="visible: columns().length == 0" href="javascript: magicLayout()" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
+      <img src="/search/static/art/layout_magic.png" />
+    </a>
   </div>
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
@@ -219,6 +222,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
       <div class="span12 preview-row">
+      </div>
+    </div>
+    <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
+      <div class="span12 preview-row">
+        Hue logo picks a timeline, filter, result, pie bar, widgets...: big magic icon? could preview but too complicated for now.
       </div>
     </div>
   </div>
@@ -482,9 +490,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('End') }: <input type="text" data-bind="value: properties.end" />
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div>  
-
-    <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-    <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
     <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
   </div>
