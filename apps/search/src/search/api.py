@@ -92,9 +92,10 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   #@demo_handler
-  def query2(self, solr_query, collection):
+  def query2(self, solr_query, collection, query):
+    
     params = self._get_params() + (
-        ('q', solr_query['q'] or EMPTY_QUERY.get()),
+        ('q', query['q'] or EMPTY_QUERY.get()),
         ('wt', 'json'),
         ('rows', solr_query['rows']),
         ('start', solr_query['start']),
@@ -119,12 +120,12 @@ class SolrApi(object):
         elif facet['type'] == 'field':
           params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
 
-    fqs = solr_query['fq']
-    for fq, val in fqs.iteritems():
-      params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq, fq, val)))),)
+    for fq in query['fqs']:
+      params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], fq['filter'])))),)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
-      params += (('fl', urllib.unquote(utf_quoter(','.join(collection['template']['fieldsSelected'])))),)
+      fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []
+      params += (('fl', urllib.unquote(utf_quoter(','.join(fields)))),)
     else:
       params += (('fl', '*'),)
 

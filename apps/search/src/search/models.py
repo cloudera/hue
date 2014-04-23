@@ -453,17 +453,17 @@ def is_chart_field(field, charts):
   return found
 
 
-def augment_solr_response2(response, collection, solr_query):
+def augment_solr_response2(response, collection, query, solr_query):
   augmented = response
   augmented['normalized_facets'] = []
 
   normalized_facets = []
 
-  def pairwise2(cat, selected_field, iterable):
+  def pairwise2(cat, selected_values, iterable):
       pairs = []
       a, b = itertools.tee(iterable)
       for element in a:
-        pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element == selected_field})
+        pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
       return pairs
 
   def reversepairs(iterable):
@@ -474,7 +474,7 @@ def augment_solr_response2(response, collection, solr_query):
         pairs.insert(0, element)
       return pairs
 
-  fq = solr_query['fq']
+  selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
 
   if response and response.get('facet_counts'):
     # [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
@@ -483,9 +483,9 @@ def augment_solr_response2(response, collection, solr_query):
       
       if category == 'field' and response['facet_counts']['facet_fields']:
         for name in response['facet_counts']['facet_fields']: # todo get from the list
-          selected_field = fq.get(name, '') # todo with multi filter
+          #selected_field = fq.get(name, '') # todo with multi filter
           collection_facet = get_facet_field(category, name, collection['facets'])
-          counts = pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name])
+          counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
           if collection_facet['properties']['sort'] == 'asc':
             counts.reverse()          
           facet = {
@@ -504,8 +504,7 @@ def augment_solr_response2(response, collection, solr_query):
           if collection_facet['properties']['sort'] == 'asc':
             counts = reversepairs(counts) 
           if facet['widgetType'] in ('facet-widget', 'pie-widget'):
-            selected_field = fq.get(name, '') # todo with multi filter
-            counts = pairwise2(name, selected_field, counts)          
+            counts = pairwise2(name, selected_values.get((facet['id'], name, 'field'), []), counts)          
           facet = {
             'id': collection_facet['id'],
             'field': name,

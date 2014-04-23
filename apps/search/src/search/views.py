@@ -67,7 +67,7 @@ def index(request):
       return no_collections(request)
 
   collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
-  query = {'q': '', 'fq': {}}
+  query = {'q': '', 'fqs': []}
 
   return render('search2.mako', request, {
     'collection': collection,
@@ -77,7 +77,7 @@ def index(request):
 
 def new_search(request):
   collection = Collection(name='twitter_demo', label='New Twitter Template')
-  query = {'q': '', 'fq': {}}
+  query = {'q': '', 'fqs': []}
 
   return render('search2.mako', request, {
     'collection': collection,
@@ -96,7 +96,6 @@ def search(request):
     # collection['name']=
   
   print request.POST
-  print collection
     
   if collection:
     solr_query = {}    
@@ -106,11 +105,9 @@ def search(request):
       solr_query['collection'] = collection['name']
       solr_query['rows'] = 10
       solr_query['start'] = 0
-      solr_query['fq'] = query['fq']
-      solr_query['q'] = query['q']
       
-      response = SolrApi(SOLR_URL.get(), request.user).query2(solr_query, collection)
-      response = augment_solr_response2(response, collection, solr_query)
+      response = SolrApi(SOLR_URL.get(), request.user).query2(solr_query, collection, query)
+      response = augment_solr_response2(response, collection, query, solr_query)
       print response
     except RestException, e:
       try:

@@ -229,11 +229,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <div>
         <a href="script:void(0)">
         <!-- ko if: selected -->
-          <span data-bind="text: value, click: $root.query.unselectFacet"></span>
-          <i data-bind="click: $root.query.unselectFacet" class="fa fa-times"></i>            
+          <span data-bind="text: value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }"></span>
+          <i data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }" class="fa fa-times"></i>            
         <!-- /ko -->
         <!-- ko if: !selected -->           
-          <span data-bind="text: value, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet"> (</span><span data-bind="text: count, click: $root.query.selectFacet"></span><span data-bind="click: $root.query.selectFacet">)</span>
+          <span data-bind="text: value + ' (' + count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}); }"></span>
         <!-- /ko -->
         </a>
       </div>
@@ -400,7 +400,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>
 
-    <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="pieChart: {data: {counts: counts, widget_id: $parent.id}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -418,6 +418,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="filter-widget">
+  <div data-bind="foreach: $root.query.fqs">
+    <span data-bind="text: ko.mapping.toJSON($data)"></span>
+  </div>
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -628,7 +631,8 @@ var viewModel;
 
 function pieChartDataTransformer(data) {
   var _data = [];
-  $(data).each(function (cnt, item) {
+  $(data.counts).each(function (cnt, item) {
+    item.widget_id = data.widget_id;
     _data.push({
       label: item.value,
       value: item.count,

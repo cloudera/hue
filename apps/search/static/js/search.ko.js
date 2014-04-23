@@ -196,17 +196,65 @@ var Query = function (vm, query) {
   var self = this;
 
   self.q = ko.observable(query.q);
-  self.fq = query.fq
-
-  self.selectFacet = function (facet_json) {
-    self.fq[facet_json.cat] = facet_json.value; // need to add facet id too
+  self.fqs = ko.mapping.fromJS(query.fqs);
+//[{'wid': 1, 'filter: ['c', 'd'], 'type': 'field', 'field': 'user_location'},
+// {'wid': 1, 'filter: [{'from': 1, 'to': 10}], 'type': 'range', 'field': 'created_at'}
+// {'wid': 2, ....}
+// ]
+ // {"count":27,"selected":false,"value":"dhclient","cat":"process"}
+  
+  self.toggleFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
+	var fq = self.getFacetFilter(data.widget_id);
+	
+	if (fq == null) {
+	    self.fqs.push({
+	      'id': data.widget_id,
+	      'field': data.facet.cat,
+	      'filter': data.facet.value,
+	      'type': 'field'
+	    });
+	} else {
+      $.each(self.fqs(), function (index, fq) {
+        if (fq.id == data.widget_id) {
+          self.fqs.remove(fq); 
+        }
+      });
+	}
+    
+    vm.search();
+  }  
+  
+  self.selectFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
+    self.fqs.push({
+      'id': data.widget_id,
+      'field': data.facet.cat,
+      'filter': data.facet.value,
+      'type': 'field'
+    });
+    
     vm.search();
   }
 
-  self.unselectFacet = function (facet_json) {
-    delete self.fq[facet_json.cat];
+  self.unselectFacet = function (data) {
+    $.each(self.fqs(), function (index, fq) {
+      if (fq.id == data.widget_id) {
+        self.fqs.remove(fq); 
+      }
+    });
+    
     vm.search();
-  }
+  }  
+
+  self.getFacetFilter = function (widget_id) {
+    var _fq = null;
+    $.each(self.fqs(), function (index, fq) {
+      if (fq.id == widget_id) {
+        _fq = fq;
+        return false;
+      }
+    });
+    return _fq;
+  }   
 };
 
 
@@ -246,12 +294,12 @@ var Collection = function (vm, collection) {
         "widget_type": facet_json.widgetType
       }, function (data) {
         if (data.status == 0) {
-        var facet = ko.mapping.fromJS(data.facet);
-        facet.field.subscribe(function () {
+          var facet = ko.mapping.fromJS(data.facet);
+          facet.field.subscribe(function () {
+            vm.search();
+          });      
+          self.facets.push(facet);
           vm.search();
-        });      
-        self.facets.push(facet);
-        vm.search();
         } else {
           $(document).trigger("error", data.message);
         }
@@ -269,7 +317,7 @@ var Collection = function (vm, collection) {
   
   self.getFacetById = function (facet_id) {
     var _facet = null;
-    $.each(self.facets(), function (index, facet) {//alert(ko.mapping.toJSON(category));
+    $.each(self.facets(), function (index, facet) {
       if (facet.id() == facet_id) {
         _facet = facet;
         return false;
@@ -409,7 +457,7 @@ var SearchViewModel = function (collection_json, query_json) {
       query: ko.mapping.toJSON(self.query),
       layout: ko.mapping.toJSON(self.columns)
     }, function (data) {
-      self.response(data); // Content not observable for performance
+      self.response(data);
       self.results.removeAll();
       if (data.error) {
         $(document).trigger("error", data.error);
@@ -420,7 +468,7 @@ var SearchViewModel = function (collection_json, query_json) {
           $.each(data.response.docs, function (index, item) {
             var row = [];
             var fields = self.collection.template.fieldsSelected();
-            // Field selection or whole record
+            // Display selected fields or whole json document
             if (fields.length != 0) {
               $.each(self.collection.template.fieldsSelected(), function (index, field) {  
                 row.push(item[field]);
@@ -449,7 +497,8 @@ var SearchViewModel = function (collection_json, query_json) {
   };
   
   self.removeWidget = function (widget_json) {
-    self.collection.removeFacet(widget_json.id); 
+    self.collection.removeFacet(widget_json.id);
+    // todo remove fqs
     self.search();
   }
 
