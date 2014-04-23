@@ -484,7 +484,10 @@ def new_facet(request, collection_id):
     facet_label = request.POST['label']
     facet_field = request.POST['field']
     widget_type = request.POST['widget_type']
-    properties = {}
+    properties = {
+      'sort': 'desc',
+      'canRange': False,
+    }
     is_range = False
 
     try:
@@ -524,11 +527,12 @@ def new_facet(request, collection_id):
                 
     if is_range:
       facet_type = 'range'
-      properties = {
+      properties.update({
         'start': stats_min,
         'end': stats_max,
         'gap': gap,
-      }       
+        'canRange': True,
+      })       
 #    elif widget_type == 'hit-widget':
 #      facet_type = 'query'
 #    elif widget_type == 'histogram-widget':
@@ -547,7 +551,6 @@ def new_facet(request, collection_id):
       'field': facet_field,
       'type': facet_type,
       'widgetType': widget_type,
-      'isRange': is_range,
       'properties': properties
     }
     result['status'] = 0

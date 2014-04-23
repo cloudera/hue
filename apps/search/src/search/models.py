@@ -466,6 +466,14 @@ def augment_solr_response2(response, collection, solr_query):
         pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element == selected_field})
       return pairs
 
+  def reversepairs(iterable):
+      pairs = []
+      a, b = itertools.tee(iterable)
+      for element in a:
+        pairs.insert(0, next(a))
+        pairs.insert(0, element)
+      return pairs
+
   fq = solr_query['fq']
 
   if response and response.get('facet_counts'):
@@ -477,12 +485,15 @@ def augment_solr_response2(response, collection, solr_query):
         for name in response['facet_counts']['facet_fields']: # todo get from the list
           selected_field = fq.get(name, '') # todo with multi filter
           collection_facet = get_facet_field(category, name, collection['facets'])
+          counts = pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name])
+          if collection_facet['properties']['sort'] == 'asc':
+            counts.reverse()          
           facet = {
             'id': collection_facet['id'],
             'field': name,
             'type': category,
             'label': collection_facet['label'],
-            'counts': pairwise2(name, selected_field, response['facet_counts']['facet_fields'][name]),
+            'counts': counts,
             # add total result count?
           }
           normalized_facets.append(facet)
@@ -490,9 +501,11 @@ def augment_solr_response2(response, collection, solr_query):
           name = facet['field']
           collection_facet = get_facet_field(category, name, collection['facets'])
           counts = response['facet_counts']['facet_ranges'][name]['counts']
+          if collection_facet['properties']['sort'] == 'asc':
+            counts = reversepairs(counts) 
           if facet['widgetType'] == 'facet-widget':
             selected_field = fq.get(name, '') # todo with multi filter
-            counts = pairwise2(name, selected_field, counts)
+            counts = pairwise2(name, selected_field, counts)          
           facet = {
             'id': collection_facet['id'],
             'field': name,

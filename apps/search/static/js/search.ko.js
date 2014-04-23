@@ -238,22 +238,19 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     $.post("/search/template/" + self.id + "/new_facet", {
-    	"collection": ko.mapping.toJSON(self),
+      "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
         "widget_type": facet_json.widgetType
       }, function (data) {
         if (data.status == 0) {
-	      var facet = ko.mapping.fromJS(data.facet);
-	      facet.field.subscribe(function () {
-	        vm.search();
-	      });
-	      facet.isRange.subscribe(function () {
-	        vm.search();
-	      });	    
-	      self.facets.push(facet);
-	      vm.search();
+        var facet = ko.mapping.fromJS(data.facet);
+        facet.field.subscribe(function () {
+          vm.search();
+        });      
+        self.facets.push(facet);
+        vm.search();
         } else {
           $(document).trigger("error", data.message);
         }
@@ -261,7 +258,7 @@ var Collection = function (vm, collection) {
   };
 
   self.removeFacet = function (widget_id) {
-    $.each(self.facets(), function (index, facet) {	
+    $.each(self.facets(), function (index, facet) {  
       if (facet.id() == widget_id()) {
         self.facets.remove(facet); 
         return false;
@@ -285,7 +282,7 @@ var Collection = function (vm, collection) {
     $.each(self.template.fieldsAttributes(), function (index, field) {
       var position = self.template.fieldsSelected.indexOf(field.name());
       if (position != -1) {
-    	_fields[position] = field;
+      _fields[position] = field;
       }      
     });
     return _fields;
@@ -305,15 +302,34 @@ var Collection = function (vm, collection) {
   }
 
   self.toggleSortColumnGridLayout = function (template_field) {
-	 if (! template_field.sort.direction()) {
-	   template_field.sort.direction('desc');
-	 } else if (template_field.sort.direction() == 'desc') {
-	   template_field.sort.direction('asc');
-	 } else {
-	   template_field.sort.direction(null); 
-	 }
+   if (! template_field.sort.direction()) {
+     template_field.sort.direction('desc');
+   } else if (template_field.sort.direction() == 'desc') {
+     template_field.sort.direction('asc');
+   } else {
+     template_field.sort.direction(null); 
+   }
 
-	 vm.search();
+   vm.search();
+  };
+  
+  self.toggleFacet = function (facet_field, event) {	
+    if (facet_field.properties.canRange()) {
+	   if (facet_field.type() == 'field' && facet_field.properties.sort() == 'desc') {
+		 facet_field.type('range');
+	   } else if (facet_field.type() == 'range' && facet_field.properties.sort() == 'desc') {
+	     facet_field.type('field'); 
+       }
+    }
+   
+    if (facet_field.properties.sort() == 'desc') {
+      facet_field.properties.sort('asc');
+    } else {
+      facet_field.properties.sort('desc');
+    }   
+   
+    $(event.target).button('loading');
+    vm.search();
   };
 };
 
@@ -331,16 +347,16 @@ var SearchViewModel = function (collection_json, query_json) {
   self.norm_facets = ko.computed(function () {
     return self.response().normalized_facets;
   });
-  self.getFacetFromQuery = function (facet_id) {	
+  self.getFacetFromQuery = function (facet_id) {  
     var _facet = null;
     if (self.norm_facets() !== undefined) {
-	  $.each(self.norm_facets(), function (index, norm_facet) {  
-	    if (norm_facet.id == facet_id()) {
-	      _facet = norm_facet;
-	    }      
-	  });
+      $.each(self.norm_facets(), function (index, norm_facet) {  
+        if (norm_facet.id == facet_id()) {
+          _facet = norm_facet;
+        }      
+      });
     }
-    return _facet;	  
+    return _facet;    
   };
 
   self.previewColumns = ko.observable("");
@@ -363,10 +379,10 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
 
   self.init = function () {
-	//self.collection.addDynamicFields();
+  //self.collection.addDynamicFields();
 
-	self.isEditing(true);
-	self.search();	
+  self.isEditing(true);
+  self.search();  
   }
 
   self.search = function () {
@@ -411,6 +427,8 @@ var SearchViewModel = function (collection_json, query_json) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function () {
+      $('.btn-loading').button('reset');
     });
   };
   
@@ -425,7 +443,7 @@ var SearchViewModel = function (collection_json, query_json) {
       layout: ko.mapping.toJSON(self.columns)
     },function (data) {
       if (data.status == 0) {
-    	self.collection.id = data.id;
+        self.collection.id = data.id;
         $(document).trigger("info", data.message);
       }
       else {

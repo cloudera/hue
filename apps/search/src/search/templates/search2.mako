@@ -335,13 +335,14 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       ${ _('Field') }: <input type="text" data-bind="value: field" />
       <br/>
-      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />
-      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-alpha-asc"></i></a>
-      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-numeric-asc"></i></a>
-      <a href="javascript: void(0)" class="btn"><i class="fa fa-sort-numeric-desc"></i></a>
+      <span>
+        <span data-bind="text: label" style="font-weight: bold"></span>
+        <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleFacet" data-loading-text="...">      
+          <i class="fa" data-bind="css: { 'fa-sort-alpha-asc': properties.sort() == 'desc' && type() != 'range', 'fa-sort-alpha-desc': properties.sort() == 'asc' && type() != 'range', 'fa-sort-numeric-desc': properties.sort() == 'desc' && type() == 'range', 'fa-sort-numeric-asc': properties.sort() == 'asc' && type() == 'range' }"></i>
+        </a>  
+      </span>
     </div>  
 
-    <div data-bind="text: label" style="font-weight: bold"></div>
     <div data-bind="foreach: counts">
       <div>
         <a href="script:void(0)">
