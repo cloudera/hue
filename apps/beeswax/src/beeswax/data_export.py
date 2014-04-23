@@ -43,8 +43,9 @@ def download(handle, format, db):
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  data, has_more = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get())
-  return export_csvxls.make_response(data[0], data[1:], format, 'query_result')
+  content_generator = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get())
+  generator = export_csvxls.create_generator(content_generator, format)
+  return export_csvxls.make_response(generator, format, 'query_result')
 
 
 def upload(path, handle, user, db, fs):
@@ -53,28 +54,20 @@ def upload(path, handle, user, db, fs):
 
   Retrieve the query result in the format specified and upload to hdfs.
   """
-  has_more = True
-  start_over = True
-
   if fs.do_as_user(user.username, fs.exists, path):
     raise Exception(_("%s already exists.") % path)
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  while has_more:
-    data, has_more = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get(), start_over=start_over)
-    dataset = export_csvxls.dataset(None, data[1:])
+  content_generator = HS2DataAdapter(handle, db, -1, start_over=True)
+  for header, data in content_generator:
+    dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
-
-    if start_over:
-      start_over = False
 
 
 def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
   """
-  HS2DataAdapter(query_model, db) -> 2D array of data.
-
-  First line should be the headers.
+  HS2DataAdapter(query_model, db) -> headers, 2D array of data.
   """
 
   results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
@@ -83,20 +76,24 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
     time.sleep(_DATA_WAIT_SLEEP)
     results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
-  data = [results.cols()]
+  headers = results.cols()
 
+  num_rows_seen = 0
+  limit_rows = max_rows > -1
   while results is not None:
+    data = []
     for row in results.rows():
-      if max_rows > -1 and len(data) > max_rows:
+      num_rows_seen += 1
+      if limit_rows and num_rows_seen > max_rows:
         break
       data.append(row)
 
-    if max_rows > -1 and len(data) > max_rows:
+    yield headers, data
+
+    if limit_rows and num_rows_seen > max_rows:
       break
 
     if results.has_more:
       results = db.fetch(handle, start_over=False, rows=FETCH_SIZE)
     else:
       results = None
-
-  return data, results.has_more if results else False

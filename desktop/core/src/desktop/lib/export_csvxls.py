@@ -17,6 +17,7 @@
 """
 Common library to export either CSV or XLS.
 """
+import gc
 import logging
 import tablib
 
@@ -24,11 +25,10 @@ from django.http import HttpResponse
 from django.utils.encoding import smart_str
 from desktop.lib import i18n
 
-LOG = logging.getLogger(__name__)
-XLS_SIZE_LIMIT = 1024 * 1024 * 1024      # 1GB
 
-class TooBigToDownloadException(Exception):
-  pass
+LOG = logging.getLogger(__name__)
+MAX_XLS_ROWS = 30000
+
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
@@ -52,9 +52,30 @@ def dataset(headers, data, encoding=None):
 
   return dataset
 
-def make_response(headers, data, format, name, encoding=None):
+
+def create_generator(content_generator, format, encoding=None):
+  if format == 'csv':
+    show_headers = True
+    while True:
+      headers, data = content_generator.next()
+      yield dataset(show_headers and headers or None, data, encoding).csv
+      show_headers = False
+  elif format == 'xls':
+    headers = None
+    data = []
+    for _headers, _data in content_generator:
+      # Forced limit on size from tablib
+      if len(data) > MAX_XLS_ROWS:
+        data = data[:MAX_XLS_ROWS]
+        break
+      headers = _headers
+      data.extend(_data)
+    yield dataset(headers, data, encoding).xls
+    gc.collect()
+
+
+def make_response(generator, format, name, encoding=None):
   """
-  @param headers List of strings to form the header
   @param data An iterator of rows, where every row is a list of strings
   @param format Either "csv" or "xls"
   @param name Base name for output file
@@ -67,11 +88,6 @@ def make_response(headers, data, format, name, encoding=None):
   else:
     raise Exception("Unknown format: %s" % format)
 
-  formatted_data = getattr(dataset(headers, data, encoding), format)
-
-  if len(formatted_data) > XLS_SIZE_LIMIT:
-    raise TooBigToDownloadException()
-
-  resp = HttpResponse(formatted_data, mimetype=mimetype)
+  resp = HttpResponse(generator, mimetype=mimetype)
   resp['Content-Disposition'] = 'attachment; filename=%s.%s' % (name, format)
   return resp

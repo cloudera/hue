@@ -38,20 +38,19 @@ def download(results, format):
     LOG.error('Unknown download format "%s"' % format)
     return
 
-  data = SearchDataAdapter(results, format)
-  return export_csvxls.make_response(data[0], data[1:], format, 'query_result')
+  content_generator = SearchDataAdapter(results, format)
+  generator = export_csvxls.create_generator(content_generator, format)
+  return export_csvxls.make_response(generator, format, 'query_result')
 
 
 def SearchDataAdapter(results, format):
   """
-  SearchDataAdapter(results, format, db) -> 2D array of data.
-
-  First line should be the headers.
+  SearchDataAdapter(results, format, db) -> headers, 2D array of data.
   """
   if results and results['response'] and results['response']['docs']:
     search_data = results['response']['docs']
     order = search_data[0].keys()
-    rows = [order]
+    rows = []
 
     for data in search_data:
       row = []
@@ -66,4 +65,4 @@ def SearchDataAdapter(results, format):
   else:
     rows = [[]]
 
-  return rows
+  yield order, rows
