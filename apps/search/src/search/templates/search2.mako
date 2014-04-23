@@ -199,7 +199,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!-- <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
     <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableFilter" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>    
   </div>
   <div class="clearfix"></div>
@@ -334,7 +334,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       ${ _('Field') }: <input type="text" data-bind="value: field" />
-      <br/>
+      <!-- ko if: type() == 'range' -->
+        <br/>
+        ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+        ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+        ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+      <!-- /ko -->
       <span>
         <span data-bind="text: label" style="font-weight: bold"></span>
         <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleFacet" data-loading-text="...">      
@@ -516,8 +521,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   This is the area widget
 </script>
 
-<script type="text/html" id="line-widget">
-  This is the line widget
+<script type="text/html" id="filter-widget">
+  
 </script>
 
 <script type="text/html" id="map-widget">

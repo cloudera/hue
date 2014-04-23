@@ -377,6 +377,7 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
+  self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));  
 
   self.init = function () {
   //self.collection.addDynamicFields();
