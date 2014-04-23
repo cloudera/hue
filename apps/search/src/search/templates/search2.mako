@@ -485,12 +485,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       ${ _('Field') }: <input type="text" data-bind="value: field" />
       <br/>
-      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />      
-      <br/>
       ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
       ${ _('End') }: <input type="text" data-bind="value: properties.end" />
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
-    </div>  
+    </div> 
 
     <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
   </div>
@@ -506,9 +504,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
-      <br/>
-      ${ _('Range') }: <input type="checkbox" data-bind="checked: isRange" />      
+      ${ _('Field') }: <input type="text" data-bind="value: field" />    
     </div>  
 
     <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}}" />

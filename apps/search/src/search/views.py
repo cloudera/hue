@@ -491,7 +491,12 @@ def new_facet(request, collection_id):
     is_range = False
 
     try:
-      SLOTS = 50
+      if widget_type == 'pie-widget':
+        SLOTS = 5
+      elif widget_type == 'facet-widget':
+        SLOTS = 10
+      else:
+        SLOTS = 50
       stats_json = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [facet_field])
       stat_facet = stats_json['stats']['stats_fields'][facet_field]
       
@@ -533,14 +538,8 @@ def new_facet(request, collection_id):
         'gap': gap,
         'canRange': True,
       })       
-#    elif widget_type == 'hit-widget':
-#      facet_type = 'query'
-#    elif widget_type == 'histogram-widget':
-#      facet_type = 'range'
-#    elif widget_type == 'bar-widget':
-#      facet_type = 'range'
-#    elif widget_type == 'pie-widget':
-#      facet_type = 'range'      
+    elif widget_type == 'hit-widget':
+      facet_type = 'query'      
     else:
       facet_type = 'field'        
         
