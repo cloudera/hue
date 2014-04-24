@@ -19,6 +19,7 @@ import itertools
 import json
 import logging
 import os
+import re
 import sys
 import tempfile
 import time
@@ -261,12 +262,34 @@ def memory(request):
   if not hasattr(settings, 'MEMORY_PROFILER'):
     return HttpResponse(_("You must enable the memory profiler via the memory_profiler config in the hue.ini."))
 
+  # type, from, to, index
+  command_order = {
+    'type': 0,
+    'from': 1,
+    'to': 2,
+    'index': 3
+  }
+  default_command = [None, None, None, None]
+  commands = []
+
+  for item in request.GET:
+    res = re.match(r'(?P<command>\w+)\.(?P<count>\d+)', item)
+    if res:
+      d = res.groupdict()
+      count = int(d['count'])
+      command = str(d['command'])
+      while len(commands) <= count:
+        commands.append(default_command[:])
+      commands[count][command_order.get(command)] = request.GET.get(item)
+
   heap = settings.MEMORY_PROFILER.heap()
-  heap = heap[int(request.GET.get('from', 0)):int(request.GET.get('to', len(heap)))]
-  if 'index' in request.GET:
-    heap = heap[int(request.GET['index'])]
-  if 'type' in request.GET:
-    heap = getattr(heap, request.GET['type'])
+  for command in commands:
+    if command[0] is not None:
+      heap = getattr(heap, command[0])
+    if command[1] is not None and command[2] is not None:
+      heap = heap[int(command[1]):int(command[2])]
+    if command[3] is not None:
+      heap = heap[int(command[3])]
   return HttpResponse(str(heap), content_type="text/plain")
 
 def jasmine(request):
