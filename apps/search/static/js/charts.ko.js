@@ -77,13 +77,22 @@ function barChart(element, options, isTimeline) {
   var _data = options.transformer(options.data);
   $(element).height(300);
 
-  if (isTimeline) {
-    console.log(_data);
-  }
-
   nv.addGraph(function () {
-    var _chart = nv.models.multiBarChart()
-        .margin({bottom: 100})
+    var _chart;
+    if (isTimeline) {
+      _chart = nv.models.multiBarWithFocusChart();
+      _chart.enableSelection();
+      _chart.onSelectRange(function(from, to){
+        console.log("SELECT RANGE!")
+        console.log(from);
+        console.log(to);
+      });
+    }
+    else {
+      _chart = nv.models.multiBarChart();
+    }
+
+    _chart.margin({bottom: 100})
         .transitionDuration(300);
 
     _chart.multibar

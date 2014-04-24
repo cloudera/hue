@@ -26,130 +26,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 
-<style type="text/css">
-  .dashboard .container-fluid {
-    padding: 10px;
-  }
-
-  .row-container {
-    width: 100%;
-    min-height: 70px;
-  }
-
-  .ui-sortable {
-    background-color: #F6F6F6;
-  }
-
-  .ui-sortable h2 {
-    padding-left: 10px!important;
-  }
-
-  .ui-sortable h2 ul {
-    float: left;
-    margin-right: 10px;
-    font-size: 14px;
-  }
-
-  .ui-sortable:not(.ui-sortable-disabled) h2 {
-    cursor: move;
-  }
-
-  .ui-sortable-disabled {
-    background-color: #FFF;
-  }
-
-  .card-column {
-    border: none;
-    min-height: 400px!important;
-  }
-
-  .card-widget {
-    padding-top: 0;
-  }
-
-  .card-widget .card-heading {
-    font-size: 16px!important;
-  }
-
-  .card-widget .card-body {
-    margin-top: 0;
-  }
-
-  .card-toolbar {
-    margin: 0;
-    padding: 4px;
-    padding-top: 10px;
-    top: 70px;
-    position: fixed;
-    width: 100%;
-  }
-
-  .row-header {
-    background-color: #F6F6F6;
-    display: inline;
-    padding: 4px;
-  }
-
-  #emptyDashboard {
-    position: absolute;
-    right: 164px;
-    top: 80px;
-    color: #666;
-    font-size: 20px;
-  }
-
-  .emptyRow {
-    margin-top: 10px;
-    margin-left: 140px;
-    color: #666;
-    font-size: 18px;
-  }
-
-  .preview-row {
-    background-color: #DDD;
-    min-height: 400px!important;
-    margin-top: 30px;
-  }
-
-  .draggable-widget {
-    width: 100px;
-    text-align: center;
-    float: left;
-    border: 1px solid #CCC;
-    margin-top: 10px;
-    margin-right: 10px;
-    cursor: move;
-  }
-  .draggable-widget a {
-    font-size: 58px;
-    line-height: 76px;
-    cursor: move;
-  }
-
-  .unselectable {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  .search-bar {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-
-  .with-top-margin {
-    margin-top: 130px;
-  }
-
-  .widget-settings-section {
-    display: none;
-  }
-
-</style>
-
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="padding-right:50px">
@@ -530,13 +406,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 
-<style type="text/css">
-  em {
-    font-weight: bold; 
-    background-color: yellow;
-  }
-</style>
-
 <div id="addFacetModal" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -581,7 +450,142 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 
+<script src="/search/static/js/nv.d3.multiBarWithFocusChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
+
+
+<style type="text/css">
+  .dashboard .container-fluid {
+    padding: 10px;
+  }
+
+  .row-container {
+    width: 100%;
+    min-height: 70px;
+  }
+
+  .ui-sortable {
+    background-color: #F6F6F6;
+  }
+
+  .ui-sortable h2 {
+    padding-left: 10px!important;
+  }
+
+  .ui-sortable h2 ul {
+    float: left;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  .ui-sortable:not(.ui-sortable-disabled) h2 {
+    cursor: move;
+  }
+
+  .ui-sortable-disabled {
+    background-color: #FFF;
+  }
+
+  .card-column {
+    border: none;
+    min-height: 400px!important;
+  }
+
+  .card-widget {
+    padding-top: 0;
+  }
+
+  .card-widget .card-heading {
+    font-size: 16px!important;
+  }
+
+  .card-widget .card-body {
+    margin-top: 0;
+  }
+
+  .card-toolbar {
+    margin: 0;
+    padding: 4px;
+    padding-top: 10px;
+    top: 70px;
+    position: fixed;
+    width: 100%;
+  }
+
+  .row-header {
+    background-color: #F6F6F6;
+    display: inline;
+    padding: 4px;
+  }
+
+  #emptyDashboard {
+    position: absolute;
+    right: 164px;
+    top: 80px;
+    color: #666;
+    font-size: 20px;
+  }
+
+  .emptyRow {
+    margin-top: 10px;
+    margin-left: 140px;
+    color: #666;
+    font-size: 18px;
+  }
+
+  .preview-row {
+    background-color: #DDD;
+    min-height: 400px!important;
+    margin-top: 30px;
+  }
+
+  .draggable-widget {
+    width: 100px;
+    text-align: center;
+    float: left;
+    border: 1px solid #CCC;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: move;
+  }
+  .draggable-widget a {
+    font-size: 58px;
+    line-height: 76px;
+    cursor: move;
+  }
+
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .search-bar {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .with-top-margin {
+    margin-top: 130px;
+  }
+
+  .widget-settings-section {
+    display: none;
+  }
+
+  em {
+    font-weight: bold;
+    background-color: yellow;
+  }
+
+  .nvd3 .nv-brush .extent {
+    fill-opacity: .225!important;
+  }
+
+</style>
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
