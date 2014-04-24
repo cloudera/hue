@@ -650,12 +650,11 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
   unload the middleware if the RemoteUserDjangoBackend is not currently
   in use.
   """
-  header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()
-
   def __init__(self):
     if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+    self.header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()
 
 
 class EnsureSafeMethodMiddleware(object):
