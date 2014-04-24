@@ -150,11 +150,7 @@ class Dbms:
 
 
   def close_operation(self, query_handle):
-    # Beeswax does not support close_operation
-    if self.server_type == BEESWAX:
-      pass
-    else:
-      return self.client.close_operation(query_handle)
+    return self.client.close_operation(query_handle)
 
 
   def cancel_operation(self, query_handle):

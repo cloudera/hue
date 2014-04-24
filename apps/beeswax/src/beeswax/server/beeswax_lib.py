@@ -178,9 +178,9 @@ class BeeswaxClient:
     return self.db_client.get_results_metadata(handle)
 
 
-  def close(self, handle):
+  def close_operation(self, handle):
     handle = handle.get_rpc_handle()
-
+    
     self.db_client.close(handle)
     self.db_client.clean(handle.log_context)
 
