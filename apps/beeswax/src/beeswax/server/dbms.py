@@ -151,9 +151,6 @@ class HiveServer2Dbms(object):
 
 
   def close_operation(self, query_handle):
-    if self.server_type == BEESWAX:
-      raise PopupException(_('%s interface does not support close_operation. %s interface does.') % (BEESWAX, HIVE_SERVER2))
-
     return self.client.close_operation(query_handle)
 
   def open_session(self, user):
