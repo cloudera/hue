@@ -1371,16 +1371,16 @@ msgstr "名前を付けて保存..."
 
 #: src/beeswax/templates/execute.mako:277
 msgid "Explain"
-msgstr "新しい"
+msgstr "Explain"
 
 #: src/beeswax/templates/execute.mako:278
 msgid "or create a"
-msgstr "クエリを説明"
+msgstr "または"
 
 #: src/beeswax/templates/execute.mako:279
 #: src/beeswax/templates/my_queries.mako:68
 msgid "New query"
-msgstr "または作成"
+msgstr "新しいクエリを作成"
 
 #: src/beeswax/templates/execute.mako:292
 msgid "See results in full screen"
