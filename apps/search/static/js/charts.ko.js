@@ -35,6 +35,7 @@ ko.bindingHandlers.pieChart = {
 
         _d3.datum(_data)
                 .transition().duration(350)
+                .each("end", _options.onComplete)
                 .call(_chart);
         nv.utils.windowResize(_chart.update);
         $(element).height($(element).width());
@@ -91,7 +92,6 @@ function barChart(element, options, isTimeline) {
     else {
       _chart = nv.models.multiBarChart();
     }
-
     _chart.margin({bottom: 100})
         .transitionDuration(300);
 
@@ -117,6 +117,8 @@ function barChart(element, options, isTimeline) {
             values: _data
           }
         ])
+        .transition().duration(350)
+        .each("end", options.onComplete)
         .call(_chart);
 
     nv.utils.windowResize(_chart.update);

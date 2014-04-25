@@ -86,6 +86,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <img src="/search/static/art/hint_arrow.png" />
 </div>
 
+
 <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
@@ -184,7 +185,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="hit-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
-    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
@@ -202,7 +203,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="facet-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
-    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
@@ -313,8 +314,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         </tr>
       </tbody>
     </table>
-    <div style="padding: 10px" data-bind="visible: $root.isRetrievingResults()">
-      <!--[if !IE]> --><i class="fa fa-spinner fa-spin" style="font-size:20px;color: #999"></i><!-- <![endif]-->
+    <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+      <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
       <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
     </div>
 	  <!-- /ko -->
@@ -332,8 +333,13 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="histogram-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
-    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
@@ -350,15 +356,20 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
+    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="bar-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
-    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
@@ -371,61 +382,69 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div> 
 
-    <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}}" />
+    <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="pie-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
-    <a data-bind="click: showAddFacetModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
+
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      ${ _('Field') }: <input type="text" data-bind="value: field" />    
-    </div>  
+      ${ _('Field') }: <input type="text" data-bind="value: field" />
+    </div>
 
-    <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}}" />
+    <div data-bind="pieChart: {data: counts, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.selectFacet(d.data.obj)}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 </script>
 
 <script type="text/html" id="area-widget">
   This is the area widget
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 </script>
 
 <script type="text/html" id="filter-widget">
-  
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 </script>
 
 <script type="text/html" id="map-widget">
   This is the map widget
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 </script>
 
-
-<div id="addFacetModal" class="modal hide fade">
+<div id="addFacetDemiModal" class="demi-modal fade hide" data-backdrop="false">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Add facet')}</h3>
+    <h3>${_('Choose field')}</h3>
   </div>
   <div class="modal-body">
     <p>
-      <div class="clearfix"></div>
-      <div style="margin-top: 20px">
-        <div class="input-append">
-          <input id="facetName" type="text">
-          <input id="widgetId" type="hidden">
-          <input id="widgetType" type="hidden">
-        </div>
-      </div>
+      <input type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input-xlarge" />
+      <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })" class="unstyled inline fields-chooser">
+        <li data-bind="click: addFacetDemiModalFieldClick"><span class="badge badge-info"><i class="fa fa-file-text-o"></i> <span data-bind="text: name()"></span> </span></li>
+      </ul>
+      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredFieldsAttributes().length == 0">${_('There are no fields matching your search term.')}</div>
     </p>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">${_('Back')}</a>
-    <a data-bind="click: submitAddFacetModal" class="btn btn-primary disable-feedback">${_('Ok')}</a>
   </div>
 </div>
 
@@ -585,6 +604,23 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     fill-opacity: .225!important;
   }
 
+  .fields-chooser li {
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .fields-chooser li .badge {
+    font-weight: normal;
+    font-size: 12px;
+  }
+
+  .widget-spinner {
+    padding: 10px;
+    font-size: 80px;
+    color: #CCC;
+    text-align: center;
+  }
+
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -685,26 +721,38 @@ $(document).ready(function () {
   function toggleGridFieldsSelection() {
     if (viewModel.collection.template.fields().length > 0) {
       viewModel.collection.template.fieldsSelected([])
-    } else {
+    }
+    else {
       var _fields = [];
       $.each(viewModel.collection.fields(), function (index, field) {
         _fields.push(field.name());
       });
       viewModel.collection.template.fieldsSelected(_fields);
-    };
-  };  
+    }
+  }
 
-  function showAddFacetModal(widget) {
-    $("#widgetId").val(widget.id());
-    $("#widgetType").val(widget.widgetType());        
-    $("#addFacetModal").modal("show");
-  };
+  var selectedWidget = null;
+  function showAddFacetDemiModal(widget) {
+    viewModel.collection.template.fieldsModalFilter("");
+    selectedWidget = widget;
+    $("#addFacetDemiModal").modal("show");
+    $("#addFacetDemiModal input[type='text']").focus();
+  }
 
-  function submitAddFacetModal() {
-    viewModel.collection.addFacet({'name': $("#facetName").val(), 'widget_id': $("#widgetId").val(), 'widgetType': $("#widgetType").val()});
-    $('#addFacetModal').modal("hide");
-    viewModel.search();
-  };
+
+  function addFacetDemiModalFieldClick(field) {
+    var _existingFacet = viewModel.collection.getFacetById(selectedWidget.id());
+    if (selectedWidget != null) {
+      selectedWidget.isLoading(true);
+      viewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
+      if (_existingFacet != null) {
+        _existingFacet.label(field.name());
+        _existingFacet.field(field.name());
+      }
+      viewModel.search();
+    }
+  }
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }

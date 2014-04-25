@@ -83,6 +83,7 @@ var Widget = function (size, id, name, widgetType, properties, offset) {
   self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
   self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
   self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
+  self.isLoading = ko.observable(false);
 
 
   self.klass = ko.computed(function () {
@@ -275,8 +276,8 @@ var Collection = function (vm, collection) {
       }
     });
     return _facet;
-  }  
-  
+  }
+
   self.template.fields = ko.computed(function () {
     var _fields = [];
     $.each(self.template.fieldsAttributes(), function (index, field) {
@@ -286,8 +287,23 @@ var Collection = function (vm, collection) {
       }      
     });
     return _fields;
-  });    
-  
+  });
+
+  self.template.fieldsModalFilter = ko.observable("");
+  self.template.filteredFieldsAttributes = ko.observableArray(self.template.fieldsAttributes());
+
+  self.template.fieldsModalFilter.subscribe(function(value){
+    var _fields = [];
+    $.each(self.template.fieldsAttributes(), function (index, field) {
+      if (field.name().toLowerCase().indexOf(self.template.fieldsModalFilter().toLowerCase()) > -1){
+        _fields.push(field);
+      }
+    });
+    self.template.filteredFieldsAttributes(_fields);
+  });
+
+
+
   self.addDynamicFields = function () { // + Adding merge smartly if schema updated
     $.post("/search/index/" + self.id + "/fields/dynamic", {
       }, function (data) {
@@ -380,10 +396,9 @@ var SearchViewModel = function (collection_json, query_json) {
   self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));  
 
   self.init = function () {
-  //self.collection.addDynamicFields();
-
-  self.isEditing(true);
-  self.search();  
+    //self.collection.addDynamicFields();
+    self.isEditing(true);
+    self.search();
   }
 
   self.search = function () {
@@ -436,7 +451,21 @@ var SearchViewModel = function (collection_json, query_json) {
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id); 
     self.search();
-  }  
+  }
+
+  self.getWidgetById = function (widget_id) {
+    var _widget = null;
+    $.each(self.columns(), function (i, col) {
+      $.each(col.rows(), function (j, row) {
+        $.each(row.widgets(), function (z, widget) {
+          if (widget.id() == widget_id){
+            _widget = widget;
+          }
+        });
+      });
+    });
+    return _widget;
+  }
 
   self.save = function () {
     $.post("/search/save", {
