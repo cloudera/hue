@@ -108,8 +108,13 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
   ul.errorlist {
     text-align: left;
-    margin-top: -4px;
     margin-bottom: 4px;
+    margin-top: -4px;
+  }
+
+  .alert-error ul.errorlist {
+    text-align: center;
+    margin-top: 0;
   }
 
   ul.errorlist li {
@@ -221,17 +226,13 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         </div>
         %endif
 
-        %if login_errors:
+        %if login_errors and not form['username'].errors and not form['password'].errors:
           <div class="alert alert-error" style="text-align: center">
             <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
-            <br />
-            <br />
             % if form.errors:
               % for error in form.errors:
-                ${ form.errors[error]|unicode,n }
+               ${ form.errors[error]|unicode,n }
               % endfor
-            % else:
-              <strong>${_('Invalid username or password.')}</strong>
             % endif
           </div>
         %endif
