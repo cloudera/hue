@@ -1298,12 +1298,6 @@ $(document).ready(function () {
     title: '${_("Press \"tab\", then \"enter\".")}'
   });
 
-  $("#executeQuery").keyup(function (event) {
-    if (event.keyCode == 13) {
-      tryExecuteQuery();
-    }
-  });
-
   initQueryField();
 
   var resizeTimeout = -1;
