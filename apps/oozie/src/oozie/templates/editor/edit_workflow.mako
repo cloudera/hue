@@ -392,7 +392,7 @@ ${ layout.menubar(section='workflows') }
 
   <div id="formActions" class="form-actions center">
   % if user_can_edit_job:
-    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: save_workflow" class="btn btn-primary" id="btn-save-wf">${ _('Save') }</button>
+    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only()" class="btn btn-primary" id="btn-save-wf">${ _('Save') }</button>
   % endif
     <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
   </div>
@@ -637,7 +637,7 @@ function workflow_save_success(data) {
     $(document).trigger("info", "${ _('Workflow saved') }");
     workflow.reload(data.data);
     workflow.is_dirty( false );
-    workflow.loading(false);
+    workflow.loading( false );
     $("#btn-save-wf").button('reset');
   }
 }
@@ -1045,6 +1045,11 @@ $(document).ready(function () {
       workflow_save_success(data);
       submitWorkflow($("#runUnsaved").data('submit-url'));
     });
+  });
+
+  $('#btn-save-wf').on("click", function() {
+    save_workflow();
+    return false;
   });
 
   function submitWorkflow(url) {
