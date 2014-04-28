@@ -201,16 +201,9 @@ var Query = function (vm, query) {
 // {'wid': 1, 'filter: [{'from': 1, 'to': 10}], 'type': 'range', 'field': 'created_at'}
 // {'wid': 2, ....}
 // ]  
-  self.toggleFacet = function (data) {alert(ko.mapping.toJSON(data)); 
+  self.toggleFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
 	var fq = self.getFacetFilter(data.widget_id);
-	
-	// Special case when text facet is a range
-	var _facet = vm.collection.getFacetById(data.widget_id);
-	if (_facet.type() == 'range') {
-      self.selectRangeFacet({'widget_id': data.widget_id, 'cat': data.facet.cat, 'from': data.facet.value, 'to': data.facet.value});
-      return;
-	}
-	
+
 	if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget_id,
@@ -237,14 +230,19 @@ var Query = function (vm, query) {
   }  
   
   self.selectRangeFacet = function (data) {
-    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+	var fq = self.getFacetFilter(data.widget_id);
+	var unselect = fq != null && fq.id() == data.widget_id;
 	
-    self.fqs.push(ko.mapping.fromJS({
-      'id': data.widget_id,
-      'field': data.cat,
-      'filter': {'from': data.from, 'to': data.to},
-      'type': 'range'
-    }));
+	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+    
+	if (! unselect) {
+      self.fqs.push(ko.mapping.fromJS({
+        'id': data.widget_id,
+        'field': data.cat,
+        'filter': {'from': data.from, 'to': data.to},
+        'type': 'range'
+      }));
+	}
 
     vm.search();
   }  
@@ -256,8 +254,6 @@ var Query = function (vm, query) {
         return false;
       }
     });
-
-    vm.search();
   } 
 
   self.getFacetFilter = function (widget_id) {
@@ -394,20 +390,25 @@ var Collection = function (vm, collection) {
   
   self.toggleFacet = function (facet_field, event) {
 	vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+	var hasChanged = false;
 	
     if (facet_field.properties.canRange()) {
-	   if (facet_field.type() == 'field' && facet_field.properties.sort() == 'desc') {
+	   if (facet_field.type() == 'field' && facet_field.properties.sort() == 'asc') {
 		 facet_field.type('range');
+		 hasChanged = true;
 	   } else if (facet_field.type() == 'range' && facet_field.properties.sort() == 'desc') {
-	     facet_field.type('field'); 
+	    facet_field.type('field')
+	     hasChanged = true;
        }
     }
-   
-    if (facet_field.properties.sort() == 'desc') {
-      facet_field.properties.sort('asc');
-    } else {
-      facet_field.properties.sort('desc');
-    }   
+
+    if (! hasChanged) {
+      if (facet_field.properties.sort() == 'desc') {
+        facet_field.properties.sort('asc');
+      } else {
+        facet_field.properties.sort('desc');
+      }   
+    }
    
     $(event.target).button('loading');
     vm.search();

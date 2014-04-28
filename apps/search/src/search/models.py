@@ -460,19 +460,21 @@ def augment_solr_response2(response, collection, query, solr_query):
   normalized_facets = []
 
   def pairwise2(cat, selected_values, iterable):
-      pairs = []
-      a, b = itertools.tee(iterable)
-      for element in a:
-        pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
-      return pairs
+    pairs = []
+    a, b = itertools.tee(iterable)
+    for element in a:
+      pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
+    return pairs
 
-  def reversepairs(iterable):
-      pairs = []
-      a, b = itertools.tee(iterable)
-      for element in a:
-        pairs.insert(0, next(a))
-        pairs.insert(0, element)
-      return pairs
+  def range_pair(cat, selected_values, iterable, end):
+    # counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
+    pairs = []
+    a, to = itertools.tee(iterable)
+    next(to, None)
+    for element in a:
+      next(to, None)
+      pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': next(to, end), 'selected': element == selected_values})
+    return pairs
 
   selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
 
@@ -480,32 +482,30 @@ def augment_solr_response2(response, collection, query, solr_query):
     # [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
     for facet in collection['facets']:
       category = facet['type']
-      
+
       if category == 'field' and response['facet_counts']['facet_fields']:
-        for name in response['facet_counts']['facet_fields']: # todo get from the list
-          #selected_field = fq.get(name, '') # todo with multi filter
-          collection_facet = get_facet_field(category, name, collection['facets'])
-          counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
-          if collection_facet['properties']['sort'] == 'asc':
-            counts.reverse()          
-          facet = {
-            'id': collection_facet['id'],
-            'field': name,
-            'type': category,
-            'label': collection_facet['label'],
-            'counts': counts,
-            # add total result count?
-          }
-          normalized_facets.append(facet)
+        name = facet['field']
+        collection_facet = get_facet_field(category, name, collection['facets'])
+        counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
+        if collection_facet['properties']['sort'] == 'asc':
+          counts.reverse()          
+        facet = {
+          'id': collection_facet['id'],
+          'field': name,
+          'type': category,
+          'label': collection_facet['label'],
+          'counts': counts,
+          # add total result count?
+        }
+        normalized_facets.append(facet)
       elif category == 'range' and response['facet_counts']['facet_ranges']:
           name = facet['field']
           collection_facet = get_facet_field(category, name, collection['facets'])
           counts = response['facet_counts']['facet_ranges'][name]['counts']
+          end = response['facet_counts']['facet_ranges'][name]['end']
+          counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), {}).get('from', None), counts, end)
           if collection_facet['properties']['sort'] == 'asc':
-            counts = reversepairs(counts) 
-#          if facet['widgetType'] in ('facet-widget', 'pie-widget'):
-#            print selected_values # 'from'
-#            counts = pairwise2(name, selected_values.get((facet['id'], name, 'field'), []), counts)          
+            counts.reverse()
           facet = {
             'id': collection_facet['id'],
             'field': name,

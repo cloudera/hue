@@ -122,8 +122,6 @@ class SolrApi(object):
 
     for fq in query['fqs']:
       model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
-      print '---'
-      print model_facet
       if model_facet['type'] == 'field':        
         params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
       elif model_facet['type'] == 'range':

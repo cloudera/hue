@@ -220,20 +220,39 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
           <i class="fa" data-bind="css: { 'fa-sort-alpha-asc': properties.sort() == 'desc' && type() != 'range', 'fa-sort-alpha-desc': properties.sort() == 'asc' && type() != 'range', 'fa-sort-numeric-desc': properties.sort() == 'desc' && type() == 'range', 'fa-sort-numeric-asc': properties.sort() == 'asc' && type() == 'range' }"></i>
         </a>  
       </span>
-    </div>  
-
-    <div data-bind="foreach: counts">
-      <div>
-        <a href="script:void(0)">
-        <!-- ko if: selected -->
-          <span data-bind="text: value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }"></span>
-          <i data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }" class="fa fa-times"></i>            
-        <!-- /ko -->
-        <!-- ko if: ! selected -->           
-          <span data-bind="text: value + ' (' + count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}); }"></span>
-        <!-- /ko -->
-        </a>
-      </div>
+    </div>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+	    <!-- ko if: type() != 'range' -->
+        <div data-bind="foreach: $parent.counts">
+          <div>
+            <a href="script:void(0)">
+              <!-- ko if: ! $data.selected -->
+                <span data-bind="text: $data.value + ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
+              <!-- /ko -->
+              <!-- ko if: $data.selected -->
+                <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                <i class="fa fa-times"></i>
+              <!-- /ko -->
+            </a>
+          </div>
+        </div>
+	    <!-- /ko -->
+	    <!-- ko if: type() == 'range' -->
+        <div data-bind="foreach: $parent.counts">
+          <div>
+            <a href="script:void(0)">
+              <!-- ko if: ! selected --> 
+                <span data-bind="text: $data.from + ' - ' + $data.to + ' (' + $data.value + ')',
+                  click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>                
+              <!-- /ko -->
+              <!-- ko if: selected -->
+                <span data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+                <i class="fa fa-times"></i>
+              <!-- /ko -->
+            </a>
+          </div>
+        </div>
+	    <!-- /ko -->    
     </div>
   </div>
   <!-- /ko -->
@@ -359,7 +378,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: from, to: to, cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer,
+      onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: d.obj.from, to: d.obj.to, cat: d.obj.field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -387,8 +407,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
     <div data-bind="barChart: {data: {counts: counts, widget_id: $parent.id()}, field: field, label: label, 
       transformer: barChartDataTransformer,
-      onClick: function(d){viewModel.query.selectRangeFacet({count: d.y, widget_id: d.widget_id, from: d.x, to: d.x_end, cat: field})}, 
-      onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}"
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) }, 
+      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
   </div>
   <!-- /ko -->
@@ -399,15 +419,22 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
-
   <!-- ko if: $root.getFacetFromQuery(id) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>
-
-    <div data-bind="pieChart: {data: {counts: counts, widget_id: $parent.id()}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <!-- ko if: type() == 'range' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, transformer: rangePieChartDataTransformer,
+         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) }, 
+         onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
+      <!-- /ko -->
+      <!-- ko if: type() != 'range' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
+      <!-- /ko -->
+    </div>    
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -426,7 +453,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="filter-widget">
   <div data-bind="foreach: $root.query.fqs">
-    <span data-bind="text: ko.mapping.toJSON($data), click: viewModel.query.removeFilter"></span>
+    <span data-bind="text: ko.mapping.toJSON($data), click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"></span>
   </div>
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -649,29 +676,45 @@ function pieChartDataTransformer(data) {
   return _data;
 }
 
-function barChartDataTransformer(data) {
+function rangePieChartDataTransformer(data) {
   var _data = [];
-  for (var i = 0; i < data.counts.length; i = i + 2) {
+  $(data.counts).each(function (cnt, item) {
+    item.widget_id = data.widget_id;
     _data.push({
-      series: 0,
-      x: data.counts[i],
-      x_end: data.counts[i + 2],
-      y: data.counts[i + 1],
-      widget_id: data.widget_id
+      label: item.from,
+      value: item.value,
+      to: item.to,
+      obj: item
     });
-  }
+  });
   return _data;
 }
 
-function timelineChartDataTransformer(data) {
+function barChartDataTransformer(data) {
   var _data = [];
-  for (var i = 0; i < data.length; i = i + 2) {
+  $(data.counts).each(function (cnt, item) {
+    item.widget_id = data.widget_id;  
     _data.push({
       series: 0,
-      x: new Date(moment(data[i]).valueOf()),
-      y: data[i + 1]
+      x: item.from,
+      x_end: item.to,
+      y: item.value,
+      obj: item
     });
-  }
+  });
+  return _data;
+}
+
+function timelineChartDataTransformer(data) { 
+  var _data = [];
+  $(data).each(function (cnt, item) {
+    _data.push({
+      series: 0,
+      x: new Date(moment(item.from).valueOf()),
+      y: item.value,
+      obj: item
+    });
+  });
   return _data;
 }
 
