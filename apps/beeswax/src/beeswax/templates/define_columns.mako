@@ -323,11 +323,42 @@ ${ layout.metastore_menubar() }
         if ($.isNumeric(_val)) {
           if (isInt(_val)) {
             // it's an int
-            _foundType = "int";
+            try {
+              // try to detect the size of the int
+              var _bytes = Math.ceil((Math.log(_val)/Math.log(2))/8);
+              switch (_bytes){
+                case 1:
+                  _foundType = "tinyint";
+                  break;
+                case 2:
+                  _foundType = "smallint";
+                  break;
+                case 3:
+                case 4:
+                  _foundType = "int";
+                  break;
+                default:
+                  _foundType = "bigint";
+                  break;
+              }
+            }
+            catch (e){
+              _foundType = "int";
+            }
           }
           else {
             // it's possibly a float
-            _foundType = "float";
+            try {
+              _foundType = "float";
+              // try to detect the size of the int
+              var _bytes = Math.ceil((Math.log(_val)/Math.log(2))/8);
+              if (_bytes > 4){
+                _foundType = "double";
+              }
+            }
+            catch (e){
+              _foundType = "float";
+            }
           }
         }
         else {
