@@ -121,7 +121,16 @@ class SolrApi(object):
           params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
 
     for fq in query['fqs']:
-      params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], fq['filter'])))),)
+      model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
+      print '---'
+      print model_facet
+      if model_facet['type'] == 'field':        
+        params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
+      elif model_facet['type'] == 'range':
+        # Set end range if last range
+        if not fq['filter'].get('to'):           
+          fq['filter']['to'] = model_facet['properties']['end'] if model_facet else '*'
+        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:[%s TO %s}' % (fq['field'],fq['field'], fq['filter']['from'], fq['filter']['to'])))),)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []

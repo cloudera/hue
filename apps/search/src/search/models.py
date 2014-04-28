@@ -503,8 +503,9 @@ def augment_solr_response2(response, collection, query, solr_query):
           counts = response['facet_counts']['facet_ranges'][name]['counts']
           if collection_facet['properties']['sort'] == 'asc':
             counts = reversepairs(counts) 
-          if facet['widgetType'] in ('facet-widget', 'pie-widget'):
-            counts = pairwise2(name, selected_values.get((facet['id'], name, 'field'), []), counts)          
+#          if facet['widgetType'] in ('facet-widget', 'pie-widget'):
+#            print selected_values # 'from'
+#            counts = pairwise2(name, selected_values.get((facet['id'], name, 'field'), []), counts)          
           facet = {
             'id': collection_facet['id'],
             'field': name,

@@ -32,7 +32,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cogs"></i></button>    
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
-      <button type="button" title="${ _('History') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-archive"></i></button>
+      <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-link"></i></button>
       &nbsp;&nbsp;&nbsp;            
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
       <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
@@ -49,9 +49,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <input data-bind="value: query.q" name="query" maxlength="256" type="text" class="search-query input-xxlarge" id="id_query" style="cursor: auto;">
       
       <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
-      <span style="padding-left:15px">
-        <button type="button" id="download-btn" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i></button>
-      </span>
     </div>
   </form>
 </div>
@@ -232,7 +229,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
           <span data-bind="text: value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }"></span>
           <i data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}) }" class="fa fa-times"></i>            
         <!-- /ko -->
-        <!-- ko if: !selected -->           
+        <!-- ko if: ! selected -->           
           <span data-bind="text: value + ' (' + count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id}); }"></span>
         <!-- /ko -->
         </a>
@@ -329,6 +326,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="resultset-pagination">
   <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } <i class="fa fa-arrow-right"></i>
+  
+  <span class="pull-right">
+    <i class="hfo hfo-file-csv"></i>
+    <i class="hfo hfo-file-xls"></i>
+    <i class="fa fa-save"></i>
+  </span>
 </script>
 
 <script type="text/html" id="histogram-widget">
@@ -356,7 +359,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer, onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: from, to: to, cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -382,7 +385,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div> 
 
-    <div data-bind="barChart: {data: counts, field: field, label: label, transformer: barChartDataTransformer, onClick: function(d){viewModel.query.selectFacet({count: d.y,selected: false,value: d.x,cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="barChart: {data: {counts: counts, widget_id: $parent.id()}, field: field, label: label, 
+      transformer: barChartDataTransformer,
+      onClick: function(d){viewModel.query.selectRangeFacet({count: d.y, widget_id: d.widget_id, from: d.x, to: d.x_end, cat: field})}, 
+      onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}"
+    />
   </div>
   <!-- /ko -->
 </script>
@@ -400,7 +407,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>
 
-    <div data-bind="pieChart: {data: {counts: counts, widget_id: $parent.id}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+    <div data-bind="pieChart: {data: {counts: counts, widget_id: $parent.id()}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -419,7 +426,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="filter-widget">
   <div data-bind="foreach: $root.query.fqs">
-    <span data-bind="text: ko.mapping.toJSON($data)"></span>
+    <span data-bind="text: ko.mapping.toJSON($data), click: viewModel.query.removeFilter"></span>
   </div>
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -644,11 +651,13 @@ function pieChartDataTransformer(data) {
 
 function barChartDataTransformer(data) {
   var _data = [];
-  for (var i = 0; i < data.length; i = i + 2) {
+  for (var i = 0; i < data.counts.length; i = i + 2) {
     _data.push({
       series: 0,
-      x: data[i],
-      y: data[i + 1]
+      x: data.counts[i],
+      x_end: data.counts[i + 2],
+      y: data.counts[i + 1],
+      widget_id: data.widget_id
     });
   }
   return _data;

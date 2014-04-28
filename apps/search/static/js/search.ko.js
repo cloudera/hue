@@ -200,23 +200,35 @@ var Query = function (vm, query) {
 //[{'wid': 1, 'filter: ['c', 'd'], 'type': 'field', 'field': 'user_location'},
 // {'wid': 1, 'filter: [{'from': 1, 'to': 10}], 'type': 'range', 'field': 'created_at'}
 // {'wid': 2, ....}
-// ]
- // {"count":27,"selected":false,"value":"dhclient","cat":"process"}
-  
-  self.toggleFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
+// ]  
+  self.toggleFacet = function (data) {alert(ko.mapping.toJSON(data)); 
 	var fq = self.getFacetFilter(data.widget_id);
 	
+	// Special case when text facet is a range
+	var _facet = vm.collection.getFacetById(data.widget_id);
+	if (_facet.type() == 'range') {
+      self.selectRangeFacet({'widget_id': data.widget_id, 'cat': data.facet.cat, 'from': data.facet.value, 'to': data.facet.value});
+      return;
+	}
+	
 	if (fq == null) {
-	    self.fqs.push({
-	      'id': data.widget_id,
-	      'field': data.facet.cat,
-	      'filter': data.facet.value,
-	      'type': 'field'
-	    });
+      self.fqs.push(ko.mapping.fromJS({
+        'id': data.widget_id,
+        'field': data.facet.cat,
+        'filter': [data.facet.value],
+        'type': 'field'
+      }));
 	} else {
       $.each(self.fqs(), function (index, fq) {
-        if (fq.id == data.widget_id) {
-          self.fqs.remove(fq); 
+        if (fq.id() == data.widget_id) {
+          if (fq.filter.indexOf(data.facet.value) > -1) {
+        	fq.filter.remove(data.facet.value);
+        	if (fq.filter().length == 0) {
+              self.fqs.remove(fq);
+        	}
+          } else {
+        	fq.filter.push(data.facet.value);
+          }
         }
       });
 	}
@@ -224,31 +236,34 @@ var Query = function (vm, query) {
     vm.search();
   }  
   
-  self.selectFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
-    self.fqs.push({
+  self.selectRangeFacet = function (data) {
+    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+	
+    self.fqs.push(ko.mapping.fromJS({
       'id': data.widget_id,
-      'field': data.facet.cat,
-      'filter': data.facet.value,
-      'type': 'field'
-    });
-    
-    vm.search();
-  }
+      'field': data.cat,
+      'filter': {'from': data.from, 'to': data.to},
+      'type': 'range'
+    }));
 
-  self.unselectFacet = function (data) {
-    $.each(self.fqs(), function (index, fq) {
-      if (fq.id == data.widget_id) {
-        self.fqs.remove(fq); 
-      }
-    });
-    
     vm.search();
   }  
+  
+  self.removeFilter = function (data) { 
+    $.each(self.fqs(), function (index, fq) {
+      if (fq.id() == data.id()) {          
+        self.fqs.remove(fq);
+        return false;
+      }
+    });
+
+    vm.search();
+  } 
 
   self.getFacetFilter = function (widget_id) {
     var _fq = null;
     $.each(self.fqs(), function (index, fq) {
-      if (fq.id == widget_id) {
+      if (fq.id() == widget_id) {
         _fq = fq;
         return false;
       }
@@ -377,7 +392,9 @@ var Collection = function (vm, collection) {
    vm.search();
   };
   
-  self.toggleFacet = function (facet_field, event) {	
+  self.toggleFacet = function (facet_field, event) {
+	vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+	
     if (facet_field.properties.canRange()) {
 	   if (facet_field.type() == 'field' && facet_field.properties.sort() == 'desc') {
 		 facet_field.type('range');
