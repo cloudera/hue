@@ -22,11 +22,16 @@ import math
 import re
 
 from django.db import models
+from django.utils.html import escape
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from django.core.urlresolvers import reverse
 
+from desktop.lib.i18n import smart_unicode
+
 from search.api import SolrApi
 from search.conf import SOLR_URL
+import numbers
+
 
 
 LOG = logging.getLogger(__name__)
@@ -527,8 +532,16 @@ def augment_solr_response2(response, collection, query, solr_query):
           normalized_facets.append(facet)
       # pivot_facet          
 
-  # TODO HTML escape docs!
-  
+  # HTML escaping
+#  for doc in response['response']['docs']:  
+#    for field, value in doc.iteritems():
+#      if isinstance(value, numbers.Number):
+#        escaped_value = value
+#      else:
+#        value = smart_unicode(value, errors='replace')
+#        escaped_value = escape(value)
+#      doc[field] = escaped_value
+      
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields:
     id_field = collection.get('idField')    
@@ -538,8 +551,8 @@ def augment_solr_response2(response, collection, query, solr_query):
           doc.update(response['highlighting'][doc[id_field]])
     else:
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
-      
-        
+
+
   response['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
   response['search_time'] = response['responseHeader']['QTime']
 

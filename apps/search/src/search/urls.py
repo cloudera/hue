@@ -40,7 +40,8 @@ urlpatterns = patterns('search.views',
   # Ajax
   url(r'^suggest/(?P<collection_id>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
   url(r'^index/(?P<collection_id>\w+)/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
-  url(r'^template/(?P<collection_id>\w+)/new_facet$', 'new_facet', name='new_facet'),
+  url(r'^template/new_facet$', 'new_facet', name='new_facet'),
+  url(r'^get_document$', 'get_document', name='get_document'),
   
   # old
   url(r'^admin/collection/(?P<collection_id>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),

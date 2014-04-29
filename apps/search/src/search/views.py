@@ -471,7 +471,29 @@ def index_fields_dynamic(request, collection_id):
 
 
 # TODO security
-def new_facet(request, collection_id):  
+def get_document(request):  
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    doc_id = request.POST.get('id')
+            
+    if doc_id:
+      result['doc'] = SolrApi(SOLR_URL.get(), request.user).get(collection['name'], doc_id)
+      result['status'] = 0
+      result['message'] = ''
+    else:
+      result['message'] = _('This document does not have any index id.')
+      result['status'] = 1
+    
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+# TODO security
+def new_facet(request):  
   result = {'status': -1, 'message': 'Error'}
   
   try:

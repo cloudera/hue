@@ -82,7 +82,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div class="toolbar-label">${_('WIDGETS')}</div>
-    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Grid Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('HTML Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-code"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <!-- <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
@@ -342,8 +343,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
           <th>${ ('Document') }</th>
         </tr>
       </thead>
-      <tbody data-bind="foreach: $root.results">
-        <tr class="result-row" data-bind="foreach: $data">
+      <tbody data-bind="foreach: { data: $root.results, as: 'documents' }">            
+        <tr class="result-row" data-bind="foreach: row, click: $root.getDocument">
           <td data-bind="html: $data"></td>
         </tr>
       </tbody>

@@ -294,7 +294,7 @@ var Collection = function (vm, collection) {
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.addFacet = function (facet_json) {
-    $.post("/search/template/" + self.id + "/new_facet", {
+    $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
@@ -510,7 +510,8 @@ var SearchViewModel = function (collection_json, query_json) {
             } else {
               row.push(ko.mapping.toJSON(item)); 
             }
-            self.results.push(row);
+            var doc = {'id': item[self.collection.idField], 'row': row};
+            self.results.push(doc);
           });
         }
         else {
@@ -550,6 +551,25 @@ var SearchViewModel = function (collection_json, query_json) {
     return _widget;
   }
 
+  self.getDocument = function (doc) {
+    $.post("/search/get_document", {
+      collection: ko.mapping.toJSON(self.collection),
+      id: doc.id
+    },function (data) {
+      if (data.status == 0) {
+    	alert(ko.mapping.toJSON(data.doc.doc));
+      }
+      else if (data.status == 1) {
+    	$(document).trigger("info", data.message);
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };  
+  
   self.save = function () {
     $.post("/search/save", {
       collection: ko.mapping.toJSON(self.collection),
