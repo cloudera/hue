@@ -197,10 +197,7 @@ var Query = function (vm, query) {
 
   self.q = ko.observable(query.q);
   self.fqs = ko.mapping.fromJS(query.fqs);
-//[{'wid': 1, 'filter: ['c', 'd'], 'type': 'field', 'field': 'user_location'},
-// {'wid': 1, 'filter: [{'from': 1, 'to': 10}], 'type': 'range', 'field': 'created_at'}
-// {'wid': 2, ....}
-// ]  
+
   self.toggleFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
 	var fq = self.getFacetFilter(data.widget_id);
 
@@ -516,7 +513,7 @@ var SearchViewModel = function (collection_json, query_json) {
   
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id);
-    // todo remove fqs
+    self.query.removeFilter(widget_json);
     self.search();
   }
 
