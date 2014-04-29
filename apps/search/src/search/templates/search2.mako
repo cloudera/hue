@@ -106,7 +106,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   </div>
 </div>
 
-<div data-bind="css: {'dashboard': true, 'unselectable': isEditing(), 'with-top-margin': isEditing()}">
+<div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
@@ -612,7 +612,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     cursor: move;
   }
 
-  .unselectable {
+  .ui-sortable .card-heading {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
