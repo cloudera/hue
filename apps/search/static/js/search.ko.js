@@ -339,11 +339,21 @@ var Collection = function (vm, collection) {
     $.each(self.template.fieldsAttributes(), function (index, field) {
       var position = self.template.fieldsSelected.indexOf(field.name());
       if (position != -1) {
-      _fields[position] = field;
+        _fields[position] = field;
       }      
     });
     return _fields;
   });
+  self.getTemplateField = function (name) {
+    var _field = null;
+    $.each(self.template.fields(), function (index, field) {
+      if (field.name() == name) {
+    	_field = field;
+        return false;
+      }
+    });
+    return _field;	  
+  };
 
   self.template.fieldsModalFilter = ko.observable("");
   self.template.filteredFieldsAttributes = ko.observableArray(self.template.fieldsAttributes());
@@ -357,7 +367,6 @@ var Collection = function (vm, collection) {
     });
     self.template.filteredFieldsAttributes(_fields);
   });
-
 
 
   self.addDynamicFields = function () { // + Adding merge smartly if schema updated
@@ -409,6 +418,16 @@ var Collection = function (vm, collection) {
    
     $(event.target).button('loading');
     vm.search();
+  };
+  
+  self.translateSelectedField = function (index, direction) {
+    if (direction == 'left') {
+	  self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
+    } else {
+      self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
+    }
+	
+	vm.search();
   };
 };
 

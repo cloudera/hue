@@ -312,12 +312,14 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 	<!-- ko if: $root.collection.template.isGridLayout() -->
     <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
       <thead>
-        <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fields">
-          <th>
+        <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
+          <th data-bind="with: $root.collection.getTemplateField($data)">
+            <a href="javascript: void(0)" data-bind="visible: $index() > 0, click: function(){ $root.collection.translateSelectedField($index(), 'left'); }"><i class="fa fa-chevron-left"></i></a>
             <a href="javascript: void(0)" title="${ _('Sort') }">
               <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
               <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
             </a>
+            <a href="javascript: void(0)" data-bind="visible: $index() < $root.collection.template.fields().length - 1, click: function(){ $root.collection.translateSelectedField($index(), 'right'); }"><i class="fa fa-chevron-right"></i></a>
           </th>
         </tr>
         <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
