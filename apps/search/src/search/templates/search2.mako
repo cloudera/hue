@@ -55,7 +55,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <div class="card card-toolbar" data-bind="slideVisible: isEditing">
   <div style="float: left">
-    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
+    <div class="toolbar-label">${_('LAYOUT')}</div>
     <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
@@ -81,7 +81,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   </div>
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
-    <div style="font-weight: bold; color: #999; padding-left: 8px">${_('WIDGETS')}</div>
+    <div class="toolbar-label">${_('WIDGETS')}</div>
     <div class="draggable-widget" data-bind="draggable: draggableResultset" title="${_('Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggableFacet" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>    
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
@@ -537,30 +537,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     min-height: 70px;
   }
 
-  .layout-container {
-    width: 100px;
-    float: left;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
-
-  .layout-box {
-    float: left;
-    height: 78px;
-    background-color: #DDD;
-    text-align: center;
-  }
-
-  .layout-box i {
-    color: #333;
-    font-size: 40px;
-    line-height: 78px;
-  }
-
-  .layout-container:hover .layout-box {
-    background-color: #CCC;
-  }
-
   .ui-sortable {
     background-color: #F6F6F6;
   }
@@ -603,7 +579,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   .card-toolbar {
     margin: 0;
     padding: 4px;
-    padding-top: 10px;
+    padding-top: 0;
     top: 70px;
     position: fixed;
     width: 100%;
@@ -636,19 +612,79 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     margin-top: 30px;
   }
 
+  .toolbar-label {
+    float: left;
+    font-weight: bold;
+    color: #999;
+    padding-left: 8px;
+    padding-top: 40px;
+  }
+
   .draggable-widget {
     width: 100px;
     text-align: center;
     float: left;
     border: 1px solid #CCC;
     margin-top: 10px;
-    margin-right: 10px;
+    margin-left: 10px;
     cursor: move;
   }
+
   .draggable-widget a {
     font-size: 58px;
     line-height: 76px;
     cursor: move;
+  }
+
+  .layout-container {
+    width: 100px;
+    float: left;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  .layout-box {
+    float: left;
+    height: 78px;
+    background-color: #DDD;
+    text-align: center;
+  }
+
+  .layout-box i {
+    color: #333;
+    font-size: 40px;
+    line-height: 78px;
+  }
+
+  .layout-container:hover .layout-box {
+    background-color: #CCC;
+  }
+
+  .with-top-margin {
+    margin-top: 100px;
+  }
+
+  @media (max-width: 1366px) {
+    .toolbar-label {
+      padding-top: 24px;
+    }
+    .draggable-widget {
+      width: 60px;
+    }
+    .draggable-widget a {
+      font-size: 28px;
+      line-height: 46px;
+    }
+    .layout-box {
+      height: 48px;
+    }
+    .layout-box i {
+      font-size: 28px;
+      line-height: 48px;
+    }
+    .with-top-margin {
+      margin-top: 60px;
+    }
   }
 
   .ui-sortable .card-heading {
@@ -663,10 +699,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   .search-bar {
     padding-top: 6px;
     padding-bottom: 6px;
-  }
-
-  .with-top-margin {
-    margin-top: 130px;
   }
 
   .widget-settings-section {
@@ -697,6 +729,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     font-size: 80px;
     color: #CCC;
     text-align: center;
+  }
+
+  .card {
+    margin: 0;
+    margin-top: 1px;
   }
 
 </style>
