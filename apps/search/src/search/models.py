@@ -457,7 +457,7 @@ def is_chart_field(field, charts):
   return found
 
 
-def augment_solr_response2(response, collection, query, solr_query):
+def augment_solr_response2(response, collection, query):
   augmented = response
   augmented['normalized_facets'] = []
 
@@ -516,6 +516,7 @@ def augment_solr_response2(response, collection, query, solr_query):
             'type': category,
             'label': collection_facet['label'],
             'counts': counts,
+            'extraSeries': []
           }
           normalized_facets.append(facet)
       elif category == 'query' and response['facet_counts']['facet_queries']:
@@ -552,7 +553,7 @@ def augment_solr_response2(response, collection, query, solr_query):
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
 
 
-  response['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
+  response['total_pages'] = 111 #int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
   response['search_time'] = response['responseHeader']['QTime']
 
   if normalized_facets:
@@ -560,7 +561,7 @@ def augment_solr_response2(response, collection, query, solr_query):
 
   return augmented
 
-def augment_solr_exception(response, collection, solr_query):
+def augment_solr_exception(response, collection):
   response.update(
   {
     "facet_counts": {   

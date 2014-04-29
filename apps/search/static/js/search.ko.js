@@ -197,6 +197,7 @@ var Query = function (vm, query) {
 
   self.q = ko.observable(query.q);
   self.fqs = ko.mapping.fromJS(query.fqs);
+  // multiq?
 
   self.toggleFacet = function (data) {
 	var fq = self.getFacetFilter(data.widget_id);
@@ -255,7 +256,7 @@ var Query = function (vm, query) {
 
   self.getFacetFilter = function (widget_id) {
     var _fq = null;
-    $.each(self.fqs(), function (index, fq) {
+    $.each(self.fqs(), function (index, fq) { 
       if (fq.id() == widget_id) {
         _fq = fq;
         return false;
@@ -344,6 +345,7 @@ var Collection = function (vm, collection) {
     });
     return _fields;
   });
+
   self.getTemplateField = function (name) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
@@ -474,6 +476,7 @@ var Collection = function (vm, collection) {
   
   self.translateSelectedField = function (index, direction) {
 	var array = self.template.fieldsSelected();
+
     if (direction == 'left') {
 	  self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
     } else {
@@ -502,7 +505,7 @@ var SearchViewModel = function (collection_json, query_json) {
     var _facet = null;
     if (self.norm_facets() !== undefined) {
       $.each(self.norm_facets(), function (index, norm_facet) {  
-        if (norm_facet.id == facet_id()) {
+        if (norm_facet.id == facet_id) {
           _facet = norm_facet;
         }      
       });
@@ -539,47 +542,80 @@ var SearchViewModel = function (collection_json, query_json) {
   self.search = function () {
     self.isRetrievingResults(true);
     $(".jHueNotify").hide();
-    $.post("/search/search", {
-      collection: ko.mapping.toJSON(self.collection),
-      query: ko.mapping.toJSON(self.query),
-      layout: ko.mapping.toJSON(self.columns)
-    }, function (data) {
-      self.response(data);
-      self.results.removeAll();
-      if (data.error) {
-        $(document).trigger("error", data.error);
-      }
-      else {
-        if (self.collection.template.isGridLayout()) {
-          // Table view
-          $.each(data.response.docs, function (index, item) {
-            var row = [];
-            var fields = self.collection.template.fieldsSelected();
-            // Display selected fields or whole json document
-            if (fields.length != 0) {
-              $.each(self.collection.template.fieldsSelected(), function (index, field) {  
-                row.push(item[field]);
-              });
-            } else {
-              row.push(ko.mapping.toJSON(item)); 
-            }
-            var doc = {'id': item[self.collection.idField], 'row': row};
-            self.results.push(doc);
-          });
+    
+    // Multi queries
+    var facet = self.query.getFacetFilter('4933579c-38b0-4599-afa1-021e2ca7ae1c');
+    var multiQs = [];
+
+    // todo APPLUY FQ filter!!
+    
+    // self.query.q().slice(1) too ?
+    if (facet && facet.filter().length > 0) { // todo + histogram there if set to multi q
+      multiQs = $.map(facet.filter(), function(d) {
+    	return $.post("/search/get_timeline", {
+            collection: ko.mapping.toJSON(self.collection),
+            query: ko.mapping.toJSON(self.query),
+            facet: ko.mapping.toJSON(facet),
+            d: d
+           }, function (data) {return data});
+      });
+    }
+
+    $.when.apply($, [
+      $.post("/search/search", {
+        collection: ko.mapping.toJSON(self.collection),
+        query: ko.mapping.toJSON(self.query),
+        layout: ko.mapping.toJSON(self.columns)
+      }, function (data) {
+        self.response(data);
+        self.results.removeAll();
+        if (data.error) {
+          $(document).trigger("error", data.error);
         }
         else {
-          // Template view
-          var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
-          $.each(data.response.docs, function (index, item) {
-            addTemplateFunctions(item);
-            self.results.push(Mustache.render(_mustacheTmpl, item));
-          });
+          if (self.collection.template.isGridLayout()) {
+            // Table view
+            $.each(data.response.docs, function (index, item) {
+              var row = [];
+              var fields = self.collection.template.fieldsSelected();
+              // Display selected fields or whole json document
+              if (fields.length != 0) {
+                $.each(self.collection.template.fieldsSelected(), function (index, field) {  
+                  row.push(item[field]);
+                });
+              } else {
+                row.push(ko.mapping.toJSON(item)); 
+              }
+              var doc = {'id': item[self.collection.idField], 'row': row};
+              self.results.push(doc);
+            });
+          }
+          else {
+            // Template view
+            var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
+            $.each(data.response.docs, function (index, item) {
+              addTemplateFunctions(item);
+              self.results.push(Mustache.render(_mustacheTmpl, item));
+            });
+          }
+          self.isRetrievingResults(false);
         }
-        self.isRetrievingResults(false);
+      })
+      ].concat(multiQs)
+    )
+    .done(function() {
+      if (arguments[0] instanceof Array) { // If multi queries
+    	var histoFacet = self.getFacetFromQuery('e90cc50b-3d55-fb7c-28f3-a0710ca28ae6');    	
+        for (var i = 1; i < arguments.length; i++) {
+          histoFacet.extraSeries.push(arguments[i][0]['series']);
+        }
+        self.response.valueHasMutated();
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
+    })
+    .fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
-    }).always(function () {
+    })
+    .always(function () {
       $('.btn-loading').button('reset');
     });
   };

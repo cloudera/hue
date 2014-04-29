@@ -177,8 +177,13 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   #@demo_handler
-  def query2(self, solr_query, collection, query):
+  def query2(self, collection, query):
+    solr_query = {}      
     
+    solr_query['collection'] = collection['name']
+    solr_query['rows'] = 10
+    solr_query['start'] = 0
+          
     params = self._get_params() + (
         ('q', query['q'] or EMPTY_QUERY.get()),
         ('wt', 'json'),
@@ -206,12 +211,13 @@ class SolrApi(object):
           params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
 
     for fq in query['fqs']:
-      model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
-      if model_facet['type'] == 'field':        
+      #model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
+      if fq['type'] == 'field':        
         params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
-      elif model_facet['type'] == 'range':
+      elif fq['type'] == 'range':
         # Set end range if last range
-        if fq['filter'].get('to'):           
+        if fq['filter'].get('to'):
+          model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]           
           fq['filter']['to'] = model_facet['properties']['end'] if model_facet else '*'
         params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:[%s TO %s}' % (fq['field'],fq['field'], fq['filter']['from'], fq['filter']['to'])))),)
 

@@ -199,12 +199,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 
 <script type="text/html" id="hit-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
     </div>  
@@ -215,7 +215,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
@@ -224,8 +224,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <!-- ko if: type() == 'range' -->
@@ -376,7 +376,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="histogram-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
@@ -385,8 +385,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <br/>      
@@ -397,8 +397,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
     ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-minus"></i></a>
+    ## <span data-bind="text: ko.mapping.toJSON(extraSeries)"></span>
 
-    <div data-bind="timelineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
+    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()})},
       onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
@@ -406,7 +407,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="bar-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
@@ -415,8 +416,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <br/>
@@ -435,7 +436,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="line-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
@@ -444,8 +445,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <br/>
@@ -465,12 +466,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 
 <script type="text/html" id="pie-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
     </div>
@@ -515,12 +516,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="map-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 
-  <!-- ko if: $root.getFacetFromQuery(id) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
     </div>
@@ -896,6 +897,7 @@ function lineChartDataTransformer(rawDatum) {
 function timelineChartDataTransformer(rawDatum) {
   var _datum = [];
   var _data = [];
+
   $(rawDatum.counts).each(function (cnt, item) {
     _data.push({
       series: 0,
@@ -904,23 +906,33 @@ function timelineChartDataTransformer(rawDatum) {
       obj: item
     });
   });
-    _datum.push({
+  
+  _datum.push({
     key: rawDatum.label,
     values: _data
   });
-  var _data = [];
-  $(rawDatum.counts).each(function (cnt, item) {
-    _data.push({
-      series: 1,
-      x: new Date(moment(item.from).valueOf()),
-      y: item.value,
-      obj: item
-    });
-  });  
+  
+  if (rawDatum.extraSeries.length > 0) {
+  var _datum = [];
+  }
+    
+  $(rawDatum.extraSeries).each(function (cnt, item) {
+    var _data = [];
+    $(item.counts).each(function (cnt, item) {
+      _data.push({
+        series: cnt + 1,
+        x: new Date(moment(item.from).valueOf()),
+        y: item.value,
+        obj: item
+      });
+    });      
+
     _datum.push({
-    key: rawDatum.label + " #2",
-    values: _data
+      key: item.label,
+      values: _data
+    });
   });
+  
   return _datum;
 }
 

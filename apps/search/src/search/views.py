@@ -89,21 +89,13 @@ def search(request):
 
   if collection['id']:
     hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
-    # collection['name']=
-  
+
   print request.POST
     
   if collection:
-    solr_query = {}    
     try:      
-      solr_query = {}      
-      
-      solr_query['collection'] = collection['name']
-      solr_query['rows'] = 10
-      solr_query['start'] = 0
-      
-      response = SolrApi(SOLR_URL.get(), request.user).query2(solr_query, collection, query)
-      response = augment_solr_response2(response, collection, query, solr_query)
+      response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
+      response = augment_solr_response2(response, collection, query)
       print response
     except RestException, e:
       try:
@@ -118,7 +110,7 @@ def search(request):
     response['error'] = _('There is no collection to search.')
 
   if 'error' in response:
-    augment_solr_exception(response, collection, solr_query)
+    augment_solr_exception(response, collection)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -484,6 +476,44 @@ def get_document(request):
     
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+# TODO security
+def get_timeline(request):  
+  result = {'status': -1, 'message': 'Error'}
+
+#  try:
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = json.loads(request.POST.get('query', '{}'))
+
+  facet = json.loads(request.POST.get('facet', '{}'))
+  facet_filter = request.POST.get('d', '{}')
+      
+  facet_id = facet['id']
+
+  # Only care about our current field:value filter
+  for fq in query['fqs']:
+    if fq['id'] == facet_id:
+      fq['filter'] = [facet_filter] 
+  
+  # Remove other facets from collection
+  collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
+  
+  response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
+  response = augment_solr_response2(response, collection, query)
+  
+  print 'get_timeline'
+  print response['normalized_facets']
+
+  result['series'] = {'label': facet_filter, 'counts': response['normalized_facets'][0]['counts']}
+  result['status'] = 0
+  result['message'] = ''
+    
+#  except Exception, e:
+#    print e
+#    result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
