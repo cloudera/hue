@@ -21,7 +21,7 @@ ko.bindingHandlers.pieChart = {
       var _data = _options.transformer(_options.data);
 
       nv.addGraph(function () {
-        var _chart = nv.models.pieChart()
+        var _chart = nv.models.growingPieChart()
                 .x(function (d) {
                   return d.label
                 })
@@ -37,6 +37,13 @@ ko.bindingHandlers.pieChart = {
                 .transition().duration(350)
                 .each("end", _options.onComplete)
                 .call(_chart);
+
+        $.each(_options.fqs(), function(cnt, item){
+          if (item.field() == _options.field()){
+            _chart.selectSlices(item.filter());
+          }
+        });
+
         nv.utils.windowResize(_chart.update);
         $(element).height($(element).width());
         return _chart;

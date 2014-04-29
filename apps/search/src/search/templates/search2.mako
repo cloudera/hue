@@ -450,7 +450,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
          onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
       <!-- /ko -->
       <!-- ko if: type() != 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
       <!-- /ko -->
     </div>    
   </div>
@@ -471,6 +471,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="filter-widget">
   <div data-bind="foreach: $root.query.fqs">
+    lala?
     <span data-bind="text: ko.mapping.toJSON($data), click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"></span>
   </div>
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -525,6 +526,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 
 <script src="/search/static/js/nv.d3.multiBarWithFocusChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <style type="text/css">
