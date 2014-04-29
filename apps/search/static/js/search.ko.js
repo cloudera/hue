@@ -198,7 +198,7 @@ var Query = function (vm, query) {
   self.q = ko.observable(query.q);
   self.fqs = ko.mapping.fromJS(query.fqs);
 
-  self.toggleFacet = function (data) {//alert(ko.mapping.toJSON(data)); 
+  self.toggleFacet = function (data) {
 	var fq = self.getFacetFilter(data.widget_id);
 
 	if (fq == null) {
@@ -226,11 +226,11 @@ var Query = function (vm, query) {
     vm.search();
   }  
   
-  self.selectRangeFacet = function (data) {
+  self.selectRangeFacet = function (data) { 
 	var fq = self.getFacetFilter(data.widget_id);
 	var unselect = fq != null && fq.id() == data.widget_id;
 	
-	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // could combine ranges
     
 	if (! unselect) {
       self.fqs.push(ko.mapping.fromJS({
@@ -419,6 +419,16 @@ var Collection = function (vm, collection) {
     $(event.target).button('loading');
     vm.search();
   };
+  
+  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(facet)); 
+	var facet = self.getFacetById(data.widget_id);
+	
+	facet.properties.start(data.from);
+	facet.properties.end(data.to);
+	//facet.properties.gap(null);
+
+    vm.search();
+  }    
   
   self.translateSelectedField = function (index, direction) {
 	var array = self.template.fieldsSelected();

@@ -31,7 +31,7 @@ from django.shortcuts import redirect
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 
-from search.api import SolrApi
+from search.api import SolrApi, _guess_gap
 from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
@@ -577,6 +577,9 @@ def new_facet(request):
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
+
+def get_range_facet(request):
+  _guess_gap(self, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
 
 def install_examples(request):
   result = {'status': -1, 'message': ''}

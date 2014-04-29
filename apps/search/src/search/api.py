@@ -19,6 +19,10 @@
 import json
 import logging
 import urllib
+import numbers
+
+from datetime import datetime
+from time import mktime
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
@@ -37,6 +41,75 @@ DEFAULT_USER = 'hue'
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
+def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
+  is_range = False
+  
+  try:
+    if widget_type == 'pie-widget':
+      SLOTS = 5
+    elif widget_type == 'facet-widget':
+      SLOTS = 10
+    else:
+      SLOTS = 100
+      
+    stats_json = solr_api.stats(collection['name'], [facet_field])
+    stat_facet = stats_json['stats']['stats_fields'][facet_field]
+    
+    if isinstance(stat_facet['min'], numbers.Number):
+      stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
+      stats_max = int(stat_facet['max'])
+      if start is not None:
+        stats_min = max(start, stats_min)
+      if end is not None:
+        stats_max = min(end, stats_max)   
+             
+      if gap is None:
+        gap = (stats_max - stats_min) / SLOTS
+      if gap < 1:
+        gap = 1
+      is_range = True
+    elif 'T' in stat_facet['min']:
+      stats_min = stat_facet['min']
+      stats_max = stat_facet['max']
+      difference = (
+          mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - 
+          mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())
+      ) / SLOTS
+
+      if difference < 1:
+        unit = 'SECONDS'
+      elif difference < 60:
+        unit = 'MINUTES'
+      elif difference < 3600:
+        unit = 'HOURS'
+      elif difference < 3600 * 24:
+        unit = 'DAYS'
+      elif difference < 3600 * 24 * 30:
+        unit = 'MONTHS'        
+      else:
+        unit = 'YEARS'
+      gap = '+1' + unit      
+      is_range = True
+  except Exception, e:
+    # stats not supported on all the fields, like text
+    pass
+
+  if is_range:
+    properties.update({
+      'start': stats_min,
+      'end': stats_max,
+      'gap': gap,
+      'canRange': True,
+    }) 
+
+
+def _guess_gap(solr_api, collection, facet_field, start=None, end=None):
+  properties = {}
+  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties, start=start, end=end)
+  return properties.get('gap')
+
+def _zoom_range_facet(facet, direction):
+  pass
 
 class SolrApi(object):
   """
@@ -109,7 +182,7 @@ class SolrApi(object):
       )
       for facet in collection['facets']:
         if facet['type'] == 'query':
-          params += (('facet.query', '%s' % facet['field']),)
+          params += (('facet.query', '%s' % facet['field']),)          
         elif facet['type'] == 'range':
           params += tuple([
              ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
@@ -126,7 +199,7 @@ class SolrApi(object):
         params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
       elif model_facet['type'] == 'range':
         # Set end range if last range
-        if not fq['filter'].get('to'):           
+        if fq['filter'].get('to'):           
           fq['filter']['to'] = model_facet['properties']['end'] if model_facet else '*'
         params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:[%s TO %s}' % (fq['field'],fq['field'], fq['filter']['from'], fq['filter']['to'])))),)
 

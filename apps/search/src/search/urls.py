@@ -42,6 +42,7 @@ urlpatterns = patterns('search.views',
   url(r'^index/(?P<collection_id>\w+)/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
   url(r'^template/new_facet$', 'new_facet', name='new_facet'),
   url(r'^get_document$', 'get_document', name='get_document'),
+  url(r'^get_range_facet$', 'get_range_facet', name='get_range_facet'),
   
   # old
   url(r'^admin/collection/(?P<collection_id>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),

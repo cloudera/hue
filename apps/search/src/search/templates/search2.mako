@@ -88,7 +88,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <!-- <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
     <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Timeline')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Histogram')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div> <!-- hcha hcha-line-chart -->
     <div class="draggable-widget" data-bind="draggable: draggableFilter" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>    
   </div>
@@ -206,8 +206,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>  
 
     <span data-bind="text: query" />: <span data-bind="text: count" />
@@ -224,7 +222,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
       <!-- ko if: type() == 'range' -->
         <br/>
         ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
@@ -387,8 +384,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
       <br/>      
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
-      <br/>
       ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
       ${ _('End') }: <input type="text" data-bind="value: properties.end" />
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
@@ -398,7 +393,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
     <div data-bind="timelineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
-      onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: from, to: to, cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+      onSelectRange: function(from, to){viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()})},
+      onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
@@ -417,7 +413,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
       <br/>
       ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
       ${ _('End') }: <input type="text" data-bind="value: properties.end" />
@@ -442,7 +437,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-      ${ _('Field') }: <input type="text" data-bind="value: field" />
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
