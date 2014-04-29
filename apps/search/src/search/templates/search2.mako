@@ -397,7 +397,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
     <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer,
-      onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: d.obj.from, to: d.obj.to, cat: d.obj.field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+      onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: from, to: to, cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
 </script>
