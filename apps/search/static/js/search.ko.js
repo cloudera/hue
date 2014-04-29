@@ -421,6 +421,7 @@ var Collection = function (vm, collection) {
   };
   
   self.translateSelectedField = function (index, direction) {
+	var array = self.template.fieldsSelected();
     if (direction == 'left') {
 	  self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
     } else {

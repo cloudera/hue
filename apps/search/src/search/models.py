@@ -19,6 +19,7 @@ import itertools
 import json
 import logging
 import math
+import numbers
 import re
 
 from django.db import models
@@ -30,8 +31,6 @@ from desktop.lib.i18n import smart_unicode
 
 from search.api import SolrApi
 from search.conf import SOLR_URL
-import numbers
-
 
 
 LOG = logging.getLogger(__name__)
@@ -533,14 +532,14 @@ def augment_solr_response2(response, collection, query, solr_query):
       # pivot_facet          
 
   # HTML escaping
-#  for doc in response['response']['docs']:  
-#    for field, value in doc.iteritems():
-#      if isinstance(value, numbers.Number):
-#        escaped_value = value
-#      else:
-#        value = smart_unicode(value, errors='replace')
-#        escaped_value = escape(value)
-#      doc[field] = escaped_value
+  for doc in response['response']['docs']:  
+    for field, value in doc.iteritems():
+      if isinstance(value, numbers.Number):
+        escaped_value = value
+      else:
+        value = smart_unicode(value, errors='replace')
+        escaped_value = escape(value)
+      doc[field] = escaped_value
       
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields:
