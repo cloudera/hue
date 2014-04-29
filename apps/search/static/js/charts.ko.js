@@ -83,11 +83,7 @@ function barChart(element, options, isTimeline) {
     if (isTimeline) {
       _chart = nv.models.multiBarWithFocusChart();
       _chart.enableSelection();
-      _chart.onSelectRange(function(from, to){
-        console.log("SELECT RANGE!")
-        console.log(from);
-        console.log(to);
-      });
+      _chart.onSelectRange(options.onSelectRange);
     }
     else {
       _chart = nv.models.multiBarChart();
