@@ -56,11 +56,27 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <div class="card card-toolbar" data-bind="slideVisible: isEditing">
   <div style="float: left">
     <div style="font-weight: bold; color: #999; padding-left: 8px">${_('LAYOUT')}</div>
-    <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdleft.png" /></a>
-    <!-- <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_onethirdright.png" /></a> -->    
-    <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')"><img src="/search/static/art/layout_full.png" /></a>
+    <a href="javascript: oneThirdLeftLayout()" onmouseover="viewModel.previewColumns('oneThirdLeft')" onmouseout="viewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 24px"></div>
+        <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
+      </div>
+    </a>
+    <!-- <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 72px"></div>
+        <div class="layout-box" style="width: 24px; margin-left: 4px"></div>
+      </div>
+    </a> -->
+    <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 100px;"></div>
+      </div>
+    </a>
     <a data-bind="visible: columns().length == 0" href="javascript: magicLayout()" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
-      <img src="/search/static/art/layout_magic.png" />
+      <div class="layout-container">
+        <div class="layout-box" style="width: 100px;"><i class="fa fa-magic"></i></div>
+      </div>
     </a>
   </div>
 
@@ -511,7 +527,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/search/static/js/nv.d3.multiBarWithFocusChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
 
-
 <style type="text/css">
   .dashboard .container-fluid {
     padding: 10px;
@@ -520,6 +535,30 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   .row-container {
     width: 100%;
     min-height: 70px;
+  }
+
+  .layout-container {
+    width: 100px;
+    float: left;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  .layout-box {
+    float: left;
+    height: 78px;
+    background-color: #DDD;
+    text-align: center;
+  }
+
+  .layout-box i {
+    color: #333;
+    font-size: 40px;
+    line-height: 78px;
+  }
+
+  .layout-container:hover .layout-box {
+    background-color: #CCC;
   }
 
   .ui-sortable {
