@@ -81,7 +81,7 @@ ko.bindingHandlers.timelineChart = {
 };
 
 function barChart(element, options, isTimeline) {
-  var _data = options.transformer(options.data);
+  var _datum = options.transformer(options.datum);
   $(element).height(300);
 
   nv.addGraph(function () {
@@ -97,10 +97,12 @@ function barChart(element, options, isTimeline) {
     }
     else {
       var _isDiscrete = false;
-      for (var i=0;i<_data.length;i++){
-        if (isNaN(_data[i].x * 1)){
-          _isDiscrete = true;
-          break;
+      for (var j=0;j<_datum.length;j++){
+        for (var i=0;i<_datum[j].values.length;i++){
+          if (isNaN(_datum[j].values[i].x * 1)){
+            _isDiscrete = true;
+            break;
+          }
         }
       }
       if (_isDiscrete){
@@ -124,12 +126,7 @@ function barChart(element, options, isTimeline) {
         .tickFormat(d3.format(',0f'));
 
     var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
-    _d3.datum([
-          {
-            key: options.label,
-            values: _data
-          }
-        ])
+    _d3.datum(_datum)
         .transition().duration(350)
         .each("end", options.onComplete)
         .call(_chart);

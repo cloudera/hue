@@ -424,7 +424,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div> 
 
-    <div data-bind="barChart: {data: {counts: counts, widget_id: $parent.id()}, field: field, label: label, 
+    <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
       transformer: barChartDataTransformer,
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) }, 
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
@@ -472,7 +472,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="filter-widget">
   <div data-bind="foreach: $root.query.fqs">
-    lala?
     <span data-bind="text: ko.mapping.toJSON($data), click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"></span>
   </div>
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -772,10 +771,11 @@ function rangePieChartDataTransformer(data) {
   return _data;
 }
 
-function barChartDataTransformer(data) {
+function barChartDataTransformer(rawDatum) {
+  var _datum = [];
   var _data = [];
-  $(data.counts).each(function (cnt, item) {
-    item.widget_id = data.widget_id;
+  $(rawDatum.counts).each(function (cnt, item) {
+    item.widget_id = rawDatum.widget_id;
     if (typeof item.from != "undefined"){
       _data.push({
         series: 0,
@@ -794,7 +794,11 @@ function barChartDataTransformer(data) {
       });
     }
   });
-  return _data;
+  _datum.push({
+    key: rawDatum.label,
+    values: _data
+  });
+  return _datum;
 }
 
 function timelineChartDataTransformer(data) { 
