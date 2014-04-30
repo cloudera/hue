@@ -156,7 +156,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2'}, dragged: function(){viewModel.search()}}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'helper': 'clone', 'opacity': 0.7, 'placeholder': 'row-highlight'}, dragged: function(){viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -542,6 +542,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
   .ui-sortable {
     background-color: #F6F6F6;
+    min-height: 100px;
   }
 
   .ui-sortable h2 {
@@ -591,7 +592,12 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   .row-header {
     background-color: #F6F6F6;
     display: inline;
-    padding: 4px;
+    padding: 3px;
+  }
+
+  .row-highlight {
+    background-color: #DDD;
+    min-height: 100px;
   }
 
   #emptyDashboard {
@@ -736,7 +742,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
   .card {
     margin: 0;
-    margin-top: 1px;
   }
 
 </style>
