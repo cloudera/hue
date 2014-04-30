@@ -156,7 +156,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'helper': 'clone', 'opacity': 0.7, 'placeholder': 'row-highlight'}, dragged: function(widget){showAddFacetDemiModal(widget);viewModel.search()}}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'helper': 'clone', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'helper': function(event){var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
