@@ -775,14 +775,24 @@ function rangePieChartDataTransformer(data) {
 function barChartDataTransformer(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
-    item.widget_id = data.widget_id;  
-    _data.push({
-      series: 0,
-      x: item.from,
-      x_end: item.to,
-      y: item.value,
-      obj: item
-    });
+    item.widget_id = data.widget_id;
+    if (typeof item.from != "undefined"){
+      _data.push({
+        series: 0,
+        x: item.from,
+        x_end: item.to,
+        y: item.value,
+        obj: item
+      });
+    }
+    else {
+      _data.push({
+        series: 0,
+        x: item.value,
+        y: item.count,
+        obj: item
+      });
+    }
   });
   return _data;
 }

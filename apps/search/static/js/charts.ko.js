@@ -81,7 +81,6 @@ ko.bindingHandlers.timelineChart = {
 };
 
 function barChart(element, options, isTimeline) {
-
   var _data = options.transformer(options.data);
   $(element).height(300);
 
@@ -91,25 +90,36 @@ function barChart(element, options, isTimeline) {
       _chart = nv.models.multiBarWithFocusChart();
       _chart.enableSelection();
       _chart.onSelectRange(options.onSelectRange);
+      _chart.xAxis
+          .showMaxMin(true)
+          .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
+      _chart.multibar.hideable(true);
     }
     else {
-      _chart = nv.models.multiBarChart();
+      var _isDiscrete = false;
+      for (var i=0;i<_data.length;i++){
+        if (isNaN(_data[i].x * 1)){
+          _isDiscrete = true;
+          break;
+        }
+      }
+      if (_isDiscrete){
+        _chart = nv.models.discreteBarChart()
+        .x(function(d) { return d.x })
+        .y(function(d) { return d.y })
+        .staggerLabels(true);
+      }
+      else {
+        _chart = nv.models.multiBarChart();
+        _chart.xAxis
+          .showMaxMin(true)
+          .tickFormat(d3.format(',0f'));
+        _chart.multibar.hideable(true);
+      }
     }
     _chart.margin({bottom: 100})
         .transitionDuration(300);
 
-    _chart.multibar
-        .hideable(true);
-    if (isTimeline) {
-      _chart.xAxis
-          .showMaxMin(true)
-          .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
-    }
-    else {
-      _chart.xAxis
-          .showMaxMin(true)
-          .tickFormat(d3.format(',0f'));
-    }
     _chart.yAxis
         .tickFormat(d3.format(',0f'));
 
