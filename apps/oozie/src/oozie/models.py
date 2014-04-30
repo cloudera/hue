@@ -1908,7 +1908,7 @@ class History(models.Model):
       pass
 
   @classmethod
-  def cross_reference_submission_history(cls, user, oozie_id, coordinator_job_id):
+  def cross_reference_submission_history(cls, user, oozie_id):
     # Try do get the history
     history = None
     try:

@@ -534,7 +534,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle) }" + "?format=json" + "${ "&show_all_actions=true" if show_all_actions else '' | n,unicode }", function (data) {
+      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "${ "&show_all_actions=true" if show_all_actions else '' | n,unicode }", function (data) {
         viewModel.isLoading(false);
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {

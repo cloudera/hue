@@ -427,7 +427,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${ oozie_bundle.get_absolute_url() }" + "?format=json", function (data) {
+      $.getJSON("${ oozie_bundle.get_absolute_url(format='json') }", function (data) {
         viewModel.isLoading(false);
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {

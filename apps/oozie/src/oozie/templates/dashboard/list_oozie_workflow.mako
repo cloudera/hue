@@ -580,7 +580,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${ oozie_workflow.get_absolute_url() }" + "?format=json", function (data) {
+      $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
 
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
