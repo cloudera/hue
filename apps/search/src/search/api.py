@@ -62,7 +62,8 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         stats_min = max(start, stats_min)
       if end is not None:
         stats_max = min(end, stats_max)   
-             
+      # TODO: check min is min of max + refactor
+      
       if gap is None:
         gap = (stats_max - stats_min) / SLOTS
       if gap < 1:
@@ -80,6 +81,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         unit = 'SECONDS'
       elif difference < 60:
         unit = 'MINUTES'
+        # todo 0, 5, 10, ...
       elif difference < 3600:
         unit = 'HOURS'
       elif difference < 3600 * 24:
@@ -106,10 +108,20 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 def _guess_gap(solr_api, collection, facet_field, start=None, end=None):
   properties = {}
   _guess_range_facet('range-widget', solr_api, collection, facet_field, properties, start=start, end=end)
-  return properties.get('gap')
+  return properties
 
-def _zoom_range_facet(facet, direction):
-  pass
+
+def _new_range_facet(solr_api, collection, facet_field):
+  properties = {}
+  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties)
+  return properties
+
+
+def _zoom_range_facet(solr_api, collection, facet_field, direction='out'):
+  properties = {}
+  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties)
+  return properties
+
 
 class SolrApi(object):
   """

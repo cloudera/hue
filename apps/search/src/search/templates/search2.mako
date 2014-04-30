@@ -389,8 +389,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div>  
 
-    <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-    <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
+    ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-minus"></i></a>
 
     <div data-bind="timelineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()})},
@@ -440,12 +440,16 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, transformer: rangePieChartDataTransformer,
-         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) }, 
-         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+        transformer: rangePieChartDataTransformer,
+        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) }, 
+        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
       <!-- /ko -->
       <!-- ko if: type() != 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs, transformer: pieChartDataTransformer, onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})}, onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+        transformer: pieChartDataTransformer,
+        onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
+        onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
       <!-- /ko -->
     </div>    
   </div>
@@ -811,8 +815,21 @@ function timelineChartDataTransformer(rawDatum) {
       obj: item
     });
   });
-  _datum.push({
+    _datum.push({
     key: rawDatum.label,
+    values: _data
+  });
+  var _data = [];
+  $(rawDatum.counts).each(function (cnt, item) {
+    _data.push({
+      series: 1,
+      x: new Date(moment(item.from).valueOf()),
+      y: item.value,
+      obj: item
+    });
+  });  
+    _datum.push({
+    key: rawDatum.label + " #2",
     values: _data
   });
   return _datum;

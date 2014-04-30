@@ -17,10 +17,6 @@
 
 import json
 import logging
-import numbers
-
-from datetime import datetime
-from time import mktime
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -31,7 +27,7 @@ from django.shortcuts import redirect
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 
-from search.api import SolrApi, _guess_gap
+from search.api import SolrApi, _guess_gap, _zoom_range_facet, _new_range_facet
 from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
@@ -507,56 +503,13 @@ def new_facet(request):
       'sort': 'desc',
       'canRange': False,
     }
-    is_range = False
-
-    try:
-      if widget_type == 'pie-widget':
-        SLOTS = 5
-      elif widget_type == 'facet-widget':
-        SLOTS = 10
-      else:
-        SLOTS = 50
-      stats_json = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [facet_field])
-      stat_facet = stats_json['stats']['stats_fields'][facet_field]
-      
-      if isinstance(stat_facet['min'], numbers.Number):
-        stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
-        stats_max = int(stat_facet['max'])
-        gap = (stats_max - stats_min) / SLOTS
-        if gap < 1:
-          gap = 1
-        is_range = True
-      elif 'T' in stat_facet['min']:
-        stats_min = stat_facet['min']
-        stats_max = stat_facet['max']
-        difference = (
-            mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - 
-            mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())) / SLOTS
-  
-        if difference < 1:
-          unit = 'SECONDS'
-        elif difference < 60:
-          unit = 'MINUTES'
-        elif difference < 3600:
-          unit = 'HOURS'
-        elif difference < 3600 * 24:
-          unit = 'DAYS'
-        else:
-          unit = 'MONTHS'
-        gap = '+1' + unit      
-        is_range = True
-    except Exception, e:
-      # stats not supported on all the fields, like text
-      pass
-                
-    if is_range:
+    
+    solr_api = SolrApi(SOLR_URL.get(), request.user)
+    range_properties = _new_range_facet(solr_api, collection, facet_field)
+                          
+    if range_properties:
       facet_type = 'range'
-      properties.update({
-        'start': stats_min,
-        'end': stats_max,
-        'gap': gap,
-        'canRange': True,
-      })       
+      properties.update(range_properties)       
     elif widget_type == 'hit-widget':
       facet_type = 'query'      
     else:
@@ -577,9 +530,31 @@ def new_facet(request):
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
+# TODO security
+def get_range_facet(request):  
+  result = {'status': -1, 'message': 'Error'}
 
-def get_range_facet(request):
-  _guess_gap(self, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    facet = json.loads(request.POST.get('facet', '{}'))
+    action = request.POST.get('action', 'select')
+    
+            
+    solr_api = SolrApi(SOLR_URL.get(), request.user)
+    
+    if action == 'select':
+      properties = _guess_gap(solr_api, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
+    else:
+      properties = _zoom_range_facet(solr_api, collection, facet['field'])
+            
+    result['properties'] = properties
+    result['status'] = 0      
+
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
 
 def install_examples(request):
   result = {'status': -1, 'message': ''}

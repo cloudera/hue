@@ -425,10 +425,52 @@ var Collection = function (vm, collection) {
 	
 	facet.properties.start(data.from);
 	facet.properties.end(data.to);
-	//facet.properties.gap(null);
-
+	
+	$.ajax({
+	  type: "POST",
+	  url: "/search/get_range_facet",	  
+	  data: {
+	    collection: ko.mapping.toJSON(self),
+	    facet: ko.mapping.toJSON(facet),
+	    action: 'select'
+	  },
+	  success: function (data) {
+	    if (data.status == 0) {
+	      facet.properties.gap(data.properties.gap);
+	    }
+	  },
+	  async: false
+	});	
+	
     vm.search();
-  }    
+  }
+
+  self.timeLineZoom = function (facet_json) { 
+	var facet = self.getFacetById(facet_json.id);
+	
+	facet.properties.start(facet.from);
+	facet.properties.end(facet.to);
+	
+	$.ajax({
+	  type: "POST",
+	  url: "/search/get_range_facet",	  
+	  data: {
+	    collection: ko.mapping.toJSON(self),
+	    facet: ko.mapping.toJSON(facet),
+	    action: "zoom_out"
+	  },
+	  success: function (data) {
+	    if (data.status == 0) {
+	      facet.properties.start(data.properties.start);
+	      facet.properties.end(data.properties.end);
+	      facet.properties.gap(data.properties.gap);
+	    }
+	  },
+	  async: false
+	});	
+	
+    vm.search();
+  }
   
   self.translateSelectedField = function (index, direction) {
 	var array = self.template.fieldsSelected();
