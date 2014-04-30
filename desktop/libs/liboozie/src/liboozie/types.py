@@ -156,13 +156,19 @@ class WorkflowAction(Action):
       self.externalId = None
 
   def get_absolute_url(self):
-    kwargs = {'action': self.id}
-    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
-      kwargs['coordinator_job_id'] = self.oozie_coordinator.id
-    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
-      kwargs['bundle_job_id'] = self.oozie_bundle.id
+    related_job_ids = []
 
-    return reverse('oozie:list_oozie_workflow_action', kwargs=kwargs)
+    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
+      related_job_ids.append('coordinator_job_id=%s' % self.oozie_coordinator.id)
+    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
+      related_job_ids.append('bundle_job_id=%s' % self.oozie_bundle.id)
+
+    if related_job_ids:
+      extra_params = '?' + '&'.join(related_job_ids)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_workflow_action', kwargs={'action': self.id}) + extra_params
 
 
 class CoordinatorAction(Action):
@@ -406,13 +412,22 @@ class Workflow(Job):
   def type(self):
     return 'Workflow'
 
-  def get_absolute_url(self):
-    kwargs = {'job_id': self.id}
+  def get_absolute_url(self, format='html'):
+    extra_params = []
+
+    if format == 'json':
+      extra_params.append('format=json')
     if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
-      kwargs['coordinator_job_id'] = self.oozie_coordinator.id
+      extra_params.append('coordinator_job_id=%s' % self.oozie_coordinator.id)
     if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
-      kwargs['bundle_job_id'] = self.oozie_bundle.id
-    return reverse('oozie:list_oozie_workflow', kwargs=kwargs)
+      extra_params.append('bundle_job_id=%s' % self.oozie_bundle.id)
+
+    if extra_params:
+      extra_params = '?' + '&'.join(extra_params)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self, full_node_list=None):
     if self.status == 'SUCCEEDED':
@@ -450,6 +465,7 @@ class Coordinator(Job):
     'timeUnit',
     'timeZone',
     'user',
+    'bundleId'
   ]
   ACTION = CoordinatorAction
 
@@ -469,11 +485,22 @@ class Coordinator(Job):
   def type(self):
     return 'Coordinator'
 
-  def get_absolute_url(self, oozie_bundle=None):
-    kwargs = {'job_id': self.id}
+  def get_absolute_url(self, oozie_bundle=None, format='html'):
+    extra_params = []
+
+    if format == 'json':
+      extra_params.append('format=json')
     if oozie_bundle:
-      kwargs.update({'bundle_job_id': oozie_bundle.id})
-    return reverse('oozie:list_oozie_coordinator', kwargs=kwargs)
+      extra_params.append('bundle_job_id=%s' % oozie_bundle.id)
+    if hasattr(self, 'bundleId') and self.bundleId:
+      extra_params.append('bundle_job_id=%s' % self.bundleId)
+
+    if extra_params:
+      extra_params = '?' + '&'.join(extra_params)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_coordinator', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self):
     """How much more time before the final materialization."""
@@ -550,8 +577,12 @@ class Bundle(Job):
   def type(self):
     return 'Bundle'
 
-  def get_absolute_url(self):
-    return reverse('oozie:list_oozie_bundle', kwargs={'job_id': self.id})
+  def get_absolute_url(self, format='html'):
+    extra_params = ''
+    if format == 'json':
+      extra_params = '?format=json'
+
+    return reverse('oozie:list_oozie_bundle', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self):
     progresses = [action.get_progress() for action in self.actions]

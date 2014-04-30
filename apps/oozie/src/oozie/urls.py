@@ -85,9 +85,9 @@ urlpatterns += patterns(
   url(r'^list_oozie_workflows/$', 'list_oozie_workflows', name='list_oozie_workflows'),
   url(r'^list_oozie_coordinators/$', 'list_oozie_coordinators', name='list_oozie_coordinators'),
   url(r'^list_oozie_bundles/$', 'list_oozie_bundles', name='list_oozie_bundles'),
-  url(r'^list_oozie_workflow/(?P<job_id>[-\w]+)/(?P<coordinator_job_id>[-\w]+)?/(?P<bundle_job_id>[-\w]+)?$', 'list_oozie_workflow', name='list_oozie_workflow'),
-  url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)/(?P<bundle_job_id>[-\w]+)?$', 'list_oozie_coordinator', name='list_oozie_coordinator'),
-  url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)/(?P<coordinator_job_id>[-\w]+)?/(?P<bundle_job_id>[-\w]+)?$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
+  url(r'^list_oozie_workflow/(?P<job_id>[-\w]+)/$', 'list_oozie_workflow', name='list_oozie_workflow'),
+  url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)/$', 'list_oozie_coordinator', name='list_oozie_coordinator'),
+  url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)/$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
   url(r'^list_oozie_bundle/(?P<job_id>[-\w]+)$', 'list_oozie_bundle', name='list_oozie_bundle'),
 
   url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_job', name='rerun_oozie_job'),

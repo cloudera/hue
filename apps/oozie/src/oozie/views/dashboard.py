@@ -160,23 +160,23 @@ def list_oozie_bundles(request):
 
 
 @show_oozie_error
-def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=None):
+def list_oozie_workflow(request, job_id):
   oozie_workflow = check_job_access_permission(request, job_id)
 
   oozie_coordinator = None
-  if coordinator_job_id is not None:
-    oozie_coordinator = check_job_access_permission(request, coordinator_job_id)
+  if request.GET.get('coordinator_job_id'):
+    oozie_coordinator = check_job_access_permission(request, request.GET.get('coordinator_job_id'))
 
   oozie_bundle = None
-  if bundle_job_id is not None:
-    oozie_bundle = check_job_access_permission(request, bundle_job_id)
+  if request.GET.get('bundle_job_id'):
+    oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
 
   if oozie_coordinator is not None:
     setattr(oozie_workflow, 'oozie_coordinator', oozie_coordinator)
   if oozie_bundle is not None:
     setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
 
-  history = History.cross_reference_submission_history(request.user, job_id, coordinator_job_id)
+  history = History.cross_reference_submission_history(request.user, job_id)
 
   hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
   hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
@@ -220,7 +220,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
 
 
 @show_oozie_error
-def list_oozie_coordinator(request, job_id, bundle_job_id=None):
+def list_oozie_coordinator(request, job_id):
   oozie_coordinator = check_job_access_permission(request, job_id)
 
   # Cross reference the submission history (if any)
@@ -231,8 +231,8 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
     pass
 
   oozie_bundle = None
-  if bundle_job_id is not None:
-    oozie_bundle = check_job_access_permission(request, bundle_job_id)
+  if request.GET.get('bundle_job_id'):
+    oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
 
   if request.GET.get('format') == 'json':
     return_obj = {
@@ -284,7 +284,7 @@ def list_oozie_bundle(request, job_id):
 
 
 @show_oozie_error
-def list_oozie_workflow_action(request, action, coordinator_job_id=None, bundle_job_id=None):
+def list_oozie_workflow_action(request, action):
   try:
     action = get_oozie().get_action(action)
     workflow = check_job_access_permission(request, action.id.split('@')[0])
@@ -293,12 +293,12 @@ def list_oozie_workflow_action(request, action, coordinator_job_id=None, bundle_
                          detail=ex.message)
 
   oozie_coordinator = None
-  if coordinator_job_id is not None:
-    oozie_coordinator = check_job_access_permission(request, coordinator_job_id)
+  if request.GET.get('coordinator_job_id'):
+    oozie_coordinator = check_job_access_permission(request, request.GET.get('coordinator_job_id'))
 
   oozie_bundle = None
-  if bundle_job_id is not None:
-    oozie_bundle = check_job_access_permission(request, bundle_job_id)
+  if request.GET.get('bundle_job_id'):
+    oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
 
   workflow.oozie_coordinator = oozie_coordinator
   workflow.oozie_bundle = oozie_bundle
@@ -528,15 +528,15 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
   coordinator_actions = coordinator.get_working_actions()
   actions = []
 
-  action_link_params = {}
+  related_job_ids = []
   if oozie_bundle is not None:
-    action_link_params['bundle_job_id'] = oozie_bundle.id
+    related_job_ids.append('bundle_job_id=%s' %oozie_bundle.id)
 
   for action in coordinator_actions:
-    action_link_params.update({'job_id': action.externalId, 'coordinator_job_id': coordinator_id})
+    related_job_ids.append('coordinator_job_id=%s' % coordinator_id)
     massaged_action = {
       'id': action.id,
-      'url': action.externalId and reverse('oozie:list_oozie_workflow', kwargs=action_link_params) or '',
+      'url': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId}) + '?%s' % '&'.join(related_job_ids) or '',
       'number': action.actionNumber,
       'type': action.type,
       'status': action.status,
@@ -563,7 +563,7 @@ def massaged_bundle_actions_for_json(bundle):
   for action in bundle_actions:
     massaged_action = {
       'id': action.coordJobId,
-      'url': action.coordJobId and reverse('oozie:list_oozie_coordinator', kwargs={'job_id': action.coordJobId, 'bundle_job_id': bundle.id}) or '',
+      'url': action.coordJobId and reverse('oozie:list_oozie_coordinator', kwargs={'job_id': action.coordJobId}) + '?bundle_job_id=%s' % bundle.id or '',
       'name': action.coordJobName,
       'type': action.type,
       'status': action.status,
