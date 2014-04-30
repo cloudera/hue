@@ -42,10 +42,10 @@ class Command(BaseCommand):
     self.stdout.write('Closing (all=%s) HiveServer2/Impala queries older than %s days...\n' % (close_all, days))
 
     n = 0
-    queries = BeeswaxQueryHistory.objects.filter(last_state__in=[QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index, QueryHistory.STATE.available.index])
+    queries = QueryHistory.objects.filter(last_state__in=[QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index, QueryHistory.STATE.available.index])
 
     if close_all:
-      queries = BeeswaxQueryHistory.objects.all()
+      queries = QueryHistory.objects.all()
 
     queries = queries.filter(submission_date__lte=datetime.today() - timedelta(days=days))
 
@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
     for query in queries:
       try:
-        query_history = BeeswaxQueryHistory.objects.get(id=query.id)
+        query_history = QueryHistory.get(id=query.id)
         if query_history.server_id is not None:
           handle = query_history.get_handle()
           dbms.get(user=query_history.owner).close_operation(handle)
@@ -69,7 +69,7 @@ class Command(BaseCommand):
         query.last_state = QueryHistory.STATE.expired.index
         query.save()
       except Exception, e:
-        if 'None' in str(e):
+        if 'None' in str(e) or 'Invalid OperationHandle' in str(e):
           query.last_state = QueryHistory.STATE.expired.index
           query.save()
         else:
