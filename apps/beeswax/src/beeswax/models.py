@@ -251,8 +251,10 @@ class SavedQuery(models.Model):
       # data is empty
       pass
 
-  def clone(self):
-    design = SavedQuery(type=self.type, owner=self.owner)
+  def clone(self, new_owner=None):
+    if new_owner is None:
+      new_owner = self.owner
+    design = SavedQuery(type=self.type, owner=new_owner)
     design.data = self.data
     design.name = self.name
     design.desc = self.desc

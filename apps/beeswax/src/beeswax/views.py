@@ -184,6 +184,10 @@ def clone_design(request, design_id):
     return list_designs(request)
 
   copy = design.clone(request.user)
+  copy.save()
+  copy_doc = design.doc.get().copy(owner=request.user)
+  copy.doc.all().delete()
+  copy.doc.add(copy_doc)
 
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 
