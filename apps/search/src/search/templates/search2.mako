@@ -156,7 +156,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'helper': 'clone', 'opacity': 0.7, 'placeholder': 'row-highlight'}, dragged: function(){viewModel.search()}}">
+    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'helper': 'clone', 'opacity': 0.7, 'placeholder': 'row-highlight'}, dragged: function(widget){showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -488,7 +488,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   </div>
 </script>
 
-<div id="addFacetDemiModal" class="demi-modal fade hide" data-backdrop="false">
+<div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>${_('Choose field')}</h3>
@@ -541,7 +541,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   }
 
   .ui-sortable {
-    background-color: #F6F6F6;
+    background-color: #F3F3F3;
     min-height: 100px;
   }
 
