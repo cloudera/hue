@@ -397,7 +397,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)"><i class="fa fa-minus"></i></a>
 
-    <div data-bind="timelineChart: {data: counts, field: field, label: label, transformer: timelineChartDataTransformer,
+    <div data-bind="timelineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){viewModel.query.selectRangeFacet({from: from, to: to, cat: field})}, onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
   </div>
   <!-- /ko -->
@@ -806,9 +806,10 @@ function barChartDataTransformer(rawDatum) {
   return _datum;
 }
 
-function timelineChartDataTransformer(data) { 
+function timelineChartDataTransformer(rawDatum) {
+  var _datum = [];
   var _data = [];
-  $(data).each(function (cnt, item) {
+  $(rawDatum.counts).each(function (cnt, item) {
     _data.push({
       series: 0,
       x: new Date(moment(item.from).valueOf()),
@@ -816,7 +817,11 @@ function timelineChartDataTransformer(data) {
       obj: item
     });
   });
-  return _data;
+  _datum.push({
+    key: rawDatum.label,
+    values: _data
+  });
+  return _datum;
 }
 
 $(document).ready(function () {
