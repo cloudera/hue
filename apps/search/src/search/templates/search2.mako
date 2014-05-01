@@ -906,10 +906,12 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    viewModel.collection.template.fieldsModalFilter("");
-    selectedWidget = widget;
-    $("#addFacetDemiModal").modal("show");
-    $("#addFacetDemiModal input[type='text']").focus();
+    if (widget.widgetType() != "resultset-widget"){
+      viewModel.collection.template.fieldsModalFilter("");
+      selectedWidget = widget;
+      $("#addFacetDemiModal").modal("show");
+      $("#addFacetDemiModal input[type='text']").focus();
+    }
   }
 
 
