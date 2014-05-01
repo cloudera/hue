@@ -186,7 +186,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
       <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
         <ul class="unstyled" style="margin: 10px">
-          <li>Name: <input type="text" data-bind="value: name" class="input-mini" /></li>
+          <li>${ _('Name')}: <input type="text" data-bind="value: name" class="input-mini" /></li>
         </ul>
       </div>
     </div>
@@ -194,7 +194,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="empty-widget">
-  This is an empty widget.
+  ${ _('This is an empty widget.')}
 </script>
 
 
@@ -218,6 +218,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 
   <!-- ko if: $root.getFacetFromQuery(id) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
@@ -556,6 +561,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script src="/search/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>

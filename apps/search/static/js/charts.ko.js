@@ -152,13 +152,13 @@ function barChart(element, options, isTimeline) {
         }
       }
       if (_isDiscrete){
-        _chart = nv.models.discreteBarChart()
+        _chart = nv.models.growingDiscreteBarChart()
         .x(function(d) { return d.x })
         .y(function(d) { return d.y })
         .staggerLabels(true);
       }
       else {
-        _chart = nv.models.multiBarChart();
+        _chart = nv.models.growingMultiBarChart();
         _chart.xAxis
           .showMaxMin(true)
           .tickFormat(d3.format(',0f'));
