@@ -90,6 +90,24 @@ ko.bindingHandlers.lineChart = {
   }
 };
 
+ko.bindingHandlers.mapChart = {
+  init: function (element, valueAccessor) {
+    $(element).height($(element).width()/2.5);
+    $(element).css("position", "relative");
+    var _options = valueAccessor();
+    var basic = new Datamap({
+      element: element
+    });
+    _options.onComplete();
+  },
+  update: function (element, valueAccessor) {
+    var value = valueAccessor();
+    // do something with the updated value
+  }
+};
+
+
+
 function lineChart(element, options) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);

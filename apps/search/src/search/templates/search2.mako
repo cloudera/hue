@@ -515,7 +515,23 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="map-widget">
-  This is the map widget
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+    </div>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+        transformer: mapChartDataTransformer,
+        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+    </div>
+  </div>
+  <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -558,6 +574,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
+<script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/datamaps.all.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/search/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
@@ -905,6 +923,20 @@ function timelineChartDataTransformer(rawDatum) {
   });
   return _datum;
 }
+
+function mapChartDataTransformer(data) {
+  var _data = [];
+  $(data.counts).each(function (cnt, item) {
+    item.widget_id = data.widget_id;
+    _data.push({
+      label: item.value,
+      value: item.count,
+      obj: item
+    });
+  });
+  return _data;
+}
+
 
 $(document).ready(function () {
 
