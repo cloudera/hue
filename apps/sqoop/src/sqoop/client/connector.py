@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from form import Form
 
 
@@ -238,7 +240,7 @@ class Connector(object):
 
     connector_dict['resources'] = resources_dict.setdefault(unicode(connector_dict['id']), {})
 
-    return Connector(**connector_dict)
+    return Connector(**force_dict_to_strings(connector_dict))
 
   def to_dict(self):
     d = {

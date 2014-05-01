@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from exception import SqoopException
 from form import Form
 
@@ -51,7 +53,7 @@ class Submission(object):
     submission_dict['updated'] = submission_dict['last-update-date']
     submission_dict['external_id'] = submission_dict.get('external-id', None)
     submission_dict['external_link'] = submission_dict.get('external-link', None)
-    return Submission(**submission_dict)
+    return Submission(**force_dict_to_strings(submission_dict))
 
   def to_dict(self):
     d = {
@@ -107,7 +109,7 @@ class SqoopSubmissionException(SqoopException):
     submission_dict['updated'] = submission_dict['last-update-date']
     submission_dict['exception'] = submission_dict.get('exception', None)
     submission_dict['exception_trace'] = submission_dict.get('exception-trace', None)
-    submission = SqoopSubmissionException(**submission_dict)
+    submission = SqoopSubmissionException(**force_dict_to_strings(submission_dict))
     return submission
 
   def to_dict(self):

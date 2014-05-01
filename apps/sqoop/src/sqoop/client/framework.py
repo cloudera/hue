@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from form import Form
 
 
@@ -181,7 +183,7 @@ class Framework(object):
     framework_dict.setdefault('con-forms', [])
     framework_dict['con_forms'] = [ Form.from_dict(con_form_dict) for con_form_dict in framework_dict['con-forms'] ]
 
-    return Framework(**framework_dict)
+    return Framework(**force_dict_to_strings(framework_dict))
 
   def to_dict(self):
     d = {

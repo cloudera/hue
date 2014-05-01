@@ -98,6 +98,27 @@ def find_unused_port():
   return port
 
 
+def force_list_to_strings(lst):
+  if not lst:
+    return lst
+
+  new_list = []
+  for item in lst:
+    if isinstance(item, basestring):
+      # Strings should not be unicode.
+      new_list.append(smart_str(item))
+    elif isinstance(item, dict):
+      # Recursively force dicts to strings.
+      new_list.append(force_dict_to_strings(item))
+    elif isinstance(item, list):
+      new_list.append(force_list_to_strings(item))
+    else:
+      # Normal objects, or other literals, should not be converted.
+      new_list.append(item)
+
+  return new_list
+
+
 def force_dict_to_strings(dictionary):
   if not dictionary:
     return dictionary
@@ -111,6 +132,8 @@ def force_dict_to_strings(dictionary):
     elif isinstance(dictionary[k], dict):
       # Recursively force dicts to strings.
       new_dict[new_key] = force_dict_to_strings(dictionary[k])
+    elif isinstance(dictionary[k], list):
+      new_dict[new_key] = force_list_to_strings(dictionary[k])
     else:
       # Normal objects, or other literals, should not be converted.
       new_dict[new_key] = dictionary[k]

@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 
 class Form(object):
   """
@@ -86,7 +88,7 @@ class Form(object):
   @staticmethod
   def from_dict(form_dict):
     form_dict['inputs'] = [Input.from_dict(input_dict) for input_dict in form_dict.setdefault('inputs', [])]
-    return Form(**form_dict)
+    return Form(**force_dict_to_strings(form_dict))
 
   def to_dict(self):
     return {
@@ -127,7 +129,7 @@ class Input(object):
   def from_dict(input_dict):
     if 'values' in input_dict and isinstance(input_dict['values'], basestring):
       input_dict['values'] = input_dict['values'].split(',')
-    return Input(**input_dict)
+    return Input(**force_dict_to_strings(input_dict))
 
   def to_dict(self):
     d = {

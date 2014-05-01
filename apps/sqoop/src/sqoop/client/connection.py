@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from exception import SqoopException
 from form import Form
 
@@ -139,7 +141,7 @@ class Connection(object):
     if not 'update_date' in connection_dict:
       connection_dict['update_date'] = connection_dict.setdefault('update-date', 0)
 
-    return Connection(**connection_dict)
+    return Connection(**force_dict_to_strings(connection_dict))
 
   def to_dict(self):
     d = {
@@ -195,7 +197,7 @@ class SqoopConnectionException(SqoopException):
 
   @classmethod
   def from_dict(cls, error_dict):
-    return SqoopConnectionException(**error_dict)
+    return SqoopConnectionException(**force_dict_to_strings(error_dict))
 
   def to_dict(self):
     return {

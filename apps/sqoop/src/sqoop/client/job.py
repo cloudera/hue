@@ -16,6 +16,8 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from exception import SqoopException
 from form import Form
 
@@ -193,7 +195,7 @@ class Job(object):
     if not 'update_date' in job_dict:
       job_dict['update_date'] = job_dict.setdefault('update-date', 0)
 
-    return Job(**job_dict)
+    return Job(**force_dict_to_strings(job_dict))
 
   def to_dict(self):
     d = {
@@ -250,7 +252,7 @@ class SqoopJobException(SqoopException):
 
   @classmethod
   def from_dict(cls, error_dict):
-    return SqoopJobException(**error_dict)
+    return SqoopJobException(**force_dict_to_strings(error_dict))
 
   def to_dict(self):
     return {
