@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 import datetime
 import json
 from south.db import db
@@ -6,7 +6,7 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-
+    
     def forwards(self, orm):
         """Migrate from ["path1", "path2", ...] to [{"name":"path1"},{"name":"path2"},...]"""
         for fs in orm.Fs.objects.all():
@@ -48,7 +48,7 @@ class Migration(DataMigration):
                 fs.touchzs = json.dumps(new_touchzs)
 
             fs.save()
-
+    
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -57,7 +57,7 @@ class Migration(DataMigration):
             'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
         },
         'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
+            'Meta': {'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
             'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -70,9 +70,9 @@ class Migration(DataMigration):
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
@@ -80,36 +80,17 @@ class Migration(DataMigration):
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
+            'Meta': {'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'desktop.document': {
-            'Meta': {'object_name': 'Document'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'description': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'extra': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'doc_owner'", 'to': "orm['auth.User']"}),
-            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['desktop.DocumentTag']", 'db_index': 'True', 'symmetrical': 'False'}),
-            'version': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'})
-        },
-        'desktop.documenttag': {
-            'Meta': {'object_name': 'DocumentTag'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'tag': ('django.db.models.fields.SlugField', [], {'max_length': '50'})
-        },
         'oozie.bundle': {
             'Meta': {'object_name': 'Bundle', '_ormbases': ['oozie.Job']},
             'coordinators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['oozie.Coordinator']", 'through': "orm['oozie.BundledCoordinator']", 'symmetrical': 'False'}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'kick_off_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 3, 20, 0, 0)'})
+            'kick_off_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 4, 30, 18, 44, 38, 149068)'})
         },
         'oozie.bundledcoordinator': {
             'Meta': {'object_name': 'BundledCoordinator'},
@@ -121,13 +102,13 @@ class Migration(DataMigration):
         'oozie.coordinator': {
             'Meta': {'object_name': 'Coordinator', '_ormbases': ['oozie.Job']},
             'concurrency': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 3, 23, 0, 0)'}),
+            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 5, 3, 18, 44, 38, 145158)'}),
             'execution': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'frequency_number': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 3, 20, 0, 0)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 4, 30, 18, 44, 38, 145114)'}),
             'throttle': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timeout': ('django.db.models.fields.SmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
@@ -159,7 +140,7 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'instance_choice': ('django.db.models.fields.CharField', [], {'default': "'default'", 'max_length': '10'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 3, 20, 0, 0)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 4, 30, 18, 44, 38, 145988)'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
             'uri': ('django.db.models.fields.CharField', [], {'default': "'/data/${YEAR}${MONTH}${DAY}'", 'max_length': '1024'})
         },
@@ -222,8 +203,8 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'Hive'},
             'archives': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'files': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
-            'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
-            'job_xml': ('django.db.models.fields.CharField', [], {'default': "'hive-config.xml'", 'max_length': '512', 'blank': 'True'}),
+            'job_properties': ('django.db.models.fields.TextField', [], {'default': '\'[{"name":"oozie.hive.defaults","value":"hive-site.xml"}]\''}),
+            'job_xml': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
             'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'}),
             'params': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'prepares': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
@@ -233,7 +214,7 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'Java'},
             'archives': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'args': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'files': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'jar_path': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
             'java_opts': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
@@ -245,12 +226,11 @@ class Migration(DataMigration):
         },
         'oozie.job': {
             'Meta': {'object_name': 'Job'},
-            'data': ('django.db.models.fields.TextField', [], {'default': "'{}'", 'blank': 'True'}),
             'deployment_dir': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_shared': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
-            'is_trashed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
+            'is_shared': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
+            'is_trashed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
             'last_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
@@ -281,13 +261,12 @@ class Migration(DataMigration):
             'jar_path': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'job_xml': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
-            'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'}),
+            'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True'}),
             'prepares': ('django.db.models.fields.TextField', [], {'default': "'[]'"})
         },
         'oozie.node': {
             'Meta': {'object_name': 'Node'},
             'children': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'parents'", 'symmetrical': 'False', 'through': "orm['oozie.Link']", 'to': "orm['oozie.Node']"}),
-            'data': ('django.db.models.fields.TextField', [], {'default': "'{}'", 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1024', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -308,7 +287,7 @@ class Migration(DataMigration):
         'oozie.shell': {
             'Meta': {'object_name': 'Shell'},
             'archives': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
-            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'command': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'files': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
@@ -330,7 +309,7 @@ class Migration(DataMigration):
         },
         'oozie.ssh': {
             'Meta': {'object_name': 'Ssh'},
-            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'command': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'host': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'}),
@@ -339,7 +318,7 @@ class Migration(DataMigration):
         },
         'oozie.start': {
             'Meta': {'object_name': 'Start'},
-            'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'})
+            'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True'})
         },
         'oozie.streaming': {
             'Meta': {'object_name': 'Streaming'},
@@ -354,20 +333,19 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'SubWorkflow'},
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'}),
-            'propagate_configuration': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'sub_workflow': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['oozie.Workflow']", 'null': 'True', 'blank': 'True'})
+            'propagate_configuration': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'sub_workflow': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['oozie.Workflow']"})
         },
         'oozie.workflow': {
             'Meta': {'object_name': 'Workflow', '_ormbases': ['oozie.Job']},
             'end': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'end_workflow'", 'null': 'True', 'to': "orm['oozie.End']"}),
-            'is_single': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_single': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
             'job_xml': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
-            'managed': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'managed': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-
+    
     complete_apps = ['oozie']
-    symmetrical = True
