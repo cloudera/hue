@@ -232,7 +232,7 @@ nv.models.growingMultiBar = function() {
           .style('stroke', function(d,i,j){ return color(d, j, i); })
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
             d3.select(this).classed('hover', true);
-            d3.select(this).transition().duration(100).attr('y', -5);
+            d3.select(this).transition().duration(100).attr('y', y(getY(d,i)) - 5);
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -245,7 +245,7 @@ nv.models.growingMultiBar = function() {
           })
           .on('mouseout', function(d,i) {
             d3.select(this).classed('hover', false);
-            d3.select(this).transition().duration(100).attr('y', 0);
+            d3.select(this).transition().duration(100).attr('y', y(getY(d,i)));
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
