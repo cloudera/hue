@@ -15,7 +15,7 @@
 // limitations under the License.
 
 
-nv.models.multiBarWithFocusChart = function() {
+nv.models.multiBarWithBrushChart = function() {
   "use strict";
   //============================================================
   // Public Variables with Default Settings

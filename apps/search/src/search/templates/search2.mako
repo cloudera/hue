@@ -88,7 +88,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     <div class="draggable-widget" data-bind="draggable: draggablePie" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <!-- <div class="draggable-widget" data-bind="draggable: draggableHit" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
     <div class="draggable-widget" data-bind="draggable: draggableBar" title="${_('Bar Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-bar-chart"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Histogram')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div> <!-- hcha hcha-line-chart -->
+    <div class="draggable-widget" data-bind="draggable: draggableHistogram" title="${_('Histogram')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-long-arrow-right"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: draggableLine" title="${_('Line')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-line-chart"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableFilter" title="${_('Filter Bar')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-filter"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: draggableMap" title="${_('Map')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-map-chart"></i></a></div>    
   </div>
@@ -428,6 +429,36 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- /ko -->
 </script>
 
+<script type="text/html" id="line-widget">
+  <!-- ko ifnot: $root.getFacetFromQuery(id) -->
+    <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id)">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>
+      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+    </div>
+
+    <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
+      transformer: lineChartDataTransformer,
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
+    />
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="pie-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -523,7 +554,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 
-<script src="/search/static/js/nv.d3.multiBarWithFocusChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
@@ -775,6 +807,36 @@ function rangePieChartDataTransformer(data) {
 }
 
 function barChartDataTransformer(rawDatum) {
+  var _datum = [];
+  var _data = [];
+  $(rawDatum.counts).each(function (cnt, item) {
+    item.widget_id = rawDatum.widget_id;
+    if (typeof item.from != "undefined"){
+      _data.push({
+        series: 0,
+        x: item.from,
+        x_end: item.to,
+        y: item.value,
+        obj: item
+      });
+    }
+    else {
+      _data.push({
+        series: 0,
+        x: item.value,
+        y: item.count,
+        obj: item
+      });
+    }
+  });
+  _datum.push({
+    key: rawDatum.label,
+    values: _data
+  });
+  return _datum;
+}
+
+function lineChartDataTransformer(rawDatum) {
   var _datum = [];
   var _data = [];
   $(rawDatum.counts).each(function (cnt, item) {

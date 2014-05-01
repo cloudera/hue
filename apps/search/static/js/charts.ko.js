@@ -80,6 +80,52 @@ ko.bindingHandlers.timelineChart = {
   }
 };
 
+ko.bindingHandlers.lineChart = {
+  init: function (element, valueAccessor) {
+    lineChart(element, valueAccessor());
+  },
+  update: function (element, valueAccessor) {
+    var value = valueAccessor();
+    // do something with the updated value
+  }
+};
+
+function lineChart(element, options) {
+  var _datum = options.transformer(options.datum);
+  $(element).height(300);
+
+  nv.addGraph(function () {
+    var _chart = nv.models.lineWithBrushChart();
+    _chart.enableSelection();
+    _chart.onSelectRange(options.onSelectRange);
+    _chart.xAxis
+        .showMaxMin(true)
+        .tickFormat(d3.format(',0f'));
+    _chart.margin({bottom: 100})
+        .transitionDuration(300);
+
+    _chart.yAxis
+        .tickFormat(d3.format(',0f'));
+
+    var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+    _d3.datum(_datum)
+        .transition().duration(350)
+        .each("end", options.onComplete)
+        .call(_chart);
+
+    nv.utils.windowResize(_chart.update);
+
+    return _chart;
+  }, function () {
+    d3.selectAll(".nv-bar").on('click',
+        function (d, i) {
+          options.onClick(d);
+        });
+  });
+
+}
+
+
 function barChart(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
@@ -87,7 +133,7 @@ function barChart(element, options, isTimeline) {
   nv.addGraph(function () {
     var _chart;
     if (isTimeline) {
-      _chart = nv.models.multiBarWithFocusChart();
+      _chart = nv.models.multiBarWithBrushChart();
       _chart.enableSelection();
       _chart.onSelectRange(options.onSelectRange);
       _chart.xAxis
