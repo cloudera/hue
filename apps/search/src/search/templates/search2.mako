@@ -250,8 +250,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
                 <span data-bind="text: $data.value + ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
               <!-- /ko -->
               <!-- ko if: $data.selected -->
-                <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                <i class="fa fa-times"></i>
+                <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
+                  <span data-bind="text: $data.value"></span>
+                  <i class="fa fa-times"></i>
+                </span>
               <!-- /ko -->
             </a>
           </div>
@@ -260,14 +262,16 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 	    <!-- ko if: type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
-            <a href="script:void(0)">
+            <a href="">
               <!-- ko if: ! selected --> 
                 <span data-bind="text: $data.from + ' - ' + $data.to + ' (' + $data.value + ')',
                   click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>                
               <!-- /ko -->
               <!-- ko if: selected -->
-                <span data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
-                <i class="fa fa-times"></i>
+                <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+                  <span data-bind="text: $data.from + ' - ' + $data.to"></span>
+                  <i class="fa fa-times"></i>
+                </span>
               <!-- /ko -->
             </a>
           </div>
@@ -397,11 +401,15 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
     ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-minus"></i></a>
-    ## <span data-bind="text: ko.mapping.toJSON(extraSeries)"></span>
+    <span>
+      Group By
+      <select data-bind="options: $root.query.multiqs, optionsText: 'label', value: $root.query.selectedMultiq">
+      </select>      
+    </span>
 
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
-      onSelectRange: function(from, to){viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()})},
-      onComplete: function(){viewModel.getWidgetById(id).isLoading(false)}}" />
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
   </div>
   <!-- /ko -->
 </script>
@@ -474,6 +482,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <br/>      
+      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />      
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
@@ -912,11 +924,12 @@ function timelineChartDataTransformer(rawDatum) {
     values: _data
   });
   
-  if (rawDatum.extraSeries.length > 0) {
-  var _datum = [];
-  }
-    
+
+  // If multi query
   $(rawDatum.extraSeries).each(function (cnt, item) {
+    if (cnt == 0) {
+      _datum = [];
+    }
     var _data = [];
     $(item.counts).each(function (cnt, item) {
       _data.push({

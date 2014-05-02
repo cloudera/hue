@@ -503,16 +503,12 @@ def get_timeline(request):
   
   response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
   response = augment_solr_response2(response, collection, query)
-  
-  print 'get_timeline'
-  print response['normalized_facets']
 
   result['series'] = {'label': facet_filter, 'counts': response['normalized_facets'][0]['counts']}
   result['status'] = 0
   result['message'] = ''
     
 #  except Exception, e:
-#    print e
 #    result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
@@ -571,7 +567,7 @@ def get_range_facet(request):
     
             
     solr_api = SolrApi(SOLR_URL.get(), request.user)
-    
+    print facet['properties']['start']
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
     else:

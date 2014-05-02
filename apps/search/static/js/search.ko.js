@@ -197,8 +197,27 @@ var Query = function (vm, query) {
 
   self.q = ko.observable(query.q);
   self.fqs = ko.mapping.fromJS(query.fqs);
-  // multiq?
+  var defaultMultiqGroup = {'id': null, 'label': 'query'};
+  self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
+    return [defaultMultiqGroup].concat(
+    		$.map($.grep(self.fqs(), function(fq, i) {
+    			  return fq.type() == 'field';
+    		}), function(fq) {return {'id': fq.id(), 'label': fq.field()}})
+    	);
+  });
+  self.selectedMultiq = ko.observable(defaultMultiqGroup);
 
+  self.isMultiq = ko.computed(function () {
+	if (self.selectedMultiq() && self.selectedMultiq()['id'] != null) {
+      var facet = self.getFacetFilter(self.selectedMultiq()['id']);
+      return facet && facet.filter().length > 0; // todo + histogram there?
+    }
+	return false;
+  });
+  self.selectedMultiq.subscribe(function () { // To keep below the computed
+    vm.search();
+  });
+  
   self.toggleFacet = function (data) {
 	var fq = self.getFacetFilter(data.widget_id);
 
@@ -227,11 +246,11 @@ var Query = function (vm, query) {
     vm.search();
   }  
   
-  self.selectRangeFacet = function (data) { 
+  self.selectRangeFacet = function (data) {
 	var fq = self.getFacetFilter(data.widget_id);
-	var unselect = fq != null && fq.id() == data.widget_id;
+	var unselect = fq != null && fq.id() == data.widget_id && data.force == undefined;
 	
-	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // could combine ranges
+	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // TODO: could combine ranges
     
 	if (! unselect) {
       self.fqs.push(ko.mapping.fromJS({
@@ -242,7 +261,9 @@ var Query = function (vm, query) {
       }));
 	}
 
-    vm.search();
+	if (data.no_refresh == undefined) {
+      vm.search();
+	}
   }  
   
   self.removeFilter = function (data) { 
@@ -428,6 +449,8 @@ var Collection = function (vm, collection) {
 	facet.properties.start(data.from);
 	facet.properties.end(data.to);
 	
+	vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
+	
 	$.ajax({
 	  type: "POST",
 	  url: "/search/get_range_facet",	  
@@ -543,21 +566,19 @@ var SearchViewModel = function (collection_json, query_json) {
     self.isRetrievingResults(true);
     $(".jHueNotify").hide();
     
-    // Multi queries
-    var facet = self.query.getFacetFilter('4933579c-38b0-4599-afa1-021e2ca7ae1c');
+    // Multi queries    
     var multiQs = [];
 
-    // todo APPLUY FQ filter!!
-    
     // self.query.q().slice(1) too ?
-    if (facet && facet.filter().length > 0) { // todo + histogram there if set to multi q
+    if (self.query.isMultiq()) {
+      var facet = self.query.getFacetFilter(self.query.selectedMultiq()['id']);
       multiQs = $.map(facet.filter(), function(d) {
     	return $.post("/search/get_timeline", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             facet: ko.mapping.toJSON(facet),
             d: d
-           }, function (data) {return data});
+          }, function (data) {return data});
       });
     }
 
