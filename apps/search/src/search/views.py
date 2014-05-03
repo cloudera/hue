@@ -484,32 +484,32 @@ def get_document(request):
 def get_timeline(request):  
   result = {'status': -1, 'message': 'Error'}
 
-#  try:
-  collection = json.loads(request.POST.get('collection', '{}'))
-  query = json.loads(request.POST.get('query', '{}'))
-
-  facet = json.loads(request.POST.get('facet', '{}'))
-  facet_filter = request.POST.get('d', '{}')
-      
-  facet_id = facet['id']
-
-  # Only care about our current field:value filter
-  for fq in query['fqs']:
-    if fq['id'] == facet_id:
-      fq['filter'] = [facet_filter] 
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    query = json.loads(request.POST.get('query', '{}'))
   
-  # Remove other facets from collection
-  collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
+    facet = json.loads(request.POST.get('facet', '{}'))
+    facet_filter = request.POST.get('d', '{}')
+        
+    facet_id = facet['id']
   
-  response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
-  response = augment_solr_response2(response, collection, query)
-
-  result['series'] = {'label': facet_filter, 'counts': response['normalized_facets'][0]['counts']}
-  result['status'] = 0
-  result['message'] = ''
+    # Only care about our current field:value filter
+    for fq in query['fqs']:
+      if fq['id'] == facet_id:
+        fq['filter'] = [facet_filter] 
     
-#  except Exception, e:
-#    result['message'] = unicode(str(e), "utf8")
+    # Remove other facets from collection
+    collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
+    
+    response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
+    response = augment_solr_response2(response, collection, query)
+
+    result['series'] = {'label': facet_filter, 'counts': response['normalized_facets'][0]['counts']}
+    result['status'] = 0
+    result['message'] = ''
+    
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
@@ -564,10 +564,9 @@ def get_range_facet(request):
     collection = json.loads(request.POST.get('collection', '{}'))
     facet = json.loads(request.POST.get('facet', '{}'))
     action = request.POST.get('action', 'select')
-    
             
     solr_api = SolrApi(SOLR_URL.get(), request.user)
-    print facet['properties']['start']
+
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
     else:
@@ -577,6 +576,7 @@ def get_range_facet(request):
     result['status'] = 0      
 
   except Exception, e:
+    print e
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
