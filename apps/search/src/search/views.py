@@ -576,7 +576,6 @@ def get_range_facet(request):
     result['status'] = 0      
 
   except Exception, e:
-    print e
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")

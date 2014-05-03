@@ -360,8 +360,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
       <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
     </div>
-	  <!-- /ko -->
-	  <!-- ko if: ! $root.collection.template.isGridLayout() -->
+	<!-- /ko -->
+	  
+	<!-- ko if: ! $root.collection.template.isGridLayout() -->
 	  <div id="result-container" data-bind="foreach: $root.results">
 	    <div class="result-row" data-bind="html: $data"></div>
 	  </div>
@@ -402,8 +403,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
     <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-minus"></i></a>
     <span>
-      Group By
-      <select data-bind="options: $root.query.multiqs, optionsText: 'label', value: $root.query.selectedMultiq">
+      ${ _('Group By') }
+      <select data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq">
       </select>      
     </span>
 
@@ -1051,7 +1052,7 @@ $(document).ready(function () {
       if (_existingFacet != null) {
         _existingFacet.label(field.name());
         _existingFacet.field(field.name());
-      }
+      }      
       viewModel.search();
     }
   }

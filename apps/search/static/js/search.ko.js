@@ -214,8 +214,8 @@ var Query = function (vm, query) {
     }
 	return false;
   });
-  self.selectedMultiq.subscribe(function () { // To keep below the computed
-    vm.search();
+  self.selectedMultiq.subscribe(function (c) { // To keep below the computed
+	vm.search();
   });
   
   self.toggleFacet = function (data) {
