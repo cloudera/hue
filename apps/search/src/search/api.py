@@ -183,9 +183,11 @@ class SolrApi(object):
     solr_query['collection'] = collection['name']
     solr_query['rows'] = 10
     solr_query['start'] = 0
+    
+    q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
           
     params = self._get_params() + (
-        ('q', query['q'] or EMPTY_QUERY.get()),
+        ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']])),
         ('wt', 'json'),
         ('rows', solr_query['rows']),
         ('start', solr_query['start']),

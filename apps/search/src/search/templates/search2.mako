@@ -46,8 +46,13 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <span class="current-collection">${ collection.label }</span>        
       </div>
 
-      <input data-bind="value: query.q" name="query" maxlength="256" type="text" class="search-query input-xxlarge" id="id_query" style="cursor: auto;">
-      
+      <span data-bind="foreach: query.qs">
+        <input data-bind="value: q" maxlength="256" type="text" class="search-query input-large" style="cursor: auto;">
+        ## if index 1 <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+      </span>
+
+      <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
+
       <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
     </div>
   </form>

@@ -195,21 +195,32 @@ function loadLayout(viewModel, json_layout) {
 var Query = function (vm, query) {
   var self = this;
 
-  self.q = ko.observable(query.q);
+  self.qs = ko.mapping.fromJS(query.qs);
   self.fqs = ko.mapping.fromJS(query.fqs);
   var defaultMultiqGroup = {'id': null, 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
     return [defaultMultiqGroup].concat(
     		$.map($.grep(self.fqs(), function(fq, i) {
     			  return fq.type() == 'field';
-    		}), function(fq) {return {'id': fq.id(), 'label': fq.field()}})
+    		}), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
     	);
   });
   self.selectedMultiq = ko.observable(defaultMultiqGroup);
 
+  self.getFacetFilter = function (widget_id) {
+    var _fq = null;
+    $.each(self.fqs(), function (index, fq) { 
+      if (fq.id() == widget_id) {
+        _fq = fq;
+        return false;
+      }
+    });
+    return _fq;
+  };
+
   self.isMultiq = ko.computed(function () {
-	if (self.selectedMultiq() && self.selectedMultiq()['id'] != null) {
-      var facet = self.getFacetFilter(self.selectedMultiq()['id']);
+	if (self.selectedMultiq() && self.selectedMultiq() != null) {
+      var facet = self.getFacetFilter(self.selectedMultiq());
       return facet && facet.filter().length > 0; // todo + histogram there?
     }
 	return false;
@@ -217,6 +228,11 @@ var Query = function (vm, query) {
   self.selectedMultiq.subscribe(function (c) { // To keep below the computed
 	vm.search();
   });
+  
+  self.addQ = function (data) {
+	self.qs.push(ko.mapping.fromJS({'q': ''}));
+	vm.search();
+  };
   
   self.toggleFacet = function (data) {
 	var fq = self.getFacetFilter(data.widget_id);
@@ -273,18 +289,7 @@ var Query = function (vm, query) {
         return false;
       }
     });
-  } 
-
-  self.getFacetFilter = function (widget_id) {
-    var _fq = null;
-    $.each(self.fqs(), function (index, fq) { 
-      if (fq.id() == widget_id) {
-        _fq = fq;
-        return false;
-      }
-    });
-    return _fq;
-  }   
+  };   
 };
 
 
@@ -356,6 +361,17 @@ var Collection = function (vm, collection) {
     return _facet;
   }
 
+  self.getHistogramFacet = function () { // might remove when list of available widgets
+    var _facet = null;
+    $.each(self.facets(), function (index, facet) {
+      if (facet.widgetType() == 'histogram-widget') {
+        _facet = facet;
+        return false;
+      }
+    });
+    return _facet;
+  }
+  
   self.template.fields = ko.computed(function () {
     var _fields = [];
     $.each(self.template.fieldsAttributes(), function (index, field) {
@@ -571,7 +587,7 @@ var SearchViewModel = function (collection_json, query_json) {
 
     // self.query.q().slice(1) too ?
     if (self.query.isMultiq()) {
-      var facet = self.query.getFacetFilter(self.query.selectedMultiq()['id']);
+      var facet = self.query.getFacetFilter(self.query.selectedMultiq());
       multiQs = $.map(facet.filter(), function(d) {
     	return $.post("/search/get_timeline", {
             collection: ko.mapping.toJSON(self.collection),
@@ -626,7 +642,8 @@ var SearchViewModel = function (collection_json, query_json) {
     )
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
-    	var histoFacet = self.getFacetFromQuery('e90cc50b-3d55-fb7c-28f3-a0710ca28ae6');    	
+    	var histoFacetId = self.collection.getHistogramFacet().id();
+    	var histoFacet = self.getFacetFromQuery(histoFacetId);	
         for (var i = 1; i < arguments.length; i++) {
           histoFacet.extraSeries.push(arguments[i][0]['series']);
         }

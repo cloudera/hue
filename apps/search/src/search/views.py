@@ -63,7 +63,7 @@ def index(request):
       return no_collections(request)
 
   collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
-  query = {'q': '', 'fqs': []}
+  query = {'qs': [{'q': ''}], 'fqs': []}
 
   return render('search2.mako', request, {
     'collection': collection,
@@ -73,7 +73,7 @@ def index(request):
 
 def new_search(request):
   collection = Collection(name='twitter_demo', label='New Twitter Template')
-  query = {'q': '', 'fqs': []}
+  query = {'qs': [{'q': ''}], 'fqs': []}
 
   return render('search2.mako', request, {
     'collection': collection,
@@ -492,6 +492,8 @@ def get_timeline(request):
     facet_filter = request.POST.get('d', '{}')
         
     facet_id = facet['id']
+    
+    # qs = only one
   
     # Only care about our current field:value filter
     for fq in query['fqs']:
