@@ -239,6 +239,7 @@ function barChart(element, options, isTimeline) {
           .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
       _chart.multibar.hideable(true);
       _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
+      _chart.onStateChange(options.onStateChange);
     }
     else {
       var _isDiscrete = false;
@@ -263,6 +264,7 @@ function barChart(element, options, isTimeline) {
           .tickFormat(d3.format(',0f'));
         _chart.multibar.hideable(true);
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
+        _chart.onStateChange(options.onStateChange);
       }
     }
     _chart.margin({bottom: 100})

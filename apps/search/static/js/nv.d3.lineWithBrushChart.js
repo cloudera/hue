@@ -54,6 +54,7 @@ nv.models.lineWithBrushChart = function() {
     , brushExtent = null
     , selectionEnabled = false
     , onSelectRange = null
+    , onStateChange = null
     ;
 
   xAxis
@@ -550,6 +551,12 @@ nv.models.lineWithBrushChart = function() {
   chart.onSelectRange = function(_) {
     if (!arguments.length) return onSelectRange;
     onSelectRange = _;
+    return chart;
+  };
+
+  chart.onStateChange = function(_) {
+    if (!arguments.length) return onStateChange;
+    onStateChange = _;
     return chart;
   };
 

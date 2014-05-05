@@ -54,6 +54,7 @@ nv.models.growingMultiBarChart = function() {
     , controlWidth = function() { return showControls ? 180 : 0 }
     , transitionDuration = 250
     , selectBars = null
+    , onStateChange = null
     ;
 
   multibar
@@ -346,6 +347,9 @@ nv.models.growingMultiBarChart = function() {
 
         state.stacked = multibar.stacked();
         dispatch.stateChange(state);
+        if (onStateChange != null) {
+          onStateChange(state);
+        }
 
         chart.update();
       });
@@ -539,6 +543,12 @@ nv.models.growingMultiBarChart = function() {
   chart.selectBars = function(args) {
     if (!arguments.length) return selectBars;
     selectBars(args);
+    return chart;
+  };
+
+  chart.onStateChange = function(_) {
+    if (!arguments.length) return onStateChange;
+    onStateChange = _;
     return chart;
   };
 
