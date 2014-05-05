@@ -419,9 +419,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       </select>      
     </span>
 
-    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label, transformer: timelineChartDataTransformer,
+    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onStateChange: function(state){ console.log(state); },
+      onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
   </div>
   <!-- /ko -->
