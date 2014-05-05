@@ -272,6 +272,7 @@ var HueGeo = {
         return this.ISO_3166[i];
       }
     }
+    return null;
   },
   getCountryFromCode: function (code) {
     for (var i = 0; i < this.ISO_3166.length; i++) {
@@ -279,6 +280,7 @@ var HueGeo = {
         return this.ISO_3166[i];
       }
     }
+    return null;
   },
   getCity: function (city, callback) {
     var api = new NominatimAPI();

@@ -592,6 +592,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/static/js/hue.geo.js"></script>
+<script src="/static/js/hue.colors.js"></script>
+
 <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
@@ -665,6 +668,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     top: 70px;
     position: fixed;
     width: 100%;
+    z-index: 1000;
   }
 
   .row-header {

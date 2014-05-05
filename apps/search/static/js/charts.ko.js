@@ -92,11 +92,91 @@ ko.bindingHandlers.lineChart = {
 
 ko.bindingHandlers.mapChart = {
   init: function (element, valueAccessor) {
-    $(element).height($(element).width()/2.5);
+    $(element).height($(element).width()/2.23);
     $(element).css("position", "relative");
     var _options = valueAccessor();
-    var basic = new Datamap({
-      element: element
+    var _data = _options.transformer(_options.data);
+    var _maxWeight = 0;
+    $(_data).each(function(cnt, item){
+      if (item.value > _maxWeight) _maxWeight = item.value;
+    });
+
+    var _chunk = _maxWeight / _data.length;
+
+    var _mapdata = {};
+    var _fills = {};
+    var _noncountries = [];
+    if (_options.isScale){
+      _fills["defaultFill"] = HueColors.LIGHT_BLUE;
+      var _colors = HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
+      $(_colors).each(function(cnt, item){
+        _fills["fill_" + cnt] = item;
+      });
+      $(_data).each(function(cnt, item){
+        var _country = HueGeo.getCountryFromName(item.label);
+        if (_country != null){
+          _mapdata[_country.alpha3] = {
+            fillKey: "fill_" + Math.floor(item.value/_chunk)
+          }
+        }
+        else {
+          _noncountries.push(item);
+        }
+      });
+    }
+    else {
+      _fills["defaultFill"] = HueColors.BLUE;
+      _fills["selected"] = HueColors.DARK_BLUE;
+      $(_data).each(function(cnt, item){
+        var _country = HueGeo.getCountryFromName(item.label);
+        if (_country != null){
+          _mapdata[_country.alpha3] = {
+            fillKey: "selected"
+          }
+        }
+        else {
+          _noncountries.push(item);
+        }
+      });
+    }
+
+    var _map = new Datamap({
+      element: element,
+      fills: _fills,
+      scope: 'world',
+      data: _mapdata,
+      done: function(datamap) {
+
+        datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+          _options.onClick(geography);
+        });
+
+        var _bubbles = [];
+      $(_noncountries).each(function(cnt, item){
+          HueGeo.getCityCoordinates(item.label, function(lat, lng){
+              _bubbles.push({
+                fillKey: "selected",
+                label: item.label,
+                radius: 4,
+                latitude: lat,
+                longitude: lng
+              });
+              _map.bubbles(_bubbles, {
+                popupTemplate: function(geo, data) {
+                  return '<div class="hoverinfo"><strong>'  + data.label + '</strong></div>'
+                }
+              });
+          });
+      });
+      },
+      geographyConfig: {
+        hideAntarctica: true,
+        borderWidth: 1,
+        borderColor: HueColors.DARK_BLUE,
+        highlightOnHover: true,
+        highlightFillColor: HueColors.DARK_BLUE,
+        highlightBorderColor: HueColors.DARK_BLUE
+      }
     });
     _options.onComplete();
   },
