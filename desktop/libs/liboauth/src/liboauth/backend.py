@@ -157,7 +157,7 @@ class OAuthBackend(DesktopBackendBase):
             if resp['status'] != '200':
                 raise Exception(_("Invalid response from OAuth provider: %s") % resp)
             username=(json.loads(content))["email"]
-            access_token = dict(screen_name=''.join([x for x in username if x.isalnum()]), oauth_token_secret=access_tok)
+            access_token = dict(screen_name=map_username(username), oauth_token_secret=access_tok)
             whitelisted_domains = liboauth.conf.WHITELISTED_DOMAINS_GOOGLE.get()
             if whitelisted_domains:
                 if username.split('@')[1] not in whitelisted_domains:
@@ -170,7 +170,7 @@ class OAuthBackend(DesktopBackendBase):
             if resp['status'] != '200':
                 raise Exception(_("Invalid response from OAuth provider: %s") % resp)
             username = (json.loads(content))["email"]
-            access_token = dict(screen_name=''.join([x for x in username if x.isalnum()]), oauth_token_secret=access_tok)
+            access_token = dict(screen_name=map_username(username), oauth_token_secret=access_tok)
         #linkedin
         elif social == 'linkedin':
             access_tok = (json.loads(cont))['access_token']
@@ -179,7 +179,7 @@ class OAuthBackend(DesktopBackendBase):
             if resp['status'] != '200':
                 raise Exception(_("Invalid response from OAuth provider: %s") % resp)
             username = (json.loads(content))['emailAddress']
-            access_token = dict(screen_name=''.join([x for x in username if x.isalnum()]), oauth_token_secret=access_tok)
+            access_token = dict(screen_name=map_username(username), oauth_token_secret=access_tok)
   
 
     return access_token
@@ -259,6 +259,12 @@ class OAuthBackend(DesktopBackendBase):
        )
     return url
 
+def map_username(username):
+    username_map = liboauth.conf.USERNAME_MAP.get()
+    if username_map:
+        for key, value in username_map.iteritems():
+            username = username.replace(key, value)
+    return ''.join([x for x in username if x.isalnum()])
 
 def find_or_create_user(username, password=None):
   try:
