@@ -243,9 +243,13 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       <!-- /ko -->
       <span>
         <span data-bind="text: label" style="font-weight: bold"></span>
-        <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleFacet" data-loading-text="...">      
-          <i class="fa" data-bind="css: { 'fa-sort-alpha-asc': properties.sort() == 'desc' && type() != 'range', 'fa-sort-alpha-desc': properties.sort() == 'asc' && type() != 'range', 'fa-sort-numeric-desc': properties.sort() == 'desc' && type() == 'range', 'fa-sort-numeric-asc': properties.sort() == 'asc' && type() == 'range' }"></i>
-        </a>  
+        
+        <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
+          <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-bars': type() == 'field' }"></i>
+        </a>
+        <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">          
+          <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+        </a>
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">

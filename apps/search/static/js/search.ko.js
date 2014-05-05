@@ -445,32 +445,30 @@ var Collection = function (vm, collection) {
    vm.search();
   };
   
-  self.toggleFacet = function (facet_field, event) {
-  vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
-  var hasChanged = false;
-  
-    if (facet_field.properties.canRange()) {
-     if (facet_field.type() == 'field' && facet_field.properties.sort() == 'asc') {
-     facet_field.type('range');
-     hasChanged = true;
-     } else if (facet_field.type() == 'range' && facet_field.properties.sort() == 'desc') {
-      facet_field.type('field')
-       hasChanged = true;
-       }
-    }
-
-    if (! hasChanged) {
-      if (facet_field.properties.sort() == 'desc') {
-        facet_field.properties.sort('asc');
-      } else {
-        facet_field.properties.sort('desc');
-      }   
-    }
+  self.toggleSortFacet = function (facet_field, event) {
+    if (facet_field.properties.sort() == 'desc') {
+      facet_field.properties.sort('asc');
+    } else {
+      facet_field.properties.sort('desc');
+    }   
    
     $(event.target).button('loading');
     vm.search();
   };
-  
+
+  self.toggleRangeFacet = function (facet_field, event) {
+    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+ 
+    if (facet_field.type() == 'field') {
+       facet_field.type('range');
+     } else if (facet_field.type() == 'range') {
+        facet_field.type('field')
+     }
+   
+    $(event.target).button('loading');
+    vm.search();
+  };  
+
   self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(facet)); 
   var facet = self.getFacetById(data.widget_id);
   

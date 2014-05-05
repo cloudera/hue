@@ -491,7 +491,6 @@ def get_timeline(request):
     qdata = json.loads(request.POST.get('qdata', '{}'))
     multiQ = request.POST.get('multiQ', 'query')
     
-    
     if multiQ == 'query':
       label = qdata['q'] 
       query['qs'] = [qdata]
@@ -534,6 +533,9 @@ def new_facet(request):
     properties = {
       'sort': 'desc',
       'canRange': False,
+      'stacked': False,
+      'limit': 10,
+      'mincount': 0
     }
     
     solr_api = SolrApi(SOLR_URL.get(), request.user)
