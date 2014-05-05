@@ -48,7 +48,9 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
       <span data-bind="foreach: query.qs">
         <input data-bind="value: q" maxlength="256" type="text" class="search-query input-large" style="cursor: auto;">
-        ## if index 1 <a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
+        <!-- ko if: $index() >= 1 -->
+        <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
+        <!-- /ko -->
       </span>
 
       <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>

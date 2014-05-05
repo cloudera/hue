@@ -197,13 +197,13 @@ var Query = function (vm, query) {
 
   self.qs = ko.mapping.fromJS(query.qs);
   self.fqs = ko.mapping.fromJS(query.fqs);
-  var defaultMultiqGroup = {'id': null, 'label': 'query'};
+  var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
     return [defaultMultiqGroup].concat(
-    		$.map($.grep(self.fqs(), function(fq, i) {
-    			  return fq.type() == 'field';
-    		}), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
-    	);
+        $.map($.grep(self.fqs(), function(fq, i) {
+            return fq.type() == 'field';
+        }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
+      );
   });
   self.selectedMultiq = ko.observable(defaultMultiqGroup);
 
@@ -218,69 +218,81 @@ var Query = function (vm, query) {
     return _fq;
   };
 
-  self.isMultiq = ko.computed(function () {
-	if (self.selectedMultiq() && self.selectedMultiq() != null) {
-      var facet = self.getFacetFilter(self.selectedMultiq());
-      return facet && facet.filter().length > 0; // todo + histogram there?
+  self.getMultiq = ko.computed(function () {
+    if (self.selectedMultiq()) {
+    if (self.selectedMultiq() == 'query') {
+      if (self.qs().length >= 2) {
+        return 'query';
+      }
+      } else {
+        var facet = self.getFacetFilter(self.selectedMultiq());
+        if (facet && facet.filter().length > 0) { // todo + histogram there?
+          return 'facet';
+        }
+      }
     }
-	return false;
+  return null;
   });
-  self.selectedMultiq.subscribe(function (c) { // To keep below the computed
-	vm.search();
+  
+  self.selectedMultiq.subscribe(function () { // To keep below the computed
+    vm.search();
   });
   
   self.addQ = function (data) {
-	self.qs.push(ko.mapping.fromJS({'q': ''}));
-	vm.search();
+    self.qs.push(ko.mapping.fromJS({'q': ''}));
+  };
+  
+  self.removeQ = function (query) {
+    self.qs.remove(query);
   };
   
   self.toggleFacet = function (data) {
-	var fq = self.getFacetFilter(data.widget_id);
+    var fq = self.getFacetFilter(data.widget_id);
 
-	if (fq == null) {
+    if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget_id,
         'field': data.facet.cat,
         'filter': [data.facet.value],
         'type': 'field'
       }));
-	} else {
+    } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget_id) {
           if (fq.filter.indexOf(data.facet.value) > -1) {
-        	fq.filter.remove(data.facet.value);
-        	if (fq.filter().length == 0) {
+            fq.filter.remove(data.facet.value);
+            if (fq.filter().length == 0) {
               self.fqs.remove(fq);
-        	}
+             }
           } else {
-        	fq.filter.push(data.facet.value);
+            fq.filter.push(data.facet.value);
           }
         }
       });
-	}
-    
+    }
+  
     vm.search();
   }  
   
   self.selectRangeFacet = function (data) {
-	var fq = self.getFacetFilter(data.widget_id);
-	var unselect = fq != null && fq.id() == data.widget_id && data.force == undefined;
-	
-	self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // TODO: could combine ranges
-    
-	if (! unselect) {
+    var fq = self.getFacetFilter(data.widget_id);
+    var unselect = fq != null && fq.id() == data.widget_id && data.force == undefined;
+  
+    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // TODO: could combine ranges
+  
+    if (! unselect) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget_id,
         'field': data.cat,
         'filter': {'from': data.from, 'to': data.to},
         'type': 'range'
       }));
-	}
+    }
 
-	if (data.no_refresh == undefined) {
+    if (data.no_refresh == undefined) {
       vm.search();
-	}
-  }  
+    }
+  };  
   
   self.removeFilter = function (data) { 
     $.each(self.fqs(), function (index, fq) {
@@ -387,11 +399,11 @@ var Collection = function (vm, collection) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
       if (field.name() == name) {
-    	_field = field;
+      _field = field;
         return false;
       }
     });
-    return _field;	  
+    return _field;    
   };
 
   self.template.fieldsModalFilter = ko.observable("");
@@ -434,16 +446,16 @@ var Collection = function (vm, collection) {
   };
   
   self.toggleFacet = function (facet_field, event) {
-	vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
-	var hasChanged = false;
-	
+  vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+  var hasChanged = false;
+  
     if (facet_field.properties.canRange()) {
-	   if (facet_field.type() == 'field' && facet_field.properties.sort() == 'asc') {
-		 facet_field.type('range');
-		 hasChanged = true;
-	   } else if (facet_field.type() == 'range' && facet_field.properties.sort() == 'desc') {
-	    facet_field.type('field')
-	     hasChanged = true;
+     if (facet_field.type() == 'field' && facet_field.properties.sort() == 'asc') {
+     facet_field.type('range');
+     hasChanged = true;
+     } else if (facet_field.type() == 'range' && facet_field.properties.sort() == 'desc') {
+      facet_field.type('field')
+       hasChanged = true;
        }
     }
 
@@ -460,69 +472,69 @@ var Collection = function (vm, collection) {
   };
   
   self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(facet)); 
-	var facet = self.getFacetById(data.widget_id);
-	
-	facet.properties.start(data.from);
-	facet.properties.end(data.to);
-	
-	vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
-	
-	$.ajax({
-	  type: "POST",
-	  url: "/search/get_range_facet",	  
-	  data: {
-	    collection: ko.mapping.toJSON(self),
-	    facet: ko.mapping.toJSON(facet),
-	    action: 'select'
-	  },
-	  success: function (data) {
-	    if (data.status == 0) {
-	      facet.properties.gap(data.properties.gap);
-	    }
-	  },
-	  async: false
-	});	
-	
+  var facet = self.getFacetById(data.widget_id);
+  
+  facet.properties.start(data.from);
+  facet.properties.end(data.to);
+  
+  vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
+  
+  $.ajax({
+    type: "POST",
+    url: "/search/get_range_facet",    
+    data: {
+      collection: ko.mapping.toJSON(self),
+      facet: ko.mapping.toJSON(facet),
+      action: 'select'
+    },
+    success: function (data) {
+      if (data.status == 0) {
+        facet.properties.gap(data.properties.gap);
+      }
+    },
+    async: false
+  });  
+  
     vm.search();
   }
 
   self.timeLineZoom = function (facet_json) { 
-	var facet = self.getFacetById(facet_json.id);
-	
-	facet.properties.start(facet.from);
-	facet.properties.end(facet.to);
-	
-	$.ajax({
-	  type: "POST",
-	  url: "/search/get_range_facet",	  
-	  data: {
-	    collection: ko.mapping.toJSON(self),
-	    facet: ko.mapping.toJSON(facet),
-	    action: "zoom_out"
-	  },
-	  success: function (data) {
-	    if (data.status == 0) {
-	      facet.properties.start(data.properties.start);
-	      facet.properties.end(data.properties.end);
-	      facet.properties.gap(data.properties.gap);
-	    }
-	  },
-	  async: false
-	});	
-	
+  var facet = self.getFacetById(facet_json.id);
+  
+  facet.properties.start(facet.from);
+  facet.properties.end(facet.to);
+  
+  $.ajax({
+    type: "POST",
+    url: "/search/get_range_facet",    
+    data: {
+      collection: ko.mapping.toJSON(self),
+      facet: ko.mapping.toJSON(facet),
+      action: "zoom_out"
+    },
+    success: function (data) {
+      if (data.status == 0) {
+        facet.properties.start(data.properties.start);
+        facet.properties.end(data.properties.end);
+        facet.properties.gap(data.properties.gap);
+      }
+    },
+    async: false
+  });  
+  
     vm.search();
   }
   
   self.translateSelectedField = function (index, direction) {
-	var array = self.template.fieldsSelected();
+  var array = self.template.fieldsSelected();
 
     if (direction == 'left') {
-	  self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
+    self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
     } else {
       self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
     }
-	
-	vm.search();
+  
+  vm.search();
   };
 };
 
@@ -584,18 +596,28 @@ var SearchViewModel = function (collection_json, query_json) {
     
     // Multi queries    
     var multiQs = [];
-
-    // self.query.q().slice(1) too ?
-    if (self.query.isMultiq()) {
-      var facet = self.query.getFacetFilter(self.query.selectedMultiq());
-      multiQs = $.map(facet.filter(), function(d) {
-    	return $.post("/search/get_timeline", {
-            collection: ko.mapping.toJSON(self.collection),
-            query: ko.mapping.toJSON(self.query),
-            facet: ko.mapping.toJSON(facet),
-            d: d
-          }, function (data) {return data});
-      });
+    var multiQ = self.query.getMultiq();
+    
+    if (multiQ != null) {
+      var facet = {};
+      var queries = [];
+      
+      if (multiQ == 'query') {
+        queries = self.query.qs();
+      } else {
+        facet = facet = self.query.getFacetFilter(self.query.selectedMultiq());
+        queries = facet.filter();       
+      }
+      
+      multiQs = $.map(queries, function(qdata) {
+        return $.post("/search/get_timeline", {
+              collection: ko.mapping.toJSON(self.collection),
+              query: ko.mapping.toJSON(self.query),
+              facet: ko.mapping.toJSON(facet),
+              qdata: ko.mapping.toJSON(qdata),
+              multiQ: multiQ
+            }, function (data) {return data});
+      });              
     }
 
     $.when.apply($, [
@@ -642,8 +664,8 @@ var SearchViewModel = function (collection_json, query_json) {
     )
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
-    	var histoFacetId = self.collection.getHistogramFacet().id();
-    	var histoFacet = self.getFacetFromQuery(histoFacetId);	
+      var histoFacetId = self.collection.getHistogramFacet().id();
+      var histoFacet = self.getFacetFromQuery(histoFacetId);  
         for (var i = 1; i < arguments.length; i++) {
           histoFacet.extraSeries.push(arguments[i][0]['series']);
         }
@@ -684,10 +706,10 @@ var SearchViewModel = function (collection_json, query_json) {
       id: doc.id
     },function (data) {
       if (data.status == 0) {
-    	alert(ko.mapping.toJSON(data.doc.doc));
+        alert(ko.mapping.toJSON(data.doc.doc));
       }
       else if (data.status == 1) {
-    	$(document).trigger("info", data.message);
+        $(document).trigger("info", data.message);
       }
       else {
         $(document).trigger("error", data.message);
