@@ -415,7 +415,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       </select>      
     </span>
 
-    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, field: field, label: label, transformer: timelineChartDataTransformer,
+    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
   </div>
@@ -442,7 +442,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
       ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
     </div> 
 
-    <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
+    <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       transformer: barChartDataTransformer,
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) }, 
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"

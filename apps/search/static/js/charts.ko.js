@@ -158,6 +158,7 @@ function barChart(element, options, isTimeline) {
           .showMaxMin(true)
           .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
       _chart.multibar.hideable(true);
+      _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
     }
     else {
       var _isDiscrete = false;
@@ -181,6 +182,7 @@ function barChart(element, options, isTimeline) {
           .showMaxMin(true)
           .tickFormat(d3.format(',0f'));
         _chart.multibar.hideable(true);
+        _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
       }
     }
     _chart.margin({bottom: 100})
