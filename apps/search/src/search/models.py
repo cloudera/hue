@@ -470,7 +470,7 @@ def augment_solr_response2(response, collection, query):
       pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
     return pairs
 
-  def range_pair(cat, selected_values, iterable, end, facet):
+  def range_pair(cat, selected_values, iterable, end):
     # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
     pairs = []
     a, to = itertools.tee(iterable)
@@ -478,11 +478,7 @@ def augment_solr_response2(response, collection, query):
     for element in a:
       next(to, None)
       to_value = next(to, end)
-      if facet['widgetType'] == 'pie-widget':        
-        label = '%s - %s ' % (element, to_value)
-      else:
-        label = element
-      pairs.append({'field': cat, 'from': label, 'value': next(a), 'to': to_value, 'selected': element == selected_values})
+      pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element == selected_values})
     return pairs
 
   selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
@@ -512,7 +508,7 @@ def augment_solr_response2(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), {}).get('from', None), counts, end, facet)
+        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), [''])[0], counts, end) # Single val selected
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
         facet = {

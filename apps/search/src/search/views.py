@@ -535,7 +535,8 @@ def new_facet(request):
       'canRange': False,
       'stacked': False,
       'limit': 10,
-      'mincount': 0
+      'mincount': 0, # Not used yet
+      'andUp': False,
     }
     
     solr_api = SolrApi(SOLR_URL.get(), request.user)

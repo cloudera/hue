@@ -210,7 +210,9 @@ class SolrApi(object):
              ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),]
           )          
         elif facet['type'] == 'field':
-          params += (('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),)
+          params += (
+              ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
+              ('f.%s.facet.limit' % facet['field'], facet['properties']['limit']))
 
     for fq in query['fqs']:
       #model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
@@ -221,7 +223,7 @@ class SolrApi(object):
 #        if fq['filter'].get('to'):
 #          model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]           
 #          fq['filter']['to'] = model_facet['properties']['end'] if model_facet else '*'
-        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:[%s TO %s}' % (fq['field'],fq['field'], fq['filter']['from'], fq['filter']['to'])))),)
+        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}%s:[%s TO %s}' % (fq['field'], fq['field'], fq['properties']['from'], fq['properties']['to'])))),)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []

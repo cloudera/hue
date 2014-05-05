@@ -263,7 +263,7 @@ var Query = function (vm, query) {
             fq.filter.remove(data.facet.value);
             if (fq.filter().length == 0) {
               self.fqs.remove(fq);
-             }
+            }
           } else {
             fq.filter.push(data.facet.value);
           }
@@ -278,13 +278,22 @@ var Query = function (vm, query) {
     var fq = self.getFacetFilter(data.widget_id);
     var unselect = fq != null && fq.id() == data.widget_id && data.force == undefined;
   
-    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id})); // TODO: could combine ranges
+    // if range already in --> unselect
+    // if not: add
+    //var filter = self.getFacetFilter(data.widget_id);
+    //if (filter != null && filter.filter().indexOf(data.from) > -1) {
+    	//
+    //}
+    
+    // if empty now or force
+    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
   
     if (! unselect) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget_id,
         'field': data.cat,
-        'filter': {'from': data.from, 'to': data.to},
+        'filter': [data.from],
+        'properties': {'from': data.from, 'to': data.to},
         'type': 'range'
       }));
     }
@@ -434,15 +443,15 @@ var Collection = function (vm, collection) {
   }
 
   self.toggleSortColumnGridLayout = function (template_field) {
-   if (! template_field.sort.direction()) {
-     template_field.sort.direction('desc');
-   } else if (template_field.sort.direction() == 'desc') {
-     template_field.sort.direction('asc');
-   } else {
-     template_field.sort.direction(null); 
-   }
+    if (! template_field.sort.direction()) {
+      template_field.sort.direction('desc');
+    } else if (template_field.sort.direction() == 'desc') {
+      template_field.sort.direction('asc');
+    } else {
+      template_field.sort.direction(null); 
+    }
 
-   vm.search();
+    vm.search();
   };
   
   self.toggleSortFacet = function (facet_field, event) {
@@ -470,69 +479,69 @@ var Collection = function (vm, collection) {
   };  
 
   self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(facet)); 
-  var facet = self.getFacetById(data.widget_id);
+    var facet = self.getFacetById(data.widget_id);
   
-  facet.properties.start(data.from);
-  facet.properties.end(data.to);
+    facet.properties.start(data.from);
+    facet.properties.end(data.to);
   
-  vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
+    vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
   
-  $.ajax({
-    type: "POST",
-    url: "/search/get_range_facet",    
-    data: {
-      collection: ko.mapping.toJSON(self),
-      facet: ko.mapping.toJSON(facet),
-      action: 'select'
-    },
-    success: function (data) {
-      if (data.status == 0) {
-        facet.properties.gap(data.properties.gap);
-      }
-    },
-    async: false
-  });  
+    $.ajax({
+      type: "POST",
+      url: "/search/get_range_facet",    
+      data: {
+        collection: ko.mapping.toJSON(self),
+        facet: ko.mapping.toJSON(facet),
+        action: 'select'
+      },
+      success: function (data) {
+        if (data.status == 0) {
+          facet.properties.gap(data.properties.gap);
+        }
+      },
+      async: false
+    });  
   
     vm.search();
   }
 
   self.timeLineZoom = function (facet_json) { 
-  var facet = self.getFacetById(facet_json.id);
+    var facet = self.getFacetById(facet_json.id);
+
+    facet.properties.start(facet.from);
+    facet.properties.end(facet.to);
   
-  facet.properties.start(facet.from);
-  facet.properties.end(facet.to);
-  
-  $.ajax({
-    type: "POST",
-    url: "/search/get_range_facet",    
-    data: {
-      collection: ko.mapping.toJSON(self),
-      facet: ko.mapping.toJSON(facet),
-      action: "zoom_out"
-    },
-    success: function (data) {
-      if (data.status == 0) {
-        facet.properties.start(data.properties.start);
-        facet.properties.end(data.properties.end);
-        facet.properties.gap(data.properties.gap);
-      }
-    },
-    async: false
-  });  
+    $.ajax({
+      type: "POST",
+      url: "/search/get_range_facet",    
+      data: {
+        collection: ko.mapping.toJSON(self),
+        facet: ko.mapping.toJSON(facet),
+        action: "zoom_out"
+      },
+      success: function (data) {
+        if (data.status == 0) {
+          facet.properties.start(data.properties.start);
+          facet.properties.end(data.properties.end);
+          facet.properties.gap(data.properties.gap);
+        }
+      },
+      async: false
+    });  
   
     vm.search();
   }
   
   self.translateSelectedField = function (index, direction) {
-  var array = self.template.fieldsSelected();
+    var array = self.template.fieldsSelected();
 
     if (direction == 'left') {
-    self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
+      self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
     } else {
       self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
     }
   
-  vm.search();
+    vm.search();
   };
 };
 

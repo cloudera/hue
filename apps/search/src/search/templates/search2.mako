@@ -221,6 +221,27 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- /ko -->
 </script>
 
+<script type="text/html" id="facet-toggle">
+      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      <!-- ko if: type() == 'range' -->
+        <br/>
+        ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+        ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+        ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+      <!-- /ko -->
+      <!-- ko if: type() == 'field' -->
+        ${ _('Limit') }: <input type="text" data-bind="value: properties.limit" />      
+      <!-- /ko -->
+    <span data-bind="text: label" style="font-weight: bold"></span>
+
+    <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
+      <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }"></i>
+    </a>
+    <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">          
+      <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+    </a>
+</script>
+
 <script type="text/html" id="facet-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -234,22 +255,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <!-- ko if: type() == 'range' -->
-        <br/>
-        ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-        ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-        ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
-      <!-- /ko -->
-      <span>
-        <span data-bind="text: label" style="font-weight: bold"></span>
-        
-        <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
-          <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-bars': type() == 'field' }"></i>
-        </a>
-        <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">          
-          <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
-        </a>
+      <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
@@ -448,7 +454,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     </div> 
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
-      transformer: barChartDataTransformer, onStateChange: function(state){ console.log(state); },
+      transformer: barChartDataTransformer,
+      onStateChange: function(state){ console.log(state); },
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) }, 
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
@@ -494,12 +501,10 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
-      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />      
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
     </div>
+
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
@@ -854,7 +859,7 @@ function rangePieChartDataTransformer(data) {
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
     _data.push({
-      label: item.from,
+      label: item.from + ' - ' + item.to,
       value: item.value,
       to: item.to,
       obj: item
