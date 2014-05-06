@@ -418,11 +418,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>      
-      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
     </div>  
 
     ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -454,11 +451,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>
-      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
     </div> 
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
@@ -484,11 +478,8 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-      <br/>
-      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
     </div>
 
     <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,

@@ -575,7 +575,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   if (initial_json.collections) {
     self.collection.name.subscribe(function (newValue) {
-	  self.collection.label(newValue);alert(newValue);
+	  self.collection.label(newValue);
     });
   }
   
