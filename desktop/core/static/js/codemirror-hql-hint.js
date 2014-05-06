@@ -58,9 +58,14 @@
 
   CodeMirror.catalogTables = "";
   CodeMirror.catalogFields = "";
+  CodeMirror.roles = "";
   CodeMirror.possibleTable = false;
   CodeMirror.possibleSoloField = false;
+  CodeMirror.possibleRole = false;
+  CodeMirror.possibleObject = false;
   CodeMirror.tableFieldMagic = false;
+  CodeMirror.roleMagic = false;
+  CodeMirror.objectMagic = false;
 
   CodeMirror.hiveQLHint = function (editor) {
     return scriptHint(editor, hiveQLKeywordsU, function (e, cur) {
@@ -84,9 +89,26 @@
   var hiveQLBuiltinsU = hiveQLBuiltins.split(" ").join("() ").split(" ");
   var hiveQLBuiltinsL = hiveQLBuiltins.toLowerCase().split(" ").join("() ").split(" ");
 
+  var hiveQLGrantables = "ROLE";
+  var hiveQLGrantablesU = hiveQLGrantables.split(" ");
+  var hiveQLGrantablesL = hiveQLGrantables.toLowerCase().split(" ");
+
+  var hiveQLGrantablePrivileges = "ROLE SELECT INSERT ALL";
+  var hiveQLGrantablePrivilegesU = hiveQLGrantablePrivileges.split(" ");
+  var hiveQLGrantablePrivilegesL = hiveQLGrantablePrivileges.toLowerCase().split(" ");
+
+  var hiveQLKeywordsAfterGrants = "TO GROUP FROM ON";
+  var hiveQLKeywordsAfterGrantsU = hiveQLKeywordsAfterGrants.split(" ");
+  var hiveQLKeywordsAfterGrantsL = hiveQLKeywordsAfterGrants.toLowerCase().split(" ");
+
+  var hiveQLKeywordsAfterPrivileges = "DATABASE TABLE FROM TO";
+  var hiveQLKeywordsAfterPrivilegesU = hiveQLKeywordsAfterPrivileges.split(" ");
+  var hiveQLKeywordsAfterPrivilegesL = hiveQLKeywordsAfterPrivileges.toLowerCase().split(" ");
+
   function getCompletions(token, context) {
     var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
     var catalogFieldsL = CodeMirror.catalogFields.toLowerCase().split(" ");
+    var rolesL = CodeMirror.roles.split(" ");
 
     var found = [], start = token.string, extraFound = [];
 
@@ -107,7 +129,39 @@
         forEach(catalogFieldsL, maybeAdd);
       }
       else {
-        if (!CodeMirror.possibleTable) {
+        if (CodeMirror.possibleRole) {
+          if (CodeMirror.roleMagic) {
+            var _specialRoleTablesL = CodeMirror.roles.toLowerCase().split(" ");
+            for (var i = 0; i < _specialRoleTablesL.length; i++) {
+              _specialRoleTablesL[i] = "<i class='fa fa-magic'></i> ROLE " + _specialRoleTablesL[i];
+            }
+            forEach(_specialRoleTablesL, maybeAddToExtra);
+          }
+          forEach(rolesL, maybeAddToExtra);
+          forEach(hiveQLKeywordsAfterGrantsU, maybeAdd);
+          forEach(hiveQLKeywordsAfterGrantsL, maybeAdd);
+        } else if (CodeMirror.possiblePrivilege) {
+          forEach(hiveQLGrantablesL, maybeAdd);
+          forEach(hiveQLGrantablesU, maybeAdd);
+          forEach(hiveQLGrantablePrivilegesL, maybeAddToExtra);
+          forEach(hiveQLGrantablePrivilegesU, maybeAddToExtra);
+          forEach(hiveQLKeywordsAfterGrantsL, maybeAdd);
+          forEach(hiveQLKeywordsAfterGrantsU, maybeAdd);
+        } else if (CodeMirror.possibleObject) {
+          if (CodeMirror.objectMagic) {
+            var _specialCatalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+            for (var i = 0; i < _specialCatalogTablesL.length; i++) {
+              _specialCatalogTablesL[i] = "<i class='fa fa-magic'></i> TABLE " + _specialCatalogTablesL[i];
+            }
+            forEach(_specialCatalogTablesL, maybeAddToExtra);
+          }
+          forEach(hiveQLKeywordsAfterPrivilegesL, maybeAddToExtra);
+          forEach(hiveQLKeywordsAfterPrivilegesU, maybeAddToExtra);
+        } else if (CodeMirror.possibleTable) {
+          forEach(catalogTablesL, maybeAddToExtra);
+          forEach(hiveQLKeywordsAfterTablesU, maybeAdd);
+          forEach(hiveQLKeywordsAfterTablesL, maybeAdd);
+        } else {
           if (CodeMirror.tableFieldMagic) {
             var _specialCatalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
             for (var i = 0; i < _specialCatalogTablesL.length; i++) {
@@ -124,12 +178,6 @@
           forEach(hiveQLTypesL, maybeAdd);
           forEach(hiveQLKeywordsU, maybeAdd);
           forEach(hiveQLKeywordsL, maybeAdd);
-
-        }
-        else {
-          forEach(catalogTablesL, maybeAddToExtra);
-          forEach(hiveQLKeywordsAfterTablesU, maybeAdd);
-          forEach(hiveQLKeywordsAfterTablesL, maybeAdd);
         }
       }
     }
