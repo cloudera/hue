@@ -19,7 +19,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, coerce_bool, coerce_csv
+from desktop.lib.conf import Config, coerce_bool, coerce_csv, coerce_json_dict
 
 
 CONSUMER_KEY_TWITTER = Config(
@@ -154,4 +154,11 @@ WHITELISTED_DOMAINS_GOOGLE = Config(
     help=_t("Comma-separated list of whitelisted domains."),
     type=coerce_csv,
     default=''
+)
+
+USERNAME_MAP = Config(
+    key="username_map",
+    help=_t("JSON formatted hash of username simplifications."),
+    type=coerce_json_dict,
+    default='{}'
 )
