@@ -780,13 +780,6 @@ ${layout.menubar(section='query')}
     font-size: 11px;
   }
 
-  .editorError {
-    color: #B94A48;
-    background-color: #F2DEDE;
-    padding: 4px;
-    font-size: 11px;
-  }
-
   .editable-empty, .editable-empty:hover {
     color: #666;
     font-style: normal;
@@ -1850,8 +1843,9 @@ $(document).ready(function () {
 function resizeLogs() {
   // Use fixed subtraction since logs aren't always visible.
   if ($("#log pre:eq(1)").length > 0) {
-    $("#log").height($(window).height() - $("#log pre:eq(1)").offset().top - 10);
-    $("#log pre:eq(1)").css("overflow", "auto").height($(window).height() - $("#log pre:eq(1)").offset().top - 50);
+    var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
+    $("#log").height(_height - 10);
+    $("#log pre:eq(1)").css("overflow", "auto").height(_height - 50);
   }
 }
 
@@ -2144,10 +2138,10 @@ function getLastDatabase(server) {
 
 // Server error handling.
 $(document).on('server.error', function (e, data) {
-  $(document).trigger('error', "${_('Server error occured: ')}" + data.message ? data.message : data.error);
+  $(document).trigger('error', "${_('Server error occurred: ')}" + data.message ? data.message : data.error);
 });
 $(document).on('server.unmanageable_error', function (e, responseText) {
-  $(document).trigger('error', "${_('Unmanageable server error occured: ')}" + responseText);
+  $(document).trigger('error', "${_('Unmanageable server error occurred: ')}" + responseText);
 });
 
 // Other
