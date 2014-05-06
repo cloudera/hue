@@ -83,7 +83,7 @@ var Widget = function (size, id, name, widgetType, properties, offset) {
   self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
   self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
   self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
-  self.isLoading = ko.observable(false);
+  self.isLoading = ko.observable(true);
 
 
   self.klass = ko.computed(function () {
