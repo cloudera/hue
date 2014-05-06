@@ -478,7 +478,7 @@ def augment_solr_response2(response, collection, query):
     for element in a:
       next(to, None)
       to_value = next(to, end)
-      pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element == selected_values})
+      pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values})
     return pairs
 
   selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
@@ -508,7 +508,7 @@ def augment_solr_response2(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), [''])[0], counts, end) # Single val selected
+        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), []), counts, end)
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
         facet = {

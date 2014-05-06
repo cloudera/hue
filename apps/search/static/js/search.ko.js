@@ -201,7 +201,7 @@ var Query = function (vm, query) {
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
-            return fq.type() == 'field';
+            return fq.type() == 'field' || fq.type() == 'range';
         }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
       );
   });
@@ -275,33 +275,41 @@ var Query = function (vm, query) {
   }  
   
   self.selectRangeFacet = function (data) {
-    var fq = self.getFacetFilter(data.widget_id);
-    var unselect = fq != null && fq.id() == data.widget_id && data.force == undefined;
-  
-    // if range already in --> unselect
-    // if not: add
-    //var filter = self.getFacetFilter(data.widget_id);
-    //if (filter != null && filter.filter().indexOf(data.from) > -1) {
-    	//
-    //}
+    if (data.force != undefined) {
+      self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+    }
     
-    // if empty now or force
-    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
-  
-    if (! unselect) {
+	var fq = self.getFacetFilter(data.widget_id);
+	  
+    if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
-        'id': data.widget_id,
-        'field': data.cat,
-        'filter': [data.from],
-        'properties': {'from': data.from, 'to': data.to},
-        'type': 'range'
-      }));
+          'id': data.widget_id,
+          'field': data.cat,
+          'filter': [data.from],
+          'properties': [{'from': data.from, 'to': data.to}],
+          'type': 'range'
+      }));    	
+    } else {    
+      if (fq.filter().indexOf(data.from) > -1) { // Unselect
+    	fq.filter.remove(data.from);
+    	$.each(fq.properties(), function (index, prop) {
+    	  if (prop && prop.from() == data.from) {
+    	    fq.properties.remove(prop);
+    	  }
+    	});
+    	if (fq.filter().length == 0) {
+          self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+    	}    	 
+      } else {
+    	 fq.filter.push(data.from);
+    	 fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
+      }
     }
 
     if (data.no_refresh == undefined) {
       vm.search();
     }
-  };  
+  };
   
   self.removeFilter = function (data) { 
     $.each(self.fqs(), function (index, fq) {
