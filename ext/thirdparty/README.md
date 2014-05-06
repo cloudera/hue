@@ -9,7 +9,6 @@ Checked-in third party dependencies
 |--------------|-------|-------|-------|----------|
 |Y|A Midsummer Nights Dream by Shakespeare|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext98/2ws1710.txt|
 |Y|Avro|1.5.0|ASL2|http://avro.apache.org/|
-|Y|Charade|1.0.3|LGPLv2.1|https://github.com/sigmavirus24/charade/|
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
