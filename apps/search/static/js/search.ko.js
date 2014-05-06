@@ -199,10 +199,10 @@ var Query = function (vm, query) {
   self.fqs = ko.mapping.fromJS(query.fqs);
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
-	var histogram_id = vm.collection.getHistogramFacet().id();
+	var histogram_id = vm.collection.getHistogramFacet();
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
-            return (fq.type() == 'field' || fq.type() == 'range') && histogram_id != fq.id();
+            return (fq.type() == 'field' || fq.type() == 'range') && (histogram_id == null || histogram_id.id() != fq.id());
         }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
       );
   });

@@ -30,7 +30,6 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   % if user.is_superuser:
     <div class="pull-right" style="padding-right:50px">
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cogs"></i></button>    
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-link"></i></button>
       &nbsp;&nbsp;&nbsp;            
