@@ -1,0 +1,89 @@
+# Chinese (China) translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/librdbms/conf.py:26
+msgid "RDBMS server configurations."
+msgstr "RDBMS 服务器配置。"
+
+#: src/librdbms/conf.py:28
+msgid "RDBMS server configuration."
+msgstr "RDBMS 服务器配置。"
+
+#: src/librdbms/conf.py:32
+msgid "Nice name of server."
+msgstr "服务器名称。"
+
+#: src/librdbms/conf.py:38
+msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgstr "数据库名称或数据库文件路径。如果已提供，则不允许选择其他数据库。"
+
+#: src/librdbms/conf.py:44
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgstr "数据库引擎，如 postgresql_psycopg2、mysql 或 sqlite3。"
+
+#: src/librdbms/conf.py:50
+msgid "Database username."
+msgstr "数据库用户名。"
+
+#: src/librdbms/conf.py:56
+msgid "Database password."
+msgstr "数据库密码。"
+
+#: src/librdbms/conf.py:62
+msgid "Database host."
+msgstr "数据库主机。"
+
+#: src/librdbms/conf.py:68
+msgid "Database port."
+msgstr "数据库端口。"
+
+#: src/librdbms/conf.py:74
+msgid "Database options to send to the server when connecting."
+msgstr "连接时发送到服务器的数据库选项。"
+
+#: src/librdbms/conf.py:90
+msgid "Database name should not be empty for the SQLite backend."
+msgstr "对于 SQLite 后端，数据库名称不应为空。"
+
+#: src/librdbms/conf.py:92
+msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgstr "对于 Oracle 后端，数据库名称不应为空。该名称应为数据库的 SID。"
+
+#: src/librdbms/conf.py:94
+msgid "Database name should not be empty for the PostgreSQL backend."
+msgstr "对于 PostgreSQL 后端，数据库名称不应为空。"
+
+#: src/librdbms/design.py:110
+msgid "No server!"
+msgstr "无服务器！"
+
+#: src/librdbms/design.py:112
+msgid "No database!"
+msgstr "无数据库！"
+
+#: src/librdbms/server/mysql_lib.py:80
+#, python-format
+msgid "Database '%s' is not allowed. Please use database '%s'."
+msgstr "不允许数据库 '%s'。请使用数据库 '%s'。"
+
+#: src/librdbms/server/mysql_lib.py:107
+#, python-format
+msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
+msgstr "无法找到 %s 数据库。您是否确定配置正确？"
+
