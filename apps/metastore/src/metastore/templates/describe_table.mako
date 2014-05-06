@@ -14,6 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.utils.html import escape
+
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
@@ -27,6 +29,7 @@ from django.utils.translation import ugettext as _
   else:
     view_or_table_noun = _("Table")
 %>
+
 ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
 
@@ -130,7 +133,7 @@ ${ components.menubar() }
                         % if item is None:
                           NULL
                         % else:
-                          ${ smart_unicode(item, errors='ignore') }
+                          ${ escape(smart_unicode(item, errors='ignore')).replace(' ', '&nbsp;') | n,unicode }
                         % endif
                       </td>
                     % endfor

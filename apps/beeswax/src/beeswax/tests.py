@@ -243,7 +243,7 @@ for x in sys.stdin:
   def test_result_escaping(self):
     # Check for XSS and NULL display
     QUERY = """
-      SELECT 'abc', 1.0, 1=1, 1, 1/0, '<a>lala</a>lulu' from test LIMIT 3;
+      SELECT 'abc', 1.0, 1=1, 1, 1/0, '<a>lala</a>lulu', 'some   spaces' from test LIMIT 3;
     """
     response = _make_query(self.client, QUERY, local=False)
     content = json.loads(response.content)
@@ -253,9 +253,9 @@ for x in sys.stdin:
     content = fetch_query_result_data(self.client, response)
 
     assert_equal([
-        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
-        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
-        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
       ], content["results"], content)
 
   def test_query_with_udf(self):
