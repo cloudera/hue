@@ -23,6 +23,8 @@ import tarfile
 import tempfile
 from zipfile import ZipFile
 
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+
 from django.utils.translation import ugettext as _
 
 
@@ -56,6 +58,7 @@ class ZipArchive(Archive):
   Acts on a zip file in memory or in a temporary location.
   Python's ZipFile class inherently buffers all reading.
   """
+
   def __init__(self, file):
     self.file = isinstance(file, basestring) and open(file) or file
     self.zfh = ZipFile(self.file)
@@ -67,7 +70,10 @@ class ZipArchive(Archive):
     Else, open a file for writing and meta pipe the contents zipfile to the new file.
     """
     # Store all extracted files in a temporary directory.
-    directory = tempfile.mkdtemp()
+    if ARCHIVE_UPLOAD_TEMPDIR.get():
+      directory = tempfile.mkdtemp(dir=ARCHIVE_UPLOAD_TEMPDIR.get())
+    else:
+      directory = tempfile.mkdtemp()
 
     dirs, files = self._filenames()
     self._create_dirs(directory, dirs)

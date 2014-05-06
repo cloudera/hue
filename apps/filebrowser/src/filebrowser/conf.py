@@ -26,3 +26,9 @@ MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
   private=True,
   default=1024*1024*25,
   type=int)
+
+ARCHIVE_UPLOAD_TEMPDIR = Config(
+  key="archive_upload_tempdir",
+  help=_("Location on local filesystem where the uploaded archives are temporary stored."),
+  default=None,
+  type=str)
