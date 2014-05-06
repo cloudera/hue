@@ -1112,7 +1112,7 @@ for x in sys.stdin:
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
     response = self.client.get("/metastore/table/default/timestamp_valid_data")
-    assert_true('2012-01-01 10:11:30' in response.content, response.content)
+    assert_true('2012-01-01&nbsp;10:11:30' in response.content, response.content)
 
   def test_partitioned_create_table(self):
     # Make sure we get a form
@@ -1352,7 +1352,7 @@ for x in sys.stdin:
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
     assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample'])
     assert_true("nada" in resp.content, resp.content)
-    assert_true("sp ace" in resp.content, resp.content)
+    assert_true("sp&nbsp;ace" in resp.content, resp.content)
 
     # Test table creation and data loading and removing header
     resp = self.client.post('/beeswax/create/import_wizard/default', {
