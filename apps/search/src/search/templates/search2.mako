@@ -38,11 +38,20 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     </div>
   % endif
   
-  <form class="form-search" style="margin: 0" data-bind="submit: search">
+  <form data-bind="visible: columns().length == 0">  
+    ${ _('Search') }
+    <!-- ko if: $root.initial.collections -->
+    <select data-bind="options: $root.initial.collections, value: $root.collection.name">
+    </select>
+    <!-- /ko -->
+  </form>
+  
+  <form class="form-search" style="margin: 0" data-bind="submit: search, visible: columns().length != 0"">
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
-        <span class="current-collection">${ collection.label }</span>        
+        <span class="current-collection" data-bind="text: collection.label"></span>
+        ## click: show also collection list + edit label box        
       </div>
 
       <span data-bind="foreach: query.qs">
@@ -79,7 +88,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <div class="layout-box" style="width: 100px;"></div>
       </div>
     </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicLayout()" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
+    <a data-bind="visible: columns().length == 0" href="javascript: magicLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-magic"></i></div>
       </div>
@@ -124,7 +133,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
       <div class="span12 preview-row">
-        Hue logo picks a timeline, filter, result, pie bar, widgets...: big magic icon? could preview but too complicated for now.
+        ${ _('Template predefined with some widgets.') }
       </div>
     </div>
   </div>
@@ -149,7 +158,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="row-template">
-  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index()==0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
+  <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
     <img src="/search/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
@@ -865,8 +874,9 @@ function rangePieChartDataTransformer(data) {
     item.widget_id = data.widget_id;
     _data.push({
       label: item.from + ' - ' + item.to,
-      value: item.value,
+      from: item.from,
       to: item.to,
+      value: item.value,
       obj: item
     });
   });
@@ -1040,7 +1050,7 @@ $(document).ready(function () {
   };
 
 
-  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode });
+  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
   ko.applyBindings(viewModel);
 
   viewModel.init();

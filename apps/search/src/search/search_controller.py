@@ -127,3 +127,6 @@ class SearchController(object):
   def is_core(self, core_name):
     solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
     return core_name in solr_cores
+
+  def get_solr_collection(self):
+    return SolrApi(SOLR_URL.get(), self.user).collections()

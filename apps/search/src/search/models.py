@@ -277,7 +277,7 @@ class Collection(models.Model):
       props['collection'] = self.get_default(user)
     if 'layout' not in props:
       props['layout'] = []    
-      
+  
     if self.id:
       props['collection']['id'] = self.id
     if self.name:

@@ -68,16 +68,30 @@ def index(request):
   return render('search2.mako', request, {
     'collection': collection,
     'query': query,
+    'initial': '{}',    
   })
 
 
 def new_search(request):
-  collection = Collection(name='twitter_demo', label='New Twitter Template')
+  collections = SearchController(request.user).get_solr_collection().keys()
+  if not collections:
+    return no_collections(request)
+
+  collection = Collection(name=collections[0], label=collections[0])
   query = {'qs': [{'q': ''}], 'fqs': []}
 
   return render('search2.mako', request, {
     'collection': collection,
     'query': query,
+    'initial': json.dumps({
+         'collections': collections,
+         'layout': [
+              {"size":3,"rows":[
+                  {"widgets":[]}],"klass":"card card-home card-column span3"},
+              {"size":9,"rows":[
+                  {"widgets":[{"size":12,"name":"Results","id":"8897bfbd-053f-ab56-dbfb-432f7b28aceb","widgetType":"resultset-widget","properties":{},"offset":0,"isLoading":False,"klass":"card card-widget span12"}]}],"klass":"card card-home card-column span9"}
+          ]         
+     }),
   })
 
 

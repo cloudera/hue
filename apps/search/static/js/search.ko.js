@@ -128,9 +128,8 @@ function oneThirdRightLayout() {
   setLayout([9, 3]);
 }
 
-function magicLayout() {
-  setLayout([3, 9]);
-  alert('Hue picked a timeline, filter, result, pie bar, widgets...');
+function magicLayout(vm) {
+  loadLayout(vm, vm.initial.layout);
 }
 
 function setLayout(colSizes) {
@@ -327,8 +326,8 @@ var Collection = function (vm, collection) {
   var self = this;
 
   self.id = collection.id;
-  self.name = collection.name;
-  self.label = collection.label;
+  self.name = ko.mapping.fromJS(collection.name);
+  self.label = ko.mapping.fromJS(collection.label);
   self.idField = collection.idField;
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
@@ -554,14 +553,32 @@ var Collection = function (vm, collection) {
   };
 };
 
+var NewTemplate = function (vm, initial) {
+  var self = this;
 
-var SearchViewModel = function (collection_json, query_json) {
+  self.collections = ko.mapping.fromJS(initial.collections);
+  self.collections.subscribe(function (newValue) {
+    vm.collection.name(newValue);
+  });
+  
+  self.layout = initial.layout;
+};
+
+
+var SearchViewModel = function (collection_json, query_json, initial_json) {
   var self = this;
 
   // Models
   self.collection = new Collection(self, collection_json.collection);
   self.query = new Query(self, query_json);
+  self.initial = new NewTemplate(self, initial_json);
 
+  if (initial_json.collections) {
+    self.collection.name.subscribe(function (newValue) {
+	  self.collection.label(newValue);alert(newValue);
+    });
+  }
+  
   // UI
   self.response = ko.observable({});
   self.results = ko.observableArray([]);
