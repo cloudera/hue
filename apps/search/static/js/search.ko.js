@@ -74,7 +74,7 @@ var Row = function (widgets) {
 }
 
 // A widget is generic. It has an id that refer to another object (e.g. facet) with the same id.
-var Widget = function (size, id, name, widgetType, properties, offset) {
+var Widget = function (size, id, name, widgetType, properties, offset, loading) {
   var self = this;
   self.size = ko.observable(size).extend({ numeric: 0 });
 
@@ -83,7 +83,7 @@ var Widget = function (size, id, name, widgetType, properties, offset) {
   self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
   self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
   self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
-  self.isLoading = ko.observable(true);
+  self.isLoading = ko.observable(typeof loading != "undefined" && loading != null ? loading : false);
 
 
   self.klass = ko.computed(function () {
@@ -179,7 +179,7 @@ function loadLayout(viewModel, json_layout) {
     $(json_col.rows).each(function (rcnt, json_row) {
       var row = new Row();
       $(json_row.widgets).each(function (wcnt, widget) {
-        row.addWidget(new Widget(widget.size, widget.id, widget.name, widget.widgetType, widget.properties, widget.offset));
+        row.addWidget(new Widget(widget.size, widget.id, widget.name, widget.widgetType, widget.properties, widget.offset, true));
       });
       _rows.push(row);
     });

@@ -116,10 +116,10 @@ nv.models.multiBarWithBrushChart = function() {
       chart.update = function() {
         container.transition().duration(transitionDuration).call(chart)
         if (selectionEnabled){
-          enableSelection();
+          enableBrush();
         }
         else {
-          disableSelection();
+          disableBrush();
         }
       };
       chart.container = this;
@@ -265,11 +265,11 @@ nv.models.multiBarWithBrushChart = function() {
       //------------------------------------------------------------
       // Setup Brush
       if (selectionEnabled){
-        enableSelection();
+        enableBrush();
       }
 
 
-      function enableSelection() {
+      function enableBrush() {
         if (g.selectAll('.nv-brush')[0].length == 0) {
           gEnter.append('g').attr('class', 'nv-brushBackground');
           gEnter.append('g').attr('class', 'nv-x nv-brush');
@@ -306,7 +306,7 @@ nv.models.multiBarWithBrushChart = function() {
         }
       }
 
-      function disableSelection() {
+      function disableBrush() {
         g.selectAll('.nv-brush').attr('display', 'none');
       }
 
@@ -634,6 +634,11 @@ nv.models.multiBarWithBrushChart = function() {
   chart.transitionDuration = function(_) {
     if (!arguments.length) return transitionDuration;
     transitionDuration = _;
+    return chart;
+  };
+
+  chart.enableSelection = function() {
+    selectionEnabled = true;
     return chart;
   };
 

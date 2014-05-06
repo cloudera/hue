@@ -231,7 +231,9 @@ function barChart(element, options, isTimeline) {
     var _chart;
     if (isTimeline) {
       _chart = nv.models.multiBarWithBrushChart();
-      //_chart.enableSelection();
+      if (_datum.length > 0 && _datum[0].values.length > 10){
+        _chart.enableSelection();
+      }
       _chart.onSelectRange(options.onSelectRange);
       _chart.xAxis
           .showMaxMin(true)
