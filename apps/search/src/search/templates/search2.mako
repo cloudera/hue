@@ -610,6 +610,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 <script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datamaps.all.min.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/search/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
@@ -813,6 +814,11 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
   .nvd3 .nv-brush .extent {
     fill-opacity: .225!important;
   }
+
+  .nvd3 .nv-legend .disabled rect {
+    fill-opacity: 0;
+  }
+
 
   .fields-chooser li {
     cursor: pointer;

@@ -21,7 +21,13 @@ nv.models.multiBarWithBrushChart = function() {
   // Public Variables with Default Settings
   //------------------------------------------------------------
 
-  var multibar = nv.models.multiBar()
+  var LABELS = {
+    STACKED: "Stacked",
+    GROUPED: "Grouped",
+    SELECT: "Enable selection"
+  }
+
+  var multibar = nv.models.growingMultiBar()
     , xAxis = nv.models.axis()
     , yAxis = nv.models.axis()
     , legend = nv.models.legend()
@@ -52,7 +58,7 @@ nv.models.multiBarWithBrushChart = function() {
     , defaultState = null
     , noData = "No Data Available."
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
-    , controlWidth = function() { return showControls ? 180 : 0 }
+    , controlWidth = function() { return showControls ? 300 : 0 }
     , transitionDuration = 250
     , extent
     , brushExtent = null
@@ -107,7 +113,15 @@ nv.models.multiBarWithBrushChart = function() {
           availableHeight = (height || parseInt(container.style('height')) || 400)
                              - margin.top - margin.bottom;
 
-      chart.update = function() { container.transition().duration(transitionDuration).call(chart) };
+      chart.update = function() {
+        container.transition().duration(transitionDuration).call(chart)
+        if (selectionEnabled){
+          enableSelection();
+        }
+        else {
+          disableSelection();
+        }
+      };
       chart.container = this;
 
       //set state.disabled
@@ -169,11 +183,6 @@ nv.models.multiBarWithBrushChart = function() {
       gEnter.append('g').attr('class', 'nv-legendWrap');
       gEnter.append('g').attr('class', 'nv-controlsWrap');
 
-      if (selectionEnabled){
-        gEnter.append('g').attr('class', 'nv-brushBackground');
-        gEnter.append('g').attr('class', 'nv-x nv-brush');
-      }
-
 
       //------------------------------------------------------------
 
@@ -211,8 +220,9 @@ nv.models.multiBarWithBrushChart = function() {
 
       if (showControls) {
         var controlsData = [
-          { key: 'Grouped', disabled: multibar.stacked() },
-          { key: 'Stacked', disabled: !multibar.stacked() }
+          { key: LABELS.GROUPED, disabled: multibar.stacked() },
+          { key: LABELS.STACKED, disabled: !multibar.stacked() },
+          { key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true }
         ];
 
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
@@ -255,33 +265,49 @@ nv.models.multiBarWithBrushChart = function() {
       //------------------------------------------------------------
       // Setup Brush
       if (selectionEnabled){
-        brush
-          .x(x)
-          .on('brush', onBrush)
-          .on('brushend', onBrushEnd)
+        enableSelection();
+      }
 
-        if (brushExtent) brush.extent(brushExtent);
-        var brushBG = g.select('.nv-brushBackground').selectAll('g')
-            .data([brushExtent || brush.extent()])
-        var brushBGenter = brushBG.enter()
-            .append('g');
 
-        brushBGenter.append('rect')
-            .attr('class', 'left')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('height', availableHeight);
+      function enableSelection() {
+        if (g.selectAll('.nv-brush')[0].length == 0) {
+          gEnter.append('g').attr('class', 'nv-brushBackground');
+          gEnter.append('g').attr('class', 'nv-x nv-brush');
+          brush
+              .x(x)
+              .on('brush', onBrush)
+              .on('brushend', onBrushEnd)
 
-        brushBGenter.append('rect')
-            .attr('class', 'right')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('height', availableHeight);
+          if (brushExtent) brush.extent(brushExtent);
+          var brushBG = g.select('.nv-brushBackground').selectAll('g')
+              .data([brushExtent || brush.extent()])
+          var brushBGenter = brushBG.enter()
+              .append('g');
 
-        var gBrush = g.select('.nv-x.nv-brush')
-            .call(brush);
-        gBrush.selectAll('rect')
-            .attr('height', availableHeight);
+          brushBGenter.append('rect')
+              .attr('class', 'left')
+              .attr('x', 0)
+              .attr('y', 0)
+              .attr('height', availableHeight);
+
+          brushBGenter.append('rect')
+              .attr('class', 'right')
+              .attr('x', 0)
+              .attr('y', 0)
+              .attr('height', availableHeight);
+
+          var gBrush = g.select('.nv-x.nv-brush')
+              .call(brush);
+          gBrush.selectAll('rect')
+              .attr('height', availableHeight);
+        }
+        else {
+          g.selectAll('.nv-brush').attr('display', 'inline');
+        }
+      }
+
+      function disableSelection() {
+        g.selectAll('.nv-brush').attr('display', 'none');
       }
 
 
@@ -370,19 +396,24 @@ nv.models.multiBarWithBrushChart = function() {
       });
 
       controls.dispatch.on('legendClick', function(d,i) {
-        if (!d.disabled) return;
-        controlsData = controlsData.map(function(s) {
-          s.disabled = true;
-          return s;
-        });
-        d.disabled = false;
+        if (typeof d.checkbox == "undefined"){
+          if (!d.disabled) return;
+          controlsData = controlsData.map(function(s) {
+            s.disabled = true;
+            return s;
+          });
+          d.disabled = false;
+        }
 
         switch (d.key) {
-          case 'Grouped':
+          case LABELS.GROUPED:
             multibar.stacked(false);
             break;
-          case 'Stacked':
+          case LABELS.STACKED:
             multibar.stacked(true);
+            break;
+          case LABELS.SELECT:
+            selectionEnabled = !selectionEnabled;
             break;
         }
 
@@ -480,6 +511,7 @@ nv.models.multiBarWithBrushChart = function() {
   chart.legend = legend;
   chart.xAxis = xAxis;
   chart.yAxis = yAxis;
+  chart.LABELS = LABELS;
 
   d3.rebind(chart, multibar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'clipEdge',
    'id', 'stacked', 'stackOffset', 'delay', 'barColor','groupSpacing');
@@ -602,11 +634,6 @@ nv.models.multiBarWithBrushChart = function() {
   chart.transitionDuration = function(_) {
     if (!arguments.length) return transitionDuration;
     transitionDuration = _;
-    return chart;
-  };
-
-  chart.enableSelection = function() {
-    selectionEnabled = true;
     return chart;
   };
 

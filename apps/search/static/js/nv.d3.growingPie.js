@@ -112,7 +112,7 @@ nv.models.growingPie = function() {
       selectSlices = function(selected) {
         $(selected).each(function(cnt, item){
           slices.each(function(d, i) {
-            if (d.data.obj.value == item) {
+            if ((typeof d.data.obj.from != "undefined" && d.data.obj.from == item) || d.data.obj.value == item) {
               d3.select(this).classed('selected', true);
               d3.select(this).select("path").transition().duration(100).attr("d", arcOver);
             }

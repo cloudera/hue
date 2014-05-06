@@ -194,7 +194,6 @@ function lineChart(element, options) {
 
   nv.addGraph(function () {
     var _chart = nv.models.lineWithBrushChart();
-    _chart.enableSelection();
     _chart.onSelectRange(options.onSelectRange);
     _chart.xAxis
         .showMaxMin(true)
@@ -232,7 +231,7 @@ function barChart(element, options, isTimeline) {
     var _chart;
     if (isTimeline) {
       _chart = nv.models.multiBarWithBrushChart();
-      _chart.enableSelection();
+      //_chart.enableSelection();
       _chart.onSelectRange(options.onSelectRange);
       _chart.xAxis
           .showMaxMin(true)
