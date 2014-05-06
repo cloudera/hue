@@ -476,7 +476,7 @@ def view_results(request, id, first_row=0):
             escaped_field = 'NULL'
           else:
             field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
-            escaped_field = escape(field)
+            escaped_field = escape(field).replace(' ', '&nbsp;')
           escaped_row.append(escaped_field)
         data.append(escaped_row)
 
