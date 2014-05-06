@@ -86,6 +86,7 @@ def search(request):
   
   collection = json.loads(request.POST.get('collection', '{}')) # TODO decorator with doc model perms
   query = json.loads(request.POST.get('query', '{}'))
+  # todo: remove the selected histo facet if multiq
 
   if collection['id']:
     hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
@@ -494,6 +495,14 @@ def get_timeline(request):
     if multiQ == 'query':
       label = qdata['q'] 
       query['qs'] = [qdata]
+    elif facet['type'] == 'range':      
+      _prop = filter(lambda prop: prop['from'] == qdata, facet['properties'])[0]
+      label = '%(from)s - %(to)s ' % _prop
+      facet_id = facet['id']
+      # Only care about our current field:value filter
+      for fq in query['fqs']:
+        if fq['id'] == facet_id:
+          fq['properties'] = [_prop]
     else:
       label = qdata
       facet_id = facet['id']

@@ -199,9 +199,10 @@ var Query = function (vm, query) {
   self.fqs = ko.mapping.fromJS(query.fqs);
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
+	var histogram_id = vm.collection.getHistogramFacet().id();
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
-            return fq.type() == 'field' || fq.type() == 'range';
+            return (fq.type() == 'field' || fq.type() == 'range') && histogram_id != fq.id();
         }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
       );
   });
@@ -620,18 +621,18 @@ var SearchViewModel = function (collection_json, query_json) {
       if (multiQ == 'query') {
         queries = self.query.qs();
       } else {
-        facet = facet = self.query.getFacetFilter(self.query.selectedMultiq());
+        facet = self.query.getFacetFilter(self.query.selectedMultiq());
         queries = facet.filter();       
       }
       
       multiQs = $.map(queries, function(qdata) {
         return $.post("/search/get_timeline", {
-              collection: ko.mapping.toJSON(self.collection),
-              query: ko.mapping.toJSON(self.query),
-              facet: ko.mapping.toJSON(facet),
-              qdata: ko.mapping.toJSON(qdata),
-              multiQ: multiQ
-            }, function (data) {return data});
+            collection: ko.mapping.toJSON(self.collection),
+            query: ko.mapping.toJSON(self.query),
+            facet: ko.mapping.toJSON(facet),
+            qdata: ko.mapping.toJSON(qdata),
+            multiQ: multiQ
+          }, function (data) {return data});
       });              
     }
 
