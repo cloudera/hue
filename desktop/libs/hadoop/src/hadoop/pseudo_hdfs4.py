@@ -320,7 +320,7 @@ class PseudoHdfs4(object):
 
     # Check that the DN is servicing
     report_out = dfsreport.stdout.read()
-    if 'Datanodes available: 1' in report_out:
+    if 'Live datanodes (1)' in report_out:
       return True
     LOG.debug('Waiting for DN to come up .................\n%s' % (report_out,))
     return False
