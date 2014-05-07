@@ -165,7 +165,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
   <div class="container-fluid">
     <div class="row-header" data-bind="visible: $root.isEditing">
-      <span class="muted"><i class="fa fa-minus"></i> ${_('Row')}</span>
+      <span class="muted">${_('Row')}</span>
       <div style="display: inline; margin-left: 60px">
         <a href="javascript:void(0)" data-bind="visible:$index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
         <a href="javascript:void(0)" data-bind="visible:$index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
@@ -270,9 +270,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 	    <!-- ko if: type() != 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
-            <a href="script:void(0)">
+            <a href="javascript: void(0)">
               <!-- ko if: ! $data.selected -->
-                <span data-bind="text: $data.value + ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
+                <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
               <!-- /ko -->
               <!-- ko if: $data.selected -->
                 <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
@@ -287,10 +288,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 	    <!-- ko if: type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
-            <a href="">
+            <a href="javascript: void(0)">
               <!-- ko if: ! selected --> 
-                <span data-bind="text: $data.from + ' - ' + $data.to + ' (' + $data.value + ')',
-                  click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>                
+                <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+                  <span data-bind="text: $data.from + ' - ' + $data.to"></span>
+                  <span class="counter" data-bind="text: ' (' + $data.value + ')'"></span>
+                </span>
               <!-- /ko -->
               <!-- ko if: selected -->
                 <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
@@ -422,8 +425,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>  
 
-    ##<a href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-minus"></i></a>
+    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
     <span>
       ${ _('Group By') }
       <select data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq">
@@ -535,10 +537,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="filter-widget">
-  <div data-bind="foreach: $root.query.fqs">
+  <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <span data-bind="text: ko.mapping.toJSON($data), click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"></span>
   </div>
-  <div class="widget-spinner" data-bind="visible: isLoading()">
+  <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>

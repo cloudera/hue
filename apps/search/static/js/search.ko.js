@@ -121,7 +121,7 @@ function fullLayout() {
 }
 
 function oneThirdLeftLayout() {
-  setLayout([3, 9]);
+  setLayout([2, 10]);
 }
 
 function oneThirdRightLayout() {
