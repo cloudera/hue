@@ -276,8 +276,8 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
                                            daph.num_values,
                                            bit_width)
 
-        logger.debug("  Definition levels: %s",
-                     ",".join([str(dl) for dl in definition_levels]))
+        logger.debug("  Definition levels: %s", len(definition_levels))
+        #             ",".join([str(dl) for dl in definition_levels]))
 
     # repetition levels are skipped if data is at the first level.
     if len(column_metadata.path_in_schema) > 1:
@@ -294,7 +294,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
         for i in range(daph.num_values):
             vals.append(
                 encoding.read_plain(io_obj, column_metadata.type, None))
-        logger.debug("  Values: %s", ",".join([str(x) for x in vals]))
+        logger.debug("  Values: %s", len(vals)); #",".join([str(x) for x in vals]))
     elif daph.encoding == Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
@@ -360,7 +360,7 @@ def _dump(fo, options, out=sys.stdout):
                     values = read_data_page(fo, schema_helper, ph, cmd,
                                             dict_items)
                     res[".".join(cmd.path_in_schema)] += values
-                    values_seen += cmd.num_values
+                    values_seen += ph.data_page_header.num_values
                 elif ph.type == PageType.DICTIONARY_PAGE:
                     logger.debug(ph)
                     assert dict_items == []
