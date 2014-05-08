@@ -86,9 +86,9 @@ def new_search(request):
     'initial': json.dumps({
          'collections': collections,
          'layout': [
-              {"size":3,"rows":[
+              {"size":2,"rows":[
                   {"widgets":[]}],"klass":"card card-home card-column span3"},
-              {"size":9,"rows":[
+              {"size":10,"rows":[
                   {"widgets":[{"size":12,"name":"Results","id":"8897bfbd-053f-ab56-dbfb-432f7b28aceb","widgetType":"resultset-widget","properties":{},"offset":0,"isLoading":False,"klass":"card card-widget span12"}]}],"klass":"card card-home card-column span9"}
           ]         
      }),

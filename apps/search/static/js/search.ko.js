@@ -69,6 +69,9 @@ var Row = function (widgets) {
   }
 
   self.remove = function (col, row) {
+	$.each(self.widgets(), function(i, widget) {
+	  viewModel.removeWidget(widget);
+	}); 
     col.rows.remove(row);
   }
 }
