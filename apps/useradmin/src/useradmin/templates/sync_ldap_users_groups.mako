@@ -20,18 +20,20 @@ from django.utils.translation import ugettext as _
 <%def name="render_field(field)">
   %if not field.is_hidden:
     <% group_class = len(field.errors) and "error" or "" %>
-    <label class="control-label" for="id_${field.html_name}">
-      <span>${field.label}</span>
-      ${unicode(field) | n}
-      % if len(field.errors):
-        <span class="help-inline">${unicode(field.errors) | n}</span>
-      % endif
-      &nbsp;
-    </label>
+    <div class="control-group ${group_class}" style="margin-bottom: 10px;">
+      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+      <div class="controls">
+        ${unicode(field) | n}
+        % if len(field.errors):
+          <span class="help-inline">${unicode(field.errors) | n}</span>
+        % endif
+        &nbsp;
+      </div>
+    </div>
   %endif
 </%def>
 
-<form action="${path}" method="POST" class="form form-inline right">
+<form action="${path}" method="POST" class="form form-horizontal">
   <div class="modal-header left">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h3>${_('Sync LDAP users and groups')}</h3>
