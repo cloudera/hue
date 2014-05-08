@@ -543,7 +543,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="filter-widget">
   <div data-bind="visible: $root.query.fqs().length == 0">${_('There are no filters applied.')}</div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
-    <span data-bind="text: ko.mapping.toJSON($data), click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"></span>
+    <!-- ko if: $data.type() == 'field' -->
+    <span class="badge badge-left"><i class="fa fa-filter"></i> <span data-bind="text: $data.field"></span>: <span style="font-weight: normal" data-bind="text: $data.filter"></span></span><span class="badge badge-info badge-right trash-filter" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times-circle"></i></span>
+    <!-- /ko -->
+    <!-- ko if: $data.type() == 'range' -->
+    <span class="badge badge-left"><i class="fa fa-filter"></i> <span data-bind="text: $data.field"></span>:
+      <span data-bind="foreach: $data.properties" style="font-weight: normal">
+        <span style="font-style: italic">${_('from')}</span> <span data-bind="text: $data.from"></span> <span style="font-style: italic">${_('to')}</span> <span data-bind="text: $data.from"></span>
+      </span>
+    </span><span class="badge badge-info badge-right trash-filter" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times-circle"></i></span>
+    <!-- /ko -->
   </div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -853,6 +862,20 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .card {
     margin: 0;
+  }
+
+  .badge-left {
+    border-radius: 9px 0px 0px 9px;
+    padding-right: 5px;
+  }
+
+  .badge-right {
+    border-radius: 0px 9px 9px 0px;
+    padding-left: 5px;
+  }
+
+  .trash-filter {
+    cursor: pointer;
   }
 
 </style>
