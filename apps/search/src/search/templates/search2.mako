@@ -1069,7 +1069,7 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    if (widget.widgetType() != "resultset-widget"){
+    if (widget.widgetType() != "resultset-widget" && widget.widgetType() != "filter-widget"){
       viewModel.collection.template.fieldsModalFilter("");
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
