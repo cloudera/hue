@@ -352,6 +352,7 @@ var Collection = function (vm, collection) {
 
 
   self.fields = ko.mapping.fromJS(collection.fields);
+  //self.availableFacetFields = ko.computed()
 
   self.addFacet = function (facet_json) {
     $.post("/search/template/new_facet", {
@@ -394,15 +395,19 @@ var Collection = function (vm, collection) {
     return _facet;
   }
 
-  self.getHistogramFacet = function () { // might remove when list of available widgets
+  self.getFacetByType = function (facetType) {
     var _facet = null;
     $.each(self.facets(), function (index, facet) {
-      if (facet.widgetType() == 'histogram-widget') {
+      if (facet.widgetType() == facetType) {
         _facet = facet;
         return false;
       }
     });
     return _facet;
+  }
+  
+  self.getHistogramFacet = function () { // might remove when list of available widgets
+    return self.getFacetByType('histogram-widget');
   }
   
   self.template.fields = ko.computed(function () {
@@ -602,7 +607,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self.previewColumns = ko.observable("");
-  self.columns = ko.observable({});
+  self.columns = ko.observable([]);
   loadLayout(self, collection_json.layout);
 
   self.isEditing = ko.observable(false);
@@ -621,6 +626,20 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
   self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));  
+
+  function getWidgets(equalsTo) {
+	return $.map(self.columns(), function (col){return $.map(col.rows(), function(row){ return $.grep(row.widgets(), function(widget){ return equalsTo(widget); });}) ;})
+  };
+  
+  self.availableDraggableResultset = ko.computed(function() {
+	return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1;}).length == 0;
+  });
+  self.availableDraggableFilter = ko.computed(function() {
+	return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget';}).length == 0;
+  });  
+  self.availableDraggableHistogram = ko.computed(function() {
+	return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget';}).length == 0; // + a date facet
+  });
 
   self.init = function () {
     //self.collection.addDynamicFields();
