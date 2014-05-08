@@ -212,7 +212,7 @@ class SolrApi(object):
         elif facet['type'] == 'field':
           params += (
               ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-              ('f.%s.facet.limit' % facet['field'], facet['properties'].get('limit', 10)))
+              ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1))
 
     for fq in query['fqs']:
       #model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]

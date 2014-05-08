@@ -296,7 +296,8 @@ class Collection(models.Model):
       id_field = id_field[0]
   
     TEMPLATE = {
-      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>", "highlighting": [""],
+      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>",
+      "highlighting": [""],
       "properties": {"highlighting_enabled": True},
       "template": """
       <div class="row-fluid">

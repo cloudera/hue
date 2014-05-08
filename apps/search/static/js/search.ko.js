@@ -336,6 +336,7 @@ var Collection = function (vm, collection) {
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
+  self.template.template.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } }); // hum?
   self.template.template.subscribe(function () {
     vm.search();
   });
@@ -612,7 +613,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       
   self.draggableHit = ko.observable(new Widget(12, UUID(), "Hit Count", "hit-widget"));
   self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
-  self.draggableResultset = ko.observable(new Widget(12, UUID(), "Results", "resultset-widget"));
+  self.draggableResultset = ko.observable(new Widget(12, UUID(), "Grid Results", "resultset-widget"));
+  self.draggableHtmlResultset = ko.observable(new Widget(12, UUID(), "HTML Results", "html-resultset-widget"));
   self.draggableHistogram = ko.observable(new Widget(12, UUID(), "Histogram", "histogram-widget"));
   self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));

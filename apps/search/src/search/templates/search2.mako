@@ -55,7 +55,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="value: q" maxlength="256" type="text" class="search-query input-large" style="cursor: auto;">
+        <input data-bind="value: q" maxlength="256" type="text" class="search-query input-xlarge" style="cursor: auto;">
         <!-- ko if: $index() >= 1 -->
         <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
@@ -63,7 +63,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
       <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
 
-      <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
+      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px"><i class="fa fa-search"></i></button>
     </div>
   </form>
 </div>
@@ -97,8 +97,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div class="toolbar-label">${_('WIDGETS')}</div>
-    <div class="draggable-widget" data-bind="draggable: {data: draggableResultset(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Grid Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>
-    <div class="draggable-widget" data-bind="draggable: {data: draggableResultset(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('HTML Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-code"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: {data: draggableResultset(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); }}}" title="${_('Grid Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-table"></i></a></div>
+    <div class="draggable-widget" data-bind="draggable: {data: draggableHtmlResultset(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(false); }}}" title="${_('HTML Results')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-code"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: {data: draggableFacet(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Text Facet')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-sort-amount-asc"></i></a></div>
     <div class="draggable-widget" data-bind="draggable: {data: draggablePie(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Pie Chart')}" rel="tooltip" data-placement="top"><a href="#"><i class="hcha hcha-pie-chart"></i></a></div>
     <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a href="#"><i class="fa fa-tachometer"></i></a></div> -->
@@ -196,6 +196,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     </h2>
     <div class="card-body" style="padding: 5px;">
+    
+      <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
+    <!--
       <ul class="nav nav-pills" data-bind="visible: $root.isEditing()">
         <li class="active">
           <a href="javascript: void(0)" class="widget-main-pill">${_('Preview')}</a>
@@ -209,6 +212,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           <li>${ _('Name')}: <input type="text" data-bind="value: name" class="input-mini" /></li>
         </ul>
       </div>
+    -->
     </div>
   </div>
 </script>
@@ -235,19 +239,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-toggle">
-      <!-- ko if: type() == 'range' -->
-        <br/>
-        ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
-        ${ _('End') }: <input type="text" data-bind="value: properties.end" />
-        ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
-      <!-- /ko -->
-      <!-- ko if: type() == 'field' -->
-        ${ _('Limit') }: <input type="text" data-bind="value: properties.limit" />      
-      <!-- /ko -->
-    <span data-bind="text: label" style="font-weight: bold"></span>
+    <!-- ko if: type() == 'range' -->
+      <br/>
+      ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
+      ${ _('End') }: <input type="text" data-bind="value: properties.end" />
+      ${ _('Gap') }: <input type="text" data-bind="value: properties.gap" />
+    <!-- /ko -->
+    <!-- ko if: type() == 'field' -->
+      ${ _('Limit') }: <input type="text" data-bind="value: properties.limit" />      
+    <!-- /ko -->
 
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
-      <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }"></i>
+      <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
     </a>
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">          
       <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
@@ -274,7 +277,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 	    <!-- ko if: type() != 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
-            <a href="javascript: void(0)">
+            <a href="javascript: void(0)">              
               <!-- ko if: ! $data.selected -->
                 <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                 <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
@@ -284,6 +287,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                   <span data-bind="text: $data.value"></span>
                   <i class="fa fa-times"></i>
                 </span>
+              <!-- /ko -->
+              <!-- ko if: $index() == $parent.properties.limit() -->
+                </br>${ _('Show more...') }
               <!-- /ko -->
             </a>
           </div>
@@ -315,100 +321,121 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-widget">
-  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    ${_('Results type')}
-    &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': $root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(true)}"><i class="fa fa-th"></i></a>
-    &nbsp;<a href="javascript: void(0)" data-bind="css:{'btn': true, 'btn-inverse': !$root.collection.template.isGridLayout()}, click: function(){$root.collection.template.isGridLayout(false)}"><i class="fa fa-code"></i></a>
-  </div>
-
   <!-- ko if: $root.collection.template.isGridLayout() -->
-  <div style="float:left; margin-right: 10px" >
-    <span data-bind="visible: ! $root.collection.template.showFieldList()">
-      <a href="javascript: void(0)" class="btn"
-        data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
-        <i class="fa fa-chevron-right"></i>
-      </a>
-    </span>
-  </div>
-  <div data-bind="visible: $root.isEditing() || $root.collection.template.showFieldList()" style="float:left; margin-right: 10px" >
-    <span data-bind="visible: $root.collection.template.showFieldList()">
-      <a href="javascript: void(0)" class="btn"
-        data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
-        <i class="fa fa-chevron-left"></i>
-      </a>
-      <strong>${ _('Fields') }</strong>      
-      &nbsp;
-      <a href="javascript: void(0)" class="btn"
-        data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
-        <i class="fa fa-square-o"></i>
-      </a>
-      <div data-bind="foreach: $root.collection.template.fieldsAttributes">
-        <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
-        <span data-bind="text: '&nbsp;' + name()"></span>
-        <br/>
+    <div style="float:left; margin-right: 10px" >
+      <span data-bind="visible: ! $root.collection.template.showFieldList()">
+        <a href="javascript: void(0)" class="btn"
+          data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
+          <i class="fa fa-chevron-right"></i>
+        </a>
+      </span>
+    </div>
+    <div data-bind="visible: $root.isEditing() || $root.collection.template.showFieldList()" style="float:left; margin-right: 10px" >
+      <span data-bind="visible: $root.collection.template.showFieldList()">
+        <a href="javascript: void(0)" class="btn"
+          data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
+          <i class="fa fa-chevron-left"></i>
+        </a>
+        <strong>${ _('Fields') }</strong>      
+        &nbsp;
+        <a href="javascript: void(0)" class="btn"
+          data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
+          <i class="fa fa-square-o"></i>
+        </a>
+        <div data-bind="foreach: $root.collection.template.fieldsAttributes">
+          <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
+          <span data-bind="text: '&nbsp;' + name()"></span>
+          <br/>
+        </div>
+      </span>
+    </div>
+
+    <div style="overflow-x: auto">
+      <div data-bind="visible: $root.results().length == 0">
+        ${ _('Your search did not match any documents.') }
       </div>
-    </span>
-  </div>
-  <!-- /ko -->
-
-  <!-- ko if: !$root.collection.template.isGridLayout() && $root.isEditing() -->
-    <textarea data-bind="value: $root.collection.template.template, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
-    <br/>
-  <!-- /ko -->
-
-  <div style="overflow-x: auto">
-    <div data-bind="visible: $root.results().length == 0">
-      ${ _('Your search did not match any documents.') }
-    </div>
     
-    <!-- ko if: $root.response().response -->
-      <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
+      <!-- ko if: $root.response().response -->
+        <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
+      <!-- /ko -->
+    
+      <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
+        <thead>
+          <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
+            <th data-bind="with: $root.collection.getTemplateField($data)">
+              <a href="javascript: void(0)" data-bind="visible: $index() > 0, click: function(){ $root.collection.translateSelectedField($index(), 'left'); }"><i class="fa fa-chevron-left"></i></a>
+              <a href="javascript: void(0)" title="${ _('Sort') }">
+                <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+                <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
+              </a>
+              <a href="javascript: void(0)" data-bind="visible: $index() < $root.collection.template.fields().length - 1, click: function(){ $root.collection.translateSelectedField($index(), 'right'); }"><i class="fa fa-chevron-right"></i></a>
+            </th>
+          </tr>
+          <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
+            <th>${ ('Document') }</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: { data: $root.results, as: 'documents' }">            
+          <tr class="result-row" data-bind="foreach: row, click: $root.getDocument">
+            <td data-bind="html: $data"></td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+        <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+      </div>	  
+    </div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="html-resultset-widget">
+  <!-- ko ifnot: $root.collection.template.isGridLayout() -->
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <ul class="nav nav-pills">
+        <li class="active">
+          <a href="javascript: void(0)" class="widget-main-pill">${_('Editor')}</a>
+        </li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('HTML')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('CSS & Js')}</a></li>
+      </ul>
+    </div>
+
+    <!-- ko if: $root.isEditing() -->
+      <textarea data-bind="value: $root.collection.template.template, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
+      <br/>
+      <textarea data-bind="value: $root.collection.template.extracode, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
+      <br/>      
     <!-- /ko -->
+
+    <div style="overflow-x: auto">
+      <div data-bind="visible: $root.results().length == 0">
+        ${ _('Your search did not match any documents.') }
+      </div>
     
-	<!-- ko if: $root.collection.template.isGridLayout() -->
-    <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
-      <thead>
-        <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
-          <th data-bind="with: $root.collection.getTemplateField($data)">
-            <a href="javascript: void(0)" data-bind="visible: $index() > 0, click: function(){ $root.collection.translateSelectedField($index(), 'left'); }"><i class="fa fa-chevron-left"></i></a>
-            <a href="javascript: void(0)" title="${ _('Sort') }">
-              <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
-              <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
-            </a>
-            <a href="javascript: void(0)" data-bind="visible: $index() < $root.collection.template.fields().length - 1, click: function(){ $root.collection.translateSelectedField($index(), 'right'); }"><i class="fa fa-chevron-right"></i></a>
-          </th>
-        </tr>
-        <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
-          <th>${ ('Document') }</th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: { data: $root.results, as: 'documents' }">            
-        <tr class="result-row" data-bind="foreach: row, click: $root.getDocument">
-          <td data-bind="html: $data"></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
-      <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-      <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+      <!-- ko if: $root.response().response -->
+        <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
+      <!-- /ko -->
+    
+      <div id="result-container" data-bind="foreach: $root.results">
+        <div class="result-row" data-bind="html: $data"></div>
+      </div>    
+    
+      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+        <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+      </div>
     </div>
-	<!-- /ko -->
-	  
-	<!-- ko if: ! $root.collection.template.isGridLayout() -->
-	  <div id="result-container" data-bind="foreach: $root.results">
-	    <div class="result-row" data-bind="html: $data"></div>
-	  </div>
-	<!-- /ko -->
-  </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="resultset-pagination">
   <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } <i class="fa fa-arrow-right"></i>
   
-  <span class="pull-right">
-    <i class="hfo hfo-file-csv"></i>
-    <i class="hfo hfo-file-xls"></i>
-    <i class="fa fa-save"></i>
+  <span class="pull-right" data-bind="visible: $data.response.numFound > 0">
+    <a class="btn" href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv"></i></a>
+    <a class="btn" href="javascript:void(0)" id="download-xls"><i class="hfo hfo-file-xls"></i></a>
   </span>
 </script>
 
@@ -1099,7 +1126,7 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    if (widget.widgetType() != "resultset-widget" && widget.widgetType() != "filter-widget"){
+    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
@@ -1120,7 +1147,6 @@ $(document).ready(function () {
       viewModel.search();
     }
   }
-
 </script>
 
 ${ commonfooter(messages) | n,unicode }
