@@ -19,7 +19,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
+${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <link href="/static/ext/css/hue-filetypes.css" rel="stylesheet">
@@ -172,7 +172,7 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div class="row-fluid row-container" data-bind="sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast');}, 'helper': function(event){$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast');showAddFacetDemiModal(widget);viewModel.search()}}">
+    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast');}, 'helper': function(event){$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast');showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -623,12 +623,16 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
 <style type="text/css">
   .dashboard .container-fluid {
-    padding: 10px;
+    padding: 6px;
   }
 
   .row-container {
     width: 100%;
     min-height: 70px;
+  }
+
+  .row-container.is-editing {
+    border: 1px solid #F6F6F6;
   }
 
   .ui-sortable {
@@ -661,10 +665,13 @@ ${ commonheader(_('Search'), "search", user, "60px") | n,unicode }
 
   .card-widget {
     padding-top: 0;
+    border: 0;
   }
 
   .card-widget .card-heading {
-    font-size: 16px!important;
+    font-size: 12px!important;
+    font-weight: bold!important;
+    line-height: 24px!important;
   }
 
   .card-widget .card-body {
