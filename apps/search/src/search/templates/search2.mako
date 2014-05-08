@@ -185,7 +185,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
         &nbsp;
       </span>
-      <span data-bind="text: name"></span>
+      <span data-bind="with: $root.collection.getFacetById(id())">
+        <span data-bind="text: label"></span>
+      </span>
+      <!-- ko ifnot: $root.collection.getFacetById(id()) -->
+        <span data-bind="text: name"></span>
+      <!-- /ko -->
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
@@ -230,7 +235,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-toggle">
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
       <!-- ko if: type() == 'range' -->
         <br/>
         ${ _('Start') }: <input type="text" data-bind="value: properties.start" />
