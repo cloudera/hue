@@ -357,39 +357,19 @@ $(document).ready(function () {
     }
   });
 
-  var _metadataTable = $("#metadataTable").dataTable({
-    "bPaginate": false,
-    "bLengthChange": false,
-    "bInfo": false,
-    "bAutoWidth": false,
-    "aoColumns": [
-      { "sWidth": "30%" },
-      { "sWidth": "70%" }
-    ],
-    "oLanguage": {
-      "sEmptyTable": "${_('No data available')}",
-      "sZeroRecords": "${_('No matching records')}"
-    }
-  });
-
-  var _rawConfigurationTable = $("#rawConfigurationTable").dataTable({
-    "bPaginate": false,
-    "bLengthChange": false,
-    "bInfo": false,
-    "bAutoWidth": false,
-    "aoColumns": [
-      { "sWidth": "30%" },
-      { "sWidth": "70%" }
-    ],
-    "oLanguage": {
-      "sEmptyTable": "${_('No data available')}",
-      "sZeroRecords": "${_('No matching records')}"
-    }
-  });
-
-  $("#metadataFilter").keyup(function () {
-    _metadataTable.fnFilter($(this).val());
-    _rawConfigurationTable.fnFilter($(this).val());
+  $("#metadataFilter").jHueDelayedInput(function(){
+    $("#metadataTable tbody tr").removeClass("hide");
+    $("#metadataTable tbody tr").each(function () {
+      if ($(this).text().toLowerCase().indexOf($("#metadataFilter").val().toLowerCase()) == -1) {
+        $(this).addClass("hide");
+      }
+    });
+    $("#rawConfigurationTable tbody tr").removeClass("hide");
+    $("#rawConfigurationTable tbody tr").each(function () {
+      if ($(this).text().toLowerCase().indexOf($("#metadataFilter").val().toLowerCase()) == -1) {
+        $(this).addClass("hide");
+      }
+    });
   });
 
   $(".jobCountersTable").dataTable({
