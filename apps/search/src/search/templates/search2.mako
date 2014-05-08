@@ -272,7 +272,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': 'h2', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast');}, 'helper': function(event){$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast');showAddFacetDemiModal(widget);viewModel.search()}}">
+    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast');}, 'helper': function(event){$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast');showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -281,6 +281,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div data-bind="css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
+        <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
         <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
         &nbsp;
@@ -806,10 +807,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     font-size: 14px;
   }
 
-  .ui-sortable:not(.ui-sortable-disabled) h2 {
-    cursor: move;
-  }
-
   .ui-sortable-disabled {
     background-color: #FFF;
   }
@@ -1014,6 +1011,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .trash-filter {
     cursor: pointer;
+  }
+
+  .move-widget {
+    cursor: move;
   }
 
 </style>
