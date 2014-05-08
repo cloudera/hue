@@ -944,6 +944,7 @@ var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, ren
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
+var HIVE_AUTOCOMPLETE_USER = "${ user }";
 
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   if (data != null && data.error) {
@@ -1085,8 +1086,8 @@ $(document).ready(function () {
   resetNavigator = function () {
     var _db = viewModel.database();
     if (_db != null) {
-      $.totalStorage('tables_' + _db, null);
-      $.totalStorage('timestamp_tables_' + _db, null);
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
       renderNavigator();
     }
   }
@@ -1191,8 +1192,8 @@ $(document).ready(function () {
   resizeNavigator();
 
   viewModel.databases.subscribe(function () {
-    if ($.totalStorage("${app_name}_last_database") != null && $.inArray($.totalStorage("${app_name}_last_database"), viewModel.databases())) {
-      viewModel.database($.totalStorage("${app_name}_last_database"));
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database") != null && $.inArray($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"), viewModel.databases())) {
+      viewModel.database($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"));
     }
   });
 
@@ -1400,7 +1401,7 @@ $(document).ready(function () {
     }
     $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
 
-    if ($.totalStorage('tables_' + viewModel.database()) == null) {
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + viewModel.database()) == null) {
       CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
       hac_getTables(viewModel.database(), function () {
       }); // if preload didn't work, tries again
@@ -1552,9 +1553,9 @@ $(document).ready(function () {
   });
 
   % if not (design and design.id) and not ( query_history and query_history.id ):
-    if ($.totalStorage("${app_name}_temp_query") != null && $.totalStorage("${app_name}_temp_query") != "") {
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query") != null && $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
-      codeMirror.setValue($.totalStorage("${app_name}_temp_query"));
+      codeMirror.setValue($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query"));
     }
   % endif
 
@@ -1872,7 +1873,7 @@ function addRowNumberToResults(data, startIndex) {
 function addResults(viewModel, dataTable, index, pageSize) {
   if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
     $(document).one('fetched.results', function () {
-      $.totalStorage("${app_name}_temp_query", null);
+      $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
       dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
     });
     viewModel.fetchResults();
@@ -2119,7 +2120,7 @@ function tryCancelQuery() {
 }
 
 function createNewQuery() {
-  $.totalStorage("${app_name}_temp_query", null);
+  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
   location.href="${ url(app_name + ':execute_query') }";
 }
 
@@ -2495,13 +2496,13 @@ function watchEvents() {
 function cacheQueryTextEvents() {
   codeMirror.on("change", function () {
     $(".query").val(codeMirror.getValue());
-    $.totalStorage("${app_name}_temp_query", codeMirror.getValue());
+    $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", codeMirror.getValue());
   });
 }
 
 function databaseCacheWriter() {
   $(".chosen-select").chosen().change(function () {
-    $.totalStorage("${app_name}_last_database", viewModel.database());
+    $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", viewModel.database());
   });
 }
 

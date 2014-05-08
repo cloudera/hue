@@ -769,6 +769,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
   var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
   var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [503]; // error codes from beeswax/views.py - autocomplete
+  var HIVE_AUTOCOMPLETE_USER = "${ user }";
 
   var codeMirror;
 

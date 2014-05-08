@@ -63,6 +63,13 @@ function hac_getTableAliases(textScanned) {
   return _aliases;
 }
 
+function hac_getTotalStorageUserPrefix(){
+  if (typeof HIVE_AUTOCOMPLETE_USER != "undefined") {
+    return HIVE_AUTOCOMPLETE_USER + "_";
+  }
+  return "";
+}
+
 function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
   if (tableName.indexOf("(") > -1) {
     tableName = tableName.substr(tableName.indexOf("(") + 1);
@@ -73,9 +80,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
     tableName = _aliases[tableName];
   }
 
-  if ($.totalStorage('columns_' + databaseName + '_' + tableName) != null && $.totalStorage('extended_columns_' + databaseName + '_' + tableName) != null) {
-    callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
-    if ($.totalStorage('timestamp_columns_' + databaseName + '_' + tableName) == null || hac_hasExpired($.totalStorage('timestamp_columns_' + databaseName + '_' + tableName))){
+  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
+    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))){
       hac_jsoncalls({
         database: databaseName,
         table: tableName,
@@ -87,9 +94,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
             hac_errorHandler(data);
           }
           else {
-            $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-            $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-            $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           }
         }
       });
@@ -107,10 +114,10 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
           hac_errorHandler(data);
         }
         else {
-          $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-          $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-          $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
-          callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
+          $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+          $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+          $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
+          callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
         }
       }
     });
@@ -128,9 +135,9 @@ function hac_tableHasAlias(tableName, textScanned) {
 }
 
 function hac_getTables(databaseName, callback) {
-  if ($.totalStorage('tables_' + databaseName) != null) {
-    callback($.totalStorage('tables_' + databaseName));
-    if ($.totalStorage('timestamp_tables_' + databaseName) == null || hac_hasExpired($.totalStorage('timestamp_tables_' + databaseName))){
+  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName) != null) {
+    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName));
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName) == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName))){
       hac_jsoncalls({
         database: databaseName,
         onDataReceived: function (data) {
@@ -141,8 +148,8 @@ function hac_getTables(databaseName, callback) {
             hac_errorHandler(data);
           }
           else {
-            $.totalStorage('tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
           }
         }
       });
@@ -160,9 +167,9 @@ function hac_getTables(databaseName, callback) {
         }
         else {
           if (data.tables) {
-            $.totalStorage('tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
-            callback($.totalStorage('tables_' + databaseName));
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
+            callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName));
           }
         }
       }
