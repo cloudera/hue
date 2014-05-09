@@ -718,8 +718,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
   <div class="modal-body">
     <p>
-      <input type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" 
-          placeholder="${_('Filter fields')}" class="input-xlarge" />
+      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'"
+       placeholder="${_('Filter fields')}" class="input-xlarge" />
       <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
           class="unstyled inline fields-chooser">
         <li data-bind="click: addFacetDemiModalFieldClick">
@@ -732,6 +732,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     </p>
   </div>
+  <div class="modal-footer">
+    <div>
+      <input type="button" class="btn disabled" data-dismiss="modal" value="${_('Pick!')}" />
+      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+    </div>
+  </div>  
 </div>
 
 
@@ -1231,10 +1237,17 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {
+    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {      
       viewModel.collection.template.fieldsModalFilter();
       viewModel.collection.template.fieldsModalType(widget.widgetType());
-      viewModel.collection.template.fieldsModalFilter("");      
+      viewModel.collection.template.fieldsModalFilter("");
+      $('#addFacetInput').typeahead({
+          'source': viewModel.collection.template.availableWidgetFieldsNames(), 
+          'updater': function(item) {
+              addFacetDemiModalFieldClick({'name': function(){return item}});
+              return item;
+           }
+      });
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
       $("#addFacetDemiModal input[type='text']").focus();

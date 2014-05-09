@@ -223,18 +223,18 @@ var Query = function (vm, query) {
 
   self.getMultiq = ko.computed(function () {
     if (self.selectedMultiq()) {
-    if (self.selectedMultiq() == 'query') {
-      if (self.qs().length >= 2) {
-        return 'query';
-      }
-      } else {
-        var facet = self.getFacetFilter(self.selectedMultiq());
-        if (facet && facet.filter().length > 0) { // todo + histogram there?
-          return 'facet';
+      if (self.selectedMultiq() == 'query') {
+        if (self.qs().length >= 2) {
+          return 'query';
         }
+      } else {
+          var facet = self.getFacetFilter(self.selectedMultiq());
+          if (facet && facet.filter().length > 0) { // todo + histogram there?
+            return 'facet';
+          }
       }
     }
-  return null;
+    return null;
   });
   
   self.selectedMultiq.subscribe(function () { // To keep below the computed
@@ -442,10 +442,18 @@ var Collection = function (vm, collection) {
   self.template.fieldsModalFilter = ko.observable(); // For UI
   self.template.fieldsModalType = ko.observable("");
   self.template.filteredFieldsAttributes = ko.observableArray();
+  self.template.availableWidgetFields = ko.computed(function() {
+    return self.template.fieldsModalType() == 'histogram-widget'? vm.availableDateFields() : self.availableFacetFields();
+  });
+  self.template.availableWidgetFieldsNames = ko.computed(function() {
+	return $.map(self.template.availableWidgetFields(), function(field){
+	  return field.name();
+	});
+  });
   
   self.template.fieldsModalFilter.subscribe(function(value) {
     var _fields = [];
-    var _availableFields = self.template.fieldsModalType() == 'histogram-widget'? vm.availableDateFields() : self.availableFacetFields(); 
+    var _availableFields = self.template.availableWidgetFields();
 
     $.each(_availableFields, function (index, field) {
       if (self.template.fieldsModalFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsModalFilter().toLowerCase()) > -1){
