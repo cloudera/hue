@@ -533,7 +533,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="resultset-pagination">
   <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } <i class="fa fa-arrow-right"></i>
   
-  <span class="pull-right" data-bind="visible: $data.response.numFound > 0">
+  <span class="pull-right" data-bind="visible: $data.response.numFound > 0 && $data.response.numFound <= 1000">
     <a class="btn" href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv"></i></a>
     <a class="btn" href="javascript:void(0)" id="download-xls"><i class="hfo hfo-file-xls"></i></a>
   </span>
@@ -718,11 +718,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
   <div class="modal-body">
     <p>
-      <input type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input-xlarge" />
-      <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })" class="unstyled inline fields-chooser">
-        <li data-bind="click: addFacetDemiModalFieldClick"><span class="badge badge-info"><i class="fa fa-file-text-o"></i> <span data-bind="text: name()"></span> </span></li>
+      <input type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" 
+          placeholder="${_('Filter fields')}" class="input-xlarge" />
+      <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
+          class="unstyled inline fields-chooser">
+        <li data-bind="click: addFacetDemiModalFieldClick">
+          <span class="badge badge-info" style="font-size:20px"><span data-bind="text: name(), attr: {'title': type()}"></span>
+          </span>
+        </li>
       </ul>
-      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredFieldsAttributes().length == 0">${_('There are no fields matching your search term.')}</div>
+      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredFieldsAttributes().length == 0">
+        ${_('There are no fields matching your search term.')}
+      </div>
     </p>
   </div>
 </div>
@@ -1225,7 +1232,9 @@ $(document).ready(function () {
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {
-      viewModel.collection.template.fieldsModalFilter("");
+      viewModel.collection.template.fieldsModalFilter();
+      viewModel.collection.template.fieldsModalType(widget.widgetType());
+      viewModel.collection.template.fieldsModalFilter("");      
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
       $("#addFacetDemiModal input[type='text']").focus();
