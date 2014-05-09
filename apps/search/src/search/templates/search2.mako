@@ -41,7 +41,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
   </form>
   
-  <form class="form-search" style="margin: 0" data-bind="submit: search, visible: columns().length != 0"">
+  <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0"">
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
@@ -509,12 +509,33 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-pagination">
-  <span data-bind="text: $root.collection.template.rows, visible: ! $root.isEditing()"></span>
-  <input type="text" data-bind="value: $root.collection.template.rows, visible: $root.isEditing()"></input>
+  <a href="javascript: void(0)" title="${ _('Previous') }">
+    <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+    <i class="fa fa-arrow-left" data-bind="
+        visible: $data.response.start >= $root.collection.template.rows(),
+        click: function() { $root.query.paginate('prev') }">
+    </i>
+  </a>  
+
+  <span data-bind="text: $data.response.start"></span>
   ${ _('of') }
-  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') }  
+  <span data-bind="text: $data.response.numFound"></span>
+  
+  <span data-bind="visible: $root.isEditing()">
+    ${ _('by') }
+    <input type="text" data-bind="value: $root.collection.template.rows, valueUpdate: 'afterkeydown'"></input>
+  </span>
+  
+  ${ _(' results') }  
   ## (<span data-bind="text: $data.responseHeader.QTime"></span> ${ _('ms') })
-  <i class="fa fa-arrow-right"></i>
+  
+  <a href="javascript: void(0)" title="${ _('Next') }">
+    <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+    <i class="fa fa-arrow-right" data-bind="
+        visible: ($root.collection.template.rows() + $data.response.start) < $data.response.numFound,
+        click: function() { $root.query.paginate('next') }">
+    </i>
+  </a>  
   
   <span class="pull-right" data-bind="visible: $data.response.numFound > 0 && $data.response.numFound <= 1000">
     <a class="btn" href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv"></i></a>
@@ -525,7 +546,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="histogram-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-  <!-- /ko -->
+  <!-- /ko -->text
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->

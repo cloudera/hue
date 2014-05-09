@@ -181,8 +181,8 @@ class SolrApi(object):
     solr_query = {}      
     
     solr_query['collection'] = collection['name']
-    solr_query['rows'] = min(collection['template']['rows'], 1000)
-    solr_query['start'] = 0
+    solr_query['rows'] = min(int(collection['template']['rows']), 1000)
+    solr_query['start'] = min(int(query['start']), 10000)
     
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
           

@@ -199,6 +199,8 @@ var Query = function (vm, query) {
 
   self.qs = ko.mapping.fromJS(query.qs);
   self.fqs = ko.mapping.fromJS(query.fqs);
+  self.start = ko.mapping.fromJS(query.start);
+  
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
 	var histogram_id = vm.collection.getHistogramFacet();
@@ -321,7 +323,16 @@ var Query = function (vm, query) {
         return false;
       }
     });
-  };   
+  }; 
+  
+  self.paginate = function (direction) {
+	if (direction == 'next') {
+	  self.start(self.start() + vm.collection.template.rows());
+	} else {
+	  self.start(self.start() - vm.collection.template.rows());
+	}
+	vm.search();
+  };
 };
 
 
@@ -349,7 +360,9 @@ var Collection = function (vm, collection) {
       vm.search();
     });
   });
-
+  self.template.rows.subscribe(function(){
+	vm.search();
+  });
 
   self.fields = ko.mapping.fromJS(collection.fields);
   self.availableFacetFields = ko.computed(function() {
@@ -676,6 +689,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isEditing(true);
     self.search();
   }
+  
+  self.searchBtn = function () {
+    self.query.start(0);
+    self.search();
+  };
 
   self.search = function () {
     self.isRetrievingResults(true);

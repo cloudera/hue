@@ -63,7 +63,7 @@ def index(request):
       return no_collections(request)
 
   collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
-  query = {'qs': [{'q': ''}], 'fqs': []}
+  query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   return render('search2.mako', request, {
     'collection': collection,
@@ -78,7 +78,7 @@ def new_search(request):
     return no_collections(request)
 
   collection = Collection(name=collections[0], label=collections[0])
-  query = {'qs': [{'q': ''}], 'fqs': []}
+  query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   return render('search2.mako', request, {
     'collection': collection,

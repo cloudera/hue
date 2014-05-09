@@ -558,12 +558,6 @@ def augment_solr_response2(response, collection, query):
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
 
 
-  augmented['pagination'] = {
-    'rows': collection['template']['rows'],
-  }
-#  response['total_pages'] = 111 #int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
-#  response['search_time'] = response['responseHeader']['QTime']
-
   if normalized_facets:
     augmented['normalized_facets'].extend(normalized_facets)
 
