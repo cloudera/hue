@@ -352,7 +352,14 @@ var Collection = function (vm, collection) {
 
 
   self.fields = ko.mapping.fromJS(collection.fields);
-  //self.availableFacetFields = ko.computed()
+  self.availableFacetFields = ko.computed(function() {
+    var facetFieldNames = $.map(self.facets(), function(facet) {
+	  return facet.field();
+    });
+    return $.grep(self.fields(), function(field) {
+      return facetFieldNames.indexOf(field.name()) == -1;
+    });
+  });
 
   self.addFacet = function (facet_json) {
     $.post("/search/template/new_facet", {
@@ -632,15 +639,19 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
   
   self.availableDraggableResultset = ko.computed(function() {
-	return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1;}).length == 0;
+	return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
   });
   self.availableDraggableFilter = ko.computed(function() {
-	return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget';}).length == 0;
+	return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget'; }).length == 0;
   });  
   self.availableDraggableHistogram = ko.computed(function() {
-	return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget';}).length == 0; // + a date facet
+	return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget'; }).length == 0 &&
+	  $.map(self.collection.availableFacetFields(), function(field) { return ['date', 'tdate'].indexOf(field.type()) != -1; });
   });
-
+  self.availableDraggableChart = ko.computed(function() {
+    return self.collection.availableFacetFields().length > 0;
+  });
+  
   self.init = function () {
     //self.collection.addDynamicFields();
     self.isEditing(true);
