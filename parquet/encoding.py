@@ -1,7 +1,7 @@
 import array
 import math
 import struct
-import StringIO
+import cStringIO
 import logging
 
 from ttypes import Type
@@ -133,9 +133,11 @@ def read_bitpacked(fo, header, width):
     Currently only supports width <=8 (doesn't support crossing bytes).
     """
     num_groups = header >> 1
-    logger.debug("Reading a bit-packed run with: %s groups", num_groups)
     count = num_groups * 8
-    raw_bytes = array.array('B', fo.read(count)).tolist()
+    byte_count = (width * count)/8
+    logger.debug("Reading a bit-packed run with: %s groups, count %s, bytes %s",
+        num_groups, count, byte_count)
+    raw_bytes = array.array('B', fo.read(byte_count)).tolist()
     current_byte = 0
     b = raw_bytes[current_byte]
     mask = _mask_for_bits(width)
@@ -206,7 +208,7 @@ def read_rle_bit_packed_hybrid(fo, width, length=None):
         raw_bytes = fo.read(length)
         if raw_bytes == '':
             return None
-        io_obj = StringIO.StringIO(raw_bytes)
+        io_obj = cStringIO.StringIO(raw_bytes)
     res = []
     while io_obj.tell() < length:
         header = read_unsigned_var_int(io_obj)
