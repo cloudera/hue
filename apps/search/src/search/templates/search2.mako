@@ -509,7 +509,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-pagination">
-  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') } <i class="fa fa-arrow-right"></i>
+  <span data-bind="text: $root.collection.template.rows, visible: ! $root.isEditing()"></span>
+  <input type="text" data-bind="value: $root.collection.template.rows, visible: $root.isEditing()"></input>
+  ${ _('of') }
+  <span data-bind="text: $data.response.numFound"></span> ${ _(' results') }  
+  ## (<span data-bind="text: $data.responseHeader.QTime"></span> ${ _('ms') })
+  <i class="fa fa-arrow-right"></i>
   
   <span class="pull-right" data-bind="visible: $data.response.numFound > 0 && $data.response.numFound <= 1000">
     <a class="btn" href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv"></i></a>

@@ -286,7 +286,11 @@ class Collection(models.Model):
       props['collection']['label'] = self.label
     # fields updated
     # idField
-
+    
+    # tmp for dev    
+    if 'rows' not in props['collection']['template']:
+      props['collection']['template']['rows'] = 10
+      
     return json.dumps(props)
 
   def get_default(self, user):      
@@ -310,17 +314,16 @@ class Collection(models.Model):
       "showFieldList": True,
       "fieldsAttributes": [{'name': field['name'], 'sort': {'direction': None}} for field in fields], # sort priority, asc/desc/none
       "fieldsSelected": [],
+      "rows": 10,
     }
     
     FACETS = []
 
-    collection_properties = {
+    return {
       'id': self.id, 'name': self.name, 'label': self.label,
       'template': TEMPLATE, 'facets': FACETS, 
       'fields': fields, 'idField': id_field, 
-    }      
-    
-    return collection_properties
+    }          
 
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
@@ -555,8 +558,11 @@ def augment_solr_response2(response, collection, query):
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
 
 
-  response['total_pages'] = 111 #int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
-  response['search_time'] = response['responseHeader']['QTime']
+  augmented['pagination'] = {
+    'rows': collection['template']['rows'],
+  }
+#  response['total_pages'] = 111 #int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
+#  response['search_time'] = response['responseHeader']['QTime']
 
   if normalized_facets:
     augmented['normalized_facets'].extend(normalized_facets)
