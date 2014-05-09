@@ -97,112 +97,94 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div class="toolbar-label">${_('WIDGETS')}</div>
-    <div class="draggable-widget"
-         data-bind="style: { cursor: availableDraggableResultset() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); }}}"
          title="${_('Grid Results')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableResultset()},
-                       css: {'btn-inverse': ! $root.availableDraggableResultset() },
                        style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
          </a>
     </div>
-    <div class="draggable-widget"
-         data-bind="style: { cursor: availableDraggableResultset() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableHtmlResultset(), 
                     isEnabled: availableDraggableResultset, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(false); }}}" 
          title="${_('HTML Results')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableResultset()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableResultset() }, 
                        style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableChart() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableChart() }, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableChart() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableChart() }, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-pie-chart"></i>
          </a>
     </div>
     <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a data-bind="attr: {href: $root.availableDraggableResultset()}, css: {'btn-inverse': ! $root.availableDraggableResultset() }, style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }"><i class="fa fa-tachometer"></i></a></div> -->
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableChart() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableChart() }, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableChart() ? 'move' : 'default' },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableChart, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Line')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableChart() }, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableHistogram() ? 'move' : 'default' }, 
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Histogram')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableHistogram()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableHistogram() }, 
                        style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
                        <i class="fa fa-long-arrow-right"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableFilter() ? 'move' : 'default' }, 
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
                     draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableFilter()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableFilter() }, 
                        style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
                        <i class="fa fa-filter"></i>
          </a>
     </div>
-    <div class="draggable-widget" 
-         data-bind="style: { cursor: availableDraggableChart() ? 'move' : 'default' }, 
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableChart, 
                     options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
          title="${_('Map')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       css: {'btn-inverse': ! $root.availableDraggableChart() }, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
@@ -888,11 +870,21 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     border: 1px solid #CCC;
     margin-top: 10px;
     margin-left: 10px;
+    cursor: move;
+  }
+
+  .draggable-widget.disabled {
+    cursor: default;
   }
 
   .draggable-widget a {
     font-size: 58px;
     line-height: 76px;
+  }
+
+  .draggable-widget.disabled a {
+    cursor: default;
+    color: #CCC;
   }
 
   .layout-container {
