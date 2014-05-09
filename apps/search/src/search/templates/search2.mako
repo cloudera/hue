@@ -21,11 +21,6 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
-<link rel="stylesheet" href="/search/static/css/search.css">
-<link href="/static/ext/css/hue-filetypes.css" rel="stylesheet">
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
-
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="padding-right:50px">
@@ -486,9 +481,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
 
     <!-- ko if: $root.isEditing() -->
-      <textarea data-bind="value: $root.collection.template.template, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
+      <textarea data-bind="value: $root.collection.template.template, codemirror: { 'lineNumbers': true, 'htmlMode': true, 'mode': 'text/html' }"></textarea>
       <br/>
-      <textarea data-bind="value: $root.collection.template.extracode, valueUpdate: 'afterkeydown'" class="span12" style="height: 100px"></textarea>
+      <textarea data-bind="value: $root.collection.template.extracode, codemirror: { 'lineNumbers': true, 'htmlMode': true, 'mode': 'text/html' }"></textarea>
       <br/>      
     <!-- /ko -->
 
@@ -502,7 +497,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <!-- /ko -->
     
       <div id="result-container" data-bind="foreach: $root.results">
-        <div class="result-row" data-bind="html: $data"></div>
+        <div class="result-row" data-bind="html: $('<span>').html($('<span>').html($data).text()).text()"></div>
       </div>    
     
       <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
@@ -723,16 +718,27 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>  
 </div>
 
+## Extra code for style and custom JS
+<span data-bind="html: $root.collection.template.extracode"></span>
 
+<link rel="stylesheet" href="/search/static/css/search.css">
+<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
+<link rel="stylesheet" href="/static/ext/css/leaflet.css">
+<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
+<link rel="stylesheet" href="/search/static/css/freshereditor.css">
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+
+<script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/codemirror-3.11.js"></script>
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-
-<link href="/static/ext/css/leaflet.css" rel="stylesheet">
-<link href="/static/ext/css/hue-charts.css" rel="stylesheet">
-
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
@@ -1206,6 +1212,44 @@ $(document).ready(function () {
     }).extend({ notify: 'always' });
     result(target());
     return result;
+  };
+
+  var mixedMode = {
+        name: "htmlmixed",
+        scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache/i,
+                       mode: null},
+                      {matches: /(text|application)\/(x-)?vb(a|script)/i,
+                       mode: "vbscript"}]
+      };
+
+
+  ko.bindingHandlers.codemirror = {
+
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var options = $.extend(valueAccessor(), {});
+      var editor = CodeMirror.fromTextArea(element, options);
+      element.editor = editor;
+      editor.setValue(allBindingsAccessor().value());
+      editor.refresh();
+      var wrapperElement = $(editor.getWrapperElement());
+
+      var sourceDelay = -1;
+      editor.on("change", function (cm) {
+        clearTimeout(sourceDelay);
+        var _cm = cm;
+        sourceDelay = setTimeout(function () {
+          allBindingsAccessor().value(_cm.getValue());
+        }, 500);
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        wrapperElement.remove();
+      });
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      var editor = element.editor;
+      editor.refresh();
+    }
   };
 
 
