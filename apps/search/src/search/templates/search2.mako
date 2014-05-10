@@ -779,7 +779,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .row-container.is-editing {
-    border: 1px solid #F6F6F6;
+    border: 1px solid #e5e5e5;
   }
 
   .ui-sortable {
@@ -835,6 +835,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     background-color: #F6F6F6;
     display: inline;
     padding: 3px;
+    border: 1px solid #e5e5e5;
+    border-bottom: none;
   }
 
   .row-highlight {
