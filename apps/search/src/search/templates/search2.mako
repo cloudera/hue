@@ -766,6 +766,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/search/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/static/ext/js/less-1.7.0.min.js" type="text/javascript" charset="utf-8"></script>
+
 <style type="text/css">
   .dashboard .container-fluid {
     padding: 6px;
@@ -1238,7 +1240,20 @@ $(document).ready(function () {
         clearTimeout(sourceDelay);
         var _cm = cm;
         sourceDelay = setTimeout(function () {
-          allBindingsAccessor().value(_cm.getValue());
+          var _enc = $("<span>").html(_cm.getValue());
+          if (_enc.find("style").length > 0){
+            var parser = new less.Parser();
+            $(_enc.find("style")).each(function(cnt, item){
+              var _less = "#result-container {" + $(item).text() + "}";
+              parser.parse(_less, function (err, tree) {
+                $(item).text(tree.toCSS());
+              });
+            });
+            allBindingsAccessor().value(_enc.html());
+          }
+          else {
+            allBindingsAccessor().value(_cm.getValue());
+          }
         }, 500);
       });
 
