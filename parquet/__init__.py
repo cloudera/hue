@@ -2,7 +2,7 @@ import gzip
 import json
 import logging
 import struct
-import StringIO
+import cStringIO
 import sys
 from collections import defaultdict
 from ttypes import (FileMetaData, CompressionCodec, Encoding,
@@ -204,7 +204,7 @@ def _read_page(fo, page_header, column_metadata):
         if column_metadata.codec == CompressionCodec.SNAPPY:
             raw_bytes = snappy.decompress(bytes_from_file)
         elif column_metadata.codec == CompressionCodec.GZIP:
-            io_obj = StringIO.StringIO(bytes_from_file)
+            io_obj = cStringIO.StringIO(bytes_from_file)
             with gzip.GzipFile(fileobj=io_obj, mode='rb') as f:
                 raw_bytes = f.read()
         else:
@@ -252,7 +252,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
     """
     daph = page_header.data_page_header
     raw_bytes = _read_page(fo, page_header, column_metadata)
-    io_obj = StringIO.StringIO(raw_bytes)
+    io_obj = cStringIO.StringIO(raw_bytes)
     vals = []
 
     logger.debug("  definition_level_encoding: %s",
@@ -276,8 +276,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
                                            daph.num_values,
                                            bit_width)
 
-        logger.debug("  Definition levels: %s",
-                     ",".join([str(dl) for dl in definition_levels]))
+        logger.debug("  Definition levels: %s", len(definition_levels))
 
     # repetition levels are skipped if data is at the first level.
     if len(column_metadata.path_in_schema) > 1:
@@ -294,18 +293,20 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
         for i in range(daph.num_values):
             vals.append(
                 encoding.read_plain(io_obj, column_metadata.type, None))
-        logger.debug("  Values: %s", ",".join([str(x) for x in vals]))
+        logger.debug("  Values: %s", len(vals))
     elif daph.encoding == Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
         logger.debug("bit_width: %d", bit_width)
         total_seen = 0
         dict_values_bytes = io_obj.read()
-        dict_values_io_obj = StringIO.StringIO(dict_values_bytes)
+        dict_values_io_obj = cStringIO.StringIO(dict_values_bytes)
         # TODO jcrobak -- not sure that this loop is needed?
         while total_seen < daph.num_values:
             values = encoding.read_rle_bit_packed_hybrid(
                 dict_values_io_obj, bit_width, len(dict_values_bytes))
+            if len(values) + total_seen > daph.num_values:
+                values = values[0: daph.num_values - total_seen]
             vals += [dictionary[v] for v in values]
             total_seen += len(values)
     else:
@@ -316,7 +317,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
 
 def read_dictionary_page(fo, page_header, column_metadata):
     raw_bytes = _read_page(fo, page_header, column_metadata)
-    io_obj = StringIO.StringIO(raw_bytes)
+    io_obj = cStringIO.StringIO(raw_bytes)
     dict_items = []
     while io_obj.tell() < len(raw_bytes):
         # TODO - length for fixed byte array
@@ -360,7 +361,7 @@ def _dump(fo, options, out=sys.stdout):
                     values = read_data_page(fo, schema_helper, ph, cmd,
                                             dict_items)
                     res[".".join(cmd.path_in_schema)] += values
-                    values_seen += cmd.num_values
+                    values_seen += ph.data_page_header.num_values
                 elif ph.type == PageType.DICTIONARY_PAGE:
                     logger.debug(ph)
                     assert dict_items == []
