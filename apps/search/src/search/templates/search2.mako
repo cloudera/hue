@@ -523,7 +523,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   
   <span data-bind="visible: $root.isEditing()">
     ${ _('by') }
-    <input type="text" data-bind="value: $root.collection.template.rows, valueUpdate: 'afterkeydown'"></input>
+    <input type="text" data-bind="value: $root.collection.template.rows, valueUpdate:'afterkeydown'"></input>
   </span>
   
   ${ _(' results') }  

@@ -347,7 +347,7 @@ var Collection = function (vm, collection) {
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
-  self.template.template.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } }); // hum?
+  self.template.template.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 3000 } });
   self.template.template.subscribe(function () {
     vm.search();
   });
@@ -363,6 +363,7 @@ var Collection = function (vm, collection) {
   self.template.rows.subscribe(function(){
 	vm.search();
   });
+  self.template.rows.extend({ rateLimit: { timeout: 1500, method: "notifyWhenChangesStop" } });
 
   self.fields = ko.mapping.fromJS(collection.fields);
   self.availableFacetFields = ko.computed(function() {
