@@ -1068,6 +1068,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/javascript" charset="utf-8">
 var viewModel;
 
+nv.dev = false;
+
 function pieChartDataTransformer(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {

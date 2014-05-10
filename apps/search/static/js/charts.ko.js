@@ -235,9 +235,7 @@ function barChart(element, options, isTimeline) {
         _chart.enableSelection();
       }
       _chart.onSelectRange(options.onSelectRange);
-      _chart.xAxis
-          .showMaxMin(true)
-          .tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
+      _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
       _chart.multibar.hideable(true);
       _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
       _chart.onStateChange(options.onStateChange);
@@ -279,6 +277,24 @@ function barChart(element, options, isTimeline) {
         .transition().duration(350)
         .each("end", options.onComplete)
         .call(_chart);
+
+    if (isTimeline) {
+      var insertLinebreaks = function (d) {
+        var _el = d3.select(this);
+        var _mom = moment(d);
+        if (_mom != null) {
+          var _words = _mom.format("YYYY-MM-DD hh:mm:ss").split(" ");
+          _el.text('');
+          for (var i = 0; i < _words.length; i++) {
+            var tspan = _el.append("tspan").text(_words[i]);
+            if (i > 0) {
+              tspan.attr("x", 0).attr("dy", '15');
+            }
+          }
+        }
+      };
+      _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
+    }
 
     nv.utils.windowResize(_chart.update);
 
