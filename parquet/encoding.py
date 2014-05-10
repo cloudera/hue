@@ -130,7 +130,7 @@ def _mask_for_bits(i):
 def read_bitpacked(fo, header, width):
     """Reads a bitpacked run of the rle/bitpack hybrid.
 
-    Currently only supports width <=8 (doesn't support crossing bytes).
+    Supports width >8 (crossing bytes).
     """
     num_groups = header >> 1
     count = num_groups * 8

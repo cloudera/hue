@@ -277,7 +277,6 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
                                            bit_width)
 
         logger.debug("  Definition levels: %s", len(definition_levels))
-        #             ",".join([str(dl) for dl in definition_levels]))
 
     # repetition levels are skipped if data is at the first level.
     if len(column_metadata.path_in_schema) > 1:
@@ -294,7 +293,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
         for i in range(daph.num_values):
             vals.append(
                 encoding.read_plain(io_obj, column_metadata.type, None))
-        logger.debug("  Values: %s", len(vals)); #",".join([str(x) for x in vals]))
+        logger.debug("  Values: %s", len(vals))
     elif daph.encoding == Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
