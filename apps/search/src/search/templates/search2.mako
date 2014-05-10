@@ -718,6 +718,31 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>  
 </div>
 
+<div id="showDocModal" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Result inspector')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <table>
+        <tbody data-bind="foreach: {data: Object.keys($root.collection.selectedDocument()), as: '_key'}">
+          <tr>
+            <th style="text-align: left" data-bind="text: _key"></th>
+            <td data-bind="html: $root.collection.selectedDocument()[_key]"></td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <input type="button" class="btn" data-dismiss="modal" value="${_('Close')}" />
+    </div>
+  </div>
+</div>
+
+
 ## Extra code for style and custom JS
 <span data-bind="html: $root.collection.template.extracode"></span>
 
@@ -996,6 +1021,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     cursor: move;
   }
 
+  .result-row {
+    cursor: pointer;
+  }
+
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -1148,6 +1177,11 @@ function mapChartDataTransformer(data) {
 
 $(document).ready(function () {
 
+  $(document).on("showDoc", function(e, doc){
+    viewModel.collection.selectedDocument(doc);
+    $("#showDocModal").modal();
+  });
+
   $(document).on("click", ".widget-settings-pill", function(){
     $(this).parents(".card-body").find(".widget-main-section").hide();
     $(this).parents(".card-body").find(".widget-settings-section").show();
@@ -1172,6 +1206,7 @@ $(document).ready(function () {
       ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
     }
   };
+
 
   ko.extenders.numeric = function (target, precision) {
     var result = ko.computed({

@@ -361,6 +361,8 @@ var Collection = function (vm, collection) {
     });
   });
 
+  self.selectedDocument = ko.observable({});
+
   self.addFacet = function (facet_json) {
     $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
@@ -791,7 +793,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       id: doc.id
     },function (data) {
       if (data.status == 0) {
-        alert(ko.mapping.toJSON(data.doc.doc));
+        $(document).trigger("showDoc", data.doc.doc);
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
