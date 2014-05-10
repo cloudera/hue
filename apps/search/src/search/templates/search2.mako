@@ -870,11 +870,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     font-weight: bold;
     color: #999;
     padding-left: 8px;
-    padding-top: 40px;
+    padding-top: 24px;
   }
 
   .draggable-widget {
-    width: 100px;
+    width: 60px;
     text-align: center;
     float: left;
     border: 1px solid #CCC;
@@ -888,8 +888,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .draggable-widget a {
-    font-size: 58px;
-    line-height: 76px;
+    font-size: 28px;
+    line-height: 46px;
   }
 
   .draggable-widget.disabled a {
@@ -906,15 +906,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .layout-box {
     float: left;
-    height: 78px;
+    height: 48px;
     background-color: #DDD;
     text-align: center;
   }
 
   .layout-box i {
     color: #333;
-    font-size: 40px;
-    line-height: 78px;
+    font-size: 28px;
+    line-height: 48px;
   }
 
   .layout-container:hover .layout-box {
@@ -922,30 +922,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .with-top-margin {
-    margin-top: 100px;
-  }
-
-  @media (max-width: 1366px) {
-    .toolbar-label {
-      padding-top: 24px;
-    }
-    .draggable-widget {
-      width: 60px;
-    }
-    .draggable-widget a {
-      font-size: 28px;
-      line-height: 46px;
-    }
-    .layout-box {
-      height: 48px;
-    }
-    .layout-box i {
-      font-size: 28px;
-      line-height: 48px;
-    }
-    .with-top-margin {
-      margin-top: 60px;
-    }
+    margin-top: 60px;
   }
 
   .ui-sortable .card-heading {
