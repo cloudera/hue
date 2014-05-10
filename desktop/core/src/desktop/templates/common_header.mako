@@ -137,7 +137,7 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script src="/static/js/hue.utils.js"></script>
-  <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
+  <script src="/static/ext/js/jquery/jquery-2.1.1.min.js"></script>
   <script src="/static/js/jquery.migration.js"></script>
   <script src="/static/js/jquery.filechooser.js"></script>
   <script src="/static/js/jquery.selector.js"></script>

@@ -530,7 +530,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js"></script>
 
 <script type="text/javascript">
   var MOMENT_DATE_FORMAT = "MM-DD-YYYY";

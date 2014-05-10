@@ -125,8 +125,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'zIndex': 2500, 'start': function(event, ui){$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
@@ -255,7 +255,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="css: klass">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -762,7 +762,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
@@ -1024,6 +1024,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   .result-row {
     cursor: pointer;
   }
+
+  body.modal-open {
+      overflow: auto!important;
+  }
+
 
 </style>
 
@@ -1316,6 +1321,11 @@ $(document).ready(function () {
       });
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
+      $("#addFacetDemiModal").on("shown", function(){
+        window.setTimeout(function(){
+          $(window).scrollTop($("#wdg_" + selectedWidget.id()).position().top);
+        }, 500);
+      });
       $("#addFacetDemiModal input[type='text']").focus();
     }
   }
