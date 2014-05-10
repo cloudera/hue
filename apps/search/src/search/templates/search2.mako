@@ -264,7 +264,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         &nbsp;
       </span>
       <span data-bind="with: $root.collection.getFacetById(id())">
-        <span data-bind="text: label"></span>
+        <span data-bind="editable: label"></span>
       </span>
       <!-- ko ifnot: $root.collection.getFacetById(id()) -->
         <span data-bind="text: name"></span>
@@ -778,10 +778,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
 
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/ext/js/knockout.x-editable.js"></script>
 <script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
@@ -1055,6 +1058,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       overflow: auto!important;
   }
 
+  .editable-click {
+    cursor: pointer;
+  }
+
 
 </style>
 
@@ -1261,17 +1268,8 @@ $(document).ready(function () {
     return result;
   };
 
-  var mixedMode = {
-        name: "htmlmixed",
-        scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache/i,
-                       mode: null},
-                      {matches: /(text|application)\/(x-)?vb(a|script)/i,
-                       mode: "vbscript"}]
-      };
-
 
   ko.bindingHandlers.codemirror = {
-
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var options = $.extend(valueAccessor(), {});
       var editor = CodeMirror.fromTextArea(element, options);
