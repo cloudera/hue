@@ -125,7 +125,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart, 
-                    options: {'zIndex': 2500, 'start': function(event, ui){$('.card-body').slideUp('fast');},
+                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast');}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
@@ -440,7 +440,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
         <thead>
           <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
-            <th data-bind="with: $root.collection.getTemplateField($data)">
+            <th data-bind="with: $root.collection.getTemplateField($data)" style="white-space: nowrap">
               <a href="javascript: void(0)" data-bind="visible: $index() > 0, click: function(){ $root.collection.translateSelectedField($index(), 'left'); }"><i class="fa fa-chevron-left"></i></a>
               <a href="javascript: void(0)" title="${ _('Sort') }">
                 <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
