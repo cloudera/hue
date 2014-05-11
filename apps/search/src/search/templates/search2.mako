@@ -94,7 +94,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div class="toolbar-label">${_('WIDGETS')}</div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');},
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); }}}"
          title="${_('Grid Results')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableResultset()},
@@ -105,8 +105,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableHtmlResultset(), 
                     isEnabled: availableDraggableResultset, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(false); }}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); $root.collection.template.isGridLayout(false); }}}"
          title="${_('HTML Results')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableResultset()}, 
                        style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
@@ -115,8 +115,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
@@ -125,19 +125,19 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}"
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-pie-chart"></i>
          </a>
     </div>
-    <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a data-bind="attr: {href: $root.availableDraggableResultset()}, css: {'btn-inverse': ! $root.availableDraggableResultset() }, style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }"><i class="fa fa-tachometer"></i></a></div> -->
+    <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a data-bind="attr: {href: $root.availableDraggableResultset()}, css: {'btn-inverse': ! $root.availableDraggableResultset() }, style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }"><i class="fa fa-tachometer"></i></a></div> -->
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
@@ -146,8 +146,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Line')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
@@ -156,8 +156,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Histogram')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableHistogram()}, 
                        style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
@@ -166,8 +166,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
                     draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableFilter()}, 
                        style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
@@ -176,8 +176,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableChart, 
-                    options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 
-                              'stop': function(event, ui){$('.card-body').slideDown('fast');}}}" 
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Map')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableChart()}, 
                        style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
@@ -249,12 +249,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast');}, 'helper': function(event){$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast');showAddFacetDemiModal(widget);viewModel.search()}}">
+    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
 
 <script type="text/html" id="widget-template">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
@@ -734,16 +735,17 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Choose field')}</h3>
+    <h3>${_('Choose field')}
+      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'"
+       placeholder="${_('Filter fields')}" class="input-xlarge" />
+    </h3>
   </div>
   <div class="modal-body">
     <p>
-      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'"
-       placeholder="${_('Filter fields')}" class="input-xlarge" />
       <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
           class="unstyled inline fields-chooser">
         <li data-bind="click: addFacetDemiModalFieldPreview">
-          <span class="badge badge-info" style="font-size:20px"><span data-bind="text: name(), attr: {'title': type()}"></span>
+          <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}"></span>
           </span>
         </li>
       </ul>
@@ -753,11 +755,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </p>
   </div>
   <div class="modal-footer">
-    <div>
-      <input type="button" class="btn disabled" data-dismiss="modal" value="${_('Pick!')}" />
-      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
-    </div>
-  </div>  
+    <input type="button" class="btn disabled" data-dismiss="modal" value="${_('Pick!')}" />
+    <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" data-bind="click: addFacetDemiModalFieldCancel" />
+  </div>
 </div>
 
 <div id="showDocModal" class="modal hide">
@@ -795,6 +795,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -821,7 +822,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
-<link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
 <script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datamaps.all.min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -1085,6 +1085,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 var viewModel;
 
 nv.dev = false;
+
+var lastWindowScrollPosition = 0;
 
 function pieChartDataTransformer(data) {
   var _data = [];
@@ -1358,17 +1360,12 @@ $(document).ready(function () {
           'source': viewModel.collection.template.availableWidgetFieldsNames(), 
           'updater': function(item) {
               addFacetDemiModalFieldPreview({'name': function(){return item}});
-              // todo close modal here too?
+              $("#addFacetDemiModal").modal("hide");
               return item;
            }
       });
       selectedWidget = widget;
       $("#addFacetDemiModal").modal("show");
-      $("#addFacetDemiModal").on("shown", function(){
-        window.setTimeout(function(){
-          $(window).scrollTop($("#wdg_" + selectedWidget.id()).position().top);
-        }, 500);
-      });
       $("#addFacetDemiModal input[type='text']").focus();
     }
   }
@@ -1383,13 +1380,13 @@ $(document).ready(function () {
         _existingFacet.label(field.name());
         _existingFacet.field(field.name());
       }      
-      viewModel.search();
     }
   }
   
-  function addFacetDemiModalFieldCancel(field) {
-    viewModel.removeWidget(selectedWidget.id());
+  function addFacetDemiModalFieldCancel() {
+    viewModel.removeWidget(selectedWidget);
   }
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }

@@ -1578,9 +1578,8 @@ a, a:hover, a:active, a:focus {
 }
 
 body.modal-open {
-    overflow: hidden;
+  overflow: hidden;
 }
-
 
 .demi-modal {
   position: fixed;
@@ -1631,10 +1630,13 @@ border-bottom-left-radius: 6px;
   margin-top: 2px;
 }
 
-
 .demi-modal .modal-body {
   position: relative;
   max-height: 400px;
   padding: 15px;
   overflow-y: auto;
+}
+
+.demi-modal .modal-footer {
+  padding: 10px;
 }

@@ -69,9 +69,9 @@ var Row = function (widgets) {
   }
 
   self.remove = function (col, row) {
-	$.each(self.widgets(), function(i, widget) {
-	  viewModel.removeWidget(widget);
-	}); 
+    $.each(self.widgets(), function(i, widget) {
+      viewModel.removeWidget(widget);
+    });
     col.rows.remove(row);
   }
 }
@@ -401,7 +401,7 @@ var Collection = function (vm, collection) {
   };
 
   self.removeFacet = function (widget_id) {
-    $.each(self.facets(), function (index, facet) {  
+    $.each(self.facets(), function (index, facet) {
       if (facet.id() == widget_id()) {
         self.facets.remove(facet); 
         return false;
@@ -807,6 +807,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id);
     self.query.removeFilter(widget_json);
+    self.removeWidgetById(widget_json.id());
     self.search();
   }
 
@@ -823,6 +824,19 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
     return _widget;
   }
+
+  self.removeWidgetById = function (widget_id) {
+    $.each(self.columns(), function (i, col) {
+      $.each(col.rows(), function (j, row) {
+        $.each(row.widgets(), function (z, widget) {
+          if (widget.id() == widget_id){
+            row.widgets.remove(widget);
+          }
+        });
+      });
+    });
+  }
+
 
   self.getDocument = function (doc) {
     $.post("/search/get_document", {
