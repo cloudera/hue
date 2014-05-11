@@ -594,6 +594,22 @@ var Collection = function (vm, collection) {
   
     vm.search();
   };
+  
+  self.upDownFacetLimit = function (facet_id, direction) {
+    var facet = self.getFacetById(facet_id);
+    
+    if (facet.properties.prevLimit == undefined) {
+      facet.properties.prevLimit = facet.properties.limit();
+    }
+    
+    if (direction == 'up') {
+      facet.properties.limit(facet.properties.limit() + 10);
+    } else {
+      facet.properties.limit(facet.properties.limit() - 10);
+    }
+    
+    vm.search();
+  };
 };
 
 var NewTemplate = function (vm, initial) {

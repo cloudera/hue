@@ -356,18 +356,34 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div data-bind="foreach: $parent.counts">
           <div>
             <a href="javascript: void(0)">              
-              <!-- ko if: ! $data.selected -->
-                <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
-              <!-- /ko -->
-              <!-- ko if: $data.selected -->
-                <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
-                  <span data-bind="text: $data.value"></span>
-                  <i class="fa fa-times"></i>
-                </span>
+              <!-- ko if: $index() != $parent.properties.limit() -->
+                <!-- ko if: ! $data.selected -->
+                  <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                  <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
+                <!-- /ko -->
+                <!-- ko if: $data.selected -->
+                  <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
+                    <span data-bind="text: $data.value"></span>
+                    <i class="fa fa-times"></i>
+                  </span>
+                <!-- /ko -->
               <!-- /ko -->
               <!-- ko if: $index() == $parent.properties.limit() -->
-                </br>${ _('Show more...') }
+                <!-- ko if: $parent.properties.prevLimit == undefined || $parent.properties.prevLimit == $parent.properties.limit() -->
+                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                    ${ _('Show more...') }
+                  </span>
+                <!-- /ko -->
+                <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
+                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                    ${ _('Show more') }
+                  </span> 
+                  /             
+                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
+                    ${ _('less...') }
+                  </span>                    
+                </span>
+                <!-- /ko -->
               <!-- /ko -->
             </a>
           </div>

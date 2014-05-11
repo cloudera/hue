@@ -12,12 +12,12 @@ It features:
 
       * File Browser for accessing HDFS
       * Hive Editor for developing and running Hive queries
-      * Impala App for executing Impala queries
-      * Search App for querying and exploring data with Solr
+      * Search App for querying, exploring, visualizing data and dashboards with Solr
+      * Impala App for executing interactive SQL queries
       * Spark Editor and Dashboard
       * Pig Editor for submitting Pig scripts
-      * Oozie App for submitting and monitoring workflows, coordinators and bundles
-      * HBase Browser for visualizing and modifying HBase tables
+      * Oozie Editor and Dashboard for submitting and monitoring workflows, coordinators and bundles
+      * HBase Browser for visualizing, querying and modifying HBase tables
       * Metastore Browser for accessing Hive metadata and HCatalog
       * Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
       * Job Designer for creating MapReduce/Streaming/Java jobs
@@ -150,12 +150,13 @@ namespace.  See ``apps/about/src/about/urls.py`` for an example.
 
 Main Stack
 ==========
+Hue would not be possible without:
 
    * Python 2.6 - 2.7
-   * Django 1.4 https://docs.djangoproject.com/en/1.4/
-   * Mako
-   * jQuery
-   * Bootstrap
+   * Django 1.4 (https://docs.djangoproject.com/en/1.4/)
+   * Knockout.js (http://knockoutjs.com/)
+   * jQuery (http://jquery.com/)
+   * Bootstrap (http://getbootstrap.com/)
 
 
 Community
