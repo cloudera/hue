@@ -347,7 +347,7 @@ var Collection = function (vm, collection) {
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
-  self.template.template.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 3000 } });
+  self.template.template.extend({rateLimit: {timeout: 3000, method: "notifyWhenChangesStop"}});
   self.template.template.subscribe(function () {
     vm.search();
   });
@@ -363,7 +363,7 @@ var Collection = function (vm, collection) {
   self.template.rows.subscribe(function(){
 	vm.search();
   });
-  self.template.rows.extend({ rateLimit: { timeout: 1500, method: "notifyWhenChangesStop" } });
+  self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
   self.fields = ko.mapping.fromJS(collection.fields);
   self.availableFacetFields = ko.computed(function() {
@@ -378,6 +378,8 @@ var Collection = function (vm, collection) {
   self.selectedDocument = ko.observable({});
 
   self.addFacet = function (facet_json) {
+    self.removeFacet(function(){return facet_json.widget_id});
+	  
     $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,

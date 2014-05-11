@@ -742,7 +742,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
        placeholder="${_('Filter fields')}" class="input-xlarge" />
       <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
           class="unstyled inline fields-chooser">
-        <li data-bind="click: addFacetDemiModalFieldClick">
+        <li data-bind="click: addFacetDemiModalFieldPreview">
           <span class="badge badge-info" style="font-size:20px"><span data-bind="text: name(), attr: {'title': type()}"></span>
           </span>
         </li>
@@ -1357,7 +1357,8 @@ $(document).ready(function () {
       $('#addFacetInput').typeahead({
           'source': viewModel.collection.template.availableWidgetFieldsNames(), 
           'updater': function(item) {
-              addFacetDemiModalFieldClick({'name': function(){return item}});
+              addFacetDemiModalFieldPreview({'name': function(){return item}});
+              // todo close modal here too?
               return item;
            }
       });
@@ -1373,7 +1374,7 @@ $(document).ready(function () {
   }
 
 
-  function addFacetDemiModalFieldClick(field) {
+  function addFacetDemiModalFieldPreview(field) {
     var _existingFacet = viewModel.collection.getFacetById(selectedWidget.id());
     if (selectedWidget != null) {
       selectedWidget.isLoading(true);
@@ -1384,6 +1385,10 @@ $(document).ready(function () {
       }      
       viewModel.search();
     }
+  }
+  
+  function addFacetDemiModalFieldCancel(field) {
+    viewModel.removeWidget(selectedWidget.id());
   }
 </script>
 
