@@ -28,9 +28,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <div class="search-bar" style="height: 30px">
     <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
-      <a href="${ url('search:index') }"><i class="fa fa-share"></i> ${ _('Search page') }</a>
+    <a class="btn" href="${ url('search:new_search') }"><i class="fa fa-file-o"></i> ${ _('New dasboard') }</a>
+    <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()">
+      <i class="fa fa-plus-circle"></i> ${ _('Import Index') }
+      </button>
     </div>
-  <h4>${_('Collection Manager')}</h4>
+  <h4>${_('Dashboards')}</h4>
 </div>
 
 
@@ -38,11 +41,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   <div class="card">
   <%actionbar:render>
     <%def name="search()">
-      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
+      <input type="text" placeholder="${_('Filter dashboards by name...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
     </%def>
 
     <%def name="creation()">
-      <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()"><i class="fa fa-plus-circle"></i> ${ _('Import') }</button>
     </%def>
   </%actionbar:render>
 

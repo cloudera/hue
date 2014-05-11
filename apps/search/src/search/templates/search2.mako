@@ -45,8 +45,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
-        <span class="current-collection" data-bind="text: collection.label"></span>
-        ## click: show also collection list + edit label box        
+        <span
+            data-bind="editable: collection.label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}">
+        </span>
+        ##<i class="fa fa-edit" data-bind="visible: $root.isEditing() && ! $root.changeCollection(), click: function(){$root.changeCollection(true);}"></i>
+        <!-- ko if: $root.isEditing() && $root.changeCollection() -->
+        <select data-bind="options: $root.initial.collections, value: $root.collection.name">
+        </select>        
+        <!-- /ko -->
       </div>
 
       <span data-bind="foreach: query.qs">
@@ -97,8 +103,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); }}}"
          title="${_('Grid Results')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableResultset()},
-                       style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
          </a>
     </div>
@@ -108,8 +113,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); $root.collection.template.isGridLayout(false); }}}"
          title="${_('HTML Results')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableResultset()}, 
-                       style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
          </a>
     </div>
@@ -118,8 +122,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
@@ -128,8 +131,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-pie-chart"></i>
          </a>
     </div>
@@ -139,8 +141,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
          </a>
     </div>
@@ -149,8 +150,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Line')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
@@ -159,8 +159,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Histogram')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableHistogram()}, 
-                       style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
@@ -169,8 +168,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableFilter()}, 
-                       style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
                        <i class="fa fa-filter"></i>
          </a>
     </div>
@@ -179,8 +177,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Map')}" rel="tooltip" data-placement="top">
-         <a data-bind="attr: {href: $root.availableDraggableChart()}, 
-                       style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
@@ -492,6 +489,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
         <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
         <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Properties')}</a></li>
       </ul>
     </div>
 

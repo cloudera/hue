@@ -143,7 +143,9 @@ def save(request):
       hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'])
     hue_collection.update_properties({'collection': collection})
     hue_collection.update_properties({'layout': layout})
-    # Todo update certain atttributes like, label, enabled...
+    hue_collection.name = collection['name']
+    hue_collection.label = collection['label']
+    hue_collection.enable = collection['enabled']
     hue_collection.save()
     response['status'] = 0
     response['id'] = hue_collection.id
@@ -605,6 +607,25 @@ def get_range_facet(request):
       properties = _zoom_range_facet(solr_api, collection, facet['field'])
             
     result['properties'] = properties
+    result['status'] = 0      
+
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+# TODO security
+def get_collection(request):  
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    name = request.POST['name']
+            
+    collection = Collection(name=name, label=name)
+    collection_json = collection.get_c(request.user)
+            
+    result['collection'] = json.loads(collection_json)
     result['status'] = 0      
 
   except Exception, e:

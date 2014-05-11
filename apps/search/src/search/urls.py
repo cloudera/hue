@@ -44,6 +44,7 @@ urlpatterns = patterns('search.views',
   url(r'^get_document$', 'get_document', name='get_document'),
   url(r'^get_range_facet$', 'get_range_facet', name='get_range_facet'),
   url(r'^get_timeline$', 'get_timeline', name='get_timeline'),
+  url(r'^get_collection', 'get_collection', name='get_collection'),
   
   # old
   url(r'^admin/collection/(?P<collection_id>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),

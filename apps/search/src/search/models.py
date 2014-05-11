@@ -320,7 +320,7 @@ class Collection(models.Model):
     FACETS = []
 
     return {
-      'id': self.id, 'name': self.name, 'label': self.label,
+      'id': self.id, 'name': self.name, 'label': self.label, 'enabled': self.enabled,
       'template': TEMPLATE, 'facets': FACETS, 
       'fields': fields, 'idField': id_field, 
     }          
