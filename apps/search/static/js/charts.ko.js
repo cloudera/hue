@@ -283,7 +283,7 @@ function barChart(element, options, isTimeline) {
         var _el = d3.select(this);
         var _mom = moment(d);
         if (_mom != null) {
-          var _words = _mom.format("YYYY-MM-DD hh:mm:ss").split(" ");
+          var _words = _mom.format("hh:mm:ss YYYY-MM-DD").split(" ");
           _el.text('');
           for (var i = 0; i < _words.length; i++) {
             var tspan = _el.append("tspan").text(_words[i]);

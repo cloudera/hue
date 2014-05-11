@@ -161,7 +161,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          title="${_('Histogram')}" rel="tooltip" data-placement="top">
          <a data-bind="attr: {href: $root.availableDraggableHistogram()}, 
                        style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
-                       <i class="fa fa-long-arrow-right"></i>
+                       <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
