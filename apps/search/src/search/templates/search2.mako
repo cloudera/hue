@@ -267,7 +267,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <span data-bind="editable: label, editableOptions: {enabled: $root.isEditing()}"></span>
       </span>
       <!-- ko ifnot: $root.collection.getFacetById(id()) -->
-        <span data-bind="text: name"></span>
+        <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing()}"></span>
       <!-- /ko -->
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
