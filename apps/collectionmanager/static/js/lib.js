@@ -38,7 +38,7 @@ var Collection = function(name) {
   };
 
   self.newField = function() {
-    self.addField('', '');
+    self.addField('', 'text_general');
   };
 
   self.setData = function(data_json) {
