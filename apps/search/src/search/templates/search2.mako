@@ -264,7 +264,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         &nbsp;
       </span>
       <span data-bind="with: $root.collection.getFacetById(id())">
-        <span data-bind="editable: label"></span>
+        <span data-bind="editable: label, editableOptions: {enabled: $root.isEditing()}"></span>
       </span>
       <!-- ko ifnot: $root.collection.getFacetById(id()) -->
         <span data-bind="text: name"></span>
@@ -800,7 +800,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
-<script src="/static/ext/js/knockout.x-editable.js"></script>
+<script src="/static/js/ko.editable.js"></script>
 <script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>

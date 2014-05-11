@@ -37,7 +37,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
     <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
     <script src="/static/ext/js/bootstrap-editable.min.js"></script>
-    <script src="/static/ext/js/knockout.x-editable.js"></script>
+    <script src="/static/js/ko.editable.js"></script>
 
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
       <div class="well">
