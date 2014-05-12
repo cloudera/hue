@@ -344,8 +344,8 @@ var Collection = function (vm, collection) {
   self.id = collection.id;
   self.name = ko.mapping.fromJS(collection.name);
   self.label = ko.mapping.fromJS(collection.label);
-  self.enabled= ko.mapping.fromJS(collection.enabled);
-  self.idField = collection.idField;
+  self.enabled = ko.mapping.fromJS(collection.enabled);
+  self.idField = ko.observable(collection.idField);
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
@@ -519,6 +519,12 @@ var Collection = function (vm, collection) {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
+	      self.idField(data.collection.collection.idField);
+	      self.template.template(data.collection.collection.template.template);
+	      self.template.fieldsAttributes.removeAll();
+	      $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
+		    self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
+		  });
 	      self.fields.removeAll();
 	      $.each(data.collection.collection.fields, function(index, field) {
 	    	self.fields.push(ko.mapping.fromJS(field));
@@ -826,7 +832,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               } else {
                 row.push(ko.mapping.toJSON(item)); 
               }
-              var doc = {'id': item[self.collection.idField], 'row': row};
+              var doc = {'id': item[self.collection.idField()], 'row': row};
               self.results.push(doc);
             });
           }
