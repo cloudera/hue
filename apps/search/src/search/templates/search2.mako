@@ -496,13 +496,75 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
     <!-- ko if: $root.isEditing() -->
       <div class="widget-editor-section">
-        <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
+        <div class="row-fluid">
+          <div class="span9">
+            <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
+          </div>
+          <div class="span3">
+            <h5 class="editor-title">${_('Available Fields')}</h5>
+            <select data-bind="options: $root.collection.fields, optionsText: 'name', value: $root.collection.template.selectedVisualField" class="input-large chosen-select"></select>
+            <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFieldToVisual">
+              <i class="fa fa-plus"></i>
+            </button>
+
+            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h2>
+            <select id="visualFunctions" data-bind="value: $root.collection.template.selectedVisualFunction" class="input-large chosen-select">
+              <option title="${ _('Formats date or timestamp in DD-MM-YYYY') }" value="{{#date}} {{/date}}">{{#date}}</option>
+              <option title="${ _('Formats date or timestamp in HH:mm:ss') }" value="{{#time}} {{/time}}">{{#time}}</option>
+              <option title="${ _('Formats date or timestamp in DD-MM-YYYY HH:mm:ss') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
+              <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
+              <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+              <option title="${ _('Formats a Unix timestamp as Ns, Nmin, Ndays... ago') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
+              <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
+              <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
+              <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
+              <option title="${ _('Truncate a value after 100 characters') }" value="{{#truncate100}} {{/truncate100}}">{{#truncate100}}</option>
+              <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
+              <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
+            </select>
+            <button title="${ _('Click on this button to add the function') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFunctionToVisual">
+              <i class="fa fa-plus"></i>
+            </button>
+            <p class="muted" style="margin-top: 10px"></p>
+          </div>
+        </div>
       </div>
       <div class="widget-html-section" style="display: none">
-      <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
+        <div class="row-fluid">
+          <div class="span9">
+            <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
+          </div>
+          <div class="span3">
+            <h5 class="editor-title">${_('Available Fields')}</h2>
+            <select data-bind="options: $root.collection.fields, optionsText: 'name', value: $root.collection.template.selectedSourceField" class="input-medium chosen-select"></select>
+            <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFieldToSource">
+              <i class="fa fa-plus"></i>
+            </button>
+
+            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h2>
+            <select id="sourceFunctions" data-bind="value: $root.collection.template.selectedSourceFunction" class="input-medium chosen-select">
+              <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
+              <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
+              <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
+              <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
+              <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+              <option title="${ _('Shows the relative time') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
+              <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
+              <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
+              <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
+              <option title="${ _('Truncate a value after 100 characters') }" value="{{#truncate100}} {{/truncate100}}">{{#truncate100}}</option>
+              <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
+              <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
+            </select>
+            <button title="${ _('Click on this button to add the function') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFunctionToSource">
+              <i class="fa fa-plus"></i>
+            </button>
+            <p class="muted" style="margin-top: 10px"></p>
+          </div>
+        </div>
       </div>
       <div class="widget-css-section" style="display: none">
-      <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
+        <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
       </div>
     <!-- /ko -->
 
@@ -516,7 +578,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <!-- /ko -->
     
       <div id="result-container" data-bind="foreach: $root.results">
-        <div class="result-row" data-bind="html: $('<span>').html($('<span>').html($data).text()).text()"></div>
+        <div class="result-row" data-bind="html: $data"></div>
       </div>    
     
       <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
@@ -797,7 +859,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
-<link href="/static/ext/css/nv.d3.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -815,7 +878,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js"></script>
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 
@@ -1085,8 +1148,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   [contenteditable=true] {
+    border: 1px dotted #DDDDDD;
     outline: 0;
     margin-top: 20px;
+    margin-bottom: 20px;
+    min-height: 150px;
   }
 
   [contenteditable=true] [class*="span"], .tmpl [class*="span"] {
@@ -1116,6 +1182,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     background-color: #f9f9f9;
   }
 
+  .editor-title {
+    font-weight: bold;
+    color: #262626;
+    border-bottom: 1px solid #338bb8;
+  }
 
 </style>
 
@@ -1368,25 +1439,40 @@ $(document).ready(function () {
         }, 100);
       });
 
+      $(".chosen-select").chosen({
+        disable_search_threshold: 10,
+        width: "75%"
+      });
+
+      $(document).on("addFieldToVisual", function(e, field){
+        _el.focus();
+        pasteHtmlAtCaret("{{" + field.name() + "}}");
+      });
+
+      $(document).on("addFunctionToVisual", function(e, fn){
+        _el.focus();
+        pasteHtmlAtCaret(fn);
+      });
+
       function updateValues(){
-        $("[data-template]")[0].editor.setValue(_el.html());
+        $("[data-template]")[0].editor.setValue(stripHtmlFromFunctions(_el.html()));
         valueAccessor().data(_el.html());
       }
 
       function storeSelection() {
-      if (window.getSelection) {
-        // IE9 and non-IE
-        sel = window.getSelection();
-        if (sel.getRangeAt && sel.rangeCount) {
-          range = sel.getRangeAt(0);
-          _el.data("range", range);
+        if (window.getSelection) {
+          // IE9 and non-IE
+          sel = window.getSelection();
+          if (sel.getRangeAt && sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            _el.data("range", range);
+          }
+        }
+        else if (document.selection && document.selection.type != "Control") {
+          // IE < 9
+          _el.data("selection", document.selection);
         }
       }
-      else if (document.selection && document.selection.type != "Control") {
-        // IE < 9
-        _el.data("selection", document.selection);
-      }
-    }
 
     function pasteHtmlAtCaret(html) {
       var sel, range;
@@ -1443,11 +1529,29 @@ $(document).ready(function () {
       editor.refresh();
       var wrapperElement = $(editor.getWrapperElement());
 
-      var sourceDelay = -1;
       $(document).on("refreshCodemirror", function(){
         editor.setSize("100%", 450);
         editor.refresh();
-      })
+      });
+
+      $(document).on("addFieldToSource", function(e, field){
+        if ($(element).data("template") == "true"){
+          editor.replaceSelection("{{" + field.name() + "}}");
+        }
+      });
+
+      $(document).on("addFunctionToSource", function(e, fn){
+        if ($(element).data("template") == "true"){
+          editor.replaceSelection(fn);
+        }
+      });
+
+      $(".chosen-select").chosen({
+        disable_search_threshold: 10,
+        width: "75%"
+      });
+
+      var sourceDelay = -1;
       editor.on("change", function (cm) {
         clearTimeout(sourceDelay);
         var _cm = cm;
@@ -1470,7 +1574,7 @@ $(document).ready(function () {
             valueAccessor().data(_cm.getValue());
           }
           if ($(".widget-html-pill").parent().hasClass("active")){
-            $("[contenteditable=true]").html(valueAccessor().data());
+            $("[contenteditable=true]").html(stripHtmlFromFunctions(valueAccessor().data()));
           }
         }, 100);
       });
@@ -1489,7 +1593,9 @@ $(document).ready(function () {
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
   ko.applyBindings(viewModel);
 
-  viewModel.init();
+  viewModel.init(function(data){
+    $(".chosen-select").trigger("chosen:updated");
+  });
 });
 
   function toggleGridFieldsSelection() {

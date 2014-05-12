@@ -355,6 +355,34 @@ var Collection = function (vm, collection) {
   self.template.isGridLayout.subscribe(function () {
     vm.search();
   });
+
+  self.template.selectedVisualField = ko.observable();
+  self.template.selectedVisualFunction = ko.observable();
+  self.template.selectedVisualFunction.subscribe(function (newValue) {
+    var _vf = $("#visualFunctions");
+    _vf.siblings(".muted").text(_vf.find(":selected").attr("title"));
+  });
+  self.template.selectedSourceField = ko.observable();
+  self.template.selectedSourceFunction = ko.observable();
+  self.template.selectedSourceFunction.subscribe(function (newValue) {
+    var _sf = $("#sourceFunctions");
+    _sf.siblings(".muted").text(_sf.find(":selected").attr("title"));
+  });
+
+  self.template.addFieldToVisual = function () {
+    $(document).trigger("addFieldToVisual", self.template.selectedVisualField());
+  };
+  self.template.addFunctionToVisual = function () {
+    $(document).trigger("addFunctionToVisual", self.template.selectedVisualFunction());
+  };
+
+  self.template.addFieldToSource = function () {
+    $(document).trigger("addFieldToSource", self.template.selectedSourceField());
+  };
+  self.template.addFunctionToSource = function () {
+    $(document).trigger("addFunctionToSource", self.template.selectedSourceFunction());
+  };
+
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
     facet.field.subscribe(function () {
@@ -367,6 +395,7 @@ var Collection = function (vm, collection) {
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
   self.fields = ko.mapping.fromJS(collection.fields);
+
   self.availableFacetFields = ko.computed(function() {
     var facetFieldNames = $.map(self.facets(), function(facet) {
 	  return facet.field(); //filter out text_general
@@ -719,10 +748,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     return self.collection.availableFacetFields().length > 0;
   });
   
-  self.init = function () {
+  self.init = function (callback) {
     //self.collection.addDynamicFields();
     self.isEditing(true);
-    self.search();
+    self.search(callback);
   }
   
   self.searchBtn = function () {
@@ -730,7 +759,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.search();
   };
 
-  self.search = function () {
+  self.search = function (callback) {
     self.isRetrievingResults(true);
     $(".jHueNotify").hide();
     
@@ -766,6 +795,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         query: ko.mapping.toJSON(self.query),
         layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
+        callback(data);
         self.response(data);
         self.results.removeAll();
         if (data.error) {
@@ -793,6 +823,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             // Template view
             var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
             $.each(data.response.docs, function (index, item) {
+              for (var prop in item) {
+                if (item.hasOwnProperty(prop)) {
+                  item[prop] = $("<span>").html(item[prop]).text();
+                }
+              }
+              // fix the fields that contain dots in the name
               addTemplateFunctions(item);
               self.results.push(Mustache.render(_mustacheTmpl, item));
             });
