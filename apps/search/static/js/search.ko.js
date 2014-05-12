@@ -707,8 +707,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
   self.changeCollection = ko.observable(false);
   self.toggledGridlayoutResultChevron = ko.observable(false);
-  self.toggleGridlayoutResultChevron = function() {
-    self.toggledGridlayoutResultChevron(! self.toggledGridlayoutResultChevron());
+  self.enableGridlayoutResultChevron = function() {
+    self.toggledGridlayoutResultChevron(true);
+  };
+  self.disableGridlayoutResultChevron = function() {
+    self.toggledGridlayoutResultChevron(false);
   };
 
   self.previewColumns = ko.observable("");
