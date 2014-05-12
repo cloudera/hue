@@ -21,6 +21,12 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
+<script type="text/javascript">
+  if (window.location.hash != ""){
+    location.href = "/search/?" + window.location.hash.substr(1);
+  }
+</script>
+
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="padding-right:50px">
@@ -1384,7 +1390,6 @@ function mapChartDataTransformer(data) {
 
 
 $(document).ready(function () {
-
   $(document).on("showDoc", function(e, doc){
     viewModel.collection.selectedDocument(doc);
     $("#showDocModal").modal();
