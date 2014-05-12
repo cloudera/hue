@@ -327,9 +327,9 @@ var Query = function (vm, query) {
   
   self.paginate = function (direction) {
 	if (direction == 'next') {
-	  self.start(self.start() + vm.collection.template.rows());
+	  self.start(self.start() + vm.collection.template.rows() * 1.0);
 	} else {
-	  self.start(self.start() - vm.collection.template.rows());
+	  self.start(self.start() - vm.collection.template.rows() * 1.0);
 	}
 	vm.search();
   };

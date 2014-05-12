@@ -531,7 +531,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-left" data-bind="
-        visible: $data.response.start >= $root.collection.template.rows(),
+        visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
     </i>
   </a>  
@@ -551,7 +551,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-right" data-bind="
-        visible: ($root.collection.template.rows() + $data.response.start) < $data.response.numFound,
+        visible: ($root.collection.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
     </i>
   </a>  

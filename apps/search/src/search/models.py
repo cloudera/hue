@@ -284,12 +284,16 @@ class Collection(models.Model):
       props['collection']['name'] = self.name
     if self.label:
       props['collection']['label'] = self.label
+    if self.enabled is not None:
+      props['collection']['enabled'] = self.enabled
     # fields updated
     # idField
     
     # tmp for dev    
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
+    if 'enabled' not in props['collection']:
+      props['collection']['enabled'] = True
       
     return json.dumps(props)
 
