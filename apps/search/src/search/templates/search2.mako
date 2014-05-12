@@ -423,26 +423,22 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="resultset-widget">
   <!-- ko if: $root.collection.template.isGridLayout() -->
     <div style="float:left; margin-right: 10px" >
-      <span data-bind="visible: ! $root.collection.template.showFieldList()">
-        <a href="javascript: void(0)" class="btn"
-          data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
+      <div data-bind="visible: ! $root.collection.template.showFieldList()" style="padding-top: 5px; display: inline-block">
+        <a href="javascript: void(0)"  data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
           <i class="fa fa-chevron-right"></i>
         </a>
-      </span>
+      </div>
     </div>
-    <div data-bind="visible: $root.isEditing() || $root.collection.template.showFieldList()" style="float:left; margin-right: 10px" >
+    <div data-bind="visible: $root.collection.template.showFieldList()" style="float:left; margin-right: 10px; background-color: #F6F6F6; padding: 5px">
       <span data-bind="visible: $root.collection.template.showFieldList()">
-        <a href="javascript: void(0)" class="btn"
-          data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
-          <i class="fa fa-chevron-left"></i>
-        </a>
-        <strong>${ _('Fields') }</strong>      
-        &nbsp;
-        <a href="javascript: void(0)" class="btn"
-          data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }">
-          <i class="fa fa-square-o"></i>
-        </a>
-        <div data-bind="foreach: $root.collection.template.fieldsAttributes">
+        <div>
+          <strong>${ _('Fields') }</strong>
+          <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+        </div>
+        <input type="text" data-bind="value: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 88%; margin-bottom: 3px" />
+        <div data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto">
           <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
           <span data-bind="text: '&nbsp;' + name()"></span>
           <br/>
@@ -832,14 +828,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
   <div class="modal-body">
     <p>
-      <ul data-bind="foreach: $root.collection.template.filteredFieldsAttributes().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
+      <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
           class="unstyled inline fields-chooser">
         <li data-bind="click: addFacetDemiModalFieldPreview">
           <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}"></span>
           </span>
         </li>
       </ul>
-      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredFieldsAttributes().length == 0">
+      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredModalFields().length == 0">
         ${_('There are no fields matching your search term.')}
       </div>
     </p>

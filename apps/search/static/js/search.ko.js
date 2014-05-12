@@ -491,7 +491,9 @@ var Collection = function (vm, collection) {
 
   self.template.fieldsModalFilter = ko.observable(); // For UI
   self.template.fieldsModalType = ko.observable("");
-  self.template.filteredFieldsAttributes = ko.observableArray();
+  self.template.fieldsAttributesFilter = ko.observable(); // For UI
+  self.template.filteredModalFields = ko.observableArray();
+  self.template.filteredAttributeFields = ko.observableArray();
   self.template.availableWidgetFields = ko.computed(function() {
     return self.template.fieldsModalType() == 'histogram-widget'? vm.availableDateFields() : self.availableFacetFields();
   });
@@ -510,8 +512,26 @@ var Collection = function (vm, collection) {
         _fields.push(field);
       }
     });
-    self.template.filteredFieldsAttributes(_fields);
+    self.template.filteredModalFields(_fields);
   });
+
+  self.template.fieldsAttributesFilter.subscribe(function(value) {
+    var _fields = [];
+    var _availableFields = self.template.fieldsAttributes();
+
+    console.log(_availableFields);
+
+    $.each(_availableFields, function (index, field) {
+      if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
+        _fields.push(field);
+      }
+    });
+    console.log("fileds")
+    console.log(_fields);
+    self.template.filteredAttributeFields(_fields);
+  });
+
+  self.template.fieldsAttributesFilter("");
 
 
   self.updateFields = function() {
