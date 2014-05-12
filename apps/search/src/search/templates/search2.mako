@@ -1535,13 +1535,13 @@ $(document).ready(function () {
       });
 
       $(document).on("addFieldToSource", function(e, field){
-        if ($(element).data("template") == "true"){
+        if ($(element).data("template")){
           editor.replaceSelection("{{" + field.name() + "}}");
         }
       });
 
       $(document).on("addFunctionToSource", function(e, fn){
-        if ($(element).data("template") == "true"){
+        if ($(element).data("template")){
           editor.replaceSelection(fn);
         }
       });

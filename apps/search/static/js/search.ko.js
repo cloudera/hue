@@ -795,7 +795,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         query: ko.mapping.toJSON(self.query),
         layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
-        callback(data);
+        if (typeof callback != undefined && callback != null){
+          callback(data);
+        }
         self.response(data);
         self.results.removeAll();
         if (data.error) {
