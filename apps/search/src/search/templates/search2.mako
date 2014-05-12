@@ -456,20 +456,20 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
         <thead>
           <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
-            <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" >
-              <div style="float:left; width:20px;">
+            <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
+              <div style="display: inline-block; width:20px;">
               <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
                   <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
                   <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
               </a>
               </div>
-              <div style="float:left;">
+              <div style="display: inline-block;">
               <a href="javascript: void(0)" title="${ _('Click to sort') }">
                 <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
                 <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
               </a>
                 </div>
-              <div style="float:left; width:20px;">
+              <div style="display: inline-block; width:20px;">
               <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
                   <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
                 <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
