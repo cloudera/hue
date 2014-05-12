@@ -706,6 +706,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     return _facet;    
   };
   self.changeCollection = ko.observable(false);
+  self.toggledGridlayoutResultChevron = ko.observable(false);
+  self.toggleGridlayoutResultChevron = function() {
+    self.toggledGridlayoutResultChevron(! self.toggledGridlayoutResultChevron());
+  };
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable([]);

@@ -243,9 +243,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div class="row-header" data-bind="visible: $root.isEditing">
       <span class="muted">${_('Row')}</span>
       <div style="display: inline; margin-left: 60px">
-        <a href="javascript:void(0)" data-bind="visible:$index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
-        <a href="javascript:void(0)" data-bind="visible:$index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
-        <a href="javascript:void(0)" data-bind="visible:$parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
+        <a href="javascript:void(0)" data-bind="visible: $index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
+        <a href="javascript:void(0)" data-bind="visible: $index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
+        <a href="javascript:void(0)" data-bind="visible: $parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
     <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}">
@@ -457,12 +457,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <thead>
           <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
             <th data-bind="with: $root.collection.getTemplateField($data)" style="white-space: nowrap">
-              <a href="javascript: void(0)" data-bind="visible: $index() > 0, click: function(){ $root.collection.translateSelectedField($index(), 'left'); }"><i class="fa fa-chevron-left"></i></a>
-              <a href="javascript: void(0)" title="${ _('Sort') }">
-                <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+              <a href="javascript: void(0)" data-bind="visible: $index() > 0, 
+                  click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
+                  <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron"></i>
+              </a>
+              <a href="javascript: void(0)" title="${ _('Click to sort') }">
+                <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout, event: { mouseover: $root.toggleGridlayoutResultChevron, mouseout: $root.toggleGridlayoutResultChevron }"></span>
                 <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
               </a>
-              <a href="javascript: void(0)" data-bind="visible: $index() < $root.collection.template.fields().length - 1, click: function(){ $root.collection.translateSelectedField($index(), 'right'); }"><i class="fa fa-chevron-right"></i></a>
+              <a href="javascript: void(0)" data-bind="visible: $index() < $root.collection.template.fields().length - 1,
+                  click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
+                  <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron"></i>
+              </a>
             </th>
           </tr>
           <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
@@ -494,7 +500,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Properties')}</a></li>
       </ul>
     </div>
-
 
     <!-- ko if: $root.isEditing() -->
       <div class="widget-editor-section">

@@ -74,7 +74,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a> &nbsp;
         <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </div>
-      <h4><i class="fa fa-list"></i> <span data-bind="text: label"></span></h4>
+      <h4><img src="/search/static/art/icon_search_24.png"/> <span data-bind="text: label"></span></h4>
     </li>
   </script>
   </div>
