@@ -489,19 +489,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <!-- ko ifnot: $root.collection.template.isGridLayout() -->
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <ul class="nav nav-pills">
-        <li class="active">
-          <a href="javascript: void(0)" class="widget-main-pill">${_('Editor')}</a>
-        </li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('HTML')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('CSS & Js')}</a></li>
+        <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
       </ul>
     </div>
 
+
     <!-- ko if: $root.isEditing() -->
-      <textarea data-bind="value: $root.collection.template.template, codemirror: { 'lineNumbers': true, 'htmlMode': true, 'mode': 'text/html' }"></textarea>
-      <br/>
-      <textarea data-bind="value: $root.collection.template.extracode, codemirror: { 'lineNumbers': true, 'htmlMode': true, 'mode': 'text/html' }"></textarea>
-      <br/>      
+      <div class="widget-editor-section">
+        <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
+      </div>
+      <div class="widget-html-section" style="display: none">
+      <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
+      </div>
+      <div class="widget-css-section" style="display: none">
+      <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
+      </div>
     <!-- /ko -->
 
     <div style="overflow-x: auto">
@@ -1078,6 +1082,42 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     cursor: pointer;
   }
 
+  .CodeMirror {
+    border: 1px dotted #DDDDDD;
+  }
+
+  [contenteditable=true] {
+    outline: 0;
+    margin-top: 20px;
+  }
+
+  [contenteditable=true] [class*="span"], .tmpl [class*="span"] {
+    background-color: #eee;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    min-height: 40px;
+    line-height: 40px;
+    background-color: #F3F3F3;
+    border: 2px dashed #DDD;
+  }
+
+  .tmpl {
+    margin: 10px;
+    height: 60px;
+  }
+
+  .tmpl [class*="span"] {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .preview-row:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
 
 </style>
 
@@ -1247,9 +1287,28 @@ $(document).ready(function () {
     $(this).parent().addClass("active");
   });
 
-  $(document).on("click", ".widget-main-pill", function(){
-    $(this).parents(".card-body").find(".widget-settings-section").hide();
-    $(this).parents(".card-body").find(".widget-main-section").show();
+  $(document).on("click", ".widget-editor-pill", function(){
+    $(this).parents(".card-body").find(".widget-html-section").hide();
+    $(this).parents(".card-body").find(".widget-css-section").hide();
+    $(this).parents(".card-body").find(".widget-editor-section").show();
+    $(this).parent().siblings().removeClass("active");
+    $(this).parent().addClass("active");
+  });
+
+  $(document).on("click", ".widget-html-pill", function(){
+    $(this).parents(".card-body").find(".widget-editor-section").hide();
+    $(this).parents(".card-body").find(".widget-css-section").hide();
+    $(this).parents(".card-body").find(".widget-html-section").show();
+    $(document).trigger("refreshCodemirror");
+    $(this).parent().siblings().removeClass("active");
+    $(this).parent().addClass("active");
+  });
+
+  $(document).on("click", ".widget-css-pill", function(){
+    $(this).parents(".card-body").find(".widget-editor-section").hide();
+    $(this).parents(".card-body").find(".widget-html-section").hide();
+    $(this).parents(".card-body").find(".widget-css-section").show();
+    $(document).trigger("refreshCodemirror");
     $(this).parent().siblings().removeClass("active");
     $(this).parent().addClass("active");
   });
@@ -1288,17 +1347,109 @@ $(document).ready(function () {
     return result;
   };
 
+  ko.bindingHandlers.freshereditor = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var _el = $(element);
+      var options = $.extend(valueAccessor(), {});
+      _el.html(options.data());
+      _el.freshereditor({
+        excludes: ['strikethrough', 'removeFormat', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']
+      });
+      _el.freshereditor("edit", true);
+      _el.on("mouseup", function () {
+        storeSelection();
+        updateValues();
+      });
+
+      var sourceDelay = -1;
+      _el.on("keyup", function () {
+        clearTimeout(sourceDelay);
+        storeSelection();
+        sourceDelay = setTimeout(function () {
+          updateValues();
+        }, 100);
+      });
+
+      function updateValues(){
+        $("[data-template]")[0].editor.setValue(_el.html());
+        valueAccessor().data(_el.html());
+      }
+
+      function storeSelection() {
+      if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          _el.data("range", range);
+        }
+      }
+      else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        _el.data("selection", document.selection);
+      }
+    }
+
+    function pasteHtmlAtCaret(html) {
+      var sel, range;
+      if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          if (_el.data("range")) {
+            range = _el.data("range");
+          }
+          else {
+            range = sel.getRangeAt(0);
+          }
+          range.deleteContents();
+
+          // Range.createContextualFragment() would be useful here but is
+          // non-standard and not supported in all browsers (IE9, for one)
+          var el = document.createElement("div");
+          el.innerHTML = html;
+          var frag = document.createDocumentFragment(), node, lastNode;
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      } else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        if (_el.data("selection")) {
+          _el.data("selection").createRange().pasteHTML(html);
+        }
+        else {
+          document.selection.createRange().pasteHTML(html);
+        }
+      }
+    }
+    }
+  };
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var options = $.extend(valueAccessor(), {});
       var editor = CodeMirror.fromTextArea(element, options);
       element.editor = editor;
-      editor.setValue(allBindingsAccessor().value());
+      editor.setValue(options.data());
       editor.refresh();
       var wrapperElement = $(editor.getWrapperElement());
 
       var sourceDelay = -1;
+      $(document).on("refreshCodemirror", function(){
+        editor.setSize("100%", 450);
+        editor.refresh();
+      })
       editor.on("change", function (cm) {
         clearTimeout(sourceDelay);
         var _cm = cm;
@@ -1308,16 +1459,22 @@ $(document).ready(function () {
             var parser = new less.Parser();
             $(_enc.find("style")).each(function(cnt, item){
               var _less = "#result-container {" + $(item).text() + "}";
-              parser.parse(_less, function (err, tree) {
-                $(item).text(tree.toCSS());
-              });
+              try {
+                parser.parse(_less, function (err, tree) {
+                  $(item).text(tree.toCSS());
+                });
+              }
+              catch (e){}
             });
-            allBindingsAccessor().value(_enc.html());
+            valueAccessor().data(_enc.html());
           }
           else {
-            allBindingsAccessor().value(_cm.getValue());
+            valueAccessor().data(_cm.getValue());
           }
-        }, 500);
+          if ($(".widget-html-pill").parent().hasClass("active")){
+            $("[contenteditable=true]").html(valueAccessor().data());
+          }
+        }, 100);
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
