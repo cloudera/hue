@@ -519,36 +519,33 @@ var Collection = function (vm, collection) {
     var _fields = [];
     var _availableFields = self.template.fieldsAttributes();
 
-    console.log(_availableFields);
-
     $.each(_availableFields, function (index, field) {
       if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
         _fields.push(field);
       }
     });
-    console.log("fileds")
-    console.log(_fields);
+    
     self.template.filteredAttributeFields(_fields);
   });
 
   self.template.fieldsAttributesFilter("");
-
 
   self.updateFields = function() {
     $.post("/search/get_collection/", {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
-	      self.idField(data.collection.collection.idField);
+	      self.idField(data.collection.collection.idField);	      
 	      self.template.template(data.collection.collection.template.template);
 	      self.template.fieldsAttributes.removeAll();
 	      $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
 		    self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-		  });
+		  });	      
 	      self.fields.removeAll();
 	      $.each(data.collection.collection.fields, function(index, field) {
 	    	self.fields.push(ko.mapping.fromJS(field));
 	      });
+	      self.template.fieldsAttributesFilter.valueHasMutated();
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {});
   };
