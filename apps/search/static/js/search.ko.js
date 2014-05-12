@@ -928,4 +928,5 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+
 };

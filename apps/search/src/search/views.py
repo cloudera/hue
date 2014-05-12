@@ -156,31 +156,22 @@ def save(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def download(request, format):
-  hue_collections = SearchController(request.user).get_search_collections()
-
-  if not hue_collections:
-    raise PopupException(_("No collection to download."))
-
-  init_collection = initial_collection(request, hue_collections)
-
-  search_form = QueryForm(request.GET, initial_collection=init_collection)
-
-  if search_form.is_valid():
-    try:
-      collection_id = search_form.cleaned_data['collection']
-      hue_collection = Collection.objects.get(id=collection_id)
-
-      solr_query = search_form.solr_query_dict
-      response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
-
-      LOG.debug('Download results for query %s' % smart_str(solr_query))
-
-      return export_download(response, format)
-    except Exception, e:
-      raise PopupException(_("Could not download search results: %s") % e)
-  else:
-    raise PopupException(_("Could not download search results: %s") % search_form.errors)
+def download(request):
+  
+  try:
+    file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
+    response = search(request)
+    
+    if file_format == 'json':
+      mimetype = 'application/json'
+      json_docs = json.dumps(json.loads(response.content)['response']['docs'])
+      resp = HttpResponse(json_docs, mimetype=mimetype)
+      resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
+      return resp    
+    
+    return export_download(json.loads(response.content), file_format)
+  except Exception, e:
+    raise PopupException(_("Could not download search results: %s") % e)
 
 
 def no_collections(request):

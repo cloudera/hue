@@ -25,7 +25,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   % if user.is_superuser:
     <div class="pull-right" style="padding-right:50px">
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"  data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cog"></i></button>
+      ## for enable, live search, max number of downloads, change solr
       <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-link"></i></button>
       &nbsp;&nbsp;&nbsp;            
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
@@ -618,16 +620,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </i>
   </a>  
   
-  <span class="pull-right" data-bind="visible: $data.response.numFound > 0 && $data.response.numFound <= 1000">
-    <a class="btn" href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv"></i></a>
-    <a class="btn" href="javascript:void(0)" id="download-xls"><i class="hfo hfo-file-xls"></i></a>
+  <!-- ko if: $data.response.numFound > 0 && $data.response.numFound <= 1000 -->
+  <span class="pull-right">
+    <form method="POST" action="${ url('search:download') }">
+      <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+      <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+      <button class="btn" type="submit" name="json" title="${ _('Download as JSON') }"><i class="hfo hfo-file-json"></i></button>
+      <button class="btn" type="submit" name="csv" title="${ _('Download as CSV') }"><i class="hfo hfo-file-csv"></i></button>
+      <button class="btn" type="submit" name="xls" title="${ _('Download as Excel') }"><i class="hfo hfo-file-xls"></i></button>
+    </form>
   </span>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="histogram-widget">
   <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
     <a data-bind="click: showAddFacetDemiModal" class="btn" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-  <!-- /ko -->text
+  <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
