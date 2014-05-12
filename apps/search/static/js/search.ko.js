@@ -21,17 +21,19 @@ var Column = function (size, rows) {
   var self = this;
   self.size = ko.observable(size);
   self.rows = ko.observableArray(rows);
+  self.drops = ko.observableArray(["temp"]);
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
   });
   self.addEmptyRow = function () {
-    self.addRow();
+    return self.addRow();
   };
   self.addRow = function (row) {
     if (typeof row == "undefined" || row == null) {
       row = new Row([]);
     }
     self.rows.push(row);
+    return row;
   };
 }
 

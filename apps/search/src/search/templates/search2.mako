@@ -227,8 +227,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div data-bind="css: klass">
     <div data-bind="template: { name: 'row-template', foreach: rows}">
     </div>
-    <div style="height: 50px; padding-left: 6px" data-bind="visible: $root.isEditing">
-      <a href="javascript:void(0)" class="btn" style="margin: 4px; margin-right: 10px" data-bind="click: addEmptyRow"><i class="fa fa-plus"></i> ${_('Row')}</a>
+    <div class="container-fluid" data-bind="visible: $root.isEditing">
+      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
     </div>
   </div>
 </script>
@@ -1195,6 +1195,27 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     font-weight: bold;
     color: #262626;
     border-bottom: 1px solid #338bb8;
+  }
+
+  .add-row {
+    background-color: #EEE;
+    min-height: 40px;
+    border: 2px dashed #CCC;
+    text-align: center;
+    padding: 4px;
+  }
+
+  .add-row:before {
+    color:#CCC;
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 48px;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f055";
   }
 
 </style>
