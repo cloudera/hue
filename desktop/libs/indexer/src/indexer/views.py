@@ -14,3 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import logging
+
+from desktop.lib.django_util import render
+
+
+LOG = logging.getLogger(__name__)
+
+
+def collections(request, is_redirect=False):
+  return render('collections.mako', request, {})

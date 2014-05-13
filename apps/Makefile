@@ -47,8 +47,7 @@ APPS := about \
   sqoop \
   zookeeper \
   rdbms \
-  spark \
-  collectionmanager
+  spark
 
 ################################################
 # Install all applications into the Desktop environment
@@ -124,8 +123,7 @@ I18N_APPS := about \
   sqoop \
   zookeeper \
   rdbms \
-  spark \
-  collectionmanager
+  spark
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)

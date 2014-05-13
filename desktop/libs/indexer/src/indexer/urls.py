@@ -17,11 +17,11 @@
 
 from django.conf.urls.defaults import patterns, url
 
-urlpatterns = patterns('collectionmanager.views',
+urlpatterns = patterns('indexer.views',
   url(r'^$', 'collections', name='index')
 )
 
-urlpatterns += patterns('collectionmanager.api',
+urlpatterns += patterns('indexer.api',
   url(r'^api/fields/parse/$', 'parse_fields', name='api_parse_fields'),
   url(r'^api/schema/example/$', 'example_schema', name='api_example_schema'),
   url(r'^api/collections/$', 'collections', name='api_collections'),

@@ -222,7 +222,7 @@ var CreateCollectionViewModel = function() {
   self.parseFields = function() {
     if (self.source() == 'file') {
       self.isLoading(true);
-      return $.post("/collectionmanager/api/fields/parse/", {
+      return $.post("/indexer/api/fields/parse/", {
         'source': self.source(),
         'type': self.sourceType(),
         'path': self.file(),
@@ -265,7 +265,7 @@ var CreateCollectionViewModel = function() {
   self.fetchExampleSchema = function() {
     self.isLoading(true);
     var collection = ko.mapping.toJS(self.collection);
-    return $.post("/collectionmanager/api/schema/example/", {
+    return $.post("/indexer/api/schema/example/", {
       'collection': ko.mapping.toJSON(collection)
     }).done(function(data) {
       if (data.status == 0) {
@@ -291,14 +291,14 @@ var CreateCollectionViewModel = function() {
       });
       switch(self.source()) {
         case 'file':
-        return $.post("/collectionmanager/api/collections/create/", {
+        return $.post("/indexer/api/collections/create/", {
           'collection': ko.mapping.toJSON(collection),
           'type': self.sourceType(),
           'path': self.file(),
           'source': self.source()
         }).done(function(data) {
           if (data.status == 0) {
-            window.location.href = '/collectionmanager';
+            window.location.href = '/indexer';
           } else {
             $(document).trigger("error", data.message);
           }
@@ -310,14 +310,14 @@ var CreateCollectionViewModel = function() {
         });
 
         case 'hive':
-        return $.post("/collectionmanager/api/collections/create/", {
+        return $.post("/indexer/api/collections/create/", {
           'collection': ko.toJSON(collection),
           'database': self.hive.database().name(),
           'table': self.hive.table().name(),
           'source': self.source()
         }).done(function(data) {
           if (data.status == 0) {
-            window.location.href = '/collectionmanager';
+            window.location.href = '/indexer';
           } else {
             $(document).trigger("error", data.message);
           }
@@ -354,7 +354,7 @@ var EditCollectionViewModel = function() {
   self.fetchFields = function() {
     if (self.collection()) {
       self.isLoading(true);
-      return $.get("/collectionmanager/api/collections/" + self.collection().name() + "/metadata/").done(function(data) {
+      return $.get("/indexer/api/collections/" + self.collection().name() + "/metadata/").done(function(data) {
         if (data.status == 0) {
           self.collection().fields(inferFields(data.fields, self.collection()));
           self.collection().uniqueKeyField(data.unique_key);
@@ -374,7 +374,7 @@ var EditCollectionViewModel = function() {
   self.updateCollection = function() {
     self.isLoading(true);
     var data = ko.mapping.toJS(self.collection);
-    return $.post("/collectionmanager/api/collections/" + self.collection().name() + "/update/", {
+    return $.post("/indexer/api/collections/" + self.collection().name() + "/update/", {
       'collection': ko.mapping.toJSON(data),
       'type': self.sourceType()
     }).done(function(data) {
@@ -422,7 +422,7 @@ var ManageCollectionsViewModel = function() {
 
   self.importCollection = function(collection, e) {
     self.isLoading(true);
-    return $.post("/collectionmanager/api/collections/import/", {
+    return $.post("/indexer/api/collections/import/", {
       'collection': ko.mapping.toJSON(collection)
     }).done(function(data) {
       self.isLoading(false);
@@ -441,7 +441,7 @@ var ManageCollectionsViewModel = function() {
 
   self.addData = function(collection, path) {
     self.isLoading(true);
-    return $.post("/collectionmanager/api/collections/" + collection.name() + "/data/", {
+    return $.post("/indexer/api/collections/" + collection.name() + "/data/", {
       'collection': ko.mapping.toJSON(collection),
       'source': 'file',
       'path': path
@@ -457,7 +457,7 @@ var ManageCollectionsViewModel = function() {
 
   self.fetchCollections = function() {
     self.isLoading(true);
-    return $.get("/collectionmanager/api/collections/").done(function(data) {
+    return $.get("/indexer/api/collections/").done(function(data) {
       if (data.status == 0) {
         var collections = [];
         ko.utils.arrayForEach(data.collections, function(collection) {
@@ -484,7 +484,7 @@ var ManageCollectionsViewModel = function() {
     if (collections.length == 0) {
       collections = ($.isArray(collection)) ? collection : [collection];
     }
-    return $.post("/collectionmanager/api/collections/remove/", {
+    return $.post("/indexer/api/collections/remove/", {
       'collections': ko.mapping.toJSON(collections)
     }).done(function(data) {
       if (data.status == 0) {

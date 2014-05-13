@@ -1,4 +1,3 @@
-#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,11 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+from setuptools import setup, find_packages
+from hueversion import VERSION
 
-ifeq ($(ROOT),)
-  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
-endif
-
-APP_NAME = collectionmanager
-include $(ROOT)/Makefile.sdk
+setup(
+      name = "indexer",
+      version = VERSION,
+      author = "Hue",
+      url = 'http://github.com/cloudera/hue',
+      description = "Collections manager for Cloudera Search",
+      packages = find_packages('src'),
+      package_dir = {'': 'src'},
+      install_requires = ['setuptools', 'desktop'],
+      entry_points = { 'desktop.sdk.application': 'indexer=indexer' },
+)

@@ -46,7 +46,8 @@ APPS := core \
 	libs/librdbms \
 	libs/libopenid \
 	libs/liboauth \
-	libs/libsolr
+	libs/libsolr \
+	libs/indexer
 
 .PHONY: default
 default:: hue syncdb

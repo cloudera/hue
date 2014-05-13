@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,17 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from setuptools import setup, find_packages
-from hueversion import VERSION
 
-setup(
-      name = "collectionmanager",
-      version = VERSION,
-      author = "Hue",
-      url = 'http://github.com/cloudera/hue',
-      description = "Collections manager for Cloudera Search",
-      packages = find_packages('src'),
-      package_dir = {'': 'src'},
-      install_requires = ['setuptools', 'desktop'],
-      entry_points = { 'desktop.sdk.application': 'collectionmanager=collectionmanager' },
-)
+DJANGO_APPS = [ "indexer" ]
+NICE_NAME = "Collection Manager"
+REQUIRES_HADOOP = False
+MENU_INDEX = 43
+ICON = "/search/static/art/icon_search_24.png"
+
+IS_URL_NAMESPACED = True

@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
 
-from collectionmanager import conf
+from indexer import conf
 
 LOG = logging.getLogger(__name__)
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'

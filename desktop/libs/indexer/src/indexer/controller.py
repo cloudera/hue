@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from collectionmanager import conf, utils
+from indexer import conf, utils
 
 
 LOG = logging.getLogger(__name__)

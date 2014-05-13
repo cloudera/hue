@@ -22,9 +22,9 @@
 <%namespace name="macros" file="macros.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Collection Manager'), "collectionmanager", user, "29px") | n,unicode }
+${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
-<link rel="stylesheet" href="/collectionmanager/static/css/admin.css">
+<link rel="stylesheet" href="/indexer/static/css/admin.css">
 <style type="text/css">
   #collections {
     list-style-type: none;
@@ -86,7 +86,7 @@ ${ commonheader(_('Collection Manager'), "collectionmanager", user, "29px") | n,
 
 
 <div class="search-bar" style="height: 30px">
-  <h4><a href="/collectionmanager">${_('Collection Manager')}</a></h4>
+  <h4><a href="/indexer">${_('Collection Manager')}</a></h4>
 </div>
 
 
@@ -380,8 +380,8 @@ ${ commonheader(_('Collection Manager'), "collectionmanager", user, "29px") | n,
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/collectionmanager/static/js/lib.js" type="text/javascript" charset="utf-8"></script>
-<script src="/collectionmanager/static/js/collections.js" type="text/javascript" charset="utf-8"></script>
+<script src="/indexer/static/js/lib.js" type="text/javascript" charset="utf-8"></script>
+<script src="/indexer/static/js/collections.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 
