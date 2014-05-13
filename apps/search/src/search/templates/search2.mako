@@ -1198,7 +1198,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .add-row {
-    background-color: #EEE;
+    background-color: #F6F6F6;
     min-height: 40px;
     border: 2px dashed #CCC;
     text-align: center;
@@ -1206,7 +1206,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .add-row:before {
-    color:#CCC;
+    color:#EEE;
     display: inline-block;
     font-family: FontAwesome;
     font-style: normal;
