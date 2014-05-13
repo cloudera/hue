@@ -31,6 +31,7 @@ from thrift.transport.TSSLSocket import TSSLSocket
 from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
@@ -80,7 +81,8 @@ class ConnectionConfig(object):
                certfile=None,
                validate=False,
                timeout_seconds=45,
-               transport='buffered'):
+               transport='buffered',
+               multiple=False):
     """
     @param klass The thrift client class
     @param host Host to connect to
@@ -100,6 +102,7 @@ class ConnectionConfig(object):
     @param validate Validate the certificate received from server
     @param timeout_seconds Timeout for thrift calls
     @param transport string representation of thrift transport to use
+    @param multiple Whether Use MultiplexedProtocol
     """
     self.klass = klass
     self.host = host
@@ -117,10 +120,11 @@ class ConnectionConfig(object):
     self.validate = validate
     self.timeout_seconds = timeout_seconds
     self.transport = transport
+    self.multiple = multiple
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
-                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport]))
+                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport, self.multiple]))
 
 class ConnectionPooler(object):
   """
@@ -260,6 +264,8 @@ def connect_to_thrift(conf):
     transport = TBufferedTransport(sock)
 
   protocol = TBinaryProtocol(transport)
+  if conf.multiple:
+    protocol = TMultiplexedProtocol(protocol, conf.service_name)
   service = conf.klass(protocol)
   return service, protocol, transport
 
