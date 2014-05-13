@@ -524,19 +524,21 @@ def query_suggest(request, collection_id, query=""):
 
 
 # TODO security
-def index_fields_dynamic(request, collection_id):  
+def index_fields_dynamic(request):  
   result = {'status': -1, 'message': 'Error'}
-
-  solr_query = {}
   
   try:
-    hue_collection = Collection.objects.get(id=collection_id)
-    solr_query['collection'] = hue_collection.name
+    name = request.POST['name']
+            
+    hue_collection = Collection(name=name, label=name)    
     
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
-    print dynamic_fields['fields']
+
     result['message'] = ''
-    result['dynamic_fields'] = [name for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
+    result['fields'] = [Collection._make_field(name, properties)
+                        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
+    result['gridlayout_header_fields'] = [Collection._make_gridlayout_header_field({'name': name}, True) 
+                                          for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")

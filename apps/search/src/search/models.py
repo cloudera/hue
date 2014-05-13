@@ -316,7 +316,7 @@ class Collection(models.Model):
       </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]), 
       "isGridLayout": True,
       "showFieldList": True,
-      "fieldsAttributes": [{'name': field['name'], 'sort': {'direction': None}} for field in fields], # sort priority, asc/desc/none
+      "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "rows": 10,
     }
@@ -329,6 +329,19 @@ class Collection(models.Model):
       'fields': fields, 'idField': id_field, 
     }          
 
+  @classmethod
+  def _make_field(cls, field, attributes):
+    return {
+        'name': str(field),
+        'type': str(attributes.get('type', '')),
+        'isId': attributes.get('required') and attributes.get('uniqueKey'),
+        'isDynamic': 'dynamicBase' in attributes
+    }
+  
+  @classmethod
+  def _make_gridlayout_header_field(cls, field, isDynamic=False):
+    return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
+
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
 
@@ -339,12 +352,7 @@ class Collection(models.Model):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
 
-    return sorted([{
-        'name': str(field),
-        'type': str(attributes.get('type', '')),
-        'isId': attributes.get('required') and attributes.get('uniqueKey'),
-      } for field, attributes in schema_fields.iteritems()]
-    )
+    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
 
   @property
   def properties_dict(self):

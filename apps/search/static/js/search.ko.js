@@ -546,10 +546,20 @@ var Collection = function (vm, collection) {
 	});
   }
 
-  function syncArray(currentObservable, newJson) {
+  function syncArray(currentObservable, newJson, isDynamic) {
     // Get names of fields
-    var _currentFieldsNames = $.map(currentObservable(), function(field){ return field.name(); });
-    var _newFieldsNames = $.map(newJson, function(field){ return field.name; });
+    var _currentFieldsNames = $.map(
+        $.grep(currentObservable(), function(field) {
+    	    return field.isDynamic() == isDynamic;
+    	  }), function(field) {
+    	return field.name(); 
+    });
+    var _newFieldsNames = $.map(
+    	$.grep(newJson, function(field) {
+    	  return field.isDynamic == isDynamic;
+        }), function(field) {
+    	return field.name;
+    });
       
     var _toDelete = diff(_currentFieldsNames, _newFieldsNames);
     var _toAdd = diff(_newFieldsNames, _currentFieldsNames);
@@ -573,25 +583,23 @@ var Collection = function (vm, collection) {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
-	      self.idField(data.collection.collection.idField);	   // template?   
-
-	      syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes);	      
-	      syncArray(self.fields, data.collection.collection.fields);
+	      self.idField(data.collection.collection.idField);   
+	      syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);	      
+	      syncArray(self.fields, data.collection.collection.fields, false);
 	    }
+	    // After sync the dynamic fields
+	    self.syncDynamicFields()
 	}).fail(function (xhr, textStatus, errorThrown) {});
   };
-  // syncDynamicFields
   
-  self.addDynamicFields = function () { // + Adding merge smartly if schema updated
-    $.post("/search/index/" + self.id + "/fields/dynamic", {
+  self.syncDynamicFields = function () {
+    $.post("/search/index/fields/dynamic", {
+    	name: self.name()
       }, function (data) {
-      if (data.status == 0) {
-        $.each(data.dynamic_fields, function (index, field) {
-          if (self.fields.indexOf(field) == -1) {
-            self.fields.push(field);
-          }
-        });
-      }
+        if (data.status == 0) {
+  	      syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);	      
+	      syncArray(self.fields, data.fields, true);
+        }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
@@ -812,7 +820,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   });
   
   self.init = function (callback) {
-    //self.collection.addDynamicFields();
+    //self.collection.syncDynamicFields();
 	self.collection.syncFields();
     self.isEditing(true);
     self.search(callback);
