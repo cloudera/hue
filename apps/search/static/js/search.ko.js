@@ -521,7 +521,7 @@ var Collection = function (vm, collection) {
     self.template.filteredModalFields(_fields);
   });
 
-  self.updateCollection = function() {
+  self.switchCollection = function() {
     $.post("/search/get_collection/", {
         name: self.name()
 	  }, function (data) {
@@ -540,46 +540,43 @@ var Collection = function (vm, collection) {
 	}).fail(function (xhr, textStatus, errorThrown) {});
   };
   
+  function diff(A, B) {
+	return A.filter(function (a) {
+	  return B.indexOf(a) == -1;
+	});
+  }
+
+  function syncArray(currentObservable, newJson) {
+    // Get names of fields
+    var _currentFieldsNames = $.map(currentObservable(), function(field){ return field.name(); });
+    var _newFieldsNames = $.map(newJson, function(field){ return field.name; });
+      
+    var _toDelete = diff(_currentFieldsNames, _newFieldsNames);
+    var _toAdd = diff(_newFieldsNames, _currentFieldsNames);
+
+    // Deleted fields
+    $.each(currentObservable(), function(index, field) {
+      if (_toDelete.indexOf(field.name()) != -1) {
+        currentObservable.remove(field);
+      }
+    });
+    // New fields
+    $.each(newJson, function(index, field) {
+  	 if (_toAdd.indexOf(field.name) != -1) {
+        currentObservable.push(ko.mapping.fromJS(field));
+      }
+    });
+  }  
+  
   self.syncFields = function() {
     $.post("/search/get_collection/", {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
-	      self.idField(data.collection.collection.idField);	      
-	      
-	      var _newNames = $.map(data.collection.collection.template.fieldsAttributes, function(field){ return field.name; });
-	      var _newFields = [];
-	      
-	      self.template.fieldsAttributes.removeAll();
-	      
-	      $.each(self.template.fieldsAttributes(), function(index, field) {//alert(ko.mapping.toJSON(field));
-	        if (_newNames.indexOf(field.name()) == -1) {
-	          self.template.fieldsAttributes.remove(field);
-	        } else {
-//	          _newFields.push(ko.mapping.fromJS(field));
-	          self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-	        }
-	      });
-	      
-	      self.fields.removeAll();
+	      self.idField(data.collection.collection.idField);	   // template?   
 
-	      alert('aa');
-	      /**ko.utils.arrayForEach(differences, function(difference) {
-	        if (difference.status === "added") {
-	        	self.template.fieldsAttribute.push()
-	        } else if (difference.status === "deleted") {
-	          results.push(difference.value);
-	        }
-	      });
-	      
-	      $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
-		    self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-		  });	      
-	      self.fields.removeAll();
-	      $.each(data.collection.collection.fields, function(index, field) {
-	    	self.fields.push(ko.mapping.fromJS(field));
-	      });
-	      self.template.fieldsAttributesFilter.valueHasMutated();*/
+	      syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes);	      
+	      syncArray(self.fields, data.collection.collection.fields);
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {});
   };
@@ -739,7 +736,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   if (initial_json.collections) {
     self.collection.name.subscribe(function (newValue) {
 	  self.collection.label(newValue);
-	  self.collection.updateCollection();
+	  self.collection.switchCollection();
 	  self.changeCollection(false);
 	  self.search();
     });
@@ -816,7 +813,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   
   self.init = function (callback) {
     //self.collection.addDynamicFields();
-	//self.collection.syncFields();
+	self.collection.syncFields();
     self.isEditing(true);
     self.search(callback);
   }
