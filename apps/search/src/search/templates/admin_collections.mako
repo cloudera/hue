@@ -29,12 +29,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <div class="search-bar" style="height: 30px">
     <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
     <a class="btn" href="${ url('search:new_search') }"><i class="fa fa-file-o"></i> ${ _('New dasboard') }</a>
-    <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()">
+    <button type="button" class="btn importBtn">
       <i class="fa fa-plus-circle"></i> ${ _('Import Index') }
-      </button>
-    <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()">
+    </button>
+    <a class="btn importBtn" href="${ url('indexer:collections') }">
       <i class="fa fa-plus-circle"></i> ${ _('Create Index') }
-      </button>
+    </a>
     </div>
   <h4>${_('Dashboards')}</h4>
 </div>

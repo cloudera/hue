@@ -37,7 +37,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-link"></i></button>
       &nbsp;&nbsp;&nbsp;            
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
-      <a class="btn" href="${ url('indexer:collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
+      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
     </div>
   % endif
   
