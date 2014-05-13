@@ -448,7 +448,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0; width: 100%">
         <thead>
           <tr data-bind="visible: $root.results().length > 0">
-            <th style="width: 30px">&nbsp;</th>
+            <th style="width: 18px">&nbsp;</th>
             <!-- ko foreach: $root.collection.template.fieldsSelected -->
             <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
               <div style="display: inline-block; width:20px;">
@@ -473,6 +473,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             <!-- /ko -->
           </tr>
           <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
+            <th style="width: 18px">&nbsp;</th>
             <th>${ ('Document') }</th>
           </tr>
         </thead>
@@ -815,30 +816,26 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Choose field')}
-      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'"
-       placeholder="${_('Filter fields')}" class="input-xlarge" />
-    </h3>
-  </div>
   <div class="modal-body">
-    <p>
-      <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })"
-          class="unstyled inline fields-chooser">
+    <div style="float: left; margin-right: 10px;text-align: center">
+      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input-small" style="float: left" /><br/>
+    </div>
+    <div>
+      <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.collection.template.filteredModalFields().length > 0"
+          class="unstyled inline fields-chooser" style="height: 70px; overflow-y: auto">
         <li data-bind="click: addFacetDemiModalFieldPreview">
           <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}"></span>
           </span>
         </li>
       </ul>
-      <div class="alert alert-info" data-bind="visible: $root.collection.template.filteredModalFields().length == 0">
+      <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 124px;height: 42px;line-height: 42px">
         ${_('There are no fields matching your search term.')}
       </div>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <input type="button" class="btn disabled" data-dismiss="modal" value="${_('Pick!')}" />
-    <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" data-bind="click: addFacetDemiModalFieldCancel" />
+      <div style="margin-left: 124px">
+        <input type="button" class="btn btn-primary disabled" data-dismiss="modal" value="${_('Pick!')}" /> or
+        <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel">${_('cancel')}</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1226,6 +1223,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .result-row:nth-child(even) {
     background-color: #F6F6F6;
+  }
+
+  .demi-modal {
+    min-height: 80px;
   }
 
 </style>
