@@ -86,11 +86,12 @@ def new_search(request):
     'initial': json.dumps({
          'collections': collections,
          'layout': [
-              {"size":2,"rows":[
-                  {"widgets":[]}],"klass":"card card-home card-column span3"},
-              {"size":10,"rows":[
-                  {"widgets":[{"size":12,"name":"Results","id":"8897bfbd-053f-ab56-dbfb-432f7b28aceb","widgetType":"resultset-widget","properties":{},"offset":0,"isLoading":False,"klass":"card card-widget span12"}]}],"klass":"card card-home card-column span9"}
-          ]         
+              {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+              {"size":10,"rows":[{"widgets":[
+                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+              "drops":["temp"],"klass":"card card-home card-column span10"}
+         ] 
      }),
   })
 
@@ -565,6 +566,9 @@ def new_facet(request):
       facet_type = 'query'      
     else:
       facet_type = 'field'        
+        
+    if facet_type == 'map-widget':
+      properties['scope'] = 'world'        
         
     result['message'] = ''
     result['facet'] = {

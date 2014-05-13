@@ -129,10 +129,6 @@ function oneThirdLeftLayout() {
   setLayout([2, 10]);
 }
 
-function oneThirdRightLayout() {
-  setLayout([9, 3]);
-}
-
 function magicLayout(vm) {
   loadLayout(vm, vm.initial.layout);
 }

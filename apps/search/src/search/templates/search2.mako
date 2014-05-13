@@ -86,12 +86,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
       </div>
     </a>
-    <!-- <a href="javascript: oneThirdRightLayout()" onmouseover="viewModel.previewColumns('oneThirdRight')" onmouseout="viewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 72px"></div>
-        <div class="layout-box" style="width: 24px; margin-left: 4px"></div>
-      </div>
-    </a> -->
     <a href="javascript: fullLayout()" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
@@ -204,10 +198,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdLeft'">
       <div class="span3 preview-row"></div>
       <div class="span9 preview-row"></div>
-    </div>
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneThirdRight'">
-      <div class="span9 preview-row"></div>
-      <div class="span3 preview-row"></div>
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
       <div class="span12 preview-row">

@@ -215,14 +215,9 @@ class SolrApi(object):
               ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1))
 
     for fq in query['fqs']:
-      #model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]
       if fq['type'] == 'field':        
         params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
       elif fq['type'] == 'range':
-        # Set end range if last range
-#        if fq['filter'].get('to'):
-#          model_facet = [facet for facet in collection['facets'] if facet['id'] == fq['id']][0]           
-#          fq['filter']['to'] = model_facet['properties']['end'] if model_facet else '*'
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
