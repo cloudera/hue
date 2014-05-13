@@ -869,6 +869,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-slider.min.css">
 <link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
@@ -877,6 +878,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/ext/js/bootstrap-slider.min.js"></script>
 <script src="/static/js/bootstrap-spinedit.js"></script>
 <script src="/static/js/ko.editable.js"></script>
 <script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
@@ -1232,8 +1234,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
 </style>
-
-<input type="text" id="mofo" />
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
@@ -1613,6 +1613,27 @@ $(document).ready(function () {
     }
     }
   };
+
+  ko.bindingHandlers.slider = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var _el = $(element);
+      var _options = $.extend(valueAccessor(), {});
+      _el.slider({
+        min: _options.min,
+        max: _options.max,
+        handle: _options.handle?_options.handle:'circle',
+        value: _options.data(),
+        tooltip: 'always'
+      });
+      _el.on("slide", function (e) {
+        _options.data(e.value);
+      });
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      var _options = $.extend(valueAccessor(), {});
+      $(element).slider("setValue", _options.data());
+    }
+  }
 
   ko.bindingHandlers.spinedit = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
