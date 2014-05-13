@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from setuptools import setup, find_packages
-from hueversion import VERSION
 
 setup(
       name = "indexer",
-      version = VERSION,
+      version = "1.0",
       author = "Hue",
       url = 'http://github.com/cloudera/hue',
       description = "Collections manager for Cloudera Search",
