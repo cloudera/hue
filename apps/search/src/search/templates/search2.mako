@@ -616,7 +616,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   
   <span data-bind="visible: $root.isEditing()">
     ${ _('by') }
-    <input type="text" data-bind="value: $root.collection.template.rows, valueUpdate:'afterkeydown'"></input>
+    <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" />
   </span>
   
   ${ _(' results') }  
@@ -869,6 +869,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
@@ -876,6 +877,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/js/bootstrap-spinedit.js"></script>
 <script src="/static/js/ko.editable.js"></script>
 <script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
@@ -1230,6 +1232,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
 </style>
+
+<input type="text" id="mofo" />
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
@@ -1609,6 +1613,24 @@ $(document).ready(function () {
     }
     }
   };
+
+  ko.bindingHandlers.spinedit = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      $(element).spinedit({
+        minimum: 0,
+        maximum: 10000,
+        step: 5,
+        value: ko.unwrap(valueAccessor()),
+        numberOfDecimals: 0
+      });
+      $(element).on("valueChanged", function (e) {
+        valueAccessor()(e.value);
+      });
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      $(element).spinedit("setValue", ko.unwrap(valueAccessor()));
+    }
+  }
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
