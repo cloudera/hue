@@ -486,10 +486,20 @@ var Collection = function (vm, collection) {
   };
 
   self.template.fieldsModalFilter = ko.observable(); // For UI
-  self.template.fieldsModalType = ko.observable("");
-  self.template.fieldsAttributesFilter = ko.observable(); // For UI
+  self.template.fieldsModalType = ko.observable(""); // For UI
+  self.template.fieldsAttributesFilter = ko.observable(""); // For UI
   self.template.filteredModalFields = ko.observableArray();
-  self.template.filteredAttributeFields = ko.observableArray();
+  self.template.filteredAttributeFields = ko.computed(function() {
+	var _fields = [];
+
+	$.each(self.template.fieldsAttributes(), function (index, field) {
+	  if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
+	    _fields.push(field);
+	  }
+	});
+	    
+	return _fields;	  
+  });
   self.template.availableWidgetFields = ko.computed(function() {
     return self.template.fieldsModalType() == 'histogram-widget'? vm.availableDateFields() : self.availableFacetFields();
   });
@@ -511,22 +521,7 @@ var Collection = function (vm, collection) {
     self.template.filteredModalFields(_fields);
   });
 
-  self.template.fieldsAttributesFilter.subscribe(function(value) {
-    var _fields = [];
-    var _availableFields = self.template.fieldsAttributes();
-
-    $.each(_availableFields, function (index, field) {
-      if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
-        _fields.push(field);
-      }
-    });
-    
-    self.template.filteredAttributeFields(_fields);
-  });
-
-  self.template.fieldsAttributesFilter("");
-
-  self.updateFields = function() {
+  self.updateCollection = function() {
     $.post("/search/get_collection/", {
         name: self.name()
 	  }, function (data) {
@@ -541,11 +536,54 @@ var Collection = function (vm, collection) {
 	      $.each(data.collection.collection.fields, function(index, field) {
 	    	self.fields.push(ko.mapping.fromJS(field));
 	      });
-	      self.template.fieldsAttributesFilter.valueHasMutated();
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {});
   };
   
+  self.syncFields = function() {
+    $.post("/search/get_collection/", {
+        name: self.name()
+	  }, function (data) {
+	    if (data.status == 0) {
+	      self.idField(data.collection.collection.idField);	      
+	      
+	      var _newNames = $.map(data.collection.collection.template.fieldsAttributes, function(field){ return field.name; });
+	      var _newFields = [];
+	      
+	      self.template.fieldsAttributes.removeAll();
+	      
+	      $.each(self.template.fieldsAttributes(), function(index, field) {//alert(ko.mapping.toJSON(field));
+	        if (_newNames.indexOf(field.name()) == -1) {
+	          self.template.fieldsAttributes.remove(field);
+	        } else {
+//	          _newFields.push(ko.mapping.fromJS(field));
+	          self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
+	        }
+	      });
+	      
+	      self.fields.removeAll();
+
+	      alert('aa');
+	      /**ko.utils.arrayForEach(differences, function(difference) {
+	        if (difference.status === "added") {
+	        	self.template.fieldsAttribute.push()
+	        } else if (difference.status === "deleted") {
+	          results.push(difference.value);
+	        }
+	      });
+	      
+	      $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
+		    self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
+		  });	      
+	      self.fields.removeAll();
+	      $.each(data.collection.collection.fields, function(index, field) {
+	    	self.fields.push(ko.mapping.fromJS(field));
+	      });
+	      self.template.fieldsAttributesFilter.valueHasMutated();*/
+	    }
+	}).fail(function (xhr, textStatus, errorThrown) {});
+  };
+  // syncDynamicFields
   
   self.addDynamicFields = function () { // + Adding merge smartly if schema updated
     $.post("/search/index/" + self.id + "/fields/dynamic", {
@@ -701,7 +739,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   if (initial_json.collections) {
     self.collection.name.subscribe(function (newValue) {
 	  self.collection.label(newValue);
-	  self.collection.updateFields();
+	  self.collection.updateCollection();
 	  self.changeCollection(false);
 	  self.search();
     });
@@ -778,6 +816,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   
   self.init = function (callback) {
     //self.collection.addDynamicFields();
+	//self.collection.syncFields();
     self.isEditing(true);
     self.search(callback);
   }

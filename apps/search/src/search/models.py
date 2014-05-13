@@ -339,10 +339,12 @@ class Collection(models.Model):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
 
-    return sorted([{'name': str(field), 'type': str(attributes.get('type', '')),
-                    'isId': attributes.get('required') and attributes.get('uniqueKey'),
-                  }
-                  for field, attributes in schema_fields.iteritems()])
+    return sorted([{
+        'name': str(field),
+        'type': str(attributes.get('type', '')),
+        'isId': attributes.get('required') and attributes.get('uniqueKey'),
+      } for field, attributes in schema_fields.iteritems()]
+    )
 
   @property
   def properties_dict(self):

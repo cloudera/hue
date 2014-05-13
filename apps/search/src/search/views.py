@@ -534,6 +534,7 @@ def index_fields_dynamic(request, collection_id):
     solr_query['collection'] = hue_collection.name
     
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
+    print dynamic_fields['fields']
     result['message'] = ''
     result['dynamic_fields'] = [name for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
     result['status'] = 0
