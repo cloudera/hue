@@ -115,7 +115,8 @@ if settings.OAUTH_AUTHENTICATION:
 
 # Add indexer app
 if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
-  dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls'))) )
+  namespace = {'namespace': 'indexer', 'app_name': 'indexer'}
+  dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls', **namespace))) )
   static_patterns.append(static_pattern('indexer/static',
                                         os.path.join(os.path.dirname(__file__), "..", '..', '..', "libs/indexer/static/")))
 
