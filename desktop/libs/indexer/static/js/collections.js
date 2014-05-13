@@ -450,7 +450,7 @@ var ManageCollectionsViewModel = function() {
 
   self.removeCollections = function(collection) {
     self.isLoading(true);
-    var collections = self.filteredCollections();
+    var collections = self.selectedCollections();
     if (collections.length == 0) {
       collections = ($.isArray(collection)) ? collection : [collection];
     }
