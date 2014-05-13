@@ -437,7 +437,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
 
     <div style="overflow-x: auto">
-      <div data-bind="visible: $root.results().length == 0">
+      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
         ${ _('Your search did not match any documents.') }
       </div>
     
@@ -445,9 +445,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
     
-      <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0">
+      <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0; width: 100%">
         <thead>
-          <tr data-bind="visible: $root.results().length > 0, foreach: $root.collection.template.fieldsSelected">        
+          <tr data-bind="visible: $root.results().length > 0">
+            <th style="width: 30px">&nbsp;</th>
+            <!-- ko foreach: $root.collection.template.fieldsSelected -->
             <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
               <div style="display: inline-block; width:20px;">
               <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
@@ -468,14 +470,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
               </a>
               </div>
             </th>
+            <!-- /ko -->
           </tr>
           <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
             <th>${ ('Document') }</th>
           </tr>
         </thead>
-        <tbody data-bind="foreach: { data: $root.results, as: 'documents' }">            
-          <tr class="result-row" data-bind="foreach: row, click: $root.getDocument">
+        <tbody data-bind="foreach: { data: $root.results, as: 'documents' }" class="result-tbody">
+          <tr class="result-row" data-bind="attr: {'id': 'doc_' + $data[$root.collection.idField()]}">
+            <td><a href="javascript:void(0)" data-bind="click: toggleDocDetails"><i class="fa fa-caret-right"></i></a></td>
+            <!-- ko foreach: row -->
             <td data-bind="html: $data"></td>
+            <!-- /ko -->
           </tr>
         </tbody>
       </table>
@@ -836,30 +842,25 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
 </div>
 
-<div id="showDocModal" class="modal hide">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Result inspector')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      <table>
-        <tbody data-bind="foreach: {data: Object.keys($root.collection.selectedDocument()), as: '_key'}">
-          <tr>
-            <th style="text-align: left" data-bind="text: _key"></th>
-            <td data-bind="html: $root.collection.selectedDocument()[_key]"></td>
-          </tr>
-        </tbody>
-      </table>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <div>
-      <input type="button" class="btn" data-dismiss="modal" value="${_('Close')}" />
-    </div>
-  </div>
+<div id="genericLoader" style="display: none">
+<!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+<!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
 </div>
 
+<script id="document-details" type="x-tmpl-mustache">
+<div class="document-details">
+  <table>
+    <tbody>
+    {{#properties}}
+      <tr>
+        <th style="text-align: left; white-space: nobreak; vertical-align:top">{{key}}</th>
+        <td width="100%">{{value}}</td>
+      </tr>
+      {{/properties}}
+    </tbody>
+  </table>
+  </div>
+</script>
 
 ## Extra code for style and custom JS
 <span data-bind="html: $root.collection.template.extracode"></span>
@@ -1143,10 +1144,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     cursor: move;
   }
 
-  .result-row {
-    cursor: pointer;
-  }
-
   body.modal-open {
       overflow: auto!important;
   }
@@ -1219,6 +1216,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\f055";
+  }
+
+  .document-details {
+    background-color: #F6F6F6;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+  }
+
+  .result-row:nth-child(even) {
+    background-color: #F6F6F6;
   }
 
 </style>
@@ -1374,11 +1381,49 @@ function mapChartDataTransformer(data) {
   return _data;
 }
 
+function toggleDocDetails(doc){
+  var _docRow = $("#doc_" + doc[viewModel.collection.idField()]);
+  if (_docRow.data("expanded") != null && _docRow.data("expanded")){
+    $("#doc_" + doc[viewModel.collection.idField()] + "_details").parent().hide();
+    _docRow.find(".fa-caret-down").removeClass("fa-caret-down").addClass("fa-caret-right");
+    _docRow.data("expanded", false);
+  }
+  else {
+    _docRow.data("expanded", true);
+    var _detailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
+    if (_detailsRow.length > 0){
+      //_detailsRow.html($("#genericLoader").html());
+      _detailsRow.parent().show();
+    }
+    else {
+      var _newRow = $("<tr>");
+      var _newCell = $("<td>").attr("colspan", _docRow.find("td").length).attr("id", "doc_" + doc[viewModel.collection.idField()] + "_details").html($("#genericLoader").html());
+      _newCell.appendTo(_newRow);
+      _newRow.insertAfter(_docRow);
+      viewModel.getDocument(doc);
+    }
+    _docRow.find(".fa-caret-right").removeClass("fa-caret-right").addClass("fa-caret-down");
+  }
+}
 
 $(document).ready(function () {
+
   $(document).on("showDoc", function(e, doc){
     viewModel.collection.selectedDocument(doc);
-    $("#showDocModal").modal();
+    var _docDetailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
+    var _doc = {
+      properties: []
+    };
+    for (var i=0; i< Object.keys(doc).length; i++){
+      _doc.properties.push({
+        key: Object.keys(doc)[i],
+        value: doc[Object.keys(doc)[i]]
+      });
+    }
+    var template = $("#document-details").html();
+    Mustache.parse(template);
+    var rendered = Mustache.render(template, _doc);
+    _docDetailsRow.html(rendered);
   });
 
   $(document).on("click", ".widget-settings-pill", function(){
