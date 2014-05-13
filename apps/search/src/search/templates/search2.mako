@@ -1619,9 +1619,10 @@ $(document).ready(function () {
       var _el = $(element);
       var _options = $.extend(valueAccessor(), {});
       _el.slider({
-        min: _options.min,
-        max: _options.max,
-        handle: _options.handle?_options.handle:'circle',
+        min: _options.min ? _options.min : 1,
+        max: _options.max ? _options.max : 10,
+        step: _options.step ? _options.step : 1,
+        handle: _options.handle ? _options.handle : 'circle',
         value: _options.data(),
         tooltip: 'always'
       });
