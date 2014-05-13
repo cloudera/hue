@@ -111,7 +111,8 @@
    <field name="host" type="string" indexed="true" stored="true" />
    <field name="process" type="string" indexed="true" stored="true" />
    <field name="message" type="text_general" indexed="true" stored="true" />
-
+   <field name="location" type="string" indexed="true" stored="true" />
+   
    <!-- tika metadata -->
    <field name="content_type" type="lowercase" indexed="true" stored="true" />
 

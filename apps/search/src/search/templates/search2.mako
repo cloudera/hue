@@ -795,7 +795,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       ${ _('Label') }: <input type="text" data-bind="value: label" />
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id},
         transformer: mapChartDataTransformer,
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
