@@ -428,7 +428,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </a>
         </div>
         <input type="text" data-bind="value: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 88%; margin-bottom: 3px" />
-        <div data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto">
+        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto">
           <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
           <span data-bind="text: '&nbsp;' + name()"></span>
           <br/>
@@ -1407,7 +1407,19 @@ function toggleDocDetails(doc){
   }
 }
 
+function resizeFieldsList() {
+  $(".fields-list").css("max-height", Math.max($("#result-container").height(), 230));
+}
+
 $(document).ready(function () {
+
+  var _resizeTimeout = -1;
+  $(window).resize(function(){
+    window.clearTimeout(_resizeTimeout);
+    window.setTimeout(function(){
+      resizeFieldsList();
+    }, 200);
+  });
 
   $(document).on("showDoc", function(e, doc){
     viewModel.collection.selectedDocument(doc);
@@ -1673,6 +1685,11 @@ $(document).ready(function () {
 
   viewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");
+  });
+  viewModel.isRetrievingResults.subscribe(function(value){
+    if (!value){
+      resizeFieldsList();
+    }
   });
 });
 
