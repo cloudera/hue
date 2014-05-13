@@ -138,9 +138,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character):
     csvfile.seek(0)
     reader = csv.reader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
     for row in reader:
-      print 'here1'
       yield [cell for cell in row]
-      print 'here2'
     
     csvfile.truncate()
     content += fh.read()
@@ -150,14 +148,14 @@ def field_values_from_log(fh):
   """
   Only timestamp and message
   """
-  csvfile = StringIO.StringIO()
+  buf = ""
   prev = content = fh.read()
   while prev:
     last_newline = content.rfind('\n')
     if last_newline > -1:
-      csvfile.write(content[:last_newline])
-      content = content[last_newline:]
-      rows = content.split('\n')
+      buf = content[:last_newline]
+      content = content[last_newline+1:]
+      rows = buf.split('\n')
       for row in rows:
         if row:
           data = {}
