@@ -203,21 +203,12 @@ var CreateCollectionViewModel = function() {
   self.hive = new HiveViewModel();
   self.hbase = new HBaseViewModel();
   self.wizard = new Wizard();
-  self.exampleSchema = ko.observable();
   self.isLoading = ko.observable();
   self.sources = ko.mapping.fromJS(SOURCES);
   self.fieldTypes = ko.mapping.fromJS(FIELD_TYPES);
   self.fieldSeparators = ko.mapping.fromJS(FIELD_SEPARATORS);
   self.fieldQuoteCharacters = ko.mapping.fromJS(FIELD_QUOTE_CHARACTERS);
   self.sourceTypes = ko.mapping.fromJS(SOURCE_TYPES);
-
-  self.allCollectionChanges = ko.computed(function() {
-    ko.toJS(self.collection.fields);
-
-    if ('fetchExampleSchema' in self) {
-      self.fetchExampleSchema();
-    }
-  });
 
   self.parseFields = function() {
     if (self.source() == 'file') {
@@ -249,8 +240,6 @@ var CreateCollectionViewModel = function() {
           } else if (first) {
             self.collection.uniqueKeyField(first.name());
           }
-
-          self.fetchExampleSchema();
         } else {
           $(document).trigger("error", data.message);
         }
@@ -260,25 +249,6 @@ var CreateCollectionViewModel = function() {
         self.isLoading(false);
       });
     }
-  };
-
-  self.fetchExampleSchema = function() {
-    self.isLoading(true);
-    var collection = ko.mapping.toJS(self.collection);
-    return $.post("/indexer/api/schema/example/", {
-      'collection': ko.mapping.toJSON(collection)
-    }).done(function(data) {
-      if (data.status == 0) {
-        self.exampleSchema(data.example);
-      } else {
-        $(document).trigger("error", data.message);
-      }
-      self.isLoading(false);
-    })
-    .fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-      self.isLoading(false);
-    });
   };
 
   self.save = function() {
@@ -300,9 +270,9 @@ var CreateCollectionViewModel = function() {
           if (data.status == 0) {
             window.location.href = '/indexer';
           } else {
+            self.isLoading(false);
             $(document).trigger("error", data.message);
           }
-          self.isLoading(false);
         })
         .fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);

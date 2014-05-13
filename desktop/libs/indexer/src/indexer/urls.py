@@ -23,7 +23,6 @@ urlpatterns = patterns('indexer.views',
 
 urlpatterns += patterns('indexer.api',
   url(r'^api/fields/parse/$', 'parse_fields', name='api_parse_fields'),
-  url(r'^api/schema/example/$', 'example_schema', name='api_example_schema'),
   url(r'^api/collections/$', 'collections', name='api_collections'),
   url(r'^api/collections/create/$', 'collections_create', name='api_collections_create'),
   url(r'^api/collections/import/$', 'collections_import', name='api_collections_import'),

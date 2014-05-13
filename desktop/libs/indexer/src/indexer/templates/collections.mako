@@ -266,41 +266,38 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script type="text/html" id="collection-fields">
-  <div class="span6">
-    <table class="table table-bordered fields-table">
-      <thead>
-        <tr>
-          <th width="30%">${_('Name')}</th>
-          <th width="15%">${_('Type')}</th>
-          <th width="10%">${_('Required')}</th>
-          <th width="10%">${_('Indexed')}</th>
-          <th width="10%">${_('Stored')}</th>
-          <th width="10%">${_('Unique Key')}</th>
-          <th width="15%"></th>
-        </tr>
-      </thead>
-      <tbody data-bind="sortable: collection.fields">
-        <tr data-bind="css: {'error': name.errors().length > 0}" class="ko_container editable">
-          <td data-bind="editableText: name">
-            <span class="pull-left fa fa-pencil"></span>
-          </td>
-          <td><select data-bind="options: $parent.fieldTypes, value: type" name="type"></select></td>
-          <td><input data-bind="checked: required" type="checkbox"></td>
-          <td><input data-bind="checked: indexed" type="checkbox"></td>
-          <td><input data-bind="checked: stored" type="checkbox"></td>
-          <td><input data-bind="checked: uniqueKeyField" name="unique-key" type="checkbox" /></td>
-          <td>
-            <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-minus"></i>&nbsp;${_("Remove")}</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <table class="table table-bordered fields-table">
+    <thead>
+      <tr>
+        <th width="30%">${_('Name')}</th>
+        <th width="15%">${_('Type')}</th>
+        <th width="10%">${_('Required')}</th>
+        <th width="10%">${_('Indexed')}</th>
+        <th width="10%">${_('Stored')}</th>
+        <th width="10%">${_('Unique Key')}</th>
+        <th width="15%"></th>
+      </tr>
+    </thead>
+    <tbody data-bind="sortable: collection.fields">
+      <tr data-bind="css: {'error': name.errors().length > 0}" class="ko_container editable">
+        <td data-bind="editableText: name">
+          <span class="pull-left fa fa-pencil"></span>
+        </td>
+        <td><select data-bind="options: $parent.fieldTypes, value: type" name="type"></select></td>
+        <td><input data-bind="checked: required" type="checkbox"></td>
+        <td><input data-bind="checked: indexed" type="checkbox"></td>
+        <td><input data-bind="checked: stored" type="checkbox"></td>
+        <td><input data-bind="checked: uniqueKeyField" name="unique-key" type="checkbox" /></td>
+        <td>
+          <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-minus"></i>&nbsp;${_("Remove")}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-    <br style="clear: both" />
-    <br />
-    <a data-bind="click: collection.newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
-  </div>
-  <pre data-bind="text: exampleSchema" class="span6 examples"></pre>
+  <br style="clear: both" />
+  <br />
+  <a data-bind="click: collection.newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
 </script>
 <!--/ Wizard -->
 

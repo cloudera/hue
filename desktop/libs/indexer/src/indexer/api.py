@@ -87,24 +87,6 @@ def parse_fields(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def example_schema(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
-  result = {'status': -1}
-
-  collection = json.loads(request.POST.get('collection', '{}'))
-
-  if not collection:
-    result['message'] = _('Collection missing.')
-
-  if result.get('message', None) is None:
-    result['example'] = example_schema_xml_with_fields_and_unique_key(collection.get('fields', []), collection.get('uniqueKeyField', 'id'))
-    result['status'] = 0
-
-  return HttpResponse(json.dumps(result), mimetype="application/json")
-
-
 def collections(request):
   searcher = CollectionManagerController(request.user)
   solr_collections = searcher.get_collections()
