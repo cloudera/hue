@@ -291,8 +291,6 @@ def collections_data(request, collection_or_core):
   except Collection.DoesNotExist:
     raise Http404()
 
-  collection = json.loads(request.POST.get('collection', '{}'))
-
   if source == 'file':
     searcher = CollectionManagerController(request.user)
 

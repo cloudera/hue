@@ -86,7 +86,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 
 <div class="search-bar" style="height: 30px">
-  <h4><a href="/indexer">${_('Collection Manager')}</a></h4>
+  <h4><a href="#manager">${_('Collection Manager')}</a></h4>
 </div>
 
 
@@ -381,7 +381,6 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <script src="/indexer/static/js/collections.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-
 function validateAndUpdateCollection() {
   if (validateFields(ko.unwrap(vm.edit.collection))) {
     vm.edit.updateCollection().done(function(data) {
