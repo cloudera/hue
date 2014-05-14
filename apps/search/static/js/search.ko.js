@@ -25,14 +25,19 @@ var Column = function (size, rows) {
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
   });
-  self.addEmptyRow = function () {
-    return self.addRow();
+  self.addEmptyRow = function (atBeginning) {
+    return self.addRow(null, atBeginning);
   };
-  self.addRow = function (row) {
+  self.addRow = function (row, atBeginning) {
     if (typeof row == "undefined" || row == null) {
       row = new Row([]);
     }
-    self.rows.push(row);
+    if (typeof atBeginning == "undefined" || atBeginning == null) {
+      self.rows.push(row);
+    }
+    else {
+      self.rows.unshift(row);
+    }
     return row;
   };
 }

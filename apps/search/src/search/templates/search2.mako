@@ -221,10 +221,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass">
+    <div class="container-fluid" data-bind="visible: $root.isEditing">
+      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
+    </div>
     <div data-bind="template: { name: 'row-template', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing">
-      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
+      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
     </div>
   </div>
 </script>
@@ -1194,23 +1197,28 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .add-row {
     background-color: #F6F6F6;
-    min-height: 40px;
-    border: 2px dashed #CCC;
+    min-height: 36px;
+    border: 2px dashed #DDD;
     text-align: center;
     padding: 4px;
   }
 
   .add-row:before {
-    color:#EEE;
+    color:#DDD;
     display: inline-block;
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
-    font-size: 48px;
+    font-size: 24px;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\f055";
+  }
+
+  .add-row-highlight {
+    min-height: 10px;
+    background-color:#CCC;
   }
 
   .document-details {
