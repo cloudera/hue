@@ -324,7 +324,7 @@ function barChart(element, options, isTimeline) {
         .staggerLabels(true);
       }
       else {
-        _chart = nv.models.growingMultiBarChart();
+        _chart = nv.models.multiBarWithBrushChart();
         _chart.xAxis
           .showMaxMin(true)
           .tickFormat(d3.format(',0f'));

@@ -192,7 +192,7 @@ class SolrApi(BaseSolrApi):
              ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
              ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
              ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),
-             ('f.%s.facet.mincount' % facet['field'], facet['properties']['gap'], facet['properties']['mincount']),]
+             ('f.%s.facet.mincount' % facet['field'], facet['properties']['mincount']),]
           )          
         elif facet['type'] == 'field':
           params += (
