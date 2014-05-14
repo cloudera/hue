@@ -306,14 +306,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
       ${ _('Start') }:
-      <input type="text" data-bind="spinedit: properties.start" />
+      <input type="text" class="input-small" data-bind="value: properties.start" />
       <br/>
-      ${ _('End') }: <input type="text" data-bind="spinedit: properties.end" />
+      ${ _('End') }: <input type="text" class="input-small" data-bind="value: properties.end" />
       <br/>
-      ${ _('Gap') }: <input type="text" data-bind="spinedit: properties.gap" />
+      ${ _('Gap') }: <input type="text" class="input-small" data-bind="value: properties.gap" />
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
-      ${ _('Limit') }: <input type="text" data-bind="spinedit: properties.limit" />
+      ${ _('Limit') }: <input type="text" class="input-small" data-bind="value: properties.limit" />
     <!-- /ko -->
 
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
