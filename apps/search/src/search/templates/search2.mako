@@ -462,10 +462,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </tr>
         </thead>
         <tbody data-bind="foreach: { data: $root.results, as: 'documents' }" class="result-tbody">
-          <tr class="result-row" data-bind="attr: {'id': 'doc_' + $data[$root.collection.idField()]}">
+          <tr class="result-row" data-bind="attr: {'id': 'doc_' + $data['id']}">
             <td><a href="javascript:void(0)" data-bind="click: toggleDocDetails"><i class="fa fa-caret-right"></i></a></td>
-            <!-- ko foreach: row -->
-            <td data-bind="html: $data"></td>
+            <!-- ko foreach: $data['row'] -->
+              <td data-bind="html: $data"></td>
             <!-- /ko -->
           </tr>
         </tbody>
@@ -486,7 +486,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
         <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
         <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Sorting')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Properties')}</a></li>
       </ul>
     </div>
 
@@ -562,8 +562,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div class="widget-section widget-css-section" style="display: none">
         <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
       </div>
-      <div class="widget-section widget-settings-section" style="display: none">
-         Sorting
+      <div class="widget-section widget-settings-section" style="display: none, min-height:200px">
+        ${ _('Sorting') }
+        
+        <div data-bind="foreach: $root.collection.template.fieldsSelected">
+          <span data-bind="text: $data"></span>
+        </div>
+        <br/>  
       </div>
     <!-- /ko -->
 
@@ -589,6 +594,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-pagination">
+<div style="text-align: center;">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-left" data-bind="
@@ -628,6 +634,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </form>
   </span>
   <!-- /ko -->
+</div>
 </script>
 
 <script type="text/html" id="histogram-widget">
