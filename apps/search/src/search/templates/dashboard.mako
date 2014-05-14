@@ -294,7 +294,7 @@ ${ commonheader(_('Search'), "search", user, "70px") | n,unicode }
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
 <link href="/static/ext/css/hue-charts.css" rel="stylesheet">

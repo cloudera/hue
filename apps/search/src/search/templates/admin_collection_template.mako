@@ -416,12 +416,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   ${ hue_collection.result.get_extracode() | n,unicode }
 </span>
 
-<link rel="stylesheet" href="/search/static/css/freshereditor.css">
+<link rel="stylesheet" href="/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/freshereditor.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>

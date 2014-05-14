@@ -102,10 +102,12 @@ var Widget = function (size, id, name, widgetType, properties, offset, loading) 
 
   self.expand = function () {
     self.size(self.size() + 1);
+    $("#wdg_" + self.id()).trigger("resize");
   }
   
   self.compress = function () {
     self.size(self.size() - 1);
+    $("#wdg_" + self.id()).trigger("resize");
   }
 
   self.moveLeft = function () {

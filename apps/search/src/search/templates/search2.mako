@@ -254,7 +254,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="widget-template">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -801,7 +800,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id},
         transformer: mapChartDataTransformer,
-        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onClick: function(d){ console.log(d); },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
     </div>
   </div>
@@ -863,7 +862,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/leaflet.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/search/static/css/freshereditor.css">
+<link rel="stylesheet" href="/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-slider.min.css">
@@ -874,18 +873,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 <script src="/static/ext/js/bootstrap-slider.min.js"></script>
 <script src="/static/js/bootstrap-spinedit.js"></script>
 <script src="/static/js/ko.editable.js"></script>
-<script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/freshereditor.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
