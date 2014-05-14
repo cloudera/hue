@@ -147,7 +147,7 @@ ko.bindingHandlers.mapChart = {
         if (_place != null){
           _mapdata[_place] = {
             fillKey: "fill_" + Math.floor(item.value / _chunk),
-            id: _place
+            id: _place,
           };
           _maphovers[_place] = item.value;
         }

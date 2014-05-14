@@ -807,10 +807,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id, scope: $root.collection.getFacetById($parent.id).properties.scope()},
+      <div data-bind="mapChart: {data: {counts: $parent.counts, scope: $root.collection.getFacetById($parent.id).properties.scope()},
         transformer: mapChartDataTransformer,
         maxWidth: 750,
-        onClick: function(d){ console.log(d); },
+        onClick: function(d){ viewModel.query.toggleFacet({facet: d, widget_id: $parent.id}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
     </div>
   </div>
@@ -1387,7 +1387,6 @@ function timelineChartDataTransformer(rawDatum) {
 function mapChartDataTransformer(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
-    item.widget_id = data.widget_id;
     _data.push({
       label: item.value,
       value: item.count,

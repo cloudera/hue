@@ -256,7 +256,7 @@ var Query = function (vm, query) {
     self.qs.remove(query);
   };
   
-  self.toggleFacet = function (data) {
+  self.toggleFacet = function (data) { alert(ko.mapping.toJSON(data));
     var fq = self.getFacetFilter(data.widget_id);
 
     if (fq == null) {
