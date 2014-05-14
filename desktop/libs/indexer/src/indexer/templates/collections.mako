@@ -27,58 +27,6 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <link rel="stylesheet" href="/indexer/static/css/admin.css">
 <style type="text/css">
-  #collections {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-  }
-
-  .placeholder {
-    height: 40px;
-    background-color: #F5F5F5;
-    border: 1px solid #E3E3E3;
-  }
-
-  .examples {
-    max-height: 700px;
-    overflow: auto;
-  }
-
-  .collection-row-container {
-    margin: 3px;
-  }
-
-  .collection-row-container .collection-row {
-    padding: 5px;
-  }
-
-  .solr-and-hue {
-    background: #f2ffe3;
-    border: 1px solid #e4f3d3;
-  }
-
-  .solr-and-hue .selected {
-    background: #ceff97;
-  }
-
-  .hue-only {
-    background: #ffe3f2;
-    border: 1px solid #f3d3e4;
-  }
-
-  .hue-only .selected {
-    background: #ff97ce;
-  }
-
-  .solr-only {
-    background: #e3f2ff;
-    border: 1px solid #d3e4f3;
-  }
-
-  .solr-only .selected {
-    background: #e3f2ff;
-  }
 </style>
 
 
@@ -129,7 +77,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <div data-bind="visible: collections().length > 0 && !isLoading()">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }" placeholder="${_('Filter dashboard')}" class="input-xlarge search-query">
             <button data-bind="click: removeCollections, clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" title="${_('Delete the selected collections')}" disabled="disabled"><i class="fa fa-times"></i> ${_('Delete collections')}</button>
-            <a href="#create" class="btn toolbarBtn">${_('Add collection')}</a>
+            <a href="#create" class="btn toolbarBtn pull-right">${_('Add collection')}</a>
           </div>
         </%def>
 
@@ -142,40 +90,31 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/><a href="#create">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
         </div>
       </div>
-      <div class="row-fluid">
+      <div class="row-fluid" data-bind="visible: collections().length > 0 && !isLoading()">
         <div class="span12">
-          <p>
-            <ul id="collections" data-bind="template: {'name': 'collection-template', 'foreach': filteredCollections}"></ul>
-          </p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>
+                  <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
+                </th>
+                <th width="100%">${_('Name')}</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: filteredCollections">
+              <tr data-bind="routie: 'edit/' + name()" class="pointer">
+                <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
+                  <span data-bind="css: {'fa-check': $parent.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
+                </td>
+                <td data-bind="text: name"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 </div>
-</script>
-
-<script id="collection-template" type="text/html">
-<li class="collection-row-container" data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false" title="${ _('Click to edit') }">
-  <div data-bind="css: {'selected': $parent.collections()[$index()].selected()}" class="collection-row">
-    <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-      <a data-bind="click: $parent.removeCollections, clickBubble: false" href="javascript:void(0);"><i class="fa fa-times"></i> ${_('Delete')}</a>
-    </div>
-
-    <form class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-      <a data-bind="routie: 'upload/' + name()" href="javascript:void(0);"><i class="fa fa-upload"></i> ${_('Upload')}</a>
-    </form>
-    <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-      <a data-bind="routie: 'edit/' + name()" href="javascript:void(0);"><i class="fa fa-pencil"></i> ${_('Edit')}</a>
-    </div>
-
-    ## <!-- ko ifnot: hasHueCollection() -->
-    ## <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-    ##   <a data-bind="click: $parent.importCollection" href="javascript:void(0);"><i class="fa fa-pencil"></i> ${_('Create')}</a>
-    ## </div>
-    ##<!-- /ko -->
-    <h4><i class="fa fa-list"></i> <span data-bind="text: name"></span></h4>
-  </div>
-</li>
 </script>
 <!--/ Manage collections page -->
 
@@ -300,7 +239,17 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 <!-- Edit collection page -->
 <script id="edit-page" type="text/html">
-<div data-bind="with: edit" class="span12">
+<div data-bind="with: edit" class="span3">
+  <div class="sidebar-nav card-small">
+    <ul class="nav nav-list">
+      <li class="nav-header">${_('Actions')}</li>
+      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload data')}</a></li>
+      <li><a href=""><i class="fa fa-list"></i> ${ _('Search data') }</a></li>
+      <li><a data-bind="click: removeCollection, clickBubble: false" href="javascript:void(0)"><i class="fa fa-trash-o"></i> ${_('Remove collection')}</a></li>
+    </ul>
+  </div>
+</div>
+<div data-bind="with: edit" class="span9">
   <div class="card wizard">
     <h1 class="card-heading simple">${_("Edit collection")}</h1>
     <div class="card-body">
@@ -363,8 +312,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
         <br style="clear:both" />
         <br style="clear:both" />
-        <a data-bind="routie: 'upload/' + collection().name() + '/' + wizard.previousUrl(), visible: wizard.hasPrevious" class="btn btn-info" href="javascript:void(0)">${_('Previous')}</a>
-        <a data-bind="routie: 'upload/' + collection().name() + '/' + wizard.nextUrl(), visible: wizard.hasNext" class="btn btn-info" href="javascript:void(0)">${_('Next')}</a>
+        <a data-bind="routie: 'edit/' + collection().name() + '/upload/' + wizard.previousUrl(), visible: wizard.hasPrevious" class="btn btn-info" href="javascript:void(0)">${_('Previous')}</a>
+        <a data-bind="routie: 'edit/' + collection().name() + '/upload/' + wizard.nextUrl(), visible: wizard.hasNext" class="btn btn-info" href="javascript:void(0)">${_('Next')}</a>
         <a data-bind="click: addData, visible: !wizard.hasNext()" class="btn btn-info" href="javascript:void(0)">${_('Finish')}</a>
       </form>
     </div>
@@ -521,13 +470,14 @@ routie({
       routie('manage');
     } else {
       vm.edit.collection(vm.manage.selectedCollections()[0]());
+      vm.edit.fetchFields();
       vm.page('edit-page');
     }
   },
-  "upload/:name": function(name) {
-    routie('upload/' + name + '/' + vm.edit.wizard.currentPage().url());
+  "edit/:name/upload": function(name) {
+    routie('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
   },
-  "upload/:name/:step": function(name, step) {
+  "edit/:name/upload/:step": function(name, step) {
     ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
       collection.selected(ko.unwrap(collection).name() == name);
     });
@@ -538,7 +488,7 @@ routie({
       vm.page('upload-page');
     }
     vm.edit.wizard.setPageByUrl(step);
-    routie('upload/' + name + '/' + vm.create.wizard.currentPage().url());
+    routie('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
   },
   "*": function() {
     routie('manage');

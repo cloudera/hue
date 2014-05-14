@@ -319,12 +319,6 @@ var EditCollectionViewModel = function() {
   self.fieldQuoteCharacters = ko.mapping.fromJS(FIELD_QUOTE_CHARACTERS);
   self.isLoading = ko.observable();
 
-  self.collection.subscribe(function(collection) {
-    if (collection) {
-      self.fetchFields();
-    }
-  });
-
   self.fetchFields = function() {
     if (self.collection()) {
       self.isLoading(true);
@@ -343,6 +337,25 @@ var EditCollectionViewModel = function() {
         self.isLoading(false);
       });
     }
+  };
+
+  self.removeCollection = function(collection) {
+    self.isLoading(true);
+    var data = [ko.mapping.toJS(self.collection)];
+    return $.post("/indexer/api/collections/remove/", {
+      'collections': ko.mapping.toJSON(data)
+    }).done(function(data) {
+      if (data.status == 0) {
+        window.location.href = '/indexer';
+      } else {
+        $(document).trigger("error", data.message);
+      }
+      self.isLoading(false);
+    })
+    .fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+      self.isLoading(false);
+    });
   };
 
   self.updateCollection = function() {
@@ -409,14 +422,17 @@ var ManageCollectionsViewModel = function() {
     });
   });
 
+  self.toggleSelectAll = function() {
+    var direction = !self.selectedCollections().length;
+    ko.utils.arrayForEach(self.filteredCollections(), function(collection) {
+      collection.selected(direction);
+    });
+  };
+
   self.toggleCollectionSelect = function(collection, e) {
     ko.utils.arrayForEach(self.collections(), function(other_collection) {
       if(ko.unwrap(other_collection).name() == collection.name()) {
         other_collection.selected(!other_collection.selected());
-      } else {
-        if (!e.ctrlKey && !e.shiftKey) {
-          other_collection.selected(false);
-        }
       }
     });
   };
