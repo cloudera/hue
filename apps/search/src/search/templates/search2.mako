@@ -771,19 +771,33 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="filter-widget">
-  <div data-bind="visible: $root.query.fqs().length == 0">${_('There are no filters applied.')}</div>
+  <div data-bind="visible: $root.query.fqs().length == 0" class="alert alert-info" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <!-- ko if: $data.type() == 'field' -->
-    <span class="badge badge-left"><i class="fa fa-filter"></i> <span data-bind="text: $data.field"></span>: <span style="font-weight: normal" data-bind="text: $data.filter"></span></span><span class="badge badge-info badge-right trash-filter" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times-circle"></i></span>
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
+      <strong>${_('value')}</strong>:
+      <span data-bind="text: $data.filter"></span>
+    </div>
     <!-- /ko -->
     <!-- ko if: $data.type() == 'range' -->
-    <span class="badge badge-left"><i class="fa fa-filter"></i> <span data-bind="text: $data.field"></span>:
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
       <span data-bind="foreach: $data.properties" style="font-weight: normal">
-        <span style="font-style: italic">${_('from')}</span> <span data-bind="text: $data.from"></span> <span style="font-style: italic">${_('to')}</span> <span data-bind="text: $data.from"></span>
+        <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
+        <br/>
+        <strong>${_('to')}</strong>: <span data-bind="text: $data.from"></span>
       </span>
-    </span><span class="badge badge-info badge-right trash-filter" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times-circle"></i></span>
+    </div>
     <!-- /ko -->
   </div>
+  <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -1244,6 +1258,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .demi-modal {
     min-height: 80px;
+  }
+
+  .filter-box {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #F6F6F6;
+    padding: 5px;
+    border:1px solid #d8d8d8;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
   }
 
 </style>

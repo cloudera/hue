@@ -259,10 +259,7 @@ function lineChart(element, options) {
   nv.addGraph(function () {
     var _chart = nv.models.lineWithBrushChart();
     _chart.onSelectRange(options.onSelectRange);
-    _chart.xAxis
-        .showMaxMin(true)
-        .tickFormat(d3.format(',0f'))
-        .transitionDuration(100);
+    _chart.xAxis.showMaxMin(false);
 
     _chart.yAxis
         .tickFormat(d3.format(',0f'));
