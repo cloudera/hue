@@ -34,7 +34,7 @@ ko.bindingHandlers.pieChart = {
         var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
 
         _d3.datum(_data)
-                .transition().duration(350)
+                .transition().duration(150)
                 .each("end", _options.onComplete)
                 .call(_chart);
 
@@ -240,16 +240,15 @@ function lineChart(element, options) {
     _chart.onSelectRange(options.onSelectRange);
     _chart.xAxis
         .showMaxMin(true)
-        .tickFormat(d3.format(',0f'));
-    _chart.margin({bottom: 100})
-        .transitionDuration(300);
+        .tickFormat(d3.format(',0f'))
+        .transitionDuration(100);
 
     _chart.yAxis
         .tickFormat(d3.format(',0f'));
 
     var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
     _d3.datum(_datum)
-        .transition().duration(350)
+        .transition().duration(150)
         .each("end", options.onComplete)
         .call(_chart);
 
@@ -309,15 +308,14 @@ function barChart(element, options, isTimeline) {
         _chart.onStateChange(options.onStateChange);
       }
     }
-    _chart.margin({bottom: 100})
-        .transitionDuration(300);
+    _chart.transitionDuration(100);
 
     _chart.yAxis
         .tickFormat(d3.format(',0f'));
 
     var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
     _d3.datum(_datum)
-        .transition().duration(350)
+        .transition().duration(150)
         .each("end", options.onComplete)
         .call(_chart);
 
