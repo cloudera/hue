@@ -226,7 +226,7 @@ def fields_from_log(fh):
   fields = []
   matches = re.search(TIMESTAMP_PATTERN, row)
   if matches:
-    fields.append(('timestamp', 'date'))
+    fields.append(('timestamp', 'tdate'))
   fields.append(('message', 'text_general'))
 
   return fields
