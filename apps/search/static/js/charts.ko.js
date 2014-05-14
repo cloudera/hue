@@ -148,6 +148,8 @@ ko.bindingHandlers.mapChart = {
           _mapdata[_place] = {
             fillKey: "fill_" + Math.floor(item.value / _chunk),
             id: _place,
+            cat: item.obj.cat,
+            value: item.obj.value
           };
           _maphovers[_place] = item.value;
         }
@@ -159,13 +161,14 @@ ko.bindingHandlers.mapChart = {
     else {
       _fills["defaultFill"] = HueColors.BLUE;
       _fills["selected"] = HueColors.DARK_BLUE;
-      $(_data).each(function(cnt, item){
+      $(_data).each(function(cnt, item) {
     	var _place = item.label.toUpperCase();
-	
         if (_place != null){
           _mapdata[_place] = {
             fillKey: "selected",
-            id: _place
+            id: _place,
+            cat: item.obj.cat,
+            value: item.obj.value
           };
           _maphovers[_place] = item.value;
         }
@@ -183,7 +186,7 @@ ko.bindingHandlers.mapChart = {
         scope: _scope,
         data: mapData,
         onClick: function(data) {
-          if (typeof options.onClick != "undefined"){
+          if (typeof options.onClick != "undefined") {
             options.onClick(data);
           }
         },
