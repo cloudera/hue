@@ -231,15 +231,14 @@ nv.models.growingMultiBar = function() {
           .style('fill', function(d,i,j){ return color(d, j, i);  })
           .style('stroke', function(d,i,j){ return color(d, j, i); });
       barsEnter
-          .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
+          .on('mouseover', function(d,i) {
             d3.select(this).classed('hover', true);
-            if (stacked){
-              d3.select(this).transition().duration(100).attr('y', y((stacked ? d.y1 : 0)) - 5);
-            }
-            else {
-              d3.select(this).transition().duration(100).attr('y', y(getY(d,i)) - 5);
-            }
-
+//            if (stacked){
+//              d3.select(this).transition().duration(100).attr('y', y((stacked ? d.y1 : 0)) - 5);
+//            }
+//            else {
+//              d3.select(this).transition().duration(100).attr('y', y(getY(d,i)) - 5);
+//            }
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,

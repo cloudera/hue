@@ -89,8 +89,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js"></script>
-## Duplication with desktop/core required because of packaging for now
-<script src="/search/static/js/jquery.selector.js"></script>
+<script src="/static/js/jquery.selector.js"></script>
 
 <script type="text/javascript">
   function ViewModel() {

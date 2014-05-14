@@ -156,7 +156,7 @@ nv.models.growingDiscreteBar = function() {
           })
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
             d3.select(this).classed('hover', true);
-            d3.select(this).select("rect").transition().duration(100).attr('y', -5);
+            //d3.select(this).select("rect").transition().duration(100).attr('y', -5);
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
