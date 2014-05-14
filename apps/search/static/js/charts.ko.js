@@ -182,13 +182,12 @@ ko.bindingHandlers.mapChart = {
         fills: fills,
         scope: _scope,
         data: mapData,
+        onClick: function(data) {
+          if (typeof options.onClick != "undefined"){
+            options.onClick(data);
+          }
+        },
         done: function(datamap) {
-          datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-            if (typeof options.onClick != "undefined"){
-              options.onClick(geography);
-            }
-          });
-
           var _bubbles = [];
           if (options.enableGeocoding) {
             $(nonCountries).each(function(cnt, item){

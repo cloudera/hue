@@ -908,8 +908,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/datamaps.all.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/search/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
