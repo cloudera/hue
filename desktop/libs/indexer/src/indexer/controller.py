@@ -59,19 +59,19 @@ class CollectionManagerController(object):
 
     return solr_collections
 
-  def get_fields(self, collection_or_core):
+  def get_fields(self, collection_or_core_name):
     try:
-      field_data = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).fields(collection_or_core)
+      field_data = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).fields(collection_or_core_name)
       fields = self._format_flags(field_data['schema']['fields'])
     except:
-      LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core)
-      raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core)
+      LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core_name)
+      raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core_name)
 
     try:
-      uniquekey = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).uniquekey(collection_or_core)
+      uniquekey = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).uniquekey(collection_or_core_name)
     except:
-      LOG.exception(_('Could not fetch unique key for collection %s.') % collection_or_core)
-      raise PopupException(_('Could not fetch unique key for collection %s. See logs for more info.') % collection_or_core)
+      LOG.exception(_('Could not fetch unique key for collection %s.') % collection_or_core_name)
+      raise PopupException(_('Could not fetch unique key for collection %s. See logs for more info.') % collection_or_core_name)
 
     return uniquekey, fields
 
@@ -152,7 +152,7 @@ class CollectionManagerController(object):
 
     api.add_fields(name, new_fields_filtered)
 
-  def update_data_from_hdfs(self, fs, collection_or_core, path, data_type='log', indexing_strategy='upload'):
+  def update_data_from_hdfs(self, fs, hue_collection, path, indexing_strategy='upload'):
     """
     Add hdfs path contents to index
     """
@@ -162,22 +162,30 @@ class CollectionManagerController(object):
       if stats.size > MAX_UPLOAD_SIZE:
         raise PopupException(_('File size is too large to handle!'))
       else:
+        # Get fields for filtering
+        unique_key, fields = self.get_fields(hue_collection.name)
+        fields = [{'name': field, 'type': fields[field]['type']} for field in fields]
+
+        properties_dict = hue_collection.properties_dict
+
         fh = fs.open(path)
-        if data_type == 'log':
+        if properties_dict['data_type'] == 'log':
           # Transform to JSON then update
-          data = json.dumps([value for value in utils.field_values_from_log(fh)])
+          data = json.dumps([value for value in utils.field_values_from_log(fh, fields)])
+          content_type = 'json'
+        elif properties_dict['data_type'] == 'separated':
+          # 'data' first line should be headers.
+          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, properties_dict['separator'], properties_dict['quote_character'], fields)])
           content_type = 'json'
         else:
-          # 'data' first line should be headers.
-          data = fh.read()
-          content_type = 'csv'
+          raise PopupException(_('Could not update index. Unknown type %s') % properties_dict['data_type'])
         fh.close()
-      if not api.update(collection_or_core, data, content_type=content_type):
+      if not api.update(hue_collection.name, data, content_type=content_type):
         raise PopupException(_('Could not update index. Check error logs for more info.'))
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
 
-  def update_data_from_hive(self, db, collection_or_core, database, table, columns, indexing_strategy='upload'):
+  def update_data_from_hive(self, db, collection_or_core_name, database, table, columns, indexing_strategy='upload'):
     """
     Add hdfs path contents to index
     """
@@ -201,7 +209,7 @@ class CollectionManagerController(object):
         for row in result.rows():
           dataset.append(row)
 
-        if not api.update(collection_or_core, dataset.csv, content_type='csv'):
+        if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
           raise PopupException(_('Could not update index. Check error logs for more info.'))
       else:
         raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))

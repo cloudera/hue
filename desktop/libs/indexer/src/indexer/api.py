@@ -67,8 +67,9 @@ def parse_fields(request):
         quote = request.POST.get('quote', '"')
         file_obj = request.fs.open(request.POST.get('path'))
         field_list = field_values_from_separated_file(file_obj, delimiter, quote)
-        field_names = next(field_list)
-        field_types = get_field_types(next(field_list))
+        row = next(field_list)
+        field_names = row.keys()
+        field_types = get_field_types(row.values())
         file_obj.close()
 
         result['data'] = zip(field_names, field_types)
@@ -152,13 +153,18 @@ def collections_create(request):
     properties_dict = hue_collection.properties_dict
     properties_dict['data_type'] = request.POST.get('type')
     properties_dict['field_order'] = [field['name'] for field in collection.get('fields', [])]
+    if properties_dict['data_type'] == 'separated':
+      properties_dict['separator'] = request.POST.get('separator', ',')
+      properties_dict['quote_character'] = request.POST.get('quote', '"')
     hue_collection.properties = json.dumps(properties_dict)
     hue_collection.save()
 
     try:
       if request.POST.get('source') == 'file':
         # Index data
-        searcher.update_data_from_hdfs(request.fs, collection.get('name'), request.POST.get('path'), request.POST.get('type'))
+        searcher.update_data_from_hdfs(request.fs,
+                                       hue_collection,
+                                       request.POST.get('path'))
 
       elif request.POST.get('source') == 'hive':
         # Run a custom hive query and post data to collection
@@ -319,7 +325,7 @@ def collections_data(request, collection_or_core):
   if source == 'file':
     searcher = CollectionManagerController(request.user)
 
-    searcher.update_data_from_hdfs(request.fs, collection_or_core, request.POST.get('path'), hue_collection.data_type)
+    searcher.update_data_from_hdfs(request.fs, hue_collection, request.POST.get('path'))
 
     response['status'] = 0
     response['message'] = _('Collections updated!')

@@ -31,6 +31,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.i18n import force_unicode, smart_str
 
 from indexer import conf
+from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES
 
 LOG = logging.getLogger(__name__)
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
@@ -124,48 +125,92 @@ def get_type_from_morphline_type(morphline_type):
     return 'string'
 
 
-def field_values_from_separated_file(fh, delimiter, quote_character):
+def field_values_from_separated_file(fh, delimiter, quote_character, fields=None):
+  if fields is None:
+    field_names = None
+  else:
+    field_names = [field['name'] for field in fields]
+
   csvfile = StringIO.StringIO()
   content = fh.read()
+  is_first = True
   while content:
     last_newline = content.rfind('\n')
     if last_newline > -1:
+      if not is_first:
+        csvfile.write('\n')
       csvfile.write(content[:last_newline])
       content = content[last_newline+1:]
+      # print content
+      # print 'here1'
     else:
+      if not is_first:
+        csvfile.write('\n')
       csvfile.write(content[:])
       content = ""
+    is_first = False
     csvfile.seek(0)
-    reader = csv.reader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
+    reader = csv.DictReader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
+    remove_keys = None
     for row in reader:
-      yield [cell for cell in row]
+      if remove_keys is None:
+        if field_names is None:
+          remove_keys = []
+        else:
+          remove_keys = set(row.keys()) - set(field_names)
+      if remove_keys:
+        for key in remove_keys:
+          del row[key]
+      yield row
     
     csvfile.truncate()
     content += fh.read()
 
 
-def field_values_from_log(fh):
+def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'} ]):
   """
   Only timestamp and message
   """
   buf = ""
   prev = content = fh.read()
+  if fields is None:
+    timestamp_key = 'timestamp'
+    message_key = 'message'
+  else:
+    try:
+      timestamp_key = next(filter(lambda field: field['type'] in DATE_FIELD_TYPES, fields))['name']
+    except:
+      timestamp_key = None
+    try:
+      message_key = next(filter(lambda field: field['type'] in TEXT_FIELD_TYPES, fields))['name']
+    except:
+      message_key = None
+
+  def value_generator(buf):
+    rows = buf.split('\n')
+    for row in rows:
+      if row:
+        data = {}
+        matches = re.search(TIMESTAMP_PATTERN, row)
+        if matches and timestamp_key:
+          data[timestamp_key] = parse(matches.groups()[0]).astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        if message_key:
+          data[message_key] = row
+        yield data
+
   while prev:
     last_newline = content.rfind('\n')
     if last_newline > -1:
       buf = content[:last_newline]
       content = content[last_newline+1:]
-      rows = buf.split('\n')
-      for row in rows:
-        if row:
-          data = {}
-          matches = re.search(TIMESTAMP_PATTERN, row)
-          if matches:
-            data['timestamp'] = parse(matches.groups()[0]).astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-          data['message'] = row
-          yield data
+      for row in value_generator(buf):
+        yield row
     prev = fh.read()
     content += prev
+
+  if content:
+    for row in value_generator(content):
+      yield row
 
 
 def fields_from_log(fh):

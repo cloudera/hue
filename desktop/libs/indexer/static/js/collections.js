@@ -265,7 +265,9 @@ var CreateCollectionViewModel = function() {
           'collection': ko.mapping.toJSON(collection),
           'type': self.sourceType(),
           'path': self.file(),
-          'source': self.source()
+          'source': self.source(),
+          'separator': self.fieldSeparator(),
+          'quote': self.fieldQuoteCharacter()
         }).done(function(data) {
           if (data.status == 0) {
             window.location.href = '/indexer';

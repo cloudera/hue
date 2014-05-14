@@ -370,6 +370,11 @@ class Collection(models.Model):
       properties_python['field_order'] = []
     if 'data_type' not in properties_python:
       properties_python['data_type'] = 'separated'
+    if properties_python['data_type'] == 'separated':
+      if 'separator' not in properties_python:
+        properties_python['separator'] = ','
+      if 'quote_character' not in properties_python:
+        properties_python['quote_character'] = '"'
     return properties_python
 
   def update_properties(self, post_data):
