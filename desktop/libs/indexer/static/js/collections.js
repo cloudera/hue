@@ -226,19 +226,13 @@ var CreateCollectionViewModel = function() {
 
           // Find unique key default field
           var message = null;
-          var first = null;
-          ko.utils.arrayForEach(self.collection.fields(), function(field) {
-            if (!first) {
-              first = field;
-            }
-            if (field.name() == 'message') {
-              message = field;
-            }
+          var uniqueKeyFields = ko.utils.arrayFilter(self.collection.fields(), function(field) {
+            return field.indexed();
           });
-          if (message) {
-            self.collection.uniqueKeyField(message.name());
-          } else if (first) {
-            self.collection.uniqueKeyField(first.name());
+          if (uniqueKeyFields.length > 0) {
+            self.collection.uniqueKeyField(uniqueKeyFields[0].name());
+          } else if (self.collection.fields().length > 0) {
+            self.collection.uniqueKeyField(self.collection.fields().name());
           }
         } else {
           $(document).trigger("error", data.message);

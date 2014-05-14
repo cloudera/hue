@@ -278,7 +278,12 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         <td><p class="text-center"><input data-bind="checked: required" type="checkbox"></p></td>
         <td><p class="text-center"><input data-bind="checked: indexed" type="checkbox"></p></td>
         <td><p class="text-center"><input data-bind="checked: stored" type="checkbox"></p></td>
-        <td><p class="text-center"><input data-bind="checked: uniqueKeyField" name="unique-key" type="checkbox" /></p></td>
+        <td>
+          <p class="text-center">
+            <input data-bind="checked: uniqueKeyField, visible: !uniqueKeyField()" name="unique-key" type="checkbox" />
+            <span class="fa" data-bind="css: {'fa-check': uniqueKeyField}">
+          </p>
+        </td>
         <td>
           <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-minus"></i>&nbsp;${_("Remove")}</a>
         </td>
