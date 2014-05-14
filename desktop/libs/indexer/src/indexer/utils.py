@@ -131,6 +131,11 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   else:
     field_names = [field['name'] for field in fields]
 
+  if fields is None:
+    timestamp_fields = None
+  else:
+    timestamp_fields = [field['name'] for field in fields if field['type'] in DATE_FIELD_TYPES]
+
   csvfile = StringIO.StringIO()
   content = fh.read()
   is_first = True
@@ -141,8 +146,6 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
         csvfile.write('\n')
       csvfile.write(content[:last_newline])
       content = content[last_newline+1:]
-      # print content
-      # print 'here1'
     else:
       if not is_first:
         csvfile.write('\n')
@@ -153,6 +156,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
     reader = csv.DictReader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
     remove_keys = None
     for row in reader:
+      # Remove keys that aren't in collection
       if remove_keys is None:
         if field_names is None:
           remove_keys = []
@@ -161,6 +165,14 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
       if remove_keys:
         for key in remove_keys:
           del row[key]
+
+      # Parse timestamp
+      if timestamp_fields:
+        for key in timestamp_fields:
+          if key in row:
+            row[key] = parse(row[key]).astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+      # Return row
       yield row
     
     csvfile.truncate()
