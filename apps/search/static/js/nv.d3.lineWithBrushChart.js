@@ -21,10 +21,16 @@ nv.models.lineWithBrushChart = function() {
   // Public Variables with Default Settings
   //------------------------------------------------------------
 
+  var LABELS = {
+    SELECT: "Enable selection"
+  }
+
+
   var lines = nv.models.line()
     , xAxis = nv.models.axis()
     , yAxis = nv.models.axis()
     , legend = nv.models.legend()
+    , controls = nv.models.legend()
     , interactiveLayer = nv.interactiveGuideline()
     , brush = d3.svg.brush()
     ;
@@ -34,6 +40,7 @@ nv.models.lineWithBrushChart = function() {
     , width = null
     , height = null
     , showLegend = true
+    , showControls = true
     , showXAxis = true
     , showYAxis = true
     , rightAlignYAxis = false
@@ -49,6 +56,7 @@ nv.models.lineWithBrushChart = function() {
     , defaultState = null
     , noData = 'No Data Available.'
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
+    , controlWidth = function() { return showControls ? 300 : 0 }
     , transitionDuration = 250
     , extent
     , brushExtent = null
@@ -64,6 +72,8 @@ nv.models.lineWithBrushChart = function() {
   yAxis
     .orient((rightAlignYAxis) ? 'right' : 'left')
     ;
+
+  controls.updateState(false);
 
   //============================================================
 
@@ -96,7 +106,15 @@ nv.models.lineWithBrushChart = function() {
                              - margin.top - margin.bottom;
 
 
-      chart.update = function() { container.transition().duration(transitionDuration).call(chart) };
+      chart.update = function() {
+        container.transition().duration(transitionDuration).call(chart)
+        if (selectionEnabled){
+          enableBrush();
+        }
+        else {
+          disableBrush();
+        }
+      };
       chart.container = this;
 
       //set state.disabled
@@ -160,10 +178,7 @@ nv.models.lineWithBrushChart = function() {
       gEnter.append('g').attr('class', 'nv-linesWrap');
       gEnter.append('g').attr('class', 'nv-legendWrap');
       gEnter.append('g').attr('class', 'nv-interactive');
-      if (selectionEnabled){
-        gEnter.append('g').attr('class', 'nv-brushBackground');
-        gEnter.append('g').attr('class', 'nv-x nv-brush');
-      }
+      gEnter.append('g').attr('class', 'nv-controlsWrap');
 
       g.select("rect")
         .attr("width",availableWidth)
@@ -172,7 +187,7 @@ nv.models.lineWithBrushChart = function() {
       // Legend
 
       if (showLegend) {
-        legend.width(availableWidth);
+        legend.width(availableWidth - controlWidth());
 
         g.select('.nv-legendWrap')
             .datum(data)
@@ -187,6 +202,19 @@ nv.models.lineWithBrushChart = function() {
         wrap.select('.nv-legendWrap')
             .attr('transform', 'translate(0,' + (-margin.top) +')')
       }
+
+      if (showControls) {
+        var controlsData = [
+          { key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true }
+        ];
+
+        controls.width(controlWidth()).color(['#444', '#444', '#444']);
+        g.select('.nv-controlsWrap')
+            .datum(controlsData)
+            .attr('transform', 'translate(0,' + (-margin.top) +')')
+            .call(controls);
+      }
+
 
       //------------------------------------------------------------
 
@@ -232,33 +260,49 @@ nv.models.lineWithBrushChart = function() {
       //------------------------------------------------------------
       // Setup Brush
       if (selectionEnabled){
-        brush
-          .x(x)
-          .on('brush', onBrush)
-          .on('brushend', onBrushEnd)
+        enableBrush();
+      }
 
-        if (brushExtent) brush.extent(brushExtent);
-        var brushBG = g.select('.nv-brushBackground').selectAll('g')
-            .data([brushExtent || brush.extent()])
-        var brushBGenter = brushBG.enter()
-            .append('g');
 
-        brushBGenter.append('rect')
-            .attr('class', 'left')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('height', availableHeight);
+      function enableBrush() {
+        if (g.selectAll('.nv-brush')[0].length == 0) {
+          gEnter.append('g').attr('class', 'nv-brushBackground');
+          gEnter.append('g').attr('class', 'nv-x nv-brush');
+          brush
+              .x(x)
+              .on('brush', onBrush)
+              .on('brushend', onBrushEnd)
 
-        brushBGenter.append('rect')
-            .attr('class', 'right')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('height', availableHeight);
+          if (brushExtent) brush.extent(brushExtent);
+          var brushBG = g.select('.nv-brushBackground').selectAll('g')
+              .data([brushExtent || brush.extent()])
+          var brushBGenter = brushBG.enter()
+              .append('g');
 
-        var gBrush = g.select('.nv-x.nv-brush')
-            .call(brush);
-        gBrush.selectAll('rect')
-            .attr('height', availableHeight);
+          brushBGenter.append('rect')
+              .attr('class', 'left')
+              .attr('x', 0)
+              .attr('y', 0)
+              .attr('height', availableHeight);
+
+          brushBGenter.append('rect')
+              .attr('class', 'right')
+              .attr('x', 0)
+              .attr('y', 0)
+              .attr('height', availableHeight);
+
+          var gBrush = g.select('.nv-x.nv-brush')
+              .call(brush);
+          gBrush.selectAll('rect')
+              .attr('height', availableHeight);
+        }
+        else {
+          g.selectAll('.nv-brush').attr('display', 'inline');
+        }
+      }
+
+      function disableBrush() {
+        g.selectAll('.nv-brush').attr('display', 'none');
       }
 
 
@@ -299,6 +343,24 @@ nv.models.lineWithBrushChart = function() {
           state = newState;
           dispatch.stateChange(state);
           chart.update();
+      });
+
+      controls.dispatch.on('legendClick', function(d,i) {
+        if (typeof d.checkbox == "undefined"){
+          if (!d.disabled) return;
+          controlsData = controlsData.map(function(s) {
+            s.disabled = true;
+            return s;
+          });
+          d.disabled = false;
+        }
+
+        switch (d.key) {
+          case LABELS.SELECT:
+            selectionEnabled = !selectionEnabled;
+            break;
+        }
+        chart.update();
       });
 
       interactiveLayer.dispatch.on('elementMousemove', function(e) {
@@ -469,6 +531,12 @@ nv.models.lineWithBrushChart = function() {
     if (!arguments.length) return color;
     color = nv.utils.getColor(_);
     legend.color(color);
+    return chart;
+  };
+
+  chart.showControls = function(_) {
+    if (!arguments.length) return showControls;
+    showControls = _;
     return chart;
   };
 
