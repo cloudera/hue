@@ -92,9 +92,21 @@ ko.bindingHandlers.lineChart = {
 
 ko.bindingHandlers.mapChart = {
   init: function (element, valueAccessor) {
-    $(element).height($(element).width()/2.23);
-    $(element).css("position", "relative");
     var _options = valueAccessor();
+
+    $(element).css("position", "relative");
+    $(element).css("marginLeft", "auto");
+    $(element).css("marginRight", "auto");
+
+    if (typeof _options.maxWidth != "undefined"){
+      var _max = _options.maxWidth*1;
+      if ($(element).width() > _max){
+        $(element).width(_max);
+      }
+    }
+
+    $(element).height($(element).width()/2.23);
+
     var _data = _options.transformer(_options.data);
     var _maxWeight = 0;
     $(_data).each(function(cnt, item){
@@ -143,56 +155,72 @@ ko.bindingHandlers.mapChart = {
       });
     }
 
-    var _map = new Datamap({
-      element: element,
-      fills: _fills,
-      scope: 'world',
-      data: _mapdata,
-      done: function(datamap) {
+    var _map = null;
+    function createDatamap(element, options, fills, mapData, nonCountries, mapHovers){
+      _map = new Datamap({
+        element: element,
+        fills: fills,
+        scope: 'world',
+        data: mapData,
+        done: function(datamap) {
 
-        datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-          if (typeof _options.onClick != "undefined"){
-            _options.onClick(geography);
-          }
-        });
-
-        var _bubbles = [];
-        if (_options.enableGeocoding){
-          $(_noncountries).each(function(cnt, item){
-              HueGeo.getCityCoordinates(item.label, function(lat, lng){
-                  _bubbles.push({
-                    fillKey: "selected",
-                    label: item.label,
-                    radius: 4,
-                    latitude: lat,
-                    longitude: lng
-                  });
-                  _map.bubbles(_bubbles, {
-                    popupTemplate: function(geo, data) {
-                      return '<div class="hoverinfo"><strong>'  + data.label + '</strong></div>'
-                    }
-                  });
-              });
+          datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+            if (typeof options.onClick != "undefined"){
+              options.onClick(geography);
+            }
           });
+
+          var _bubbles = [];
+          if (options.enableGeocoding){
+            $(nonCountries).each(function(cnt, item){
+                HueGeo.getCityCoordinates(item.label, function(lat, lng){
+                    _bubbles.push({
+                      fillKey: "selected",
+                      label: item.label,
+                      value: item.value,
+                      radius: 4,
+                      latitude: lat,
+                      longitude: lng
+                    });
+                    _map.bubbles(_bubbles, {
+                      popupTemplate: function(geo, data) {
+                        return '<div class="hoverinfo" style="text-align: center"><strong>'  + data.label + '</strong><br/>' + item.value + '</div>'
+                      }
+                    });
+                });
+            });
+          }
+        },
+        geographyConfig: {
+          hideAntarctica: true,
+          borderWidth: 1,
+          borderColor: HueColors.DARK_BLUE,
+          highlightOnHover: true,
+          highlightFillColor: HueColors.DARK_BLUE,
+          highlightBorderColor: HueColors.DARK_BLUE,
+          popupTemplate: function(geography, data) {
+            var _hover = mapHovers[geography.properties.name.toLowerCase()];
+            return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + ((typeof _hover != "undefined")?'<br/>' + _hover : '') + '</div>'
+          }
         }
-      },
-      geographyConfig: {
-        hideAntarctica: true,
-        borderWidth: 1,
-        borderColor: HueColors.DARK_BLUE,
-        highlightOnHover: true,
-        highlightFillColor: HueColors.DARK_BLUE,
-        highlightBorderColor: HueColors.DARK_BLUE,
-        popupTemplate: function(geography, data) {
-          var _hover = _maphovers[geography.properties.name.toLowerCase()];
-          return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + ((typeof _hover != "undefined")?'<br/>' + _hover : '') + '</div>'
-        }
-      }
-    });
-    _options.onComplete();
+      });
+      options.onComplete();
+    }
+
+    createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
+
+
     nv.utils.windowResize(_map.update);
     $(element).parents(".card-widget").on("resize", function(){
-      console.log("resize!");
+      $(element).empty();
+      if (typeof _options.maxWidth != "undefined"){
+        var _max = _options.maxWidth*1;
+        if ($(element).width() > _max){
+          $(element).width(_max);
+        }
+      }
+      $(element).height($(element).width()/2.23);
+      createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
     });
   },
   update: function (element, valueAccessor) {

@@ -800,6 +800,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id},
         transformer: mapChartDataTransformer,
+        maxWidth: 750,
         onClick: function(d){ console.log(d); },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
     </div>
