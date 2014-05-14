@@ -269,24 +269,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </h2>
-    <div class="card-body" style="padding: 5px;">
-    
+    <div class="card-body" style="padding: 5px;">    
       <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
-    <!--
-      <ul class="nav nav-pills" data-bind="visible: $root.isEditing()">
-        <li class="active">
-          <a href="javascript: void(0)" class="widget-main-pill">${_('Preview')}</a>
-        </li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Settings')}</a></li>
-      </ul>
-
-      <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
-      <div data-bind="visible: $root.isEditing()" class="widget-settings-section">
-        <ul class="unstyled" style="margin: 10px">
-          <li>${ _('Name')}: <input type="text" data-bind="value: name" class="input-mini" /></li>
-        </ul>
-      </div>
-    -->
     </div>
   </div>
 </script>
@@ -502,12 +486,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
         <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
         <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Properties')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Sorting')}</a></li>
       </ul>
     </div>
 
     <!-- ko if: $root.isEditing() -->
-      <div class="widget-editor-section">
+      <div class="widget-section widget-editor-section">
         <div class="row-fluid">
           <div class="span9">
             <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
@@ -541,7 +525,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </div>
         </div>
       </div>
-      <div class="widget-html-section" style="display: none">
+      <div class="widget-section widget-html-section" style="display: none">
         <div class="row-fluid">
           <div class="span9">
             <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
@@ -575,8 +559,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </div>
         </div>
       </div>
-      <div class="widget-css-section" style="display: none">
+      <div class="widget-section widget-css-section" style="display: none">
         <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
+      </div>
+      <div class="widget-section widget-settings-section" style="display: none">
+         Sorting
       </div>
     <!-- /ko -->
 
@@ -1397,7 +1384,6 @@ function toggleDocDetails(doc){
     _docRow.data("expanded", true);
     var _detailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
     if (_detailsRow.length > 0){
-      //_detailsRow.html($("#genericLoader").html());
       _detailsRow.parent().show();
     }
     else {
@@ -1444,23 +1430,21 @@ $(document).ready(function () {
   });
 
   $(document).on("click", ".widget-settings-pill", function(){
-    $(this).parents(".card-body").find(".widget-main-section").hide();
+    $(this).parents(".card-body").find(".widget-section").hide();
     $(this).parents(".card-body").find(".widget-settings-section").show();
     $(this).parent().siblings().removeClass("active");
     $(this).parent().addClass("active");
   });
 
   $(document).on("click", ".widget-editor-pill", function(){
-    $(this).parents(".card-body").find(".widget-html-section").hide();
-    $(this).parents(".card-body").find(".widget-css-section").hide();
+    $(this).parents(".card-body").find(".widget-section").hide();
     $(this).parents(".card-body").find(".widget-editor-section").show();
     $(this).parent().siblings().removeClass("active");
     $(this).parent().addClass("active");
   });
 
   $(document).on("click", ".widget-html-pill", function(){
-    $(this).parents(".card-body").find(".widget-editor-section").hide();
-    $(this).parents(".card-body").find(".widget-css-section").hide();
+    $(this).parents(".card-body").find(".widget-section").hide();
     $(this).parents(".card-body").find(".widget-html-section").show();
     $(document).trigger("refreshCodemirror");
     $(this).parent().siblings().removeClass("active");
@@ -1468,8 +1452,7 @@ $(document).ready(function () {
   });
 
   $(document).on("click", ".widget-css-pill", function(){
-    $(this).parents(".card-body").find(".widget-editor-section").hide();
-    $(this).parents(".card-body").find(".widget-html-section").hide();
+    $(this).parents(".card-body").find(".widget-section").hide();
     $(this).parents(".card-body").find(".widget-css-section").show();
     $(document).trigger("refreshCodemirror");
     $(this).parent().siblings().removeClass("active");
@@ -1664,7 +1647,7 @@ $(document).ready(function () {
       var wrapperElement = $(editor.getWrapperElement());
 
       $(document).on("refreshCodemirror", function(){
-        editor.setSize("100%", 450);
+        editor.setSize("100%", 300);
         editor.refresh();
       });
 
@@ -1684,6 +1667,7 @@ $(document).ready(function () {
         disable_search_threshold: 10,
         width: "75%"
       });
+      $('.chosen-select').trigger('chosen:updated');
 
       var sourceDelay = -1;
       editor.on("change", function (cm) {

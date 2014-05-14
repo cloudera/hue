@@ -897,11 +897,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             // Template view
             var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
             $.each(data.response.docs, function (index, item) {
-              for (var prop in item) {
-                if (item.hasOwnProperty(prop)) {
-                  item[prop] = $("<span>").html(item[prop]).text();
-                }
-              }
               // fix the fields that contain dots in the name
               addTemplateFunctions(item);
               self.results.push(Mustache.render(_mustacheTmpl, item));
