@@ -27,7 +27,7 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/create/$', 'collections_create', name='api_collections_create'),
   url(r'^api/collections/import/$', 'collections_import', name='api_collections_import'),
   url(r'^api/collections/remove/$', 'collections_remove', name='api_collections_remove'),
-  url(r'^api/collections/(?P<collection_or_core>\w+)/metadata/$', 'collections_fields_and_metadata', name='api_collections_metadata'),
-  url(r'^api/collections/(?P<collection_or_core>\w+)/update/$', 'collections_update', name='api_collections_update'),
-  url(r'^api/collections/(?P<collection_or_core>\w+)/data/$', 'collections_data', name='api_collections_data')
+  url(r'^api/collections/(?P<collection>\w+)/fields/$', 'collections_fields', name='api_collections_fields'),
+  url(r'^api/collections/(?P<collection>\w+)/update/$', 'collections_update', name='api_collections_update'),
+  url(r'^api/collections/(?P<collection>\w+)/data/$', 'collections_data', name='api_collections_data')
 )

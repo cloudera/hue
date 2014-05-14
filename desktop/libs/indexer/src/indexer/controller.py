@@ -31,7 +31,7 @@ from indexer import conf, utils
 
 
 LOG = logging.getLogger(__name__)
-MAX_UPLOAD_SIZE = 1024*1024 # 1 MB
+MAX_UPLOAD_SIZE = 10*1024*1024 # 10 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 
@@ -152,7 +152,7 @@ class CollectionManagerController(object):
 
     api.add_fields(name, new_fields_filtered)
 
-  def update_data_from_hdfs(self, fs, hue_collection, path, indexing_strategy='upload'):
+  def update_data_from_hdfs(self, fs, collection_or_core_name, fields, path, data_type='separated', indexing_strategy='upload', **kwargs):
     """
     Add hdfs path contents to index
     """
@@ -163,24 +163,22 @@ class CollectionManagerController(object):
         raise PopupException(_('File size is too large to handle!'))
       else:
         # Get fields for filtering
-        unique_key, fields = self.get_fields(hue_collection.name)
+        unique_key, fields = self.get_fields(collection_or_core_name)
         fields = [{'name': field, 'type': fields[field]['type']} for field in fields]
 
-        properties_dict = hue_collection.properties_dict
-
         fh = fs.open(path)
-        if properties_dict['data_type'] == 'log':
+        if data_type == 'log':
           # Transform to JSON then update
           data = json.dumps([value for value in utils.field_values_from_log(fh, fields)])
           content_type = 'json'
-        elif properties_dict['data_type'] == 'separated':
+        elif data_type == 'separated':
           # 'data' first line should be headers.
-          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, properties_dict['separator'], properties_dict['quote_character'], fields)])
+          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)])
           content_type = 'json'
         else:
-          raise PopupException(_('Could not update index. Unknown type %s') % properties_dict['data_type'])
+          raise PopupException(_('Could not update index. Unknown type %s') % data_type)
         fh.close()
-      if not api.update(hue_collection.name, data, content_type=content_type):
+      if not api.update(collection_or_core_name, data, content_type=content_type):
         raise PopupException(_('Could not update index. Check error logs for more info.'))
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)

@@ -117,16 +117,6 @@ def collections(request):
   for collection in solr_collections:
     massaged_collections.append({
       'name': collection,
-      'solr': True,
-      'hue': collection in hue_collections_map
-    })
-    if collection in hue_collections_map:
-      del hue_collections_map[collection]
-  for collection in hue_collections_map:
-    massaged_collections.append({
-      'name': collection,
-      'solr': False,
-      'hue': True
     })
   response = {
     'status': 0,
@@ -149,22 +139,17 @@ def collections_create(request):
 
     # Create instance directory, collection, and add fields
     searcher.create_collection(collection.get('name'), collection.get('fields', []), collection.get('uniqueKeyField'))
-    hue_collection, created = Collection.objects.get_or_create(name=collection.get('name'), solr_properties='{}', is_enabled=True, user=request.user)
-    properties_dict = hue_collection.properties_dict
-    properties_dict['data_type'] = request.POST.get('type')
-    properties_dict['field_order'] = [field['name'] for field in collection.get('fields', [])]
-    if properties_dict['data_type'] == 'separated':
-      properties_dict['separator'] = request.POST.get('separator', ',')
-      properties_dict['quote_character'] = request.POST.get('quote', '"')
-    hue_collection.properties = json.dumps(properties_dict)
-    hue_collection.save()
 
     try:
       if request.POST.get('source') == 'file':
         # Index data
         searcher.update_data_from_hdfs(request.fs,
-                                       hue_collection,
-                                       request.POST.get('path'))
+                                       collection.get('name'),
+                                       collection.get('fields', []),
+                                       request.POST.get('path'),
+                                       request.POST.get('type'),
+                                       separator=request.POST.get('separator'),
+                                       quote_character=request.POST.get('quote'))
 
       elif request.POST.get('source') == 'hive':
         # Run a custom hive query and post data to collection
@@ -182,7 +167,6 @@ def collections_create(request):
       response['message'] = _('Collection created!')
     except:
       searcher.delete_collection(collection.get('name'))
-      hue_collection.delete()
       raise
   else:
     response['message'] = _('Collection missing.')
@@ -234,7 +218,6 @@ def collections_remove(request):
   if response.get('message', None) is None:
     searcher = CollectionManagerController(request.user)
     solr_collections = searcher.get_collections()
-    Collection.objects.filter(name__in=[collection.get('name') for collection in collections]).delete()
 
     for collection in collections:
       if collection.get('name') in solr_collections:
@@ -248,33 +231,24 @@ def collections_remove(request):
 
 
 @admin_only()
-def collections_fields_and_metadata(request, collection_or_core):
+def collections_fields(request, collection):
   if request.method != 'GET':
     raise PopupException(_('GET request required.'))
 
   response = {}
 
   searcher = CollectionManagerController(request.user)
-  unique_key, fields = searcher.get_fields(collection_or_core)
+  unique_key, fields = searcher.get_fields(collection)
 
-  try:
-    # Sort fields by field order
-    hue_collection = Collection.objects.get(name=collection_or_core)
-    unknown_fields = list(set(fields.keys()) - set(hue_collection.properties_dict['field_order']))
-    field_order = hue_collection.properties_dict['field_order'] + unknown_fields
-    data_type = hue_collection.properties_dict['data_type']
-  except Collection.DoesNotExist:
-    data_type = 'separated'
   response['status'] = 0
-  response['fields'] = [(field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in field_order]
+  response['fields'] = [(field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields]
   response['unique_key'] = unique_key
-  response['type'] = data_type
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @admin_only()
-def collections_update(request, collection_or_core):
+def collections_update(request, collection):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
 
@@ -282,34 +256,20 @@ def collections_update(request, collection_or_core):
 
   collection = json.loads(request.POST.get('collection', '{}'))
 
-  try:
-    hue_collection = Collection.objects.get(name=collection_or_core)
-  except Collection.DoesNotExist:
-    raise Http404()
-
   if not collection:
     response['message'] = _('No collection to update.')
 
   if response.get('message', None) is None:
     searcher = CollectionManagerController(request.user)
-    searcher.update_collection(collection_or_core, collection.get('fields', []))
-
-    # Update metadata
-    properties_dict = hue_collection.properties_dict
-    properties_dict['field_order'] = [field['name'] for field in collection.get('fields', [])]
-    if 'type' in request.POST:
-      properties_dict['data_type'] = request.POST.get('type')
-    hue_collection.properties = json.dumps(properties_dict)
-    hue_collection.save()
+    searcher.update_collection(collection.get('name'), collection.get('fields', []))
 
     response['status'] = 0
     response['message'] = _('Collection updated!')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-
 @admin_only()
-def collections_data(request, collection_or_core):
+def collections_data(request, collection):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
 
@@ -317,18 +277,19 @@ def collections_data(request, collection_or_core):
 
   source = request.POST.get('source')
 
-  try:
-    hue_collection = Collection.objects.get(name=collection_or_core)
-  except Collection.DoesNotExist:
-    raise Http404()
-
   if source == 'file':
     searcher = CollectionManagerController(request.user)
 
-    searcher.update_data_from_hdfs(request.fs, hue_collection, request.POST.get('path'))
+    searcher.update_data_from_hdfs(request.fs,
+                                   collection,
+                                   None,
+                                   request.POST.get('path'),
+                                   request.POST.get('type'),
+                                   separator=request.POST.get('separator'),
+                                   quote_character=request.POST.get('quote'))
 
     response['status'] = 0
-    response['message'] = _('Collections updated!')
+    response['message'] = _('Index imported!')
   else:
     response['message'] = _('Unsupported source %s') % source
 

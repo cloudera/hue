@@ -178,11 +178,11 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
     message_key = 'message'
   else:
     try:
-      timestamp_key = next(filter(lambda field: field['type'] in DATE_FIELD_TYPES, fields))['name']
+      timestamp_key = next(iter(filter(lambda field: field['type'] in DATE_FIELD_TYPES, fields)))['name']
     except:
       timestamp_key = None
     try:
-      message_key = next(filter(lambda field: field['type'] in TEXT_FIELD_TYPES, fields))['name']
+      message_key = next(iter(filter(lambda field: field['type'] in TEXT_FIELD_TYPES, fields)))['name']
     except:
       message_key = None
 
@@ -204,12 +204,14 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
       buf = content[:last_newline]
       content = content[last_newline+1:]
       for row in value_generator(buf):
+        # print row
         yield row
     prev = fh.read()
     content += prev
 
   if content:
     for row in value_generator(content):
+      # print row
       yield row
 
 

@@ -145,7 +145,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <div class="row-fluid">
         <div class="span12">
           <p>
-            <ul id="collections" data-bind="template: {'name': 'collection-template', 'foreach': filteredCollections, 'afterRender': afterCollectionListRender}"></ul>
+            <ul id="collections" data-bind="template: {'name': 'collection-template', 'foreach': filteredCollections}"></ul>
           </p>
         </div>
       </div>
@@ -155,29 +155,24 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script id="collection-template" type="text/html">
-<li class="collection-row-container" data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false, css: {'hue-only': !hasSolrCollection(), 'solr-only': !hasHueCollection(), 'solr-and-hue': hasHueCollection() && hasSolrCollection()}" title="${ _('Click to edit') }">
+<li class="collection-row-container" data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false" title="${ _('Click to edit') }">
   <div data-bind="css: {'selected': $parent.collections()[$index()].selected()}" class="collection-row">
     <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
       <a data-bind="click: $parent.removeCollections, clickBubble: false" href="javascript:void(0);"><i class="fa fa-times"></i> ${_('Delete')}</a>
     </div>
 
-    <!-- ko if: hasHueCollection() && hasSolrCollection() -->
     <form class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-      <div style="display: none">
-        <input class="fileChooser">
-      </div>
-      <a data-bind="click: chooseFileToIndex, clickBubble: false" href="javascript:void(0);"><i class="fa fa-upload"></i> ${_('Upload')}</a>
+      <a data-bind="routie: 'upload/' + name()" href="javascript:void(0);"><i class="fa fa-upload"></i> ${_('Upload')}</a>
     </form>
     <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
       <a data-bind="routie: 'edit/' + name()" href="javascript:void(0);"><i class="fa fa-pencil"></i> ${_('Edit')}</a>
     </div>
-    <!-- /ko -->
 
-    <!-- ko ifnot: hasHueCollection() -->
-    <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
-      <a data-bind="click: $parent.importCollection" href="javascript:void(0);"><i class="fa fa-pencil"></i> ${_('Create')}</a>
-    </div>
-    <!-- /ko -->
+    ## <!-- ko ifnot: hasHueCollection() -->
+    ## <div class="pull-right" style="margin-top: 10px;margin-right: 10px;">
+    ##   <a data-bind="click: $parent.importCollection" href="javascript:void(0);"><i class="fa fa-pencil"></i> ${_('Create')}</a>
+    ## </div>
+    ##<!-- /ko -->
     <h4><i class="fa fa-list"></i> <span data-bind="text: name"></span></h4>
   </div>
 </li>
@@ -191,7 +186,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     <h1 class="card-heading simple">${_("Create collection from file")}</h1>
     <div class="card-body" data-bind="if: wizard.currentPage()">
       <form class="form form-horizontal">
-        <div data-bind="template: { 'name': wizard.currentPage().name}"></div>
+        <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
         <br style="clear:both" />
         <br style="clear:both" />
         <a data-bind="routie: 'create/wizard/' + wizard.previousUrl(), visible: wizard.hasPrevious" class="btn btn-info" href="javascript:void(0)">${_('Previous')}</a>
@@ -202,10 +197,9 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   </div>
 </div>
 </script>
-<!--/ Create by file -->
 
-<!-- Wizard -->
-<script type="text/html" id="collection-data">
+<!-- Create wizard -->
+<script type="text/html" id="create-collection-data">
   <div class="control-group" data-bind="css: {'error': collection.name.errors().length > 0}">
     <label for="name" class="control-label">${_("Name")}</label>
     <div class="controls">
@@ -228,7 +222,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="collection-data-separated">
+<script type="text/html" id="create-collection-data-separated">
   <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
     <label for="separator" class="control-label">${_("Separator")}</label>
     <div class="controls">
@@ -244,7 +238,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="collection-data-morphlines">
+<script type="text/html" id="create-collection-data-morphlines">
   <div class="control-group" data-bind="css: {'error': morphlines.name.errors().length > 0}">
     <label for="name" class="control-label">${_("Morphlines config name")}</label>
 
@@ -262,7 +256,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="collection-fields">
+<script type="text/html" id="create-collection-fields">
   <table class="table">
     <thead>
       <tr>
@@ -275,8 +269,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         <th width="50%"></th>
       </tr>
     </thead>
-    <tbody data-bind="sortable: collection.fields">
-      <tr data-bind="css: {'error': name.errors().length > 0}" class="ko_container editable">
+    <tbody data-bind="foreach: collection.fields">
+      <tr data-bind="css: {'error': name.errors().length > 0}" class="editable">
         <td data-bind="editableText: name">
           <span class="pull-left fa fa-pencil"></span>
         </td>
@@ -296,7 +290,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <br />
   <a data-bind="click: collection.newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
 </script>
-<!--/ Wizard -->
+<!--/ Create wizard -->
+<!--/ Create by file -->
 
 <!-- Edit collection page -->
 <script id="edit-page" type="text/html">
@@ -305,14 +300,6 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     <h1 class="card-heading simple">${_("Edit collection")}</h1>
     <div class="card-body">
       <form class="form">
-        <div class="control-group" data-bind="css: {'error': sourceType.errors().length > 0}">
-          <label for="name" class="control-label">${_("Source type")}</label>
-          <div class="controls">
-            <select data-bind="options: sourceTypes, value: sourceType" name="type"></select>
-          </div>
-        </div>
-        <br />
-        <br />
         <table class="table">
           <thead>
             <tr>
@@ -325,7 +312,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
               <th width="50%"></th>
             </tr>
           </thead>
-          <tbody data-bind="sortable: { 'data': ko.utils.arrayFilter(collection().fields(), function(field) { return field.saved() }) }">
+          <tbody data-bind="foreach: ko.utils.arrayFilter(collection().fields(), function(field) { return field.saved() })">
             <tr class="ko_container">
               <td data-bind="text: name"></td>
               <td data-bind="text: type"></td>
@@ -336,7 +323,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
               <td></td>
             </tr>
           </tbody>
-          <tbody data-bind="sortable: { 'data': ko.utils.arrayFilter(collection().fields(), function(field) { return !field.saved() }) }">
+          <tbody data-bind="foreach: ko.utils.arrayFilter(collection().fields(), function(field) { return !field.saved() })">
             <tr data-bind="css: {'error': name.errors().length > 0}"  class="ko_container editable">
               <td data-bind="editableText: name">
                 <span class="pull-left fa fa-pencil"></span>
@@ -361,6 +348,57 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </div>
 </script>
 
+<!-- Upload wizard -->
+<script id="upload-page" type="text/html">
+<div data-bind="with: edit" class="span12">
+  <div class="card wizard">
+    <h1 class="card-heading simple">${_("Index data from file")}</h1>
+    <div class="card-body" data-bind="if: wizard.currentPage()">
+      <form class="form form-horizontal">
+        <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
+        <br style="clear:both" />
+        <br style="clear:both" />
+        <a data-bind="routie: 'upload/' + collection().name() + '/' + wizard.previousUrl(), visible: wizard.hasPrevious" class="btn btn-info" href="javascript:void(0)">${_('Previous')}</a>
+        <a data-bind="routie: 'upload/' + collection().name() + '/' + wizard.nextUrl(), visible: wizard.hasNext" class="btn btn-info" href="javascript:void(0)">${_('Next')}</a>
+        <a data-bind="click: addData, visible: !wizard.hasNext()" class="btn btn-info" href="javascript:void(0)">${_('Finish')}</a>
+      </form>
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="text/html" id="upload-collection-data">
+  <div class="control-group" data-bind="css: {'error': file.errors().length > 0}">
+    <label for="name" class="control-label">${_("Files")}</label>
+    <div class="controls">
+      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/foo/data.csv"/>
+    </div>
+  </div>
+
+  <div class="control-group" data-bind="css: {'error': sourceType.errors().length > 0}">
+    <label for="name" class="control-label">${_("Source type")}</label>
+    <div class="controls">
+      <select data-bind="options: sourceTypes, value: sourceType" name="type"></select>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="upload-collection-data-separated">
+  <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
+    <label for="separator" class="control-label">${_("Separator")}</label>
+    <div class="controls">
+      <select data-bind="options: fieldSeparators, value: fieldSeparator" name="separator"></select>
+    </div>
+  </div>
+
+  <div class="control-group" data-bind="css: {'error': fieldQuoteCharacter.errors().length > 0}">
+    <label for="quote" class="control-label">${_("Quote character")}</label>
+    <div class="controls">
+      <select data-bind="options: fieldQuoteCharacters, value: fieldQuoteCharacter" name="quote"></select>
+    </div>
+  </div>
+</script>
+<!--/ Wizard -->
 <!--/ Edit collection page -->
 
 
@@ -374,6 +412,10 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <script src="/indexer/static/js/collections.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
+function afterRender() {
+  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
+}
+
 function validateAndUpdateCollection() {
   if (validateFields(ko.unwrap(vm.edit.collection))) {
     vm.edit.updateCollection().done(function(data) {
@@ -383,18 +425,6 @@ function validateAndUpdateCollection() {
     });
   }
   return false;
-}
-
-function afterCollectionListRender(elements) {
-  $(elements).find(".fileChooser:not(:has(~ button))").change(function(e) {
-    var context = ko.contextFor(e.target);
-    vm.manage.addData(context.$data, $(e.target).val());
-  });
-  addFileBrowseButton();
-}
-
-function addFileBrowseButton() {
-  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 }
 
 function chooseFileToIndex($data, e) {
@@ -427,11 +457,11 @@ function validateFields(collection) {
 }
 
 var vm = new CollectionsViewModel();
-var root = vm.create.wizard.getPage('name', 'collection-data', 'separated', validateFileAndNameAndType);
-vm.create.wizard.getPage('separated', 'collection-data-separated', 'fields', validateFetchFields);
-vm.create.wizard.getPage('morphlines', 'collection-data-morphlines', 'fields', validateFetchFields);
-vm.create.wizard.getPage('fields', 'collection-fields', null, function() { return validateFields(vm.create.collection) });
-vm.create.wizard.rootPage(root);
+var create_root = vm.create.wizard.getPage('name', 'create-collection-data', 'separated', validateFileAndNameAndType);
+vm.create.wizard.getPage('separated', 'create-collection-data-separated', 'fields', validateFetchFields);
+vm.create.wizard.getPage('morphlines', 'create-collection-data-morphlines', 'fields', validateFetchFields);
+vm.create.wizard.getPage('fields', 'create-collection-fields', null, function() { return validateFields(vm.create.collection) });
+vm.create.wizard.rootPage(create_root);
 vm.create.wizard.currentPage(vm.create.wizard.rootPage());
 
 vm.create.sourceType.subscribe(function(value) {
@@ -439,6 +469,22 @@ vm.create.sourceType.subscribe(function(value) {
     vm.create.wizard.getPage('name').next('fields');
   } else {
     vm.create.wizard.getPage('name').next(value);
+  }
+});
+
+var edit_root = vm.edit.wizard.getPage('data', 'upload-collection-data', 'separated', function() {return validateNotNull(vm.edit.file, "${ _('File path is missing') }")});
+vm.edit.wizard.getPage('separated', 'upload-collection-data-separated', null, null);
+vm.edit.wizard.rootPage(edit_root);
+vm.edit.wizard.currentPage(vm.edit.wizard.rootPage());
+
+vm.edit.sourceType.subscribe(function(value) {
+  if (!value) {
+    // Weird bug where sourceType disappears when switching between pages
+    vm.edit.sourceType(vm.edit.wizard.getPage('data').next());
+  } else if (value == 'log') {
+    vm.edit.wizard.getPage('data').next(null);
+  } else {
+    vm.edit.wizard.getPage('data').next(value);
   }
 });
 
@@ -453,7 +499,7 @@ routie({
     vm.page('create-page');
     routie('create/wizard');
   },
-  "create/wizard": function(step) {
+  "create/wizard": function() {
     vm.page('create-page');
     routie('create/wizard/' + vm.create.wizard.currentPage().url());
   },
@@ -461,7 +507,6 @@ routie({
     vm.page('create-page');
     vm.create.wizard.setPageByUrl(step);
     routie('create/wizard/' + vm.create.wizard.currentPage().url());
-    $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
   },
   "edit/:name": function(name) {
     ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
@@ -473,6 +518,22 @@ routie({
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.page('edit-page');
     }
+  },
+  "upload/:name": function(name) {
+    routie('upload/' + name + '/' + vm.edit.wizard.currentPage().url());
+  },
+  "upload/:name/:step": function(name, step) {
+    ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
+      collection.selected(ko.unwrap(collection).name() == name);
+    });
+    if (vm.manage.selectedCollections().length == 0) {
+      routie('manage');
+    } else {
+      vm.edit.collection(vm.manage.selectedCollections()[0]());
+      vm.page('upload-page');
+    }
+    vm.edit.wizard.setPageByUrl(step);
+    routie('upload/' + name + '/' + vm.create.wizard.currentPage().url());
   },
   "*": function() {
     routie('manage');

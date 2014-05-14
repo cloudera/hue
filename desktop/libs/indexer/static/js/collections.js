@@ -310,11 +310,19 @@ var EditCollectionViewModel = function() {
 
   // Models
   self.collection = ko.observable();
+  self.source = ko.observable(SOURCES[0]).extend({'errors': null});
+  self.fieldSeparator = ko.observable().extend({'errors': null});
+  self.fieldQuoteCharacter = ko.observable().extend({'errors': null});
+  self.file = ko.observable().extend({'errors': null});
   self.sourceType = ko.observable().extend({'errors': null});
 
   // UI
+  self.wizard = new Wizard();
+  self.sources = ko.mapping.fromJS(SOURCES);
   self.fieldTypes = ko.mapping.fromJS(FIELD_TYPES);
   self.sourceTypes = ko.mapping.fromJS(SOURCE_TYPES);
+  self.fieldSeparators = ko.mapping.fromJS(FIELD_SEPARATORS);
+  self.fieldQuoteCharacters = ko.mapping.fromJS(FIELD_QUOTE_CHARACTERS);
   self.isLoading = ko.observable();
 
   self.collection.subscribe(function(collection) {
@@ -326,7 +334,7 @@ var EditCollectionViewModel = function() {
   self.fetchFields = function() {
     if (self.collection()) {
       self.isLoading(true);
-      return $.get("/indexer/api/collections/" + self.collection().name() + "/metadata/").done(function(data) {
+      return $.get("/indexer/api/collections/" + self.collection().name() + "/fields/").done(function(data) {
         if (data.status == 0) {
           self.collection().fields(inferFields(data.fields, self.collection()));
           self.collection().uniqueKeyField(data.unique_key);
@@ -361,6 +369,33 @@ var EditCollectionViewModel = function() {
       $(document).trigger("error", xhr.responseText);
       self.isLoading(false);
     });
+  };
+
+  self.addData = function() {
+    self.isLoading(true);
+    switch(self.source()) {
+      case 'file':
+      var data = ko.mapping.toJS(self.collection);
+      return $.post("/indexer/api/collections/" + self.collection().name() + "/data/", {
+        'collection': ko.mapping.toJSON(data),
+        'source': self.source(),
+        'type': self.sourceType(),
+        'path': self.file(),
+        'separator': self.fieldSeparator(),
+        'quote': self.fieldQuoteCharacter()
+      }).done(function(data) {
+        if (data.status == 0) {
+          window.location.href = '/indexer';
+        } else {
+          self.isLoading(false);
+          $(document).trigger("error", data.message);
+        }
+      })
+      .fail(function (xhr, textStatus, errorThrown) {
+        self.isLoading(false);
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 };
 
@@ -409,22 +444,6 @@ var ManageCollectionsViewModel = function() {
 
   self.filterTest = function(obj, filter) {
     return ko.unwrap(obj).name().indexOf(filter) != -1;
-  };
-
-  self.addData = function(collection, path) {
-    self.isLoading(true);
-    return $.post("/indexer/api/collections/" + collection.name() + "/data/", {
-      'collection': ko.mapping.toJSON(collection),
-      'source': 'file',
-      'path': path
-    }).done(function(data) {
-      self.isLoading(false);
-      $(document).trigger("info", data.message);
-    })
-    .fail(function (xhr, textStatus, errorThrown) {
-      self.isLoading(false);
-      $(document).trigger("error", xhr.responseText);
-    });
   };
 
   self.fetchCollections = function() {

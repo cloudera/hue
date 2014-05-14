@@ -366,15 +366,6 @@ class Collection(models.Model):
     if 'collection' in properties_python:
       if 'showFieldList' not in properties_python['collection']['template']:
         properties_python['collection']['template']['showFieldList'] = True
-    if 'field_order' not in properties_python:
-      properties_python['field_order'] = []
-    if 'data_type' not in properties_python:
-      properties_python['data_type'] = 'separated'
-    if properties_python['data_type'] == 'separated':
-      if 'separator' not in properties_python:
-        properties_python['separator'] = ','
-      if 'quote_character' not in properties_python:
-        properties_python['quote_character'] = '"'
     return properties_python
 
   def update_properties(self, post_data):
@@ -394,26 +385,6 @@ class Collection(models.Model):
   def autocomplete(self, autocomplete):
     properties_ = self.properties_dict
     properties_['autocomplete'] = autocomplete
-    self.properties = json.dumps(properties_)
-
-  @property
-  def field_order(self):
-    return self.properties_dict['field_order']
-
-  @field_order.setter
-  def field_order(self, field_order):
-    properties_ = self.properties_dict
-    properties_['field_order'] = field_order
-    self.properties = json.dumps(properties_)
-
-  @property
-  def data_type(self):
-    return self.properties_dict['data_type']
-
-  @data_type.setter
-  def data_type(self, data_type):
-    properties_ = self.properties_dict
-    properties_['data_type'] = data_type
     self.properties = json.dumps(properties_)
 
   @property

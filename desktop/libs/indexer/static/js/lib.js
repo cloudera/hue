@@ -127,6 +127,7 @@ var Wizard = function() {
   self.currentPage = ko.observable(self.rootPage());
   // Stack of previous pages.
   self.previousPages = ko.observableArray();
+  self.pages = {};
 
   self.hasPrevious = ko.computed(function() {
     return self.previousPages().length > 0;
@@ -197,17 +198,15 @@ var Wizard = function() {
       }
     }
   };
-};
 
-ko.utils.extend(Wizard.prototype, {
-  'pages': {},
-  'getPage': function(url, name, next, validate_fn) {
-    if (!this.pages[url]) {
-      this.pages[url] = new Page(url, name, next, validate_fn);
+  self.getPage = function(url, name, next, validate_fn) {
+    self.pages;
+    if (!self.pages[url]) {
+      self.pages[url] = new Page(url, name, next, validate_fn);
     }
-    return this.pages[url];
-  }
-});
+    return self.pages[url];
+  };
+};
 
 // End Wizard
 
