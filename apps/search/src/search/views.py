@@ -108,14 +108,11 @@ def search(request):
 
   if collection['id']:
     hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
-
-  print request.POST
     
   if collection:
     try:      
       response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
       response = augment_solr_response2(response, collection, query)
-      print response
     except RestException, e:
       try:
         response['error'] = json.loads(e.message)['error']['msg']
@@ -631,8 +628,8 @@ def new_facet(request):
       'canRange': False,
       'stacked': False,
       'limit': 10,
-      'mincount': 0, # Not used yet
-      'andUp': False,
+      'mincount': 0,
+      'andUp': False,  # Not used yet
     }
     
     solr_api = SolrApi(SOLR_URL.get(), request.user)
@@ -646,8 +643,10 @@ def new_facet(request):
     else:
       facet_type = 'field'        
         
-    if facet_type == 'map-widget':
-      properties['scope'] = 'world'        
+    if widget_type == 'map-widget':
+      properties['scope'] = 'world'
+      properties['mincount'] = 1
+      properties['limit'] = 100        
         
     result['message'] = ''
     result['facet'] = {

@@ -105,11 +105,11 @@ ko.bindingHandlers.mapChart = {
       }
     }
 
-    $(element).height($(element).width()/2.23);
+    $(element).height($(element).width() / 2.23);
 
     var _data = _options.transformer(_options.data);
     var _maxWeight = 0;
-    $(_data).each(function(cnt, item){
+    $(_data).each(function(cnt, item) {
       if (item.value > _maxWeight) _maxWeight = item.value;
     });
 
@@ -119,19 +119,21 @@ ko.bindingHandlers.mapChart = {
     var _maphovers = {};
     var _fills = {};
     var _noncountries = [];
+
     if (_options.isScale){
       _fills["defaultFill"] = HueColors.LIGHT_BLUE;
       var _colors = HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
-      $(_colors).each(function(cnt, item){
+      $(_colors).each(function(cnt, item) {
         _fills["fill_" + cnt] = item;
       });
-      $(_data).each(function(cnt, item){
-        var _country = HueGeo.getCountryFromName(item.label);
-        if (_country != null){
-          _mapdata[_country.alpha3] = {
-            fillKey: "fill_" + Math.floor(item.value/_chunk)
+      $(_data).each(function(cnt, item) {
+        var _place = item.label;
+        if (_place != null){
+          _mapdata[_place] = {
+            fillKey: "fill_" + Math.floor(item.value / _chunk),
+            id: _place
           };
-          _maphovers[_country.name.split(",")[0].toLowerCase()] = item.value;
+          _maphovers[_place] = item.value;
         }
         else {
           _noncountries.push(item);
@@ -142,12 +144,13 @@ ko.bindingHandlers.mapChart = {
       _fills["defaultFill"] = HueColors.BLUE;
       _fills["selected"] = HueColors.DARK_BLUE;
       $(_data).each(function(cnt, item){
-        var _country = HueGeo.getCountryFromName(item.label);
-        if (_country != null){
-          _mapdata[_country.alpha3] = {
-            fillKey: "selected"
+    	var _place = item.label;
+        if (_place != null){
+          _mapdata[_place] = {
+            fillKey: "selected",
+            id: _place
           };
-          _maphovers[_country.name.split(",")[0].toLowerCase()] = item.value;
+          _maphovers[_place] = item.value;
         }
         else {
           _noncountries.push(item);
@@ -156,7 +159,7 @@ ko.bindingHandlers.mapChart = {
     }
 
     var _map = null;
-    function createDatamap(element, options, fills, mapData, nonCountries, mapHovers){
+    function createDatamap(element, options, fills, mapData, nonCountries, mapHovers) {
       _map = new Datamap({
         element: element,
         fills: fills,
@@ -199,8 +202,11 @@ ko.bindingHandlers.mapChart = {
           highlightFillColor: HueColors.DARK_BLUE,
           highlightBorderColor: HueColors.DARK_BLUE,
           popupTemplate: function(geography, data) {
-            var _hover = mapHovers[geography.properties.name.toLowerCase()];
-            return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + ((typeof _hover != "undefined")?'<br/>' + _hover : '') + '</div>'
+        	var _hover = '';
+        	if (data != null) {
+        	  _hover = '<br/>' + mapHovers[data.id];	
+        	}            
+            return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + _hover + '</div>'
           }
         }
       });
@@ -219,7 +225,7 @@ ko.bindingHandlers.mapChart = {
           $(element).width(_max);
         }
       }
-      $(element).height($(element).width()/2.23);
+      $(element).height($(element).width() / 2.23);
       createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
     });
   },

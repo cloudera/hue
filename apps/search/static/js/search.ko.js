@@ -492,7 +492,7 @@ var Collection = function (vm, collection) {
     return _field;    
   };
 
-  self.template.fieldsModalFilter = ko.observable(); // For UI
+  self.template.fieldsModalFilter = ko.observable(""); // For UI
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
   self.template.fieldsModalOkButton = ko.observable(false);

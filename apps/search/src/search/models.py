@@ -456,23 +456,8 @@ def get_facet_field_label(field, facets):
   facets = filter(lambda facet: facet['type'] == 'field' and facet['field'] == field, facets)
   if facets:
     return facets[0]['label']
-#  if type == 'field':
-#    for fld in facets['fields']:
-#      if fld['field'] == field:
-#        label = fld['label']
-#  elif type == 'range':
-#    for fld in facets['ranges']:
-#      if fld['field'] == field:
-#        label = fld['label']
-#  elif type == 'date':
-#    for fld in facets['dates']:
-#      if fld['field'] == field:
-#        label = fld['label']
-#  elif type == 'chart':
-#    for fld in facets['charts']:
-#      if fld['field'] == field:
-#        label = fld['label']
-  return label
+  else:
+    return label
 
 def get_facet_field_uuid(field, type, facets):
   uuid = ''

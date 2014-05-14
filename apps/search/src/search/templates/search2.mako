@@ -796,7 +796,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
+      ${ _('Scope') }: <input type="text" data-bind="value: properties.scope" />
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id},
@@ -1753,9 +1755,9 @@ $(document).ready(function () {
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {      
-      viewModel.collection.template.fieldsModalFilter();
-      viewModel.collection.template.fieldsModalType(widget.widgetType());
       viewModel.collection.template.fieldsModalFilter("");
+      viewModel.collection.template.fieldsModalType(widget.widgetType());
+      viewModel.collection.template.fieldsModalFilter.valueHasMutated();
       viewModel.collection.template.fieldsModalOkButton(false);
       $('#addFacetInput').typeahead({
           'source': viewModel.collection.template.availableWidgetFieldsNames(), 

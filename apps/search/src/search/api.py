@@ -191,12 +191,15 @@ class SolrApi(BaseSolrApi):
              ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
              ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
              ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
-             ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),]
+             ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),
+             ('f.%s.facet.mincount' % facet['field'], facet['properties']['gap'], facet['properties']['mincount']),]
           )          
         elif facet['type'] == 'field':
           params += (
               ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-              ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1))
+              ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
+              ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
+          )
 
     for fq in query['fqs']:
       if fq['type'] == 'field':        
