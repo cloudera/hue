@@ -45,7 +45,7 @@ def utf_quoter(what):
 
 def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
   is_range = False
-  
+
   try:
     if widget_type == 'pie-widget':
       SLOTS = 5
@@ -113,9 +113,9 @@ def _guess_gap(solr_api, collection, facet_field, start=None, end=None):
   return properties
 
 
-def _new_range_facet(solr_api, collection, facet_field):
+def _new_range_facet(solr_api, collection, facet_field, widget_type):
   properties = {}
-  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties)
+  _guess_range_facet(widget_type, solr_api, collection, facet_field, properties)
   return properties
 
 

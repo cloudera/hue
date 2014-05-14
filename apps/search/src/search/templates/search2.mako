@@ -813,7 +813,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
 </script>
 
-<div id="addFacetDemiModal" class="demi-modal hide">
+<div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-body">
     <div style="float: left; margin-right: 10px;text-align: center">
       <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>

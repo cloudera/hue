@@ -636,7 +636,7 @@ def new_facet(request):
     }
     
     solr_api = SolrApi(SOLR_URL.get(), request.user)
-    range_properties = _new_range_facet(solr_api, collection, facet_field)
+    range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
                           
     if range_properties:
       facet_type = 'range'
