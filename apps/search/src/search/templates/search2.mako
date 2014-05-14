@@ -798,12 +798,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Scope') }: <input type="text" data-bind="value: properties.scope" />
+      ${ _('Scope') }: 
+      <select data-bind="selectedOptions: properties.scope">
+        <option value="world">${ _("World") }</option>
+        <option value="usa">${ _("USA") }</option>
+      </select>
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id},
+      <div data-bind="mapChart: {data: {counts: $parent.counts, widget_id: $parent.id, scope: $root.collection.getFacetById($parent.id).properties.scope()},
         transformer: mapChartDataTransformer,
         maxWidth: 750,
         onClick: function(d){ console.log(d); },

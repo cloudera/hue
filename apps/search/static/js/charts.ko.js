@@ -113,15 +113,16 @@ ko.bindingHandlers.mapChart = {
     $(element).css("marginLeft", "auto");
     $(element).css("marginRight", "auto");
 
-    if (typeof _options.maxWidth != "undefined"){
-      var _max = _options.maxWidth*1;
-      if ($(element).width() > _max){
+    if (typeof _options.maxWidth != "undefined") {
+      var _max = _options.maxWidth * 1;
+      if ($(element).width() > _max) {
         $(element).width(_max);
       }
     }
 
     $(element).height($(element).width() / 2.23);
 
+    var _scope = typeof _options.data.scope != "undefined" ? String(_options.data.scope) : "world";
     var _data = _options.transformer(_options.data);
     var _maxWeight = 0;
     $(_data).each(function(cnt, item) {
@@ -135,7 +136,7 @@ ko.bindingHandlers.mapChart = {
     var _fills = {};
     var _noncountries = [];
 
-    if (_options.isScale){
+    if (_options.isScale) {
       _fills["defaultFill"] = HueColors.LIGHT_BLUE;
       var _colors = HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
       $(_colors).each(function(cnt, item) {
@@ -159,7 +160,8 @@ ko.bindingHandlers.mapChart = {
       _fills["defaultFill"] = HueColors.BLUE;
       _fills["selected"] = HueColors.DARK_BLUE;
       $(_data).each(function(cnt, item){
-    	var _place = item.label;
+    	var _place = item.label.toUpperCase();
+	
         if (_place != null){
           _mapdata[_place] = {
             fillKey: "selected",
@@ -178,10 +180,9 @@ ko.bindingHandlers.mapChart = {
       _map = new Datamap({
         element: element,
         fills: fills,
-        scope: 'world',
+        scope: _scope,
         data: mapData,
         done: function(datamap) {
-
           datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
             if (typeof options.onClick != "undefined"){
               options.onClick(geography);
@@ -189,7 +190,7 @@ ko.bindingHandlers.mapChart = {
           });
 
           var _bubbles = [];
-          if (options.enableGeocoding){
+          if (options.enableGeocoding) {
             $(nonCountries).each(function(cnt, item){
                 HueGeo.getCityCoordinates(item.label, function(lat, lng){
                     _bubbles.push({
