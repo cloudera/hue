@@ -271,6 +271,15 @@ ko.extenders.selectable = function(target, options) {
   return target;
 };
 
+ko.bindingHandlers.chosen = {
+  init: function(element, options) {
+    $(element).chosen(options);
+  },
+  update: function(element) {
+    $(element).trigger('chosen:updated');
+  }
+};
+
 ko.bindingHandlers.editableText = {
   init: function(element, valueAccessor) {
     $(element).attr('contenteditable', true);

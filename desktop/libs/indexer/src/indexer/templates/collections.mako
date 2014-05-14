@@ -24,6 +24,7 @@
 
 ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <link rel="stylesheet" href="/indexer/static/css/admin.css">
 <style type="text/css">
   #collections {
@@ -78,10 +79,6 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   .solr-only .selected {
     background: #e3f2ff;
   }
-
-  .fields-table {
-    min-width: 500px;
-  }
 </style>
 
 
@@ -130,7 +127,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <%actionbar:render>
         <%def name="search()">
           <div data-bind="visible: collections().length > 0 && !isLoading()">
-            <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }" placeholder="${_('Filter collections by name...')}" class="input-xlarge search-query">
+            <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }" placeholder="${_('Filter dashboard')}" class="input-xlarge search-query">
             <button data-bind="click: removeCollections, clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" title="${_('Delete the selected collections')}" disabled="disabled"><i class="fa fa-times"></i> ${_('Delete collections')}</button>
             <a href="#create" class="btn toolbarBtn">${_('Add collection')}</a>
           </div>
@@ -219,7 +216,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': file.errors().length > 0}">
     <label for="name" class="control-label">${_("Files")}</label>
     <div class="controls">
-      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/foo/udf.jar"/>
+      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/foo/data.csv"/>
     </div>
   </div>
 
@@ -266,16 +263,16 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script type="text/html" id="collection-fields">
-  <table class="table table-bordered fields-table">
+  <table class="table">
     <thead>
       <tr>
-        <th width="30%">${_('Name')}</th>
-        <th width="15%">${_('Type')}</th>
-        <th width="10%">${_('Required')}</th>
-        <th width="10%">${_('Indexed')}</th>
-        <th width="10%">${_('Stored')}</th>
-        <th width="10%">${_('Unique Key')}</th>
-        <th width="15%"></th>
+        <th width="25%" class="nowrap">${_('Name')}</th>
+        <th width="25%" class="nowrap">${_('Type')}</th>
+        <th width="0%" class="nowrap">${_('Required')}</th>
+        <th width="0%" class="nowrap">${_('Indexed')}</th>
+        <th width="0%" class="nowrap">${_('Stored')}</th>
+        <th width="0%" class="nowrap">${_('Unique Key')}</th>
+        <th width="50%"></th>
       </tr>
     </thead>
     <tbody data-bind="sortable: collection.fields">
@@ -283,11 +280,11 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         <td data-bind="editableText: name">
           <span class="pull-left fa fa-pencil"></span>
         </td>
-        <td><select data-bind="options: $parent.fieldTypes, value: type" name="type"></select></td>
-        <td><input data-bind="checked: required" type="checkbox"></td>
-        <td><input data-bind="checked: indexed" type="checkbox"></td>
-        <td><input data-bind="checked: stored" type="checkbox"></td>
-        <td><input data-bind="checked: uniqueKeyField" name="unique-key" type="checkbox" /></td>
+        <td><select data-bind="options: $parent.fieldTypes, value: type, chosen: {}" name="type"></select></td>
+        <td><p class="text-center"><input data-bind="checked: required" type="checkbox"></p></td>
+        <td><p class="text-center"><input data-bind="checked: indexed" type="checkbox"></p></td>
+        <td><p class="text-center"><input data-bind="checked: stored" type="checkbox"></p></td>
+        <td><p class="text-center"><input data-bind="checked: uniqueKeyField" name="unique-key" type="checkbox" /></p></td>
         <td>
           <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-minus"></i>&nbsp;${_("Remove")}</a>
         </td>
@@ -316,52 +313,48 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         </div>
         <br />
         <br />
-        <table class="table table-bordered fields-table">
+        <table class="table">
           <thead>
             <tr>
-              <th width="50%" class="nowrap">${_('Name')}</th>
-              <th width="20%" class="nowrap">${_('Type')}</th>
-              <th width="1%" class="nowrap">${_('Unique key field')}</th>
-              <th width="1%" class="nowrap">${_('Required')}</th>
-              <th width="1%" class="nowrap">${_('Indexed')}</th>
-              <th width="1%" class="nowrap">${_('Stored')}</th>
-              <th width="26%"></th>
+              <th width="25%" class="nowrap">${_('Name')}</th>
+              <th width="25%" class="nowrap">${_('Type')}</th>
+              <th width="0%" class="nowrap">${_('Unique key field')}</th>
+              <th width="0%" class="nowrap">${_('Required')}</th>
+              <th width="0%" class="nowrap">${_('Indexed')}</th>
+              <th width="0%" class="nowrap">${_('Stored')}</th>
+              <th width="50%"></th>
             </tr>
           </thead>
-          <tbody data-bind="sortable: collection().fields">
-            <!-- ko if: saved() -->
+          <tbody data-bind="sortable: { 'data': ko.utils.arrayFilter(collection().fields(), function(field) { return field.saved() }) }">
             <tr class="ko_container">
               <td data-bind="text: name"></td>
               <td data-bind="text: type"></td>
-              <td><span class="fa" data-bind="css: {'fa-check': uniqueKeyField, 'fa-times': !uniqueKeyField()}"></span></td>
-              <td><span class="fa" data-bind="css: {'fa-check': required, 'fa-times': !required()}"></span></td>
-              <td><span class="fa" data-bind="css: {'fa-check': indexed, 'fa-times': !indexed()}"></span></td>
-              <td><span class="fa" data-bind="css: {'fa-check': stored, 'fa-times': !stored()}"></span></td>
+              <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': uniqueKeyField}"></span></p></td>
+              <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': required}"></span></p></td>
+              <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': indexed}"></span></p></td>
+              <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': stored}"></span></p></td>
               <td></td>
             </tr>
-            <!-- /ko -->
-            <!-- ko ifnot: saved() -->
+          </tbody>
+          <tbody data-bind="sortable: { 'data': ko.utils.arrayFilter(collection().fields(), function(field) { return !field.saved() }) }">
             <tr data-bind="css: {'error': name.errors().length > 0}"  class="ko_container editable">
               <td data-bind="editableText: name">
                 <span class="pull-left fa fa-pencil"></span>
               </td>
-              <td><select data-bind="options: $parent.fieldTypes, value: type" name="type"></select></td>
-              <td><span class="fa" data-bind="css: {'fa-check': uniqueKeyField, 'fa-times': !uniqueKeyField()}"></span></td>
-              <td><input data-bind="checked: required" type="checkbox"></td>
-              <td><input data-bind="checked: indexed" type="checkbox"></td>
-              <td><input data-bind="checked: stored" type="checkbox"></td>
+              <td><select data-bind="options: $parent.fieldTypes, value: type, chosen: {}" name="type"></select></td>
+              <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': uniqueKeyField}"></span></p></td>
+              <td><p class="text-center"><input data-bind="checked: required" type="checkbox"></p></td>
+              <td><p class="text-center"><input data-bind="checked: indexed" type="checkbox"></p></td>
+              <td><p class="text-center"><input data-bind="checked: stored" type="checkbox"></p></td>
               <td><a data-bind="click: remove" href="javascript:void(0)" class="btn btn-danger nowrap"><i class="fa fa-minus"></i>&nbsp;${_("Remove field")}</a></td>
             </tr>
-            <!-- /ko -->
           </tbody>
         </table>
-        <br />
-        <br />
         <a data-bind="click: collection().newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
         <br />
         <br />
+        <br />
         <a data-bind="click: validateAndUpdateCollection" class="btn btn-info" href="javascript:void(0)">${_('Update')}</a>
-        <a data-bind="routie: '/'" class="btn btn-info" href="javascript:void(0)">${_('Done')}</a>
       </form>
     </div>
   </div>
@@ -372,7 +365,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
