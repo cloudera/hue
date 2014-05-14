@@ -247,7 +247,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible: $parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}, dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}">
+    <div style="min-height:0px" data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, 
+        sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, 
+        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 
+            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 
+            'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+            dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
   </div>
 </script>
@@ -801,7 +806,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Scope') }: 
-      <select data-bind="selectedOptions: properties.scope">
+      <select data-bind="selectedOptions: properties.scope" class="input-small">
         <option value="world">${ _("World") }</option>
         <option value="usa">${ _("USA") }</option>
       </select>

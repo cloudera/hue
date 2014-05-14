@@ -827,7 +827,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   });
   
   self.init = function (callback) {
-    //self.collection.syncDynamicFields();
 	self.collection.syncFields();
     self.isEditing(true);
     self.search(callback);
