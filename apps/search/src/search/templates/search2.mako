@@ -802,10 +802,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
 </script>
 
-<div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="addFacetDemiModal" class="demi-modal hide">
   <div class="modal-body">
     <div style="float: left; margin-right: 10px;text-align: center">
-      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input-small" style="float: left" /><br/>
+      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.collection.template.filteredModalFields().length > 0"
@@ -819,7 +819,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         ${_('There are no fields matching your search term.')}
       </div>
       <div style="margin-left: 124px">
-        <input type="button" class="btn btn-primary disabled" data-dismiss="modal" value="${_('Pick!')}" /> or
+        <input type="button" class="btn btn-primary" data-bind="enable: $root.collection.template.fieldsModalOkButton" data-dismiss="modal" value="${_('Pick!')}" /> or
         <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel">${_('cancel')}</a>
       </div>
     </div>
@@ -1740,6 +1740,7 @@ $(document).ready(function () {
       viewModel.collection.template.fieldsModalFilter();
       viewModel.collection.template.fieldsModalType(widget.widgetType());
       viewModel.collection.template.fieldsModalFilter("");
+      viewModel.collection.template.fieldsModalOkButton(false);
       $('#addFacetInput').typeahead({
           'source': viewModel.collection.template.availableWidgetFieldsNames(), 
           'updater': function(item) {
@@ -1759,6 +1760,7 @@ $(document).ready(function () {
     var _existingFacet = viewModel.collection.getFacetById(selectedWidget.id());
     if (selectedWidget != null) {
       selectedWidget.isLoading(true);
+      viewModel.collection.template.fieldsModalOkButton(true);
       viewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
       if (_existingFacet != null) {
         _existingFacet.label(field.name());
