@@ -180,8 +180,6 @@ nv.models.growingDiscreteBar = function() {
             });
           })
           .on('click', function(d,i) {
-            console.log(d);
-            console.log(i);
             dispatch.elementClick({
               value: getY(d,i),
               point: d,

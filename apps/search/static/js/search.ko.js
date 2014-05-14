@@ -994,7 +994,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       if (data.status == 0) {
         self.collection.id = data.id;
         $(document).trigger("info", data.message);
-        window.location.hash = '#collection=' + data.id;
+        if (window.location.search.indexOf("collection") == -1){
+          window.location.hash = '#collection=' + data.id;
+        }
       }
       else {
         $(document).trigger("error", data.message);

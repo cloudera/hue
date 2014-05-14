@@ -229,7 +229,8 @@ nv.models.growingMultiBar = function() {
           ;
       bars
           .style('fill', function(d,i,j){ return color(d, j, i);  })
-          .style('stroke', function(d,i,j){ return color(d, j, i); })
+          .style('stroke', function(d,i,j){ return color(d, j, i); });
+      barsEnter
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
             d3.select(this).classed('hover', true);
             if (stacked){

@@ -258,9 +258,9 @@ function lineChart(element, options) {
     return _chart;
   }, function () {
     d3.selectAll(".nv-bar").on('click',
-        function (d, i) {
-          options.onClick(d);
-        });
+      function (d, i) {
+        options.onClick(d);
+      });
   });
 
 }
@@ -343,10 +343,10 @@ function barChart(element, options, isTimeline) {
 
     return _chart;
   }, function () {
-    d3.selectAll(".nv-bar").on('click',
-        function (d, i) {
-          options.onClick(d);
-        });
+    d3.selectAll(".nv-bar").on("click",
+      function (d, i) {
+        options.onClick(d);
+      });
   });
 
 }
