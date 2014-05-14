@@ -19,6 +19,12 @@ ko.bindingHandlers.pieChart = {
     init: function (element, valueAccessor) {
       var _options = valueAccessor();
       var _data = _options.transformer(_options.data);
+      $(element).css("marginLeft", "auto");
+      $(element).css("marginRight", "auto");
+      if (typeof _options.maxWidth != "undefined"){
+        var _max = _options.maxWidth*1;
+        $(element).width(Math.min($(element).parent().width(), _max));
+      }
 
       nv.addGraph(function () {
         var _chart = nv.models.growingPieChart()
@@ -46,12 +52,21 @@ ko.bindingHandlers.pieChart = {
 
         nv.utils.windowResize(_chart.update);
         $(element).height($(element).width());
+        $(element).parents(".card-widget").on("resize", function(){
+          if (typeof _options.maxWidth != "undefined"){
+            var _max = _options.maxWidth*1;
+            $(element).width(Math.min($(element).parent().width(), _max));
+          }
+          $(element).height($(element).width());
+          _chart.update();
+        });
+
         return _chart;
       }, function () {
         d3.selectAll(".nv-slice").on('click',
-                function (d, i) {
-                  _options.onClick(d);
-                });
+          function (d, i) {
+            _options.onClick(d);
+          });
       });
     },
     update: function (element, valueAccessor) {

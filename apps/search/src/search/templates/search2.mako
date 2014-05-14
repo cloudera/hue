@@ -742,12 +742,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <!-- ko if: type() == 'range' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
         transformer: rangePieChartDataTransformer,
+        maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) }, 
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
       <!-- /ko -->
       <!-- ko if: type() != 'range' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
+        maxWidth: 250,
         onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
         onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
       <!-- /ko -->
