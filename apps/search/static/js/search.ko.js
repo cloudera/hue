@@ -495,7 +495,6 @@ var Collection = function (vm, collection) {
   self.template.fieldsModalFilter = ko.observable(""); // For UI
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
-  self.template.fieldsModalOkButton = ko.observable(false);
   self.template.filteredModalFields = ko.observableArray();
   self.template.filteredAttributeFields = ko.computed(function() {
 	var _fields = [];

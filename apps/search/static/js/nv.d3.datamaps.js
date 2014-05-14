@@ -35,6 +35,7 @@
         hideAntarctica: true,
         borderWidth: 1,
         borderColor: '#FDFDFD',
+        selectedBorderColor: '#EE8081',
         popupTemplate: function(geography, data) {
           return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
         },
@@ -150,8 +151,20 @@
           onClick(colorCodeData[d.id]);
         }
       })
-      .style('stroke-width', geoConfig.borderWidth)
-      .style('stroke', geoConfig.borderColor);
+      .style('stroke-width', function(d) {
+        var strokeWidth = geoConfig.borderWidth;
+        if ( colorCodeData[d.id] && colorCodeData[d.id].isSelected ) {
+          strokeWidth = 2;
+        }
+        return strokeWidth;
+      })
+      .style('stroke', function(d) {
+        var strokeColor = geoConfig.borderColor;
+        if ( colorCodeData[d.id] && colorCodeData[d.id].isSelected ) {
+          strokeColor = geoConfig.selectedBorderColor;
+        }
+        return strokeColor;
+      });
   }
 
   function handleGeographyConfig () {
