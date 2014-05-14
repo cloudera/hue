@@ -65,6 +65,7 @@ nv.models.multiBarWithBrushChart = function() {
     , selectionEnabled = false
     , onSelectRange = null
     , onStateChange = null
+    , onChartUpdate = null
     ;
 
   multibar
@@ -114,7 +115,11 @@ nv.models.multiBarWithBrushChart = function() {
                              - margin.top - margin.bottom;
 
       chart.update = function() {
-        container.transition().duration(transitionDuration).call(chart)
+        container
+            .transition()
+            .duration(transitionDuration)
+            .each("end", onChartUpdate)
+            .call(chart);
         if (selectionEnabled){
           enableBrush();
         }
@@ -422,7 +427,6 @@ nv.models.multiBarWithBrushChart = function() {
           onStateChange(state);
         }
         dispatch.stateChange(state);
-
         chart.update();
       });
 
@@ -651,6 +655,12 @@ nv.models.multiBarWithBrushChart = function() {
   chart.onStateChange = function(_) {
     if (!arguments.length) return onStateChange;
     onStateChange = _;
+    return chart;
+  };
+
+  chart.onChartUpdate = function(_) {
+    if (!arguments.length) return onChartUpdate;
+    onChartUpdate = _;
     return chart;
   };
 

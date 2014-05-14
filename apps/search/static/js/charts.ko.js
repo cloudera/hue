@@ -271,6 +271,22 @@ function barChart(element, options, isTimeline) {
 
   nv.addGraph(function () {
     var _chart;
+
+    var insertLinebreaks = function (d) {
+      var _el = d3.select(this);
+      var _mom = moment(d);
+      if (_mom != null) {
+        var _words = _mom.format("hh:mm:ss YYYY-MM-DD").split(" ");
+        _el.text('');
+        for (var i = 0; i < _words.length; i++) {
+          var tspan = _el.append("tspan").text(_words[i]);
+          if (i > 0) {
+            tspan.attr("x", 0).attr("dy", '15');
+          }
+        }
+      }
+    };
+
     if (isTimeline) {
       _chart = nv.models.multiBarWithBrushChart();
       if (_datum.length > 0 && _datum[0].values.length > 10){
@@ -281,6 +297,9 @@ function barChart(element, options, isTimeline) {
       _chart.multibar.hideable(true);
       _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
       _chart.onStateChange(options.onStateChange);
+      _chart.onChartUpdate(function(){
+        _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
+      });
     }
     else {
       var _isDiscrete = false;
@@ -316,26 +335,12 @@ function barChart(element, options, isTimeline) {
     var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
     _d3.datum(_datum)
         .transition().duration(150)
-        .each("end", options.onComplete)
-        .call(_chart);
-
-    if (isTimeline) {
-      var insertLinebreaks = function (d) {
-        var _el = d3.select(this);
-        var _mom = moment(d);
-        if (_mom != null) {
-          var _words = _mom.format("hh:mm:ss YYYY-MM-DD").split(" ");
-          _el.text('');
-          for (var i = 0; i < _words.length; i++) {
-            var tspan = _el.append("tspan").text(_words[i]);
-            if (i > 0) {
-              tspan.attr("x", 0).attr("dy", '15');
-            }
+        .each("end", function(){
+          options.onComplete();
+          if (isTimeline) {
+            _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
           }
-        }
-      };
-      _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
-    }
+        }).call(_chart);
 
     nv.utils.windowResize(_chart.update);
 
