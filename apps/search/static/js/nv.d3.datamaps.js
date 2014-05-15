@@ -42,6 +42,7 @@
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
+        selectedFillColor: '#666666',
         selectedBorderColor: '#666666',
         highlightBorderWidth: 2
     },
@@ -143,6 +144,9 @@
         var fillColor;
         if ( colorCodeData[d.id] ) {
           fillColor = fillData[ colorCodeData[d.id].fillKey ];
+          if (colorCodeData[d.id].selected){
+            fillColor = geoConfig.selectedFillColor;
+          }
         }
         return fillColor || fillData.defaultFill;
       })

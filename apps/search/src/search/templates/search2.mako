@@ -1788,7 +1788,9 @@ $(document).ready(function () {
   });
 
   $("#addFacetDemiModal").on("hidden", function () {
-    addFacetDemiModalFieldCancel();
+    if (typeof selectedWidget.hasBeenSelected == "undefined"){
+      addFacetDemiModalFieldCancel();
+    }
   });
 
 });
@@ -1829,6 +1831,7 @@ $(document).ready(function () {
   function addFacetDemiModalFieldPreview(field) {
     var _existingFacet = viewModel.collection.getFacetById(selectedWidget.id());
     if (selectedWidget != null) {
+      selectedWidget.hasBeenSelected = true;
       selectedWidget.isLoading(true);
       viewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
       if (_existingFacet != null) {
