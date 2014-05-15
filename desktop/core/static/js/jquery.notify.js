@@ -58,6 +58,8 @@
             el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN - $(window).scrollTop());
         }
 
+        _this.options.message = $("<span>").html(_this.options.message).text();
+
         if (_this.options.level == TYPES.ERROR){
             el.addClass("alert-error");
             el.find(".message").html("<i class='fa fa-exclamation-triangle'></i> <strong>" + _this.options.message + "</strong>");
