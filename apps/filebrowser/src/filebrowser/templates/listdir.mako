@@ -93,7 +93,7 @@ ${ fb_components.menubar() }
                 <i class="fa fa-plus-circle"></i> ${_('New')}
                 <span class="caret"></span>
               </a>
-              <ul class="dropdown-menu" style="top: auto">
+              <ul class="dropdown-menu pull-right" style="top: auto">
                 <li><a href="#" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
                 <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> ${_('Directory')}</a></li>
               </ul>
