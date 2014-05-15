@@ -34,7 +34,7 @@ ${layout.menubar(section='query')}
 
 <div class="span2" id="navigator">
   <ul class="nav nav-tabs" style="margin-bottom: 0">
-    <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Navigator')}</a></li>
+    <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Assist')}</a></li>
     <li><a href="#settingsTab" data-toggle="tab" class="sidetab">${_('Settings')} <span data-bind="visible:design.settings.values().length + design.fileResources.values().length + design.functions.values().length > 0, text: design.settings.values().length + design.fileResources.values().length + design.functions.values().length" class="badge badge-info">12</span></a></li>
   </ul>
   <div class="tab-content">
