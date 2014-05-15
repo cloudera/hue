@@ -1761,6 +1761,11 @@ $(document).ready(function () {
       resizeFieldsList();
     }
   });
+
+  $("#addFacetDemiModal").on("hidden", function () {
+    addFacetDemiModalFieldCancel();
+  });
+
 });
 
   function toggleGridFieldsSelection() {
