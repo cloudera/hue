@@ -198,7 +198,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Function name...') }"/>
                 <ul id="navigatorFunctions" class="unstyled">
                   <li>
-                    <a class="navigatorFunctionCategory" href="javascript:void(0)">Eval Functions</a>
+                    <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Eval Functions</a>
                     <ul class="navigatorFunctionCategoryContent unstyled hide">
                       <li><a href="#">AVG(%VAR%)</a></li>
                       <li><a href="#">CONCAT(%VAR1%, %VAR2%)</a></li>
@@ -214,7 +214,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                     </ul>
                   </li>
                   <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Relational Operators</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Relational Operators</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">COGROUP %VAR% BY %VAR%</a></li>
                         <li><a href="#">CROSS %VAR1%, %VAR2%;</a></li>
@@ -235,7 +235,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                     </li>
 
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Input/Output</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Input/Output</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">LOAD '%FILE%';</a></li>
                         <li><a href="#">DUMP %VAR%;</a></li>
@@ -243,7 +243,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Debug</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Debug</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">EXPLAIN %VAR%;</a></li>
                         <li><a href="#">ILLUSTRATE %VAR%;</a></li>
@@ -251,13 +251,13 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">HCatalog</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HCatalog</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">LOAD '%TABLE%' USING org.apache.hcatalog.pig.HCatLoader();</a></li>
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Math</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Math</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">ABS(%VAR%)</a></li>
                         <li><a href="#">ACOS(%VAR%)</a></li>
@@ -281,7 +281,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Tuple, Bag, Map Functions</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Tuple, Bag, Map Functions</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">TOTUPLE(%VAR%)</a></li>
                         <li><a href="#">TOBAG(%VAR%)</a></li>
@@ -290,7 +290,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">String Functions</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> String Functions</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">INDEXOF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
                         <li><a href="#">LAST_INDEX_OF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
@@ -306,20 +306,20 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Macros</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Macros</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">IMPORT '%PATH_TO_MACRO%';</a></li>
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">HBase</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HBase</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li><a href="#">LOAD 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
                         <li><a href="#">STORE %VAR% INTO 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
                       </ul>
                     </li>
                     <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Python UDF</a>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Python UDF</a>
                       <ul class="navigatorFunctionCategoryContent unstyled hide">
                         <li>
                           <a data-python="true" href="#">REGISTER 'python_udf.py' USING jython AS myfuncs;</a>
@@ -803,9 +803,17 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
     $(".navigatorFunctionCategory").on("click", function () {
       var _submenu = $(this).next(".navigatorFunctionCategoryContent");
-      _submenu.find("li").removeClass("hide");
+      if (_submenu.hasClass("hide")){
+        $(this).find("i").removeClass("fa-caret-right").addClass("fa-caret-down");
+        _submenu.find("li").removeClass("hide");
+        _submenu.removeClass("hide");
+      }
+      else {
+        $(this).find("i").removeClass("fa-caret-down").addClass("fa-caret-right");
+        _submenu.find("li").addClass("hide");
+        _submenu.addClass("hide");
+      }
       $("#navigatorSearch").val("");
-      _submenu.removeClass("hide");
     });
 
     $(".navigatorFunctionCategoryContent li a").on("click", function (e) {
