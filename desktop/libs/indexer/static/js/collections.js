@@ -7,7 +7,7 @@ var SOURCES = [
 ];
 
 var SOURCE_TYPES = [
-  'log',
+  // 'log',
   'separated',
   // 'morphlines'
 ];
