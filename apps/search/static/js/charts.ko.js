@@ -106,19 +106,27 @@ ko.bindingHandlers.lineChart = {
 };
 
 ko.bindingHandlers.mapChart = {
-  init: function (element, valueAccessor) {
+  render: function (element, valueAccessor) {
+
     var _options = valueAccessor();
+
+    $(element).empty();
 
     $(element).css("position", "relative");
     $(element).css("marginLeft", "auto");
     $(element).css("marginRight", "auto");
-
-    if (typeof _options.maxWidth != "undefined") {
-      var _max = _options.maxWidth * 1;
-      if ($(element).width() > _max) {
-        $(element).width(_max);
+//
+//    if (typeof _options.maxWidth != "undefined") {
+//      var _max = _options.maxWidth * 1;
+//      if ($(element).width() > _max) {
+//        $(element).width(_max);
+//      }
+//    }
+//
+    if (typeof _options.maxWidth != "undefined"){
+        var _max = _options.maxWidth*1;
+        $(element).width(Math.min($(element).parent().width(), _max));
       }
-    }
 
     $(element).height($(element).width() / 2.23);
 
@@ -159,7 +167,7 @@ ko.bindingHandlers.mapChart = {
       });
     }
     else {
-      _fills["defaultFill"] = HueColors.BLUE;
+      _fills["defaultFill"] = HueColors.LIGHT_BLUE;
       _fills["selected"] = HueColors.DARK_BLUE;
       $(_data).each(function(cnt, item) {
     	var _place = item.label.toUpperCase();
@@ -168,7 +176,8 @@ ko.bindingHandlers.mapChart = {
             fillKey: "selected",
             id: _place,
             cat: item.obj.cat,
-            value: item.obj.value
+            value: item.obj.value,
+            selected: item.obj.selected
           };
           _maphovers[_place] = item.value;
         }
@@ -218,12 +227,13 @@ ko.bindingHandlers.mapChart = {
           borderColor: HueColors.DARK_BLUE,
           highlightOnHover: true,
           highlightFillColor: HueColors.DARK_BLUE,
-          highlightBorderColor: HueColors.DARK_BLUE,
+          highlightBorderColor: HueColors.BLUE,
+          selectedBorderColor: HueColors.GRAY,
           popupTemplate: function(geography, data) {
         	var _hover = '';
         	if (data != null) {
-        	  _hover = '<br/>' + mapHovers[data.id];	
-        	}            
+        	  _hover = '<br/>' + mapHovers[data.id];
+        	}
             return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + _hover + '</div>'
           }
         }
@@ -233,23 +243,15 @@ ko.bindingHandlers.mapChart = {
 
     createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
 
-
-    nv.utils.windowResize(_map.update);
-    $(element).parents(".card-widget").on("resize", function(){
-      $(element).empty();
-      if (typeof _options.maxWidth != "undefined"){
-        var _max = _options.maxWidth*1;
-        if ($(element).width() > _max){
-          $(element).width(_max);
-        }
-      }
-      $(element).height($(element).width() / 2.23);
-      createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
+    $(element).parents(".card-widget").one("resize", function(){
+      ko.bindingHandlers.mapChart.render(element, valueAccessor);
     });
   },
+  init: function (element, valueAccessor) {
+    ko.bindingHandlers.mapChart.render(element, valueAccessor)
+  },
   update: function (element, valueAccessor) {
-    var value = valueAccessor();
-    // do something with the updated value
+    ko.bindingHandlers.mapChart.render(element, valueAccessor);
   }
 };
 

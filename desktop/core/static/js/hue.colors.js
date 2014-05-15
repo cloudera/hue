@@ -49,7 +49,9 @@ var HueColors = {
     }
     return _bands;
   },
-  LIGHT_BLUE: "#f7fbff",
-  BLUE: "#c7d2e1",
-  DARK_BLUE: "#08306b"
+  LIGHT_BLUE: "#DBE8F1",
+  BLUE: "#87BAD5",
+  DARK_BLUE: "#338BB8",
+  PURPLE: "#C0B1E9",
+  GRAY: "#666666"
 };
