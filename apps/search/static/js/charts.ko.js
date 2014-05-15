@@ -68,40 +68,24 @@ ko.bindingHandlers.pieChart = {
             _options.onClick(d);
           });
       });
-    },
-    update: function (element, valueAccessor) {
-      var value = valueAccessor();
-      // do something with the updated value
     }
   };
 
 ko.bindingHandlers.barChart = {
   init: function (element, valueAccessor) {
     barChart(element, valueAccessor(), false);
-  },
-  update: function (element, valueAccessor) {
-    var value = valueAccessor();
-    // do something with the updated value
   }
 };
 
 ko.bindingHandlers.timelineChart = {
   init: function (element, valueAccessor) {
     barChart(element, valueAccessor(), true);
-  },
-  update: function (element, valueAccessor) {
-    var value = valueAccessor();
-    // do something with the updated value
   }
 };
 
 ko.bindingHandlers.lineChart = {
   init: function (element, valueAccessor) {
     lineChart(element, valueAccessor());
-  },
-  update: function (element, valueAccessor) {
-    var value = valueAccessor();
-    // do something with the updated value
   }
 };
 
@@ -115,14 +99,7 @@ ko.bindingHandlers.mapChart = {
     $(element).css("position", "relative");
     $(element).css("marginLeft", "auto");
     $(element).css("marginRight", "auto");
-//
-//    if (typeof _options.maxWidth != "undefined") {
-//      var _max = _options.maxWidth * 1;
-//      if ($(element).width() > _max) {
-//        $(element).width(_max);
-//      }
-//    }
-//
+
     if (typeof _options.maxWidth != "undefined"){
         var _max = _options.maxWidth*1;
         $(element).width(Math.min($(element).parent().width(), _max));

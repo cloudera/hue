@@ -247,7 +247,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="visible: $parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div style="min-height:0px" data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}, 
+    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
         sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, 
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 
