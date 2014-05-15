@@ -298,6 +298,17 @@ ko.bindingHandlers.editableText = {
   }
 };
 
+function getCharacterLabel(character) {
+  var LABELS = {
+    '\t': '\\t'
+  };
+  if (LABELS[character]) {
+    return LABELS[character];
+  } else {
+    return character;
+  }
+}
+
 function validateNotNull(obs, message) {
   var ret = true;
   if (!obs()) {

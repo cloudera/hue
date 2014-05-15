@@ -208,7 +208,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
     <label for="separator" class="control-label">${_("Separator")}</label>
     <div class="controls">
-      <select data-bind="options: fieldSeparators, value: fieldSeparator" name="separator"></select>
+      <select data-bind="options: fieldSeparators, optionsText: getCharacterLabel, value: fieldSeparator" name="separator"></select>
     </div>
   </div>
 
@@ -384,7 +384,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
     <label for="separator" class="control-label">${_("Separator")}</label>
     <div class="controls">
-      <select data-bind="options: fieldSeparators, value: fieldSeparator" name="separator"></select>
+      <select data-bind="options: fieldSeparators, optionsText: getCharacterLabel, value: fieldSeparator" name="separator"></select>
     </div>
   </div>
 

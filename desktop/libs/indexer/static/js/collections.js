@@ -232,7 +232,7 @@ var CreateCollectionViewModel = function() {
           if (uniqueKeyFields.length > 0) {
             self.collection.uniqueKeyField(uniqueKeyFields[0].name());
           } else if (self.collection.fields().length > 0) {
-            self.collection.uniqueKeyField(self.collection.fields().name());
+            self.collection.uniqueKeyField(self.collection.fields()[0].name());
           }
         } else {
           $(document).trigger("error", data.message);
