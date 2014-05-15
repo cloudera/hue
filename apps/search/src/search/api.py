@@ -22,11 +22,11 @@ import urllib
 import numbers
 
 from datetime import datetime
+from math import log
 from time import mktime
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest import resource
+from desktop.lib.rest.http_client import RestException
 from django.utils.translation import ugettext as _
 
 from libsolr.api import SolrApi as BaseSolrApi
@@ -44,8 +44,6 @@ def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
 def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
-  is_range = False
-
   try:
     if widget_type == 'pie-widget':
       SLOTS = 5
@@ -60,20 +58,22 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
       stats_max = int(stat_facet['max'])
-      if start is not None:
-        stats_min = max(start, stats_min)
-      if end is not None:
-        stats_max = min(end, stats_max)   
-      # TODO: check min is min of max + refactor
+      if start is None:
+        start, _ = _round_range(stats_min)
+      if end is None:
+        _, end = _round_range(stats_max)        
       
       if gap is None:
-        gap = (stats_max - stats_min) / SLOTS
+        gap = (end - start) / SLOTS
       if gap < 1:
         gap = 1
-      is_range = True
     elif 'T' in stat_facet['min']:
       stats_min = stat_facet['min']
       stats_max = stat_facet['max']
+      if start is None:
+        start = stats_min 
+      if end is None:
+        end = stats_max
       difference = (
           mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - 
           mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())
@@ -93,19 +93,28 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       else:
         unit = 'YEARS'
       gap = '+1' + unit      
-      is_range = True
+
+    properties.update({
+      'min': stats_min,
+      'max': stats_max,
+      'start': start,
+      'end': end,
+      'gap': gap,
+      'canRange': True,
+    })
   except Exception, e:
+    print e
     # stats not supported on all the fields, like text
     pass
 
-  if is_range:
-    properties.update({
-      'start': stats_min,
-      'end': stats_max,
-      'gap': gap,
-      'canRange': True,
-    }) 
-
+def _round_range(n):
+  if n <= 10:
+    return n, n
+  else:
+    i = int(log(n, 10))
+    end = round(n, -i)
+    start = end - 10 ** i
+    return start, end 
 
 def _guess_gap(solr_api, collection, facet_field, start=None, end=None):
   properties = {}

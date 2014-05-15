@@ -311,6 +311,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       ${ _('End') }: <input type="text" class="input-small" data-bind="value: properties.end" />
       <br/>
       ${ _('Gap') }: <input type="text" class="input-small" data-bind="value: properties.gap" />
+      <br/>
+      ${ _('Min') }:
+      <input type="text" class="input-small" data-bind="value: properties.min" />
+      <br/>
+      ${ _('Max') }: <input type="text" class="input-small" data-bind="value: properties.max" />
+      <br/>      
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
       ${ _('Limit') }: <input type="text" class="input-small" data-bind="value: properties.limit" />

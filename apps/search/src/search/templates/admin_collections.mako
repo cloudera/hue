@@ -33,7 +33,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       <i class="fa fa-plus-circle"></i> ${ _('Import Index') }
     </button>
     <a class="btn importBtn" href="${ url('indexer:collections') }">
-      <i class="fa fa-plus-circle"></i> ${ _('Create Index') }
+      <i class="fa fa-plus-circle"></i> ${ _('Indexes') }
     </a>
     </div>
   <h4>${_('Dashboards')}</h4>
