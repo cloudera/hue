@@ -519,11 +519,44 @@ var ManageCollectionsViewModel = function() {
 };
 
 
-var CollectionsViewModel = function() {
+var CollectionsViewModel = function(config) {
   var self = this;
+
+  var _config = config || {};
 
   // Models
   self.page = ko.observable();
+  self.breadcrum = ko.observable();
+  self.breadcrum.list = ko.computed(function() {
+    var breadcrum_config = _config.breadcrum || {};
+    var labels = breadcrum_config.labels || {};
+    var skip = breadcrum_config.skip || [];
+    var breadcrums = [];
+    var crum = '';
+    breadcrums.push({
+      'url': '/',
+      'label': labels[crum] || crum,
+      'crum': crum
+    });
+    if (self.breadcrum()) {
+      var crums = [];
+      var newcrums = ko.utils.arrayMap( self.breadcrum().split('/'), function(crum) {
+        crums.push(crum);
+        if (skip.indexOf(crum) != -1) {
+          return null;
+        }
+        return {
+          'url': crums.join('/'),
+          'label': labels[crum] || crum,
+          'crum': crum
+        };
+      });
+      breadcrums.push.apply( breadcrums, ko.utils.arrayFilter(newcrums, function(breadcrum) {
+        return !!breadcrum;
+      }) );
+    }
+    return breadcrums;
+  });
 
   // UI
   self.create = new CreateCollectionViewModel();

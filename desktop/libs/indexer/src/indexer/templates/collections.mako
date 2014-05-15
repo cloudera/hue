@@ -27,6 +27,32 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <link rel="stylesheet" href="/indexer/static/css/admin.css">
 <style type="text/css">
+.hueBreadcrumb {
+  padding: 12px 14px;
+}
+
+.hueBreadcrumbBar {
+  padding: 0;
+  margin: 12px;
+}
+
+.hueBreadcrumbBar a {
+  color: #338BB8 !important;
+  display: inline !important;
+}
+
+.divider {
+  color: #CCC;
+}
+
+.sidebar-nav {
+  padding: 0;
+}
+
+.card-heading {
+  padding-left: 6px !important;
+  border-bottom: none !important;
+}
 </style>
 
 
@@ -66,12 +92,29 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </div>
 
 
+<!-- Breadcrum component -->
+<script id="breadcrum" type="text/html">
+<ul data-bind="foreach: breadcrum.list" class="nav nav-pills hueBreadcrumbBar">
+  <li class="nowrap">
+    <!-- ko if: $index() == ( $root.breadcrum.list().length - 1 ) -->
+    <span data-bind="text: label" style="padding-left:12px"></span>
+    <!-- /ko -->
+    <!-- ko if: $index() != ( $root.breadcrum.list().length - 1 ) -->
+    <a data-bind="routie: url, text: label" href="javascript:void(0)"></a>
+    <span class="divider">&gt;</span>
+    <!-- /ko -->
+  </li>
+</ul>
+</script>
+<!-- /Breadcrum component -->
+
+
 <!-- Manage collections page -->
 <script id="manage-page" type="text/html">
-<div data-bind="with: manage" class="span12" >
+<div class="span12" >
   <div class="card wizard">
-    <h1 class="card-heading simple">${_("Manage collections")}</h1>
-    <div class="card-body">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root, 'if': manage.collections().length != 0 }"></div>
+    <div class="card-body" data-bind="with: manage">
       <%actionbar:render>
         <%def name="search()">
           <div data-bind="visible: collections().length > 0 && !isLoading()">
@@ -120,11 +163,11 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 <!-- Create by file -->
 <script id="create-page" type="text/html">
-<div data-bind="with: create" class="span12">
+<div class="span12">
   <div class="card wizard">
-    <h1 class="card-heading simple">${_("Create collection from file")}</h1>
-    <div class="card-body" data-bind="if: wizard.currentPage()">
-      <form class="form form-horizontal">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+    <div class="card-body" data-bind="with: create">
+      <form data-bind="if: wizard.currentPage()" class="form form-horizontal">
         <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
         <br style="clear:both" />
         <br style="clear:both" />
@@ -239,8 +282,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 <!-- Edit collection page -->
 <script id="edit-page" type="text/html">
-<div data-bind="with: edit" class="span3">
-  <div class="sidebar-nav card-small">
+<div class="span3">
+  <div data-bind="with: edit" class="sidebar-nav card-small">
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload data')}</a></li>
@@ -249,10 +292,10 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     </ul>
   </div>
 </div>
-<div data-bind="with: edit" class="span9">
+<div class="span9">
   <div class="card wizard">
-    <h1 class="card-heading simple">${_("Edit collection")}</h1>
-    <div class="card-body">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+    <div data-bind="with: edit"  class="card-body">
       <form class="form">
         <table class="table">
           <thead>
@@ -304,11 +347,11 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 <!-- Upload wizard -->
 <script id="upload-page" type="text/html">
-<div data-bind="with: edit" class="span12">
+<div class="span12">
   <div class="card wizard">
-    <h1 class="card-heading simple">${_("Index data from file")}</h1>
-    <div class="card-body" data-bind="if: wizard.currentPage()">
-      <form class="form form-horizontal">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+    <div class="card-body" data-bind="with: edit">
+      <form data-bind="if: wizard.currentPage()" class="form form-horizontal">
         <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
         <br style="clear:both" />
         <br style="clear:both" />
@@ -410,10 +453,18 @@ function validateFields(collection) {
   return ret;
 }
 
-var vm = new CollectionsViewModel();
+var vm = new CollectionsViewModel({
+  'breadcrum': {
+    'labels': {
+      '': "${_('Collections')}",
+      'data': "${_('Upload data')}"
+    },
+    'skip': ['manage', 'upload', 'edit', 'create', 'wizard']
+  }
+});
 var create_root = vm.create.wizard.getPage('name', 'create-collection-data', 'separated', validateFileAndNameAndType);
 vm.create.wizard.getPage('separated', 'create-collection-data-separated', 'fields', validateFetchFields);
-vm.create.wizard.getPage('morphlines', 'create-collection-data-morphlines', 'fields', validateFetchFields);
+// vm.create.wizard.getPage('morphlines', 'create-collection-data-morphlines', 'fields', validateFetchFields);
 vm.create.wizard.getPage('fields', 'create-collection-fields', null, function() { return validateFields(vm.create.collection) });
 vm.create.wizard.rootPage(create_root);
 vm.create.wizard.currentPage(vm.create.wizard.rootPage());
@@ -442,9 +493,14 @@ vm.edit.sourceType.subscribe(function(value) {
   }
 });
 
+$(window).on('hashchange', function() {
+  vm.breadcrum(window.location.hash.substring(1));
+});
+
 routie({
   "": function() {
     routie('manage');
+    vm.breadcrum(window.location.hash.substring(1));
   },
   "manage": function() {
     vm.page('manage-page');
@@ -492,6 +548,7 @@ routie({
   },
   "*": function() {
     routie('manage');
+    vm.breadcrum(window.location.hash.substring(1));
   },
 });
 
