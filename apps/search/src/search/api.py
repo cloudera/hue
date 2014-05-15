@@ -55,16 +55,23 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     stats_json = solr_api.stats(collection['name'], [facet_field])
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
     
+    # to refactor
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
       stats_max = int(stat_facet['max'])
       if start is None:
-        start, _ = _round_number_range(stats_min)
+        if widget_type == 'line-widget':
+          start, _ = _round_thousand_range(stats_min)
+        else:        
+          start, _ =  _round_number_range(stats_min)
       if end is None:
-        _, end = _round_number_range(stats_max)        
+        if widget_type == 'line-widget':
+          _, end = _round_thousand_range(stats_max)
+        else:
+          _, end = _round_number_range(stats_max)        
       
       if gap is None:
-        gap = (end - start) / SLOTS
+        gap = int((end - start) / SLOTS)
       if gap < 1:
         gap = 1
     elif 'T' in stat_facet['min']:
@@ -132,11 +139,20 @@ def _round_date_range(tm):
 
 def _round_number_range(n):
   if n <= 10:
-    return n, n
+    return n, n + 1
   else:
     i = int(log(n, 10))
     end = round(n, -i)
     start = end - 10 ** i
+    return start, end 
+
+def _round_thousand_range(n):
+  if n <= 10:
+    return 0, 0
+  else:
+    i = int(log(n, 10))
+    start = 10 ** i
+    end = 10 ** (i + 1)
     return start, end 
 
 def _guess_gap(solr_api, collection, facet_field, start=None, end=None):

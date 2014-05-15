@@ -403,7 +403,7 @@ var Collection = function (vm, collection) {
 
   self.availableFacetFields = ko.computed(function() {
     var facetFieldNames = $.map(self.facets(), function(facet) {
-	  return facet.field(); //filter out text_general
+	  return facet.field(); //filter out text_general, __version__
     });
     return $.grep(self.fields(), function(field) {
       return facetFieldNames.indexOf(field.name()) == -1;
@@ -508,7 +508,15 @@ var Collection = function (vm, collection) {
 	return _fields;	  
   });
   self.template.availableWidgetFields = ko.computed(function() {
-    return self.template.fieldsModalType() == 'histogram-widget'? vm.availableDateFields() : self.availableFacetFields();
+    if (self.template.fieldsModalType() == 'histogram-widget') {
+      return vm.availableDateFields();	
+    }
+    else if (self.template.fieldsModalType() == 'line-widget') {
+      return vm.availableNumberFields();
+    }
+    else {
+      return self.availableFacetFields();
+    }
   });
   self.template.availableWidgetFieldsNames = ko.computed(function() {
 	return $.map(self.template.availableWidgetFields(), function(field){
@@ -752,7 +760,9 @@ var NewTemplate = function (vm, initial) {
 };
 
 
-var DATE_TYPE = ['date', 'tdate'];
+var DATE_TYPES = ['date', 'tdate'];
+var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat'];
+
 
 var SearchViewModel = function (collection_json, query_json, initial_json) {
   var self = this;
@@ -810,7 +820,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));  
 
   self.availableDateFields = ko.computed(function() {
-    return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPE.indexOf(field.type()) != -1; });
+    return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
+  });
+  self.availableNumberFields = ko.computed(function() {
+    return $.grep(self.collection.availableFacetFields(), function(field) { return NUMBER_TYPES.indexOf(field.type()) != -1; });
   });
   
   function getWidgets(equalsTo) {
@@ -826,6 +839,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableDraggableHistogram = ko.computed(function() {
 	return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget'; }).length == 0 &&
 	  self.availableDateFields().length > 0;
+  });
+  self.availableDraggableNumbers = ko.computed(function() {
+	return getWidgets(function(widget){ return widget.widgetType() == 'line-widget'; }).length == 0 &&
+	  self.availableNumberFields().length > 0;
   });
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;

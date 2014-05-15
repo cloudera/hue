@@ -147,12 +147,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-bar-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableLine(), isEnabled: availableDraggableChart, 
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
+                    draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers, 
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Line')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
