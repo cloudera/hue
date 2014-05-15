@@ -6,6 +6,9 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
+    needed_by = (
+        ("desktop", "0007_auto__add_documentpermission__add_documenttag__add_document"),
+    )
 
     def forwards(self, orm):
         """Migrate from ["path1", "path2", ...] to [{"name":"path1"},{"name":"path2"},...]"""
