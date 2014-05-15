@@ -733,8 +733,22 @@ var NewTemplate = function (vm, initial) {
   var self = this;
 
   self.collections = ko.mapping.fromJS(initial.collections);
-  
   self.layout = initial.layout;
+
+  if (self.collections) {
+    vm.collection.name.subscribe(function (newValue) {
+	  vm.collection.label(newValue);
+	  vm.collection.switchCollection();
+	  vm.changeCollection(false);
+	  vm.search();
+    });
+  }
+  
+  self.init = function() {
+    if (initial.autoLoad) {
+	  magicLayout(vm);
+    }
+  };
 };
 
 
@@ -748,15 +762,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.query = new Query(self, query_json);
   self.initial = new NewTemplate(self, initial_json);
 
-  if (initial_json.collections) {
-    self.collection.name.subscribe(function (newValue) {
-	  self.collection.label(newValue);
-	  self.collection.switchCollection();
-	  self.changeCollection(false);
-	  self.search();
-    });
-  }
-  
   // UI
   self.response = ko.observable({});
   self.results = ko.observableArray([]);
@@ -827,6 +832,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   });
   
   self.init = function (callback) {
+	self.initial.init();
 	self.collection.syncFields();
     self.isEditing(true);
     self.search(callback);

@@ -75,6 +75,7 @@ def index(request):
   })
 
 
+# TODO security
 def new_search(request):
   collections = SearchController(request.user).get_solr_collection().keys()
   if not collections:
@@ -91,6 +92,31 @@ def new_search(request):
          'layout': [
               {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
+                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+              "drops":["temp"],"klass":"card card-home card-column span10"}
+         ] 
+     }),
+  })
+
+
+# TODO security
+def browse(request, name):
+  collections = SearchController(request.user).get_solr_collection().keys()
+  if not collections:
+    return no_collections(request)
+
+  collection = Collection(name=name, label=name)
+  query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+
+  return render('search2.mako', request, {
+    'collection': collection,
+    'query': query,
+    'initial': json.dumps({
+         'autoLoad': True,
+         'collections': collections,
+         'layout': [
+              {"size":12,"rows":[{"widgets":[
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
