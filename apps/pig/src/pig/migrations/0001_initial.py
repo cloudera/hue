@@ -5,6 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
+    needed_by = (
+        ("desktop", "0007_auto__add_documentpermission__add_documenttag__add_document"),
+    )
 
     def forwards(self, orm):
 
