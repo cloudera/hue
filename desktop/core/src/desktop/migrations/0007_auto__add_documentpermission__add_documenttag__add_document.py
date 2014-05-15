@@ -7,6 +7,11 @@ from django.db import models
 from desktop.models import Document
 
 class Migration(SchemaMigration):
+    depends_on = (
+      ("oozie", "0025_change_examples_path_format"),
+      ("pig", "0001_initial"),
+      ("beeswax", "0008_auto__add_field_queryhistory_query_type"),
+    )
     
     def forwards(self, orm):
         
