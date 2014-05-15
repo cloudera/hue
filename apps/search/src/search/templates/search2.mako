@@ -414,16 +414,24 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="visible: $root.collection.template.showFieldList()" style="float:left; margin-right: 10px; background-color: #F6F6F6; padding: 5px">
       <span data-bind="visible: $root.collection.template.showFieldList()">
         <div>
-          <strong>${ _('Fields') }</strong>
           <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
             <i class="fa fa-chevron-left"></i>
           </a>
+          <input type="text" data-bind="value: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
         </div>
-        <input type="text" data-bind="value: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 88%; margin-bottom: 3px" />
-        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto">
-          <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" /> 
-          <span data-bind="text: '&nbsp;' + name()"></span>
-          <br/>
+        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px">
+          <a href="javascript: void(0)" class="btn btn-mini"
+            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }"
+            style="margin-right: 2px;">
+            <i class="fa fa-square-o"></i>
+          </a>
+          <strong>${_('Field Name')}</strong>
+        </div>
+        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto; padding-left: 4px">
+          <label class="checkbox">
+            <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" />
+            <span data-bind="text: name"></span>
+          </label>
         </div>
       </span>
     </div>
