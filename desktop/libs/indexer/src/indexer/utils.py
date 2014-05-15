@@ -31,7 +31,8 @@ from django.utils.translation import ugettext as _
 from desktop.lib.i18n import force_unicode, smart_str
 
 from indexer import conf
-from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES
+from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES,\
+                           DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
 
 LOG = logging.getLogger(__name__)
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
@@ -100,8 +101,13 @@ def get_field_types(row):
     except:
       raise ValueError()
 
-  test_fns = [('int', int),
-              ('float', float),
+  def test_int(value):
+    if len(bin(int(value))) - 2 > 32:
+      raise ValueError()
+
+  test_fns = [('tint', test_int),
+              ('tlong', int),
+              ('tdouble', float),
               ('boolean', test_boolean),
               ('tdate', test_timestamp)]
   field_types = []
@@ -136,6 +142,21 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   else:
     timestamp_fields = [field['name'] for field in fields if field['type'] in DATE_FIELD_TYPES]
 
+  if fields is None:
+    integer_fields = None
+  else:
+    integer_fields = [field['name'] for field in fields if field['type'] in INTEGER_FIELD_TYPES]
+
+  if fields is None:
+    decimal_fields = None
+  else:
+    decimal_fields = [field['name'] for field in fields if field['type'] in DECIMAL_FIELD_TYPES]
+
+  if fields is None:
+    boolean_fields = None
+  else:
+    boolean_fields = [field['name'] for field in fields if field['type'] in BOOLEAN_FIELD_TYPES]
+
   csvfile = StringIO.StringIO()
   content = fh.read()
   is_first = True
@@ -166,13 +187,30 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
         for key in remove_keys:
           del row[key]
 
-      # Parse timestamp
+      # Parse dates
       if timestamp_fields:
         for key in timestamp_fields:
           if key in row:
             row[key] = parse(row[key]).astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-      # Return row
+      # Parse decimal
+      if decimal_fields:
+        for key in decimal_fields:
+          if key in row:
+            row[key] = float(row[key])
+
+      # Parse integer
+      if integer_fields:
+        for key in integer_fields:
+          if key in row:
+            row[key] = int(row[key])
+
+      # Parse boolean
+      if boolean_fields:
+        for key in boolean_fields:
+          if key in row:
+            row[key] = str(row[key]).lower() == "true"
+
       yield row
     
     csvfile.truncate()
@@ -216,14 +254,12 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
       buf = content[:last_newline]
       content = content[last_newline+1:]
       for row in value_generator(buf):
-        # print row
         yield row
     prev = fh.read()
     content += prev
 
   if content:
     for row in value_generator(content):
-      # print row
       yield row
 
 

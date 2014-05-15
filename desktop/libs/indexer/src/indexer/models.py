@@ -132,3 +132,26 @@ DATE_FIELD_TYPES = (
   "pdate",
   "tdate"
 )
+
+INTEGER_FIELD_TYPES = (
+  "int",
+  "tint",
+  "pint",
+  "long",
+  "tlong",
+  "plong"
+)
+
+DECIMAL_FIELD_TYPES = (
+  "float",
+  "tfloat",
+  "pfloat",
+  "double",
+  "tdouble",
+  "pdouble",
+  "currency"
+)
+
+BOOLEAN_FIELD_TYPES = (
+  'boolean',
+)

@@ -173,7 +173,9 @@ class CollectionManagerController(object):
           content_type = 'json'
         elif data_type == 'separated':
           # 'data' first line should be headers.
-          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)])
+          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)], indent=2)
+          with open('/tmp/output.json', 'w') as f:
+            f.write(data)
           content_type = 'json'
         else:
           raise PopupException(_('Could not update index. Unknown type %s') % data_type)
