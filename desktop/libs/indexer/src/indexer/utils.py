@@ -103,7 +103,7 @@ def get_field_types(row):
   test_fns = [('int', int),
               ('float', float),
               ('boolean', test_boolean),
-              ('date', test_timestamp)]
+              ('tdate', test_timestamp)]
   field_types = []
   for field in row:
     field_type = None
