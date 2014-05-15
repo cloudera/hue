@@ -610,27 +610,29 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="resultset-pagination">
-<div style="text-align: center;">
+<div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-left" data-bind="
         visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
-    </i>
-  </a>  
+    </i></a>
 
-  <span data-bind="text: $data.response.start"></span>
+  ${ _('Showing') }
+  <span data-bind="text: ($data.response.start + 1)"></span>
+  ${ _('to') }
+  <span data-bind="text: ($data.response.start + $root.collection.template.rows())"></span>
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
-  
-  <span data-bind="visible: $root.isEditing()">
-    ${ _('by') }
-    <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" />
+  ${ _(' results.') }
+
+  ${ _('Show') }
+  <span data-bind="visible: $root.isEditing()" class="spinedit-pagination">
+    <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
   </span>
-  
-  ${ _(' results') }  
-  ## (<span data-bind="text: $data.responseHeader.QTime"></span> ${ _('ms') })
-  
+  ${ _('results per page.') }
+
+
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-right" data-bind="
@@ -638,7 +640,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         click: function() { $root.query.paginate('next') }">
     </i>
   </a>  
-  
+
   <!-- ko if: $data.response.numFound > 0 && $data.response.numFound <= 1000 -->
   <span class="pull-right">
     <form method="POST" action="${ url('search:download') }">
@@ -1269,6 +1271,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+  }
+
+  .spinedit-pagination div.spinedit .fa-chevron-up {
+    top: -7px;
+  }
+
+  .spinedit-pagination div.spinedit .fa-chevron-down {
+    top: 7px;
+    left: -4px;
   }
 
 </style>

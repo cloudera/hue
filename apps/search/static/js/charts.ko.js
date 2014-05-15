@@ -240,6 +240,7 @@ function lineChart(element, options) {
 
   nv.addGraph(function () {
     var _chart = nv.models.lineWithBrushChart();
+    _chart.enableSelection();
     _chart.onSelectRange(options.onSelectRange);
     _chart.xAxis.showMaxMin(false);
 
