@@ -90,7 +90,8 @@ class HbaseApi(object):
                                   service_name="Hue HBase Thrift Client for %s" % name,
                                   kerberos_principal=None,
                                   use_sasl=False,
-                                  timeout_seconds=None)
+                                  timeout_seconds=None,
+                                  transport=conf.THRIFT_TRANSPORT.get())
 
   def get(self, cluster, tableName, row, column, attributes):
     client = self.connectCluster(cluster)

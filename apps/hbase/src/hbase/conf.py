@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, validate_thrift_transport
 
 HBASE_CLUSTERS = Config(
   key="hbase_clusters",
@@ -29,3 +29,20 @@ TRUNCATE_LIMIT = Config(
   default="500",
   help="Hard limit of rows or columns per row fetched before truncating.",
   type=int)
+
+THRIFT_TRANSPORT = Config(
+  key="thrift_transport",
+  default="buffered",
+  help="'buffered' is the default of the HBase Thrift Server. " +
+       "'framed' can be used to chunk up responses, " +
+       "which is useful when used in conjunction with the nonblocking server in Thrift.",
+  type=str
+)
+
+
+def config_validator(user):
+  res = []
+
+  res.extend(validate_thrift_transport(THRIFT_TRANSPORT))
+
+  return res

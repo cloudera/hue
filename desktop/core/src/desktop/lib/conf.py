@@ -80,6 +80,9 @@ import sys
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
 
+# Supported thrift transports
+SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
+
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
 
@@ -676,3 +679,16 @@ def validate_port(confvar):
   except ValueError:
     return error_res
   return [ ]
+
+def validate_thrift_transport(confvar):
+  """
+  Validate that the provided thrift transport is supported.
+  Returns [(confvar, error_msg)] or []
+  """
+  transport = confvar.get()
+  error_res = [(confvar, 'Thrift transport %s not supported. Please choose a supported transport: %s' % (transport, ', '.join(SUPPORTED_THRIFT_TRANSPORTS)))]
+
+  if transport not in SUPPORTED_THRIFT_TRANSPORTS:
+    return error_res
+
+  return []

@@ -28,7 +28,7 @@ import sys
 from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
 from thrift.transport.TSSLSocket import TSSLSocket
-from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
+from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from desktop.lib.python_util import create_synchronous_io_multiplexer
@@ -78,7 +78,8 @@ class ConnectionConfig(object):
                keyfile=None,
                certfile=None,
                validate=False,
-               timeout_seconds=45):
+               timeout_seconds=45,
+               transport='buffered'):
     """
     @param klass The thrift client class
     @param host Host to connect to
@@ -96,6 +97,7 @@ class ConnectionConfig(object):
     @param certfile certificate file
     @param validate Validate the certificate received from server
     @param timeout_seconds Timeout for thrift calls
+    @param transport string representation of thrift transport to use
     """
     self.klass = klass
     self.host = host
@@ -111,10 +113,11 @@ class ConnectionConfig(object):
     self.certfile = certfile
     self.validate = validate
     self.timeout_seconds = timeout_seconds
+    self.transport = transport
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
-                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate]))
+                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport]))
 
 class ConnectionPooler(object):
   """
@@ -248,6 +251,8 @@ def connect_to_thrift(conf):
       return saslc
 
     transport = TSaslClientTransport(sasl_factory, conf.mechanism, sock)
+  elif conf.transport == 'framed':
+    transport = TFramedTransport(sock)
   else:
     transport = TBufferedTransport(sock)
 
@@ -267,6 +272,8 @@ def _grab_transport_from_wrapper(outer_transport):
     return outer_transport._TBufferedTransport__trans
   elif isinstance(outer_transport, TSaslClientTransport):
     return outer_transport._trans
+  elif isinstance(outer_transport, TFramedTransport):
+    return outer_transport._TFramedTransport__trans
   else:
     raise Exception("Unknown transport type: " + outer_transport.__class__)
 
