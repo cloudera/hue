@@ -39,7 +39,7 @@ class Command(NoArgsCommand):
     self.user = install_sample_user()
     self.fs = cluster.get_hdfs()
 
-    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../examples/twitter/index_data.csv'))
+    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
 
     LOG.info(_("Installing twitter collection"))
     self._setup_collection_from_csv({
