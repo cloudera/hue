@@ -499,12 +499,13 @@ class WebHdfs(Hdfs):
                     permission=oct(stat.S_IMODE(sb.mode)),
                     data=data)
 
+      if offset != 0:
+        self.append(dst, data)
+
       cnt = len(data)
       if cnt < UPLOAD_CHUNK_SIZE.get():
         break
 
-      if offset != 0:
-        self.append(dst, data)
       offset += cnt
 
 
