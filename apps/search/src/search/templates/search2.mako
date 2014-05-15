@@ -306,20 +306,20 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
       ${ _('Start') }:
-      <input type="text" class="input-small" data-bind="value: properties.start" />
+      <input type="text" class="input-large" data-bind="value: properties.start" />
       <br/>
-      ${ _('End') }: <input type="text" class="input-small" data-bind="value: properties.end" />
+      ${ _('End') }: <input type="text" class="input-large" data-bind="value: properties.end" />
       <br/>
       ${ _('Gap') }: <input type="text" class="input-small" data-bind="value: properties.gap" />
       <br/>
       ${ _('Min') }:
-      <input type="text" class="input-small" data-bind="value: properties.min" />
+      <input type="text" class="input-medium" data-bind="value: properties.min" />
       <br/>
-      ${ _('Max') }: <input type="text" class="input-small" data-bind="value: properties.max" />
+      ${ _('Max') }: <input type="text" class="input-medium" data-bind="value: properties.max" />
       <br/>      
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
-      ${ _('Limit') }: <input type="text" class="input-small" data-bind="value: properties.limit" />
+      ${ _('Limit') }: <input type="text" class="input-medium" data-bind="value: properties.limit" />
     <!-- /ko -->
 
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
@@ -680,7 +680,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
     <span>
       ${ _('Group By') }
-      <select data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq">
+      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq">
       </select>      
     </span>
 

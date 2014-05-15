@@ -21,7 +21,7 @@ import logging
 import urllib
 import numbers
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import log
 from time import mktime
 
@@ -59,9 +59,9 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
       stats_max = int(stat_facet['max'])
       if start is None:
-        start, _ = _round_range(stats_min)
+        start, _ = _round_number_range(stats_min)
       if end is None:
-        _, end = _round_range(stats_max)        
+        _, end = _round_number_range(stats_max)        
       
       if gap is None:
         gap = (end - start) / SLOTS
@@ -72,27 +72,45 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       stats_max = stat_facet['max']
       if start is None:
         start = stats_min 
+      start = start.replace('.000', '')
+      start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
+      start_ts, _ = _round_date_range(start_ts)
+      start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       if end is None:
         end = stats_max
+      end = end.replace('.000', '')
+      end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+      _, end_ts = _round_date_range(end_ts)
+      end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       difference = (
-          mktime(datetime.strptime(stats_max, '%Y-%m-%dT%H:%M:%SZ').timetuple()) - 
-          mktime(datetime.strptime(stats_min, '%Y-%m-%dT%H:%M:%SZ').timetuple())
+          mktime(end_ts.timetuple()) - 
+          mktime(start_ts.timetuple())
       ) / SLOTS
 
       if difference < 1:
-        unit = 'SECONDS'
-      elif difference < 60:
-        unit = 'MINUTES'
-        # todo 0, 5, 10, ...
+        gap = '+1SECONDS'
+      elif difference < 100:
+        gap = '+1MINUTES'
+      elif difference < 60 * 5:
+        gap = '+5MINUTES'
+      elif difference < 60 * 10:
+        gap = '+10MINUTES'
+      elif difference < 60 * 30:
+        gap = '+30MINUTES'                
       elif difference < 3600:
-        unit = 'HOURS'
+        gap = '+1HOURS'
+      elif difference < 3600 * 3:
+        gap = '+3HOURS'
+      elif difference < 3600 * 12:
+        gap = '+12HOURS'
       elif difference < 3600 * 24:
-        unit = 'DAYS'
+        gap = '+1DAYS'
+      elif difference < 3600 * 24 * 7:
+        gap = '+7DAYS'        
       elif difference < 3600 * 24 * 30:
-        unit = 'MONTHS'        
+        gap = '+1MONTHS'        
       else:
-        unit = 'YEARS'
-      gap = '+1' + unit      
+        gap = '+1YEARS'      
 
     properties.update({
       'min': stats_min,
@@ -107,7 +125,12 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     # stats not supported on all the fields, like text
     pass
 
-def _round_range(n):
+def _round_date_range(tm):
+  start = tm - timedelta(minutes=tm.minute, seconds=tm.second, microseconds=tm.microsecond)
+  end = start + timedelta(minutes=60)  
+  return start, end
+
+def _round_number_range(n):
   if n <= 10:
     return n, n
   else:
