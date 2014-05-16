@@ -323,15 +323,17 @@ function barChart(element, options, isTimeline) {
       }
       else {
         _chart = nv.models.multiBarWithBrushChart();
-        _chart.xAxis
-          .showMaxMin(true)
-          .tickFormat(d3.format(',0f'));
+        if (_datum.length > 0 && _datum[0].values.length > 10){
+          _chart.enableSelection();
+        }
+        _chart.xAxis.showMaxMin(false).tickFormat(d3.format(',0f'));
         _chart.multibar.hideable(true);
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
         _chart.onStateChange(options.onStateChange);
+        _chart.onSelectRange(options.onSelectRange);
       }
     }
-    _chart.transitionDuration(100);
+    _chart.transitionDuration(0);
 
     _chart.yAxis
         .tickFormat(d3.format(',0f'));
