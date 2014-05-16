@@ -30,6 +30,8 @@ from desktop.lib.rest import resource
 from search.models import Collection
 
 
+QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+
 class MockResource():
   RESPONSE = None
 
@@ -68,6 +70,9 @@ class TestSearchBase(object):
 
 
 class TestWithMockedSolr(TestSearchBase):
+  def _get_collection_param(self, collection):
+    col_json = json.loads(collection.get_c(self.user))
+    return col_json['collection']    
 
   def test_index(self):
     response = self.c.get(reverse('search:index'))
@@ -84,7 +89,10 @@ class TestWithMockedSolr(TestSearchBase):
 
     # journal_title facet + date range article_date facets clicked and author_facet not clicked
     # http://solr:8983/solr/articles/select?user.name=hue&doAs=romain&q=%2A%3A%2A&wt=json&rows=15&start=0&facet=true&facet.mincount=1&facet.limit=100&facet.sort=count&facet.field=journal_title&facet.field=author_facet&facet.date=article_date&f.article_date.facet.date.start=NOW-7MONTH%2FDAYS&f.article_date.facet.date.end=NOW-5MONTH&f.article_date.facet.date.gap=%2B1DAYS&fq=article_date%3A%5B2013-06-13T00%3A00%3A00Z+TO+2013-06-13T00%3A00%3A00Z%2B1DAYS%5D&fq=journal_title%3A%22in%22
-    response = self.c.get(reverse('search:index'))
+    response = self.c.post(reverse('search:search'), {
+        'collection': json.dumps(self._get_collection_param(collection)),
+        'query': json.dumps(QUERY)
+    })
 
     assert_false('alert alert-error' in response.content, response.content)
 
@@ -94,7 +102,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true('journal_title' in response.content, response.content)
     assert_true('angewandte' in response.content, response.content)
 
-    assert_true('Showing 4 results' in response.content, response.content)
+    assert_true('"numFound": 4' in response.content, response.content)
 
   def test_get_collection_fields(self):
     collection, created = Collection.objects.get_or_create(name='collection_1', solr_properties={})
@@ -103,30 +111,60 @@ class TestWithMockedSolr(TestSearchBase):
 
     assert_equal(
         # Dynamic fields not included for now
-        [{'type': 'long', 'name': '_version_'}, {'type': 'text_general', 'name': 'author'}, {'type': 'string', 'name': 'cat'}, {'type': 'text_general', 'name': 'category'}, {'type': 'text_general', 'name': 'comments'}, {'type': 'text_general', 'name': 'content'}, {'type': 'string', 'name': 'content_type'}, {'type': 'text_general', 'name': 'description'}, {'type': 'text_general', 'name': 'features'}, {'type': 'string', 'name': 'id'}, {'type': 'boolean', 'name': 'inStock'}, {'type': 'text_general', 'name': 'includes'}, {'type': 'text_general', 'name': 'keywords'}, {'type': 'date', 'name': 'last_modified'}, {'type': 'string', 'name': 'links'}, {'type': 'text_general', 'name': 'manu'}, {'type': 'string', 'name': 'manu_exact'}, {'type': 'text_general', 'name': 'name'}, {'type': 'payloads', 'name': 'payloads'}, {'type': 'int', 'name': 'popularity'}, {'type': 'float', 'name': 'price'}, {'type': 'text_general', 'name': 'resourcename'}, {'type': 'text_en_splitting_tight', 'name': 'sku'}, {'type': 'location', 'name': 'store'}, {'type': 'text_general', 'name': 'subject'}, {'type': 'text_general', 'name': 'text'}, {'type': 'text_general_rev', 'name': 'text_rev'}, {'type': 'text_general', 'name': 'title'}, {'type': 'text_general', 'name': 'url'}, {'type': 'float', 'name': 'weight'}], 
+        [{'isDynamic': False, 'isId': None, 'type': 'long', 'name': '_version_'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'author'},
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'cat'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'category'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'comments'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'content'},
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'content_type'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'description'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'features'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'boolean', 'name': 'inStock'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'includes'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'keywords'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'date', 'name': 'last_modified'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'links'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'manu'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'manu_exact'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'name'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'payloads', 'name': 'payloads'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'int', 'name': 'popularity'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'price'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'resourcename'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_en_splitting_tight', 'name': 'sku'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'location', 'name': 'store'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'subject'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'text'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general_rev', 'name': 'text_rev'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'title'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'weight'},
+         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}], 
         collection.fields_data(self.user)
     )
-
-  def test_empty_highlighting(self):
-    collection, created = Collection.objects.get_or_create(name='collection_1', solr_properties={})
-
-    assert_equal('[]', collection.result.get_highlighting())
-
-    assert_true('{{_version_}} {{author}}' in collection.result.get_template(True), collection.result.get_template(True))
 
   def test_download(self):
     collection, created = Collection.objects.get_or_create(name='collection_1', solr_properties={})
 
     MockResource.set_solr_response("""{"responseHeader":{"status":0,"QTime":59,"params":{"facet":"true","facet.mincount":"1","facet.limit":"100","facet.date":"article_date","f.article_date.facet.date.start":"NOW-7MONTH/DAYS","wt":"json","rows":"15","user.name":"hue","start":"0","facet.sort":"count","q":"*:*","f.article_date.facet.date.end":"NOW-5MONTH","doAs":"romain","f.article_date.facet.date.gap":"+1DAYS","facet.field":["journal_title","author_facet"],"fq":["article_date:[2013-06-13T00:00:00Z TO 2013-06-13T00:00:00Z+1DAYS]","journal_title:\\"in\\""]}},"response":{"numFound":4,"start":0,"maxScore":1.0,"docs":[{"article_title":"Investigations for neonatal seizures.","journal_issn":"1878-0946","article_abstract_text":["Seizures during the neonatal period are always medical emergencies. Apart from the need for rapid anticonvulsive treatment, the underlying condition is often not immediately obvious. In the search for the correct diagnosis, a thorough history, clinical examination, laboratory work-up, neurophysiological and neuroradiological investigations are all essential. A close collaboration between neonatologists, neuropaediatricians, laboratory specialists, neurophysiologists and radiologists facilitates the adequate care of the infant."],"ontologies":["36481|1 "],"article_date":"2013-06-13T00:00:00Z","journal_title":"Seminars in fetal & neonatal medicine","date_created":"2013-08-22T00:00:00Z","journal_country":"Netherlands","journal_iso_abbreviation":"Semin Fetal Neonatal Med","id":"23680099","author":["B B Hallberg","M M Blennow"],"article_pagination":"196-201","journal_publication_date":"2013-08-22T00:00:00Z","affiliation":"Department of Neonatology, Karolinska Institutet and University Hospital, Stockholm, Sweden. boubou.hallberg@ki.se","language":"eng","_version_":1450807641462800385},{"article_title":"Enantiomeric selection properties of β-homoDNA: enhanced pairing for heterochiral complexes.","journal_issn":"1521-3773","article_date":"2013-06-13T00:00:00Z","journal_title":"Angewandte Chemie (International ed. in English)","date_created":"2013-07-20T00:00:00Z","journal_country":"Germany","journal_iso_abbreviation":"Angew. Chem. Int. Ed. Engl.","id":"23670912","author":["Daniele D D'Alonzo","Jussara J Amato","Guy G Schepers","Matheus M Froeyen","Arthur A Van Aerschot","Piet P Herdewijn","Annalisa A Guaragna"],"article_pagination":"6662-5","journal_publication_date":"2013-06-24T00:00:00Z","affiliation":"Dipartimento di Scienze Chimiche, Università degli Studi di Napoli Federico II, Via Cintia 21, 80126 Napoli, Italy. dandalonzo@unina.it","language":"eng","_version_":1450807661929955329},{"article_title":"Interference of bacterial cell-to-cell communication: a new concept of antimicrobial chemotherapy breaks antibiotic resistance.","journal_issn":"1664-302X","article_abstract_text":["Bacteria use a cell-to-cell communication activity termed \\"quorum sensing\\" to coordinate group behaviors in a cell density dependent manner. Quorum sensing influences the expression profile of diverse genes, including antibiotic tolerance and virulence determinants, via specific chemical compounds called \\"autoinducers\\". During quorum sensing, Gram-negative bacteria typically use an acylated homoserine lactone (AHL) called autoinducer 1. Since the first discovery of quorum sensing in a marine bacterium, it has been recognized that more than 100 species possess this mechanism of cell-to-cell communication. In addition to being of interest from a biological standpoint, quorum sensing is a potential target for antimicrobial chemotherapy. This unique concept of antimicrobial control relies on reducing the burden of virulence rather than killing the bacteria. It is believed that this approach will not only suppress the development of antibiotic resistance, but will also improve the treatment of refractory infections triggered by multi-drug resistant pathogens. In this paper, we review and track recent progress in studies on AHL inhibitors/modulators from a biological standpoint. It has been discovered that both natural and synthetic compounds can disrupt quorum sensing by a variety of means, such as jamming signal transduction, inhibition of signal production and break-down and trapping of signal compounds. We also focus on the regulatory elements that attenuate quorum sensing activities and discuss their unique properties. Understanding the biological roles of regulatory elements might be useful in developing inhibitor applications and understanding how quorum sensing is controlled."],"ontologies":["2402|1 ","1875|1 ","2047|3 ","36690|1 ","8120|1 ","1872|1 ","1861|1 ","1955|2 ","38027|1 ","3853|1 ","2237|3 ","37074|1 ","3043|2 ","36478|1 ","4403|1 ","2751|1 ","10751|1 ","36467|1 ","2387|1 ","7278|3 ","3826|1 "],"article_date":"2013-06-13T00:00:00Z","journal_title":"Frontiers in microbiology","date_created":"2013-06-30T00:00:00Z","journal_country":"Switzerland","journal_iso_abbreviation":"Front Microbiol","id":"23720655","author":["Hidetada H Hirakawa","Haruyoshi H Tomita"],"article_pagination":"114","journal_publication_date":"2013-09-13T00:00:00Z","affiliation":"Advanced Scientific Research Leaders Development Unit, Gunma University Maebashi, Gunma, Japan.","language":"eng","_version_":1450807662055784448},{"article_title":"The role of musical training in emergent and event-based timing.","journal_issn":"1662-5161","article_abstract_text":["Introduction: Musical performance is thought to rely predominantly on event-based timing involving a clock-like neural process and an explicit internal representation of the time interval. Some aspects of musical performance may rely on emergent timing, which is established through the optimization of movement kinematics, and can be maintained without reference to any explicit representation of the time interval. We predicted that musical training would have its largest effect on event-based timing, supporting the dissociability of these timing processes and the dominance of event-based timing in musical performance. Materials and Methods: We compared 22 musicians and 17 non-musicians on the prototypical event-based timing task of finger tapping and on the typically emergently timed task of circle drawing. For each task, participants first responded in synchrony with a metronome (Paced) and then responded at the same rate without the metronome (Unpaced). Results: Analyses of the Unpaced phase revealed that non-musicians were more variable in their inter-response intervals for finger tapping compared to circle drawing. Musicians did not differ between the two tasks. Between groups, non-musicians were more variable than musicians for tapping but not for drawing. We were able to show that the differences were due to less timer variability in musicians on the tapping task. Correlational analyses of movement jerk and inter-response interval variability revealed a negative association for tapping and a positive association for drawing in non-musicians only. Discussion: These results suggest that musical training affects temporal variability in tapping but not drawing. Additionally, musicians and non-musicians may be employing different movement strategies to maintain accurate timing in the two tasks. These findings add to our understanding of how musical training affects timing and support the dissociability of event-based and emergent timing modes."],"ontologies":["36810|1 ","49002|1 ","3132|1 ","3797|1 ","37953|1 ","36563|2 ","524|1 ","3781|1 ","2848|1 ","17163|1 ","17165|1 ","49010|1 ","36647|3 ","36529|1 ","2936|1 ","2643|1 ","714|1 ","3591|1 ","2272|1 ","3103|1 ","2265|1 ","37051|1 ","3691|1 "],"article_date":"2013-06-14T00:00:00Z","journal_title":"Frontiers in human neuroscience","date_created":"2013-06-29T00:00:00Z","journal_country":"Switzerland","journal_iso_abbreviation":"Front Hum Neurosci","id":"23717275","author":["L H LH Baer","J L N JL Thibodeau","T M TM Gralnick","K Z H KZ Li","V B VB Penhune"],"article_pagination":"191","journal_publication_date":"2013-09-13T00:00:00Z","affiliation":"Department of Psychology, Centre for Research in Human Development, Concordia University Montréal, QC, Canada.","language":"eng","_version_":1450807667479019520}]},"facet_counts":{"facet_queries":{},"facet_fields":{"journal_title":["in",4,"frontiers",2,"angewandte",1,"chemie",1,"ed",1,"english",1,"fetal",1,"human",1,"international",1,"medicine",1,"microbiology",1,"neonatal",1,"neuroscience",1,"seminars",1],"author_facet":["Annalisa A Guaragna",1,"Arthur A Van Aerschot",1,"B B Hallberg",1,"Daniele D D'Alonzo",1,"Guy G Schepers",1,"Haruyoshi H Tomita",1,"Hidetada H Hirakawa",1,"J L N JL Thibodeau",1,"Jussara J Amato",1,"K Z H KZ Li",1,"L H LH Baer",1,"M M Blennow",1,"Matheus M Froeyen",1,"Piet P Herdewijn",1,"T M TM Gralnick",1,"V B VB Penhune",1]},"facet_dates":{"article_date":{"gap":"+1DAYS","start":"2013-04-27T00:00:00Z","end":"2013-06-28T00:00:00Z"}},"facet_ranges":{}},"highlighting":{"23680099":{},"23670912":{},"23720655":{},"23717275":{}},"spellcheck":{"suggestions":["correctlySpelled",false]}}""")
 
-    csv_response = self.c.get(reverse('search:download', kwargs={'format': 'csv'}))
-    csv_response_content = csv_response.content
-    assert_equal(6898, len(csv_response_content))
+    csv_response = self.c.post(reverse('search:download'), {
+        'csv': True,
+        'collection': json.dumps(self._get_collection_param(collection)),
+        'query': json.dumps(QUERY)
+    })
+    csv_response_content = csv_response.content    
     assert_equal('application/csv', csv_response['Content-Type'])
-    assert_true('article_title,_version_,article_pagination,author,language,journal_title,journal_country,journal_issn,id,affiliation,article_date,journal_iso_abbreviation,journal_publication_date,date_created,article_abstract_text' in csv_response_content, csv_response_content)
-    assert_true("""The role of musical training in emergent and event-based timing.,1450807667479019520,191,"[u'L H LH Baer', u'J L N JL Thibodeau', u'T M TM Gralnick', u'K Z H KZ Li', u'V B VB Penhune']",eng,Frontiers in human neuroscience,Switzerland,1662-5161,23717275,"Department of Psychology, Centre for Research in Human Development, Concordia University Montréal, QC, Canada.",2013-06-14T00:00:00Z,Front Hum Neurosci,2013-09-13T00:00:00Z,2013-06-29T00:00:00Z,"[u'Introduction: Musical performance is thought to rely predominantly on event-based timing involving a clock-like neural process and an explicit internal representation of the time interval. Some aspects of musical performance may rely on emergent timing, which is established through the optimization of movement kinematics, and can be maintained without reference to any explicit representation of the time interval. We predicted that musical training would have its largest effect on event-based timing, supporting the dissociability of these timing processes and the dominance of event-based timing in musical performance. Materials and Methods: We compared 22 musicians and 17 non-musicians on the prototypical event-based timing task of finger tapping and on the typically emergently timed task of circle drawing. For each task, participants first responded in synchrony with a metronome (Paced) and then responded at the same rate without the metronome (Unpaced). Results: Analyses of the Unpaced phase revealed that non-musicians were more variable in their inter-response intervals for finger tapping compared to circle drawing. Musicians did not differ between the two tasks. Between groups, non-musicians were more variable than musicians for tapping but not for drawing. We were able to show that the differences were due to less timer variability in musicians on the tapping task. Correlational analyses of movement jerk and inter-response interval variability revealed a negative association for tapping and a positive association for drawing in non-musicians only. Discussion: These results suggest that musical training affects temporal variability in tapping but not drawing. Additionally, musicians and non-musicians may be employing different movement strategies to maintain accurate timing in the two tasks. These findings add to our understanding of how musical training affects timing and support the dissociability of event-based and emergent timing modes.']","[u'36810|1 ', u'49002|1 ', u'3132|1 ', u'3797|1 ', u'37953|1 ', u'36563|2 ', u'524|1 ', u'3781|1 ', u'2848|1 ', u'17163|1 ', u'17165|1 ', u'49010|1 ', u'36647|3 ', u'36529|1 ', u'2936|1 ', u'2643|1 ', u'714|1 ', u'3591|1 ', u'2272|1 ', u'3103|1 ', u'2265|1 ', u'37051|1 ', u'3691|1 ']""" in csv_response_content, csv_response_content)
+    assert_equal(7434, len(csv_response_content))
+    assert_true('article_title,journal_issn,author,language,journal_title,journal_country,article_pagination,ontologies,affiliation,date_created,article_date,journal_iso_abbreviation,journal_publication_date,_version_,article_abstract_text,id' in csv_response_content, csv_response_content)
+    assert_true("""Interference of bacterial cell-to-cell communication: a new concept of antimicrobial chemotherapy breaks antibiotic resistance.,1664-302X,"[u&#39;Hidetada H Hirakawa&#39;, u&#39;Haruyoshi H Tomita&#39;]",eng,Frontiers in microbiology,Switzerland,114,"[u&#39;2402|1 &#39;, u&#39;1875|1 &#39;""" in csv_response_content, csv_response_content)
 
-    xls_response = self.c.get(reverse('search:download', kwargs={'format': 'xls'}))
+    xls_response = self.c.post(reverse('search:download'), {
+        'xls': True,
+        'collection': json.dumps(self._get_collection_param(collection)),
+        'query': json.dumps(QUERY)
+    })
     assert_not_equal(0, len(xls_response.content))
     assert_equal('application/xls', xls_response['Content-Type'])
 

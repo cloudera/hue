@@ -129,7 +129,7 @@ def search(request):
     
   if collection:
     try:      
-      response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
+      response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
       response = augment_solr_response(response, collection, query)
     except RestException, e:
       try:
@@ -175,7 +175,7 @@ def save(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def download(request):  
+def download(request):
   try:
     file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
     response = search(request)

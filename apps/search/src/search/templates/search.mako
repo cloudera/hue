@@ -630,14 +630,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <span data-bind="text: ($data.response.start + $root.collection.template.rows())"></span>
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
-  ${ _(' results.') }
+  ${ _(' results') }
 
-  ${ _('Show') }
-  <span data-bind="visible: $root.isEditing()" class="spinedit-pagination">
-    <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
+  <span data-bind="visible: $root.isEditing()">
+    ${ _('Show') }
+    <span class="spinedit-pagination">
+      <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
+    </span>
+    ${ _('results per page') }
   </span>
-  ${ _('results per page.') }
-
 
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>

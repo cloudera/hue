@@ -185,31 +185,8 @@ class SolrApi(BaseSolrApi):
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
 
-  @demo_handler
-  def query(self, solr_query, hue_core):
-    try:
-      params = self._get_params() + (
-          ('q', solr_query['q'] or EMPTY_QUERY.get()),
-          ('wt', 'json'),
-          ('rows', solr_query['rows']),
-          ('start', solr_query['start']),
-      )
-
-      params += hue_core.get_query(solr_query)
-
-      fqs = solr_query['fq'].split('|')
-      for fq in fqs:
-        if fq:
-          params += (('fq', urllib.unquote(utf_quoter(fq))),)
-
-      response = self._root.get('%(collection)s/select' % solr_query, params)
-
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
   #@demo_handler
-  def query2(self, collection, query):
+  def query(self, collection, query):
     solr_query = {}      
     
     solr_query['collection'] = collection['name']
