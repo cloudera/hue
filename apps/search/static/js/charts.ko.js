@@ -205,8 +205,8 @@ ko.bindingHandlers.mapChart = {
           highlightOnHover: true,
           highlightFillColor: HueColors.DARK_BLUE,
           highlightBorderColor: HueColors.BLUE,
-          selectedFillColor: HueColors.GRAY,
-          selectedBorderColor: HueColors.GRAY,
+          selectedFillColor: HueColors.DARKER_BLUE,
+          selectedBorderColor: HueColors.DARKER_BLUE,
           popupTemplate: function(geography, data) {
         	var _hover = '';
         	if (data != null) {
