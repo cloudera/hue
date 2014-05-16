@@ -26,17 +26,13 @@ from django.shortcuts import redirect
 
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib import i18n
-
-from beeswax.create_table import _parse_fields, FILE_READERS, DELIMITERS
 
 from search.api import SolrApi, _guess_gap, _zoom_range_facet, _new_range_facet
 from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
-from search.forms import QueryForm, CollectionForm
 from search.management.commands import search_setup
-from search.models import Collection, augment_solr_response2, augment_solr_exception
+from search.models import Collection, augment_solr_response, augment_solr_exception
 from search.search_controller import SearchController
 
 from django.utils.encoding import force_unicode
@@ -49,10 +45,6 @@ LOG = logging.getLogger(__name__)
 
 def initial_collection(request, hue_collections):
   return hue_collections[0].id
-
-
-def dashboard(request):
-  return render('dashboard.mako', request, {})
 
 
 def index(request):
@@ -68,7 +60,7 @@ def index(request):
   collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-  return render('search2.mako', request, {
+  return render('search.mako', request, {
     'collection': collection,
     'query': query,
     'initial': '{}',    
@@ -84,7 +76,7 @@ def new_search(request):
   collection = Collection(name=collections[0], label=collections[0])
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-  return render('search2.mako', request, {
+  return render('search.mako', request, {
     'collection': collection,
     'query': query,
     'initial': json.dumps({
@@ -109,7 +101,7 @@ def browse(request, name):
   collection = Collection(name=name, label=name)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-  return render('search2.mako', request, {
+  return render('search.mako', request, {
     'collection': collection,
     'query': query,
     'initial': json.dumps({
@@ -138,7 +130,7 @@ def search(request):
   if collection:
     try:      
       response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
-      response = augment_solr_response2(response, collection, query)
+      response = augment_solr_response(response, collection, query)
     except RestException, e:
       try:
         response['error'] = json.loads(e.message)['error']['msg']
@@ -183,8 +175,7 @@ def save(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def download(request):
-  
+def download(request):  
   try:
     file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
     response = search(request)
@@ -227,58 +218,6 @@ def admin_collections(request, is_redirect=False):
     'is_redirect': is_redirect
   })
 
-
-@allow_admin_only
-def admin_collections_create_manual(request):
-  return render('admin_collections_create_manual.mako', request, {})
-
-
-@allow_admin_only
-def admin_collections_create_file(request):
-  return render('admin_collections_create_file.mako', request, {})
-
-
-@allow_admin_only
-def admin_collections_create(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
-  response = {'status': -1}
-
-  collection = json.loads(request.POST.get('collection', '{}'))
-
-  if collection:
-    searcher = SearchController(request.user)
-    searcher.create_new_collection(collection.get('name', ''), collection.get('fields', []))
-
-    response['status'] = 0
-    response['message'] = _('Page saved!')
-  else:
-    response['message'] = _('Collection missing.')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-@allow_admin_only
-def admin_collection_update(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
-  response = {'status': -1}
-
-  collection = json.loads(request.POST.get('collection', '{}'))
-
-  if collection:
-    hue_collection = Collection.objects.get(id=collection['id'])
-    searcher = SearchController(request.user)
-    searcher.create_new_collection(collection.get('name', ''), collection.get('fields', []))
-
-    response['status'] = 0
-    response['message'] = _('Page saved!')
-  else:
-    response['message'] = _('Collection missing.')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @allow_admin_only
@@ -340,6 +279,7 @@ def admin_collections_import(request):
     else:
       return admin_collections(request, True)
 
+
 @allow_admin_only
 def admin_collection_delete(request):
   if request.method != 'POST':
@@ -366,165 +306,6 @@ def admin_collection_copy(request):
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-@allow_admin_only
-def admin_collection_properties(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-
-  if request.method == 'POST':
-    collection_form = CollectionForm(request.POST, instance=hue_collection, user=request.user)
-    if collection_form.is_valid(): # Check for autocomplete in data?
-      searcher = SearchController(request.user)
-      hue_collection = collection_form.save(commit=False)
-      hue_collection.is_core_only = not searcher.is_collection(hue_collection.name)
-      hue_collection.autocomplete = json.loads(request.POST.get('autocomplete'))
-      hue_collection.save()
-      return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
-    else:
-      request.error(_('Errors on the form: %s.') % collection_form.errors)
-  else:
-    collection_form = CollectionForm(instance=hue_collection)
-
-  return render('admin_collection_properties.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-    'collection_form': collection_form,
-    'collection_properties': json.dumps(hue_collection.properties_dict)
-  })
-
-
-@allow_admin_only
-def admin_collection_template(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-  sample_data = {}
-
-  if request.method == 'POST':
-    hue_collection.result.update_from_post(request.POST)
-    hue_collection.result.save()
-    return HttpResponse(json.dumps({}), mimetype="application/json")
-
-  solr_query = {}
-  solr_query['collection'] = hue_collection.name
-  solr_query['q'] = ''
-  solr_query['fq'] = ''
-  solr_query['rows'] = 5
-  solr_query['start'] = 0
-  solr_query['facets'] = 0
-
-  try:
-    response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
-    sample_data = json.dumps(response["response"]["docs"])
-  except PopupException, e:
-    message = e
-    try:
-      message = json.loads(e.message.message)['error']['msg'] # Try to get the core error
-    except:
-      pass
-    request.error(_('No preview available, some facets are invalid: %s') % message)
-    LOG.exception(e)
-
-  return render('admin_collection_template.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-    'sample_data': sample_data,
-  })
-
-
-@allow_admin_only
-def admin_collection_facets(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-
-  if request.method == 'POST':
-    hue_collection.facets.update_from_post(request.POST)
-    hue_collection.facets.save()
-    return HttpResponse(json.dumps({}), mimetype="application/json")
-
-  return render('admin_collection_facets.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-  })
-
-
-@allow_admin_only
-def admin_collection_sorting(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-
-  if request.method == 'POST':
-    hue_collection.sorting.update_from_post(request.POST)
-    hue_collection.sorting.save()
-    return HttpResponse(json.dumps({}), mimetype="application/json")
-
-  return render('admin_collection_sorting.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-  })
-
-
-@allow_admin_only
-def admin_collection_highlighting(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-
-  if request.method == 'POST':
-    hue_collection.result.update_from_post(request.POST)
-    hue_collection.result.save()
-    return HttpResponse(json.dumps({}), mimetype="application/json")
-
-  return render('admin_collection_highlighting.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-  })
-
-
-# Ajax below
-
-@allow_admin_only
-def admin_collection_solr_properties(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
-
-  content = render('admin_collection_properties_solr_properties.mako', request, {
-    'solr_collection': solr_collection,
-    'hue_collection': hue_collection,
-  }, force_template=True).content
-
-  return HttpResponse(json.dumps({'content': content}), mimetype="application/json")
-
-
-@allow_admin_only
-def admin_collection_schema(request, collection_id):
-  hue_collection = Collection.objects.get(id=collection_id)
-  solr_schema = SolrApi(SOLR_URL.get(), request.user).schema(hue_collection.name)
-
-  content = {
-    'solr_schema': solr_schema.decode('utf-8')
-  }
-  return HttpResponse(json.dumps(content), mimetype="application/json")
-
-
-@allow_admin_only
-def parse_fields(request):
-  result = {'status': -1, 'message': ''}
-
-  try:
-    file_obj = request.FILES.get('collections_file')
-    delim, reader_type, fields_list = _parse_fields(
-                                        'collections_file',
-                                        file_obj,
-                                        i18n.get_site_encoding(),
-                                        [reader.TYPE for reader in FILE_READERS],
-                                        DELIMITERS)
-    result['status'] = 0
-    result['data'] = fields_list
-  except Exception, e:
-    result['message'] = e.message
-
-  return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
 # TODO security
@@ -625,7 +406,7 @@ def get_timeline(request):
     collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
     
     response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
-    response = augment_solr_response2(response, collection, query)
+    response = augment_solr_response(response, collection, query)
   
     label += ' (%s) ' % response['response']['numFound']
   

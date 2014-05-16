@@ -15,9 +15,6 @@
 # limitations under the License.
 
 from django.contrib import admin
-from search.models import Collection, Result, Facet, Sorting
+from search.models import Collection
 
 admin.site.register(Collection)
-admin.site.register(Result)
-admin.site.register(Facet)
-admin.site.register(Sorting)

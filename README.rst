@@ -3,8 +3,8 @@
 Welcome to the repository for Hue
 =================================
 
-`Hue
-<http://gethue.com>`_ is an open source Web UI for doing big data with Hadoop.
+Hue is an open source Web interface for analyzing data with Apache Hadoop: `gethue.com
+<http://gethue.com>`_ 
 
 .. image:: docs/images/hue-screen.png
 

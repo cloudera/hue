@@ -18,7 +18,6 @@
 import itertools
 import json
 import logging
-import math
 import numbers
 import re
 
@@ -36,6 +35,12 @@ from search.conf import SOLR_URL
 LOG = logging.getLogger(__name__)
 
 
+"""
+Collection manger contains all the data now.
+"""
+
+
+# Deprecated
 class Facet(models.Model):
   _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates', 'charts', 'order']
 
@@ -66,10 +71,6 @@ class Facet(models.Model):
       ('facet.limit', 100),
       ('facet.sort', properties.get('sort')),
     )
-
-#    if data_dict.get('fields'):
-#      field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['fields']])
-#      params += field_facets
 
     if data_dict.get('charts'):
       for field_facet in data_dict['charts']:
@@ -116,6 +117,7 @@ class Facet(models.Model):
     return params
 
 
+# Deprecated
 class Result(models.Model):
   _ATTRIBUTES = ['properties', 'template', 'highlighting', 'extracode']
 
@@ -167,6 +169,7 @@ class Result(models.Model):
     return params
 
 
+# Deprecated
 class Sorting(models.Model):
   _ATTRIBUTES = ['properties', 'fields']
 
@@ -251,6 +254,7 @@ class CollectionManager(models.Manager):
 
 
 class Collection(models.Model):
+  """All the data is now saved into the properties field"""
   enabled = models.BooleanField(default=True)
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
@@ -286,8 +290,6 @@ class Collection(models.Model):
       props['collection']['label'] = self.label
     if self.enabled is not None:
       props['collection']['enabled'] = self.enabled
-    # fields updated
-    # idField
     
     # tmp for dev    
     if 'rows' not in props['collection']['template']:
@@ -398,25 +400,6 @@ class Collection(models.Model):
     else:
       return '/search/static/art/icon_search_24.png'
 
-def get_facet_field_format(field, type, facets):
-  format = ""
-  try:
-    if type == 'field':
-      for fld in facets['fields']:
-        if fld['field'] == field:
-          format = fld['format']
-    elif type == 'range':
-      for fld in facets['ranges']:
-        if fld['field'] == field:
-          format = fld['format']
-    elif type == 'date':
-      for fld in facets['dates']:
-        if fld['field'] == field:
-          format = fld['format']
-  except:
-    pass
-  return format
-
 
 def get_facet_field(category, field, facets):
   facets = filter(lambda facet: facet['type'] == category and facet['field'] == field, facets)
@@ -425,63 +408,30 @@ def get_facet_field(category, field, facets):
   else:
     return None
 
+def pairwise2(cat, selected_values, iterable):
+  pairs = []
+  a, b = itertools.tee(iterable)
+  for element in a:
+    pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
+  return pairs
 
-def get_facet_field_label(field, facets):
-  label = field
-
-  facets = filter(lambda facet: facet['type'] == 'field' and facet['field'] == field, facets)
-  if facets:
-    return facets[0]['label']
-  else:
-    return label
-
-def get_facet_field_uuid(field, type, facets):
-  uuid = ''
-  if type == 'field':
-    for fld in facets['fields']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  elif type == 'range':
-    for fld in facets['ranges']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  elif type == 'date':
-    for fld in facets['dates']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  return uuid
-
-def is_chart_field(field, charts):
-  found = False
-  for fld in charts:
-    if field == fld['field']:
-      found = True
-  return found
+def range_pair(cat, selected_values, iterable, end):
+  # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
+  pairs = []
+  a, to = itertools.tee(iterable)
+  next(to, None)
+  for element in a:
+    next(to, None)
+    to_value = next(to, end)
+    pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values})
+  return pairs
 
 
-def augment_solr_response2(response, collection, query):
+def augment_solr_response(response, collection, query):
   augmented = response
   augmented['normalized_facets'] = []
 
   normalized_facets = []
-
-  def pairwise2(cat, selected_values, iterable):
-    pairs = []
-    a, b = itertools.tee(iterable)
-    for element in a:
-      pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
-    return pairs
-
-  def range_pair(cat, selected_values, iterable, end):
-    # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
-    pairs = []
-    a, to = itertools.tee(iterable)
-    next(to, None)
-    for element in a:
-      next(to, None)
-      to_value = next(to, end)
-      pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values})
-    return pairs
 
   selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
 
@@ -590,114 +540,3 @@ def augment_solr_exception(response, collection):
       ]
     }
   }) 
-
-def augment_solr_response(response, facets, solr_query):
-  augmented = response
-  augmented['normalized_facets'] = []
-
-  normalized_facets = {}
-  default_facets = []
-
-  chart_facets = facets.get('charts', [])
-
-  def pairwise(iterable):
-      "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-      a, b = itertools.tee(iterable)
-      next(b, None)
-      return list(itertools.izip(a, b))
-
-  def pairwise2(cat, fq, iterable):
-      pairs = []
-      a, b = itertools.tee(iterable)
-      for element in a:
-        pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element == selected_field})
-      return pairs
-
-  fq = solr_query['fq']
-
-  if response and response.get('facet_counts'):
-    if response['facet_counts']['facet_fields']:
-      for cat in response['facet_counts']['facet_fields']:
-        selected_field = fq.get(cat, '')
-        facet = {
-          'field': cat,
-          'type': 'chart' if is_chart_field(cat, chart_facets) else 'field',
-          'label': get_facet_field_label(cat, is_chart_field(cat, chart_facets) and 'chart' or 'field', facets),
-          'counts': pairwise2(cat, selected_field, response['facet_counts']['facet_fields'][cat]),
-        }
-        uuid = get_facet_field_uuid(cat, 'field', facets)
-        if uuid == '':
-          default_facets.append(facet)
-        else:
-          normalized_facets[uuid] = facet
-
-    if response['facet_counts']['facet_ranges']:
-      for cat in response['facet_counts']['facet_ranges']:
-        facet = {
-          'field': cat,
-          'type': 'chart' if is_chart_field(cat, chart_facets) else 'range',
-          'label': get_facet_field_label(cat, 'range', facets),
-          'counts': response['facet_counts']['facet_ranges'][cat]['counts'],
-          'start': response['facet_counts']['facet_ranges'][cat]['start'],
-          'end': response['facet_counts']['facet_ranges'][cat]['end'],
-          'gap': response['facet_counts']['facet_ranges'][cat]['gap'],
-        }
-        uuid = get_facet_field_uuid(cat, 'range', facets)
-        if uuid == '':
-          default_facets.append(facet)
-        else:
-          normalized_facets[uuid] = facet
-
-    if response['facet_counts']['facet_dates']:
-      for cat in response['facet_counts']['facet_dates']:
-        facet = {
-          'field': cat,
-          'type': 'date',
-          'label': get_facet_field_label(cat, 'date', facets),
-          'format': get_facet_field_format(cat, 'date', facets),
-          'start': response['facet_counts']['facet_dates'][cat]['start'],
-          'end': response['facet_counts']['facet_dates'][cat]['end'],
-          'gap': response['facet_counts']['facet_dates'][cat]['gap'],
-        }
-        counts = []
-        for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-          if date not in ('start', 'end', 'gap'):
-            counts.append(date)
-            counts.append(count)
-        facet['counts'] = counts
-
-        uuid = get_facet_field_uuid(cat, 'date', facets)
-        if uuid == '':
-          default_facets.append(facet)
-        else:
-          normalized_facets[uuid] = facet
-
-    if response and response.get('response'):
-      
-      # Todo, and not as ugly as below, probably simplify to go back beginning + < >
-      
-      pages_to_show = 5 # always use an odd number since we do it symmetrically
-
-#      beginning = 0
-#      previous = int(solr_query["start"]) - int(solr_query["rows"])
-#      next = int(solr_query["start"]) + int(solr_query["rows"])
-#
-#      pages_after = (pages_to_show - 1) / 2
-#      pages_total = solr_query['total_pages']+1
-#      real_pages_after =  pages_total - solr_query["current_page"]
-#      symmetric_start = solr_query["current_page"] < pages_total - pages_after
-#      symmetric_end = solr_query["current_page"] > pages_after
-#
-#      pagination_start = solr_query["current_page"] > (pages_to_show - 1)/2 and (symmetric_start and solr_query["current_page"] - (pages_to_show - 1)/2 or solr_query["current_page"] - pages_to_show + real_pages_after ) or 1
-#      pagination_end = solr_query["current_page"] < solr_query['total_pages']+1-(pages_to_show - 1)/2 and (symmetric_end and solr_query["current_page"] + (pages_to_show - 1)/2 + 1 or solr_query["current_page"] + (pages_to_show - solr_query["current_page"]) + 1) or solr_query['total_pages']+1
-      
-
-  for ordered_uuid in facets.get('order', []):
-    try:
-      augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
-    except:
-      pass
-  if default_facets:
-    augmented['normalized_facets'].extend(default_facets)
-
-  return augmented
