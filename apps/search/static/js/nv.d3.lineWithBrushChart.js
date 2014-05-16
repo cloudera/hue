@@ -451,12 +451,11 @@ nv.models.lineWithBrushChart = function() {
 
         if (onSelectRange != null){
           var _leftEdges = x.range();
-          var _width = x.rangeBand();
           var _j;
-          for(_j=0; extent[0] > (_leftEdges[_j] + _width); _j++) {}
+          for(_j=0; extent[0] > (_leftEdges[_j]); _j++) {}
           var _from = typeof x.domain()[_j] != "undefined" ? x.domain()[_j] : x.domain()[0];
 
-          for(_j=0; extent[1] > (_leftEdges[_j] + _width); _j++) {}
+          for(_j=0; extent[1] > (_leftEdges[_j]); _j++) {}
           var _to = typeof x.domain()[_j] != "undefined" ? x.domain()[_j] : x.domain()[x.domain().length-1];
 
           onSelectRange(_from, _to);

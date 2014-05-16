@@ -241,7 +241,9 @@ function lineChart(element, options) {
 
   nv.addGraph(function () {
     var _chart = nv.models.lineWithBrushChart();
-    _chart.enableSelection();
+    if (_datum.length > 0 && _datum[0].values.length > 10){
+      _chart.enableSelection();
+    }
     _chart.onSelectRange(options.onSelectRange);
     _chart.xAxis.showMaxMin(false);
 
