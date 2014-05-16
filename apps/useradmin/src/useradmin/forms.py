@@ -39,7 +39,7 @@ def get_server_choices():
   if desktop_conf.LDAP.LDAP_SERVERS.get():
     return [(ldap_server_record_key, ldap_server_record_key) for ldap_server_record_key in desktop_conf.LDAP.LDAP_SERVERS.get()]
   else:
-    return [('LDAP', 'LDAP')]
+    return []
 
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
@@ -134,7 +134,8 @@ class AddLdapUsersForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     super(AddLdapUsersForm, self).__init__(*args, **kwargs)
-    self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=False)
+    if get_server_choices():
+      self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=True)
 
   def clean(self):
     cleaned_data = super(AddLdapUsersForm, self).clean()
@@ -184,7 +185,8 @@ class AddLdapGroupsForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     super(AddLdapGroupsForm, self).__init__(*args, **kwargs)
-    self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=False)
+    if get_server_choices():
+      self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=True)
 
   def clean(self):
     cleaned_data = super(AddLdapGroupsForm, self).clean()
@@ -315,4 +317,5 @@ class SyncLdapUsersGroupsForm(forms.Form):
                                             required=False)
   def __init__(self, *args, **kwargs):
     super(SyncLdapUsersGroupsForm, self).__init__(*args, **kwargs)
-    self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=False)
+    if get_server_choices():
+      self.fields['server'] = forms.ChoiceField(choices=get_server_choices(), required=True)

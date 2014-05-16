@@ -313,7 +313,7 @@ def add_ldap_users(request):
     if form.is_valid():
       username_pattern = form.cleaned_data['username_pattern']
       import_by_dn = form.cleaned_data['dn']
-      server = form.cleaned_data['server']
+      server = form.cleaned_data.get('server')
       try:
         connection = ldap_access.get_connection_from_server(server)
         users = import_ldap_users(connection, username_pattern, False, import_by_dn)
@@ -359,7 +359,7 @@ def add_ldap_groups(request):
       import_by_dn = form.cleaned_data['dn']
       import_members = form.cleaned_data['import_members']
       import_members_recursive = form.cleaned_data['import_members_recursive']
-      server = form.cleaned_data['server']
+      server = form.cleaned_data.get('server')
       try:
         connection = ldap_access.get_connection_from_server(server)
         groups = import_ldap_groups(connection, groupname_pattern, import_members=import_members, import_members_recursive=import_members_recursive, sync_users=True, import_by_dn=import_by_dn)
@@ -394,7 +394,7 @@ def sync_ldap_users_groups(request):
     form = SyncLdapUsersGroupsForm(request.POST)
     if form.is_valid():
       is_ensuring_home_directory = form.cleaned_data['ensure_home_directory']
-      server = form.cleaned_data['server']
+      server = form.cleaned_data.get('server')
       connection = ldap_access.get_connection_from_server(server)
       sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs)
       return redirect(reverse(list_users))
