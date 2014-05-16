@@ -687,7 +687,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
-      onClick: function(d){console.log(d)},
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
   </div>
   <!-- /ko -->
@@ -712,7 +712,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       transformer: barChartDataTransformer,
       onStateChange: function(state){ console.log(state); },
-      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) }, 
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
   </div>
@@ -736,8 +737,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
 
     <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
-      transformer: lineChartDataTransformer,
+      transformer: lineChartDataTransformer,      
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
   </div>
@@ -781,7 +783,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="filter-widget">
-  <div data-bind="visible: $root.query.fqs().length == 0" class="alert alert-info" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
+  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <!-- ko if: $data.type() == 'field' -->
     <div class="filter-box">
