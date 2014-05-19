@@ -64,12 +64,16 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
           start, _ = _round_thousand_range(stats_min)
         else:        
           start, _ =  _round_number_range(stats_min)
+      else:
+        start = int(start)
       if end is None:
         if widget_type == 'line-widget':
           _, end = _round_thousand_range(stats_max)
         else:
           _, end = _round_number_range(stats_max)        
-      
+      else:
+        end = int(end)
+
       if gap is None:
         gap = int((end - start) / SLOTS)
       if gap < 1:

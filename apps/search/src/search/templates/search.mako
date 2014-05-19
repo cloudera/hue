@@ -151,7 +151,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers, 
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Line')}" rel="tooltip" data-placement="top">
+         title="${_('Line Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
          </a>
@@ -160,7 +160,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram, 
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Histogram')}" rel="tooltip" data-placement="top">
+         title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
@@ -709,6 +709,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div> 
+    
+    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       transformer: barChartDataTransformer,
@@ -736,6 +738,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
+
+    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
 
     <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
       transformer: lineChartDataTransformer,      
@@ -877,7 +881,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <div class="document-details">
   <table>
     <tbody>
-    {{#properties}}
+      {{#properties}}
       <tr>
         <th style="text-align: left; white-space: nobreak; vertical-align:top">{{key}}</th>
         <td width="100%">{{value}}</td>
@@ -1365,7 +1369,7 @@ function lineChartDataTransformer(rawDatum) {
   var _data = [];
   $(rawDatum.counts).each(function (cnt, item) {
     item.widget_id = rawDatum.widget_id;
-    if (typeof item.from != "undefined"){
+    if (typeof item.from != "undefined") {
       _data.push({
         series: 0,
         x: item.from,

@@ -107,14 +107,35 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="timestamp" type="tdate" indexed="true" stored="true" />
-   <field name="host" type="string" indexed="true" stored="true" />
-   <field name="process" type="string" indexed="true" stored="true" />
-   <field name="message" type="text_general" indexed="true" stored="true" />
-   <field name="location" type="string" indexed="true" stored="true" />
+   <field name="time" type="tdate" indexed="true" stored="true" />
+   <field name="record" type="text_en" indexed="true" stored="true" />
+   <field name="client_ip" type="string" indexed="true" stored="true" />
+   <field name="code" type="string" indexed="true" stored="true" />
+   <field name="user_agent" type="string" indexed="true" stored="true" />
+   <field name="protocol" type="text_general" indexed="true" stored="true" />   
+   <field name="url" type="string" indexed="true" stored="true" />   
+   <field name="request" type="string" indexed="true" stored="true" />
+   <field name="referer" type="string" indexed="true" stored="true" />
+   <field name="bytes" type="tint" indexed="true" stored="true" />
+   <field name="method" type="string" indexed="true" stored="true" />
    
-   <!-- tika metadata -->
-   <field name="content_type" type="lowercase" indexed="true" stored="true" />
+   <field name="extension" type="string" indexed="true" stored="true" />   
+   <field name="app" type="string" indexed="true" stored="true" />      
+   <field name="subapp" type="string" indexed="true" stored="true" />
+      
+   <field name="device_family" type="string" indexed="true" stored="true" />
+   <field name="user_agent_major" type="string" indexed="true" stored="true" />   
+   <field name="user_agent_family" type="string" indexed="true" stored="true" />
+   <field name="os_family" type="string" indexed="true" stored="true" />   
+   <field name="os_major" type="string" indexed="true" stored="true" />
+   
+   <field name="region_code" type="string" indexed="true" stored="true" />
+   <field name="country_code" type="string" indexed="true" stored="true" />
+   <field name="city" type="string" indexed="true" stored="true" />
+   <field name="latitude" type="float" indexed="true" stored="true" />
+   <field name="longitude" type="float" indexed="true" stored="true" />
+   <field name="country_name" type="string" indexed="true" stored="true" />
+   <field name="country_code3" type="string" indexed="true" stored="true" />
 
    <field name="_version_" type="long" indexed="true" stored="true"/>
    <dynamicField name="ignored_*" type="ignored"/>
