@@ -493,27 +493,29 @@ vm.edit.sourceType.subscribe(function(value) {
   }
 });
 
-$(window).on('hashchange', function() {
-  vm.breadcrum(window.location.hash.substring(1));
-});
+// $(window).on('hashchange', function() {
+//   vm.breadcrum(window.location.hash.substring(1));
+// });
 
 routie({
   "": function() {
-    routie('manage');
-    vm.breadcrum(window.location.hash.substring(1));
+    vm.breadcrum("manage");
+    vm.page('manage-page');
   },
   "manage": function() {
+    vm.breadcrum(window.location.hash.substring(1));
     vm.page('manage-page');
   },
   "create": function() {
     vm.page('create-page');
-    routie('create/wizard');
+    vm.breadcrum("create/wizard/" + vm.create.wizard.currentPage().url());
   },
   "create/wizard": function() {
     vm.page('create-page');
-    routie('create/wizard/' + vm.create.wizard.currentPage().url());
+    vm.breadcrum("create/wizard/" + vm.create.wizard.currentPage().url());
   },
   "create/wizard/:step": function(step) {
+    vm.breadcrum(window.location.hash.substring(1));
     vm.page('create-page');
     vm.create.wizard.setPageByUrl(step);
     routie('create/wizard/' + vm.create.wizard.currentPage().url());
@@ -523,15 +525,25 @@ routie({
       collection.selected(ko.unwrap(collection).name() == name);
     });
     if (vm.manage.selectedCollections().length == 0) {
-      routie('manage');
+      window.location.back();
     } else {
+      vm.breadcrum(window.location.hash.substring(1));
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.edit.fetchFields();
       vm.page('edit-page');
     }
   },
   "edit/:name/upload": function(name) {
-    routie('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
+    ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
+      collection.selected(ko.unwrap(collection).name() == name);
+    });
+    if (vm.manage.selectedCollections().length == 0) {
+      routie('manage');
+    } else {
+      vm.breadcrum('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
+      vm.edit.collection(vm.manage.selectedCollections()[0]());
+      vm.page('upload-page');
+    }
   },
   "edit/:name/upload/:step": function(name, step) {
     ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
@@ -540,16 +552,13 @@ routie({
     if (vm.manage.selectedCollections().length == 0) {
       routie('manage');
     } else {
+      vm.breadcrum(window.location.hash.substring(1));
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.page('upload-page');
     }
     vm.edit.wizard.setPageByUrl(step);
     routie('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
-  },
-  "*": function() {
-    routie('manage');
-    vm.breadcrum(window.location.hash.substring(1));
-  },
+  }
 });
 
 vm.manage.fetchCollections();
