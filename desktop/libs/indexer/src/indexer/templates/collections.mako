@@ -57,7 +57,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 
 <div class="search-bar" style="height: 30px">
-  <h4><a href="#manager">${_('Collection Manager')}</a></h4>
+  <h4><a href="#manage">${_('Collection Manager')}</a></h4>
 </div>
 
 
@@ -492,10 +492,6 @@ vm.edit.sourceType.subscribe(function(value) {
     vm.edit.wizard.getPage('data').next(value);
   }
 });
-
-// $(window).on('hashchange', function() {
-//   vm.breadcrum(window.location.hash.substring(1));
-// });
 
 routie({
   "": function() {

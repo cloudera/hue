@@ -157,24 +157,35 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   else:
     boolean_fields = [field['name'] for field in fields if field['type'] in BOOLEAN_FIELD_TYPES]
 
-  csvfile = StringIO.StringIO()
   content = fh.read()
-  is_first = True
+  headers = None
   while content:
     last_newline = content.rfind('\n')
     if last_newline > -1:
-      if not is_first:
-        csvfile.write('\n')
-      csvfile.write(content[:last_newline])
-      content = content[last_newline+1:]
+      # If new line is quoted, skip this iteration and try again.
+      if content[:last_newline].count('"') % 2 != 0:
+        content += fh.read()
+        continue
+      else:
+        if headers is None:
+          csvfile = StringIO.StringIO(content[:last_newline])
+        else:
+          csvfile = StringIO.StringIO('\n' + content[:last_newline])
+        content = content[last_newline+1:] + fh.read()
     else:
-      if not is_first:
-        csvfile.write('\n')
-      csvfile.write(content[:])
-      content = ""
-    is_first = False
-    csvfile.seek(0)
-    reader = csv.DictReader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
+      if headers is None:
+        csvfile = StringIO.StringIO(content)
+      else:
+        csvfile = StringIO.StringIO('\n' + content)
+      content = fh.read()
+
+    # First line is headers
+    if headers is None:
+      headers = next(csv.reader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character)))
+
+    # User dict reader
+    reader = csv.DictReader(csvfile, fieldnames=headers, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
+
     remove_keys = None
     for row in reader:
       # Remove keys that aren't in collection
@@ -191,7 +202,8 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
       if timestamp_fields:
         for key in timestamp_fields:
           if key in row:
-            row[key] = parse(row[key]).astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+            dt = parse(row[key])
+            row[key] = dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
       # Parse decimal
       if decimal_fields:
@@ -212,9 +224,6 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
             row[key] = str(row[key]).lower() == "true"
 
       yield row
-    
-    csvfile.truncate()
-    content += fh.read()
 
 
 def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'} ]):
