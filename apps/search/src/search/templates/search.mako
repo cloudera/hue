@@ -222,12 +222,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="column-template">
   <div data-bind="css: klass">
     <div class="container-fluid" data-bind="visible: $root.isEditing">
-      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
+      <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); if ($root.collection.getFacetById(widget.id()) == null) { showAddFacetDemiModal(widget); } viewModel.search()}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
     <div data-bind="template: { name: 'row-template', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing">
-      <div data-bind="css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}, dragged: function(widget){var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}"></div>
+      <div data-bind="click: function(){$data.addEmptyRow()}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); if ($root.collection.getFacetById(widget.id()) == null) { showAddFacetDemiModal(widget); } viewModel.search()}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
   </div>
 </script>
@@ -276,7 +276,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </h2>
-    <div class="card-body" style="padding: 5px;">    
+    <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
     </div>
   </div>
@@ -1000,6 +1000,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   .card-widget .card-body {
     margin-top: 0;
+    min-height: 40px;
   }
 
   .card-toolbar {
@@ -1236,6 +1237,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     border: 2px dashed #DDD;
     text-align: center;
     padding: 4px;
+    cursor: pointer;
   }
 
   .add-row:before {
