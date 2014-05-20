@@ -536,8 +536,8 @@ var Collection = function (vm, collection) {
     self.template.filteredModalFields(_fields);
   });
 
-  self.switchCollection = function() {
-    $.post("/search/get_collection/", {
+  self.switchCollection = function() { // Long term would be to reload the page
+    $.post("/search/get_collection", {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
@@ -594,7 +594,7 @@ var Collection = function (vm, collection) {
   }  
   
   self.syncFields = function() {
-    $.post("/search/get_collection/", {
+    $.post("/search/get_collection", {
         name: self.name()
 	  }, function (data) {
 	    if (data.status == 0) {
@@ -742,21 +742,50 @@ var NewTemplate = function (vm, initial) {
 
   self.collections = ko.mapping.fromJS(initial.collections);
   self.layout = initial.layout;
-
-  if (self.collections) {
-    vm.collection.name.subscribe(function (newValue) {
-	  vm.collection.label(newValue);
-	  vm.collection.switchCollection();
-	  vm.changeCollection(false);
-	  vm.search();
-    });
-  }
+  self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
   
-  self.init = function() {
+  self.init = function() { 
+	if (self.inited()) {
+	  // If new dashboard
+	  vm.collection.name.subscribe(function(newValue) {
+		vm.collection.label(newValue);
+	    vm.collection.switchCollection();
+		vm.search();
+	  });
+	} else {
+	  self.syncCollections();
+	}	  
+	  
     if (initial.autoLoad) {
 	  magicLayout(vm);
-    }
+    }   
   };
+  
+  self.syncCollections = function () {
+    $.post("/search/get_collections", {
+    },function (data) {
+      if (data.status == 0) {
+    	// Sync new and old names
+        $.each(data.collection, function(index, name) {
+          if (self.collections.indexOf(name) == -1) {
+            self.collections.push(name);
+          }
+        });
+        $.each(self.collections(), function(index, collection) {
+          if (data.collection.indexOf(collection) == -1) {
+            self.collections.remove(collection);
+          }
+        });        
+      } 
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    }).done(function() {
+      self.inited(true);
+    });
+  };   
 };
 
 
@@ -789,7 +818,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     }
     return _facet;    
   };
-  self.changeCollection = ko.observable(false);
   self.toggledGridlayoutResultChevron = ko.observable(false);
   self.enableGridlayoutResultChevron = function() {
     self.toggledGridlayoutResultChevron(true);

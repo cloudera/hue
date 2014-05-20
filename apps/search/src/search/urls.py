@@ -35,7 +35,8 @@ urlpatterns = patterns('search.views',
   url(r'^get_document$', 'get_document', name='get_document'),
   url(r'^get_range_facet$', 'get_range_facet', name='get_range_facet'),
   url(r'^get_timeline$', 'get_timeline', name='get_timeline'),
-  url(r'^get_collection', 'get_collection', name='get_collection'),
+  url(r'^get_collection$', 'get_collection', name='get_collection'),
+  url(r'^get_collections$', 'get_collections', name='get_collections'),
   
   # Admin
   url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),

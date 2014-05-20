@@ -34,11 +34,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     % if user.is_superuser:
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cog"></i></button>
+      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
+          data-bind="css: {'btn': true}">
+        <i class="fa fa-cog"></i>
+      </button>
     % endif
       <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}"><i class="fa fa-link"></i></button>
     % if user.is_superuser:
-      ## for enable, live search, max number of downloads, change solr
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
       <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a>
@@ -46,8 +48,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>  
   
   <form data-bind="visible: columns().length == 0">  
-    ${ _('Search') }
-    <!-- ko if: $root.initial.collections -->
+    ${ _('Select a search index') }
+    <!-- ko if: columns().length == 0 -->
     <select data-bind="options: $root.initial.collections, value: $root.collection.name">
     </select>
     <!-- /ko -->
@@ -60,11 +62,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <span
             data-bind="editable: collection.label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}">
         </span>
-        ##<i class="fa fa-edit" data-bind="visible: $root.isEditing() && ! $root.changeCollection(), click: function(){$root.changeCollection(true);}"></i>
-        <!-- ko if: $root.isEditing() && $root.changeCollection() -->
-        <select data-bind="options: $root.initial.collections, value: $root.collection.name">
-        </select>        
-        <!-- /ko -->
       </div>
 
       <span data-bind="foreach: query.qs">
@@ -192,12 +189,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </div>
 
 <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
-  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Click on the pencil to get started with your dashboard!')}</div>
+  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
   <img src="/search/static/art/hint_arrow.png" />
 </div>
 
 <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
-  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${_('Click on a layout to get started with your dashboard!')}</div>
+  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Click on a layout to start your dashboard!') }</div>
   <img src="/search/static/art/hint_arrow_horiz_flipped.png" />
 </div>
 
@@ -895,6 +892,22 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 124px;height: 42px;line-height: 42px">
         ${_('There are no fields matching your search term.')}
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+  <div class="modal-body">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <div style="float: left; margin-right: 10px;text-align: center">
+      <!-- ko if: $root.initial.inited() -->
+      ${ _('Solr index') }
+      <select data-bind="options: $root.initial.collections, value: $root.collection.name">
+      </select>        
+      <!-- /ko -->
+    </div>
+    <div>
+      ${ _('Visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled"/>
     </div>
   </div>
 </div>
