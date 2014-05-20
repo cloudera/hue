@@ -74,7 +74,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       </div>
     </div>
   </div>
-  <div data-bind="template: {'name': page, if: !isLoading()}" class="row-fluid" id="page"></div>
+  <div data-bind="template: {'name': page, if: !isLoading() && !!page()}" class="row-fluid" id="page"></div>
 </div>
 
 
@@ -521,7 +521,7 @@ routie({
       collection.selected(ko.unwrap(collection).name() == name);
     });
     if (vm.manage.selectedCollections().length == 0) {
-      window.location.back();
+      routie('manage');
     } else {
       vm.breadcrum(window.location.hash.substring(1));
       vm.edit.collection(vm.manage.selectedCollections()[0]());
