@@ -65,7 +65,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="value: q" maxlength="256" type="text" class="search-query input-xlarge" style="cursor: auto;">
+        <input data-bind="clearable: q" maxlength="256" type="text" class="search-query input-xlarge">
         <!-- ko if: $index() >= 1 -->
         <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
@@ -1343,6 +1343,29 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     left: -4px;
   }
 
+  .clearable {
+    background: url(/search/static/art/clearField.png) no-repeat right -10px center;
+    border: 1px solid #999;
+    padding: 3px 18px 3px 4px;
+    border-radius: 3px;
+    transition: background 0.4s !important;
+  }
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .clearable {
+      background: url(/search/static/art/clearField@2x.png) no-repeat right -10px center;
+    }
+  }
+
+  .clearable.x {
+    background-position: right 5px center;
+  }
+
+  .clearable.onX {
+    cursor: pointer !important;
+  }
+
+
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -1750,6 +1773,28 @@ $(document).ready(function () {
     update: function (element, valueAccessor, allBindingsAccessor) {
       var _options = $.extend(valueAccessor(), {});
       $(element).slider("setValue", _options.data());
+    }
+  }
+
+  ko.bindingHandlers.clearable = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var _el = $(element);
+      function tog(v) {
+        return v ? 'addClass' : 'removeClass';
+      }
+      _el.addClass("clearable");
+      _el.on("input",function () {
+        _el[tog(this.value)]("x");
+        valueAccessor()(_el.val());
+      }).on("mousemove", function (e) {
+        _el[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
+      }).on("click", function () {
+        _el.removeClass("x onX").val("");
+        valueAccessor()("");
+      });
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      $(element).val(ko.unwrap(valueAccessor()));
     }
   }
 
