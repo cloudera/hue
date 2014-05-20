@@ -1354,6 +1354,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .clearable {
       background: url(/search/static/art/clearField@2x.png) no-repeat right -10px center;
+      background-size: 10px 10px;
     }
   }
 
