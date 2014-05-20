@@ -90,7 +90,7 @@ def get_field_types(row):
     if not value:
       raise ValueError()
 
-    if len(value) > 50:
+    if len(value) > 50 or len(value) < 3:
       raise ValueError()
 
     if value.startswith('[') and value.endswith(']'):
