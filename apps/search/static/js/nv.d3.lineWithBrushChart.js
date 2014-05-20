@@ -450,7 +450,7 @@ nv.models.lineWithBrushChart = function() {
         extent = brush.empty() ? x.domain() : brush.extent();
 
         if (onSelectRange != null){
-          onSelectRange(extent[0], extent[1]);
+          onSelectRange(parseInt(extent[0]), parseInt(extent[1])); // Only int values currently
         }
       }
 

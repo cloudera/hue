@@ -809,7 +809,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <span data-bind="foreach: $data.properties" style="font-weight: normal">
         <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
         <br/>
-        <strong>${_('to')}</strong>: <span data-bind="text: $data.from"></span>
+        <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
       </span>
     </div>
     <!-- /ko -->

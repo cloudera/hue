@@ -57,7 +57,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     
     # to refactor
     if isinstance(stat_facet['min'], numbers.Number):
-      stats_min = int(stat_facet['min']) # if field is float, cast as float isinstance(y, float)
+      stats_min = int(stat_facet['min']) # Cast floats to int currently
       stats_max = int(stat_facet['max'])
       if start is None:
         if widget_type == 'line-widget':
@@ -75,7 +75,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         end = int(end)
 
       if gap is None:
-        gap = int((end - start) / SLOTS)
+        gap = int((end - start) / SLOTS)      
       if gap < 1:
         gap = 1
     elif 'T' in stat_facet['min']:
@@ -159,9 +159,9 @@ def _round_thousand_range(n):
     end = 10 ** (i + 1)
     return start, end 
 
-def _guess_gap(solr_api, collection, facet_field, start=None, end=None):
+def _guess_gap(solr_api, collection, facet, start=None, end=None):
   properties = {}
-  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties, start=start, end=end)
+  _guess_range_facet(facet['widgetType'], solr_api, collection, facet['field'], properties, start=start, end=end)
   return properties
 
 
@@ -171,9 +171,9 @@ def _new_range_facet(solr_api, collection, facet_field, widget_type):
   return properties
 
 
-def _zoom_range_facet(solr_api, collection, facet_field, direction='out'):
+def _zoom_range_facet(solr_api, collection, facet, direction='out'):
   properties = {}
-  _guess_range_facet('range-widget', solr_api, collection, facet_field, properties)
+  _guess_range_facet(facet['widgetType'], solr_api, collection, facet['field'], properties)
   return properties
 
 
@@ -231,8 +231,16 @@ class SolrApi(BaseSolrApi):
           )
 
     for fq in query['fqs']:
-      if fq['type'] == 'field':        
-        params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
+      if fq['type'] == 'field':
+        # This does not work if spaces in Solr: 
+        # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
+        f = []
+        for _filter in fq['filter']:          
+          if ' ' in _filter:
+            f.append(urllib.unquote(utf_quoter('%s:"%s"' % (fq['field'], _filter))))
+          else:
+            f.append(urllib.unquote(utf_quoter('{!field f=%s}%s' % (fq['field'], _filter))))
+        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join(f)),)
       elif fq['type'] == 'range':
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
 

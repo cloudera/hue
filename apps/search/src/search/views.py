@@ -482,14 +482,15 @@ def get_range_facet(request):
     solr_api = SolrApi(SOLR_URL.get(), request.user)
 
     if action == 'select':
-      properties = _guess_gap(solr_api, collection, facet['field'], facet['properties']['start'], facet['properties']['end'])
+      properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
     else:
-      properties = _zoom_range_facet(solr_api, collection, facet['field'])
+      properties = _zoom_range_facet(solr_api, collection, facet)
             
     result['properties'] = properties
     result['status'] = 0      
 
   except Exception, e:
+    print e
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
