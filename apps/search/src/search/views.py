@@ -405,7 +405,7 @@ def get_timeline(request):
     # Remove other facets from collection for speed
     collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
     
-    response = SolrApi(SOLR_URL.get(), request.user).query2(collection, query)
+    response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
     response = augment_solr_response(response, collection, query)
   
     label += ' (%s) ' % response['response']['numFound']

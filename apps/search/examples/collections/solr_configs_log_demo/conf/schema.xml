@@ -112,7 +112,7 @@
    <field name="client_ip" type="string" indexed="true" stored="true" />
    <field name="code" type="string" indexed="true" stored="true" />
    <field name="user_agent" type="string" indexed="true" stored="true" />
-   <field name="protocol" type="text_general" indexed="true" stored="true" />   
+   <field name="protocol" type="string" indexed="true" stored="true" />   
    <field name="url" type="string" indexed="true" stored="true" />   
    <field name="request" type="string" indexed="true" stored="true" />
    <field name="referer" type="string" indexed="true" stored="true" />
