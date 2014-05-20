@@ -41,31 +41,43 @@ class Command(NoArgsCommand):
     self.searcher = controller.CollectionManagerController(self.user)
 
     LOG.info(_("Installing twitter collection"))
-    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
     self._setup_collection_from_csv({
       'name': 'twitter_example',
-      'fields': self._parse_fields(twitter_path),
+      'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
-    }, twitter_path)
+    }, path)
     LOG.info(_("Twitter collection successfully installed"))
 
     LOG.info(_("Installing yelp collection"))
-    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
     self._setup_collection_from_csv({
       'name': 'yelp_example',
-      'fields': self._parse_fields(twitter_path),
+      'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
-    }, twitter_path)
+    }, path)
     LOG.info(_("Yelp collection successfully installed"))
 
     LOG.info(_("Installing jobs collection"))
-    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_jobs_demo/index_data.csv'))
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_jobs_demo/index_data.csv'))
     self._setup_collection_from_csv({
       'name': 'jobs_example',
-      'fields': self._parse_fields(twitter_path),
+      'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
-    }, twitter_path)
+    }, path)
     LOG.info(_("Jobs collection successfully installed"))
+
+    LOG.info(_("Installing logs collection"))
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_log_demo/index_data.csv'))
+    self._setup_collection_from_csv({
+      'name': 'logs_example',
+      'fields': self._parse_fields(path, fieldtypes={
+        'region_code': 'string',
+        'referer': 'string'
+      }),
+      'uniqueKeyField': 'id'
+    }, path)
+    LOG.info(_("Logs collection successfully installed"))
 
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
     if self.searcher.collection_exists(collection['name']):
@@ -102,10 +114,10 @@ class Command(NoArgsCommand):
       if self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.exists, hdfs_path):
         self.fs.remove(hdfs_path, skip_trash=True)
 
-  def _parse_fields(self, path, separator=',', quote_character='"'):
+  def _parse_fields(self, path, separator=',', quote_character='"', fieldtypes={}):
     with open(path) as fh:
       field_generator = utils.field_values_from_separated_file(fh, separator, quote_character)
       row = next(field_generator)
       field_names = row.keys()
       field_types = utils.get_field_types(row.values())
-      return [{'name': field[0], 'type': field[1]} for field in zip(field_names, field_types)]
+      return [{'name': field[0], 'type': field[0] in fieldtypes and fieldtypes[field[0]] or field[1]} for field in zip(field_names, field_types)]
