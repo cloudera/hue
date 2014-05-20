@@ -58,6 +58,15 @@ class Command(NoArgsCommand):
     }, twitter_path)
     LOG.info(_("Yelp collection successfully installed"))
 
+    LOG.info(_("Installing jobs collection"))
+    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_jobs_demo/index_data.csv'))
+    self._setup_collection_from_csv({
+      'name': 'jobs_example',
+      'fields': self._parse_fields(twitter_path),
+      'uniqueKeyField': 'id'
+    }, twitter_path)
+    LOG.info(_("Jobs collection successfully installed"))
+
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
     if self.searcher.collection_exists(collection['name']):
       self.searcher.delete_collection(collection['name'])
