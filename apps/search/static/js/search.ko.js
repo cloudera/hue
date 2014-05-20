@@ -647,14 +647,14 @@ var Collection = function (vm, collection) {
     if (facet_field.type() == 'field') {
        facet_field.type('range');
      } else if (facet_field.type() == 'range') {
-        facet_field.type('field')
+       facet_field.type('field')
      }
    
     $(event.target).button('loading');
     vm.search();
   };  
 
-  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(facet)); 
+  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(data)); 
     var facet = self.getFacetById(data.widget_id);
   
     facet.properties.start(data.from);

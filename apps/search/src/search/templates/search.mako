@@ -724,7 +724,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       transformer: barChartDataTransformer,
       onStateChange: function(state){ console.log(state); },
-      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onClick: function(d) {alert(type);
+        if (type == 'range') { 
+          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+        } else {
+          viewModel.query.toggleFacet({facet: d.obj, widget_id: $parent.id()});
+        } 
+      },
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
@@ -1407,8 +1413,8 @@ function rangePieChartDataTransformer(data) {
 function barChartDataTransformer(rawDatum) {
   var _datum = [];
   var _data = [];
+
   $(rawDatum.counts).each(function (cnt, item) {
-    item.widget_id = rawDatum.widget_id;
     if (typeof item.from != "undefined"){
       _data.push({
         series: 0,
