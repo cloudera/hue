@@ -23,7 +23,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/javascript">
   if (window.location.hash != ""){
-    location.href = "/search/?" + window.location.hash.substr(1);
+    if (window.location.hash.indexOf("collection") > -1){
+      location.href = "/search/?" + window.location.hash.substr(1);
+    }
   }
 </script>
 
@@ -34,8 +36,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cog"></i></button>
       ## for enable, live search, max number of downloads, change solr
-      <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-link"></i></button>
-      &nbsp;&nbsp;&nbsp;            
+      &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
       <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
     </div>
@@ -49,7 +50,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
   </form>
   
-  <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0"">
+  <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
@@ -916,6 +917,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/lzstring.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
@@ -1808,9 +1810,22 @@ $(document).ready(function () {
     }
   };
 
+  var _query = ${ query | n,unicode };
+  if (window.location.hash != ""){
+    if (window.location.hash.indexOf("collection") == -1){
+      try {
+        var _decompress = LZString.decompressFromBase64(window.location.hash.substr(1));
+        if (_decompress != null && $.trim(_decompress) != ""){
+          _query = ko.mapping.fromJSON(LZString.decompressFromBase64(window.location.hash.substr(1)));
+        }
+      }
+      catch (e){}
+    }
+  }
 
-  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
+  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, _query, ${ initial | n,unicode });
   ko.applyBindings(viewModel);
+
 
   viewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");

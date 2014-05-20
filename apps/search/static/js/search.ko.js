@@ -932,6 +932,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             });
           }
           self.isRetrievingResults(false);
+          window.location.hash = LZString.compressToBase64(ko.mapping.toJSON(self.query));
         }
       })
       ].concat(multiQs)
@@ -953,7 +954,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       $('.btn-loading').button('reset');
     });
   };
-  
+
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id);
     self.query.removeFilter(widget_json);
