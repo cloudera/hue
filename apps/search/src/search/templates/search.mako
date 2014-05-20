@@ -35,6 +35,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cog"></i></button>
+      <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}"><i class="fa fa-link"></i></button>
       ## for enable, live search, max number of downloads, change solr
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
@@ -859,6 +860,21 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 </script>
+
+<div id="shareModal" class="modal hide" data-backdrop="true">
+  <div class="modal-header">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <h3>${_('Share this dashboard')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('The following URL will show the current dashboard and the applied filters.')}</p>
+    <input type="text" style="width: 540px" />
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
 
 <div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-body">
@@ -1843,6 +1859,33 @@ $(document).ready(function () {
   });
 
 });
+
+  function showShareModal() {
+    if (window.location.search.indexOf("collection") == -1 && window.location.hash.indexOf("collection") == -1) {
+      $(document).trigger("error", "${_('The current collection must be saved to be shared.')}");
+    }
+    else {
+      $("#shareModal input[type='text']").on("focus", function () {
+        this.select();
+      });
+      var _search = window.location.search;
+      var _pathname = window.location.pathname;
+      if (_pathname.indexOf("${ url('search:new_search') }") > -1) {
+        _pathname = "${ url('search:index') }";
+      }
+      if (_search == "" && window.location.hash.indexOf("collection") > -1) {
+        _search = "?" + window.location.hash.substr(1);
+      }
+
+      if (_search != "") {
+        $("#shareModal input[type='text']").val(window.location.origin + _pathname + _search + "#" + LZString.compressToBase64(ko.mapping.toJSON(viewModel.query))).focus();
+        $("#shareModal").modal("show");
+      }
+      else {
+        $(document).trigger("error", "${_('The current collection cannot be shared.')}");
+      }
+    }
+  }
 
   function toggleGridFieldsSelection() {
     if (viewModel.collection.template.fields().length > 0) {

@@ -932,7 +932,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             });
           }
           self.isRetrievingResults(false);
-          window.location.hash = LZString.compressToBase64(ko.mapping.toJSON(self.query));
         }
       })
       ].concat(multiQs)
