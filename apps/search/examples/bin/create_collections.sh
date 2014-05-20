@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-for c in "twitter_demo" "yelp_demo" "log_demo" "jobs_demo"; do
+for c in "twitter_demo" "yelp_demo" "log_analytics_demo" "jobs_demo"; do
   echo "Creating collection $c"
   solrctl instancedir --create $c ../collections/solr_configs_$c
   solrctl collection --create $c -s 1
