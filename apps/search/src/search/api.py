@@ -237,10 +237,10 @@ class SolrApi(BaseSolrApi):
         f = []
         for _filter in fq['filter']:          
           if ' ' in _filter:
-            f.append(urllib.unquote(utf_quoter('%s:"%s"' % (fq['field'], _filter))))
+            f.append('%s:"%s"' % (fq['field'], _filter))
           else:
-            f.append(urllib.unquote(utf_quoter('{!field f=%s}%s' % (fq['field'], _filter))))
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join(f)),)
+            f.append('{!field f=%s}%s' % (fq['field'], _filter))
+        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}' % fq['field'] + ' '.join(f)))),)
       elif fq['type'] == 'range':
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
 

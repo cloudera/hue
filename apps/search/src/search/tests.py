@@ -144,6 +144,9 @@ class TestWithMockedSolr(TestSearchBase):
         collection.fields_data(self.user)
     )
 
+  # TODO
+  # test facet with userlocation: türkiye, 東京, new york
+
   def test_download(self):
     collection, created = Collection.objects.get_or_create(name='collection_1', solr_properties={})
 

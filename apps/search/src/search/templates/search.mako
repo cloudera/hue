@@ -22,26 +22,28 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/javascript">
-  if (window.location.hash != ""){
-    if (window.location.hash.indexOf("collection") > -1){
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("collection") > -1) {
       location.href = "/search/?" + window.location.hash.substr(1);
     }
   }
 </script>
 
 <div class="search-bar">
-  % if user.is_superuser:
-    <div class="pull-right" style="padding-right:50px">
+  <div class="pull-right" style="padding-right:50px">
+    % if user.is_superuser:
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-cog"></i></button>
+    % endif
       <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}"><i class="fa fa-link"></i></button>
+    % if user.is_superuser:
       ## for enable, live search, max number of downloads, change solr
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
-      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a> 
-    </div>
-  % endif
+      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a>
+    % endif 
+  </div>  
   
   <form data-bind="visible: columns().length == 0">  
     ${ _('Search') }

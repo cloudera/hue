@@ -39,12 +39,7 @@ from django.utils.encoding import force_unicode
 from desktop.lib.rest.http_client import RestException
 
 
-
 LOG = logging.getLogger(__name__)
-
-
-def initial_collection(request, hue_collections):
-  return hue_collections[0].id
 
 
 def index(request):
@@ -67,7 +62,7 @@ def index(request):
   })
 
 
-# TODO security
+@allow_admin_only
 def new_search(request):
   collections = SearchController(request.user).get_solr_collection().keys()
   if not collections:
@@ -92,7 +87,7 @@ def new_search(request):
   })
 
 
-# TODO security
+@allow_admin_only
 def browse(request, name):
   collections = SearchController(request.user).get_solr_collection().keys()
   if not collections:
@@ -120,7 +115,7 @@ def browse(request, name):
 def search(request):
   response = {}  
   
-  collection = json.loads(request.POST.get('collection', '{}')) # TODO decorator with doc model perms
+  collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
   # todo: remove the selected histo facet if multiq
 
@@ -149,10 +144,11 @@ def search(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@allow_admin_only
 def save(request):
   response = {'status': -1}  
   
-  collection = json.loads(request.POST.get('collection', '{}')) # TODO perms decorator
+  collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
   layout = json.loads(request.POST.get('layout', '{}')) 
     
   if collection:
@@ -217,7 +213,6 @@ def admin_collections(request, is_redirect=False):
     'existing_hue_collections': existing_hue_collections,
     'is_redirect': is_redirect
   })
-
 
 
 @allow_admin_only
@@ -308,7 +303,6 @@ def admin_collection_copy(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-# TODO security
 def query_suggest(request, collection_id, query=""):
   hue_collection = Collection.objects.get(id=collection_id)
   result = {'status': -1, 'message': 'Error'}
@@ -327,7 +321,6 @@ def query_suggest(request, collection_id, query=""):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# TODO security
 def index_fields_dynamic(request):  
   result = {'status': -1, 'message': 'Error'}
   
@@ -350,7 +343,6 @@ def index_fields_dynamic(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# TODO security
 def get_document(request):  
   result = {'status': -1, 'message': 'Error'}
 
@@ -372,7 +364,6 @@ def get_document(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# TODO security
 def get_timeline(request):  
   result = {'status': -1, 'message': 'Error'}
 
@@ -419,12 +410,11 @@ def get_timeline(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# TODO security
 def new_facet(request):  
   result = {'status': -1, 'message': 'Error'}
   
   try:
-    collection = json.loads(request.POST.get('collection', '{}'))
+    collection = json.loads(request.POST.get('collection', '{}')) # Perms
     
     facet_id = request.POST['id']
     facet_label = request.POST['label']
@@ -470,12 +460,12 @@ def new_facet(request):
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
-# TODO security
+
 def get_range_facet(request):  
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    collection = json.loads(request.POST.get('collection', '{}'))
+    collection = json.loads(request.POST.get('collection', '{}')) # Perms
     facet = json.loads(request.POST.get('facet', '{}'))
     action = request.POST.get('action', 'select')
             
