@@ -38,10 +38,10 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     self.user = install_sample_user()
     self.fs = cluster.get_hdfs()
-
-    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
+    self.searcher = controller.CollectionManagerController(self.user)
 
     LOG.info(_("Installing twitter collection"))
+    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
     self._setup_collection_from_csv({
       'name': 'twitter_example',
       'fields': self._parse_fields(twitter_path),
@@ -49,11 +49,21 @@ class Command(NoArgsCommand):
     }, twitter_path)
     LOG.info(_("Twitter collection successfully installed"))
 
+    LOG.info(_("Installing yelp collection"))
+    twitter_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
+    self._setup_collection_from_csv({
+      'name': 'yelp_example',
+      'fields': self._parse_fields(twitter_path),
+      'uniqueKeyField': 'id'
+    }, twitter_path)
+    LOG.info(_("Yelp collection successfully installed"))
+
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
-    searcher = controller.CollectionManagerController(self.user)
+    if self.searcher.collection_exists(collection['name']):
+      self.searcher.delete_collection(collection['name'])
 
     # Create instance directory, collection, and add fields
-    searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'])
+    self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'])
 
     try:
       hdfs_path = '/tmp/%s' % uuid.uuid4()
@@ -67,7 +77,7 @@ class Command(NoArgsCommand):
         self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.create, hdfs_path, data=fh.read(), overwrite=overwrite)
 
       # Index data
-      searcher.update_data_from_hdfs(self.fs,
+      self.searcher.update_data_from_hdfs(self.fs,
                                      collection['name'],
                                      collection['fields'],
                                      hdfs_path,
@@ -76,7 +86,7 @@ class Command(NoArgsCommand):
                                      quote_character=quote_character)
 
     except:
-      searcher.delete_collection(collection['name'])
+      self.searcher.delete_collection(collection['name'])
       raise
     finally:
       # Remove HDFS file

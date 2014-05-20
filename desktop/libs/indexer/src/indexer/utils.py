@@ -26,6 +26,7 @@ import StringIO
 import tempfile
 from dateutil.parser import parse
 
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
@@ -200,9 +201,12 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
       # Parse dates
       if timestamp_fields:
+        tzinfo = pytz.timezone(settings.TIME_ZONE)
         for key in timestamp_fields:
           if key in row:
             dt = parse(row[key])
+            if not dt.tzinfo:
+              dt = tzinfo.localize(dt)
             row[key] = dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
       # Parse decimal

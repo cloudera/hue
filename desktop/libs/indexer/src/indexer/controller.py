@@ -50,6 +50,9 @@ class CollectionManagerController(object):
         field[flags[1]] = field['flags'][index] == FLAGS[index][0]
     return fields
 
+  def collection_exists(self, collection):
+    return collection in self.get_collections()
+
   def get_collections(self):
     try:
       solr_collections = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).collections()
