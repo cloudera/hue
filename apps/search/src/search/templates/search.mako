@@ -187,10 +187,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div class="clearfix"></div>
 </div>
 
-<div id="emptyDashboard" data-bind="visible: !isEditing() && columns().length == 0">
+<div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Click on the pencil to get started with your dashboard!')}</div>
   <img src="/search/static/art/hint_arrow.png" />
 </div>
+
+<div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
+  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${_('Click on a layout to get started with your dashboard!')}</div>
+  <img src="/search/static/art/hint_arrow_horiz_flipped.png" />
+</div>
+
 
 
 <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
@@ -205,7 +211,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
       <div class="span12 preview-row">
-        ${ _('Template predefined with some widgets.') }
+        <div style="text-align: center; color:#EEE; font-size: 180px; margin-top: 80px">
+          <i class="fa fa-magic"></i>
+        </div>
       </div>
     </div>
   </div>
@@ -1032,8 +1040,17 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   #emptyDashboard {
     position: absolute;
-    right: 164px;
+    right: 204px;
     top: 80px;
+    color: #666;
+    font-size: 20px;
+    z-index: 1000;
+  }
+
+  #emptyDashboardEditing {
+    position: absolute;
+    left: 120px;
+    top: 160px;
     color: #666;
     font-size: 20px;
   }
@@ -1046,7 +1063,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   .preview-row {
-    background-color: #DDD;
+    background-color: #f9f9f9;
     min-height: 400px!important;
     margin-top: 30px;
   }
@@ -1223,10 +1240,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     font-size: 12px;
     text-align: center;
     font-weight: bold;
-  }
-
-  .preview-row:nth-child(odd) {
-    background-color: #f9f9f9;
   }
 
   .editor-title {
@@ -1545,6 +1558,18 @@ $(document).ready(function () {
       ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
     }
   };
+
+  ko.bindingHandlers.fadeVisible = {
+    init: function(element, valueAccessor) {
+      var value = valueAccessor();
+      $(element).toggle(ko.unwrap(value));
+    },
+    update: function(element, valueAccessor) {
+      var value = valueAccessor();
+      $(element).stop();
+      ko.unwrap(value) ? $(element).fadeIn() : $(element).hide();
+    }
+};
 
 
   ko.extenders.numeric = function (target, precision) {
