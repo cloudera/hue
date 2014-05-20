@@ -18,7 +18,8 @@
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('indexer.views',
-  url(r'^$', 'collections', name='collections')
+  url(r'^$', 'collections', name='collections'),
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
 
 urlpatterns += patterns('indexer.api',

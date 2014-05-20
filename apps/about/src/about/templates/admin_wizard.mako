@@ -107,6 +107,14 @@ ${ header.menubar() }
                 </a>
               </li>
           % endif
+          % if 'indexer' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('indexer:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['indexer'].nice_name }
+                </a>
+              </li>
+          % endif
           % if 'search' in app_names:
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"

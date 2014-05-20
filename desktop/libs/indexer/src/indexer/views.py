@@ -16,8 +16,14 @@
 # limitations under the License.
 
 import logging
+import json
+
+from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
+
+from indexer.management.commands import indexer_install_examples
 
 
 LOG = logging.getLogger(__name__)
@@ -25,3 +31,18 @@ LOG = logging.getLogger(__name__)
 
 def collections(request, is_redirect=False):
   return render('collections.mako', request, {})
+
+def install_examples(request, is_redirect=False):
+  result = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    result['message'] = _('A POST request is required.')
+  else:
+    try:
+      indexer_install_examples.Command().handle_noargs()
+      result['status'] = 0
+    except Exception, e:
+      LOG.exception(e)
+      result['message'] = str(e)
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
