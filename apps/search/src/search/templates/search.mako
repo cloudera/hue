@@ -297,10 +297,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 
 <script type="text/html" id="hit-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-
-  <!-- /ko -->
-
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
@@ -340,9 +336,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -432,7 +425,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
             <i class="fa fa-chevron-left"></i>
           </a>
-          <input type="text" data-bind="value: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
+          <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
         </div>
         <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px">
           <a href="javascript: void(0)" class="btn btn-mini"
@@ -674,9 +667,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="histogram-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -706,9 +696,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="bar-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -745,9 +732,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="line-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -774,9 +758,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 
 <script type="text/html" id="pie-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
@@ -843,9 +824,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="map-widget">
-  <!-- ko ifnot: $root.getFacetFromQuery(id()) -->
-  <!-- /ko -->
-
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">

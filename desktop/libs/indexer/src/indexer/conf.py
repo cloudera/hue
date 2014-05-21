@@ -22,6 +22,7 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config
 
 
+# Unused
 BATCH_INDEXER_PATH = Config(
   key="batch_indexer_path",
   help=_t("Batch indexer path in HDFS."),

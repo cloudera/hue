@@ -27,16 +27,15 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="search-bar" style="height: 30px">
-    <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
-    <a class="btn" href="${ url('search:new_search') }"><i class="fa fa-file-o"></i> ${ _('New dasboard') }</a>
+    <div class="pull-right" style="margin-top: 4px; margin-right: 20px">    
     <button type="button" class="btn importBtn">
       <i class="fa fa-plus-circle"></i> ${ _('Import Index') }
     </button>
     <a class="btn importBtn" href="${ url('indexer:collections') }">
-      <i class="fa fa-plus-circle"></i> ${ _('Indexes') }
+      <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
     </div>
-  <h4>${_('Dashboards')}</h4>
+  <h4><a href="">${_('Dashboards')}</a></h4>
 </div>
 
 
@@ -45,9 +44,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   <%actionbar:render>
     <%def name="search()">
       <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
+      &nbsp;
+      &nbsp;
+      <a class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dasboard') }</a>      
     </%def>
 
-    <%def name="creation()">
+    <%def name="creation()">    
     </%def>
   </%actionbar:render>
 

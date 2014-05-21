@@ -832,7 +832,7 @@
 
 
 ###########################################################################
-# Settings to configure Hbase
+# Settings to configure HBase Browser
 ###########################################################################
 
 [hbase]
@@ -850,25 +850,6 @@
 
 
 ###########################################################################
-# Settings to configure Solr Collection Manager
-###########################################################################
-
-[collectionmanager]
-
-  # Batch indexer path in HDFS.
-  ## batch_indexer_path=/var/lib/search/search-mr-job.jar
-
-  # Location of the solrctl binary.
-  ## solrctl_path=/usr/lib/solr/bin/solrctl
-
-  # Location of the solr home.
-  ## solr_home=/usr/lib/solr
-
-  # Zookeeper ensemble.
-  ## solr_zk_ensemble=localhost:2181/solr
-
-
-###########################################################################
 # Settings to configure Solr Search
 ###########################################################################
 
@@ -882,6 +863,25 @@
 
   ## Query sent when no term is entered
   ## empty_query=*:*
+
+
+###########################################################################
+# Settings to configure Solr Indexer
+###########################################################################
+
+[indexer]
+
+  # Location of the solrctl binary.
+  ## solrctl_path=/usr/bin/solrctl
+
+  # Location of the solr home.
+  ## solr_home=/usr/lib/solr
+
+  # Zookeeper ensemble.
+  ## solr_zk_ensemble=localhost:2181/solr
+
+  # The contents of this directory will be copied over to the solrctl host to its temporary directory.
+  ## config_template_path=/../hue/desktop/libs/indexer/src/data/solr_configs
 
 
 ###########################################################################

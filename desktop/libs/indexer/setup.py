@@ -20,7 +20,7 @@ setup(
       version = "1.0",
       author = "Hue",
       url = 'http://github.com/cloudera/hue',
-      description = "Collections manager for Cloudera Search",
+      description = "Collections manager for Search",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools', 'desktop'],

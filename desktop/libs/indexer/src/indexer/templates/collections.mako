@@ -56,8 +56,15 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </style>
 
 
-<div class="search-bar" style="height: 30px">
-  <h4><a href="#manage">${_('Collection Manager')}</a></h4>
+<div class="search-bar" style="height: 30px">  
+  <div>
+    <div class="pull-right" style="padding-right:50px">  
+      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-tags"></i> ${ _('Dashboards') }
+      </a>
+    </div>  
+    <h4><a href="#manage">${_('Solr Indexer')}</a></h4>
+  </div>
 </div>
 
 
@@ -118,9 +125,15 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <%actionbar:render>
         <%def name="search()">
           <div data-bind="visible: collections().length > 0 && !isLoading()">
-            <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }" placeholder="${_('Filter dashboard')}" class="input-xlarge search-query">
-            <button data-bind="click: removeCollections, clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" title="${_('Delete the selected collections')}" disabled="disabled"><i class="fa fa-times"></i> ${_('Delete collections')}</button>
-            <a href="#create" class="btn toolbarBtn pull-right">${_('Add collection')}</a>
+            <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
+                placeholder="${_('Filter collections...')}" class="input-xlarge search-query">
+            <button data-bind="click: removeCollections, clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" 
+                title="${_('Delete the selected collections')}" disabled="disabled">
+              <i class="fa fa-times"></i> ${_('Delete')}
+            </button>
+            <a href="#create" class="btn toolbarBtn pull-right">
+              <i class="fa fa-plus-circle"></i> ${_('Create')}
+            </a>
           </div>
         </%def>
 
@@ -149,7 +162,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
                 <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
                   <span data-bind="css: {'fa-check': $parent.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
                 </td>
-                <td data-bind="text: name"></td>
+                <td data-bind="text: name" style="cursor: pointer"></td>
               </tr>
             </tbody>
           </table>
@@ -182,6 +195,9 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 <!-- Create wizard -->
 <script type="text/html" id="create-collection-data">
+  <div class="alert alert-info">
+    ${ _('Pick a name and a CSV or Tab separated file with header to index from HDFS') }
+  </div>
   <div class="control-group" data-bind="css: {'error': collection.name.errors().length > 0}">
     <label for="name" class="control-label">${_("Name")}</label>
     <div class="controls">
@@ -192,11 +208,11 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': file.errors().length > 0}">
     <label for="name" class="control-label">${_("Files")}</label>
     <div class="controls">
-      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/foo/data.csv"/>
+      <input data-bind="value: file" type="text" class="input-xxlarge fileChooser" placeholder="/user/hue/data.csv"/>
     </div>
   </div>
 
-  <div class="control-group" data-bind="css: {'error': sourceType.errors().length > 0}">
+  <div class="control-group hide" data-bind="css: {'error': sourceType.errors().length > 0}">
     <label for="name" class="control-label">${_("Source type")}</label>
     <div class="controls">
       <select data-bind="options: sourceTypes, value: sourceType" name="type"></select>
@@ -205,6 +221,9 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script type="text/html" id="create-collection-data-separated">
+  <div class="alert alert-info">
+    ${ _('Format of the selected file to index') }
+  </div>
   <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
     <label for="separator" class="control-label">${_("Separator")}</label>
     <div class="controls">
@@ -267,7 +286,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           </p>
         </td>
         <td>
-          <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-minus"></i>&nbsp;${_("Remove")}</a>
+          <a data-bind="click: remove, visible: editable" href="javascript:void(0)" class="btn"><i class="fa fa-minus"></i></a>
         </td>
       </tr>
     </tbody>
@@ -275,7 +294,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
   <br style="clear: both" />
   <br />
-  <a data-bind="click: collection.newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
+  <a data-bind="click: collection.newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add")}</a>
 </script>
 <!--/ Create wizard -->
 <!--/ Create by file -->
@@ -286,9 +305,9 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div data-bind="with: edit" class="sidebar-nav card-small">
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
-      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload data')}</a></li>
-      <li><a href=""><i class="fa fa-list"></i> ${ _('Search data') }</a></li>
-      <li><a data-bind="click: removeCollection, clickBubble: false" href="javascript:void(0)"><i class="fa fa-trash-o"></i> ${_('Remove collection')}</a></li>
+      <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
+      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-folder-open-o"></i> ${_('Index file')}</a></li>      
+      <li><a data-bind="click: removeCollection, clickBubble: false" href="javascript:void(0)"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>
 </div>
@@ -330,11 +349,11 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
               <td><p class="text-center"><input data-bind="checked: required" type="checkbox"></p></td>
               <td><p class="text-center"><input data-bind="checked: indexed" type="checkbox"></p></td>
               <td><p class="text-center"><input data-bind="checked: stored" type="checkbox"></p></td>
-              <td><a data-bind="click: remove" href="javascript:void(0)" class="btn btn-danger nowrap"><i class="fa fa-minus"></i>&nbsp;${_("Remove field")}</a></td>
+              <td><a data-bind="click: remove" href="javascript:void(0)" class="btn btn-danger nowrap"><i class="fa fa-minus"></i></a></td>
             </tr>
           </tbody>
         </table>
-        <a data-bind="click: collection().newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add field")}</a>
+        <a data-bind="click: collection().newField" href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus"></i>&nbsp;${_("Add")}</a>
         <br />
         <br />
         <br />
@@ -368,7 +387,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': file.errors().length > 0}">
     <label for="name" class="control-label">${_("Files")}</label>
     <div class="controls">
-      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/foo/data.csv"/>
+      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/hue/data.csv"/>
     </div>
   </div>
 

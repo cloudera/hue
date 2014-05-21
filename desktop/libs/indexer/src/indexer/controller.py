@@ -31,7 +31,7 @@ from indexer import conf, utils
 
 
 LOG = logging.getLogger(__name__)
-MAX_UPLOAD_SIZE = 10*1024*1024 # 10 MB
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 

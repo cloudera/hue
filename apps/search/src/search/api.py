@@ -294,7 +294,7 @@ class SolrApi(BaseSolrApi):
           ('path', '/clusterstate.json'),
       )
       response = self._root.get('zookeeper', params=params)
-      return json.loads(response['znode']['data'])
+      return json.loads(response['znode'].get('data', '{}'))
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
