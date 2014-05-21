@@ -16,7 +16,7 @@
 # limitations under the License.
 
 DJANGO_APPS = [ "indexer" ]
-NICE_NAME = "Collection Manager"
+NICE_NAME = "Solr Indexer"
 REQUIRES_HADOOP = False
 MENU_INDEX = 43
 ICON = "/search/static/art/icon_search_24.png"

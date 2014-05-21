@@ -358,6 +358,7 @@ var Collection = function (vm, collection) {
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
+  self.template.extracode.extend({rateLimit: {timeout: 1000 * 60 * 60, method: "notifyWhenChangesStop"}}); // No live js/css update
   self.template.template.extend({rateLimit: {timeout: 3000, method: "notifyWhenChangesStop"}});
   self.template.template.subscribe(function () {
     vm.search();

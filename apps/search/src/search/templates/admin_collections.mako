@@ -46,7 +46,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
       &nbsp;
       &nbsp;
-      <a class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dasboard') }</a>      
+      <a class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>      
     </%def>
 
     <%def name="creation()">    

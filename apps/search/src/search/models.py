@@ -36,7 +36,7 @@ LOG = logging.getLogger(__name__)
 
 
 """
-Collection manger contains all the data now.
+Collection model contains all the data now.
 """
 
 

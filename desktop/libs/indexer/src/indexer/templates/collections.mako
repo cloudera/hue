@@ -306,7 +306,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
-      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-folder-open-o"></i> ${_('Index file')}</a></li>      
+      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>      
       <li><a data-bind="click: removeCollection, clickBubble: false" href="javascript:void(0)"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>
@@ -384,14 +384,17 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script type="text/html" id="upload-collection-data">
+  <div class="alert alert-info">
+    ${ _('CSV or TSV file to index') }
+  </div>
   <div class="control-group" data-bind="css: {'error': file.errors().length > 0}">
     <label for="name" class="control-label">${_("Files")}</label>
     <div class="controls">
-      <input data-bind="value: file" type="text" class="span7 fileChooser" placeholder="/user/hue/data.csv"/>
+      <input data-bind="value: file" type="text" class="input-xxlarge fileChooser" placeholder="/user/hue/data.csv"/>
     </div>
   </div>
 
-  <div class="control-group" data-bind="css: {'error': sourceType.errors().length > 0}">
+  <div class="control-group hide" data-bind="css: {'error': sourceType.errors().length > 0}">
     <label for="name" class="control-label">${_("Source type")}</label>
     <div class="controls">
       <select data-bind="options: sourceTypes, value: sourceType" name="type"></select>
@@ -400,6 +403,9 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </script>
 
 <script type="text/html" id="upload-collection-data-separated">
+  <div class="alert alert-info">
+    ${ _('Format of the selected file to index') }
+  </div>
   <div class="control-group" data-bind="css: {'error': fieldSeparator.errors().length > 0}">
     <label for="separator" class="control-label">${_("Separator")}</label>
     <div class="controls">
