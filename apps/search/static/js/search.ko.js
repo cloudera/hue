@@ -327,7 +327,7 @@ var Query = function (vm, query) {
         self.fqs.remove(fq);
         // Also re-init range select widget
         var rangeWidget = vm.collection.getFacetById(fq.id());
-        if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1) {
+        if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
           vm.collection.timeLineZoom({'id': rangeWidget.id()});	
         }
         return false;

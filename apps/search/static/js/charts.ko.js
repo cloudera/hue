@@ -122,19 +122,20 @@ ko.bindingHandlers.mapChart = {
     var _noncountries = [];
 
     if (_options.isScale) {
-      _fills["defaultFill"] = HueColors.LIGHT_BLUE;
+      _fills["defaultFill"] = HueColors.WHITE;
       var _colors = HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
       $(_colors).each(function(cnt, item) {
         _fills["fill_" + cnt] = item;
       });
       $(_data).each(function(cnt, item) {
-        var _place = item.label;
+        var _place = item.label.toUpperCase();
         if (_place != null){
           _mapdata[_place] = {
-            fillKey: "fill_" + Math.floor(item.value / _chunk),
+            fillKey: "fill_" + (Math.floor(item.value / _chunk) - 1),
             id: _place,
             cat: item.obj.cat,
-            value: item.obj.value
+            value: item.obj.value,
+            selected: item.obj.selected
           };
           _maphovers[_place] = item.value;
         }

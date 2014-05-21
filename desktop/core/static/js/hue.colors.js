@@ -54,5 +54,6 @@ var HueColors = {
   DARK_BLUE: "#338BB8",
   DARKER_BLUE: "#205875",
   PURPLE: "#C0B1E9",
-  GRAY: "#666666"
+  GRAY: "#666666",
+  WHITE: "#FFFFFF",
 };

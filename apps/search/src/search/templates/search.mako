@@ -735,7 +735,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
         } 
       },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: d.obj.widget_id}) },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
   </div>
@@ -859,6 +859,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div data-bind="mapChart: {data: {counts: $parent.counts, scope: $root.collection.getFacetById($parent.id).properties.scope()},
         transformer: mapChartDataTransformer,
         maxWidth: 750,
+        isScale: true,
         onClick: function(d){ viewModel.query.toggleFacet({facet: d, widget_id: $parent.id}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
     </div>
