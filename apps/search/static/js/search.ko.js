@@ -217,7 +217,7 @@ var Query = function (vm, query) {
   });
   self.selectedMultiq = ko.observable(defaultMultiqGroup);
 
-  self.getFacetFilter = function (widget_id) {
+  self.getFacetFilter = function(widget_id) {
     var _fq = null;
     $.each(self.fqs(), function (index, fq) { 
       if (fq.id() == widget_id) {
@@ -325,6 +325,11 @@ var Query = function (vm, query) {
     $.each(self.fqs(), function (index, fq) {
       if (fq.id() == data.id()) {          
         self.fqs.remove(fq);
+        // Also re-init range select widget
+        var rangeWidget = vm.collection.getFacetById(fq.id());
+        if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1) {
+          vm.collection.timeLineZoom({'id': rangeWidget.id()});	
+        }
         return false;
       }
     });
@@ -466,7 +471,7 @@ var Collection = function (vm, collection) {
     return _facet;
   }
   
-  self.getHistogramFacet = function () { // might remove when list of available widgets
+  self.getHistogramFacet = function () { // Should do multi histogram
     return self.getFacetByType('histogram-widget');
   }
   
@@ -791,6 +796,8 @@ var NewTemplate = function (vm, initial) {
 
 var DATE_TYPES = ['date', 'tdate'];
 var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat'];
+
+var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
 
 var SearchViewModel = function (collection_json, query_json, initial_json) {
