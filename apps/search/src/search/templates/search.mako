@@ -719,19 +719,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div> 
     
-    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <!-- ko if: type() == 'range' -->
+        <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
+      <!-- /ko -->
+    </div>
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       transformer: barChartDataTransformer,
       onStateChange: function(state){ console.log(state); },
-      onClick: function(d) {alert(type);
-        if (type == 'range') { 
-          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+      onClick: function(d) {
+        if (d.obj.field != undefined) { 
+          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
         } else {
-          viewModel.query.toggleFacet({facet: d.obj, widget_id: $parent.id()});
+          viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
         } 
       },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: d.obj.widget_id}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
     />
   </div>
@@ -1415,7 +1419,8 @@ function barChartDataTransformer(rawDatum) {
   var _data = [];
 
   $(rawDatum.counts).each(function (cnt, item) {
-    if (typeof item.from != "undefined"){
+    item.widget_id = rawDatum.widget_id;
+    if (typeof item.from != "undefined") {
       _data.push({
         series: 0,
         x: item.from,
