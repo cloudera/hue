@@ -286,7 +286,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     </h2>
     <div class="card-body" style="padding: 5px;">
-      <div data-bind="template: { name: function() { return widgetType(); } }" class="widget-main-section"></div>
+      <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
 </script>
@@ -334,7 +334,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
       <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
     </a>
-    <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">          
+    <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
       <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
     </a>
 </script>
@@ -419,7 +419,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="resultset-widget">
   <!-- ko if: $root.collection.template.isGridLayout() -->
-    <div style="float:left; margin-right: 10px" >
+    <div style="float:left; margin-right: 10px">
       <div data-bind="visible: ! $root.collection.template.showFieldList()" style="padding-top: 5px; display: inline-block">
         <a href="javascript: void(0)"  data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
           <i class="fa fa-chevron-right"></i>
@@ -459,7 +459,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <!-- ko if: $root.response().response -->
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
-      <div style="overflow-x: auto">
+
+      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+        <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+      </div>
+
+      <div id="result-main" style="overflow-x: auto">
         <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0; width: 100%">
           <thead>
             <tr data-bind="visible: $root.results().length > 0">
@@ -473,8 +479,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                 </a>
                 </div>
                 <div style="display: inline-block;">
-                <a href="javascript: void(0)" title="${ _('Click to sort') }">
-                  <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+                <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
+                  <span data-bind="text: name"></span>
                   <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
                 </a>
                   </div>
@@ -492,7 +498,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
               <th>${ ('Document') }</th>
             </tr>
           </thead>
-          <tbody data-bind="foreach: { data: $root.results, as: 'documents' }" class="result-tbody">
+          <tbody data-bind="foreach: { data: $root.results, as: 'documents'}" class="result-tbody">
             <tr class="result-row" data-bind="attr: {'id': 'doc_' + $data['id']}">
               <td><a href="javascript:void(0)" data-bind="click: toggleDocDetails"><i class="fa fa-caret-right"></i></a></td>
               <!-- ko foreach: $data['row'] -->
@@ -502,10 +508,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </tbody>
         </table>
       </div>
-      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
-        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-        <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
-      </div>	  
     </div>
   <!-- /ko -->
 </script>
@@ -603,7 +605,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     <!-- /ko -->
 
-    <div style="overflow-x: auto">
+    <div id="result-main" style="overflow-x: auto">
       <div data-bind="visible: $root.results().length == 0">
         ${ _('Your search did not match any documents.') }
       </div>
@@ -2010,6 +2012,10 @@ $(document).ready(function () {
   function addFacetDemiModalFieldCancel() {
     viewModel.removeWidget(selectedWidget);
   }
+
+  $(document).on("setResultsHeight", function () {
+    $("#result-main").height($("#result-container").outerHeight() + 100);
+  });
 
 </script>
 

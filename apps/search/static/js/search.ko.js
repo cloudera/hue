@@ -631,7 +631,7 @@ var Collection = function (vm, collection) {
     } else {
       template_field.sort.direction(null); 
     }
-
+    $(document).trigger("setResultsHeight");
     vm.search();
   };
   
