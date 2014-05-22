@@ -18,6 +18,7 @@
 
 import csv
 import logging
+import operator
 import os
 import pytz
 import re
@@ -82,7 +83,9 @@ def copy_config_with_fields_and_unique_key(fields, unique_key_field):
   return tmp_path, solr_config_path
 
 
-def get_field_types(row):
+def get_field_types(field_list, iterations=3):
+  assert iterations > 0, "iterations should be a positive integer (not a negative integer or 0)"
+
   def test_boolean(value):
     if value.lower() not in ('false', 'true'):
       raise ValueError(_("%s is not a boolean value") % value)
@@ -110,24 +113,47 @@ def get_field_types(row):
     if len(smart_str(value).split(' ')) > 4:
       raise ValueError()
 
-  test_fns = [('tint', test_int),
+  test_fns = [('boolean', test_boolean),
+              ('tint', test_int),
               ('tlong', int),
               ('tdouble', float),
-              ('boolean', test_boolean),
               ('tdate', test_timestamp),
-              ('string', test_string)]
-  field_types = []
-  for field in row:
-    field_type = None
-    for test_fn in test_fns:
-      try:
-        test_fn[1](field)
-        field_type = test_fn[0]
-        break
-      except ValueError:
-        pass
-    field_types.append(field_type or 'text_general')
-  return field_types
+              ('string', test_string),
+              ('text_general', any)]
+  all_field_types = []
+  for row in field_list:
+    # Try 'iterations' amount of times
+    if iterations == 0:
+      break
+
+    iterations -= 1
+
+    row_field_types = []
+    for field in row:
+      field_type_index = None
+      for index in range(0, len(test_fns)):
+        try:
+          test_fns[index][1](field)
+          field_type_index = index
+          break
+        except ValueError:
+          pass
+      row_field_types.append(field_type_index)
+    all_field_types.append(row_field_types)
+
+  # No rows to asses
+  if not all_field_types:
+    return []
+
+  # Choose based on priority.
+  # If a column has largely tint's, but one tlong, then the type should be tlong.
+  final_field_types = all_field_types[0]
+  for row_field_types in all_field_types:
+    for index in range(0, len(row_field_types)):
+      if row_field_types[index] > final_field_types[index]:
+        final_field_types[index] = row_field_types[index]
+
+  return [test_fns[index][0] for index in final_field_types]
 
 
 def get_type_from_morphline_type(morphline_type):

@@ -16,11 +16,12 @@
 # limitations under the License.
 
 from functools import wraps
+import itertools
 import json
 import logging
 import re
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.utils.decorators import available_attrs
 from django.utils.translation import ugettext as _
 
@@ -69,7 +70,7 @@ def parse_fields(request):
         field_list = field_values_from_separated_file(file_obj, delimiter, quote)
         row = next(field_list)
         field_names = row.keys()
-        field_types = get_field_types(row.values())
+        field_types = get_field_types((row.values() for row in itertools.chain([row], field_list)), iterations=51)
         file_obj.close()
 
         result['data'] = zip(field_names, field_types)
