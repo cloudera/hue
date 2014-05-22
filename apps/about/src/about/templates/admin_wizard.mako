@@ -114,6 +114,12 @@ ${ header.menubar() }
                   <i class="fa fa-download"></i> ${ apps['search'].nice_name }
                 </a>
               </li>
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('indexer:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['indexer'].nice_name }
+                </a>
+              </li>
           % endif
           % if 'oozie' in app_names:
               <li>

@@ -35,8 +35,6 @@ from search.management.commands import search_setup
 from search.models import Collection, augment_solr_response, augment_solr_exception
 from search.search_controller import SearchController
 
-from indexer.management.commands import indexer_install_examples
-
 from django.utils.encoding import force_unicode
 from desktop.lib.rest.http_client import RestException
 
@@ -527,7 +525,6 @@ def install_examples(request):
   else:
     try:
       search_setup.Command().handle_noargs()
-      indexer_install_examples.Command().handle_noargs()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)
