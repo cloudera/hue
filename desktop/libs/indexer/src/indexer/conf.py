@@ -16,10 +16,31 @@
 # limitations under the License.
 
 import os
+import subprocess
+from urlparse import urlparse
 
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
+
+
+def solrctl():
+  """
+  solrctl path
+  """
+  try:
+    return subprocess.check_output(['which', 'solrctl'])
+  except subprocess.CalledProcessError:
+    return '/usr/bin/solrctl'
+
+
+def zkensemble():
+  """
+  ZooKeeper Ensemble
+  """
+  from search.conf import SOLR_URL
+  parsed = urlparse(SOLR_URL.get())
+  return "%s:2181/solr" % (parsed.hostname or 'localhost')
 
 
 # Unused
@@ -40,7 +61,7 @@ SOLRCTL_PATH = Config(
   key="solrctl_path",
   help=_t("Location of the solrctl binary."),
   type=str,
-  default="/usr/bin/solrctl")
+  dynamic_default=solrctl)
 
 SOLR_HOME = Config(
   key="solr_home",
@@ -52,4 +73,4 @@ SOLR_ZK_ENSEMBLE  = Config(
   key="solr_zk_ensemble",
   help=_t("Zookeeper ensemble."),
   type=str,
-  default="localhost:2181/solr")
+  dynamic_default=zkensemble)
