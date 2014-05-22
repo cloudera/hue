@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
 import logging
 import uuid
 import os
@@ -119,5 +120,5 @@ class Command(NoArgsCommand):
       field_generator = utils.field_values_from_separated_file(fh, separator, quote_character)
       row = next(field_generator)
       field_names = row.keys()
-      field_types = utils.get_field_types(row.values())
+      field_types = utils.get_field_types((row.values() for row in itertools.chain([row], field_generator)), iterations=51)
       return [{'name': field[0], 'type': field[0] in fieldtypes and fieldtypes[field[0]] or field[1]} for field in zip(field_names, field_types)]

@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
 
-from indexer.management.commands import indexer_install_examples
+from indexer.management.commands import indexer_setup
 
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ def install_examples(request, is_redirect=False):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      indexer_install_examples.Command().handle_noargs()
+      indexer_setup.Command().handle_noargs()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)
