@@ -67,6 +67,7 @@ var Field = function(collection, name, type, required, indexed, stored) {
     },
     'write': function(value) {
       collection.uniqueKeyField(self.name());
+      self.indexed(true);
     }
   });
   self.editable = ko.computed(function() {

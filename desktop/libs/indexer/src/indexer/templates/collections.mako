@@ -294,7 +294,12 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         </td>
         <td><select data-bind="options: $parent.fieldTypes, value: type, chosen: {}" name="type"></select></td>
         <td><p class="text-center"><input data-bind="checked: required" type="checkbox"></p></td>
-        <td><p class="text-center"><input data-bind="checked: indexed" type="checkbox"></p></td>
+        <td>
+          <p class="text-center">
+            <input data-bind="checked: indexed, visible: !uniqueKeyField()" type="checkbox">
+            <span class="fa" data-bind="css: {'fa-check': uniqueKeyField}">
+          </p>
+        </td>
         <td><p class="text-center"><input data-bind="checked: stored" type="checkbox"></p></td>
         <td>
           <p class="text-center">
