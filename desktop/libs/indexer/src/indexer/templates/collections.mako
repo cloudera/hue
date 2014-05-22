@@ -99,6 +99,23 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </div>
 
 
+<div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Delete collections')}</h3>
+  </div>
+  <div class="modal-body">
+    <ul data-bind="foreach: selectedCollections">
+      <li data-bind="text: name"></li>
+    </ul>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+    <button data-bind="click: removeCollections" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+  </div>
+</div>
+
+
 <!-- Breadcrum component -->
 <script id="breadcrum" type="text/html">
 <ul data-bind="foreach: breadcrum.list" class="nav nav-pills hueBreadcrumbBar">
@@ -127,8 +144,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <div data-bind="visible: collections().length > 0 && !isLoading()">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
                 placeholder="${_('Filter collections...')}" class="input-xlarge search-query">
-            <button data-bind="click: removeCollections, clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" 
-                title="${_('Delete the selected collections')}" disabled="disabled">
+            <button data-bind="clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" 
+                title="${_('Delete the selected collections')}" data-toggle="modal" data-target="#deleteCollections">
               <i class="fa fa-times"></i> ${_('Delete')}
             </button>
             <a href="#create" class="btn toolbarBtn pull-right">
@@ -449,10 +466,6 @@ function validateAndUpdateCollection() {
   return false;
 }
 
-function chooseFileToIndex($data, e) {
-  $(e.target).siblings().find('button').click();
-}
-
 function validateFileAndNameAndType() {
   var ret = validateNotNull(vm.create.collection.name, "${ _('Name is missing') }");
   var ret = validateNotNull(vm.create.file, "${ _('File path is missing') }") && ret;
@@ -489,17 +502,12 @@ var vm = new CollectionsViewModel({
 });
 var create_root = vm.create.wizard.getPage('name', 'create-collection-data', 'separated', validateFileAndNameAndType);
 vm.create.wizard.getPage('separated', 'create-collection-data-separated', 'fields', validateFetchFields);
-// vm.create.wizard.getPage('morphlines', 'create-collection-data-morphlines', 'fields', validateFetchFields);
 vm.create.wizard.getPage('fields', 'create-collection-fields', null, function() { return validateFields(vm.create.collection) });
 vm.create.wizard.rootPage(create_root);
 vm.create.wizard.currentPage(vm.create.wizard.rootPage());
 
 vm.create.sourceType.subscribe(function(value) {
-  if (value == 'log') {
-    vm.create.wizard.getPage('name').next('fields');
-  } else {
-    vm.create.wizard.getPage('name').next(value);
-  }
+  vm.create.wizard.getPage('name').next(value);
 });
 
 var edit_root = vm.edit.wizard.getPage('data', 'upload-collection-data', 'separated', function() {return validateNotNull(vm.edit.file, "${ _('File path is missing') }")});
@@ -508,14 +516,7 @@ vm.edit.wizard.rootPage(edit_root);
 vm.edit.wizard.currentPage(vm.edit.wizard.rootPage());
 
 vm.edit.sourceType.subscribe(function(value) {
-  if (!value) {
-    // Weird bug where sourceType disappears when switching between pages
-    vm.edit.sourceType(vm.edit.wizard.getPage('data').next());
-  } else if (value == 'log') {
-    vm.edit.wizard.getPage('data').next(null);
-  } else {
-    vm.edit.wizard.getPage('data').next(value);
-  }
+  vm.edit.wizard.getPage('data').next(value);
 });
 
 routie({
