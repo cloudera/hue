@@ -425,46 +425,50 @@ def new_facet(request):
     facet_label = request.POST['label']
     facet_field = request.POST['field']
     widget_type = request.POST['widget_type']
-    properties = {
-      'sort': 'desc',
-      'canRange': False,
-      'stacked': False,
-      'limit': 10,
-      'mincount': 0,
-      'andUp': False,  # Not used yet
-    }
-    
-    solr_api = SolrApi(SOLR_URL.get(), request.user)
-    range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
-                          
-    if range_properties:
-      facet_type = 'range'
-      properties.update(range_properties)       
-    elif widget_type == 'hit-widget':
-      facet_type = 'query'      
-    else:
-      facet_type = 'field'        
-        
-    if widget_type == 'map-widget':
-      properties['scope'] = 'world'
-      properties['mincount'] = 1
-      properties['limit'] = 100        
-        
+
     result['message'] = ''
-    result['facet'] = {
-      'id': facet_id,
-      'label': facet_label,
-      'field': facet_field,
-      'type': facet_type,
-      'widgetType': widget_type,
-      'properties': properties
-    }
+    result['facet'] =  _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
+
+def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
+  properties = {
+    'sort': 'desc',
+    'canRange': False,
+    'stacked': False,
+    'limit': 10,
+    'mincount': 0,
+    'andUp': False,  # Not used yet
+  }
+  
+  solr_api = SolrApi(SOLR_URL.get(), user)
+  range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
+                        
+  if range_properties:
+    facet_type = 'range'
+    properties.update(range_properties)       
+  elif widget_type == 'hit-widget':
+    facet_type = 'query'      
+  else:
+    facet_type = 'field'        
+      
+  if widget_type == 'map-widget':
+    properties['scope'] = 'world'
+    properties['mincount'] = 1
+    properties['limit'] = 100     
+    
+  return {
+    'id': facet_id,
+    'label': facet_label,
+    'field': facet_field,
+    'type': facet_type,
+    'widgetType': widget_type,
+    'properties': properties
+  }
 
 def get_range_facet(request):  
   result = {'status': -1, 'message': 'Error'}
@@ -485,7 +489,6 @@ def get_range_facet(request):
     result['status'] = 0      
 
   except Exception, e:
-    print e
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")

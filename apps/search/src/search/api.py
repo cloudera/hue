@@ -31,7 +31,6 @@ from django.utils.translation import ugettext as _
 
 from libsolr.api import SolrApi as BaseSolrApi
 
-from search.examples import demo_handler
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
 

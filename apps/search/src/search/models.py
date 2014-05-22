@@ -238,12 +238,11 @@ class CollectionManager(models.Manager):
     facets = Facet.objects.create()
     result = Result.objects.create()      
     sorting = Sorting.objects.create()
-    cores = json.dumps({})
 
     collection = Collection.objects.create(
         name=name,
         label=label,
-        cores=cores,
+        cores=json.dumps({}),
         is_core_only=False,
         facets=facets,
         result=result,
@@ -259,7 +258,7 @@ class Collection(models.Model):
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
   is_core_only = models.BooleanField(default=False)
-  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json'))
+  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json')) # Unused
   properties = models.TextField(
       default=json.dumps({}), verbose_name=_t('Properties'),
       help_text=_t('Hue properties (e.g. results by pages number)')
@@ -277,8 +276,14 @@ class Collection(models.Model):
   def get_c(self, user):
     props = self.properties_dict
 
-    if 'collection' not in props:
+    if 'collection' not in props:      
       props['collection'] = self.get_default(user)
+      if self.cores != '{}': # Convert collections from < Hue 3.6
+        try:
+          self._import_hue_3_5_collections(props, user)
+        except Exception, e:
+          LOG.error('Could not import collection: %s' % e)
+
     if 'layout' not in props:
       props['layout'] = []    
   
@@ -361,13 +366,14 @@ class Collection(models.Model):
     if not self.properties:
       self.data = json.dumps({})
     properties_python = json.loads(self.properties)
-    # Backward compatibility
+
+    # Backward compatibility conversions
     if 'autocomplete' not in properties_python:
-      properties_python['autocomplete'] = False
-    # TODO: Should convert old Hue 3.5 format here
+      properties_python['autocomplete'] = False    
     if 'collection' in properties_python:
       if 'showFieldList' not in properties_python['collection']['template']:
         properties_python['collection']['template']['showFieldList'] = True
+    
     return properties_python
 
   def update_properties(self, post_data):
@@ -395,10 +401,37 @@ class Collection(models.Model):
       return '/search/static/art/icon_twitter.png'
     elif self.name == 'yelp_demo':
       return '/search/static/art/icon_yelp.png'
-    elif self.name == 'log_demo':
+    elif self.name == 'log_analytics_demo':
       return '/search/static/art/icon_logs.png'
     else:
       return '/search/static/art/icon_search_24.png'
+
+  def _import_hue_3_5_collections(self, props, user):
+    props['collection']['template']['template'] = self.result.get_template()
+    props['collection']['template']['extracode'] = escape(self.result.get_extracode())
+    props['collection']['template']['isGridLayout'] = False
+    props['layout'] = [
+          {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+          {"size":10,"rows":[{"widgets":[
+              {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"html-resultset-widget",
+               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]
+          }], "drops":["temp"],"klass":"card card-home card-column span10"}
+     ]
+    
+    from search.views import _create_facet
+    
+    props['collection']['facets'] =[]
+    facets = self.facets.get_data()         
+
+    for facet_id in facets['order']:
+      for facet in facets['fields'] + facets['ranges']:
+        if facet['uuid'] == facet_id:
+          props['collection']['facets'].append(
+              _create_facet({'name': self.name}, user, facet_id, facet['label'], facet['field'], 'facet-widget'))
+          props['layout'][0]['rows'][0]['widgets'].append({
+              "size":12,"name": facet['label'], "id":facet_id, "widgetType": "facet-widget",
+              "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"
+          })
 
 
 def get_facet_field(category, field, facets):
