@@ -116,6 +116,19 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </div>
 
 
+<div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
+  <div data-bind="if: collection()" class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Delete collection ')} <span data-bind="text: collection().name"></span></h3>
+  </div>
+  <div class="modal-body"></div>
+  <div data-bind="if: collection()" class="modal-footer">
+    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+    <button data-bind="click: removeCollection" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+  </div>
+</div>
+
+
 <!-- Breadcrum component -->
 <script id="breadcrum" type="text/html">
 <ul data-bind="foreach: breadcrum.list" class="nav nav-pills hueBreadcrumbBar">
@@ -329,7 +342,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
       <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>      
-      <li><a data-bind="click: removeCollection, clickBubble: false" href="javascript:void(0)"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
+      <li><a href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>
 </div>
