@@ -223,17 +223,7 @@ var CreateCollectionViewModel = function() {
       }).done(function(data) {
         if (data.status == 0) {
           self.collection.fields(inferFields(data.data, self.collection));
-
-          // Find unique key default field
-          var message = null;
-          var uniqueKeyFields = ko.utils.arrayFilter(self.collection.fields(), function(field) {
-            return field.indexed();
-          });
-          if (uniqueKeyFields.length > 0) {
-            self.collection.uniqueKeyField(uniqueKeyFields[0].name());
-          } else if (self.collection.fields().length > 0) {
-            self.collection.uniqueKeyField(self.collection.fields()[0].name());
-          }
+          chooseUniqueKey(self.collection);
         } else {
           $(document).trigger("error", data.message);
         }

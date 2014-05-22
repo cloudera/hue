@@ -296,6 +296,39 @@ ko.bindingHandlers.editableText = {
   }
 };
 
+function chooseUniqueKey(collection) {
+  function fieldChooser(fields) {
+    if (fields.length > 0) {
+      fields[0].uniqueKeyField(true);
+      return true;
+    }
+    return false;
+  }
+
+  // Find a field named "ID"
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.name().toLowerCase() == 'id';
+  }))) return;
+
+  // Find a long
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return $.inArray(field.type().toLowerCase(), ['long', 'tlong', 'plong']) != -1;
+  }))) return;
+
+  // Find an integer
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return $.inArray(field.type().toLowerCase(), ['int', 'tint', 'pint']) != -1;
+  }))) return;
+
+  // Find first indexed field
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.indexed();
+  }))) return;
+
+  // Choose a field
+  fieldChooser(collection.fields());
+}
+
 function getCharacterLabel(character) {
   var LABELS = {
     '\t': '\\t'
