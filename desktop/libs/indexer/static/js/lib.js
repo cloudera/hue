@@ -49,9 +49,7 @@ var Collection = function(name) {
 var Field = function(collection, name, type, required, indexed, stored) {
   var self = this;
 
-  if (indexed == undefined) {
-    indexed = type.indexOf('text_') == -1;
-  }
+  indexed = (indexed == undefined) ? true : !!indexed;
   required = (required == undefined) ? true : !!required;
 
   self.name = ko.observable(name).extend({'errors': null});

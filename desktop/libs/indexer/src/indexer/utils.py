@@ -106,11 +106,16 @@ def get_field_types(row):
     if len(bin(int(value))) - 2 > 32:
       raise ValueError()
 
+  def test_string(value):
+    if len(smart_str(value).split(' ')) > 4:
+      raise ValueError()
+
   test_fns = [('tint', test_int),
               ('tlong', int),
               ('tdouble', float),
               ('boolean', test_boolean),
-              ('tdate', test_timestamp)]
+              ('tdate', test_timestamp),
+              ('string', test_string)]
   field_types = []
   for field in row:
     field_type = None
