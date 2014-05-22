@@ -291,7 +291,7 @@ class Collection(models.Model):
     if self.enabled is not None:
       props['collection']['enabled'] = self.enabled
     
-    # tmp for dev    
+    # tmp for dev
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
     if 'enabled' not in props['collection']:
@@ -306,7 +306,7 @@ class Collection(models.Model):
       id_field = id_field[0]
   
     TEMPLATE = {
-      "extracode": "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>",
+      "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
       "highlighting": [""],
       "properties": {"highlighting_enabled": True},
       "template": """

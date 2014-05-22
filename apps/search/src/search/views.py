@@ -21,6 +21,7 @@ import logging
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.encoding import smart_str
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 
@@ -150,7 +151,9 @@ def save(request):
   
   collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
   layout = json.loads(request.POST.get('layout', '{}')) 
-    
+ 
+  collection['template']['extracode'] = escape(collection['template']['extracode']) # Escape HTML
+  
   if collection:
     if collection['id']:
       hue_collection = Collection.objects.get(id=collection['id'])

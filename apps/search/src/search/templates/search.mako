@@ -47,7 +47,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     % endif 
   </div>  
   
-  <form data-bind="visible: columns().length == 0">  
+  <form data-bind="visible: $root.isEditing() && columns().length == 0">  
     ${ _('Select a search index') }
     <!-- ko if: columns().length == 0 -->
     <select data-bind="options: $root.initial.collections, value: $root.collection.name">
@@ -194,7 +194,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </div>
 
 <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
-  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Click on a layout to start your dashboard!') }</div>
+  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
   <img src="/search/static/art/hint_arrow_horiz_flipped.png" />
 </div>
 
