@@ -310,18 +310,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
-      ${ _('Start') }:
-      <input type="text" class="input-large" data-bind="value: properties.start" />
-      <br/>
-      ${ _('End') }: <input type="text" class="input-large" data-bind="value: properties.end" />
-      <br/>
-      ${ _('Gap') }: <input type="text" class="input-small" data-bind="value: properties.gap" />
-      <br/>
-      ${ _('Min') }:
-      <input type="text" class="input-medium" data-bind="value: properties.min" />
-      <br/>
-      ${ _('Max') }: <input type="text" class="input-medium" data-bind="value: properties.max" />
-      <br/>      
+      <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max, handle: 'triangle'}"></div>
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
       ${ _('Limit') }: <input type="text" class="input-medium" data-bind="value: properties.limit" />
@@ -933,8 +922,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
-<link rel="stylesheet" href="/static/ext/css/bootstrap-slider.min.css">
 <link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
+<link rel="stylesheet" href="/static/css/bootstrap-slider.css">
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
@@ -944,8 +933,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
-<script src="/static/ext/js/bootstrap-slider.min.js"></script>
 <script src="/static/js/bootstrap-spinedit.js"></script>
+<script src="/static/js/bootstrap-slider.js"></script>
 <script src="/static/js/ko.editable.js"></script>
 <script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/freshereditor.js" type="text/javascript" charset="utf-8"></script>
@@ -1752,20 +1741,25 @@ $(document).ready(function () {
       var _el = $(element);
       var _options = $.extend(valueAccessor(), {});
       _el.slider({
-        min: _options.min ? _options.min : 1,
-        max: _options.max ? _options.max : 10,
-        step: _options.step ? _options.step : 1,
-        handle: _options.handle ? _options.handle : 'circle',
-        value: _options.data(),
+        min: _options.start() ? _options.start() : 1,
+        max: _options.end() ? _options.end() : 10,
+        step: _options.gap() ? _options.gap() : 1,
+        handle: _options.handle ? _options.handle : 'triangle',
+        start: _options.min(),
+        end: _options.max(),
+        tooltip_split: true,
         tooltip: 'always'
       });
       _el.on("slide", function (e) {
-        _options.data(e.value);
+        _options.start(e.start);
+        _options.end(e.end);
+        _options.min(e.min);
+        _options.max(e.max);
+        _options.gap(e.step);
       });
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
       var _options = $.extend(valueAccessor(), {});
-      $(element).slider("setValue", _options.data());
     }
   }
 
@@ -1905,6 +1899,14 @@ $(document).ready(function () {
     }
   });
 
+  viewModel.isEditing.subscribe(function(value){
+    if (value){
+      window.setTimeout(function(){
+        $(".slider-cnt").slider("redraw");
+      }, 300);
+    }
+  });
+
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){
       addFacetDemiModalFieldCancel();
@@ -1996,5 +1998,6 @@ $(document).ready(function () {
   });
 
 </script>
+
 
 ${ commonfooter(messages) | n,unicode }
