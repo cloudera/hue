@@ -41,6 +41,23 @@ def get_server_choices():
   else:
     return []
 
+def validate_dn(dn):
+  assert dn is not None, _('Full Distinguished Name required.')
+
+def validate_username(username_pattern):
+  validator = re.compile(r"^%s$" % get_username_re_rule())
+
+  assert username_pattern is not None, _('Username is required.')
+  assert len(username_pattern) <= 30, _('Username must be fewer than 30 characters.')
+  assert validator.match(username_pattern), _("Username must not contain whitespaces and ':'")
+
+def validate_groupname(groupname_pattern):
+  validator = re.compile(r"^%s$" % get_groupname_re_rule())
+
+  assert groupname_pattern is not None, _('Group name required.')
+  assert len(groupname_pattern) <= 80, _('Group name must be 80 characters or fewer.')
+  assert validator.match(groupname_pattern), _("Group name can be any character as long as it's 80 characters or fewer.")
+
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
@@ -117,9 +134,8 @@ class SuperUserChangeForm(UserChangeForm):
 
 
 class AddLdapUsersForm(forms.Form):
-  username_pattern = forms.RegexField(
+  username_pattern = forms.CharField(
       label=_t("Username"),
-      regex='^%s$' % (get_username_re_rule(),),
       help_text=_t("Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."),
       error_messages={'invalid': _t("Whitespaces and ':' not allowed")})
   dn = forms.BooleanField(label=_t("Distinguished name"),
@@ -142,27 +158,23 @@ class AddLdapUsersForm(forms.Form):
     username_pattern = cleaned_data.get("username_pattern")
     dn = cleaned_data.get("dn")
 
-    if dn:
-      if username_pattern is not None and len(username_pattern) > 64:
-        msg = _('Too long: 64 characters or fewer and not %s.') % username_pattern
-        errors = self._errors.setdefault('username_pattern', ErrorList())
-        errors.append(msg)
-        raise forms.ValidationError(msg)
-    else:
-      if username_pattern is not None and len(username_pattern) > 30:
-        msg = _('Too long: 30 characters or fewer and not %s.') % username_pattern
-        errors = self._errors.setdefault('username_pattern', ErrorList())
-        errors.append(msg)
-        raise forms.ValidationError(msg)
+    try:
+      if dn:
+        validate_dn(username_pattern)
+      else:
+        validate_username(username_pattern)
+    except AssertionError, e:
+      errors = self._errors.setdefault('username_pattern', ErrorList())
+      errors.append(e.message)
+      raise forms.ValidationError(e.message)
 
     return cleaned_data
 
 
 class AddLdapGroupsForm(forms.Form):
-  groupname_pattern = forms.RegexField(
+  groupname_pattern = forms.CharField(
       label=_t("Name"),
       max_length=80,
-      regex='^%s$' % get_groupname_re_rule(),
       help_text=_t("Required. 80 characters or fewer."),
       error_messages={'invalid': _t("80 characters or fewer.") })
   dn = forms.BooleanField(label=_t("Distinguished name"),
@@ -193,12 +205,15 @@ class AddLdapGroupsForm(forms.Form):
     groupname_pattern = cleaned_data.get("groupname_pattern")
     dn = cleaned_data.get("dn")
 
-    if not dn:
-      if groupname_pattern is not None and len(groupname_pattern) > 80:
-        msg = _('Too long: 80 characters or fewer and not %s') % groupname_pattern
-        errors = self._errors.setdefault('groupname_pattern', ErrorList())
-        errors.append(msg)
-        raise forms.ValidationError(msg)
+    try:
+      if dn:
+        validate_dn(groupname_pattern)
+      else:
+        validate_groupname(groupname_pattern)
+    except AssertionError, e:
+      errors = self._errors.setdefault('groupname_pattern', ErrorList())
+      errors.append(e.message)
+      raise forms.ValidationError(e.message)
 
     return cleaned_data
 
