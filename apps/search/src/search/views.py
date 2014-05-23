@@ -474,7 +474,7 @@ def install_examples(request):
   else:
     try:
       search_setup.Command().handle_noargs()
-      #indexer_setup.Command().handle_noargs()
+      indexer_setup.Command().handle_noargs()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

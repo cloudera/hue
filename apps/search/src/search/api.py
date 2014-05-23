@@ -93,6 +93,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')        
       start_ts, _ = _round_date_range(start_ts)
       start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
+      stats_min = min(stats_min, start)
       if end is None:
         end = stats_max
       end = re.sub('\.\d\d?\d?Z$', 'Z', end)
@@ -103,6 +104,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
       _, end_ts = _round_date_range(end_ts)
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
+      stats_max = max(stats_max, end)
       difference = (
           mktime(end_ts.timetuple()) - 
           mktime(start_ts.timetuple())
@@ -128,7 +130,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         gap = '+1DAYS'
       elif difference < 3600 * 24 * 7:
         gap = '+7DAYS'        
-      elif difference < 3600 * 24 * 30:
+      elif difference < 3600 * 24 * 40:
         gap = '+1MONTHS'        
       else:
         gap = '+1YEARS'      
