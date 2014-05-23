@@ -54,6 +54,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       
     stats_json = solr_api.stats(collection['name'], [facet_field])
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
+    is_date = False
     
     # to refactor
     if isinstance(stat_facet['min'], numbers.Number):
@@ -79,18 +80,27 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       if gap < 1:
         gap = 1
     elif 'T' in stat_facet['min']:
+      is_date = True
       stats_min = stat_facet['min']
       stats_max = stat_facet['max']
       if start is None:
         start = stats_min 
       start = re.sub('\.\d\d?\d?Z$', 'Z', start)
-      start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
+      try:
+        start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
+      except Exception, e:        
+        LOG.error('Bad date: %s' % e)        
+        start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')        
       start_ts, _ = _round_date_range(start_ts)
       start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       if end is None:
         end = stats_max
       end = re.sub('\.\d\d?\d?Z$', 'Z', end)
-      end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+      try:
+        end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+      except Exception, e:
+        LOG.error('Bad date: %s' % e)
+        end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
       _, end_ts = _round_date_range(end_ts)
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       difference = (
@@ -130,6 +140,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       'end': end,
       'gap': gap,
       'canRange': True,
+      'isDate': is_date,
     })
   except Exception, e:
     print e

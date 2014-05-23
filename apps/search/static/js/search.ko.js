@@ -432,7 +432,7 @@ var Collection = function (vm, collection) {
       }, function (data) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
-          facet.field.subscribe(function () {
+          facet.field.subscribe(function() {
             vm.search();
           });      
           self.facets.push(facet);

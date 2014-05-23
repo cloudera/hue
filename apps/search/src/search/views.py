@@ -382,6 +382,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'stacked': False,
     'limit': 10,
     'mincount': 0,
+    'isDate': False,
     'andUp': False,  # Not used yet
   }
   
@@ -411,7 +412,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   }
 
 def get_range_facet(request):  
-  result = {'status': -1, 'message': 'Error'}
+  result = {'status': -1, 'message': ''}
 
   try:
     collection = json.loads(request.POST.get('collection', '{}')) # Perms
@@ -435,7 +436,7 @@ def get_range_facet(request):
 
 
 def get_collection(request):  
-  result = {'status': -1, 'message': 'Error'}
+  result = {'status': -1, 'message': ''}
 
   try:
     name = request.POST['name']
@@ -453,7 +454,7 @@ def get_collection(request):
 
 
 def get_collections(request):  
-  result = {'status': -1, 'message': 'Error'}
+  result = {'status': -1, 'message': ''}
 
   try:           
     result['collection'] = SearchController(request.user).get_all_indexes()
@@ -473,7 +474,7 @@ def install_examples(request):
   else:
     try:
       search_setup.Command().handle_noargs()
-      indexer_setup.Command().handle_noargs()
+      #indexer_setup.Command().handle_noargs()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

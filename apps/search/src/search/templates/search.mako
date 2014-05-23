@@ -310,7 +310,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
-      <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max, handle: 'triangle'}"></div>
+      <!-- ko ifnot: properties.isDate() -->    
+        <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max, handle: 'triangle'}"></div>
+      <!-- /ko -->
+      <!-- ko if: properties.isDate() -->
+        ${ _('Start') }:
+        <input type="text" class="input-large" data-bind="value: properties.start" />
+        <br/>
+        ${ _('End') }: <input type="text" class="input-large" data-bind="value: properties.end" />
+        <br/>
+        ${ _('Gap') }: <input type="text" class="input-small" data-bind="value: properties.gap" />
+        <br/>
+        ${ _('Min') }:
+        <input type="text" class="input-medium" data-bind="value: properties.min" />
+        <br/>
+        ${ _('Max') }: <input type="text" class="input-medium" data-bind="value: properties.max" />
+        <br/>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
       ${ _('Limit') }: <input type="text" class="input-medium" data-bind="value: properties.limit" />
@@ -865,7 +881,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 10px;text-align: center">
-      <input id="addFacetInput" type="text" data-bind="value: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>
+      <input id="addFacetInput" type="text" data-bind="clearable: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.collection.template.filteredModalFields().length > 0"
@@ -875,7 +891,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </span>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 124px;height: 42px;line-height: 42px">
+      <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
         ${_('There are no fields matching your search term.')}
       </div>
     </div>
