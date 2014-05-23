@@ -511,7 +511,7 @@ def test_add_ldap_users():
     assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
 
     # Test wild card
-    response = c.post(URL, dict(server='nonsense', username_pattern='*r*', password1='test', password2='test'))
+    response = c.post(URL, dict(server='nonsense', username_pattern='*rr*', password1='test', password2='test'))
     assert_true('/useradmin/users' in response['Location'], response)
 
     # Test ignore case
@@ -535,6 +535,19 @@ def test_add_ldap_users():
     assert_true('/useradmin/users' in response['Location'], response)
     assert_false(User.objects.filter(username='Rock').exists())
     assert_true(User.objects.filter(username='rock').exists())
+
+    # Test regular with spaces (should fail)
+    response = c.post(URL, dict(server='nonsense', username_pattern='user with space', password1='test', password2='test'))
+    assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
+
+    # Test dn with spaces in username and dn (should fail)
+    response = c.post(URL, dict(server='nonsense', username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true("There was a problem with some of the LDAP information" in response.content, response)
+    assert_true("Username must not contain whitespaces" in response.content, response)
+
+    # Test dn with spaces in dn, but not username (should succeed)
+    response = c.post(URL, dict(server='nonsense', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true(User.objects.filter(username='spaceless').exists())
 
   finally:
     for finish in done:

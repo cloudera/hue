@@ -28,8 +28,7 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 
-from useradmin.models import LdapGroup, UserProfile
-from useradmin.models import get_profile
+from useradmin.models import LdapGroup, UserProfile, get_profile
 
 from hadoop import pseudo_hdfs4
 from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
@@ -469,7 +468,7 @@ def test_add_ldap_users():
     assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
 
     # Test wild card
-    response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test'))
+    response = c.post(URL, dict(username_pattern='*rr*', password1='test', password2='test'))
     assert_true('/useradmin/users' in response['Location'], response)
 
     # Test ignore case
@@ -493,6 +492,19 @@ def test_add_ldap_users():
     assert_true('/useradmin/users' in response['Location'], response)
     assert_false(User.objects.filter(username='Rock').exists())
     assert_true(User.objects.filter(username='rock').exists())
+
+    # Test regular with spaces (should fail)
+    response = c.post(URL, dict(username_pattern='user with space', password1='test', password2='test'))
+    assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
+
+    # Test dn with spaces in username and dn (should fail)
+    response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true("There was a problem with some of the LDAP information" in response.content, response)
+    assert_true("Username must not contain whitespaces" in response.content, response)
+
+    # Test dn with spaces in dn, but not username (should succeed)
+    response = c.post(URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true(User.objects.filter(username='spaceless').exists())
 
   finally:
     for finish in done:
