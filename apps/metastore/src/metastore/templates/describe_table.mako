@@ -51,7 +51,7 @@ ${ components.menubar() }
             <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
           </td>
           <td>${ column.type }</td>
-          <td>${ column.comment != 'None' and column.comment or "" }</td>
+          <td>${ column.comment != 'None' and smart_unicode(column.comment) or "" }</td>
         </tr>
       % endfor
     </tbody>
@@ -84,7 +84,7 @@ ${ components.menubar() }
         <div class="card-body">
           <p>
             % if table.comment:
-            <div class="alert alert-info">${ _('Comment:') } ${ table.comment }</div>
+            <div class="alert alert-info">${ _('Comment:') } ${ smart_unicode(table.comment) }</div>
             % endif
 
             <ul class="nav nav-tabs">
