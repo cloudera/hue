@@ -51,6 +51,7 @@ var Field = function(collection, name, type, required, indexed, stored) {
 
   indexed = (indexed == undefined) ? true : !!indexed;
   required = (required == undefined) ? true : !!required;
+  stored = (stored == undefined) ? true : !!stored;
 
   self.name = ko.observable(name).extend({'errors': null});
   self.type = ko.observable(type).extend({'errors': null});
