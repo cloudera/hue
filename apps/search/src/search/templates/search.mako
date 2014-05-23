@@ -588,7 +588,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
 
     <div id="result-main" style="overflow-x: auto">
-      <div data-bind="visible: $root.results().length == 0">
+      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
         ${ _('Your search did not match any documents.') }
       </div>
     
@@ -913,7 +913,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 ## Extra code for style and custom JS
-<span data-bind="html: $root.collection.template.extracode"></span>
+<span id="extra" data-bind="augmenthtml: $root.collection.template.extracode"></span>
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
@@ -972,386 +972,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/search/static/js/charts.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/ext/js/less-1.7.0.min.js" type="text/javascript" charset="utf-8"></script>
-
-<style type="text/css">
-  .dashboard .container-fluid {
-    padding: 6px;
-  }
-
-  .row-container {
-    width: 100%;
-    min-height: 70px;
-  }
-
-  .row-container.is-editing {
-    border: 1px solid #e5e5e5;
-  }
-
-  .ui-sortable {
-    background-color: #F3F3F3;
-    min-height: 100px;
-  }
-
-  .ui-sortable h2 {
-    padding-left: 10px!important;
-  }
-
-  .ui-sortable h2 ul {
-    float: left;
-    margin-right: 10px;
-    font-size: 14px;
-  }
-
-  .ui-sortable-disabled {
-    background-color: #FFF;
-  }
-
-  .card-column {
-    border: none;
-    min-height: 400px!important;
-  }
-
-  .card-widget {
-    padding-top: 0;
-    border: 0;
-    min-height: 100px;
-  }
-
-  .card-widget .card-heading {
-    font-size: 12px!important;
-    font-weight: bold!important;
-    line-height: 24px!important;
-  }
-
-  .card-widget .card-body {
-    margin-top: 0;
-    min-height: 40px;
-  }
-
-  .card-toolbar {
-    margin: 0;
-    padding: 4px;
-    padding-top: 0;
-    top: 70px;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-  }
-
-  .row-header {
-    background-color: #F6F6F6;
-    display: inline;
-    padding: 3px;
-    border: 1px solid #e5e5e5;
-    border-bottom: none;
-  }
-
-  .row-highlight {
-    background-color: #DDD;
-    min-height: 100px;
-  }
-
-  #emptyDashboard {
-    position: absolute;
-    right: 204px;
-    top: 80px;
-    color: #666;
-    font-size: 20px;
-    z-index: 1000;
-  }
-
-  #emptyDashboardEditing {
-    position: absolute;
-    left: 120px;
-    top: 160px;
-    color: #666;
-    font-size: 20px;
-  }
-
-  .emptyRow {
-    margin-top: 10px;
-    margin-left: 140px;
-    color: #666;
-    font-size: 18px;
-  }
-
-  .preview-row {
-    background-color: #f9f9f9;
-    min-height: 400px!important;
-    margin-top: 30px;
-  }
-
-  .toolbar-label {
-    float: left;
-    font-weight: bold;
-    color: #999;
-    padding-left: 8px;
-    padding-top: 24px;
-  }
-
-  .draggable-widget {
-    width: 60px;
-    text-align: center;
-    float: left;
-    border: 1px solid #CCC;
-    margin-top: 10px;
-    margin-left: 10px;
-    cursor: move;
-  }
-
-  .draggable-widget.disabled {
-    cursor: default;
-  }
-
-  .draggable-widget a {
-    font-size: 28px;
-    line-height: 46px;
-  }
-
-  .draggable-widget.disabled a {
-    cursor: default;
-    color: #CCC;
-  }
-
-  .layout-container {
-    width: 100px;
-    float: left;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
-
-  .layout-box {
-    float: left;
-    height: 48px;
-    background-color: #DDD;
-    text-align: center;
-  }
-
-  .layout-box i {
-    color: #333;
-    font-size: 28px;
-    line-height: 48px;
-  }
-
-  .layout-container:hover .layout-box {
-    background-color: #CCC;
-  }
-
-  .with-top-margin {
-    margin-top: 60px;
-  }
-
-  .ui-sortable .card-heading {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  .search-bar {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-
-  .widget-settings-section {
-    display: none;
-  }
-
-  em {
-    font-weight: bold;
-    background-color: yellow;
-  }
-
-  .nvd3 .nv-brush .extent {
-    fill-opacity: .225!important;
-  }
-
-  .nvd3 .nv-legend .disabled rect {
-    fill-opacity: 0;
-  }
-
-
-  .fields-chooser li {
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-
-  .fields-chooser li .badge {
-    font-weight: normal;
-    font-size: 12px;
-  }
-
-  .widget-spinner {
-    padding: 10px;
-    font-size: 80px;
-    color: #CCC;
-    text-align: center;
-  }
-
-  .card {
-    margin: 0;
-  }
-
-  .badge-left {
-    border-radius: 9px 0px 0px 9px;
-    padding-right: 5px;
-  }
-
-  .badge-right {
-    border-radius: 0px 9px 9px 0px;
-    padding-left: 5px;
-  }
-
-  .trash-filter {
-    cursor: pointer;
-  }
-
-  .move-widget {
-    cursor: move;
-  }
-
-  body.modal-open {
-      overflow: auto!important;
-  }
-
-  .editable-click {
-    cursor: pointer;
-  }
-
-  .CodeMirror {
-    border: 1px dotted #DDDDDD;
-  }
-
-  [contenteditable=true] {
-    border: 1px dotted #DDDDDD;
-    outline: 0;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    min-height: 150px;
-  }
-
-  [contenteditable=true] [class*="span"], .tmpl [class*="span"] {
-    background-color: #eee;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    min-height: 40px;
-    line-height: 40px;
-    background-color: #F3F3F3;
-    border: 2px dashed #DDD;
-  }
-
-  .tmpl {
-    margin: 10px;
-    height: 60px;
-  }
-
-  .tmpl [class*="span"] {
-    color: #999;
-    font-size: 12px;
-    text-align: center;
-    font-weight: bold;
-  }
-
-  .editor-title {
-    font-weight: bold;
-    color: #262626;
-    border-bottom: 1px solid #338bb8;
-  }
-
-  .add-row {
-    background-color: #F6F6F6;
-    min-height: 36px;
-    border: 2px dashed #DDD;
-    text-align: center;
-    padding: 4px;
-    cursor: pointer;
-  }
-
-  .add-row:before {
-    color:#DDD;
-    display: inline-block;
-    font-family: FontAwesome;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 24px;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    content: "\f055";
-  }
-
-  .add-row-highlight {
-    min-height: 10px;
-    background-color:#CCC;
-  }
-
-  .document-details {
-    background-color: #F6F6F6;
-    padding: 10px;
-    border: 1px solid #e5e5e5;
-  }
-
-  .result-row:nth-child(even) {
-    background-color: #F6F6F6;
-  }
-
-  .result-row td {
-    white-space: nowrap;
-  }
-
-  .demi-modal {
-    min-height: 80px;
-  }
-
-  .filter-box {
-    float: left;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    background-color: #F6F6F6;
-    padding: 5px;
-    border:1px solid #d8d8d8;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-  }
-
-  .spinedit-pagination div.spinedit .fa-chevron-up {
-    top: -7px;
-  }
-
-  .spinedit-pagination div.spinedit .fa-chevron-down {
-    top: 7px;
-    left: -4px;
-  }
-
-  .clearable {
-    background: url(/search/static/art/clearField.png) no-repeat right -10px center;
-    border: 1px solid #999;
-    padding: 3px 18px 3px 4px;
-    border-radius: 3px;
-    transition: background 0.4s !important;
-  }
-
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .clearable {
-      background: url(/search/static/art/clearField@2x.png) no-repeat right -10px center;
-      background-size: 10px 10px;
-    }
-  }
-
-  .clearable.x {
-    background-position: right 5px center;
-  }
-
-  .clearable.onX {
-    cursor: pointer !important;
-  }
-
-
-</style>
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
@@ -1771,6 +1391,35 @@ $(document).ready(function () {
     }
   }
 
+  ko.bindingHandlers.augmenthtml = {
+    render: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var _val = ko.unwrap(valueAccessor());
+      var _enc = $("<span>").html(_val);
+      if (_enc.find("style").length > 0){
+        var parser = new less.Parser();
+        $(_enc.find("style")).each(function(cnt, item){
+          var _less = "#result-container {" + $(item).text() + "}";
+          try {
+            parser.parse(_less, function (err, tree) {
+              $(item).text(tree.toCSS());
+            });
+          }
+          catch (e){}
+        });
+        $(element).html(_enc.html());
+      }
+      else {
+        $(element).html(_val);
+      }
+    },
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      ko.bindingHandlers.augmenthtml.render(element, valueAccessor, allBindingsAccessor, viewModel);
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      ko.bindingHandlers.augmenthtml.render(element, valueAccessor, allBindingsAccessor, viewModel);
+    }
+  }
+
   ko.bindingHandlers.clearable = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var _el = $(element);
@@ -1848,23 +1497,7 @@ $(document).ready(function () {
         clearTimeout(sourceDelay);
         var _cm = cm;
         sourceDelay = setTimeout(function () {
-          var _enc = $("<span>").html(_cm.getValue());
-          if (_enc.find("style").length > 0){
-            var parser = new less.Parser();
-            $(_enc.find("style")).each(function(cnt, item){
-              var _less = "#result-container {" + $(item).text() + "}";
-              try {
-                parser.parse(_less, function (err, tree) {
-                  $(item).text(tree.toCSS());
-                });
-              }
-              catch (e){}
-            });
-            valueAccessor().data(_enc.html());
-          }
-          else {
-            valueAccessor().data(_cm.getValue());
-          }
+          valueAccessor().data(_cm.getValue());
           if ($(".widget-html-pill").parent().hasClass("active")){
             $("[contenteditable=true]").html(stripHtmlFromFunctions(valueAccessor().data()));
           }
