@@ -1298,6 +1298,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     background-color: #F6F6F6;
   }
 
+  .result-row td {
+    white-space: nowrap;
+  }
+
   .demi-modal {
     min-height: 80px;
   }
