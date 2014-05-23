@@ -41,7 +41,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username
 
 
 
@@ -320,6 +320,8 @@ def add_ldap_users(request):
       except ldap.LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+      except AssertionError, e:
+        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       if users and form.cleaned_data['ensure_home_directory']:
         for user in users:
@@ -366,6 +368,8 @@ def add_ldap_groups(request):
       except ldap.LDAPError, e:
         LOG.error(_("LDAP Exception: %s") % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+      except AssertionError, e:
+        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       if groups:
         return redirect(reverse(list_groups))
@@ -523,6 +527,9 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
   """
   imported_users = []
   for ldap_info in user_info:
+    # Extra validation in case import by DN and username has spaces or colons
+    validate_username(ldap_info['username'])
+
     user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
     profile = get_profile(user)
     if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
