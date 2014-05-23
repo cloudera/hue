@@ -18,8 +18,9 @@
 
 import json
 import logging
-import urllib
 import numbers
+import urllib
+import re
 
 from datetime import datetime, timedelta
 from math import log
@@ -82,13 +83,13 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       stats_max = stat_facet['max']
       if start is None:
         start = stats_min 
-      start = start.replace('.000', '')
+      start = re.sub('\.\d\d?\d?Z$', 'Z', start)
       start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
       start_ts, _ = _round_date_range(start_ts)
       start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       if end is None:
         end = stats_max
-      end = end.replace('.000', '')
+      end = re.sub('\.\d\d?\d?Z$', 'Z', end)
       end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
       _, end_ts = _round_date_range(end_ts)
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
