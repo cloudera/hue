@@ -1586,6 +1586,10 @@ $(document).ready(function () {
     $(this).parent().addClass("active");
   });
 
+  $(document).on("magicLayout", function(){
+    resizeFieldsList();
+  });
+
   ko.bindingHandlers.slideVisible = {
     init: function (element, valueAccessor) {
       var value = valueAccessor();
@@ -1902,7 +1906,9 @@ $(document).ready(function () {
   viewModel.isEditing.subscribe(function(value){
     if (value){
       window.setTimeout(function(){
-        $(".slider-cnt").slider("redraw");
+        if ($(".slider-cnt").length > 0 && $(".slider-cnt").data("slider")){
+          $(".slider-cnt").slider("redraw");
+        }
       }, 300);
     }
   });

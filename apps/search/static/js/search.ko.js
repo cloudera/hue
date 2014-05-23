@@ -138,6 +138,7 @@ function oneThirdLeftLayout() {
 
 function magicLayout(vm) {
   loadLayout(vm, vm.initial.layout);
+  $(document).trigger("magicLayout");
 }
 
 function setLayout(colSizes) {
