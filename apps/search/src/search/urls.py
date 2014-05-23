@@ -39,7 +39,6 @@ urlpatterns = patterns('search.views',
   url(r'^get_collections$', 'get_collections', name='get_collections'),
   
   # Admin
-  url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
   url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
 

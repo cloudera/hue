@@ -208,33 +208,8 @@ class Sorting(models.Model):
 
 
 class CollectionManager(models.Manager):
-
-  def get_or_create(self, name, solr_properties, is_core_only=False, is_enabled=True, user=None):
-    try:
-      return self.get(name=name), False
-    except Collection.DoesNotExist:
-      facets = Facet.objects.create()
-      result = Result.objects.create()      
-      sorting = Sorting.objects.create()
-      cores = json.dumps(solr_properties)
-
-      collection = Collection.objects.create(
-          name=name,
-          label=name,
-          enabled=is_enabled,
-          cores=cores,
-          is_core_only=is_core_only,
-          facets=facets,
-          result=result,
-          sorting=sorting
-      )
-
-      collection.update_properties({'collection': collection.get_default(user)})
-      collection.save()
-
-      return collection, True      
-
-  def create2(self, name, label):
+ 
+  def create2(self, name, label, is_core_only=False):
     facets = Facet.objects.create()
     result = Result.objects.create()      
     sorting = Sorting.objects.create()
@@ -242,8 +217,8 @@ class CollectionManager(models.Manager):
     collection = Collection.objects.create(
         name=name,
         label=label,
-        cores=json.dumps({}),
-        is_core_only=False,
+        cores=json.dumps({'version': 2}),
+        is_core_only=is_core_only,
         facets=facets,
         result=result,
         sorting=sorting

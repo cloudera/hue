@@ -230,7 +230,6 @@ class SolrApi(BaseSolrApi):
           )
 
     for fq in query['fqs']:
-      print fq
       if fq['type'] == 'field':
         # This does not work if spaces in Solr: 
         # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)

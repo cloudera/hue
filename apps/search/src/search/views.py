@@ -67,7 +67,7 @@ def index(request):
 
 @allow_admin_only
 def new_search(request):
-  collections = SearchController(request.user).get_solr_collection().keys()
+  collections = SearchController(request.user).get_all_indexes()
   if not collections:
     return no_collections(request)
 
@@ -218,66 +218,6 @@ def admin_collections(request, is_redirect=False):
     'existing_hue_collections': existing_hue_collections,
     'is_redirect': is_redirect
   })
-
-
-@allow_admin_only
-def admin_collections_import(request):
-  if request.method == 'POST':
-    searcher = SearchController(request.user)
-    imported = []
-    not_imported = []
-    status = -1
-    message = ""
-    importables = json.loads(request.POST["selected"])
-    for imp in importables:
-      try:
-        searcher.add_new_collection(imp)
-        imported.append(imp['name'])
-      except Exception, e:
-        not_imported.append(imp['name'] + ": " + unicode(str(e), "utf8"))
-
-    if len(imported) == len(importables):
-      status = 0;
-      message = _('Collection(s) or core(s) imported successfully!')
-    elif len(not_imported) == len(importables):
-      status = 2;
-      message = _('There was an error importing the collection(s) or core(s)')
-    else:
-      status = 1;
-      message = _('Collection(s) or core(s) partially imported')
-
-    result = {
-      'status': status,
-      'message': message,
-      'imported': imported,
-      'notImported': not_imported
-    }
-
-    return HttpResponse(json.dumps(result), mimetype="application/json")
-  else:
-    if request.GET.get('format') == 'json':
-      searcher = SearchController(request.user)
-      new_solr_collections = searcher.get_new_collections()
-      massaged_collections = []
-      for coll in new_solr_collections:
-        massaged_collections.append({
-          'type': 'collection',
-          'name': coll
-        })
-      new_solr_cores = searcher.get_new_cores()
-      massaged_cores = []
-      for core in new_solr_cores:
-        massaged_cores.append({
-          'type': 'core',
-          'name': core
-        })
-      response = {
-        'newSolrCollections': list(massaged_collections),
-        'newSolrCores': list(massaged_cores)
-      }
-      return HttpResponse(json.dumps(response), mimetype="application/json")
-    else:
-      return admin_collections(request, True)
 
 
 @allow_admin_only
@@ -516,7 +456,7 @@ def get_collections(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:           
-    result['collection'] = SearchController(request.user).get_solr_collection().keys()
+    result['collection'] = SearchController(request.user).get_all_indexes()
     result['status'] = 0      
 
   except Exception, e:

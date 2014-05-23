@@ -40,44 +40,6 @@ class SearchController(object):
     # TODO perms
     return Collection.objects.filter(enabled=True)
 
-  def get_new_collections(self):
-    try:
-      solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
-      for name in Collection.objects.values_list('name', flat=True):
-        solr_collections.pop(name, None)
-    except Exception, e:
-      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
-      solr_collections = []
-
-    return solr_collections
-
-  def get_new_cores(self):
-    try:
-      solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
-      for name in Collection.objects.values_list('name', flat=True):
-        solr_cores.pop(name, None)
-    except Exception, e:
-      solr_cores = []
-      LOG.warn('No Single core setup on Solr server: %s' % e)
-
-    return solr_cores
-
-  def add_new_collection(self, attrs):
-    if attrs['type'] == 'collection':
-      collections = self.get_new_collections()
-      collection = collections[attrs['name']]
-
-      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=collection, is_enabled=True, user=self.user)
-      return hue_collection
-    elif attrs['type'] == 'core':
-      cores = self.get_new_cores()
-      core = cores[attrs['name']]
-
-      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True, user=self.user)
-      return hue_collection
-    else:
-      raise PopupException(_('Collection type does not exist: %s') % attrs)
-
   def delete_collection(self, collection_id):
     id = collection_id
     try:
@@ -129,3 +91,6 @@ class SearchController(object):
 
   def get_solr_collection(self):
     return SolrApi(SOLR_URL.get(), self.user).collections()
+  
+  def get_all_indexes(self):
+    return self.get_solr_collection().keys() + SolrApi(SOLR_URL.get(), self.user).cores().keys()
