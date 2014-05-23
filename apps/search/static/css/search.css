@@ -500,6 +500,11 @@ body.modal-open {
 
 .result-row td {
   white-space: nowrap;
+  padding: 3px;
+}
+
+#result-container thead tr {
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .demi-modal {

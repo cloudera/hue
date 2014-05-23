@@ -416,7 +416,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
           </a>
           <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
         </div>
-        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px">
+        <div style="margin-bottom: 8px">
+          <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(true)}, style: {'font-weight': $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: $root.collection.template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: $root.collection.template.fields().length"></span>)</a>
+        </div>
+        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
           <a href="javascript: void(0)" class="btn btn-mini"
             data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }"
             style="margin-right: 2px;">
@@ -430,6 +433,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             <span data-bind="text: name"></span>
           </label>
         </div>
+        <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
+          <i class="fa fa-frown-o"></i>
+        </div>
       </span>
     </div>
 
@@ -439,7 +445,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     
       <!-- ko if: $root.response().response -->
-        <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
+        <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }" style="padding: 8px; color: #666"></div>
       <!-- /ko -->
 
       <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">

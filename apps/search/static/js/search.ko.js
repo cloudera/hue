@@ -504,16 +504,22 @@ var Collection = function (vm, collection) {
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
   self.template.filteredModalFields = ko.observableArray();
+  self.template.filteredAttributeFieldsAll = ko.observable(true);
   self.template.filteredAttributeFields = ko.computed(function() {
-	var _fields = [];
+    var _fields = [];
 
-	$.each(self.template.fieldsAttributes(), function (index, field) {
-	  if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
-	    _fields.push(field);
-	  }
-	});
-	    
-	return _fields;	  
+    var _iterable = self.template.fieldsAttributes();
+    if (!self.template.filteredAttributeFieldsAll()){
+      _iterable = self.template.fields();
+    }
+
+    $.each(_iterable, function (index, field) {
+      if (self.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsAttributesFilter().toLowerCase()) > -1){
+        _fields.push(field);
+      }
+    });
+
+    return _fields;
   });
   self.template.availableWidgetFields = ko.computed(function() {
     if (self.template.fieldsModalType() == 'histogram-widget') {
