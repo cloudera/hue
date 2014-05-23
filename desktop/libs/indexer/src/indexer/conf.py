@@ -29,7 +29,7 @@ def solrctl():
   solrctl path
   """
   try:
-    return subprocess.check_output(['which', 'solrctl'])
+    return subprocess.check_output(['which', 'solrctl']).strip()
   except subprocess.CalledProcessError:
     return '/usr/bin/solrctl'
 

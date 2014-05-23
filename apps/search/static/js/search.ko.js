@@ -714,6 +714,12 @@ var Collection = function (vm, collection) {
           facet.properties.start(data.properties.start);
           facet.properties.end(data.properties.end);
           facet.properties.gap(data.properties.gap);
+          
+          var fq = vm.query.getFacetFilter(facet_json.id);
+          if (fq != null) {
+            fq.properties()[0].from(data.properties.start);
+            fq.properties()[0].to(data.properties.end);
+          }
         }
       },
       async: false

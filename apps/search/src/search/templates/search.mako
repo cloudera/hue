@@ -1187,7 +1187,7 @@ $(document).ready(function () {
     }, 200);
   });
 
-  $(document).on("showDoc", function(e, doc){
+  $(document).on("showDoc", function(e, doc) {
     viewModel.collection.selectedDocument(doc);
     var _docDetailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
     var _doc = {
