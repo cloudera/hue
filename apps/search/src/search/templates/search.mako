@@ -503,11 +503,35 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             </tr>
           </thead>
           <tbody data-bind="foreach: { data: $root.results, as: 'documents'}" class="result-tbody">
-            <tr class="result-row" data-bind="attr: {'id': 'doc_' + $data['id']}">
-              <td><a href="javascript:void(0)" data-bind="click: toggleDocDetails"><i class="fa fa-caret-right"></i></a></td>
-              <!-- ko foreach: $data['row'] -->
+            <tr class="result-row">
+              <td>
+                <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
+                  <i class="fa" data-bind="css: {'fa-caret-right' : ! showDetails(), 'fa-caret-down' : showDetails() }"></i>
+                </a>
+              </td>
+              <!-- ko foreach: row -->
                 <td data-bind="html: $data"></td>
               <!-- /ko -->
+            </tr>
+            <tr data-bind="visible: showDetails">                        
+              <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">              
+                <!-- ko if: $data.details().length == 0 -->
+                 <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+                 <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                <!-- /ko -->
+                <!-- ko if: $data.details().length > 0 -->                  
+				  <div class="document-details">
+				    <table>
+				      <tbody data-bind="foreach: details">
+				        <tr>
+				          <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th> 
+				          <td width="100%" data-bind="text: value"></td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>                    
+                <!-- /ko -->
+              </td>
             </tr>
           </tbody>
         </table>
@@ -916,25 +940,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   </div>
 </div>
 
-<div id="genericLoader" style="display: none">
-<!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-<!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
-</div>
-
-<script id="document-details" type="x-tmpl-mustache">
-<div class="document-details">
-  <table>
-    <tbody>
-      {{#properties}}
-      <tr>
-        <th style="text-align: left; white-space: nobreak; vertical-align:top">{{key}}</th>
-        <td width="100%">{{value}}</td>
-      </tr>
-      {{/properties}}
-    </tbody>
-  </table>
-  </div>
-</script>
 
 ## Extra code for style and custom JS
 <span id="extra" data-bind="augmenthtml: $root.collection.template.extracode"></span>
@@ -1149,27 +1154,11 @@ function mapChartDataTransformer(data) {
   return _data;
 }
 
-function toggleDocDetails(doc){
-  var _docRow = $("#doc_" + doc[viewModel.collection.idField()]);
-  if (_docRow.data("expanded") != null && _docRow.data("expanded")){
-    $("#doc_" + doc[viewModel.collection.idField()] + "_details").parent().hide();
-    _docRow.find(".fa-caret-down").removeClass("fa-caret-down").addClass("fa-caret-right");
-    _docRow.data("expanded", false);
-  }
-  else {
-    _docRow.data("expanded", true);
-    var _detailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
-    if (_detailsRow.length > 0){
-      _detailsRow.parent().show();
-    }
-    else {
-      var _newRow = $("<tr>");
-      var _newCell = $("<td>").attr("colspan", _docRow.find("td").length).attr("id", "doc_" + doc[viewModel.collection.idField()] + "_details").html($("#genericLoader").html());
-      _newCell.appendTo(_newRow);
-      _newRow.insertAfter(_docRow);
-      viewModel.getDocument(doc);
-    }
-    _docRow.find(".fa-caret-right").removeClass("fa-caret-right").addClass("fa-caret-down");
+function toggleDocDetails(doc) {  
+  doc.showDetails(! doc.showDetails());
+  
+  if (doc.details().length == 0) {
+    viewModel.getDocument(doc);
   }
 }
 
@@ -1185,24 +1174,6 @@ $(document).ready(function () {
     window.setTimeout(function(){
       resizeFieldsList();
     }, 200);
-  });
-
-  $(document).on("showDoc", function(e, doc) {
-    viewModel.collection.selectedDocument(doc);
-    var _docDetailsRow = $("#doc_" + doc[viewModel.collection.idField()] + "_details");
-    var _doc = {
-      properties: []
-    };
-    for (var i=0; i< Object.keys(doc).length; i++){
-      _doc.properties.push({
-        key: Object.keys(doc)[i],
-        value: doc[Object.keys(doc)[i]]
-      });
-    }
-    var template = $("#document-details").html();
-    Mustache.parse(template);
-    var rendered = Mustache.render(template, _doc);
-    _docDetailsRow.html(rendered);
   });
 
   $(document).on("click", ".widget-settings-pill", function(){

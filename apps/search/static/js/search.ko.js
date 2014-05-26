@@ -967,7 +967,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               } else {
                 row.push(ko.mapping.toJSON(item)); 
               }
-              var doc = {'id': item[self.collection.idField()], 'row': row};
+              var doc = {
+            	  'id': item[self.collection.idField()],
+            	  'row': row,
+            	  'showDetails': ko.observable(item.showDetails),
+            	  'details': ko.observableArray(item.details),
+              };
               self.results.push(doc);
             });
           }
@@ -1041,9 +1046,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     $.post("/search/get_document", {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
-    },function (data) {
+    }, function (data) {
       if (data.status == 0) {
-        $(document).trigger("showDoc", data.doc.doc);
+	    $.each(data.doc.doc, function(key, val) {
+	      doc['details'].push(ko.mapping.fromJS({
+		      key: key,
+		      value: val
+		  }));	    		    	
+	    });
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
@@ -1056,11 +1066,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };  
   
+
   self.save = function () {
     $.post("/search/save", {
       collection: ko.mapping.toJSON(self.collection),
       layout: ko.mapping.toJSON(self.columns)
-    },function (data) {
+    }, function (data) {
       if (data.status == 0) {
         self.collection.id = data.id;
         $(document).trigger("info", data.message);
