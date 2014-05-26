@@ -222,6 +222,8 @@
   font-size: 12px !important;
   font-weight: bold !important;
   line-height: 24px !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
 }
 
 .card-widget .card-body {
@@ -363,14 +365,6 @@
 em {
   font-weight: bold;
   background-color: yellow;
-}
-
-.nvd3 .nv-brush .extent {
-  fill-opacity: .225 !important;
-}
-
-.nvd3 .nv-legend .disabled rect {
-  fill-opacity: 0;
 }
 
 .fields-chooser li {

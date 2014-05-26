@@ -698,6 +698,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </span>
 
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
+      fqs: $root.query.fqs,
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
@@ -726,6 +727,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
+      fqs: $root.query.fqs,
       transformer: barChartDataTransformer,
       onStateChange: function(state){ console.log(state); },
       onClick: function(d) {
@@ -947,6 +949,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
 <link rel="stylesheet" href="/static/css/bootstrap-slider.css">
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
+<link rel="stylesheet" href="/search/static/css/nv.d3.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
