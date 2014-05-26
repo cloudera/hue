@@ -1446,7 +1446,7 @@ $(document).ready(function () {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var _el = $(element);
       function tog(v) {
-        return v ? 'addClass' : 'removeClass';
+        return v ? "addClass" : "removeClass";
       }
       _el.addClass("clearable");
       _el.on("input",function () {
@@ -1454,9 +1454,11 @@ $(document).ready(function () {
         valueAccessor()(_el.val());
       }).on("mousemove", function (e) {
         _el[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
-      }).on("click", function () {
-        _el.removeClass("x onX").val("");
-        valueAccessor()("");
+      }).on("click", function (e) {
+        if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left){
+          _el.removeClass("x onX").val("");
+          valueAccessor()("");
+        }
       });
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
