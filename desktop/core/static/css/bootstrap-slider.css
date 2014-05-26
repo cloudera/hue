@@ -146,3 +146,7 @@
   opacity: 1;
   filter: alpha(opacity=100);
 }
+
+.slider .tooltip {
+  z-index: 10;
+}
