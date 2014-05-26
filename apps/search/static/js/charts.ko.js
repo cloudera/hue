@@ -65,6 +65,7 @@ ko.bindingHandlers.pieChart = {
       }, function () {
         d3.selectAll(".nv-slice").on('click',
           function (d, i) {
+            chartsUpdatingState();
             _options.onClick(d);
           });
       });
@@ -174,6 +175,7 @@ ko.bindingHandlers.mapChart = {
         data: mapData,
         onClick: function(data) {
           if (typeof options.onClick != "undefined") {
+            chartsUpdatingState();
             options.onClick(data);
           }
         },
@@ -245,7 +247,10 @@ function lineChart(element, options) {
     if (_datum.length > 0 && _datum[0].values.length > 10){
       _chart.enableSelection();
     }
-    _chart.onSelectRange(options.onSelectRange);
+    _chart.onSelectRange(function(from, to){
+      chartsUpdatingState();
+      options.onSelectRange(from, to);
+    });
     _chart.xAxis.showMaxMin(false);
 
     _chart.yAxis
@@ -261,8 +266,9 @@ function lineChart(element, options) {
 
     return _chart;
   }, function () {
-    d3.selectAll(".nv-bar").on('click',
+    d3.selectAll(".nv-line").on('click',
       function (d, i) {
+        chartsUpdatingState();
         options.onClick(d);
       });
   });
@@ -297,7 +303,10 @@ function barChart(element, options, isTimeline) {
       if (_datum.length > 0 && _datum[0].values.length > 10){
         _chart.enableSelection();
       }
-      _chart.onSelectRange(options.onSelectRange);
+      _chart.onSelectRange(function(from, to){
+        chartsUpdatingState();
+        options.onSelectRange(from, to);
+      });
       _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
       _chart.multibar.hideable(true);
       _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
@@ -331,7 +340,10 @@ function barChart(element, options, isTimeline) {
         _chart.multibar.hideable(true);
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
         _chart.onStateChange(options.onStateChange);
-        _chart.onSelectRange(options.onSelectRange);
+        _chart.onSelectRange(function(from, to){
+          chartsUpdatingState();
+          options.onSelectRange(from, to);
+        });
       }
     }
     _chart.transitionDuration(0);
@@ -355,8 +367,13 @@ function barChart(element, options, isTimeline) {
   }, function () {
     d3.selectAll(".nv-bar").on("click",
       function (d, i) {
+        chartsUpdatingState();
         options.onClick(d);
       });
   });
 
+}
+
+function chartsUpdatingState() {
+  $(document).find("svg").css("opacity", "0.5");
 }

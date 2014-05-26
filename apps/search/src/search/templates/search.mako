@@ -807,7 +807,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <!-- ko if: $data.type() == 'field' -->
     <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
       <strong>${_('field')}</strong>:
       <span data-bind="text: $data.field"></span>
       <br/>
@@ -817,7 +817,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
     <!-- ko if: $data.type() == 'range' -->
     <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
       <strong>${_('field')}</strong>:
       <span data-bind="text: $data.field"></span>
       <br/>
