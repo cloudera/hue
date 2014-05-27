@@ -43,7 +43,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
       &nbsp;
       &nbsp;
-      <a class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>      
+      <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>      
     </%def>
 
     <%def name="creation()">    
@@ -54,9 +54,9 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     <div class="span10 offset1 center importBtn" style="cursor: pointer">
       <i class="fa fa-plus-circle waiting"></i>
       <h1 class="emptyMessage">
-        ${ _('There are currently no collections defined.') }<br/>
+        ${ _('There are currently no dashboards defined.') }<br/>
         <a class="btn importBtn" href="${ url('search:new_search') }">
-          <i class="fa fa-file-o"></i> ${ _('Dashboard') }
+          <i class="fa fa-plus-circle"></i> ${ _('Dashboard') }
         </a> 
       </h1>
     </div>
