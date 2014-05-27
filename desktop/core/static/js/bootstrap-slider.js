@@ -93,7 +93,7 @@
 
     this.picker
       .addClass("slider-horizontal")
-    this.picker.width(Math.min(this.element.parents(".card-widget").innerWidth() - 30, 250));
+    this.picker.width(Math.min(this.element.parents(".card-widget").innerWidth() - 60, 250));
     this.stylePos = "left";
     this.mousePos = "pageX";
     this.sizePos = "offsetWidth";
@@ -296,7 +296,7 @@
     layout: function () {
       var positionPercentages;
 
-      this.picker.width(Math.min(this.element.parents(".card-widget").innerWidth() - 30, 250));
+      this.picker.width(Math.min(this.element.parents(".card-widget").innerWidth() - 60, 250));
       this.size = this.picker[0][this.sizePos];
 
       if (this.reversed) {
