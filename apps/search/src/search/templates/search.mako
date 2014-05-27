@@ -903,16 +903,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <div style="float: left; margin-right: 10px;text-align: center">
+    <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
       <!-- ko if: $root.initial.inited() -->
       ${ _('Solr index') }
-      <select data-bind="options: $root.initial.collections, value: $root.collection.name">
-      </select>        
+      <select data-bind="options: $root.initial.collections, value: $root.collection.name" style="margin-bottom: 0">
+      </select>
       <!-- /ko -->
     </div>
-    <div>
+    <label class="checkbox" style="margin-top: 4px">
       ${ _('Visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled"/>
-    </div>
+    </label>
   </div>
 </div>
 
