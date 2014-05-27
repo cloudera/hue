@@ -136,7 +136,9 @@
 
 
     var self = this;
-    $.each(["min",
+    $.each([
+      "type",
+      "min",
       "max",
       "step",
       "precision",
@@ -148,11 +150,14 @@
     ], function (i, attr) {
       if (typeof el.data("slider-" + attr) !== "undefined") {
         self[attr] = el.data("slider-" + attr);
-      } else if (typeof options[attr] !== "undefined") {
+      }
+      else if (typeof options[attr] !== "undefined") {
         self[attr] = options[attr];
-      } else if (typeof el.prop(attr) !== "undefined") {
+      }
+      else if (typeof el.prop(attr) !== "undefined") {
         self[attr] = el.prop(attr);
-      } else {
+      }
+      else {
         self[attr] = 0; // to prevent empty string issues in calculations in IE
       }
     });
@@ -195,6 +200,10 @@
     this.offset = this.picker.offset();
     this.size = this.picker[0][this.sizePos];
     this.formatter = options.formatter;
+    this.stepFormatter = options.stepFormatter;
+
+    this.reverseFormatter = options.reverseFormatter;
+    this.reverseStepFormatter = options.reverseStepFormatter;
 
     this.tooltip_separator = options.tooltip_separator;
     this.tooltip_split = options.tooltip_split;
@@ -223,10 +232,12 @@
       this.tooltip.addClass("hide");
       this.tooltip_start.addClass("hide");
       this.tooltip_end.addClass("hide");
-    } else if (tooltip === "always") {
+    }
+    else if (tooltip === "always") {
       this.showTooltip();
       this.alwaysShowTooltip = true;
-    } else {
+    }
+    else {
       this.picker.on({
         mouseenter: $.proxy(this.showTooltip, this),
         mouseleave: $.proxy(this.hideTooltip, this)
@@ -241,11 +252,11 @@
       });
     }
 
-    this.enabled = options.enabled &&
-      (this.element.data("slider-enabled") === undefined || this.element.data("slider-enabled") === true);
+    this.enabled = options.enabled && (this.element.data("slider-enabled") === undefined || this.element.data("slider-enabled") === true);
     if (this.enabled) {
       this.enable();
-    } else {
+    }
+    else {
       this.disable();
     }
     this.natural_arrow_keys = this.element.data("slider-natural_arrow_keys") || options.natural_arrow_keys;
@@ -270,7 +281,8 @@
     showTooltip: function () {
       if (this.tooltip_split === false) {
         this.tooltip.addClass("in");
-      } else {
+      }
+      else {
         this.tooltip_start.addClass("in");
         this.tooltip_end.addClass("in");
         this.tooltip_min.addClass("in");
@@ -301,7 +313,8 @@
 
       if (this.reversed) {
         positionPercentages = [ 100 - this.percentage[0], this.percentage[1] ];
-      } else {
+      }
+      else {
         positionPercentages = [ this.percentage[0], this.percentage[1] ];
       }
 
@@ -335,7 +348,7 @@
           this.formatter(this.max)
         );
         this.tooltipInner_step.val(
-          this.formatter(this.step)
+          this.stepFormatter(this.step)
         );
 
         this.tooltip_start[0].style[this.stylePos] = this.size * ( (positionPercentages[0]) / 100) - (this.tooltip_start.outerWidth() / 2) + "px";
@@ -345,7 +358,8 @@
         this.tooltip_max[0].style[this.stylePos] = this.size - (this.tooltip_max.outerWidth() / 2) + "px";
         this.tooltip_step[0].style[this.stylePos] = this.size/2 - (this.tooltip_max.outerWidth() / 2) + "px";
 
-      } else {
+      }
+      else {
         this.tooltipInner.val(
           this.formatter(this.value[0])
         );
@@ -354,8 +368,8 @@
     },
 
     blur: function (idx, ev) {
-      this.value[0] = this.tooltipInner_start.val()*1;
-      this.value[1] = this.tooltipInner_end.val()*1;
+      this.value[0] = this.reverseFormatter(this.tooltipInner_start.val());
+      this.value[1] = this.reverseFormatter(this.tooltipInner_end.val());
       this.setAdditionalValues();
       this.setValue(this.value, true);
     },
@@ -391,7 +405,8 @@
         var diff1 = Math.abs(this.percentage[0] - percentage);
         var diff2 = Math.abs(this.percentage[1] - percentage);
         this.dragged = (diff1 < diff2) ? 0 : 1;
-      } else {
+      }
+      else {
         this.dragged = 0;
       }
 
@@ -473,7 +488,8 @@
 
       if (percentage > 100) {
         percentage = 100;
-      } else if (percentage < 0) {
+      }
+      else if (percentage < 0) {
         percentage = 0;
       }
 
@@ -529,7 +545,8 @@
         if (this.dragged === 0 && this.percentage[1] < percentage) {
           this.percentage[0] = this.percentage[1];
           this.dragged = 1;
-        } else if (this.dragged === 1 && this.percentage[0] > percentage) {
+        }
+        else if (this.dragged === 1 && this.percentage[0] > percentage) {
           this.percentage[1] = this.percentage[0];
           this.dragged = 0;
         }
@@ -582,7 +599,8 @@
           val[1] = this.applyPrecision(val[1]);
         }
         this.value = val;
-      } else {
+      }
+      else {
         val = (this.min + Math.round((this.diff * this.percentage[0] / 100) / this.step) * this.step);
         if (val < this.min) {
           val = this.min;
@@ -634,11 +652,11 @@
     },
 
     setAdditionalValues: function() {
-      this.min = this.tooltipInner_min.val()*1;
-      this.max = this.tooltipInner_max.val()*1;
-      this.start = this.tooltipInner_start.val()*1;
-      this.end = this.tooltipInner_end.val()*1;
-      this.step = this.tooltipInner_step.val()*1;
+      this.min = this.reverseFormatter(this.tooltipInner_min.val());
+      this.max = this.reverseFormatter(this.tooltipInner_max.val());
+      this.start = this.reverseFormatter(this.tooltipInner_start.val());
+      this.end = this.reverseFormatter(this.tooltipInner_end.val());
+      this.step = this.reverseStepFormatter(this.tooltipInner_step.val());
     },
 
     setValue: function (val, triggerSlideEvent) {
@@ -653,13 +671,15 @@
 
         this.value[0] = Math.max(this.min, Math.min(this.max, this.value[0]));
         this.value[1] = Math.max(this.min, Math.min(this.max, this.value[1]));
-      } else {
+      }
+      else {
         this.value = this.applyPrecision(this.value);
         this.value = [ Math.max(this.min, Math.min(this.max, this.value))];
         this.handle2.addClass("hide");
         if (this.selection === "after") {
           this.value[1] = this.max;
-        } else {
+        }
+        else {
           this.value[1] = this.min;
         }
       }
@@ -671,7 +691,8 @@
           (this.value[1] - this.min) * 100 / this.diff,
           this.step * 100 / this.diff
         ];
-      } else {
+      }
+      else {
         this.percentage = [0, 0, 100];
       }
 
@@ -698,14 +719,16 @@
     validateInputValue: function (val) {
       if (typeof val === "number") {
         return val;
-      } else if (val instanceof Array) {
+      }
+      else if (val instanceof Array) {
         $.each(val, function (i, input) {
           if (typeof input !== "number") {
             throw new Error(ErrorMsgs.formatInvalidInputErrorMsg(input));
           }
         });
         return val;
-      } else {
+      }
+      else {
         throw new Error(ErrorMsgs.formatInvalidInputErrorMsg(val));
       }
     },
@@ -737,7 +760,8 @@
     toggle: function () {
       if (this.enabled) {
         this.disable();
-      } else {
+      }
+      else {
         this.enable();
       }
     },
@@ -773,7 +797,8 @@
     if (typeof option === "string" && option !== "refresh") {
       var args = Array.prototype.slice.call(arguments, 1);
       return invokePublicMethod.call(this, option, args);
-    } else {
+    }
+    else {
       return createNewSliderInstance.call(this, option);
     }
   };
@@ -785,10 +810,12 @@
 
       if (typeof result === "undefined") {
         return $(this);
-      } else {
+      }
+      else {
         return result;
       }
-    } else {
+    }
+    else {
       throw new Error("method '" + methodName + "()' does not exist for slider.");
     }
   }
@@ -797,7 +824,8 @@
     var sliderObject = $(element).data("slider");
     if (sliderObject && sliderObject instanceof Slider) {
       return sliderObject;
-    } else {
+    }
+    else {
       throw new Error(ErrorMsgs.callingContextNotSliderInstance);
     }
   }
@@ -825,6 +853,7 @@
   }
 
   $.fn.slider.defaults = {
+    type: "number",
     min: 0,
     max: 10,
     step: 1,
@@ -841,6 +870,15 @@
     enabled: true,
     formatter: function (value) {
       return value;
+    },
+    stepFormatter: function (value) {
+      return value;
+    },
+    reverseFormatter: function (value) {
+      return value*1;
+    },
+    reverseStepFormatter: function (value) {
+      return value*1;
     }
   };
 

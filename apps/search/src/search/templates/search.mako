@@ -311,7 +311,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
       <!-- ko ifnot: properties.isDate() -->    
-        <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max, handle: 'triangle'}"></div>
+        <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
         ${ _('Start') }:
