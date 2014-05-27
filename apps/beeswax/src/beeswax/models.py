@@ -270,6 +270,10 @@ class SavedQuery(models.Model):
     design.data = data
     design.is_auto = True
     design.save()
+
+    Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
+    design.doc.get().add_to_history()    
+    
     return design
 
   @staticmethod
