@@ -1440,6 +1440,13 @@ a#advanced-btn:hover {
   padding-top: 6px;
 }
 
+.navigator li.dropdown .fa {
+  color: #267CC3;
+  font-size: 19px;
+  padding-left: 5px;
+  padding-right: 8px;
+}
+
 .navigator .dropdown-menu > li > a {
   padding-left: 5px;
   padding-right: 30px;

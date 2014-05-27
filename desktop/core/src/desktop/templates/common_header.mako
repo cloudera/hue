@@ -402,10 +402,14 @@ from django.utils.translation import ugettext as _
                % for collection in collections:
                <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ collection.icon }"/> ${ collection.label }</a></li>
                % endfor
+               % if user.is_superuser:
+                 <li class="divider"></li>
+                 <li><a href="${ url('indexer:collections') }"><i class="fa fa-database"></i> ${ _('Indexes') }</a></li>
+               % endif
              </ul>
            </li>
          % endif
-       % endif     
+       % endif
        % if other_apps:
        <li class="dropdown">
          <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
