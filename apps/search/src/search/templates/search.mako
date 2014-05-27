@@ -321,7 +321,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
-      ${ _('Limit') }: <input type="text" class="input-medium" data-bind="value: properties.limit" />
+      ${ _('Limit') }: <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
     <!-- /ko -->
 
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
