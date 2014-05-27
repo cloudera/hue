@@ -27,7 +27,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="search-bar" style="height: 30px">
-    <div class="pull-right" style="margin-top: 4px; margin-right: 20px">    
+    <div class="pull-right" style="margin-right: 20px">
     <a class="btn importBtn" href="${ url('indexer:collections') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>

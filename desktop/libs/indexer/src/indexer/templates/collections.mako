@@ -57,16 +57,13 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 
 <div class="search-bar" style="height: 30px">  
-  <div>
-    <div class="pull-right" style="padding-right:50px">  
-      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-tags"></i> ${ _('Dashboards') }
-      </a>
-    </div>  
-    <h4><a href="#manage">${_('Solr Indexer')}</a></h4>
+  <div class="pull-right" style="margin-right: 20px">
+    <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-tags"></i> ${ _('Dashboards') }
+    </a>
   </div>
+  <h4><a href="#manage">${_('Solr Indexer')}</a></h4>
 </div>
-
 
 <div class="container-fluid">
   <div class="row-fluid" data-bind="visible: isLoading()">
