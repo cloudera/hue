@@ -878,7 +878,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         maxWidth: 750,
         isScale: true,
         onClick: function(d){ viewModel.query.toggleFacet({facet: d, widget_id: $parent.id}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id); if (widget != null) {widget.isLoading(false)};} }" />
     </div>
   </div>
   <!-- /ko -->
