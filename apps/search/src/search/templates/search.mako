@@ -472,7 +472,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div id="result-main" style="overflow-x: auto">
         <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0; width: 100%">
           <thead>
-            <tr data-bind="visible: $root.results().length > 0">
+            <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0">
               <th style="width: 18px">&nbsp;</th>
               <!-- ko foreach: $root.collection.template.fieldsSelected -->
               <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">

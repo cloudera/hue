@@ -736,8 +736,6 @@ var Collection = function (vm, collection) {
     } else {
       self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
     }
-  
-    vm.search();
   };
   
   self.upDownFacetLimit = function (facet_id, direction) {
