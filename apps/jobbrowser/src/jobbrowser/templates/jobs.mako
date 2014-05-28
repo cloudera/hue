@@ -110,7 +110,7 @@ ${ components.menubar() }
       "bAutoWidth": false,
       "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "aaSorting": [
-        [1, "desc"]
+        [10, "desc"]
       ],
       "bProcessing": true,
       "bDeferRender": true,
