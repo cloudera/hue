@@ -92,11 +92,11 @@ class Command(NoArgsCommand):
 
       # Put in HDFS
       with open(path) as fh:
-        if self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.exists, hdfs_path):
+        if self.fs.do_as_user(self.user.username, self.fs.exists, hdfs_path):
           overwrite = True
         else:
           overwrite = False
-        self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.create, hdfs_path, data=fh.read(), overwrite=overwrite)
+        self.fs.do_as_user(self.user.username, self.fs.create, hdfs_path, data=fh.read(), overwrite=overwrite)
 
       # Index data
       self.searcher.update_data_from_hdfs(self.fs,
@@ -112,8 +112,8 @@ class Command(NoArgsCommand):
       raise
     finally:
       # Remove HDFS file
-      if self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.exists, hdfs_path):
-        self.fs.remove(hdfs_path, skip_trash=True)
+      if self.fs.do_as_user(self.user.username, self.fs.exists, hdfs_path):
+        self.fs.do_as_user(self.user.username, self.fs.remove, hdfs_path, skip_trash=True)
 
   def _parse_fields(self, path, separator=',', quote_character='"', fieldtypes={}):
     with open(path) as fh:

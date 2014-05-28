@@ -157,9 +157,9 @@ class TestWithMockedSolr(TestSearchBase):
     })
     csv_response_content = csv_response.content
     assert_equal('application/csv', csv_response['Content-Type'])
-    assert_equal(7434, len(csv_response_content))
-    assert_true('article_title,journal_issn,author,language,journal_title,journal_country,article_pagination,ontologies,affiliation,date_created,article_date,journal_iso_abbreviation,journal_publication_date,_version_,article_abstract_text,id' in csv_response_content, csv_response_content)
-    assert_true("""Interference of bacterial cell-to-cell communication: a new concept of antimicrobial chemotherapy breaks antibiotic resistance.,1664-302X,"[u&#39;Hidetada H Hirakawa&#39;, u&#39;Haruyoshi H Tomita&#39;]",eng,Frontiers in microbiology,Switzerland,114,"[u&#39;2402|1 &#39;, u&#39;1875|1 &#39;""" in csv_response_content, csv_response_content)
+    assert_equal(7490, len(csv_response_content))
+    assert_true('article_title,showDetails,journal_issn,author,language,journal_title,journal_country,article_pagination,ontologies,affiliation,date_created,article_date,journal_iso_abbreviation,journal_publication_date,_version_,article_abstract_text,id,details' in csv_response_content, csv_response_content)
+    assert_true("""Investigations for neonatal seizures.,False,1878-0946,"[u&#39;B B Hallberg&#39;, u&#39;M M Blennow&#39;]",""" in csv_response_content, csv_response_content)
 
     xls_response = self.c.post(reverse('search:download'), {
         'xls': True,

@@ -318,6 +318,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <br/>
       <!-- /ko -->
     <!-- /ko -->
+
     <!-- ko if: type() == 'field' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
@@ -326,10 +327,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     <!-- /ko -->
 
-    <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
+    <a href="javascript: void(0)" title="${ _('Toggle range or field facet') }" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
       <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
     </a>
-    <a href="javascript: void(0)" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
+    <a href="javascript: void(0)" title="${ _('Toggle sort order') }" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
       <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
     </a>
 </script>
@@ -708,7 +709,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>
 
-    <div style="padding-bottom: 10px; text-align: center">
+    <div style="padding-bottom: 10px; text-align: left">
       <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
       <span class="facet-field-label">${ _('Group by') }</span>
       <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq"></select>
