@@ -11,15 +11,11 @@ individual users.
 
 This guide describes how to install and configure a Hue tarball. For
 information about installing Hue packages, see
-https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation[Installing Hue].
+http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/CDH5-Installation-Guide/cdh5ig_cdh_hue_configure.html[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
 link:sdk/sdk.html[Hue SDK Documentation]
-
-IMPORTANT: Hue requires the Hadoop contained in
-https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide[Cloudera's
-Distribution including Apache Hadoop (CDH4)]
 
 .Conventions Used in this Guide:
 * Commands that must be run with +root+ permission have a +#+ command prompt.
@@ -30,8 +26,8 @@ Hue Installation Instructions
 -----------------------------
 
 The following instructions describe how to install the Hue tarball on a
-multi-node cluster. You need to also install CDH and update some
-Hadoop configuration files before running Hue.
+multi-node cluster. You need to also install Hadoop and its satellite components
+(Oozie, Hive...) and update some Hadoop configuration files before running Hue.
 
 
 Install Hue
@@ -122,27 +118,30 @@ of various Python libraries and you don't have to be concerned about missing
 software components.
 
 
-Install Hadoop from CDH
-~~~~~~~~~~~~~~~~~~~~~~~
+Install Hadoop
+-~~~~~~~~~~~~~
 
-To use Hue, you must install and run Hadoop from CDH4 or later.  If you
-are not running this version of CDH or later, upgrade your cluster before
-proceeding.
+Depending on which apps you need, you need to make sure that some Hadoop services
+are already setup (that way Hue can talk to them).  
 
-.Dependency on CDH Components
+.Dependency
 [grid="rows"]
-`-------------.----------.----------------------------------.------------------------
-  Component   Required   Applications                       Notes
--------------------------------------------------------------------------------------
-  HDFS        Yes        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
-  MR1         No         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
-  Yarn        No         JobDesigner, Beeswax               Transitive dependency via Hive or Oozie
-  Oozie       No         JobDesigner, Oozie                 Oozie access through REST API
-  Hive        No         Beeswax                            Beeswax uses the Hive client libraries
-  HBase       No         HBase Browser                      Requires Thrift 1 service
-  Pig         No         Pig Editor                         Requires Oozie
-  Sqoop2      No         Sqoop Editor                       Requires Sqoop2 server
--------------------------------------------------------------------------------------
+`-----------------------------------------------.------------------------
+  Component      Applications                       Notes
+-------------------------------------------------------------------------
+  HDFS        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
+  MR1         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
+  MR2/YARN    JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
+  Oozie       JobDesigner, Oozie                 Oozie access through REST API
+  Hive        Beeswax                            Requires HiveServer2
+  HBase       HBase Browser                      Requires Thrift 1 service
+  Pig         Pig Editor                         Requires Oozie
+  Sqoop2      Sqoop Editor                       Requires Sqoop2 server
+  Search      Search                             Requires Solr server
+  Impala      Impala Editor                      Requires an Impalad
+  ZooKeeper   ZooKeeper Browser                  Requires ZooKeeper server and REST server
+  Spark       Spark Editor                       Requires Spark Jobserver
+--------------------------------------------------------------------------------------
 
 
 Hadoop Configuration
@@ -187,6 +186,12 @@ Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
     </property>
 
 
+Configure MapReduce 0.23+ (MR2)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Hue is using only standard Hadoop APIs.
+
+
 Configure MapReduce 0.20 (MR1)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -194,7 +199,6 @@ Hue communicates with the JobTracker via the Hue plugins, which is a jar
 file that you place in your MapReduce `lib` directory.
 
 If you JobTracker and Hue are located on the same host, copy it over.
-If you are using CDH3, your MapReduce library directory might be in `/usr/lib/hadoop/lib`.
 
     $ cd /usr/share/hue
     $ cp desktop/libs/hadoop/java-lib/hue-plugins-*.jar /usr/lib/hadoop-0.20-mapreduce/lib
@@ -314,23 +318,6 @@ system) must be world-writable (1777), as Hive makes extensive use of it.
 
 [NOTE]
 
-
-No Existing Hive Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Familiarize yourself with the configuration options in
-`hive-site.xml`. See
-https://ccp.cloudera.com/display/CDH4DOC/Hive+Installation#HiveInstallation-ConfiguringtheHiveMetastore[Hive
-Installation and Configuration].
-Having a `hive-site.xml` is optional but often useful, particularly on setting
-up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
-You may store the `hive-site.xml` in `/etc/hue`, or instruct
-Beeswax to locate it using the `hive_conf_dir` configuration variable. See
-`hue.ini`.
-
-Existing Hive Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 In `hue.ini`, modify `hive_conf_dir` to point to the
 directory containing `hive-site.xml`.
 
@@ -341,7 +328,7 @@ Configuring Hue
 Hue ships with a default configuration that will work for
 pseudo-distributed clusters.  If you are running on a real cluster, you must
 make a few changes to the `hue.ini` configuration file (`/etc/hue/hue.ini` when installed from the
-CDH package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
+package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
 The following sections describe the key configuration options you must make to configure Hue.
 
 
@@ -504,22 +491,6 @@ submit_to::
   If your Oozie is configured with to talk to a 0.20 MapReduce service, then
   set this to `true`. Hue will be submitting jobs to this MapReduce cluster.
 
-hadoop_mapred_home::
-  This is the home of your Hadoop MapReduce installation. It is the
-  root of the Hadoop MR1 untarred directory, or the root of the
-  Hadoop 0.20 untarred directory, or `/usr/lib/hadoop-0.20-mapreduce` for
-  CDH packages. If `submit_to` is true for this cluster, this
-  config value becomes the `$HADOOP_MAPRED_HOME` for
-  BeeswaxServer and child shell processes.
-
-hadoop_bin::
-  Use this as the MR1 Hadoop launcher script, which is usually
-  `/usr/bin/hadoop`.
-
-hadoop_conf_dir::
-  This is the configuration directory of the MR1 service,
-  typically `/etc/hadoop/conf`.
-
 
 Yarn (MR2) Cluster
 ^^^^^^^^^^^^^^^^^^
@@ -537,22 +508,6 @@ submit_to::
   If your Oozie is configured with to talk to a Yarn cluster, then
   set this to `true`. Hue will be submitting jobs to this Yarn cluster.
   But note that JobBrowser will not be able to show MR2 jobs.
-
-hadoop_mapred_home::
-  This is the home of your Hadoop MapReduce installation. It is the
-  root of the Hadoop 0.23 untarred directory, or
-  `/usr/lib/hadoop-mapreduce` for CDH packages. If `submit_to` is
-  true for this cluster, this config value becomes the
-  `$HADOOP_MAPRED_HOME` for BeeswaxServer and child shell
-  processes.
-
-hadoop_bin::
-  Use this as the Yarn/MR2 Hadoop launcher script, which is usually
-  `/usr/bin/hadoop`.
-
-hadoop_conf_dir::
-  This is the configuration directory of the Yarn/MR2 service,
-  typically `/etc/hadoop/conf`.
 
 
 Beeswax Configuration

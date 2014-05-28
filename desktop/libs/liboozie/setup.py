@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "liboozie",
-      version = "3.5.0",
+      version = "3.6.0",
       url = 'http://github.com/cloudera/hue',
       description = "Oozie Libraries",
       packages = find_packages('src'),

@@ -26,8 +26,6 @@ By building on top of Hue SDK, you get, out of the box:
 This document will orient you with the general structure of Hue
 and will walk you through adding a new application using the SDK.
 
-NOTE: Hue began its life as "Cloudera Desktop," so you may find
-references to "Desktop" in a few places.
 
 From 30,000 feet
 ----------------
@@ -113,9 +111,9 @@ Software
 --------
 
 Developing for the Hue SDK has similar requirements to running
-Hue itself.  We require python (2.4 to 2.7), Django (1.2 included
-with our distribution), Hadoop (Cloudera's Distribution including Apache Hadoop,
-at least version 4), Java (Sun Java 1.6), and Firefox (at least 3.0).
+Hue itself.  We require python (2.6 to 2.7), Django (1.4 included
+with our distribution), Hadoop (Apache Hadoop 1.2+), Java (Sun Java 1.7),
+and Browser (latest Chrome, Firefox or IE9+).
 
 Recommended Reading / Important Technologies
 --------------------------------------------
@@ -194,13 +192,11 @@ the applications that are installed. Note that in the following example, the val
 "--install" option is the path to the root directory of the application you want to install. In this
 example, it is a relative path to "/Users/philip/src/hue/calculator".
 
-        $ ./build/env/bin/python tools/app_reg/app_reg.py --install calculator
+        $ ./build/env/bin/python tools/app_reg/app_reg.py --install calculator --relative-paths
         === Installing app at calculator
         Updating registry with calculator (version 0.1)
         --- Making egg-info for calculator
 
-        $ ./build/env/bin/python tools/app_reg/app_reg.py --list 2>&1 | grep calculator
-        calculator           0.1     /Users/philip/src/hue/calculator
 
 <div class="note">
   If you'd like to customize the build process, you can modify (or even complete
@@ -807,15 +803,15 @@ Adding Interactive Elements to Your UI
 
 Hue by default loads these JavaScript components:
 
-* jQuery 1.8.1
-* jQuery.dataTables 1.8.2
-* Bootstrap 2.1.1
+* jQuery
+* jQuery.dataTables
+* Bootstrap
 
 These are used by some Hue applications, but not loaded by default:
 
-* Knockout 2.1.1 (`desktop/core/static/ext/js/knockout-min.js`)
+* Knockout js (`desktop/core/static/ext/js/knockout-min.js`)
 * DataTables pagination using the Bootstrap style (`desktop/core/static/ext/js/datatables-paging-0.1.js`)
-* jQuery UI autocomplete 1.8.18 (`desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js`)
+* jQuery UI (`desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js`)
 
 These standard components have their own online documentation, which we will
 not repeat here. They let you write interactive behaviors with little or no
