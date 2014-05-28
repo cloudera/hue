@@ -552,10 +552,17 @@ body.modal-open {
 }
 
 .field-selector {
+  display: inline-block;
+  margin-left: 3px;
+  min-height: 20px;
+  line-height: 20px
+}
+
+.field-selector.hoverable {
   cursor: pointer;
 }
 
-.field-selector:hover {
+.field-selector.hoverable:hover {
   background-color: #DDD;
 }
 

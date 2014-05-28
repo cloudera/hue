@@ -440,7 +440,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto; padding-left: 4px">
           <div style="margin-bottom: 3px">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
-            <div class="field-selector" data-bind="text: name" style="display: inline-block; margin-left: 3px; min-height: 20px; line-height: 20px"></div>
+            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn"></div>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
@@ -1928,18 +1928,25 @@ $(document).ready(function () {
     $("#result-main").height($("#result-container").outerHeight() + 100);
   });
 
-$(document).on("click", ".field-selector", function () {
-    var _t = $("#result-container");
-    var _text = $.trim($(this).text());
-    var _col = _t.find("th").filter(function() {
-      return $.trim($(this).text()) == _text;
-    });
-    _t.find(".columnSelected").removeClass("columnSelected");
-    _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
-    _t.parent().animate({
-      scrollLeft: _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
-    }, 300);
-  });
+  function highlightColumn(column) {
+    var _colName = $.trim(column.name());
+    if (viewModel.collection.template.fieldsSelected.indexOf(_colName) > -1) {
+      var _t = $("#result-container");
+      var _col = _t.find("th").filter(function () {
+        return $.trim($(this).text()) == _colName;
+      });
+      if (_t.find("tr td:nth-child(" + (_col.index() + 1) + ").columnSelected").length == 0) {
+        _t.find(".columnSelected").removeClass("columnSelected");
+        _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+        _t.parent().animate({
+          scrollLeft: _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+        }, 300);
+      }
+      else {
+        _t.find(".columnSelected").removeClass("columnSelected");
+      }
+    }
+  }
 
 
 </script>
