@@ -44,7 +44,7 @@ ${ layout.menubar(section='workflows') }
         <li><a href="#properties"><i class="fa fa-cog"></i> ${ _('Properties') }</a></li>
         % if user_can_edit_job:
           <li>
-            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="fa fa-folder-open"></i> ${ _('Workspace') }</a>
+            <a data-bind="attr: {href: '/filebrowser/view' + fixLeadingSlash(deployment_dir()) }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="fa fa-folder-open"></i> ${ _('Workspace') }</a>
           </li>
         % endif
 
@@ -981,6 +981,13 @@ window.onresize = function () {
     modal.recenter(280, 0);
   }
 };
+
+function fixLeadingSlash(path) {
+  if (path[0] != "/") {
+    return "/" + path;
+  }
+  return path;
+}
 
 var AUTOCOMPLETE_PROPERTIES;
 
