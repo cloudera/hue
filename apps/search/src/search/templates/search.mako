@@ -314,14 +314,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
-        <div class="input-prepend input-group">
-           <span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="input-xxlarge form-control" data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}" />
-        </div>
+        <div data-bind="simpledaterangepicker: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
         <br/>
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: type() == 'field' -->
-      ${ _('Limit') }: <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">${ _('Limit') }</span> <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
+        </span>
+      </div>
     <!-- /ko -->
 
     <a href="javascript: void(0)" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
@@ -665,7 +667,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   <span data-bind="visible: $root.isEditing()">
     ${ _('Show') }
-    <span class="spinedit-pagination">
+    <span class="spinedit-cnt">
       <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
     </span>
     ${ _('results per page') }
@@ -706,12 +708,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>  
 
-    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
-    <span>
-      ${ _('Group By') }
-      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq">
-      </select>      
-    </span>
+    <div style="padding-bottom: 10px; text-align: center">
+      <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
+      <span class="facet-field-label">${ _('Group by') }</span>
+      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq"></select>
+    </div>
 
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
       fqs: $root.query.fqs,
@@ -944,6 +945,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <link rel="stylesheet" href="/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css">
 <link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
 <link rel="stylesheet" href="/static/css/bootstrap-slider.css">
 <link rel="stylesheet" href="/static/css/bootstrap-daterangepicker.css">
@@ -959,6 +962,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/bootstrap-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/bootstrap-spinedit.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/bootstrap-slider.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/bootstrap-daterangepicker.js" type="text/javascript" charset="utf-8"></script>
@@ -1383,6 +1388,241 @@ $(document).ready(function () {
     }
   }
 
+  ko.bindingHandlers.simpledaterangepicker = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var DATE_FORMAT = "YYYY-MM-DD";
+      var TIME_FORMAT = "HH:mm:ss";
+      var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+
+      var _el = $(element);
+      var _options = $.extend(valueAccessor(), {});
+
+      var _intervalOptions = [
+        '<option value="+200MILLISECONDS">200ms</option>',
+        '<option value="+1SECONDS">1s</option>',
+        '<option value="+1MINUTES">1m</option>',
+        '<option value="+5MINUTES">5m</option>',
+        '<option value="+10MINUTES">10m</option>',
+        '<option value="+30MINUTES">30m</option>',
+        '<option value="+1HOURS">1h</option>',
+        '<option value="+3HOURS">3h</option>',
+        '<option value="+12HOURS">12h</option>',
+        '<option value="+1DAYS">1d</option>',
+        '<option value="+7DAYS">7d</option>',
+        '<option value="+1MONTHS">1M</option>',
+        '<option value="+6MONTHS">6M</option>',
+        '<option value="+1YEARS">1y</option>'
+      ];
+
+      function enableOptions() {
+        var _opts = [];
+        var _tmp = $("<div>").html(_intervalOptions.join(""))
+        $.each(arguments, function(cnt, item){
+          if (_tmp.find("option[value='+"+item+"']").length > 0){
+            _opts.push('<option value="+'+item+'">' + _tmp.find("option[value='+"+item+"']").eq(0).text() + '</option>');
+          }
+        });
+        return _opts;
+      }
+
+      function renderOptions(opts) {
+        var _html = "";
+        for (var i=0; i<opts.length; i++){
+          _html += opts[i];
+        }
+        _html += '<option value="">${ _('Custom') }</option>';
+        return _html;
+      }
+
+      var _tmpl = $('<div class="simpledaterangepicker">' +
+                    '<div class="facet-field-cnt">' +
+                      '<div class="facet-field-label facet-field-label-fixed-width">${ _('Start') }</div>' +
+                      '<div class="input-prepend input-group">' +
+                        '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
+                        '<input type="text" class="input-small form-control start-date" />' +
+                      '</div>&nbsp;' +
+                      '<div class="input-prepend input-group">' +
+                        '<span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span>' +
+                        '<input type="text" class="input-mini form-control start-time" />' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="facet-field-cnt">' +
+                      '<div class="facet-field-label facet-field-label-fixed-width">${ _('End') }</div>' +
+                      '<div class="input-prepend input-group">' +
+                        '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
+                        '<input type="text" class="input-small form-control end-date" />' +
+                      '</div>&nbsp;' +
+                      '<div class="input-prepend input-group">' +
+                        '<span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span>' +
+                        '<input type="text" class="input-mini form-control end-time" />' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="facet-field-cnt">' +
+                      '<div class="facet-field-label facet-field-label-fixed-width">${ _('Interval') }</div>' +
+                      '<select class="input-small interval-select" style="margin-right: 6px">' +
+                          renderOptions(_intervalOptions) +
+                      '</select>' +
+                      '<input class="input interval hide" type="text" value="" />' +
+                    '</div>' +
+                  '</div>'
+      );
+
+      _tmpl.insertAfter(_el);
+
+      _tmpl.find(".start-date").val(moment(_options.min()).format(DATE_FORMAT));
+      _tmpl.find(".start-date").datepicker({
+				format: DATE_FORMAT.toLowerCase()
+			}).on("changeDate", function () {
+        rangeHandler(true);
+      });
+
+      _tmpl.find(".start-time").val(moment(_options.min()).format(TIME_FORMAT));
+      _tmpl.find(".start-time").timepicker({
+          minuteStep: 1,
+          showSeconds: true,
+          showMeridian: false,
+          defaultTime: false
+      });
+
+      _tmpl.find(".end-date").val(moment(_options.max()).format(DATE_FORMAT));
+      _tmpl.find(".end-date").datepicker({
+				format: DATE_FORMAT.toLowerCase()
+			}).on("changeDate", function () {
+        rangeHandler(false);
+      });
+
+      _tmpl.find(".end-time").val(moment(_options.max()).format(TIME_FORMAT));
+      _tmpl.find(".end-time").timepicker({
+          minuteStep: 1,
+          showSeconds: true,
+          showMeridian: false,
+          defaultTime: false
+      });
+
+      _tmpl.find(".start-time").on("change", function () {
+        // the timepicker plugin doesn't have a change event handler
+        // so we need to wait a bit to handle in with the default field event
+        window.setTimeout(function () {
+          rangeHandler(true)
+        }, 200);
+      });
+
+      _tmpl.find(".end-time").on("change", function () {
+        window.setTimeout(function () {
+          rangeHandler(false)
+        }, 200);
+      });
+
+      rangeHandler(true);
+
+      function matchIntervals(){
+        if (_tmpl.find(".interval-select option[value='"+_options.gap()+"']").length > 0){
+          _tmpl.find(".interval-select").val(_options.gap());
+          _tmpl.find(".interval").hide();
+        }
+        else {
+          _tmpl.find(".interval-select").val("");
+          _tmpl.find(".interval").show();
+        }
+      }
+
+      _tmpl.find(".interval").val(_options.gap());
+
+      _tmpl.find(".interval-select").on("change", function () {
+        if (_tmpl.find(".interval-select").val() == ""){
+          _tmpl.find(".interval").show();
+        }
+        else {
+          _tmpl.find(".interval").hide();
+          _options.gap(_tmpl.find(".interval-select").val());
+          _tmpl.find(".interval").val(_options.gap());
+        }
+      });
+
+      _tmpl.find(".interval").on("change", function () {
+        if (_tmpl.find(".interval-select").val() == ""){
+          _options.gap(_tmpl.find(".interval").val());
+        }
+      });
+
+      function rangeHandler(isStart) {
+        var startDate = moment(_tmpl.find(".start-date").val() + " " + _tmpl.find(".start-time").val(), DATETIME_FORMAT);
+        var endDate = moment(_tmpl.find(".end-date").val() + " " + _tmpl.find(".end-time").val(), DATETIME_FORMAT);
+        if (startDate.valueOf() > endDate.valueOf()) {
+          if (isStart) {
+            _tmpl.find(".end-date").val(startDate.format(DATE_FORMAT));
+            _tmpl.find(".end-date").datepicker('setValue', startDate.format(DATE_FORMAT));
+            _tmpl.find(".end-date").data("original-val", _tmpl.find(".end-date").val());
+            _tmpl.find(".end-time").val(startDate.format(TIME_FORMAT));
+          }
+          else {
+            if (_tmpl.find(".end-date").val() == _tmpl.find(".start-date").val()) {
+              _tmpl.find(".end-time").val(startDate.format(TIME_FORMAT));
+              _tmpl.find(".end-time").data("timepicker").setValues(startDate.format(TIME_FORMAT));
+            }
+            else {
+              _tmpl.find(".end-date").val(_tmpl.find(".end-date").data("original-val"));
+              _tmpl.find(".end-date").datepicker("setValue", _tmpl.find(".end-date").data("original-val"));
+            }
+            // non-sticky error notification
+            $.jHueNotify.notify({
+              level:"ERROR",
+              message:"${ _("The end cannot be before the starting moment") }"
+            });
+          }
+        }
+        else {
+          _tmpl.find(".end-date").data("original-val", _tmpl.find(".end-date").val());
+          _tmpl.find(".start-date").datepicker("hide");
+          _tmpl.find(".end-date").datepicker("hide");
+        }
+
+        var _calculatedStartDate = moment(_tmpl.find(".start-date").val() + " " + _tmpl.find(".start-time").val(), DATETIME_FORMAT).utc();
+        var _calculatedEndDate = moment(_tmpl.find(".end-date").val() + " " + _tmpl.find(".end-time").val(), DATETIME_FORMAT).utc();
+
+        _options.min(_calculatedStartDate.format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+        _options.start(_options.min());
+        _options.max(_calculatedEndDate.format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+        _options.end(_options.max());
+
+        var _opts = [];
+        // hide not useful options from interval
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'minutes') > 1 && _calculatedEndDate.diff(_calculatedStartDate, 'minutes') <= 60){
+          _opts = enableOptions("200MILLISECONDS", "1SECONDS", "1MINUTES", "5MINUTES", "10MINUTES", "30MINUTES");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'hours') > 1 && _calculatedEndDate.diff(_calculatedStartDate, 'hours') <= 12){
+          _opts = enableOptions("5MINUTES", "10MINUTES", "30MINUTES", "1HOURS", "3HOURS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'hours') > 12 && _calculatedEndDate.diff(_calculatedStartDate, 'hours') < 36){
+          _opts = enableOptions("10MINUTES", "30MINUTES", "1HOURS", "3HOURS", "12HOURS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 1 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 7){
+          _opts = enableOptions("30MINUTES", "1HOURS", "3HOURS", "12HOURS", "1DAYS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 7 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 14){
+          _opts = enableOptions("3HOURS", "12HOURS", "1DAYS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 14 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 31){
+          _opts = enableOptions("12HOURS", "1DAYS", "7DAYS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 1){
+          _opts = enableOptions("1DAYS", "7DAYS", "1MONTHS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 6){
+          _opts = enableOptions("1DAYS", "7DAYS", "1MONTHS", "6MONTHS");
+        }
+        if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 12){
+          _opts = enableOptions("7DAYS", "1MONTHS", "6MONTHS", "1YEARS");
+        }
+
+        $(".interval-select").html(renderOptions(_opts));
+
+        matchIntervals();
+      }
+    }
+  }
+
+
   ko.bindingHandlers.daterangepicker = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var _el = $(element);
@@ -1576,6 +1816,7 @@ $(document).ready(function () {
   }
 
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, _query, ${ initial | n,unicode });
+  viewModel.isEditing(true);
   ko.applyBindings(viewModel);
 
 

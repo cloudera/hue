@@ -517,13 +517,15 @@ body.modal-open {
   border-radius: 3px;
 }
 
-.spinedit-pagination div.spinedit .fa-chevron-up {
+.spinedit-cnt div.spinedit .fa-chevron-up {
   top: -7px;
+  color: #666;
 }
 
-.spinedit-pagination div.spinedit .fa-chevron-down {
+.spinedit-cnt div.spinedit .fa-chevron-down {
   top: 7px;
   left: -4px;
+  color: #666;
 }
 
 .clearable {
@@ -556,3 +558,28 @@ body.modal-open {
 .field-selector:hover {
   background-color: #DDD;
 }
+
+.facet-field-cnt {
+  margin-bottom: 6px;
+}
+
+.facet-field-label {
+  color: #333;
+  font-size: 11px;
+  margin-bottom: 2px;
+  margin-right: 4px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.facet-field-label-fixed-width {
+  width: 90px;
+  text-align: right;
+  padding-right: 8px;
+  display: inline-block;
+}
+
+.card-widget .input-append, .card-widget .input-prepend, .card-widget select, .card-widget input {
+  margin-bottom: 0;
+}
+
