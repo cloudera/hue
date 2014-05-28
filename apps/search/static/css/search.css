@@ -548,3 +548,11 @@ body.modal-open {
 .clearable.onX {
   cursor: pointer !important;
 }
+
+.field-selector {
+  cursor: pointer;
+}
+
+.field-selector:hover {
+  background-color: #DDD;
+}
