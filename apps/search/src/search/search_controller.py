@@ -91,6 +91,6 @@ class SearchController(object):
 
   def get_solr_collection(self):
     return SolrApi(SOLR_URL.get(), self.user).collections()
-  
+
   def get_all_indexes(self):
     return self.get_solr_collection().keys() + SolrApi(SOLR_URL.get(), self.user).cores().keys()

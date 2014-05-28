@@ -76,7 +76,7 @@ class TestSearchBase(object):
 class TestWithMockedSolr(TestSearchBase):
   def _get_collection_param(self, collection):
     col_json = json.loads(collection.get_c(self.user))
-    return col_json['collection']    
+    return col_json['collection']
 
   def test_index(self):
     response = self.c.get(reverse('search:index'))
@@ -117,30 +117,30 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'category'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'comments'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'content'},
-         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'content_type'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'content_type'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'description'},
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'features'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'boolean', 'name': 'inStock'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'includes'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'keywords'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'date', 'name': 'last_modified'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'links'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'manu'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'manu_exact'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'name'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'payloads', 'name': 'payloads'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'int', 'name': 'popularity'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'price'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'resourcename'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_en_splitting_tight', 'name': 'sku'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'location', 'name': 'store'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'subject'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'text'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general_rev', 'name': 'text_rev'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'title'}, 
-         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'}, 
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'features'},
+         {'isDynamic': False, 'isId': None, 'type': 'boolean', 'name': 'inStock'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'includes'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'keywords'},
+         {'isDynamic': False, 'isId': None, 'type': 'date', 'name': 'last_modified'},
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'links'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'manu'},
+         {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'manu_exact'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'name'},
+         {'isDynamic': False, 'isId': None, 'type': 'payloads', 'name': 'payloads'},
+         {'isDynamic': False, 'isId': None, 'type': 'int', 'name': 'popularity'},
+         {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'price'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'resourcename'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_en_splitting_tight', 'name': 'sku'},
+         {'isDynamic': False, 'isId': None, 'type': 'location', 'name': 'store'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'subject'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'text'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general_rev', 'name': 'text_rev'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'title'},
+         {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'},
          {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'weight'},
-         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}], 
+         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}],
          self.collection.fields_data(self.user)
     )
 
@@ -155,7 +155,7 @@ class TestWithMockedSolr(TestSearchBase):
         'collection': json.dumps(self._get_collection_param(self.collection)),
         'query': json.dumps(QUERY)
     })
-    csv_response_content = csv_response.content    
+    csv_response_content = csv_response.content
     assert_equal('application/csv', csv_response['Content-Type'])
     assert_equal(7434, len(csv_response_content))
     assert_true('article_title,journal_issn,author,language,journal_title,journal_country,article_pagination,ontologies,affiliation,date_created,article_date,journal_iso_abbreviation,journal_publication_date,_version_,article_abstract_text,id' in csv_response_content, csv_response_content)

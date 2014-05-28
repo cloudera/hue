@@ -53,7 +53,7 @@
 
     <input type="hidden" name="sfield" value="store"/>
     <input type="hidden" id="spatialFQ" name="fq" value=""/>
-    <input type="hidden" name="queryOpts" value="spatial"/>        
+    <input type="hidden" name="queryOpts" value="spatial"/>
 
   </div>
 

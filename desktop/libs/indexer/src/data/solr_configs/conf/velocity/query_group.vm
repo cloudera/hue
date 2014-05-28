@@ -34,7 +34,7 @@
         </option>
 
       </select>
-    </label>  
+    </label>
 
     <input type="hidden" name="group" value="true"/>
 

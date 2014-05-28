@@ -44,17 +44,17 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
       <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a>
-    % endif 
-  </div>  
-  
-  <form data-bind="visible: $root.isEditing() && columns().length == 0">  
+    % endif
+  </div>
+
+  <form data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a search index') }
     <!-- ko if: columns().length == 0 -->
     <select data-bind="options: $root.initial.collections, value: $root.collection.name">
     </select>
     <!-- /ko -->
   </form>
-  
+
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
     <strong>${_("Search")}</strong>
     <div class="input-append">
@@ -111,8 +111,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
-                    draggable: {data: draggableHtmlResultset(), 
-                    isEnabled: availableDraggableResultset, 
+                    draggable: {data: draggableHtmlResultset(),
+                    isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); $root.collection.template.isGridLayout(false); }}}"
          title="${_('HTML Results')}" rel="tooltip" data-placement="top">
@@ -121,7 +121,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableFacet(), isEnabled: availableDraggableChart, 
+                    draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
@@ -130,7 +130,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggablePie(), isEnabled: availableDraggableChart, 
+                    draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
@@ -140,7 +140,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
     <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a data-bind="attr: {href: $root.availableDraggableResultset()}, css: {'btn-inverse': ! $root.availableDraggableResultset() }, style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }"><i class="fa fa-tachometer"></i></a></div> -->
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableBar(), isEnabled: availableDraggableChart, 
+                    draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
@@ -149,7 +149,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
-                    draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers, 
+                    draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Line Chart')}" rel="tooltip" data-placement="top">
@@ -158,7 +158,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableHistogram() },
-                    draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram, 
+                    draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
@@ -167,7 +167,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
-                    draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter, 
+                    draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
@@ -176,7 +176,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableMap(), isEnabled: availableDraggableChart, 
+                    draggable: {data: draggableMap(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Map')}" rel="tooltip" data-placement="top">
@@ -257,9 +257,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
     </div>
     <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
-        sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing, 
-        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true, 
-            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}, 
+        sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing,
+        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
             dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});showAddFacetDemiModal(widget);viewModel.search()}}">
     </div>
@@ -299,9 +299,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/html" id="hit-widget">
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
-    </div>  
+    </div>
 
     <span data-bind="text: query" />: <span data-bind="text: count" />
   </div>
@@ -310,7 +310,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <script type="text/html" id="facet-toggle">
     <!-- ko if: type() == 'range' -->
-      <!-- ko ifnot: properties.isDate() -->    
+      <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
@@ -347,14 +347,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-	    <!-- ko if: type() != 'range' -->
+      <!-- ko if: type() != 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
-            <a href="javascript: void(0)">              
+            <a href="javascript: void(0)">
               <!-- ko if: $index() != $parent.properties.limit() -->
                 <!-- ko if: ! $data.selected -->
                   <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                  <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>                
+                  <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
                   <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
@@ -372,23 +372,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                 <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
                   <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
                     ${ _('Show more') }
-                  </span> 
-                  /             
+                  </span>
+                  /
                   <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
                     ${ _('less...') }
-                  </span>                    
+                  </span>
                 </span>
                 <!-- /ko -->
               <!-- /ko -->
             </a>
           </div>
         </div>
-	    <!-- /ko -->
-	    <!-- ko if: type() == 'range' -->
+      <!-- /ko -->
+      <!-- ko if: type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div>
             <a href="javascript: void(0)">
-              <!-- ko if: ! selected --> 
+              <!-- ko if: ! selected -->
                 <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
                   <span data-bind="text: $data.from + ' - ' + $data.to"></span>
                   <span class="counter" data-bind="text: ' (' + $data.value + ')'"></span>
@@ -403,7 +403,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             </a>
           </div>
         </div>
-	    <!-- /ko -->    
+      <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
@@ -453,7 +453,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
         ${ _('Your search did not match any documents.') }
       </div>
-    
+
       <!-- ko if: $root.response().response -->
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }" style="padding: 8px; color: #666"></div>
       <!-- /ko -->
@@ -507,23 +507,23 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                 <td data-bind="html: $data"></td>
               <!-- /ko -->
             </tr>
-            <tr data-bind="visible: showDetails">                        
-              <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">              
+            <tr data-bind="visible: showDetails">
+              <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
                 <!-- ko if: $data.details().length == 0 -->
                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 <!-- /ko -->
-                <!-- ko if: $data.details().length > 0 -->                  
-				  <div class="document-details">
-				    <table>
-				      <tbody data-bind="foreach: details">
-				        <tr>
-				          <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th> 
-				          <td width="100%" data-bind="text: value"></td>
-				        </tr>
-				      </tbody>
-				    </table>
-				  </div>                    
+                <!-- ko if: $data.details().length > 0 -->
+          <div class="document-details">
+            <table>
+              <tbody data-bind="foreach: details">
+                <tr>
+                  <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th>
+                  <td width="100%" data-bind="text: value"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
                 <!-- /ko -->
               </td>
             </tr>
@@ -619,11 +619,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
       <div class="widget-section widget-settings-section" style="display: none, min-height:200px">
         ${ _('Sorting') }
-        
+
         <div data-bind="foreach: $root.collection.template.fieldsSelected">
           <span data-bind="text: $data"></span>
         </div>
-        <br/>  
+        <br/>
       </div>
     <!-- /ko -->
 
@@ -631,15 +631,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
         ${ _('Your search did not match any documents.') }
       </div>
-    
+
       <!-- ko if: $root.response().response -->
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
-    
+
       <div id="result-container" data-bind="foreach: $root.results">
         <div class="result-row" data-bind="html: $data"></div>
-      </div>    
-    
+      </div>
+
       <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -679,7 +679,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         visible: ($root.collection.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
     </i>
-  </a>  
+  </a>
 
   <!-- ko if: $data.response.numFound > 0 && $data.response.numFound <= 1000 -->
   <span class="pull-right">
@@ -703,10 +703,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
-    </div>  
+    </div>
 
     <div style="padding-bottom: 10px; text-align: center">
       <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
@@ -732,11 +732,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">      
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
-    </div> 
-    
+    </div>
+
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
         <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
@@ -748,11 +748,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       transformer: barChartDataTransformer,
       onStateChange: function(state){ console.log(state); },
       onClick: function(d) {
-        if (d.obj.field != undefined) { 
+        if (d.obj.field != undefined) {
           viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
         } else {
           viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
-        } 
+        }
       },
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
@@ -777,7 +777,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
 
     <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
-      transformer: lineChartDataTransformer,      
+      transformer: lineChartDataTransformer,
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
@@ -800,7 +800,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
         transformer: rangePieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) }, 
+        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
       <!-- /ko -->
       <!-- ko if: type() != 'range' -->
@@ -810,7 +810,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
         onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
       <!-- /ko -->
-    </div>    
+    </div>
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -857,7 +857,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Scope') }: 
+      ${ _('Scope') }:
       <select data-bind="selectedOptions: properties.scope" class="input-small">
         <option value="world">${ _("World") }</option>
         <option value="usa">${ _("USA") }</option>
@@ -1112,12 +1112,12 @@ function timelineChartDataTransformer(rawDatum) {
       obj: item
     });
   });
-  
+
   _datum.push({
     key: rawDatum.label,
     values: _data
   });
-  
+
 
   // If multi query
   $(rawDatum.extraSeries).each(function (cnt, item) {
@@ -1132,14 +1132,14 @@ function timelineChartDataTransformer(rawDatum) {
         y: item.value,
         obj: item
       });
-    });      
+    });
 
     _datum.push({
       key: item.label,
       values: _data
     });
   });
-  
+
   return _datum;
 }
 
@@ -1155,9 +1155,9 @@ function mapChartDataTransformer(data) {
   return _data;
 }
 
-function toggleDocDetails(doc) {  
+function toggleDocDetails(doc) {
   doc.showDetails(! doc.showDetails());
-  
+
   if (doc.details().length == 0) {
     viewModel.getDocument(doc);
   }
@@ -1471,8 +1471,8 @@ $(document).ready(function () {
 
       _tmpl.find(".start-date").val(moment(_options.min()).format(DATE_FORMAT));
       _tmpl.find(".start-date").datepicker({
-				format: DATE_FORMAT.toLowerCase()
-			}).on("changeDate", function () {
+        format: DATE_FORMAT.toLowerCase()
+      }).on("changeDate", function () {
         rangeHandler(true);
       });
 
@@ -1486,8 +1486,8 @@ $(document).ready(function () {
 
       _tmpl.find(".end-date").val(moment(_options.max()).format(DATE_FORMAT));
       _tmpl.find(".end-date").datepicker({
-				format: DATE_FORMAT.toLowerCase()
-			}).on("changeDate", function () {
+        format: DATE_FORMAT.toLowerCase()
+      }).on("changeDate", function () {
         rangeHandler(false);
       });
 
@@ -1888,12 +1888,12 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {      
+    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       viewModel.collection.template.fieldsModalType(widget.widgetType());
       viewModel.collection.template.fieldsModalFilter.valueHasMutated();
       $('#addFacetInput').typeahead({
-          'source': viewModel.collection.template.availableWidgetFieldsNames(), 
+          'source': viewModel.collection.template.availableWidgetFieldsNames(),
           'updater': function(item) {
               addFacetDemiModalFieldPreview({'name': function(){return item}});
               return item;
@@ -1919,7 +1919,7 @@ $(document).ready(function () {
       $("#addFacetDemiModal").modal("hide");
     }
   }
-  
+
   function addFacetDemiModalFieldCancel() {
     viewModel.removeWidget(selectedWidget);
   }

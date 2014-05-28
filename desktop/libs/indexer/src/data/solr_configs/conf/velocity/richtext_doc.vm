@@ -77,7 +77,7 @@
 ## Resource Name
 <div>
   #if($doc.getFieldValue('resourcename'))
-    Resource name: $filename 
+    Resource name: $filename
   #elseif($url)
     URL: $url
   #end

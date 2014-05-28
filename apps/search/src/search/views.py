@@ -48,7 +48,7 @@ LOG = logging.getLogger(__name__)
 def index(request):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
-  
+
   if not hue_collections or not collection_id:
     if request.user.is_superuser:
       return admin_collections(request, True)
@@ -61,7 +61,7 @@ def index(request):
   return render('search.mako', request, {
     'collection': collection,
     'query': query,
-    'initial': json.dumps({'collections': [], 'layout': []}),    
+    'initial': json.dumps({'collections': [], 'layout': []}),
   })
 
 
@@ -85,7 +85,7 @@ def new_search(request):
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
-         ] 
+         ]
      }),
   })
 
@@ -110,23 +110,23 @@ def browse(request, name):
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
-         ] 
+         ]
      }),
   })
 
 
 def search(request):
-  response = {}  
-  
+  response = {}
+
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
   # todo: remove the selected histo facet if multiq
 
   if collection['id']:
     hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
-    
+
   if collection:
-    try:      
+    try:
       response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
       response = augment_solr_response(response, collection, query)
     except RestException, e:
@@ -136,7 +136,7 @@ def search(request):
         response['error'] = force_unicode(str(e))
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-      
+
       response['error'] = force_unicode(str(e))
   else:
     response['error'] = _('There is no collection to search.')
@@ -149,13 +149,13 @@ def search(request):
 
 @allow_admin_only
 def save(request):
-  response = {'status': -1}  
-  
+  response = {'status': -1}
+
   collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
-  layout = json.loads(request.POST.get('layout', '{}')) 
- 
+  layout = json.loads(request.POST.get('layout', '{}'))
+
   collection['template']['extracode'] = escape(collection['template']['extracode']) # Escape HTML
-  
+
   if collection:
     if collection['id']:
       hue_collection = Collection.objects.get(id=collection['id'])
@@ -180,14 +180,14 @@ def download(request):
   try:
     file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
     response = search(request)
-    
+
     if file_format == 'json':
       mimetype = 'application/json'
       json_docs = json.dumps(json.loads(response.content)['response']['docs'])
       resp = HttpResponse(json_docs, mimetype=mimetype)
       resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
-      return resp    
-    
+      return resp
+
     return export_download(json.loads(response.content), file_format)
   except Exception, e:
     raise PopupException(_("Could not download search results: %s") % e)
@@ -266,20 +266,20 @@ def query_suggest(request, collection_id, query=""):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def index_fields_dynamic(request):  
+def index_fields_dynamic(request):
   result = {'status': -1, 'message': 'Error'}
-  
+
   try:
     name = request.POST['name']
-            
-    hue_collection = Collection(name=name, label=name)    
-    
+
+    hue_collection = Collection(name=name, label=name)
+
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
 
     result['message'] = ''
     result['fields'] = [Collection._make_field(name, properties)
                         for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
-    result['gridlayout_header_fields'] = [Collection._make_gridlayout_header_field({'name': name}, True) 
+    result['gridlayout_header_fields'] = [Collection._make_gridlayout_header_field({'name': name}, True)
                                           for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
     result['status'] = 0
   except Exception, e:
@@ -288,13 +288,13 @@ def index_fields_dynamic(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def get_document(request):  
+def get_document(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
     doc_id = request.POST.get('id')
-            
+
     if doc_id:
       result['doc'] = SolrApi(SOLR_URL.get(), request.user).get(collection['name'], doc_id)
       result['status'] = 0
@@ -302,14 +302,14 @@ def get_document(request):
     else:
       result['message'] = _('This document does not have any index id.')
       result['status'] = 1
-    
+
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def get_timeline(request):  
+def get_timeline(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
@@ -318,11 +318,11 @@ def get_timeline(request):
     facet = json.loads(request.POST.get('facet', '{}'))
     qdata = json.loads(request.POST.get('qdata', '{}'))
     multiQ = request.POST.get('multiQ', 'query')
-    
+
     if multiQ == 'query':
-      label = qdata['q'] 
+      label = qdata['q']
       query['qs'] = [qdata]
-    elif facet['type'] == 'range':      
+    elif facet['type'] == 'range':
       _prop = filter(lambda prop: prop['from'] == qdata, facet['properties'])[0]
       label = '%(from)s - %(to)s ' % _prop
       facet_id = facet['id']
@@ -336,16 +336,16 @@ def get_timeline(request):
       # Only care about our current field:value filter
       for fq in query['fqs']:
         if fq['id'] == facet_id:
-          fq['filter'] = [qdata] 
-      
+          fq['filter'] = [qdata]
+
     # Remove other facets from collection for speed
     collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
-    
+
     response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
     response = augment_solr_response(response, collection, query)
-  
+
     label += ' (%s) ' % response['response']['numFound']
-  
+
     result['series'] = {'label': label, 'counts': response['normalized_facets'][0]['counts']}
     result['status'] = 0
     result['message'] = ''
@@ -355,12 +355,12 @@ def get_timeline(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def new_facet(request):  
+def new_facet(request):
   result = {'status': -1, 'message': 'Error'}
-  
+
   try:
     collection = json.loads(request.POST.get('collection', '{}')) # Perms
-    
+
     facet_id = request.POST['id']
     facet_label = request.POST['label']
     facet_field = request.POST['field']
@@ -385,23 +385,23 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'isDate': False,
     'andUp': False,  # Not used yet
   }
-  
+
   solr_api = SolrApi(SOLR_URL.get(), user)
   range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
-                        
+
   if range_properties:
     facet_type = 'range'
-    properties.update(range_properties)       
+    properties.update(range_properties)
   elif widget_type == 'hit-widget':
-    facet_type = 'query'      
+    facet_type = 'query'
   else:
-    facet_type = 'field'        
-      
+    facet_type = 'field'
+
   if widget_type == 'map-widget':
     properties['scope'] = 'world'
     properties['mincount'] = 1
-    properties['limit'] = 100     
-    
+    properties['limit'] = 100
+
   return {
     'id': facet_id,
     'label': facet_label,
@@ -411,23 +411,23 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'properties': properties
   }
 
-def get_range_facet(request):  
+def get_range_facet(request):
   result = {'status': -1, 'message': ''}
 
   try:
     collection = json.loads(request.POST.get('collection', '{}')) # Perms
     facet = json.loads(request.POST.get('facet', '{}'))
     action = request.POST.get('action', 'select')
-            
+
     solr_api = SolrApi(SOLR_URL.get(), request.user)
 
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
     else:
       properties = _zoom_range_facet(solr_api, collection, facet)
-            
+
     result['properties'] = properties
-    result['status'] = 0      
+    result['status'] = 0
 
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
@@ -435,17 +435,17 @@ def get_range_facet(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def get_collection(request):  
+def get_collection(request):
   result = {'status': -1, 'message': ''}
 
   try:
     name = request.POST['name']
-            
+
     collection = Collection(name=name, label=name)
     collection_json = collection.get_c(request.user)
-            
+
     result['collection'] = json.loads(collection_json)
-    result['status'] = 0      
+    result['status'] = 0
 
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
@@ -453,12 +453,12 @@ def get_collection(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def get_collections(request):  
+def get_collections(request):
   result = {'status': -1, 'message': ''}
 
-  try:           
+  try:
     result['collection'] = SearchController(request.user).get_all_indexes()
-    result['status'] = 0      
+    result['status'] = 0
 
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")

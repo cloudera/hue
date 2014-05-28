@@ -56,7 +56,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </style>
 
 
-<div class="search-bar" style="height: 30px">  
+<div class="search-bar" style="height: 30px">
   <div class="pull-right" style="margin-right: 20px">
     <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i> ${ _('Dashboards') }
@@ -154,7 +154,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <div data-bind="visible: collections().length > 0 && !isLoading()">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
                 placeholder="${_('Filter collections...')}" class="input-xlarge search-query">
-            <button data-bind="clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn" 
+            <button data-bind="clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn"
                 title="${_('Delete the selected collections')}" data-toggle="modal" data-target="#deleteCollections">
               <i class="fa fa-times"></i> ${_('Delete')}
             </button>
@@ -338,7 +338,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
-      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>      
+      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>
       <li><a href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>

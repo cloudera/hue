@@ -34,7 +34,7 @@
 # - Supplemental Punctuation: http://www.unicode.org/charts/PDF/U2E00.pdf
 # - Alphabetic Presentation Forms: http://www.unicode.org/charts/PDF/UFB00.pdf
 # - Halfwidth and Fullwidth Forms: http://www.unicode.org/charts/PDF/UFF00.pdf
-#  
+#
 # See: http://en.wikipedia.org/wiki/Latin_characters_in_Unicode
 #
 # The set of character conversions supported by this map is a superset of
@@ -3785,11 +3785,11 @@
 #
 # use warnings;
 # use strict;
-# 
+#
 # my @source_chars = ();
 # my @source_char_descriptions = ();
 # my $target = '';
-# 
+#
 # while (<>) {
 #   if (/case\s+'(\\u[A-F0-9]+)':\s*\/\/\s*(.*)/i) {
 #     push @source_chars, $1;

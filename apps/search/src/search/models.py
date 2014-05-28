@@ -208,10 +208,10 @@ class Sorting(models.Model):
 
 
 class CollectionManager(models.Manager):
- 
+
   def create2(self, name, label, is_core_only=False):
     facets = Facet.objects.create()
-    result = Result.objects.create()      
+    result = Result.objects.create()
     sorting = Sorting.objects.create()
 
     collection = Collection.objects.create(
@@ -251,7 +251,7 @@ class Collection(models.Model):
   def get_c(self, user):
     props = self.properties_dict
 
-    if 'collection' not in props:      
+    if 'collection' not in props:
       props['collection'] = self.get_default(user)
       if self.cores != '{}': # Convert collections from < Hue 3.6
         try:
@@ -260,8 +260,8 @@ class Collection(models.Model):
           LOG.error('Could not import collection: %s' % e)
 
     if 'layout' not in props:
-      props['layout'] = []    
-  
+      props['layout'] = []
+
     if self.id:
       props['collection']['id'] = self.id
     if self.name:
@@ -270,21 +270,21 @@ class Collection(models.Model):
       props['collection']['label'] = self.label
     if self.enabled is not None:
       props['collection']['enabled'] = self.enabled
-    
+
     # tmp for dev
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
     if 'enabled' not in props['collection']:
       props['collection']['enabled'] = True
-      
+
     return json.dumps(props)
 
-  def get_default(self, user):      
+  def get_default(self, user):
     fields = self.fields_data(user)
     id_field = [field['name'] for field in fields if field.get('isId')]
     if id_field:
       id_field = id_field[0]
-  
+
     TEMPLATE = {
       "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
       "highlighting": [""],
@@ -295,21 +295,21 @@ class Collection(models.Model):
           <div class="span12">%s</div>
         </div>
         <br/>
-      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]), 
+      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "rows": 10,
     }
-    
+
     FACETS = []
 
     return {
       'id': self.id, 'name': self.name, 'label': self.label, 'enabled': self.enabled,
-      'template': TEMPLATE, 'facets': FACETS, 
-      'fields': fields, 'idField': id_field, 
-    }          
+      'template': TEMPLATE, 'facets': FACETS,
+      'fields': fields, 'idField': id_field,
+    }
 
   @classmethod
   def _make_field(cls, field, attributes):
@@ -319,7 +319,7 @@ class Collection(models.Model):
         'isId': attributes.get('required') and attributes.get('uniqueKey'),
         'isDynamic': 'dynamicBase' in attributes
     }
-  
+
   @classmethod
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
     return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
@@ -344,11 +344,11 @@ class Collection(models.Model):
 
     # Backward compatibility conversions
     if 'autocomplete' not in properties_python:
-      properties_python['autocomplete'] = False    
+      properties_python['autocomplete'] = False
     if 'collection' in properties_python:
       if 'showFieldList' not in properties_python['collection']['template']:
         properties_python['collection']['template']['showFieldList'] = True
-    
+
     return properties_python
 
   def update_properties(self, post_data):
@@ -392,11 +392,11 @@ class Collection(models.Model):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]
           }], "drops":["temp"],"klass":"card card-home card-column span10"}
      ]
-    
+
     from search.views import _create_facet
-    
+
     props['collection']['facets'] =[]
-    facets = self.facets.get_data()         
+    facets = self.facets.get_data()
 
     for facet_id in facets['order']:
       for facet in facets['fields'] + facets['ranges']:
@@ -453,7 +453,7 @@ def augment_solr_response(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
         if collection_facet['properties']['sort'] == 'asc':
-          counts.reverse()          
+          counts.reverse()
         facet = {
           'id': collection_facet['id'],
           'field': name,
@@ -489,12 +489,12 @@ def augment_solr_response(response, collection, query):
             'type': category,
             'label': name,
             'count': value,
-          }        
+          }
           normalized_facets.append(facet)
-      # pivot_facet          
+      # pivot_facet
 
   # HTML escaping
-  for doc in response['response']['docs']:  
+  for doc in response['response']['docs']:
     for field, value in doc.iteritems():
       if isinstance(value, numbers.Number):
         escaped_value = value
@@ -504,10 +504,10 @@ def augment_solr_response(response, collection, query):
       doc[field] = escaped_value
     doc['showDetails'] = False
     doc['details'] = []
-      
+
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields:
-    id_field = collection.get('idField')    
+    id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
         if id_field in doc and doc[id_field] in highlighted_fields:
@@ -524,7 +524,7 @@ def augment_solr_response(response, collection, query):
 def augment_solr_exception(response, collection):
   response.update(
   {
-    "facet_counts": {   
+    "facet_counts": {
     },
     "highlighting": {
     },
@@ -549,4 +549,4 @@ def augment_solr_exception(response, collection):
       "docs": [
       ]
     }
-  }) 
+  })

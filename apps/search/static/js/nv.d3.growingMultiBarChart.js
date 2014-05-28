@@ -273,7 +273,7 @@ nv.models.growingMultiBarChart = function() {
               // Issue #140
               xTicks
                 .selectAll("text")
-                .attr('transform', function(d,i,j) { 
+                .attr('transform', function(d,i,j) {
                     return  getTranslate(0, (j % 2 == 0 ? staggerUp : staggerDown));
                   });
 
@@ -297,13 +297,13 @@ nv.models.growingMultiBarChart = function() {
               .selectAll('.tick text')
               .attr('transform', 'rotate(' + rotateLabels + ' 0,0)')
               .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
-          
+
           g.select('.nv-x.nv-axis').selectAll('g.nv-axisMaxMin text')
               .style('opacity', 1);
       }
 
 
-      if (showYAxis) {      
+      if (showYAxis) {
           yAxis
             .scale(y)
             .ticks( availableHeight / 36 )
@@ -322,7 +322,7 @@ nv.models.growingMultiBarChart = function() {
       // Event Handling/Dispatching (in chart's scope)
       //------------------------------------------------------------
 
-      legend.dispatch.on('stateChange', function(newState) { 
+      legend.dispatch.on('stateChange', function(newState) {
         state = newState;
         dispatch.stateChange(state);
         chart.update();
@@ -420,7 +420,7 @@ nv.models.growingMultiBarChart = function() {
    'id', 'stacked', 'stackOffset', 'delay', 'barColor','groupSpacing');
 
   chart.options = nv.utils.optionsFunc.bind(chart);
-  
+
   chart.margin = function(_) {
     if (!arguments.length) return margin;
     margin.top    = typeof _.top    != 'undefined' ? _.top    : margin.top;
@@ -527,7 +527,7 @@ nv.models.growingMultiBarChart = function() {
     defaultState = _;
     return chart;
   };
-  
+
   chart.noData = function(_) {
     if (!arguments.length) return noData;
     noData = _;

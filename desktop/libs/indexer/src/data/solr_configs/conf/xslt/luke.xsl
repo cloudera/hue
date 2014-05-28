@@ -6,9 +6,9 @@
     The ASF licenses this file to You under the Apache License, Version 2.0
     (the "License"); you may not use this file except in compliance with
     the License.  You may obtain a copy of the License at
-    
+
     http://www.apache.org/licenses/LICENSE-2.0
-    
+
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 -->
 
 
-<!-- 
+<!--
   Display the luke request handler with graphs
  -->
 <xsl:stylesheet
@@ -190,7 +190,7 @@
                  <div class="histogram">
                   <xsl:attribute name="style">background-color: <xsl:value-of select="$fill"/>; width: <xsl:value-of select="$bar_width"/>px; height: <xsl:value-of select="($iheight*number(.)) div $max"/>px;</xsl:attribute>
                  </div>
-                   </td> 
+                   </td>
                 </xsl:for-each>
               </tr>
               <tr>

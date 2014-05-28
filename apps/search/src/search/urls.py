@@ -24,7 +24,7 @@ urlpatterns = patterns('search.views',
   url(r'^new_search', 'new_search', name='new_search'),
   url(r'^browse/(?P<name>\w+)', 'browse', name='browse'),
   url(r'^download$', 'download', name='download'),
-  
+
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
 
   # Ajax
@@ -37,7 +37,7 @@ urlpatterns = patterns('search.views',
   url(r'^get_timeline$', 'get_timeline', name='get_timeline'),
   url(r'^get_collection$', 'get_collection', name='get_collection'),
   url(r'^get_collections$', 'get_collections', name='get_collections'),
-  
+
   # Admin
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
   url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),

@@ -51,11 +51,11 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       SLOTS = 10
     else:
       SLOTS = 100
-      
+
     stats_json = solr_api.stats(collection['name'], [facet_field])
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
     is_date = False
-    
+
     # to refactor
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # Cast floats to int currently
@@ -63,7 +63,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       if start is None:
         if widget_type == 'line-widget':
           start, _ = _round_thousand_range(stats_min)
-        else:        
+        else:
           start, _ =  _round_number_range(stats_min)
       else:
         start = int(start)
@@ -71,12 +71,12 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         if widget_type == 'line-widget':
           _, end = _round_thousand_range(stats_max)
         else:
-          _, end = _round_number_range(stats_max)        
+          _, end = _round_number_range(stats_max)
       else:
         end = int(end)
 
       if gap is None:
-        gap = int((end - start) / SLOTS)      
+        gap = int((end - start) / SLOTS)
       if gap < 1:
         gap = 1
     elif 'T' in stat_facet['min']:
@@ -84,13 +84,13 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       stats_min = stat_facet['min']
       stats_max = stat_facet['max']
       if start is None:
-        start = stats_min 
+        start = stats_min
       start = re.sub('\.\d\d?\d?Z$', 'Z', start)
       try:
         start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
-      except Exception, e:        
-        LOG.error('Bad date: %s' % e)        
-        start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')        
+      except Exception, e:
+        LOG.error('Bad date: %s' % e)
+        start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
       start_ts, _ = _round_date_range(start_ts)
       start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       stats_min = min(stats_min, start)
@@ -106,7 +106,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
       stats_max = max(stats_max, end)
       difference = (
-          mktime(end_ts.timetuple()) - 
+          mktime(end_ts.timetuple()) -
           mktime(start_ts.timetuple())
       ) / SLOTS
 
@@ -119,7 +119,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       elif difference < 60 * 10:
         gap = '+10MINUTES'
       elif difference < 60 * 30:
-        gap = '+30MINUTES'                
+        gap = '+30MINUTES'
       elif difference < 3600:
         gap = '+1HOURS'
       elif difference < 3600 * 3:
@@ -129,11 +129,11 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       elif difference < 3600 * 24:
         gap = '+1DAYS'
       elif difference < 3600 * 24 * 7:
-        gap = '+7DAYS'        
+        gap = '+7DAYS'
       elif difference < 3600 * 24 * 40:
-        gap = '+1MONTHS'        
+        gap = '+1MONTHS'
       else:
-        gap = '+1YEARS'      
+        gap = '+1YEARS'
 
     properties.update({
       'min': stats_min,
@@ -151,7 +151,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
 def _round_date_range(tm):
   start = tm - timedelta(minutes=tm.minute, seconds=tm.second, microseconds=tm.microsecond)
-  end = start + timedelta(minutes=60)  
+  end = start + timedelta(minutes=60)
   return start, end
 
 def _round_number_range(n):
@@ -161,7 +161,7 @@ def _round_number_range(n):
     i = int(log(n, 10))
     end = round(n, -i)
     start = end - 10 ** i
-    return start, end 
+    return start, end
 
 def _round_thousand_range(n):
   if n <= 10:
@@ -170,7 +170,7 @@ def _round_thousand_range(n):
     i = int(log(n, 10))
     start = 10 ** i
     end = 10 ** (i + 1)
-    return start, end 
+    return start, end
 
 def _guess_gap(solr_api, collection, facet, start=None, end=None):
   properties = {}
@@ -204,14 +204,14 @@ class SolrApi(BaseSolrApi):
 
   #@demo_handler
   def query(self, collection, query):
-    solr_query = {}      
-    
+    solr_query = {}
+
     solr_query['collection'] = collection['name']
     solr_query['rows'] = min(int(collection['template']['rows'] or 10), 1000)
     solr_query['start'] = min(int(query['start']), 10000)
-    
+
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
-          
+
     params = self._get_params() + (
         ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']])),
         ('wt', 'json'),
@@ -227,7 +227,7 @@ class SolrApi(BaseSolrApi):
       )
       for facet in collection['facets']:
         if facet['type'] == 'query':
-          params += (('facet.query', '%s' % facet['field']),)          
+          params += (('facet.query', '%s' % facet['field']),)
         elif facet['type'] == 'range':
           params += tuple([
              ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
@@ -235,7 +235,7 @@ class SolrApi(BaseSolrApi):
              ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
              ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),
              ('f.%s.facet.mincount' % facet['field'], facet['properties']['mincount']),]
-          )          
+          )
         elif facet['type'] == 'field':
           params += (
               ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
@@ -245,10 +245,10 @@ class SolrApi(BaseSolrApi):
 
     for fq in query['fqs']:
       if fq['type'] == 'field':
-        # This does not work if spaces in Solr: 
+        # This does not work if spaces in Solr:
         # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
         f = []
-        for _filter in fq['filter']:          
+        for _filter in fq['filter']:
           if _filter is not None and ' ' in _filter:
             f.append('%s:"%s"' % (fq['field'], _filter))
           else:
@@ -277,7 +277,7 @@ class SolrApi(BaseSolrApi):
           if attribute_field[0]['sort']['direction']:
             fields.append('%s %s' % (field, attribute_field[0]['sort']['direction']))
       if fields:
-        params += (         
+        params += (
           ('sort', ','.join(fields)),
         )
 
@@ -371,7 +371,7 @@ class SolrApi(BaseSolrApi):
           ('wt', 'json'),
       )
       response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
-      return self._get_json(response)    
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -381,10 +381,10 @@ class SolrApi(BaseSolrApi):
           ('wt', 'json'),
       )
       response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
-      return self._get_json(response)    
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-    
+
   def stats(self, core, fields):
     try:
       params = (
@@ -392,7 +392,7 @@ class SolrApi(BaseSolrApi):
           ('wt', 'json'),
           ('rows', 0),
           ('stats', 'true'),
-      )      
+      )
       params += tuple([('stats.field', field) for field in fields])
       response = self._root.get('%(core)s/select' % {'core': core}, params=params)
       return self._get_json(response)
@@ -404,7 +404,7 @@ class SolrApi(BaseSolrApi):
       params = (
           ('id', doc_id),
           ('wt', 'json'),
-      )      
+      )
       response = self._root.get('%(core)s/get' % {'core': core}, params=params)
       return self._get_json(response)
     except RestException, e:

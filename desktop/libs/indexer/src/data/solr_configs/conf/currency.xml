@@ -58,10 +58,10 @@
     <rate from="USD" to="AED" rate="3.672955" comment="U.A.E. Dirham" />
     <rate from="USD" to="UAH" rate="7.988582" comment="UKRAINE Hryvnia" />
     <rate from="USD" to="GBP" rate="0.647910" comment="UNITED KINGDOM Pound" />
-    
+
     <!-- Cross-rates for some common currencies -->
-    <rate from="EUR" to="GBP" rate="0.869914" />  
-    <rate from="EUR" to="NOK" rate="7.800095" />  
-    <rate from="GBP" to="NOK" rate="8.966508" />  
+    <rate from="EUR" to="GBP" rate="0.869914" />
+    <rate from="EUR" to="NOK" rate="7.800095" />
+    <rate from="GBP" to="NOK" rate="8.966508" />
   </rates>
 </currencyConfig>

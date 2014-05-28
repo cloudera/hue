@@ -325,7 +325,7 @@ $.Autocompleter = function(input, options) {
 		if (!options.matchCase)
 			term = term.toLowerCase();
 		var data = cache.load(term);
-		data = null; // Avoid buggy cache and go to Solr every time 
+		data = null; // Avoid buggy cache and go to Solr every time
 		// recieve the cached data
 		if (data && data.length) {
 			success(term, data);
@@ -419,7 +419,7 @@ $.Autocompleter.Cache = function(options) {
 	var length = 0;
 	
 	function matchSubset(s, sub) {
-		if (!options.matchCase) 
+		if (!options.matchCase)
 			s = s.toLowerCase();
 		var i = s.indexOf(sub);
 		if (options.matchContains == "word"){
@@ -433,7 +433,7 @@ $.Autocompleter.Cache = function(options) {
 		if (length > options.cacheLength){
 			flush();
 		}
-		if (!data[q]){ 
+		if (!data[q]){
 			length++;
 		}
 		data[q] = value;
@@ -463,7 +463,7 @@ $.Autocompleter.Cache = function(options) {
 				
 			var firstChar = value.charAt(0).toLowerCase();
 			// if no lookup array for this character exists, look it up now
-			if( !stMatchSets[firstChar] ) 
+			if( !stMatchSets[firstChar] )
 				stMatchSets[firstChar] = [];
 
 			// if the match is a string
@@ -506,7 +506,7 @@ $.Autocompleter.Cache = function(options) {
 		load: function(q) {
 			if (!options.cacheLength || !length)
 				return null;
-			/* 
+			/*
 			 * if dealing w/local data and matchContains than we must make sure
 			 * to loop through all the data collections looking for matches
 			 */
@@ -528,7 +528,7 @@ $.Autocompleter.Cache = function(options) {
 					}
 				}				
 				return csub;
-			} else 
+			} else
 			// if the exact item exists, use it
 			if (data[q]){
 				return data[q];
@@ -578,7 +578,7 @@ $.Autocompleter.Select = function (options, input, select, config) {
 		list = $("<ul/>").appendTo(element).mouseover( function(event) {
 			if(target(event).nodeName && target(event).nodeName.toUpperCase() == 'LI') {
 	            active = $("li", list).removeClass(CLASSES.ACTIVE).index(target(event));
-			    $(target(event)).addClass(CLASSES.ACTIVE);            
+			    $(target(event)).addClass(CLASSES.ACTIVE);
 	        }
 		}).click(function(event) {
 			$(target(event)).addClass(CLASSES.ACTIVE);
@@ -596,7 +596,7 @@ $.Autocompleter.Select = function (options, input, select, config) {
 			element.css("width", options.width);
 			
 		needsInit = false;
-	} 
+	}
 	
 	function target(event) {
 		var element = event.target;
@@ -726,7 +726,7 @@ $.Autocompleter.Select = function (options, input, select, config) {
 						listItems.width( list.width() - parseInt(listItems.css("padding-left")) - parseInt(listItems.css("padding-right")) );
 					}
                 }
-                
+
             }
 		},
 		selected: function() {

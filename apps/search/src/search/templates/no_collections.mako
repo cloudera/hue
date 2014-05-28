@@ -49,13 +49,13 @@ ${ commonheader(_('Search'), "search", user, "120px") | n,unicode }
         ${ _('... First create a search dashboard with ') }
         <a class="btn importBtn" href="${ url('search:new_search') }">
           <i class="fa fa-file-o"></i> ${ _('Dashboard') }
-        </a>      
+        </a>
       </h1>
       <h1>
         ${ _('... or create a search index with ') }
         <a class="btn importBtn" href="${ url('indexer:collections') }">
           <i class="fa fa-database"></i> ${ _('Indexer') }
-        </a>      
+        </a>
       </h1>
       % endif
     </div>

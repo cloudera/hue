@@ -19,7 +19,7 @@
 
 #macro(debug)#if($request.params.get('debugQuery'))&debugQuery=true#end#end
 
-#macro(boostPrice)#if($request.params.get('bf') == 'price')&bf=price#end#end        
+#macro(boostPrice)#if($request.params.get('bf') == 'price')&bf=price#end#end
 
 #macro(annotate)#if($request.params.get('annotateBrowse'))&annotateBrowse=true#end#end
 
@@ -35,7 +35,7 @@
 
 #macro(lensNoQ)?#if($request.params.getParams('fq') and $list.size($request.params.getParams('fq')) > 0)&#fqs($request.params.getParams('fq'))#end#sort($request.params.getParams('sort'))#debug#boostPrice#annotate#spatial#qOpts#group#end
 #macro(lens)#lensNoQ#q#end
-        
+
 
 #macro(url_for_lens)#{url_for_home}#lens#end
 
@@ -91,7 +91,7 @@
       #end
     #end
     </ul>
-  #end      
+  #end
 #end
 
 
@@ -150,7 +150,7 @@ $pad$v##
 $v##
     #end
   #end
-#end  
+#end
 
 #macro(utc_date $theDate)
 $date.format("yyyy-MM-dd'T'HH:mm:ss'Z'",$theDate,$date.getLocale(),$date.getTimeZone().getTimeZone("UTC"))##

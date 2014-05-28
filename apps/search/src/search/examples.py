@@ -28,11 +28,11 @@ def demo_handler(view_fn):
       return view_fn(request, *args, **kwargs)
     except Exception, e:
       from search.api import SolrApi
-      if '/solr/twitter_demo/select' in str(e):      
+      if '/solr/twitter_demo/select' in str(e):
         return SolrApi._get_json(TWITTER_SEARCH_RESPONSE)
-      elif '/solr/yelp_demo/select' in str(e):        
-        return SolrApi._get_json(YELP_SEARCH_RESPONSE)      
-      elif '/solr/log_demo/select' in str(e):        
+      elif '/solr/yelp_demo/select' in str(e):
+        return SolrApi._get_json(YELP_SEARCH_RESPONSE)
+      elif '/solr/log_demo/select' in str(e):
         return SolrApi._get_json(LOG_SEARCH_RESPONSE)
       else:
         raise e

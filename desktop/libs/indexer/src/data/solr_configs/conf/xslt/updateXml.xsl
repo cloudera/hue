@@ -1,4 +1,4 @@
-<!-- 
+<!--
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -30,7 +30,7 @@
         <xsl:apply-templates select="response/result/doc"/>
     </add>
   </xsl:template>
-  
+
   <!-- Ignore score (makes no sense to index) -->
   <xsl:template match="doc/*[@name='score']" priority="100">
   </xsl:template>
@@ -47,7 +47,7 @@
   <!-- Flatten arrays to duplicate field lines -->
   <xsl:template match="doc/arr" priority="100">
       <xsl:variable name="fn" select="@name"/>
-      
+
       <xsl:for-each select="*">
 		<xsl:element name="field">
 		    <xsl:attribute name="name"><xsl:value-of select="$fn"/></xsl:attribute>

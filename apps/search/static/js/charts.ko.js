@@ -149,7 +149,7 @@ ko.bindingHandlers.mapChart = {
       _fills["defaultFill"] = HueColors.LIGHT_BLUE;
       _fills["selected"] = HueColors.DARK_BLUE;
       $(_data).each(function(cnt, item) {
-    	var _place = item.label.toUpperCase();
+      var _place = item.label.toUpperCase();
         if (_place != null){
           _mapdata[_place] = {
             fillKey: "selected",
@@ -211,10 +211,10 @@ ko.bindingHandlers.mapChart = {
           selectedFillColor: HueColors.DARKER_BLUE,
           selectedBorderColor: HueColors.DARKER_BLUE,
           popupTemplate: function(geography, data) {
-        	var _hover = '';
-        	if (data != null) {
-        	  _hover = '<br/>' + mapHovers[data.id];
-        	}
+          var _hover = '';
+          if (data != null) {
+            _hover = '<br/>' + mapHovers[data.id];
+          }
             return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + _hover + '</div>'
           }
         }

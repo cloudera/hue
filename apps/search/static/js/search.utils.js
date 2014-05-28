@@ -154,7 +154,7 @@ function fixTemplateDotsAndFunctionNames(template) {
       }
       if (tag.indexOf(".") > -1) {
         _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
-      }      
+      }
     });
     _mustacheTmpl = _mustacheTmpl.replace(/\{\{(.+?)\}\}/g, "{{{$1}}}");
   }

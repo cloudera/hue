@@ -104,7 +104,7 @@ var Widget = function (size, id, name, widgetType, properties, offset, loading) 
     self.size(self.size() + 1);
     $("#wdg_" + self.id()).trigger("resize");
   }
-  
+
   self.compress = function () {
     self.size(self.size() - 1);
     $("#wdg_" + self.id()).trigger("resize");
@@ -113,7 +113,7 @@ var Widget = function (size, id, name, widgetType, properties, offset, loading) 
   self.moveLeft = function () {
     self.offset(self.offset() - 1);
   }
-  
+
   self.moveRight = function () {
     self.offset(self.offset() + 1);
   }
@@ -181,8 +181,8 @@ function setLayout(colSizes) {
 
 function loadLayout(viewModel, json_layout) {
   var _columns = [];
-  
-  $(json_layout).each(function (cnt, json_col) { 
+
+  $(json_layout).each(function (cnt, json_col) {
     var _rows = [];
     $(json_col.rows).each(function (rcnt, json_row) {
       var row = new Row();
@@ -206,10 +206,10 @@ var Query = function (vm, query) {
   self.qs = ko.mapping.fromJS(query.qs);
   self.fqs = ko.mapping.fromJS(query.fqs);
   self.start = ko.mapping.fromJS(query.start);
-  
+
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
-	var histogram_id = vm.collection.getHistogramFacet();
+  var histogram_id = vm.collection.getHistogramFacet();
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
             return (fq.type() == 'field' || fq.type() == 'range') && (histogram_id == null || histogram_id.id() != fq.id());
@@ -220,7 +220,7 @@ var Query = function (vm, query) {
 
   self.getFacetFilter = function(widget_id) {
     var _fq = null;
-    $.each(self.fqs(), function (index, fq) { 
+    $.each(self.fqs(), function (index, fq) {
       if (fq.id() == widget_id) {
         _fq = fq;
         return false;
@@ -244,19 +244,19 @@ var Query = function (vm, query) {
     }
     return null;
   });
-  
+
   self.selectedMultiq.subscribe(function () { // To keep below the computed
     vm.search();
   });
-  
+
   self.addQ = function (data) {
     self.qs.push(ko.mapping.fromJS({'q': ''}));
   };
-  
+
   self.removeQ = function (query) {
     self.qs.remove(query);
   };
-  
+
   self.toggleFacet = function (data) {
     var fq = self.getFacetFilter(data.widget_id);
 
@@ -281,17 +281,17 @@ var Query = function (vm, query) {
         }
       });
     }
-  
+
     vm.search();
-  }  
-  
+  }
+
   self.selectRangeFacet = function (data) {
     if (data.force != undefined) {
       self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
     }
-    
-	var fq = self.getFacetFilter(data.widget_id);
-	  
+
+  var fq = self.getFacetFilter(data.widget_id);
+  
     if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
           'id': data.widget_id,
@@ -299,21 +299,21 @@ var Query = function (vm, query) {
           'filter': [data.from],
           'properties': [{'from': data.from, 'to': data.to}],
           'type': 'range'
-      }));    	
-    } else {    
+      }));      
+    } else {
       if (fq.filter().indexOf(data.from) > -1) { // Unselect
-    	fq.filter.remove(data.from);
-    	$.each(fq.properties(), function (index, prop) {
-    	  if (prop && prop.from() == data.from) {
-    	    fq.properties.remove(prop);
-    	  }
-    	});
-    	if (fq.filter().length == 0) {
+      fq.filter.remove(data.from);
+      $.each(fq.properties(), function (index, prop) {
+        if (prop && prop.from() == data.from) {
+          fq.properties.remove(prop);
+        }
+      });
+      if (fq.filter().length == 0) {
           self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
-    	}    	 
+      }      
       } else {
-    	 fq.filter.push(data.from);
-    	 fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
+       fq.filter.push(data.from);
+       fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
       }
     }
 
@@ -321,28 +321,28 @@ var Query = function (vm, query) {
       vm.search();
     }
   };
-  
-  self.removeFilter = function (data) { 
+
+  self.removeFilter = function (data) {
     $.each(self.fqs(), function (index, fq) {
-      if (fq.id() == data.id()) {          
+      if (fq.id() == data.id()) {
         self.fqs.remove(fq);
         // Also re-init range select widget
         var rangeWidget = vm.collection.getFacetById(fq.id());
         if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
-          vm.collection.timeLineZoom({'id': rangeWidget.id()});	
+          vm.collection.timeLineZoom({'id': rangeWidget.id()});  
         }
         return false;
       }
     });
-  }; 
-  
+  };
+
   self.paginate = function (direction) {
-	if (direction == 'next') {
-	  self.start(self.start() + vm.collection.template.rows() * 1.0);
-	} else {
-	  self.start(self.start() - vm.collection.template.rows() * 1.0);
-	}
-	vm.search();
+  if (direction == 'next') {
+    self.start(self.start() + vm.collection.template.rows() * 1.0);
+  } else {
+    self.start(self.start() - vm.collection.template.rows() * 1.0);
+  }
+  vm.search();
   };
 };
 
@@ -403,7 +403,7 @@ var Collection = function (vm, collection) {
     });
   });
   self.template.rows.subscribe(function(){
-	vm.search();
+  vm.search();
   });
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
@@ -411,7 +411,7 @@ var Collection = function (vm, collection) {
 
   self.availableFacetFields = ko.computed(function() {
     var facetFieldNames = $.map(self.facets(), function(facet) {
-	  return facet.field(); //filter out text_general, __version__
+    return facet.field(); //filter out text_general, __version__
     });
     return $.grep(self.fields(), function(field) {
       return facetFieldNames.indexOf(field.name()) == -1;
@@ -422,7 +422,7 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     self.removeFacet(function(){return facet_json.widget_id});
-	  
+  
     $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
@@ -434,7 +434,7 @@ var Collection = function (vm, collection) {
           var facet = ko.mapping.fromJS(data.facet);
           facet.field.subscribe(function() {
             vm.search();
-          });      
+          });
           self.facets.push(facet);
           vm.search();
         } else {
@@ -446,12 +446,12 @@ var Collection = function (vm, collection) {
   self.removeFacet = function (widget_id) {
     $.each(self.facets(), function (index, facet) {
       if (facet.id() == widget_id()) {
-        self.facets.remove(facet); 
+        self.facets.remove(facet);
         return false;
       }
     });
-  }  
-  
+  }
+
   self.getFacetById = function (facet_id) {
     var _facet = null;
     $.each(self.facets(), function (index, facet) {
@@ -473,18 +473,18 @@ var Collection = function (vm, collection) {
     });
     return _facet;
   }
-  
+
   self.getHistogramFacet = function () { // Should do multi histogram
     return self.getFacetByType('histogram-widget');
   }
-  
+
   self.template.fields = ko.computed(function () {
     var _fields = [];
     $.each(self.template.fieldsAttributes(), function (index, field) {
       var position = self.template.fieldsSelected.indexOf(field.name());
       if (position != -1) {
         _fields[position] = field;
-      }      
+      }
     });
     return _fields;
   });
@@ -497,7 +497,7 @@ var Collection = function (vm, collection) {
         return false;
       }
     });
-    return _field;    
+    return _field;
   };
 
   self.template.fieldsModalFilter = ko.observable(""); // For UI
@@ -523,7 +523,7 @@ var Collection = function (vm, collection) {
   });
   self.template.availableWidgetFields = ko.computed(function() {
     if (self.template.fieldsModalType() == 'histogram-widget') {
-      return vm.availableDateFields();	
+      return vm.availableDateFields();  
     }
     else if (self.template.fieldsModalType() == 'line-widget') {
       return vm.availableNumberFields();
@@ -533,11 +533,11 @@ var Collection = function (vm, collection) {
     }
   });
   self.template.availableWidgetFieldsNames = ko.computed(function() {
-	return $.map(self.template.availableWidgetFields(), function(field){
-	  return field.name();
-	});
+  return $.map(self.template.availableWidgetFields(), function(field){
+    return field.name();
   });
-  
+  });
+
   self.template.fieldsModalFilter.subscribe(function(value) {
     var _fields = [];
     var _availableFields = self.template.availableWidgetFields();
@@ -553,43 +553,43 @@ var Collection = function (vm, collection) {
   self.switchCollection = function() { // Long term would be to reload the page
     $.post("/search/get_collection", {
         name: self.name()
-	  }, function (data) {
-	    if (data.status == 0) {
-	      self.idField(data.collection.collection.idField);	      
-	      self.template.template(data.collection.collection.template.template);
-	      self.template.fieldsAttributes.removeAll();
-	      $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
-		    self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-		  });	      
-	      self.fields.removeAll();
-	      $.each(data.collection.collection.fields, function(index, field) {
-	    	self.fields.push(ko.mapping.fromJS(field));
-	      });
-	    }
-	}).fail(function (xhr, textStatus, errorThrown) {});
+    }, function (data) {
+      if (data.status == 0) {
+        self.idField(data.collection.collection.idField);  
+        self.template.template(data.collection.collection.template.template);
+        self.template.fieldsAttributes.removeAll();
+        $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
+        self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
+      });  
+        self.fields.removeAll();
+        $.each(data.collection.collection.fields, function(index, field) {
+        self.fields.push(ko.mapping.fromJS(field));
+        });
+      }
+  }).fail(function (xhr, textStatus, errorThrown) {});
   };
-  
+
   function diff(A, B) {
-	return A.filter(function (a) {
-	  return B.indexOf(a) == -1;
-	});
+  return A.filter(function (a) {
+    return B.indexOf(a) == -1;
+  });
   }
 
   function syncArray(currentObservable, newJson, isDynamic) {
     // Get names of fields
     var _currentFieldsNames = $.map(
         $.grep(currentObservable(), function(field) {
-    	    return field.isDynamic() == isDynamic;
-    	  }), function(field) {
-    	return field.name(); 
+          return field.isDynamic() == isDynamic;
+        }), function(field) {
+      return field.name();
     });
     var _newFieldsNames = $.map(
-    	$.grep(newJson, function(field) {
-    	  return field.isDynamic == isDynamic;
+      $.grep(newJson, function(field) {
+        return field.isDynamic == isDynamic;
         }), function(field) {
-    	return field.name;
+      return field.name;
     });
-      
+
     var _toDelete = diff(_currentFieldsNames, _newFieldsNames);
     var _toAdd = diff(_newFieldsNames, _currentFieldsNames);
 
@@ -601,33 +601,33 @@ var Collection = function (vm, collection) {
     });
     // New fields
     $.each(newJson, function(index, field) {
-  	 if (_toAdd.indexOf(field.name) != -1) {
+     if (_toAdd.indexOf(field.name) != -1) {
         currentObservable.push(ko.mapping.fromJS(field));
       }
     });
-  }  
-  
+  }
+
   self.syncFields = function() {
     $.post("/search/get_collection", {
         name: self.name()
-	  }, function (data) {
-	    if (data.status == 0) {
-	      self.idField(data.collection.collection.idField);   
-	      syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);	      
-	      syncArray(self.fields, data.collection.collection.fields, false);
-	    }
-	    // After sync the dynamic fields
-	    self.syncDynamicFields()
-	}).fail(function (xhr, textStatus, errorThrown) {});
+    }, function (data) {
+      if (data.status == 0) {
+        self.idField(data.collection.collection.idField);
+        syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);  
+        syncArray(self.fields, data.collection.collection.fields, false);
+      }
+      // After sync the dynamic fields
+      self.syncDynamicFields()
+  }).fail(function (xhr, textStatus, errorThrown) {});
   };
-  
+
   self.syncDynamicFields = function () {
     $.post("/search/index/fields/dynamic", {
-    	name: self.name()
+      name: self.name()
       }, function (data) {
         if (data.status == 0) {
-  	      syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);	      
-	      syncArray(self.fields, data.fields, true);
+          syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);  
+        syncArray(self.fields, data.fields, true);
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
@@ -638,47 +638,47 @@ var Collection = function (vm, collection) {
     } else if (template_field.sort.direction() == 'desc') {
       template_field.sort.direction('asc');
     } else {
-      template_field.sort.direction(null); 
+      template_field.sort.direction(null);
     }
     $(document).trigger("setResultsHeight");
     vm.search();
   };
-  
+
   self.toggleSortFacet = function (facet_field, event) {
     if (facet_field.properties.sort() == 'desc') {
       facet_field.properties.sort('asc');
     } else {
       facet_field.properties.sort('desc');
-    }   
-   
+    }
+
     $(event.target).button('loading');
     vm.search();
   };
 
   self.toggleRangeFacet = function (facet_field, event) {
     vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
- 
+
     if (facet_field.type() == 'field') {
        facet_field.type('range');
      } else if (facet_field.type() == 'range') {
        facet_field.type('field')
      }
-   
+
     $(event.target).button('loading');
     vm.search();
-  };  
+  };
 
-  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(data)); 
+  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(data));
     var facet = self.getFacetById(data.widget_id);
-  
+
     facet.properties.start(data.from);
     facet.properties.end(data.to);
-  
+
     vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
-  
+
     $.ajax({
       type: "POST",
-      url: "/search/get_range_facet",    
+      url: "/search/get_range_facet",
       data: {
         collection: ko.mapping.toJSON(self),
         facet: ko.mapping.toJSON(facet),
@@ -690,20 +690,20 @@ var Collection = function (vm, collection) {
         }
       },
       async: false
-    });  
-  
+    });
+
     vm.search();
   }
 
-  self.timeLineZoom = function (facet_json) { 
+  self.timeLineZoom = function (facet_json) {
     var facet = self.getFacetById(facet_json.id);
 
     facet.properties.start(facet.from);
     facet.properties.end(facet.to);
-  
+
     $.ajax({
       type: "POST",
-      url: "/search/get_range_facet",    
+      url: "/search/get_range_facet",
       data: {
         collection: ko.mapping.toJSON(self),
         facet: ko.mapping.toJSON(facet),
@@ -714,7 +714,7 @@ var Collection = function (vm, collection) {
           facet.properties.start(data.properties.start);
           facet.properties.end(data.properties.end);
           facet.properties.gap(data.properties.gap);
-          
+
           var fq = vm.query.getFacetFilter(facet_json.id);
           if (fq != null) {
             fq.properties()[0].from(data.properties.start);
@@ -723,11 +723,11 @@ var Collection = function (vm, collection) {
         }
       },
       async: false
-    });  
-  
+    });
+
     vm.search();
   }
-  
+
   self.translateSelectedField = function (index, direction) {
     var array = self.template.fieldsSelected();
 
@@ -737,20 +737,20 @@ var Collection = function (vm, collection) {
       self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
     }
   };
-  
+
   self.upDownFacetLimit = function (facet_id, direction) {
     var facet = self.getFacetById(facet_id);
-    
+
     if (facet.properties.prevLimit == undefined) {
       facet.properties.prevLimit = facet.properties.limit();
     }
-    
+
     if (direction == 'up') {
       facet.properties.limit(facet.properties.limit() + 10);
     } else {
       facet.properties.limit(facet.properties.limit() - 10);
     }
-    
+
     vm.search();
   };
 };
@@ -761,29 +761,29 @@ var NewTemplate = function (vm, initial) {
   self.collections = ko.mapping.fromJS(initial.collections);
   self.layout = initial.layout;
   self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
-  
-  self.init = function() { 
-	if (self.inited()) {
-	  // If new dashboard
-	  vm.collection.name.subscribe(function(newValue) {
-		vm.collection.label(newValue);
-	    vm.collection.switchCollection();
-		vm.search();
-	  });
-	} else {
-	  self.syncCollections();
-	}	  
-	  
+
+  self.init = function() {
+    if (self.inited()) {
+      // If new dashboard
+      vm.collection.name.subscribe(function(newValue) {
+      vm.collection.label(newValue);
+      vm.collection.switchCollection();
+      vm.search();
+      });
+    } else {
+      self.syncCollections();
+    }  
+
     if (initial.autoLoad) {
-	  magicLayout(vm);
-    }   
+      magicLayout(vm);
+    }
   };
-  
+
   self.syncCollections = function () {
     $.post("/search/get_collections", {
     },function (data) {
       if (data.status == 0) {
-    	// Sync new and old names
+      // Sync new and old names
         $.each(data.collection, function(index, name) {
           if (self.collections.indexOf(name) == -1) {
             self.collections.push(name);
@@ -793,8 +793,8 @@ var NewTemplate = function (vm, initial) {
           if (data.collection.indexOf(collection) == -1) {
             self.collections.remove(collection);
           }
-        });        
-      } 
+        });
+      }
       else {
         $(document).trigger("error", data.message);
       }
@@ -803,7 +803,7 @@ var NewTemplate = function (vm, initial) {
     }).done(function() {
       self.inited(true);
     });
-  };   
+  };
 };
 
 
@@ -827,16 +827,16 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.norm_facets = ko.computed(function () {
     return self.response().normalized_facets;
   });
-  self.getFacetFromQuery = function (facet_id) {  
+  self.getFacetFromQuery = function (facet_id) {
     var _facet = null;
     if (self.norm_facets() !== undefined) {
-      $.each(self.norm_facets(), function (index, norm_facet) {  
+      $.each(self.norm_facets(), function (index, norm_facet) {
         if (norm_facet.id == facet_id) {
           _facet = norm_facet;
-        }      
+        }
       });
     }
-    return _facet;    
+    return _facet;
   };
   self.toggledGridlayoutResultChevron = ko.observable(false);
   self.enableGridlayoutResultChevron = function() {
@@ -855,7 +855,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isEditing(!self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
-      
+
   self.draggableHit = ko.observable(new Widget(12, UUID(), "Hit Count", "hit-widget"));
   self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
   self.draggableResultset = ko.observable(new Widget(12, UUID(), "Grid Results", "resultset-widget"));
@@ -865,7 +865,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
   self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
   self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
-  self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));  
+  self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
@@ -873,35 +873,35 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableNumberFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return NUMBER_TYPES.indexOf(field.type()) != -1; });
   });
-  
+
   function getWidgets(equalsTo) {
-	return $.map(self.columns(), function (col){return $.map(col.rows(), function(row){ return $.grep(row.widgets(), function(widget){ return equalsTo(widget); });}) ;})
+    return $.map(self.columns(), function (col){return $.map(col.rows(), function(row){ return $.grep(row.widgets(), function(widget){ return equalsTo(widget); });}) ;})
   };
-  
+
   self.availableDraggableResultset = ko.computed(function() {
-	return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
+    return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
   });
   self.availableDraggableFilter = ko.computed(function() {
-	return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget'; }).length == 0;
-  });  
+    return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget'; }).length == 0;
+  });
   self.availableDraggableHistogram = ko.computed(function() {
-	return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget'; }).length == 0 &&
-	  self.availableDateFields().length > 0;
+    return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget'; }).length == 0 &&
+    self.availableDateFields().length > 0;
   });
   self.availableDraggableNumbers = ko.computed(function() {
-	return getWidgets(function(widget){ return widget.widgetType() == 'line-widget'; }).length == 0 &&
-	  self.availableNumberFields().length > 0;
+    return getWidgets(function(widget){ return widget.widgetType() == 'line-widget'; }).length == 0 &&
+    self.availableNumberFields().length > 0;
   });
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;
   });
-  
+
   self.init = function (callback) {
-	self.initial.init();
-	self.collection.syncFields();
+  self.initial.init();
+  self.collection.syncFields();
     self.search(callback);
   }
-  
+
   self.searchBtn = function () {
     self.query.start(0);
     self.search();
@@ -910,22 +910,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.search = function (callback) {
     self.isRetrievingResults(true);
     $(".jHueNotify").hide();
-    
-    // Multi queries    
+
+    // Multi queries
     var multiQs = [];
     var multiQ = self.query.getMultiq();
-    
+
     if (multiQ != null) {
       var facet = {};
       var queries = [];
-      
+
       if (multiQ == 'query') {
         queries = self.query.qs();
       } else {
         facet = self.query.getFacetFilter(self.query.selectedMultiq());
-        queries = facet.filter();       
+        queries = facet.filter();
       }
-      
+
       multiQs = $.map(queries, function(qdata) {
         return $.post("/search/get_timeline", {
             collection: ko.mapping.toJSON(self.collection),
@@ -934,7 +934,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             qdata: ko.mapping.toJSON(qdata),
             multiQ: multiQ
           }, function (data) {return data});
-      });              
+      });
     }
 
     $.when.apply($, [
@@ -959,17 +959,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               var fields = self.collection.template.fieldsSelected();
               // Display selected fields or whole json document
               if (fields.length != 0) {
-                $.each(self.collection.template.fieldsSelected(), function (index, field) {  
+                $.each(self.collection.template.fieldsSelected(), function (index, field) {
                   row.push(item[field]);
                 });
               } else {
-                row.push(ko.mapping.toJSON(item)); 
+                row.push(ko.mapping.toJSON(item));
               }
               var doc = {
-            	  'id': item[self.collection.idField()],
-            	  'row': row,
-            	  'showDetails': ko.observable(item.showDetails),
-            	  'details': ko.observableArray(item.details),
+                'id': item[self.collection.idField()],
+                'row': row,
+                'showDetails': ko.observable(item.showDetails),
+                'details': ko.observableArray(item.details),
               };
               self.results.push(doc);
             });
@@ -991,7 +991,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
         var histoFacetId = self.collection.getHistogramFacet().id();
-        var histoFacet = self.getFacetFromQuery(histoFacetId);  
+        var histoFacet = self.getFacetFromQuery(histoFacetId);
         for (var i = 1; i < arguments.length; i++) {
           histoFacet.extraSeries.push(arguments[i][0]['series']);
         }
@@ -1046,12 +1046,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       id: doc.id
     }, function (data) {
       if (data.status == 0) {
-	    $.each(data.doc.doc, function(key, val) {
-	      doc['details'].push(ko.mapping.fromJS({
-		      key: key,
-		      value: val
-		  }));	    		    	
-	    });
+      $.each(data.doc.doc, function(key, val) {
+        doc['details'].push(ko.mapping.fromJS({
+          key: key,
+          value: val
+      }));                
+      });
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
@@ -1062,8 +1062,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  };  
-  
+  };
+
 
   self.save = function () {
     $.post("/search/save", {

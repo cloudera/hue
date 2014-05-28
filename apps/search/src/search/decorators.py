@@ -45,7 +45,7 @@ def allow_writer_only(view_func):
     collection_json = json.loads(request.POST.get('collection', '{}'))
     collection = Collection.objects.get(id=collection_json['id']) # TODO perms with doc model HUE-1987
 
-    if not request.user.is_superuser: 
+    if not request.user.is_superuser:
       message = _("Permission denied. You are not an Administrator.")
       raise PopupException(message)
 
