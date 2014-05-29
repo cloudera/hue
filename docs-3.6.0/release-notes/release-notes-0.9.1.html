@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>HUE v0.9.1, released July 21, 2010</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="HUE v0.9.1, released July 21, 2010" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp45568"></a>HUE v0.9.1, released July 21, 2010</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_list_of_all_bugs_fixed">1. List of All Bugs Fixed</a></span></dt><dt><span class="section"><a href="#_project_information">2. Project Information</a></span></dt></dl></div><p>HUE 0.9.1 is mainly a bug-fix release. Most notably:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+A lot of installation related issues have been corrected.
+</li><li class="listitem">
+The JFrame filtering system now supports garbage collection of individual
+  elements, which fixes memory leak on partial refresh.
+</li><li class="listitem">
+IE compatibility has improved.
+</li><li class="listitem">
+User manual has been updated.
+</li></ul></div><p>This release also includes a few small features:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+New multi-select widget for the front-end.
+</li><li class="listitem">
+A new configuration variable, <code class="literal">http_500_debug_mode</code>, turns on debugging for
+  internal server error.
+</li><li class="listitem">
+The <code class="literal">app_reg</code> tool registers and display the application’s author.
+</li></ul></div><div class="section" title="1. List of All Bugs Fixed"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_all_bugs_fixed"></a>1. List of All Bugs Fixed</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-2. app_reg does not install conf/*.ini
+</li><li class="listitem">
+HUE-3. Prod install contains jframegallery
+</li><li class="listitem">
+HUE-4. User manual S2.1 incorrect
+</li><li class="listitem">
+HUE-5. libs/hadoop should be more lenient looking for jars
+</li><li class="listitem">
+HUE-8. beeswax import data doesn’t work
+</li><li class="listitem">
+HUE-10. Makefile.vars: DESKTOP_PLUGIN_DIR incorrect
+</li><li class="listitem">
+HUE-12. Drop down box to select user for chown
+</li><li class="listitem">
+HUE-13. app_reg should show app’s author
+</li><li class="listitem">
+HUE-14. make processing ext-py unnecessarily
+</li><li class="listitem">
+HUE-15. Explicitly specifying default for jobtracker.thrift.address for consistency with hdfs-site.xml
+</li><li class="listitem">
+HUE-16. Provide a way to tell hudson.sh to skip cleaning the checkout.
+</li><li class="listitem">
+HUE-17. <span class="emphasis"><em>make install</em></span> fails if the working tree is not clean
+</li><li class="listitem">
+HUE-18. tests in <span class="emphasis"><em>help</em></span> app should not depend on useradmin
+</li><li class="listitem">
+HUE-19. Add get_content_summaries call to NameNode plugin.
+</li><li class="listitem">
+HUE-21. Create new JFrame Filter system that allows for individual element
+</li><li class="listitem">
+HUE-22. Allow relcoation of a Hue installation
+</li><li class="listitem">
+HUE-23. Integrate IE Compatible Protovis
+</li><li class="listitem">
+HUE-24. Filesize Sorting doesn’t work
+</li><li class="listitem">
+HUE-25. Allow multi-select for moving multiple users into a group
+</li><li class="listitem">
+HUE-26. UserAdmin js file throws error in IE
+</li><li class="listitem">
+HUE-28. confparse wasn’t handling continued lines correctly
+</li><li class="listitem">
+HUE-29. Set HADOOP_LOG_DIR for mini_cluster.py
+</li><li class="listitem">
+HUE-30: Add support for Behavior Filters to add keyboard events to JFrame instance
+</li><li class="listitem">
+HUE-32. User manual update
+</li><li class="listitem">
+HUE-33. Protovis version has bug wherein mark events do not have their index properly set
+</li><li class="listitem">
+HUE-34. Make Splitview’s fixed side be the one with the explicit size
+</li><li class="listitem">
+HUE-35. create icons for tiny file browser and a "go up" folder
+</li><li class="listitem">
+HUE-36. Allow form controls and the like to work in elements that toggle splitviews
+</li><li class="listitem">
+HUE-40. virtualenv_support missing setuptools for py2.6
+</li><li class="listitem">
+HUE-42. Toolbar buttons look messed up in Chrome
+</li><li class="listitem">
+HUE-44. Filebrowser: move file ok button does nothing while no file/folder is selected
+</li><li class="listitem">
+HUE-46. Bump version number for 0.9.1 release
+</li><li class="listitem">
+HUE-47. FitText filter isn’t garbage collecting right
+</li><li class="listitem">
+HUE-49. create table syntax error for partition table
+</li><li class="listitem">
+HUE-50. Removing desktop/core/ext-py/python-ldap-2.3.11.
+</li><li class="listitem">
+HUE-51. Hue needs a 500 template
+</li><li class="listitem">
+HUE-53. Fix various IE compatibility issues.
+</li><li class="listitem">
+HUE-56. 0.9.1 release notes
+</li></ul></div></div><div class="section" title="2. Project Information"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_project_information"></a>2. Project Information</h2></div></div></div><p>Homepage: <a class="ulink" href="http://github.com/cloudera/hue" target="_top">http://github.com/cloudera/hue</a></p></div></div></body></html>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v1.2.0, released Feb 21, 2011</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="Hue v1.2.0, released Feb 21, 2011" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp25136176"></a>Hue v1.2.0, released Feb 21, 2011</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_notable_changes_and_caveats">1. Notable Changes and Caveats</a></span></dt><dt><span class="section"><a href="#_list_of_all_bugs_fixed">2. List of All Bugs Fixed</a></span></dt><dt><span class="section"><a href="#_project_information">3. Project Information</a></span></dt></dl></div><p>Hue is a web interface for Hadoop, and a platform for building custom
+applications with a rich framework. The 1.2.0 is a minor release, largely
+focused on bug fixes and compatibility with the upcoming release of Cloudera’s
+Distribution for Apache Hadoop 3, beta 4.</p><div class="section" title="1. Notable Changes and Caveats"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_changes_and_caveats"></a>1. Notable Changes and Caveats</h2></div></div></div><p>Notable changes:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Upgraded Django to 1.2
+</li><li class="listitem">
+Many HueChart improvements and bug fixes
+</li><li class="listitem">
+Upgraded included Hive from 0.5 to 0.7
+</li><li class="listitem">
+Beeswax no longer leaks file descriptors
+</li><li class="listitem">
+Renamed all JavaScript references of "CCS" to "Hue"
+</li></ul></div><p>Caveats:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hue 1.2.0 only works with CDH3b4 or newer. CDH2 and earlier versions of CDH3
+will not work.
+</li><li class="listitem">
+The included version of Hive has been upgraded from 0.5 to 0.7. This version
+of Hive has changed the format for the metastore. Upgrading Hue 1.2 will require
+you to upgrade your metastore version using the upgrade scripts included with
+Hive.
+</li></ul></div></div><div class="section" title="2. List of All Bugs Fixed"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_all_bugs_fixed"></a>2. List of All Bugs Fixed</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-349. Standardize the DOCTYPE
+</li><li class="listitem">
+HUE-290. Make JFrame work stand-alone
+</li><li class="listitem">
+HUE-270.  JFrame doesn’t sweep content on refresh
+</li><li class="listitem">
+HUE-400. Beeswax sample installation assumes a ‘hue’ user
+</li><li class="listitem">
+HUE-301. Break Partial Refresh into a stand-alone class
+</li><li class="listitem">
+HUE-406. Prevent Hue from fetching and displaying login box twice.
+</li><li class="listitem">
+HUE-290. Make JFrame work stand-alone
+</li><li class="listitem">
+HUE-260. Relinquish the keyboard when an error popup is closed.
+</li><li class="listitem">
+HUE-263. Add support for Resizable and Sortable Behavior Filters.
+</li><li class="listitem">
+Resolving Hive 0.5 → Hive 0.6 API incompatibilities. Check whether DriverContext should be null in initialization of FetchTask.
+</li><li class="listitem">
+Switched to use the official CDH3b3 tarball.
+</li><li class="listitem">
+HUE-286. Adding notion of <span class="emphasis"><em>currentData</em></span> and selection handling to HueChart
+</li><li class="listitem">
+HUE-334. superuser can be deleted
+</li><li class="listitem">
+HUE-353.  Add livePathUpdate action to FormRequest
+</li><li class="listitem">
+HUE-322. CSS Modules
+</li><li class="listitem">
+HUE-308. Upgrade to Django 1.2
+</li><li class="listitem">
+HUE-261. When checking an element for draggability in the JBrowser header, ensure it’s extended (IE can’t extend embed tags).
+</li><li class="listitem">
+HUE-392. Proxy to support a blacklist
+</li><li class="listitem">
+HUE-266. Allow the user to choose their background as a preference.
+</li><li class="listitem">
+HUE-279. Various improvements to HueChart   Add handling for current offset parent in scrolled containter in pv.Mark.prototype.mouse   Add event bar and vector calculations to manually determine and fire wedgeOver/Out events.   Add getNormalizedForField function to HueChart.Data   Re-working event handling in HueChart.Box   Response to Nutron’s review comments
+</li><li class="listitem">
+HUE-310. Handle large file upload.
+</li><li class="listitem">
+HUE-303. FIXED Popup windows try to select the text inside the first checkbox instead of the first text input
+</li><li class="listitem">
+HUE-413. Beeswax history page filter box not working
+</li><li class="listitem">
+HUE-412. Allow HueChart to deal with no data and pull out appropriate arrays representative of data series which are in the data object.
+</li><li class="listitem">
+[HUE-345] Provide way to override settings and classpath of minicluster.
+</li><li class="listitem">
+Adding Pygments-1.3.1.
+</li><li class="listitem">
+HUE-416. filebrowser: chown leads to an error page
+</li><li class="listitem">
+HUE-262. When cleaning up partials in partial refresh; do not attempt to remove line containers that don’t exist.
+</li><li class="listitem">
+[HUE-354] beeswax_server.sh should put HADOOP_EXTRA_CLASSPATH_STRING on the Beeswax server’s classpath
+</li><li class="listitem">
+HUE-11. jframegallery should show the html source
+</li><li class="listitem">
+HUE-409. Add info about secret key to Hue installation guide
+</li><li class="listitem">
+HUE-277.  supervisor.py doesn’t drop group privileges
+</li><li class="listitem">
+HUE-271. Beeswax_server should have configurable java heap size
+</li><li class="listitem">
+HUE-365. jobbrowser test using the wrong job id
+</li><li class="listitem">
+HUE-315.  Make Protovis/HueChart work in IE
+</li><li class="listitem">
+HUE-350.  Change form.ccs-table_config to .ccs-table_config
+</li><li class="listitem">
+HUE-304. Cannot submit form from outside. Allow submitting any form from any link not only a child of the form itself.
+</li><li class="listitem">
+HUE-274. Add a filter for autocompletion
+</li><li class="listitem">
+HUE-302. Continued HueChart Improvments
+</li><li class="listitem">
+HUE-309. Hardcoded "default" hdfs cluster in config
+</li><li class="listitem">
+HUE-342.  Add draggable HueChart.Box selections and refactor date handling in HueChart
+</li><li class="listitem">
+HUE-282. beeswax hive_conf_dir should be /etc/hive/conf
+</li><li class="listitem">
+Add ability for livePath to work with form elements simply using name and value of the element.
+</li><li class="listitem">
+HUE-318.  SubmitOnChange doesn’t work with checkboxes in IE.
+</li><li class="listitem">
+HUE-306. Add color management to HueChart.
+</li><li class="listitem">
+HUE-409. Add info about secret key to Hue installation guide
+</li><li class="listitem">
+HUE-393. Beeswax doesn’t work with external metastore
+</li><li class="listitem">
+HUE-265. Add a linker that can hide its parent element.
+</li><li class="listitem">
+HUE-326. Beeswax might be leaking file descriptors
+</li><li class="listitem">
+HUE-441. stderr content changes to Hue server error log upon job completion (cherry picked from commit afd6f313b0621c407c3106a851c96572fac1811c)
+</li><li class="listitem">
+HUE-313. jobsub’s list somewhat broken when searching with an owner name
+</li><li class="listitem">
+HUE-276. Implement a generic way to do mini graphs e.g. in table cells
+</li><li class="listitem">
+HUE-343. CSS Button Component
+</li><li class="listitem">
+[HUE-345] Provide way to override settings and classpath of minicluster (REVISED)
+</li><li class="listitem">
+HUE-353. Add livePathUpdate action to FormRequest
+</li><li class="listitem">
+HUE-311. Hue’s conf.py should warn about variables without type= parameters that look like numbers
+</li><li class="listitem">
+HUE-415. beeswax doesn’t honour hive_conf_dir
+</li><li class="listitem">
+HUE-360. Fixing issue with incorrect column definitions when creating tables manually in Beeswax
+</li><li class="listitem">
+HUE-359. Allow JFrame Gallery to read from multiple directories
+</li><li class="listitem">
+HUE-308. Upgrade to Django 1.2
+</li><li class="listitem">
+HUE-292. The Chooser JFrame linker <code class="literal">data-chooseFor</code> name selector now starts form the FORM parent element of the link if it exists
+</li><li class="listitem">
+Updating Hive jars from 0.5 to 0.6. Updating beeswax_server.sh, hive-default-xml.jar and tests to work with Hive 0.6.
+</li><li class="listitem">
+HUE-291. Make Partial Refresh honor response order.
+</li><li class="listitem">
+HUE-410. Add HueChart.Tips to change elementEnter/show functionality.
+</li><li class="listitem">
+HUE-432. Updating jframe.hash; Post load prompt popup works again (cherry picked from commit ca77ce137f47502a3d794181905cb8ab0f620fbe)
+</li><li class="listitem">
+HUE-263. Add support for Resizable and Sortable Behavior Filters.
+</li><li class="listitem">
+HUE-357. TreeView does not propagate errors. (cherry picked from commit c878a2bb6bc70593e52290afc8fa4ff2292c3cd7)
+</li><li class="listitem">
+HUE-287. hue.ini mentions PamBackend erroneously
+</li><li class="listitem">
+HUE-324. Add ability for HueChart.Box charts to determine what data series and value the mouse is over.
+</li><li class="listitem">
+HUE-405. Hue User Admin does not support non-ascii names
+</li><li class="listitem">
+HUE-336. kt_renewer doesn’t work for root user
+</li><li class="listitem">
+HUE-224. Increase Beeswax’s default $HADOOP_HEAPSIZE.
+</li><li class="listitem">
+HUE-402.  Fix DynamicTips reference in HueChart
+</li><li class="listitem">
+HUE-323. Make it possible for forms to specify an ajax target
+</li><li class="listitem">
+HUE-414. Running beeswax examples produces "unsaved" queries
+</li><li class="listitem">
+HUE-264. Add a timer filter that increments up every second.
+</li><li class="listitem">
+HUE-366. Update Beeswax Hive from 0.5 to 0.6. Updating Hive jars from 0.5 to 0.6. Resolving Hive 0.5 → Hive 0.6 API incompatibilities in BeeswaxServiceImpl. Updating beeswax_server.sh, hive-default-xml.jar and tests to work with Hive 0.6.
+</li><li class="listitem">
+HUE-300. Adding a default log4j.properties file to the conf dir to make java logging for beeswax configurable
+</li><li class="listitem">
+HUE-200. Permission Denied error on Install Samples isn’t propagated well
+</li><li class="listitem">
+[HUE-337] Load all libs AND all apps before binding configs.
+</li><li class="listitem">
+HUE-269. Disable "smart" typing in PostEditor
+</li><li class="listitem">
+[HUE-355] Move Hadoop settings in mini_cluster.py into constants.
+</li><li class="listitem">
+HUE-265. Add a linker that can hide its parent element.
+</li><li class="listitem">
+HUE-325.  Add ability for HueChart.Box charts to show DynamicTips
+</li><li class="listitem">
+HUE-401: Socket timeout of 2s is too aggressive in Thrift plugin
+</li><li class="listitem">
+HUE-347. Ensure CSS files are not cached
+</li><li class="listitem">
+HUE-418. Errant debug message in JT plugin
+</li><li class="listitem">
+HUE-434. Missing all icons
+</li><li class="listitem">
+HUE-266. Allow the user to choose their background as a preference.
+</li><li class="listitem">
+HUE-278. Add HueCharts library to Hue   Move Number.Files.js up to core/static   Add HueChart, HueChart.Area, .Box, .Line and corresponding package.yml changes   Add HueChart.Circle   Response to Nutron’s review comments on HueChart.
+</li><li class="listitem">
+HUE-305. Cannot easily declare accesskeys for children of an HTMLTable. Allow simple declarative Keyboard shortcut creation from data-accesskey attributes.
+</li><li class="listitem">
+HUE-348. When FilterInput updates a zebra table, update the zebras
+</li><li class="listitem">
+HUE-399.  Allow HueChart to show time offsets rather than absolute dates
+</li><li class="listitem">
+HUE-275. Add dynamic filter to Beeswax table view
+</li><li class="listitem">
+HUE-417. Beeswax views with big white bar at the bottom
+</li><li class="listitem">
+HUE-358. Rename all instances of "CCS" to "Hue"
+</li><li class="listitem">
+HUE-395.  Various HueChart Improvements   — Removing ms_from_first and using UTC ms values instead.   — Integrating Shawn’s getTicks method.   — Adding ability to change HueChart data after initialization: setData and addDataSeries.
+</li><li class="listitem">
+HUE-264. Add a timer filter that increments up every second.
+</li><li class="listitem">
+HUE-335.  Hue throws <span class="emphasis"><em>background is not defined</em></span> error on start in IE.
+</li><li class="listitem">
+HUE-351. Move Behavior.SubmitOnChange form search to click/change event.
+</li><li class="listitem">
+HUE-461. Clicking the Save As button in the file editor causes all changes to be thrown away. (cherry picked from commit 3e260cd1509390092a5e1c161d4cb59fb584c987)
+</li><li class="listitem">
+HUE-471. Document Hive upgrade (cherry picked from commit e46985cf66b5ae5e1752d0be382abd455cda042e)
+</li><li class="listitem">
+HUE-478. Add the Hive 0.7 metastore upgrade scripts to Hue (cherry picked from commit 54f17f7e24e5c387f8a5a4d3b203e7c999a6e20c)
+</li><li class="listitem">
+HUE-476. Upgrade beeswax’s Hive jars to Hive 0.7 from Hive 0.6.
+</li><li class="listitem">
+HUE-470. Thrift connection pooler breaks if thrift service inheritance is used (cherry picked from commit 03a91700c91501b4f5be6fe28f9daf9a8cf944a0)
+</li></ul></div></div><div class="section" title="3. Project Information"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_project_information"></a>3. Project Information</h2></div></div></div><p>Homepage: <a class="ulink" href="http://cloudera.github.com/hue/" target="_top">http://cloudera.github.com/hue/</a></p></div></div></body></html>
