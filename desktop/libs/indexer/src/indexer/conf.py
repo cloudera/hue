@@ -29,7 +29,8 @@ def solrctl():
   solrctl path
   """
   try:
-    return subprocess.check_output(['which', 'solrctl']).strip()
+    proc = subprocess.Popen(['which', 'solrctl'], stdout=subprocess.PIPE)
+    return proc.stdout.read().strip()
   except subprocess.CalledProcessError:
     return '/usr/bin/solrctl'
 

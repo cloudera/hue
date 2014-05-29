@@ -92,7 +92,7 @@ class CollectionManagerController(object):
                                stderr=subprocess.PIPE,
                                env={
                                  'SOLR_HOME': conf.SOLR_HOME.get(),
-                                 'SOLR_ZK_ENSEMBLE': 'conf.SOLR_ZK_ENSEMBLE.get()'
+                                 'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                })
     status = process.wait()
 
