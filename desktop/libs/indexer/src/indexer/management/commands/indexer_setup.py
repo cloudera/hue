@@ -44,7 +44,7 @@ class Command(NoArgsCommand):
     LOG.info(_("Installing twitter collection"))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
     self._setup_collection_from_csv({
-      'name': 'twitter_example',
+      'name': 'twitter_demo',
       'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
     }, path)
@@ -53,7 +53,7 @@ class Command(NoArgsCommand):
     LOG.info(_("Installing yelp collection"))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
     self._setup_collection_from_csv({
-      'name': 'yelp_example',
+      'name': 'yelp_demo',
       'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
     }, path)
@@ -62,7 +62,7 @@ class Command(NoArgsCommand):
     LOG.info(_("Installing jobs collection"))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_jobs_demo/index_data.csv'))
     self._setup_collection_from_csv({
-      'name': 'jobs_example',
+      'name': 'jobs_demo',
       'fields': self._parse_fields(path),
       'uniqueKeyField': 'id'
     }, path)
@@ -71,7 +71,7 @@ class Command(NoArgsCommand):
     LOG.info(_("Installing logs collection"))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_log_analytics_demo/index_data.csv'))
     self._setup_collection_from_csv({
-      'name': 'logs_example',
+      'name': 'log_analytics_demo',
       'fields': self._parse_fields(path, fieldtypes={
         'region_code': 'string',
         'referer': 'string'
@@ -81,37 +81,25 @@ class Command(NoArgsCommand):
     LOG.info(_("Logs collection successfully installed"))
 
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
-    if self.searcher.collection_exists(collection['name']):
-      self.searcher.delete_collection(collection['name'])
-
-    # Create instance directory, collection, and add fields
-    self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'])
+    if not self.searcher.collection_exists(collection['name']):
+      self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'])
 
     try:
       hdfs_path = '/tmp/%s' % uuid.uuid4()
 
-      # Put in HDFS
       with open(path) as fh:
-        if self.fs.do_as_user(self.user.username, self.fs.exists, hdfs_path):
-          overwrite = True
-        else:
-          overwrite = False
-        self.fs.do_as_user(self.user.username, self.fs.create, hdfs_path, data=fh.read(), overwrite=overwrite)
+        self.fs.do_as_user(self.user.username, self.fs.create, hdfs_path, data=fh.read())
 
-      # Index data
-      self.searcher.update_data_from_hdfs(self.fs,
-                                     collection['name'],
-                                     collection['fields'],
-                                     hdfs_path,
-                                     'separated',
-                                     separator=separator,
-                                     quote_character=quote_character)
-
-    except:
-      self.searcher.delete_collection(collection['name'])
-      raise
+      self.searcher.update_data_from_hdfs(
+          self.fs,
+          collection['name'],
+          collection['fields'],
+          hdfs_path,
+          'separated',
+          separator=separator,
+          quote_character=quote_character
+      )
     finally:
-      # Remove HDFS file
       if self.fs.do_as_user(self.user.username, self.fs.exists, hdfs_path):
         self.fs.do_as_user(self.user.username, self.fs.remove, hdfs_path, skip_trash=True)
 
