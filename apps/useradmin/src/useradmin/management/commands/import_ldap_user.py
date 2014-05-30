@@ -40,7 +40,7 @@ class Command(BaseCommand):
                                    action="store_true",
                                    default=False),
       make_option("--server", help=_t("Server to connect to."),
-                              action="store_true",
+                              action="store",
                               default=None),
   )
 

@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
   option_list = BaseCommand.option_list + (
       make_option("--server", help=_t("Server to connect to."),
-                              action="store_true",
+                              action="store",
                               default=None),
    )
 
