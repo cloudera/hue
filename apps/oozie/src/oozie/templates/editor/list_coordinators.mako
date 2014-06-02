@@ -30,6 +30,9 @@ ${ layout.menubar(section='coordinators') }
   input.search-query {
     vertical-align: top;
   }
+  .cron-frequency {
+    white-space: nowrap;
+  }
 </style>
 
 <div class="container-fluid">
@@ -103,7 +106,11 @@ ${ layout.menubar(section='coordinators') }
               ${ coordinator.workflow }
             % endif
           </td>
+          % if enable_cron_scheduling:
+          <td class="cron-frequency"><input class="value" type="hidden" value="${ coordinator.cron_frequency["frequency"] }"/></td>
+          % else:
           <td>${ coordinator.text_frequency }</td>
+          % endif
           <td>
             <span class="label label-info">${ coordinator.status }</span>
           </td>
@@ -161,6 +168,12 @@ ${ layout.menubar(section='coordinators') }
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+
+% if enable_cron_scheduling:
+<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
+<script src="/static/js/jqCron.js" type="text/javascript"></script>
+% endif
+
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
@@ -310,6 +323,12 @@ ${ layout.menubar(section='coordinators') }
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    % if enable_cron_scheduling:
+    ${ utils.cron_js() }
+    renderCrons(); // from utils.inc.mako
+    % endif
+
   });
 </script>
 
