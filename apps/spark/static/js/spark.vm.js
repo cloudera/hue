@@ -222,9 +222,14 @@ function sparkViewModel() {
         type: 'POST',
         success: function(data) {
           if (data.status == 0) {
-            $(document).trigger('saved.query', data);
+            if (self.query.id() == -1) {
+              self.query.id(data.design_id);
+              $(document).trigger('savedas.query', data);
+            } else {
+              $(document).trigger('saved.query', data);
+            }
           } else {
-        	self.query.errors.push(data.message);
+            self.query.errors.push(data.message);
           }
         },
         error: function() {
@@ -283,8 +288,8 @@ function sparkViewModel() {
             self.updateResults(data.results.result);
             self.resultsEmpty($.isEmptyObject(data.results.result));
           } else {
-        	self.query.errors.push(data.results.ERROR.message);
-          }          
+            self.query.errors.push(data.results.ERROR.message);
+          }
           $(document).trigger('executed.query', data);
         }
       },
