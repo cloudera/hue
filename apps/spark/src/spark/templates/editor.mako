@@ -500,6 +500,10 @@ ${ common.createContextModal() }
     $.jHueNotify.info("${_('Application saved successfully!')}")
   });
 
+  $(document).on('savedas.query', function() {
+    window.location.href = "${ url('spark:editor') }" + viewModel.query.id();
+  });
+
   var dataTable = null;
 
   function cleanResultsTable() {
