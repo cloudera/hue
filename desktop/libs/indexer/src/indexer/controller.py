@@ -78,13 +78,13 @@ class CollectionManagerController(object):
 
     return uniquekey, fields
 
-  def create_collection(self, name, fields, unique_key_field='id'):
+  def create_collection(self, name, fields, unique_key_field='id', df='text'):
     """
     Create solr collection and instance dir.
     Create schema.xml file so that we can set UniqueKey field.
     """
     # Need to remove path afterwards
-    tmp_path, solr_config_path = utils.copy_config_with_fields_and_unique_key(fields, unique_key_field)
+    tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df)
 
     # Create instance directory.
     process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--create", name, solr_config_path],

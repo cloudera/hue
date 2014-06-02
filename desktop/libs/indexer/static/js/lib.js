@@ -24,6 +24,7 @@ var Collection = function(name) {
 
   // Metadata
   self.uniqueKeyField = ko.observable().extend({'errors': null});
+  self.df = ko.observable().extend({'errors': null});
   self.hasHueCollection = ko.observable(true).extend({'errors': null});
   self.hasSolrCollection = ko.observable(true).extend({'errors': null});
 
@@ -68,6 +69,15 @@ var Field = function(collection, name, type, required, indexed, stored) {
     },
     'write': function(value) {
       collection.uniqueKeyField(self.name());
+      self.indexed(true);
+    }
+  });
+  self.df = ko.computed({
+    'read': function() {
+      return collection.df() == self.name();
+    },
+    'write': function(value) {
+      collection.df(self.name());
       self.indexed(true);
     }
   });
@@ -320,6 +330,39 @@ function chooseUniqueKey(collection) {
   // Find an integer
   if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
     return $.inArray(field.type().toLowerCase(), ['int', 'tint', 'pint']) != -1;
+  }))) return;
+
+  // Find first indexed field
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.indexed();
+  }))) return;
+
+  // Choose a field
+  fieldChooser(collection.fields());
+}
+
+function chooseDefaultField(collection) {
+  function fieldChooser(fields) {
+    if (fields.length > 0) {
+      fields[0].df(true);
+      return true;
+    }
+    return false;
+  }
+
+  // Find a field named "text"
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.name().toLowerCase() == 'text';
+  }))) return;
+
+  // Find a text field
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.type().toLowerCase().substring(0, 4) == 'text';
+  }))) return;
+
+  // Find a string field
+  if (fieldChooser(ko.utils.arrayFilter(collection.fields(), function(field) {
+    return field.type().toLowerCase() == 'string';
   }))) return;
 
   // Find first indexed field

@@ -224,6 +224,7 @@ var CreateCollectionViewModel = function() {
         if (data.status == 0) {
           self.collection.fields(inferFields(data.data, self.collection));
           chooseUniqueKey(self.collection);
+          chooseDefaultField(self.collection);
         } else {
           $(document).trigger("error", data.message);
         }

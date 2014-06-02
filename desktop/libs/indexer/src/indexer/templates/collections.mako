@@ -294,6 +294,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
         <th width="0%" class="nowrap">${_('Indexed')}</th>
         <th width="0%" class="nowrap">${_('Stored')}</th>
         <th width="0%" class="nowrap">${_('Unique Key')}</th>
+        <th width="0%" class="nowrap">${_('Default Field')}</th>
         <th width="50%"></th>
       </tr>
     </thead>
@@ -315,6 +316,12 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <p class="text-center">
             <input data-bind="checked: uniqueKeyField, visible: !uniqueKeyField()" name="unique-key" type="checkbox" />
             <span class="fa" data-bind="css: {'fa-check': uniqueKeyField}">
+          </p>
+        </td>
+        <td>
+          <p class="text-center">
+            <input data-bind="checked: df, visible: !df()" name="unique-key" type="checkbox" />
+            <span class="fa" data-bind="css: {'fa-check': df}">
           </p>
         </td>
         <td>
