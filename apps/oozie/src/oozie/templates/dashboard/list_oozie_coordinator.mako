@@ -56,7 +56,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         </li>
 
         <li class="nav-header">${ _('Frequency') }</li>
+        % if enable_cron_scheduling:
+        <li class="white cron-frequency"><input class="value" type="hidden" value="${ oozie_coordinator.frequency }"/></li>
+        % else:
         <li class="white">${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</li>
+        % endif
 
         <li class="nav-header">${ _('Next Materialized Time') }</li>
         <li class="white" id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
@@ -357,6 +361,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="/static/js/jquery.blueprint.js"></script>
 % endif
 
+% if enable_cron_scheduling:
+<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
+<script src="/static/js/jqCron.js" type="text/javascript"></script>
+% endif
 
 <style type="text/css">
   .CodeMirror.cm-s-default {
@@ -432,6 +440,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     $("a[data-row-selector='true']").jHueRowSelector();
 
     $("*[rel=tooltip]").tooltip();
+
+    % if enable_cron_scheduling:
+      ${ utils.cron_js() }
+      renderCrons();
+    % endif
 
     $(".dataset").each(function () {
       if ($(this).text().length > 15) {

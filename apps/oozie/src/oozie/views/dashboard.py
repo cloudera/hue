@@ -38,7 +38,7 @@ from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
 
-from oozie.conf import OOZIE_JOBS_COUNT
+from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
   RerunBundleForm
 from oozie.models import History, Job, Workflow, utc_datetime_format, Bundle,\
@@ -125,6 +125,7 @@ def list_oozie_coordinators(request):
     kwargs['user'] = request.user.username
 
   coordinators = get_oozie(request.user).get_coordinators(**kwargs)
+  enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
 
   if request.GET.get('format') == 'json':
     json_jobs = coordinators.jobs
@@ -137,6 +138,7 @@ def list_oozie_coordinators(request):
   return render('dashboard/list_oozie_coordinators.mako', request, {
     'jobs': split_oozie_jobs(request.user, coordinators.jobs),
     'has_job_edition_permission': has_job_edition_permission,
+    'enable_cron_scheduling': enable_cron_scheduling,
   })
 
 
@@ -275,6 +277,8 @@ def list_oozie_coordinator(request, job_id):
     }
     oozie_slas = api.get_oozie_slas(**params)
 
+  enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
+
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
     'oozie_slas': oozie_slas,
@@ -282,7 +286,8 @@ def list_oozie_coordinator(request, job_id):
     'oozie_bundle': oozie_bundle,
     'has_job_edition_permission': has_job_edition_permission,
     'show_all_actions': show_all_actions,
-    'MAX_COORD_ACTIONS': MAX_COORD_ACTIONS
+    'MAX_COORD_ACTIONS': MAX_COORD_ACTIONS,
+    'enable_cron_scheduling': enable_cron_scheduling,
   })
 
 

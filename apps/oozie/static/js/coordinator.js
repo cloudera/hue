@@ -16,11 +16,14 @@
 
 // Not in coordinator_properties as also used in create coordinator.
 
-function initCoordinator(coordinator_json) {
+function initCoordinator(coordinator_json, i18n) {
 
   var coordCron =
     $('#coord-frequency')
       .jqCron({
+        texts: {
+          i18n: i18n
+        },
         enabled_minute: false,
         multiple_dom: true,
         multiple_month: true,
@@ -31,7 +34,7 @@ function initCoordinator(coordinator_json) {
         default_period: 'day',
         default_value: coordinator_json.frequency,
         no_reset_button: true,
-        lang: 'en'
+        lang: 'i18n'
       })
       .jqCronGetInstance();
 

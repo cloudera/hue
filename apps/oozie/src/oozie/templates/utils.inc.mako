@@ -279,7 +279,6 @@
   </div>
 </%def>
 
-
 ## Would be nice include it in slaForm() somehow
 <%def name="slaGlobal()">
   function addSLATextAndPlaceholder(elements, $data) {
@@ -523,3 +522,51 @@
   </script>
 
 </%def>
+
+<%def name="cron_js()">
+var cron_i18n = {
+    empty: '${_('-all-')}',
+    name_minute: '${_('minute')}',
+    name_hour: '${_('hour')}',
+    name_day: '${_('day')}',
+    name_week: '${_('week')}',
+    name_month: '${_('month')}',
+    name_year: '${_('year')}',
+    text_period: '${_('Every')} <b />',
+    text_mins: ' ${_('at')} <b /> ${_('minutes past the hour')}',
+    text_time: ' ${_('at')} <b />:<b />',
+    text_dow: ' ${_('on')} <b />',
+    text_month: ' ${_('of')} <b />',
+    text_dom: ' ${_('on the')} <b />',
+    error1: '${_('The tag %s is not supported !')}',
+    error2: '${_('Bad number of elements')}',
+    error3: '${_('The jquery_element should be set into jqCron settings')}',
+    error4: '${_('Unrecognized expression')}',
+    weekdays: ['${_('monday')}', '${_('tuesday')}', '${_('wednesday')}', '${_('thursday')}', '${_('friday')}', '${_('saturday')}', '${_('sunday')}'],
+    months: ['${_('january')}', '${_('february')}', '${_('march')}', '${_('april')}', '${_('may')}', '${_('june')}', '${_('july')}', '${_('august')}', '${_('september')}', '${_('october')}', '${_('november')}', '${_('december')}']
+}
+function renderCrons() {
+    $(".cron-frequency").each(function(){
+      var _val = $(this).find(".value");
+      _val.jqCron({
+        texts: {
+          i18n: cron_i18n // comes from utils.inc.mako
+        },
+        readonly: true,
+        enabled_minute: false,
+        multiple_dom: true,
+        multiple_month: true,
+        multiple_mins: true,
+        multiple_dow: true,
+        multiple_time_hours: true,
+        multiple_time_minutes: false,
+        default_period: 'day',
+        default_value: _val.val(),
+        no_reset_button: true,
+        lang: 'i18n'
+      })
+      .jqCronGetInstance();
+    });
+}
+</%def>
+
