@@ -86,9 +86,12 @@ def list_coordinators(request, workflow_id=None):
   if workflow_id is not None:
     data = [job for job in data if job.workflow.id == workflow_id]
 
+  enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
+
   return render('editor/list_coordinators.mako', request, {
     'jobs': data,
     'json_jobs': json.dumps([job.id for job in data]),
+    'enable_cron_scheduling': enable_cron_scheduling,
   })
 
 

@@ -453,8 +453,10 @@ ${ layout.menubar(section='coordinators') }
 <form class="form-horizontal" id="add-dataset-form"></form>
 <form class="form-horizontal" id="edit-dataset-form"></form>
 
-<link rel="stylesheet" type="text/css" href="/static/ext/jqCron/jqCron.css" />
-<script type="text/javascript" src="/static/ext/jqCron/jqCron.min.js"></script>
+% if enable_cron_scheduling:
+<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
+<script src="/static/js/jqCron.js" type="text/javascript"></script>
+% endif
 
 <script type="text/javascript" src="/oozie/static/js/coordinator.js"></script>
 
@@ -623,7 +625,8 @@ ${ layout.menubar(section='coordinators') }
       };
 
       % if enable_cron_scheduling:
-        initCoordinator(${ coordinator_frequency | n,unicode });
+        ${ utils.cron_js() }
+        initCoordinator(${ coordinator_frequency | n,unicode }, cron_i18n); // cron_i18n comes from utils.inc.mako
       % endif
 
       window.slaModel = new slaModel();
