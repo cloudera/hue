@@ -139,7 +139,7 @@ def collections_create(request):
     searcher = CollectionManagerController(request.user)
 
     # Create instance directory, collection, and add fields
-    searcher.create_collection(collection.get('name'), collection.get('fields', []), collection.get('uniqueKeyField'))
+    searcher.create_collection(collection.get('name'), collection.get('fields', []), collection.get('uniqueKeyField'), collection.get('df'))
 
     try:
       if request.POST.get('source') == 'file':

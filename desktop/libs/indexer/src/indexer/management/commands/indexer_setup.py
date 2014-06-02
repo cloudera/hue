@@ -46,7 +46,8 @@ class Command(NoArgsCommand):
     self._setup_collection_from_csv({
       'name': 'twitter_demo',
       'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id'
+      'uniqueKeyField': 'id',
+      'df': 'text'
     }, path)
     LOG.info(_("Twitter collection successfully installed"))
 
@@ -55,7 +56,8 @@ class Command(NoArgsCommand):
     self._setup_collection_from_csv({
       'name': 'yelp_demo',
       'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id'
+      'uniqueKeyField': 'id',
+      'df': 'text'
     }, path)
     LOG.info(_("Yelp collection successfully installed"))
 
@@ -64,7 +66,8 @@ class Command(NoArgsCommand):
     self._setup_collection_from_csv({
       'name': 'jobs_demo',
       'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id'
+      'uniqueKeyField': 'id',
+      'df': 'description'
     }, path)
     LOG.info(_("Jobs collection successfully installed"))
 
@@ -76,13 +79,14 @@ class Command(NoArgsCommand):
         'region_code': 'string',
         'referer': 'string'
       }),
-      'uniqueKeyField': 'id'
+      'uniqueKeyField': 'id',
+      'df': 'record'
     }, path)
     LOG.info(_("Logs collection successfully installed"))
 
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
     if not self.searcher.collection_exists(collection['name']):
-      self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'])
+      self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'], collection['df'])
 
     try:
       hdfs_path = '/tmp/%s' % uuid.uuid4()

@@ -47,38 +47,56 @@ DEFAULT_FIELD = {
   'required': 'true'
 }
 
-def schema_xml_with_fields(schema_xml, fields):
-  fields_xml = ''
-  for field in fields:
-    field_dict = DEFAULT_FIELD.copy()
-    field_dict.update(field)
-    fields_xml += FIELD_XML_TEMPLATE % field_dict + '\n'
-  return force_unicode(force_unicode(schema_xml).replace(u'<!-- REPLACE FIELDS -->', force_unicode(fields_xml)))
+class SchemaXml(object):
+  def __init__(self, xml):
+    self.xml = xml
 
-def schema_xml_with_unique_key_field(schema_xml, unique_key_field):
-  return force_unicode(force_unicode(schema_xml).replace(u'<!-- REPLACE UNIQUE KEY -->', force_unicode(unique_key_field)))
+  def uniqueKeyField(self, unique_key_field):
+    self.xml = force_unicode(force_unicode(self.xml).replace(u'<!-- REPLACE UNIQUE KEY -->', force_unicode(unique_key_field)))
 
-def schema_xml_with_fields_and_unique_key(schema_xml, fields, unique_key_field):
-  return schema_xml_with_unique_key_field(schema_xml_with_fields(schema_xml, fields), unique_key_field)
+  def fields(self, fields):
+    fields_xml = ''
+    for field in fields:
+      field_dict = DEFAULT_FIELD.copy()
+      field_dict.update(field)
+      fields_xml += FIELD_XML_TEMPLATE % field_dict + '\n'
+    self.xml = force_unicode(force_unicode(self.xml).replace(u'<!-- REPLACE FIELDS -->', force_unicode(fields_xml)))
 
-def example_schema_xml_with_fields_and_unique_key(fields, unique_key_field):
-  # Get complete schema.xml
-  with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/schema.xml')) as f:
-    return schema_xml_with_fields_and_unique_key(f.read(), fields, unique_key_field)
 
-def copy_config_with_fields_and_unique_key(fields, unique_key_field):
-  # Get complete schema.xml
-  with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/schema.xml')) as f:
-    schema_xml = schema_xml_with_fields_and_unique_key(f.read(), fields, unique_key_field)
+class SolrConfigXml(object):
+  def __init__(self, xml):
+    self.xml = xml
 
+  def defaultField(self, df):
+    self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df)))
+
+
+def copy_configs(fields, unique_key_field, df):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
   solr_config_path = os.path.join(tmp_path, os.path.basename(conf.CONFIG_TEMPLATE_PATH.get()))
   shutil.copytree(conf.CONFIG_TEMPLATE_PATH.get(), solr_config_path)
 
-  # Write complete schema.xml to copy
-  with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
-    f.write(smart_str(schema_xml))
+  if fields or unique_key_field:
+    # Get complete schema.xml
+    with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/schema.xml')) as f:
+      schemaxml = SchemaXml(f.read())
+      schemaxml.uniqueKeyField(unique_key_field)
+      schemaxml.fields(fields)
+
+    # Write complete schema.xml to copy
+    with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
+      f.write(smart_str(schemaxml.xml))
+
+  if df:
+    # Get complete solrconfig.xml
+    with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/solrconfig.xml')) as f:
+      solrconfigxml = SolrConfigXml(f.read())
+      solrconfigxml.defaultField(df)
+
+    # Write complete solrconfig.xml to copy
+    with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
+      f.write(smart_str(solrconfigxml.xml))
 
   return tmp_path, solr_config_path
 
