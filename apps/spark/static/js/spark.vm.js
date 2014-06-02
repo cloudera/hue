@@ -243,6 +243,7 @@ function sparkViewModel() {
     data.autoContext = self.autoContext();
     data.context = self.context() ? self.context().name : '';
     data.params = ko.toJSON(self.query.params());
+    self.resultsEmpty(false);
     var request = {
       url: '/spark/api/execute',
       dataType: 'json',
