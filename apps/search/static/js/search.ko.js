@@ -910,6 +910,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.search = function (callback) {
     self.isRetrievingResults(true);
     $(".jHueNotify").hide();
+    logGA('search');
 
     // Multi queries
     var multiQs = [];
@@ -1085,4 +1086,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
+  function logGA(page) {
+    if (typeof trackOnGA == 'function') {
+      trackOnGA('search/' + page);
+    }
+  }
 };

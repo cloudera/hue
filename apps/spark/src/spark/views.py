@@ -32,13 +32,13 @@ from beeswax.views import safe_get_design
 from spark.job_server_api import get_api
 from spark.forms import UploadApp
 from desktop.lib.exceptions import StructuredException
-from desktop.lib.rest.http_client import RestException
 from spark.api import design_to_dict
 
 from spark.decorators import view_error_handler
 
 
 LOG = logging.getLogger(__name__)
+
 
 @view_error_handler
 def editor(request, design_id=None, query_history_id=None):
