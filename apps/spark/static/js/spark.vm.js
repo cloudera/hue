@@ -269,7 +269,7 @@ function sparkViewModel() {
   };
 
   self.checkQueryStatus = function() {
-  var timerId = 0;
+    var timerId = 0;
 
     var request = {
       url: '/spark/api/job/' + self.query.jobId(),
@@ -279,8 +279,12 @@ function sparkViewModel() {
         // Script finished
         if (data.results.status == 'OK' || data.results.status == 'ERROR') {
           clearInterval(timerId);
-          self.updateResults(data.results.result);
-          self.resultsEmpty($.isEmptyObject(data.results.result));
+          if (data.results.status == 'OK') {
+            self.updateResults(data.results.result);
+            self.resultsEmpty($.isEmptyObject(data.results.result));
+          } else {
+        	self.query.errors.push(data.results.ERROR.message);
+          }          
           $(document).trigger('executed.query', data);
         }
       },
