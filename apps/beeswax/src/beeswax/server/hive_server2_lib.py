@@ -743,7 +743,9 @@ class HiveServerClientCompatible(object):
 
 
   def get_tables(self, database, table_names):
-    return [table['TABLE_NAME'] for table in self._client.get_tables(database, table_names)]
+    tables = [table['TABLE_NAME'] for table in self._client.get_tables(database, table_names)]
+    tables.sort()
+    return tables
 
 
   def get_table(self, database, table_name):
