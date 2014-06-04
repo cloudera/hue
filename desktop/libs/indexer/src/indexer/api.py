@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from functools import wraps
+
 import itertools
 import json
 import logging
@@ -29,9 +30,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from search.models import Collection
 
 from controller import CollectionManagerController
-from utils import fields_from_log,\
-                  field_values_from_separated_file, get_type_from_morphline_type,\
-                  get_field_types
+from utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
 
 
 LOG = logging.getLogger(__name__)
@@ -111,18 +110,12 @@ def parse_fields(request):
 def collections(request):
   searcher = CollectionManagerController(request.user)
   solr_collections = searcher.get_collections()
-  hue_collections_map = {}
-  for collection in Collection.objects.all():
-    hue_collections_map[collection.name] = collection
-  massaged_collections = []
-  for collection in solr_collections:
-    massaged_collections.append({
-      'name': collection,
-    })
+
   response = {
     'status': 0,
-    'collections': list(massaged_collections)
+    'collections': [{'name': collection} for collection in solr_collections]
   }
+
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -166,8 +159,8 @@ def collections_create(request):
 
       response['status'] = 0
       response['message'] = _('Collection created!')
-    except:
-      searcher.delete_collection(collection.get('name'))
+    except Exception, e:
+      LOG.error(e)
       raise
   else:
     response['message'] = _('Collection missing.')

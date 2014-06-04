@@ -55,9 +55,10 @@ class CollectionManagerController(object):
 
   def get_collections(self):
     try:
-      solr_collections = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).collections()
+      from search.search_controller import SearchController
+      return SearchController(self.user).get_all_indexes()
     except Exception, e:
-      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+      LOG.warn('Error get_collections: %s' % e)
       solr_collections = []
 
     return solr_collections
@@ -95,8 +96,6 @@ class CollectionManagerController(object):
                                  'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                })
     status = process.wait()
-
-    # Don't want directories laying around
     shutil.rmtree(tmp_path)
 
     if status != 0:
@@ -104,6 +103,7 @@ class CollectionManagerController(object):
       raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
 
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+
     if not api.create_collection(name):
       # Delete instance directory.
       process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--delete", name],
@@ -113,6 +113,7 @@ class CollectionManagerController(object):
                                    'SOLR_HOME': conf.SOLR_HOME.get(),
                                    'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                  })
+
       if process.wait() != 0:
         LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
       raise PopupException(_('Could not create collection. Check error logs for more info.'))
@@ -160,6 +161,7 @@ class CollectionManagerController(object):
     Add hdfs path contents to index
     """
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+
     if indexing_strategy == 'upload':
       stats = fs.stats(path)
       if stats.size > MAX_UPLOAD_SIZE:

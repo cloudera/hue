@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import numbers
 import urllib
@@ -26,18 +25,9 @@ from datetime import datetime, timedelta
 from math import log
 from time import mktime
 
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import RestException
 from django.utils.translation import ugettext as _
 
-from libsolr.api import SolrApi as BaseSolrApi
-
-from search.conf import EMPTY_QUERY, SECURITY_ENABLED
-
-
 LOG = logging.getLogger(__name__)
-
-DEFAULT_USER = 'hue'
 
 
 def utf_quoter(what):
@@ -56,7 +46,6 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
     is_date = False
 
-    # to refactor
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # Cast floats to int currently
       stats_max = int(stat_facet['max'])
@@ -188,224 +177,3 @@ def _zoom_range_facet(solr_api, collection, facet, direction='out'):
   properties = {}
   _guess_range_facet(facet['widgetType'], solr_api, collection, facet['field'], properties)
   return properties
-
-
-class SolrApi(BaseSolrApi):
-  """
-  http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
-  """
-  def __init__(self, solr_url, user):
-    super(SolrApi, self).__init__(solr_url, user, SECURITY_ENABLED.get())
-
-  def _get_params(self):
-    if self.security_enabled:
-      return (('doAs', self._user ),)
-    return (('user.name', DEFAULT_USER), ('doAs', self._user),)
-
-  #@demo_handler
-  def query(self, collection, query):
-    solr_query = {}
-
-    solr_query['collection'] = collection['name']
-    solr_query['rows'] = min(int(collection['template']['rows'] or 10), 1000)
-    solr_query['start'] = min(int(query['start']), 10000)
-
-    q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
-
-    params = self._get_params() + (
-        ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']])),
-        ('wt', 'json'),
-        ('rows', solr_query['rows']),
-        ('start', solr_query['start']),
-    )
-
-    if any(collection['facets']):
-      params += (
-        ('facet', 'true'),
-        ('facet.mincount', 0),
-        ('facet.limit', 10),
-      )
-      for facet in collection['facets']:
-        if facet['type'] == 'query':
-          params += (('facet.query', '%s' % facet['field']),)
-        elif facet['type'] == 'range':
-          params += tuple([
-             ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-             ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
-             ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
-             ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),
-             ('f.%s.facet.mincount' % facet['field'], facet['properties']['mincount']),]
-          )
-        elif facet['type'] == 'field':
-          params += (
-              ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-              ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
-              ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
-          )
-
-    for fq in query['fqs']:
-      if fq['type'] == 'field':
-        # This does not work if spaces in Solr:
-        # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
-        f = []
-        for _filter in fq['filter']:
-          if _filter is not None and ' ' in _filter:
-            f.append('%s:"%s"' % (fq['field'], _filter))
-          else:
-            f.append('{!field f=%s}%s' % (fq['field'], _filter))
-        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}' % fq['field'] + ' '.join(f)))),)
-      elif fq['type'] == 'range':
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
-
-    if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
-      fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []
-      params += (('fl', urllib.unquote(utf_quoter(','.join(fields)))),)
-    else:
-      params += (('fl', '*'),)
-
-    params += (
-      ('hl', 'true'),
-      ('hl.fl', '*'),
-      ('hl.snippets', 3)
-    )
-
-    if collection['template']['fieldsSelected']:
-      fields = []
-      for field in collection['template']['fieldsSelected']:
-        attribute_field = filter(lambda attribute: field == attribute['name'], collection['template']['fieldsAttributes'])
-        if attribute_field:
-          if attribute_field[0]['sort']['direction']:
-            fields.append('%s %s' % (field, attribute_field[0]['sort']['direction']))
-      if fields:
-        params += (
-          ('sort', ','.join(fields)),
-        )
-
-    response = self._root.get('%(collection)s/select' % solr_query, params)
-
-    return self._get_json(response)
-
-
-  def suggest(self, solr_query, hue_core):
-    try:
-      params = self._get_params() + (
-          ('q', solr_query['q']),
-          ('wt', 'json'),
-      )
-      response = self._root.get('%(collection)s/suggest' % solr_query, params)
-      if type(response) != dict:
-        response = json.loads(response)
-      return response
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def collections(self):
-    try:
-      params = self._get_params() + (
-          ('detail', 'true'),
-          ('path', '/clusterstate.json'),
-      )
-      response = self._root.get('zookeeper', params=params)
-      return json.loads(response['znode'].get('data', '{}'))
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def collection_or_core(self, hue_collection):
-    if hue_collection.is_core_only:
-      return self.core(hue_collection.name)
-    else:
-      return self.collection(hue_collection.name)
-
-  def collection(self, name):
-    try:
-      collections = self.collections()
-      return collections[name]
-    except Exception, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def cores(self):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-      )
-      return self._root.get('admin/cores', params=params)['status']
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def core(self, core):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-          ('core', core),
-      )
-      return self._root.get('admin/cores', params=params)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def schema(self, core):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-          ('file', 'schema.xml'),
-      )
-      return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def fields(self, core, dynamic=False):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-          ('fl', '*'),
-      )
-      if not dynamic:
-        params += (('show', 'schema'),)
-      response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def luke(self, core):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-      )
-      response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def schema_fields(self, core):
-    try:
-      params = self._get_params() + (
-          ('wt', 'json'),
-      )
-      response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def stats(self, core, fields):
-    try:
-      params = (
-          ('q', EMPTY_QUERY.get()),
-          ('wt', 'json'),
-          ('rows', 0),
-          ('stats', 'true'),
-      )
-      params += tuple([('stats.field', field) for field in fields])
-      response = self._root.get('%(core)s/select' % {'core': core}, params=params)
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def get(self, core, doc_id):
-    try:
-      params = (
-          ('id', doc_id),
-          ('wt', 'json'),
-      )
-      response = self._root.get('%(core)s/get' % {'core': core}, params=params)
-      return self._get_json(response)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))

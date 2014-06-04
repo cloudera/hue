@@ -22,7 +22,7 @@ urlpatterns = patterns('search.views',
   url(r'^search$', 'search', name='search'),
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),
-  url(r'^browse/(?P<name>\w+)', 'browse', name='browse'),
+  url(r'^browse/(?P<name>.+)', 'browse', name='browse'),
   url(r'^download$', 'download', name='download'),
 
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),

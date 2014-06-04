@@ -20,26 +20,25 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import RestException
 
-from search.api import SolrApi, _guess_gap, _zoom_range_facet, _new_range_facet
+from libsolr.api import SolrApi
+from indexer.management.commands import indexer_setup
+
+from search.api import _guess_gap, _zoom_range_facet, _new_range_facet
 from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
 from search.management.commands import search_setup
 from search.models import Collection, augment_solr_response, augment_solr_exception
 from search.search_controller import SearchController
-
-from indexer.management.commands import indexer_setup
-
-from django.utils.encoding import force_unicode
-from desktop.lib.rest.http_client import RestException
 
 
 LOG = logging.getLogger(__name__)
@@ -96,7 +95,7 @@ def new_search(request):
 
 @allow_admin_only
 def browse(request, name):
-  collections = SearchController(request.user).get_solr_collection().keys()
+  collections = SearchController(request.user).get_all_indexes()
   if not collections:
     return no_collections(request)
 
