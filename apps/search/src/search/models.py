@@ -28,16 +28,12 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.i18n import smart_unicode
 
-from search.api import SolrApi
+from libsolr.api import SolrApi
+
 from search.conf import SOLR_URL
 
 
 LOG = logging.getLogger(__name__)
-
-
-"""
-Collection model contains all the data now.
-"""
 
 
 # Deprecated

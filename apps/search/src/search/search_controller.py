@@ -18,12 +18,12 @@
 
 import logging
 
-from desktop.lib.exceptions_renderable import PopupException
+from django.utils.translation import ugettext as _
 
-from search.api import SolrApi
+from libsolr.api import SolrApi
+
 from search.conf import SOLR_URL
 from search.models import Collection
-from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)
@@ -93,4 +93,10 @@ class SearchController(object):
     return SolrApi(SOLR_URL.get(), self.user).collections()
 
   def get_all_indexes(self):
-    return self.get_solr_collection().keys() + SolrApi(SOLR_URL.get(), self.user).cores().keys()
+    indexes = []
+    try:
+      indexes = self.get_solr_collection().keys()
+    except:
+      pass
+    return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
+
