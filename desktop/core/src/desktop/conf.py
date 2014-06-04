@@ -453,39 +453,6 @@ LDAP = ConfigSection(
       type=int,
       default=10),
 
-    USERS = ConfigSection(
-      key="users",
-      help=_("Configuration for LDAP user schema and search."),
-      members=dict(
-        USER_FILTER=Config("user_filter",
-                           default="objectclass=*",
-                           help=_("A base filter for use when searching for users.")),
-        USER_NAME_ATTR=Config("user_name_attr",
-                              default="sAMAccountName",
-                              help=_("The username attribute in the LDAP schema. "
-                                   "Typically, this is 'sAMAccountName' for AD and 'uid' "
-                                   "for other LDAP systems.")),
-      )
-    ),
-
-    GROUPS = ConfigSection(
-      key="groups",
-      help=_("Configuration for LDAP group schema and search."),
-      members=dict(
-        GROUP_FILTER=Config("group_filter",
-                           default="objectclass=*",
-                           help=_("A base filter for use when searching for groups.")),
-        GROUP_NAME_ATTR=Config("group_name_attr",
-                              default="cn",
-                              help=_("The group name attribute in the LDAP schema. "
-                                  "Typically, this is 'cn'.")),
-        GROUP_MEMBER_ATTR=Config("group_member_attr",
-                                 default="member",
-                                 help=_("The LDAP attribute which specifies the "
-                                      "members of a group.")),
-      )
-    ),
-
     LDAP_SERVERS = UnspecifiedConfigSection(
       key="ldap_servers",
       help=_("LDAP server record."),
@@ -514,9 +481,13 @@ LDAP = ConfigSection(
                          default=None,
                          help=_("The distinguished name to bind as, when importing from LDAP.")),
           BIND_PASSWORD=Config("bind_password",
-                         default=None,
-                         private=True,
-                         help=_("The password for the bind user.")),
+                               default=None,
+                               private=True,
+                               help=_("The password for the bind user.")),
+          SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
+                                            default=True,
+                                            type=coerce_bool,
+                                            help=_("Use search bind authentication.")),
 
           USERS = ConfigSection(
             key="users",
@@ -580,7 +551,38 @@ LDAP = ConfigSection(
     SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
                    default=True,
                    type=coerce_bool,
-                   help=_("Use search bind authentication."))))
+                   help=_("Use search bind authentication.")),
+
+    USERS = ConfigSection(
+      key="users",
+      help=_("Configuration for LDAP user schema and search."),
+      members=dict(
+        USER_FILTER=Config("user_filter",
+                           default="objectclass=*",
+                           help=_("A base filter for use when searching for users.")),
+        USER_NAME_ATTR=Config("user_name_attr",
+                              default="sAMAccountName",
+                              help=_("The username attribute in the LDAP schema. "
+                                   "Typically, this is 'sAMAccountName' for AD and 'uid' "
+                                   "for other LDAP systems.")),
+      )),
+
+    GROUPS = ConfigSection(
+      key="groups",
+      help=_("Configuration for LDAP group schema and search."),
+      members=dict(
+        GROUP_FILTER=Config("group_filter",
+                           default="objectclass=*",
+                           help=_("A base filter for use when searching for groups.")),
+        GROUP_NAME_ATTR=Config("group_name_attr",
+                              default="cn",
+                              help=_("The group name attribute in the LDAP schema. "
+                                  "Typically, this is 'cn'.")),
+        GROUP_MEMBER_ATTR=Config("group_member_attr",
+                                 default="member",
+                                 help=_("The LDAP attribute which specifies the "
+                                      "members of a group.")),
+      ))))
 
 
 OAUTH = ConfigSection(
