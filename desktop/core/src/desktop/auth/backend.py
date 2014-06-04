@@ -330,7 +330,7 @@ class LdapBackend(object):
     else:
       setattr(self._backend.settings, 'SERVER_URI', ldap_config.LDAP_URL.get())
 
-    if desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get():
+    if ldap_config.SEARCH_BIND_AUTHENTICATION.get():
       # New Search/Bind Auth
       base_dn = ldap_config.BASE_DN.get()
       user_name_attr = ldap_config.USERS.USER_NAME_ATTR.get()
