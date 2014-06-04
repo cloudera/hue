@@ -451,85 +451,88 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
 
     <div>
-      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
-        ${ _('Your search did not match any documents.') }
-      </div>
-
-      <!-- ko if: $root.response().response -->
-        <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }" style="padding: 8px; color: #666"></div>
-      <!-- /ko -->
-
       <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
       </div>
 
-      <div id="result-main" style="overflow-x: auto">
-        <table id="result-container" data-bind="visible: !$root.isRetrievingResults()" style="margin-top: 0; width: 100%">
-          <thead>
-            <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0">
-              <th style="width: 18px">&nbsp;</th>
-              <!-- ko foreach: $root.collection.template.fieldsSelected -->
-              <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
-                <div style="display: inline-block; width:20px;">
-                <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
-                    <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
-                    <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
-                </a>
-                </div>
-                <div style="display: inline-block;">
-                <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
-                  <span data-bind="text: name"></span>
-                  <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
-                </a>
+      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+        </br>
+        ${ _('Your search did not match any documents.') }
+      </div>
+
+      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length > 0">
+        <!-- ko if: $root.response().response -->
+          <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }" style="padding: 8px; color: #666"></div>
+        <!-- /ko -->
+
+        <div id="result-main" style="overflow-x: auto">
+          <table id="result-container" data-bind="visible: ! $root.isRetrievingResults()" style="margin-top: 0; width: 100%">
+            <thead>
+              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0">
+                <th style="width: 18px">&nbsp;</th>
+                <!-- ko foreach: $root.collection.template.fieldsSelected -->
+                <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
+                  <div style="display: inline-block; width:20px;">
+                    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
+                      <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
+                      <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
+                    </a>
                   </div>
-                <div style="display: inline-block; width:20px;">
-                <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
-                    <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
-                  <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
-                </a>
-                </div>
-              </th>
-              <!-- /ko -->
-            </tr>
-            <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
-              <th style="width: 18px">&nbsp;</th>
-              <th>${ ('Document') }</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: { data: $root.results, as: 'documents'}" class="result-tbody">
-            <tr class="result-row">
-              <td>
-                <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
-                  <i class="fa" data-bind="css: {'fa-caret-right' : ! showDetails(), 'fa-caret-down' : showDetails() }"></i>
-                </a>
-              </td>
-              <!-- ko foreach: row -->
-                <td data-bind="html: $data"></td>
-              <!-- /ko -->
-            </tr>
-            <tr data-bind="visible: showDetails">
-              <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
-                <!-- ko if: $data.details().length == 0 -->
-                 <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                 <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <div style="display: inline-block;">
+                    <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
+                      <span data-bind="text: name"></span>
+                      <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
+                    </a>
+                  </div>
+                  <div style="display: inline-block; width:20px;">
+                    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
+                      <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
+                      <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
+                    </a>
+                  </div>
+                </th>
                 <!-- /ko -->
-                <!-- ko if: $data.details().length > 0 -->
-          <div class="document-details">
-            <table>
-              <tbody data-bind="foreach: details">
-                <tr>
-                  <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th>
-                  <td width="100%" data-bind="text: value"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </tr>
+              <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
+                <th style="width: 18px">&nbsp;</th>
+                <th>${ ('Document') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: { data: $root.results, as: 'documents'}" class="result-tbody">
+              <tr class="result-row">
+                <td>
+                  <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
+                    <i class="fa" data-bind="css: {'fa-caret-right' : ! showDetails(), 'fa-caret-down' : showDetails() }"></i>
+                  </a>
+                </td>
+                <!-- ko foreach: row -->
+                  <td data-bind="html: $data"></td>
                 <!-- /ko -->
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+              <tr data-bind="visible: showDetails">
+                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+                  <!-- ko if: $data.details().length == 0 -->
+                    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+                    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <!-- /ko -->
+                  <!-- ko if: $data.details().length > 0 -->
+                    <div class="document-details">
+                      <table>
+                        <tbody data-bind="foreach: details">
+                          <tr>
+                             <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th>
+                             <td width="100%" data-bind="text: value"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  <!-- /ko -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   <!-- /ko -->
@@ -630,10 +633,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
     <div id="result-main" style="overflow-x: auto">
       <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+        </br>
         ${ _('Your search did not match any documents.') }
       </div>
 
-      <!-- ko if: $root.response().response -->
+      <!-- ko if: $root.response().response && $root.results().length > 0 -->
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
 
@@ -656,7 +660,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <i class="fa fa-arrow-left" data-bind="
         visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
-    </i></a>
+    </i>
+  </a>
 
   ${ _('Showing') }
   <span data-bind="text: ($data.response.start + 1)"></span>
