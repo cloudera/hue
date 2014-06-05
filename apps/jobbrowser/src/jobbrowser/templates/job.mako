@@ -526,20 +526,19 @@ $(document).ready(function () {
     var _this = $(this);
     _this.attr("data-loading-text", _this.text() + " ...");
     _this.button("loading");
-    $.post(_this.data("killurl"),
-            {
-              "format": "json"
-            },
-            function (response) {
-              _this.button("reset");
-              $("#killModal").modal("hide");
-              if (response.status != 0) {
-                $(document).trigger("error", "${ _('There was a problem killing this job.') }");
-              }
-              else {
-                callJobDetails({ url: _this.data("url")});
-              }
-            }
+    $.post(_this.data("killurl"), {
+          "format": "json"
+        },
+        function (response) {
+          _this.button("reset");
+          $("#killModal").modal("hide");
+          if (response.status != 0) {
+            $(document).trigger("error", "${ _('There was a problem killing this job.') }");
+          }
+          else {
+            callJobDetails({ url: _this.data("url")});
+          }
+        }
     );
   });
 
