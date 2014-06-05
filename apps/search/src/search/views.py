@@ -55,7 +55,11 @@ def index(request):
     else:
       return no_collections(request)
 
-  collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
+  try:
+    collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
+  except Exception, e:
+    raise PopupException(e, title=_('Error while accessing the collection'))
+
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   return render('search.mako', request, {
