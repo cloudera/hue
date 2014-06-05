@@ -1377,10 +1377,10 @@ $(document).ready(function () {
         tooltip: 'always'
       });
       _el.on("slide", function (e) {
-        _options.start(e.start);
-        _options.end(e.end);
-        _options.min(e.min);
-        _options.max(e.max);
+        _options.start(e.min);
+        _options.end(e.max);
+        _options.min(e.start);
+        _options.max(e.end);
         _options.gap(e.step);
       });
     },
