@@ -38,6 +38,15 @@ from django.utils.translation import ugettext as _
 LOGGER = logging.getLogger(__name__)
 
 
+def can_view_job(username, job_conf):
+  acl_modify = job_conf.get('mapreduce.job.acl-view-job', '')
+  return acl_modify == '*' or username in acl_modify.split(',')
+
+def can_modify_job(username, job_conf):
+  acl_modify = job_conf.get('mapreduce.job.acl-modify-job', '')
+  return acl_modify == '*' or username in acl_modify.split(',')
+
+
 class JobLinkage(object):
   """
   A thin representation of a job, without much of the details.
