@@ -208,9 +208,15 @@ nv.models.growingMultiBar = function() {
       selectBars = function(selected) {
         $(selected).each(function(cnt, item){
           bars.each(function(d, i) {
-            if (d.data.obj.value == item) {
-              d3.select(this).classed('selected', true);
-              d3.select(this).transition().duration(100).attr('y', -5);
+            if (d.x instanceof Date){
+              if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
+                d3.select(this).classed('selected', true);
+              }
+            }
+            else {
+              if (d.x == item) {
+                d3.select(this).classed('selected', true);
+              }
             }
           });
         });
@@ -233,12 +239,6 @@ nv.models.growingMultiBar = function() {
       barsEnter
           .on('mouseover', function(d,i) {
             d3.select(this).classed('hover', true);
-//            if (stacked){
-//              d3.select(this).transition().duration(100).attr('y', y((stacked ? d.y1 : 0)) - 5);
-//            }
-//            else {
-//              d3.select(this).transition().duration(100).attr('y', y(getY(d,i)) - 5);
-//            }
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -251,12 +251,6 @@ nv.models.growingMultiBar = function() {
           })
           .on('mouseout', function(d,i) {
             d3.select(this).classed('hover', false);
-            if (stacked){
-              d3.select(this).transition().duration(100).attr('y', y((stacked ? d.y1 : 0)));
-            }
-            else {
-              d3.select(this).transition().duration(100).attr('y', y(getY(d,i)));
-            }
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
