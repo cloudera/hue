@@ -390,8 +390,9 @@
         }
 
         function handleChoice(filePath) {
-          if (filePath.indexOf("${ workflow.deployment_dir }") > -1) {
-            filePath = filePath.substring("${ workflow.deployment_dir }".length + 1);
+          var _deployDir = $.trim("${ workflow.deployment_dir }");
+          if (_deployDir != "" && filePath.indexOf(_deployDir) > -1) {
+            filePath = filePath.substring(_deployDir.length + 1);
             if (filePath == "") {
               filePath = "./";
             }
