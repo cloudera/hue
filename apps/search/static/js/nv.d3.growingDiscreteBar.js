@@ -141,9 +141,8 @@ nv.models.growingDiscreteBar = function() {
       selectBars = function(selected) {
         $(selected).each(function(cnt, item){
           bars.each(function(d, i) {
-            if (d.data.obj.value == item) {
+            if (d.x == item) {
               d3.select(this).classed('selected', true);
-              d3.select(this).select("rect").transition().duration(100).attr('y', -5);
             }
           });
         });
@@ -156,7 +155,6 @@ nv.models.growingDiscreteBar = function() {
           })
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
             d3.select(this).classed('hover', true);
-            //d3.select(this).select("rect").transition().duration(100).attr('y', -5);
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -169,7 +167,6 @@ nv.models.growingDiscreteBar = function() {
           })
           .on('mouseout', function(d,i) {
             d3.select(this).classed('hover', false);
-            d3.select(this).select("rect").transition().duration(100).attr('y', 0);
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,

@@ -27,3 +27,13 @@ Overrides nvd3 classes
 .nvd3 .nv-legend .disabled rect {
   fill-opacity: 0;
 }
+
+.nvd3 .selected {
+  stroke-width: 2!important;
+  stroke-dasharray: 5;
+  stroke-opacity: 1!important;
+}
+
+.nvd3 .selected > rect {
+  stroke-opacity: 1!important;
+}
