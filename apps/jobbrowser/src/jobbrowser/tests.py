@@ -37,6 +37,7 @@ from oozie.models import Workflow
 
 from jobbrowser import models, views
 from jobbrowser.conf import SHARE_JOBS
+from jobbrowser.models import can_view_job, can_modify_job
 
 
 LOG = logging.getLogger(__name__)
@@ -163,11 +164,10 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
   def test_uncommon_views(self):
     """
-    These views exist, but tend not to be ever called,
-    because they're not in the normal UI.
+    These views exist, but tend not to be ever called, because they're not in the normal UI.
     """
     raise SkipTest
-    # None of these should raise
+
     self.client.get("/jobbrowser/clusterstatus")
     self.client.get("/jobbrowser/queues")
     self.client.get("/jobbrowser/jobbrowser")
@@ -180,12 +180,12 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     INPUT_DIR = self.home_dir + '/input'
     OUTPUT_DIR = self.home_dir + '/output'
     try:
-        self.cluster.fs.mkdir(self.home_dir + "/jt-test_failed_jobs")
-        self.cluster.fs.mkdir(INPUT_DIR)
-        self.cluster.fs.rmtree(OUTPUT_DIR)
+      self.cluster.fs.mkdir(self.home_dir + "/jt-test_failed_jobs")
+      self.cluster.fs.mkdir(INPUT_DIR)
+      self.cluster.fs.rmtree(OUTPUT_DIR)
     except:
-        # rmtree probably failed here.
-        pass
+      pass
+
     response = self.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
         'name': ['test_failed_jobs-1'],
         'description': ['description test_failed_jobs-1'],
@@ -227,7 +227,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     response = self.client.get('/jobbrowser/jobs/?format=json&state=failed')
     assert_true(self.hadoop_job_id_short in response.content)
 
-    raise SkipTest
+    raise SkipTest # Not compatible with MR2
 
     # The single job view should have the failed task table
     response = self.client.get('/jobbrowser/jobs/%s' % (self.hadoop_job_id,))
@@ -366,8 +366,16 @@ class TestMapReduce2NoHadoop:
 
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
+    self.user = User.objects.get(username='test')
 
-    self.finish = YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True)
+    self.c2 = make_logged_in_client(is_superuser=False, username="test2")
+    grant_access("test2", "test2", "jobbrowser")
+    self.user2 = User.objects.get(username='test2')
+
+    self.finish = [
+        YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
+        SHARE_JOBS.set_for_testing(False)
+    ]
     assert_true(cluster.is_yarn())
 
 
@@ -376,7 +384,8 @@ class TestMapReduce2NoHadoop:
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
 
-    self.finish()
+    for f in self.finish:
+      f()
 
   def test_jobs(self):
     response = self.c.get('/jobbrowser/?format=json')
@@ -386,12 +395,13 @@ class TestMapReduce2NoHadoop:
     assert_equal(len(json.loads(response.content)), 1)
 
   def test_running_job(self):
-    raise SkipTest
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0054')
+    assert_true('job_1356251510842_0054' in response.content)
+    assert_true('RUNNING' in response.content)
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_false('job' in response.context)
+    assert_true('job_1356251510842_0054' in response.content)
+    assert_true('RUNNING' in response.content)
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
@@ -409,19 +419,34 @@ class TestMapReduce2NoHadoop:
     result = json.loads(response.content)
     assert_equal(result['status'], 0)
 
+  def test_acls_job(self):
+    response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054') # Check in perm decorator
+    assert_true(can_view_job('test', response.context['job']))
+    assert_true(can_modify_job('test', response.context['job']))
+
+    response2 = self.c2.get('/jobbrowser/jobs/job_1356251510842_0054')
+    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
+
+    assert_false(can_view_job('test2', response.context['job']))
+    assert_false(can_modify_job('test2', response.context['job']))
+
 
 class MockResourceManagerApi:
   APPS = {
-    'application_1356251510842_0054': {u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
-    u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
-    u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
-    u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
-    u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'romain'},
-  'application_1356251510842_0009': {u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
-    u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
-    u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
-    u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
-    u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'romain'}
+    'application_1356251510842_0054': {
+        u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+        u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
+        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
+        u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
+        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'test'
+    },
+    'application_1356251510842_0009': {
+        u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
+        u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
+        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
+        u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
+        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'test'
+    }
   }
 
   def __init__(self, oozie_url=None): pass
@@ -452,10 +477,18 @@ class MockMapreduce2Api(object):
   def __init__(self, oozie_url=None): pass
 
   def tasks(self, job_id):
-    return {u'tasks': {u'task': [{u'finishTime': 1357153330271, u'successfulAttempt': u'attempt_1356251510842_0062_m_000000_0', u'elapsedTime': 1901, u'state': u'SUCCEEDED',
-                                  u'startTime': 1357153328370, u'progress': 100.0, u'type': u'MAP', u'id': u'task_1356251510842_0062_m_000000'},
-                                 {u'finishTime': 0, u'successfulAttempt': u'', u'elapsedTime': 0, u'state': u'SCHEDULED', u'startTime': 1357153326322, u'progress': 0.0,
-                                  u'type': u'REDUCE', u'id': u'task_1356251510842_0062_r_000000'}]}}
+    return {
+      u'tasks': {
+        u'task': [{
+            u'finishTime': 1357153330271, u'successfulAttempt': u'attempt_1356251510842_0062_m_000000_0', u'elapsedTime': 1901, u'state': u'SUCCEEDED',
+            u'startTime': 1357153328370, u'progress': 100.0, u'type': u'MAP', u'id': u'task_1356251510842_0062_m_000000'},
+                  {
+            u'finishTime': 0, u'successfulAttempt': u'', u'elapsedTime': 0, u'state': u'SCHEDULED', u'startTime': 1357153326322, u'progress': 0.0,
+            u'type': u'REDUCE', u'id': u'task_1356251510842_0062_r_000000'}
+        ]
+      }
+    }
+
   def conf(self, job_id):
     return {
       "conf" : {
@@ -464,8 +497,9 @@ class MockMapreduce2Api(object):
            {
               "value" : "/home/hadoop/hdfs/data",
               "name" : "dfs.datanode.data.dir"
-           },]
-         }
+           },
+         ]
+      }
     }
 
   def job_attempts(self, job_id):
@@ -544,12 +578,24 @@ class MockMapreduce2Api(object):
 class MockMapreduceApi(MockMapreduce2Api):
   def job(self, user, job_id):
     if '1356251510842_0009' not in job_id:
-      job = {u'job': {u'reducesCompleted': 0, u'mapsRunning': 1, u'id': u'job_1356251510842_0054', u'successfulReduceAttempts': 0, u'successfulMapAttempts': 0,
-                      u'uberized': False, u'reducesTotal': 1, u'elapsedTime': 3426, u'mapsPending': 0, u'state': u'RUNNING', u'failedReduceAttempts': 0,
-                      u'mapsCompleted': 0, u'killedMapAttempts': 0, u'killedReduceAttempts': 0, u'runningReduceAttempts': 0, u'failedMapAttempts': 0, u'mapsTotal': 1,
-                      u'user': u'romain', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
-                      u'name': u'select avg(salary) from sample_07(Stage-1)', u'reducesRunning': 0, u'newMapAttempts': 0, u'diagnostics': u'', u'mapProgress': 0.0,
-                      u'runningMapAttempts': 1, u'newReduceAttempts': 1}}
+      job = {
+          u'job': {
+              u'reducesCompleted': 0, u'mapsRunning': 1, u'id': u'job_1356251510842_0054', u'successfulReduceAttempts': 0, u'successfulMapAttempts': 0,
+              u'uberized': False, u'reducesTotal': 1, u'elapsedTime': 3426, u'mapsPending': 0, u'state': u'RUNNING', u'failedReduceAttempts': 0,
+              u'mapsCompleted': 0, u'killedMapAttempts': 0, u'killedReduceAttempts': 0, u'runningReduceAttempts': 0, u'failedMapAttempts': 0, u'mapsTotal': 1,
+              u'user': u'romain', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
+              u'name': u'select avg(salary) from sample_07(Stage-1)', u'reducesRunning': 0, u'newMapAttempts': 0, u'diagnostics': u'', u'mapProgress': 0.0,
+              u'runningMapAttempts': 1, u'newReduceAttempts': 1,
+              "acls" : [{
+                  "value" : "test",
+                  "name" : "mapreduce.job.acl-modify-job"
+               }, {
+                  "value" : "test",
+                  "name" : "mapreduce.job.acl-view-job"
+               }
+              ],
+          }
+      }
       job['job']['id'] = job_id
       return job
 
@@ -560,8 +606,14 @@ class HistoryServerApi(MockMapreduce2Api):
 
   def job(self, user, job_id):
     if '1356251510842_0054' not in job_id:
-      return {u'job': {u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009', u'successfulReduceAttempts': 1,
-                     u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1, u'state': u'SUCCEEDED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
-                     u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'romain', u'startTime': 1357151916268, u'avgReduceTime': 137,
-                     u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
-                     u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0}}
+      return {
+          u'job': {
+              u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009',
+              u'successfulReduceAttempts': 1, u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1,
+              u'state': u'SUCCEEDED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
+              u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'test', 
+              u'startTime': 1357151916268, u'avgReduceTime': 137,
+              u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+              u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0
+          }
+      }

@@ -99,6 +99,9 @@ class Job:
     setattr(self, 'finishedReduces', self.reducesCompleted)
     setattr(self, 'desiredReduces', None)
 
+    if not hasattr(self, 'acls'):
+      setattr(self, 'acls', {})
+
   @property
   def counters(self):
     counters = self.api.counters(self.id)
@@ -155,6 +158,7 @@ class Task:
     setattr(self, 'execFinishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'progress', self.progress / 100)
+
   @property
   def attempts(self):
     # We can cache as we deal with history server

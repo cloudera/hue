@@ -42,8 +42,7 @@ from hadoop.yarn.clients import get_log_client
 
 from jobbrowser import conf
 from jobbrowser.api import get_api, ApplicationNotRunning
-from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job,\
-  can_modify_job
+from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job
 
 import urllib2
 
@@ -62,8 +61,9 @@ def check_job_permission(view_func):
       return job_not_assigned(request, jobid, request.path)
     except Exception, e:
       raise PopupException(_('Could not find job %s.') % jobid, detail=e)
+    print job.user != request.user.username, can_view_job(request.user.username, job)
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
-      and job.user != request.user.username:
+      and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
     return view_func(request, *args, **kwargs)
@@ -140,7 +140,7 @@ def massage_job_for_json(job, request):
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
-    'canKill': (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2 and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job.full_job_conf)),
+    'canKill': (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2 and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
   }
   return job
