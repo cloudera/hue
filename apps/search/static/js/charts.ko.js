@@ -361,6 +361,12 @@ function barChart(element, options, isTimeline) {
           }
         }).call(_chart);
 
+    $.each(options.fqs(), function(cnt, item){
+      if (item.field() == options.field){
+        _chart.selectBars(item.filter());
+      }
+    });
+
     nv.utils.windowResize(_chart.update);
 
     return _chart;
