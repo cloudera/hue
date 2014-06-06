@@ -72,7 +72,7 @@ ${ components.menubar() }
       <th>${_('Queue')}</th>
       <th>${_('Priority')}</th>
       <th>${_('Duration')}</th>
-      <th>${_('Date')}</th>
+      <th>${_('Submission')}</th>
       <th data-row-selector-exclude="true"></th>
     </tr>
     </thead>

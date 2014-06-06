@@ -38,14 +38,20 @@ from django.utils.translation import ugettext as _
 LOGGER = logging.getLogger(__name__)
 
 
-def can_view_job(username, job_conf):
-  acl_modify = job_conf.get('mapreduce.job.acl-view-job', '')
-  return acl_modify == '*' or username in acl_modify.split(',')
+def can_view_job(username, job):
+  acl = get_acls(job).get('mapreduce.job.acl-view-job', '')
+  return acl == '*' or username in acl.split(',')
 
-def can_modify_job(username, job_conf):
-  acl_modify = job_conf.get('mapreduce.job.acl-modify-job', '')
-  return acl_modify == '*' or username in acl_modify.split(',')
+def can_modify_job(username, job):
+  acl = get_acls(job).get('mapreduce.job.acl-modify-job', '')
+  return acl == '*' or username in acl.split(',')
 
+def get_acls(job):
+  if job.is_mr2:
+    return dict([(acl['name'], acl['value']) for acl in job.acls])
+  else:
+    return job.full_job_conf
+      
 
 class JobLinkage(object):
   """
@@ -183,14 +189,14 @@ class Job(JobLinkage):
     if self.job.desiredMaps == 0:
       maps_percent_complete = 0
     else:
-      maps_percent_complete = int(round(float(self.job.finishedMaps)/self.job.desiredMaps*100))
+      maps_percent_complete = int(round(float(self.job.finishedMaps) / self.job.desiredMaps * 100))
 
     self.desiredMaps = self.job.desiredMaps
 
     if self.job.desiredReduces == 0:
       reduces_percent_complete = 0
     else:
-      reduces_percent_complete = int(round(float(self.job.finishedReduces)/self.job.desiredReduces*100))
+      reduces_percent_complete = int(round(float(self.job.finishedReduces) / self.job.desiredReduces * 100))
 
     self.desiredReduces = self.job.desiredReduces
     self.maps_percent_complete = maps_percent_complete
@@ -212,10 +218,10 @@ class Job(JobLinkage):
     if finishTime == 0:
       finishTime = datetime.datetime.now()
     else:
-      finishTime = datetime.datetime.fromtimestamp(finishTime/1000)
-    self.duration = finishTime - datetime.datetime.fromtimestamp(self.job.startTime/1000)
+      finishTime = datetime.datetime.fromtimestamp(finishTime / 1000)
+    self.duration = finishTime - datetime.datetime.fromtimestamp(self.job.startTime / 1000)
 
-    diff = int(finishTime.strftime("%s"))*1000 - self.startTimeMs
+    diff = int(finishTime.strftime("%s")) * 1000 - self.startTimeMs
     self.durationFormatted = format_duration_in_millis(diff)
     self.durationInMillis = diff
 
