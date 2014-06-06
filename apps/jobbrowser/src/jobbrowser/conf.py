@@ -18,6 +18,7 @@
 from desktop.lib.conf import Config, coerce_bool
 from django.utils.translation import ugettext_lazy as _
 
+
 SHARE_JOBS = Config(
   key='share_jobs',
   default=True,
