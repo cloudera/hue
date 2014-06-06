@@ -570,6 +570,11 @@ body.modal-open {
   margin-bottom: 6px;
 }
 
+.facet-field-switch {
+  display: inline;
+  margin-top: 10px;
+}
+
 .facet-field-label {
   color: #333;
   font-size: 11px;
