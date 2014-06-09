@@ -418,7 +418,7 @@
 
 
 ###########################################################################
-# Settings to configure OPENID
+# Settings to configure OpenId
 ###########################################################################
 
 [libopenid]
@@ -577,18 +577,6 @@
       # Change this if your HDFS cluster is Kerberos-secured
       ## security_enabled=false
 
-      # Settings about this HDFS cluster. If you install HDFS in a
-      # different location, you need to set the following.
-
-      # Defaults to $HADOOP_HDFS_HOME or /usr/lib/hadoop-hdfs
-      ## hadoop_hdfs_home=/usr/lib/hadoop-hdfs
-
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
-
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
-
   # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
@@ -603,20 +591,11 @@
       # Whether to submit jobs to this cluster
       submit_to=True
 
+      # Resource Manager logical name (required for HA)
+      ## logical_name=
+
       # Change this if your YARN cluster is Kerberos-secured
       ## security_enabled=false
-
-      # Settings about this MR2 cluster. If you install MR2 in a
-      # different location, you need to set the following.
-
-      # Defaults to $HADOOP_MR2_HOME or /usr/lib/hadoop-mapreduce
-      ## hadoop_mapred_home=/usr/lib/hadoop-mapreduce
-
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
-
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
 
       # URL of the ResourceManager API
       ## resourcemanager_api_url=http://localhost:8088
@@ -626,6 +605,13 @@
 
       # URL of the HistoryServer API
       # history_server_api_url=http://localhost:19888
+
+    # HA support by specifying multiple clusters
+    # e.g.
+
+    # [[[ha]]]
+      # Resource Manager logical name (required for HA)
+      ## logical_name=my-rm-name
 
   # Configuration for MapReduce (MR1)
   # ------------------------------------------------------------------------
@@ -638,7 +624,7 @@
       # The port where the JobTracker IPC listens on
       ## jobtracker_port=8021
 
-      # JobTracker logical name.
+      # JobTracker logical name for HA
       ## logical_name=
 
       # Thrift plug-in port for the JobTracker
@@ -650,24 +636,13 @@
       # Change this if your MapReduce cluster is Kerberos-secured
       ## security_enabled=false
 
-      # Settings about this MR1 cluster. If you install MR1 in a
-      # different location, you need to set the following.
-
-      # Defaults to $HADOOP_MR1_HOME or /usr/lib/hadoop-0.20-mapreduce
-      ## hadoop_mapred_home=/usr/lib/hadoop-0.20-mapreduce
-
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
-
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
-
     # HA support by specifying multiple clusters
     # e.g.
 
     # [[[ha]]]
-      # Enter the host on which you are running the failover JobTracker
-      # jobtracker_host=localhost-ha
+      # Enter the logical name of the JobTrackers
+      # logical_name=my-jt-name
+
 
 ###########################################################################
 # Settings to configure the Filebrowser app

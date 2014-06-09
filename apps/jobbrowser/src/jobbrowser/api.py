@@ -30,7 +30,7 @@ import hadoop.yarn.node_manager_api as node_manager_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
 from jobbrowser.yarn_models import Application, Job as YarnJob, Container
-from hadoop.cluster import get_next_ha_mrcluster
+from hadoop.cluster import get_next_ha_mrcluster, get_next_ha_yarncluster
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -61,6 +61,24 @@ def jt_ha(funct):
         jt_ha = get_next_ha_mrcluster()
         if jt_ha is not None:
           config, api.jt = jt_ha
+          return funct(api, *args, **kwargs)
+      raise ex
+  return wraps(funct)(decorate)
+
+
+def rm_ha(funct):
+  """
+  Support RM HA by trying other RM API.
+  """
+  def decorate(api, *args, **kwargs):
+    try:
+      return funct(api, *args, **kwargs)
+    except Exception, ex:
+      if 'Connection refused' in str(ex):
+        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
+        rm_ha = get_next_ha_yarncluster()
+        if rm_ha is not None:
+          config, api.resource_manager_api = rm_ha
           return funct(api, *args, **kwargs)
       raise ex
   return wraps(funct)(decorate)
@@ -195,6 +213,7 @@ class YarnApi(JobBrowserApi):
   def get_job_link(self, job_id):
     return self.get_job(job_id)
 
+  @rm_ha
   def get_jobs(self, user, **kwargs):
     state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED', }
     filters = {}
@@ -228,6 +247,7 @@ class YarnApi(JobBrowserApi):
                   user.is_superuser or
                   job.user == user.username, jobs)
 
+  @rm_ha
   def get_job(self, jobid):
     try:
       # App id

@@ -60,7 +60,7 @@ class TestBrowser():
     assert_equal("Foo Bar Baz", views.format_counter_name("fooBarBaz"))
     assert_equal("Foo", views.format_counter_name("foo"))
     assert_equal("Foo.", views.format_counter_name("foo."))
-    assert_equal("A Bbb Ccc", views.format_counter_name("A_BBB_CCC"))\
+    assert_equal("A Bbb Ccc", views.format_counter_name("A_BBB_CCC"))
 
 def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5):
   hadoop_job_id = None
