@@ -145,7 +145,7 @@ class ClusterMiddleware(object):
       if request.fs is not None:
         request.fs.setuser(request.user.username)
 
-      request.jt = cluster.get_default_mrcluster()
+      request.jt = cluster.get_default_mrcluster() # Deprecated, only there for MR1
       if request.jt is not None:
         request.jt.setuser(request.user.username)
     else:

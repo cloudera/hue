@@ -47,7 +47,7 @@ class Submission(object):
     self.job = job
     self.user = user
     self.fs = fs
-    self.jt = jt
+    self.jt = jt # Deprecated with YARN, we now use logical names only for RM
     self.oozie_id = oozie_id
     self.api = get_oozie(self.user)
 
@@ -73,13 +73,13 @@ class Submission(object):
     if self.oozie_id is not None:
       raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
 
-    jobtracker = cluster.get_cluster_addr_for_job_submission()
+    jt_address = cluster.get_cluster_addr_for_job_submission()
 
     if deployment_dir is None:
-      self._update_properties(jobtracker) # Needed as we need to set some properties like Credentials before
+      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
       deployment_dir = self.deploy()
 
-    self._update_properties(jobtracker, deployment_dir)
+    self._update_properties(jt_address, deployment_dir)
 
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))
@@ -91,9 +91,9 @@ class Submission(object):
     return self.oozie_id
 
   def rerun(self, deployment_dir, fail_nodes=None, skip_nodes=None):
-    jobtracker = cluster.get_cluster_addr_for_job_submission()
+    jt_address = cluster.get_cluster_addr_for_job_submission()
 
-    self._update_properties(jobtracker, deployment_dir)
+    self._update_properties(jt_address, deployment_dir)
     self.properties.update({'oozie.wf.application.path': deployment_dir})
 
     if fail_nodes:
@@ -111,9 +111,9 @@ class Submission(object):
 
 
   def rerun_coord(self, deployment_dir, params):
-    jobtracker = cluster.get_cluster_addr_for_job_submission()
+    jt_address = cluster.get_cluster_addr_for_job_submission()
 
-    self._update_properties(jobtracker, deployment_dir)
+    self._update_properties(jt_address, deployment_dir)
     self.properties.update({'oozie.coord.application.path': deployment_dir})
 
     self.api.job_control(self.oozie_id, action='coord-rerun', properties=self.properties, parameters=params)
@@ -123,9 +123,9 @@ class Submission(object):
 
 
   def rerun_bundle(self, deployment_dir, params):
-    jobtracker = cluster.get_cluster_addr_for_job_submission()
+    jt_address = cluster.get_cluster_addr_for_job_submission()
 
-    self._update_properties(jobtracker, deployment_dir)
+    self._update_properties(jt_address, deployment_dir)
     self.properties.update({'oozie.bundle.application.path': deployment_dir})
     self.api.job_control(self.oozie_id, action='bundle-rerun', properties=self.properties, parameters=params)
     LOG.info("Rerun: %s" % (self,))
@@ -180,6 +180,7 @@ class Submission(object):
 
   def _update_properties(self, jobtracker_addr, deployment_dir=None):
     LOG.info('Using FS %s and JT %s' % (self.fs, self.jt))
+
     if self.jt and self.jt.logical_name:
       jobtracker_addr = self.jt.logical_name
 
