@@ -137,7 +137,7 @@ ${ components.menubar() }
     $(document).ajaxError(function (event, jqxhr, settings, exception) {
       if (jqxhr.status == 500) {
         window.clearInterval(_runningInterval);
-        $(document).trigger("error", "${_('There was a problem communicating with the server. Refresh the page.')}");
+        $(document).trigger("error", "${_('There was a problem communicating with the server: ')}" + $.parseJSON(jqxhr.responseText).message);
       }
     });
 

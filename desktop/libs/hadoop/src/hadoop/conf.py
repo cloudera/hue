@@ -84,10 +84,10 @@ MR_CLUSTERS = UnspecifiedConfigSection(
                   default=8021,
                   help="Service port for the JobTracker",
                   type=int),
-      LOGICAL_NAME = Config('logical_name',
-                            default="",
-                            type=str,
-                            help=_t('JobTracker logical name.')),
+      LOGICAL_NAME=Config('logical_name',
+                          default="",
+                          type=str,
+                          help=_t('JobTracker logical name.')),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int),
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
@@ -102,8 +102,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
 
 YARN_CLUSTERS = UnspecifiedConfigSection(
   "yarn_clusters",
-  help="One entry for each Yarn cluster. Currently only one cluster "
-       "(called 'default') is supported.",
+  help="One entry for each Yarn cluster",
   each=ConfigSection(
     help="Information about a single Yarn cluster",
     members=dict(
@@ -114,6 +113,10 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   default=8032,
                   type=int,
                   help="Service port for the ResourceManager"),
+      LOGICAL_NAME=Config('logical_name',
+                          default="",
+                          type=str,
+                          help=_t('Resource Manager logical name.')),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",

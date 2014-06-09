@@ -15,13 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from hadoop.fs import hadoopfs, webhdfs, LocalSubFileSystem
+import os
+import logging
+
+from hadoop import conf
+from hadoop.fs import webhdfs, LocalSubFileSystem
 from hadoop.job_tracker import LiveJobTracker
 
 from desktop.lib.paths import get_build_dir
-from hadoop import conf
-import os
-import logging
+
 
 LOG = logging.getLogger(__name__)
 
@@ -33,31 +35,27 @@ MR_NAME_CACHE = 'default'
 
 def _make_filesystem(identifier):
   choice = os.getenv("FB_FS")
+
   if choice == "testing":
     path = os.path.join(get_build_dir(), "fs")
     if not os.path.isdir(path):
-      LOG.warning(
-        ("Could not find fs directory: %s. Perhaps you need to run " +
-        "manage.py filebrowser_test_setup?") % path)
+      LOG.warning(("Could not find fs directory: %s. Perhaps you need to run manage.py filebrowser_test_setup?") % path)
     return LocalSubFileSystem(path)
   else:
     cluster_conf = conf.HDFS_CLUSTERS[identifier]
-    # The only way to disable webhdfs is to specify an empty value
-    if cluster_conf.WEBHDFS_URL.get() != '':
-      return webhdfs.WebHdfs.from_config(cluster_conf)
-    else:
-      return hadoopfs.HadoopFileSystem.from_config(
-        cluster_conf,
-        hadoop_bin_path=conf.HADOOP_BIN.get())
+    return webhdfs.WebHdfs.from_config(cluster_conf)
+
 
 def _make_mrcluster(identifier):
   cluster_conf = conf.MR_CLUSTERS[identifier]
   return LiveJobTracker.from_conf(cluster_conf)
 
+
 def get_hdfs(identifier="default"):
   global FS_CACHE
   get_all_hdfs()
   return FS_CACHE[identifier]
+
 
 def get_all_hdfs():
   global FS_CACHE
@@ -68,6 +66,7 @@ def get_all_hdfs():
   for identifier in conf.HDFS_CLUSTERS.keys():
     FS_CACHE[identifier] = _make_filesystem(identifier)
   return FS_CACHE
+
 
 def get_default_mrcluster():
   """
@@ -85,6 +84,19 @@ def get_default_mrcluster():
     if candidates:
       return candidates.values()[0]
     return None
+
+
+def get_default_yarncluster():
+  """
+  Get the default RM (not necessarily HA).
+  """
+  global MR_NAME_CACHE
+
+  try:
+    return conf.YARN_CLUSTERS[MR_NAME_CACHE]
+  except KeyError:
+    return get_yarn()
+
 
 def get_next_ha_mrcluster():
   """
@@ -120,10 +132,12 @@ def get_next_ha_mrcluster():
         return (config, jt)
   return None
 
+
 def get_mrcluster(identifier="default"):
   global MR_CACHE
   all_mrclusters()
   return MR_CACHE[identifier]
+
 
 def all_mrclusters():
   global MR_CACHE
@@ -134,43 +148,93 @@ def all_mrclusters():
     MR_CACHE[identifier] = _make_mrcluster(identifier)
   return MR_CACHE
 
+
 def get_yarn():
+  global MR_NAME_CACHE
+  if MR_NAME_CACHE in conf.YARN_CLUSTERS:
+    return conf.YARN_CLUSTERS[MR_NAME_CACHE]
+
   for name in conf.YARN_CLUSTERS.keys():
     yarn = conf.YARN_CLUSTERS[name]
     if yarn.SUBMIT_TO.get():
       return yarn
 
-def get_cluster_conf_for_job_submission():
+
+def get_next_ha_yarncluster():
   """
-  Check the `submit_to' for each MR/Yarn cluster, and return the
+  Return the next available YARN RM instance and cache its name.
+  """
+  from hadoop.yarn.resource_manager_api import ResourceManagerApi
+  global MR_NAME_CACHE
+
+  has_ha = sum([conf.YARN_CLUSTERS[name].SUBMIT_TO.get() for name in conf.YARN_CLUSTERS.keys()]) >= 2
+
+  for name in conf.YARN_CLUSTERS.keys():
+    config = conf.YARN_CLUSTERS[name]
+    if config.SUBMIT_TO.get():
+      if has_ha:
+        try:
+          rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get())
+          cluster_info = rm.cluster()
+          if cluster_info['clusterInfo']['haState'] == 'ACTIVE':
+            MR_NAME_CACHE = name
+            LOG.warn('Picking RM HA: %s' % name)
+            return (config, rm)
+          else:
+            LOG.info('RM %s is not RUNNING, skipping it: %s' % (name, cluster_info))
+        except Exception, ex:
+          LOG.info('RM %s is not available, skipping it: %s' % (name, ex))
+      else:
+        return (config, rm)
+  return None
+
+
+def get_cluster_for_job_submission():
+  """
+  Check the 'submit_to' for each MR/Yarn cluster, and return the
   config section of first one that enables submission.
 
-  HA support for MR1.
+  Support MR1/MR2 HA.
   """
-  yarn = get_yarn()
+  yarn = get_next_ha_yarncluster()
   if yarn:
     return yarn
 
   mr = get_next_ha_mrcluster()
-
   if mr is not None:
-    config, jt = mr
+    return mr
+
+  return None
+
+
+def get_cluster_conf_for_job_submission():
+  cluster = get_cluster_for_job_submission()
+
+  if cluster:
+    config, rm = cluster
     return config
   else:
     return None
 
+
 def get_cluster_addr_for_job_submission():
   """
-  Check the `submit_to' for each MR/Yarn cluster, and return the
-  host:port of first one that enables submission.
+  Check the 'submit_to' for each MR/Yarn cluster, and return the logical name or host:port of first one that enables submission.
   """
+  if is_yarn():
+    if get_yarn().LOGICAL_NAME.get():
+      return get_yarn().LOGICAL_NAME.get()
+
   conf = get_cluster_conf_for_job_submission()
   if conf is None:
     return None
+
   return "%s:%s" % (conf.HOST.get(), conf.PORT.get())
+
 
 def is_yarn():
   return get_yarn() is not None
+
 
 def clear_caches():
   """
@@ -181,6 +245,7 @@ def clear_caches():
   old = FS_CACHE, MR_CACHE
   FS_CACHE, MR_CACHE = None, None
   return old
+
 
 def restore_caches(old):
   """
