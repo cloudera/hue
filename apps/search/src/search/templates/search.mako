@@ -687,14 +687,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </i>
   </a>
 
-  <!-- ko if: $data.response.numFound > 0 && $data.response.numFound <= 1000 -->
+  <!-- ko if: $data.response.numFound > 0 -->
   <span class="pull-right">
     <form method="POST" action="${ url('search:download') }">
       <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
       <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
-      <button class="btn" type="submit" name="json" title="${ _('Download as JSON') }"><i class="hfo hfo-file-json"></i></button>
-      <button class="btn" type="submit" name="csv" title="${ _('Download as CSV') }"><i class="hfo hfo-file-csv"></i></button>
-      <button class="btn" type="submit" name="xls" title="${ _('Download as Excel') }"><i class="hfo hfo-file-xls"></i></button>
+      <input type="hidden" name="download">
+      <button class="btn" type="submit" name="json" title="${ _('Download first rows as JSON') }"><i class="hfo hfo-file-json"></i></button>
+      <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="hfo hfo-file-csv"></i></button>
+      <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="hfo hfo-file-xls"></i></button>
     </form>
   </span>
   <!-- /ko -->
