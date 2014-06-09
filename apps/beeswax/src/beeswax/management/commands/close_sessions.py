@@ -53,7 +53,11 @@ class Command(BaseCommand):
     import beeswax
     from beeswax import conf
     from beeswax import hive_site
-    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
+    try:
+      beeswax.conf.HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
+    except:
+      self.stdout.write('Did you export HIVE_CONF_DIR=/etc/hive/conf?\n')
+      raise
 
     hive_site.reset()
     hive_site.get_conf()
