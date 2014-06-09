@@ -25,21 +25,21 @@ from beeswax.server import dbms
 
 class Command(BaseCommand):
   """
-  Close old HiveServer2 and Impala queries.
+  Close HiveServer2 queries.
 
   e.g.
   build/env/bin/hue close_queries 7 all
   Closing (all=True) queries older than 7 days...
   0 queries closed.
   """
-  args = '<age_in_days> <all> (default is 7)'
-  help = 'Close finished Hive queries older than 7 days. If \'all\' is specified, also close the Impala ones.'
+  args = '<age_in_days> (default is 7)'
+  help = 'Close finished Hive queries older than 7 days.'
 
   def handle(self, *args, **options):
     days = int(args[0]) if len(args) >= 1 else 7
     close_all = args[1] == 'all' if len(args) >= 2 else False
 
-    self.stdout.write('Closing (all=%s) HiveServer2/Impala queries older than %s days...\n' % (close_all, days))
+    self.stdout.write('Closing (all=%s) HiveServer2 queries older than %s days...\n' % (close_all, days))
 
     n = 0
     queries = QueryHistory.objects.filter(last_state__in=[QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index, QueryHistory.STATE.available.index])

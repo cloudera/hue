@@ -25,21 +25,21 @@ from beeswax.server import dbms
 
 class Command(BaseCommand):
   """
-  Close old HiveServer2 and Impala sessions.
+  Close HiveServer2 sessions.
 
   e.g.
   build/env/bin/hue close_sessions 7 all
   Closing (all=True) queries older than 7 days...
   0 queries closed.
   """
-  args = '<age_in_days> <all> (default is 7)'
-  help = 'Close finished Hive queries older than 7 days. If \'all\' is specified, also close the Impala ones.'
+  args = '<age_in_days> (default is 7)'
+  help = 'Close finished Hive queries older than 7 days.'
 
   def handle(self, *args, **options):
     days = int(args[0]) if len(args) >= 1 else 7
     close_all = args[1] == 'all' if len(args) >= 2 else False
 
-    self.stdout.write('Closing (all=%s) HiveServer2/Impala sessions older than %s days...\n' % (close_all, days))
+    self.stdout.write('Closing (all=%s) HiveServer2 sessions older than %s days...\n' % (close_all, days))
 
     n = 0
     sessions = Session.objects.all()
@@ -64,10 +64,10 @@ class Command(BaseCommand):
 
     for session in sessions:
       try:
-          resp = dbms.get(user=session.owner).close_session(session)
-          if not 'Session does not exist!' in str(resp):
-            self.stdout.write('Info: %s\n' % resp)
-            n += 1
+        resp = dbms.get(user=session.owner).close_session(session)
+        if not 'Session does not exist!' in str(resp):
+          self.stdout.write('Info: %s\n' % resp)
+          n += 1
       except Exception, e:
         if not 'Session does not exist!' in str(e):
           self.stdout.write('Info: %s\n' % e)
