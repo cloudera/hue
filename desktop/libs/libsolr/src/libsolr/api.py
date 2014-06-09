@@ -61,8 +61,16 @@ class SolrApi(object):
     solr_query = {}
 
     solr_query['collection'] = collection['name']
-    solr_query['rows'] = min(int(collection['template']['rows'] or 10), 1000)
-    solr_query['start'] = min(int(query['start']), 10000)
+
+    if query['download']:
+      solr_query['rows'] = 1000
+      solr_query['start'] = 0
+    else:
+      solr_query['rows'] = int(collection['template']['rows'] or 10)
+      solr_query['start'] = int(query['start'])
+
+    solr_query['rows'] = min(solr_query['rows'], 1000)
+    solr_query['start'] = min(solr_query['start'], 10000)
 
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
 

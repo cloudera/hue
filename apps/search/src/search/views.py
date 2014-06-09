@@ -123,6 +123,7 @@ def search(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
+  query['download'] = 'download' in request.POST
   # todo: remove the selected histo facet if multiq
 
   if collection['id']:
@@ -157,7 +158,7 @@ def save(request):
   collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
   layout = json.loads(request.POST.get('layout', '{}'))
 
-  collection['template']['extracode'] = escape(collection['template']['extracode']) # Escape HTML
+  collection['template']['extracode'] = escape(collection['template']['extracode'])
 
   if collection:
     if collection['id']:
