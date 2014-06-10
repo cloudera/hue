@@ -191,8 +191,9 @@ def download(request):
       resp = HttpResponse(json_docs, mimetype=mimetype)
       resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
       return resp
-
-    return export_download(json.loads(response.content), file_format)
+    else:
+      collection = json.loads(request.POST.get('collection', '{}'))
+      return export_download(json.loads(response.content), file_format, collection)
   except Exception, e:
     raise PopupException(_("Could not download search results: %s") % e)
 
