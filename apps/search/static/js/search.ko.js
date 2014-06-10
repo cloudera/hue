@@ -610,24 +610,24 @@ var Collection = function (vm, collection) {
   self.syncFields = function() {
     $.post("/search/get_collection", {
         name: self.name()
-    }, function (data) {
-      if (data.status == 0) {
-        self.idField(data.collection.collection.idField);
-        syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);  
-        syncArray(self.fields, data.collection.collection.fields, false);
-      }
-      // After sync the dynamic fields
-      self.syncDynamicFields()
-  }).fail(function (xhr, textStatus, errorThrown) {});
+      }, function (data) {
+        if (data.status == 0) {
+          self.idField(data.collection.collection.idField);
+          syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);  
+          syncArray(self.fields, data.collection.collection.fields, false);
+        }
+        // After sync the dynamic fields
+        self.syncDynamicFields()
+    }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.syncDynamicFields = function () {
     $.post("/search/index/fields/dynamic", {
-      name: self.name()
+        name: self.name()
       }, function (data) {
         if (data.status == 0) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);  
-        syncArray(self.fields, data.fields, true);
+          syncArray(self.fields, data.fields, true);
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
