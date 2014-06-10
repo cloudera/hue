@@ -61,9 +61,9 @@ def check_job_permission(view_func):
       return job_not_assigned(request, jobid, request.path)
     except Exception, e:
       raise PopupException(_('Could not find job %s.') % jobid, detail=e)
-    print job.user != request.user.username, can_view_job(request.user.username, job)
+
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
-      and job.user != request.user.username and not can_view_job(request.user.username, job):
+        and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
     return view_func(request, *args, **kwargs)

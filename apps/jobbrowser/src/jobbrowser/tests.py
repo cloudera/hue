@@ -37,7 +37,7 @@ from oozie.models import Workflow
 
 from jobbrowser import models, views
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.models import can_view_job, can_modify_job
+from jobbrowser.models import can_view_job, can_modify_job, Job
 
 
 LOG = logging.getLogger(__name__)
@@ -349,6 +349,29 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                 response.content)
 
 
+class TestMapReduce1NoHadoop:
+
+  def test_acls_job(self):
+    job = MockMr1Job()
+
+    assert_true(can_view_job('test', job))
+    assert_true(can_modify_job('test', job))
+
+    assert_false(can_view_job('test2', job))
+    assert_false(can_modify_job('test2', job))
+
+
+class MockMr1Job(Job):
+
+  def __init__(self):
+    self.is_mr2 = False
+    self._full_job_conf = {
+      'mapreduce.cluster.acls.enabled': True,
+      'mapreduce.job.acl-modify-job': 'test',
+      'mapreduce.job.acl-view-job': 'test'
+    }
+
+
 class TestMapReduce2NoHadoop:
 
   def setUp(self):
@@ -611,7 +634,7 @@ class HistoryServerApi(MockMapreduce2Api):
               u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009',
               u'successfulReduceAttempts': 1, u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1,
               u'state': u'SUCCEEDED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
-              u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'test', 
+              u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'test',
               u'startTime': 1357151916268, u'avgReduceTime': 137,
               u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
               u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0
