@@ -1596,12 +1596,23 @@ Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobd
     --- we should be ignoring duplicates ---
 Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0002
 Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0003
-12/12/27 10:48:22 INFO mapreduce.Job: The url to track the job: http://localhost:8088/proxy/application_1356251510842_0022/
+14/06/10 14:30:55 INFO exec.Task: Starting Job = job_1402420825148_0001, Tracking URL = http://localhost:8088/proxy/application_1402420825148_0001/
 """
-  assert_equal(["job_201003191517_0002", "job_201003191517_0003", "application_1356251510842_0022"],
+  assert_equal(
+    ["job_201003191517_0002", "job_201003191517_0003", "job_1402420825148_0001"],
     beeswax.views._parse_out_hadoop_jobs(sample_log))
   assert_equal([], beeswax.views._parse_out_hadoop_jobs("nothing to see here"))
 
+  sample_log_no_direct_url = """
+14/06/09 08:40:38 INFO impl.YarnClientImpl: Submitted application application_1402269517321_0003
+14/06/09 08:40:38 INFO mapreduce.Job: The url to track the job: N/A
+14/06/09 08:40:38 INFO exec.Task: Starting Job = job_1402269517321_0003, Tracking URL = N/A
+14/06/09 08:40:38 INFO exec.Task: Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1402269517321_0003
+14/06/09 08:40:38 INFO cli.CLIService: OperationHandle [opType=EXECUTE_STATEMENT, getHandleIdentifier()=2168d15e-96d2-415a-8d49-e2535e82c2a4]: getOperationStatus()
+"""
+  assert_equal(
+      ["job_1402269517321_0003"],
+      beeswax.views._parse_out_hadoop_jobs(sample_log_no_direct_url))
 
 def test_hive_site():
   tmpdir = tempfile.mkdtemp()

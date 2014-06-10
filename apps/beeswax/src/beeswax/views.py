@@ -866,29 +866,16 @@ def parse_query_context(context):
   return pair
 
 
-HADOOP_JOBS_RE = re.compile("(http[^\s]*/jobdetails.jsp\?jobid=([a-z0-9_]*))")
-HADOOP_YARN_JOBS_RE = re.compile("(http[^\s]*/proxy/([a-z0-9_]+?)/)")
+HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
 
 def _parse_out_hadoop_jobs(log):
   """
-  Ideally, Hive would tell us what jobs it has run directly
-  from the Thrift interface.  For now, we parse the logs
-  to look for URLs to those jobs.
+  Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
   """
   ret = []
 
   for match in HADOOP_JOBS_RE.finditer(log):
-    full_job_url, job_id = match.groups()
-    # We ignore full_job_url for now, but it may
-    # come in handy if we support multiple MR clusters
-    # correctly.
-
-    # Ignore duplicates
-    if job_id not in ret:
-      ret.append(job_id)
-
-  for match in HADOOP_YARN_JOBS_RE.finditer(log):
-    full_job_url, job_id = match.groups()
+    job_id = match.group(1)
     if job_id not in ret:
       ret.append(job_id)
 
