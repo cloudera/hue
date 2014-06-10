@@ -173,6 +173,16 @@ def default_from_email():
   return _default_from_email
 
 
+def default_database_options():
+  """Database type dependent options"""
+  if DATABASE.ENGINE.get().endswith('oracle'):
+    return {'threaded': True}
+  elif DATABASE.ENGINE.get().endswith('sqlite3'):
+    return {'timeout': 30}
+  else:
+    return {}
+
+
 SMTP = ConfigSection(
   key='smtp',
   help=_('Configuration options for connecting to an external SMTP server.'),
@@ -268,7 +278,7 @@ DATABASE = ConfigSection(
       key='options',
       help=_('Database options to send to the server when connecting.'),
       type=coerce_json_dict,
-      default='{}'
+      dynamic_default=default_database_options
     )
   )
 )
