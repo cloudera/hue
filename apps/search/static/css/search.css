@@ -591,7 +591,37 @@ body.modal-open {
   display: inline-block;
 }
 
+.simpledaterangepicker .left-margin {
+  margin-left: 6px;
+}
+
+.card-column.span2 .facet-field-label-fixed-width {
+  text-align: left;
+  width: auto;
+}
+
+.card-column.span2 .simpledaterangepicker .facet-field-label-fixed-width {
+  display: block;
+}
+
+.card-column.span2 .simpledaterangepicker .input-prepend {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.card-column.span2 .simpledaterangepicker .left-margin {
+  margin-left: 0;
+}
+
+.card-column.span2 .simpledaterangepicker input[type='text'] {
+  width: 70%;
+}
+
+.card-column.span2 .simpledaterangepicker select {
+  margin-bottom: 5px;
+}
+
+
 .card-widget .input-append, .card-widget .input-prepend, .card-widget select, .card-widget input {
   margin-bottom: 0;
 }
-
