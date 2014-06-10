@@ -204,9 +204,12 @@ nv.models.multiBarWithBrushChart = function() {
             series.color = d3.rgb('#ccc').darker(i * 1.5).toString();
           })
 
-        g.select('.nv-legendWrap')
-            .datum(data)
-            .call(legend);
+        try {
+          g.select('.nv-legendWrap')
+              .datum(data)
+              .call(legend);
+        }
+        catch (e){}
 
         if ( margin.top != legend.height()) {
           margin.top = legend.height();
