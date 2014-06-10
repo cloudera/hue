@@ -51,7 +51,7 @@ def get_acls(job):
     return dict([(acl['name'], acl['value']) for acl in job.acls])
   else:
     return job.full_job_conf
-      
+
 
 class JobLinkage(object):
   """
