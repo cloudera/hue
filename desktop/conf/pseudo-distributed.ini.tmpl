@@ -285,15 +285,15 @@
           # The username attribute in the LDAP schema
           ## group_name_attr=cn
 
-  # Configuration options for specifying the Desktop Database.  For more info,
-  # see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine
+  # Configuration options for specifying the Desktop Database. For more info,
+  # see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine
   # ------------------------------------------------------------------------
   [[database]]
     # Database engine is typically one of:
-    # postgresql_psycopg2, mysql, or sqlite3
+    # postgresql_psycopg2, mysql, sqlite3 or oracle.
     #
-    # Note that for sqlite3, 'name', below is a filename;
-    # for other backends, it is the database name.
+    # Note that for sqlite3, 'name', below is a a path to the filename. For other backends, it is the database name.
+    # Note for Oracle, options={'threaded':true} must be set in order to avoid crashes.
     ## engine=sqlite3
     ## host=
     ## port=

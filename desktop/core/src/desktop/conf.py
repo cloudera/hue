@@ -225,7 +225,7 @@ SMTP = ConfigSection(
 DATABASE = ConfigSection(
   key='database',
   help=_("""Configuration options for specifying the Desktop Database.
-          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"""),
+          For more info, see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"""),
   members=dict(
     ENGINE=Config(
       key='engine',
