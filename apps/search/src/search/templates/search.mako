@@ -309,6 +309,24 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </script>
 
 <script type="text/html" id="facet-toggle">
+    <div class="facet-field-cnt" data-bind="visible: properties.canRange">
+      <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
+      <a href="javascript: void(0)" title="${ _('Toggle range or field facet') }" data-bind="click: $root.collection.toggleRangeFacet" data-loading-text="...">
+        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
+        <span data-bind="visible: type() == 'range'">${_('range')}</span>
+        <span data-bind="visible: type() == 'field'">${_('field')}</span>
+      </a>
+    </div>
+
+    <div class="facet-field-cnt">
+      <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
+      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
+        <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+        <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
+        <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+      </a>
+    </div>
+
     <!-- ko if: type() == 'range' -->
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
@@ -322,17 +340,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- ko if: type() == 'field' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
-          <span class="facet-field-label">${ _('Limit') }</span> <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
+          <span class="facet-field-label facet-field-label-fixed-width">${ _('Limit') }</span> <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
         </span>
       </div>
     <!-- /ko -->
 
-    <a href="javascript: void(0)" title="${ _('Toggle range or field facet') }" class="btn btn-loading" data-bind="visible: properties.canRange, click: $root.collection.toggleRangeFacet" data-loading-text="...">
-      <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
-    </a>
-    <a href="javascript: void(0)" title="${ _('Toggle sort order') }" class="btn btn-loading" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
-      <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
-    </a>
 </script>
 
 <script type="text/html" id="facet-widget">
@@ -715,9 +727,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>
 
-    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
       <span class="facet-field-label">${ _('Zoom') }</span>
-      <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i> ${ _('reset') }</a> &nbsp;|&nbsp;
+      <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label">${ _('Group by') }</span>
       <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
@@ -747,7 +759,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
-        <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
+        <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
+          <span class="facet-field-label">${ _('Zoom') }</span>
+          <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+        </div>
       <!-- /ko -->
     </div>
 
@@ -782,7 +797,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </span>
     </div>
 
-    <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i></a>
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
+      <span class="facet-field-label">${ _('Zoom') }</span>
+      <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+    </div>
 
     <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
       transformer: lineChartDataTransformer,
@@ -1446,8 +1464,8 @@ $(document).ready(function () {
                       '<div class="input-prepend input-group">' +
                         '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
                         '<input type="text" class="input-small form-control start-date" />' +
-                      '</div>&nbsp;' +
-                      '<div class="input-prepend input-group">' +
+                      '</div>' +
+                      '<div class="input-prepend input-group left-margin">' +
                         '<span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span>' +
                         '<input type="text" class="input-mini form-control start-time" />' +
                       '</div>' +
@@ -1457,8 +1475,8 @@ $(document).ready(function () {
                       '<div class="input-prepend input-group">' +
                         '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
                         '<input type="text" class="input-small form-control end-date" />' +
-                      '</div>&nbsp;' +
-                      '<div class="input-prepend input-group">' +
+                      '</div>' +
+                      '<div class="input-prepend input-group left-margin">' +
                         '<span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span>' +
                         '<input type="text" class="input-mini form-control end-time" />' +
                       '</div>' +
@@ -1472,7 +1490,7 @@ $(document).ready(function () {
                     '</div>' +
                     '<div class="facet-field-cnt picker">' +
                       '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
-                      '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar-o"></i> ${ _('Custom properties') }</a></div>' +
+                      '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar-o"></i> ${ _('Custom format') }</a></div>' +
                     '</div>' +
                     '<div class="facet-field-cnt custom">' +
                       '<div class="facet-field-label facet-field-label-fixed-width">${ _('Start') }</div>' +
@@ -1497,7 +1515,7 @@ $(document).ready(function () {
                     '</div>' +
                     '<div class="facet-field-cnt custom">' +
                       '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
-                      '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar"></i> ${ _('Show pickers') }</a></div>' +
+                      '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar"></i> ${ _('Date pickers') }</a></div>' +
                     '</div>' +
 
                   '</div>'
