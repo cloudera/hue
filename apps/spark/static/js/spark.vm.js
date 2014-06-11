@@ -286,7 +286,7 @@ function sparkViewModel() {
           clearInterval(timerId);
           if (data.results.status == 'OK') {
             self.updateResults(data.results.result);
-            self.resultsEmpty($.isEmptyObject(data.results.result));
+            self.resultsEmpty(data.results.result.length > 0);
           } else {
             self.query.errors.push(data.results.ERROR.message);
           }
