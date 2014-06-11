@@ -18,6 +18,7 @@
 
 import json
 import logging
+import os
 import shutil
 import subprocess
 
@@ -50,18 +51,38 @@ class CollectionManagerController(object):
         field[flags[1]] = field['flags'][index] == FLAGS[index][0]
     return fields
 
+  def is_solr_cloud_mode(self):
+    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    if not hasattr(self, '_solr_cloud_mode'):
+      try:
+        api.collections()
+        setattr(self, '_solr_cloud_mode', True)
+      except:
+        setattr(self, '_solr_cloud_mode', False)
+    return getattr(self, '_solr_cloud_mode')
+
   def collection_exists(self, collection):
     return collection in self.get_collections()
 
   def get_collections(self):
     try:
-      from search.search_controller import SearchController
-      return SearchController(self.user).get_all_indexes()
+      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+      if self.is_solr_cloud_mode():
+        solr_collections = api.collections()
+        for name in solr_collections:
+          solr_collections[name]['isCoreOnly'] = False
+      else:
+        solr_collections = {}
+      solr_cores = api.cores()
+      for name in solr_cores:
+        solr_cores[name]['isCoreOnly'] = True
     except Exception, e:
-      LOG.warn('Error get_collections: %s' % e)
-      solr_collections = []
+      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+      solr_collections = {}
+      solr_cores = {}
 
-    return solr_collections
+    solr_cores.update(solr_collections)
+    return solr_cores
 
   def get_fields(self, collection_or_core_name):
     try:
@@ -81,62 +102,83 @@ class CollectionManagerController(object):
 
   def create_collection(self, name, fields, unique_key_field='id', df='text'):
     """
-    Create solr collection and instance dir.
+    Create solr collection or core and instance dir.
     Create schema.xml file so that we can set UniqueKey field.
     """
-    # Need to remove path afterwards
-    tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df)
+    if self.is_solr_cloud_mode():
+      # solrcloud mode
 
-    # Create instance directory.
-    process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--create", name, solr_config_path],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               env={
-                                 'SOLR_HOME': conf.SOLR_HOME.get(),
-                                 'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
-                               })
-    status = process.wait()
-    shutil.rmtree(tmp_path)
+      # Need to remove path afterwards
+      tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df, True)
 
-    if status != 0:
-      LOG.error("Cloud not create instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
-      raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
-
-    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-
-    if not api.create_collection(name):
-      # Delete instance directory.
-      process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--delete", name],
+      # Create instance directory.
+      process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--create", name, solr_config_path],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE,
                                  env={
                                    'SOLR_HOME': conf.SOLR_HOME.get(),
                                    'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                  })
+      status = process.wait()
 
-      if process.wait() != 0:
-        LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
-      raise PopupException(_('Could not create collection. Check error logs for more info.'))
+      # Don't want directories laying around
+      shutil.rmtree(tmp_path)
 
-  def delete_collection(self, name):
-    """
-    Delete solr collection and instance dir
-    """
-    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-    if api.remove_collection(name):
-      # Delete instance directory.
-      process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--delete", name],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 env={
-                                   'SOLR_HOME': conf.SOLR_HOME.get(),
-                                   'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
-                                 })
-      if process.wait() != 0:
-        LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
+      if status != 0:
+        LOG.error("Cloud not create instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
         raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
+
+      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+      if not api.create_collection(name):
+        # Delete instance directory if we couldn't create a collection.
+        process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--delete", name],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   env={
+                                     'SOLR_HOME': conf.SOLR_HOME.get(),
+                                     'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
+                                   })
+        if process.wait() != 0:
+          LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
+        raise PopupException(_('Could not create collection. Check error logs for more info.'))
     else:
-      raise PopupException(_('Could not create collection. Check error logs for more info.'))
+      # Non-solrcloud mode
+      # Create instance directory locally.
+      instancedir = os.path.join(conf.CORE_INSTANCE_DIR.get(), name)
+      if os.path.exists(instancedir):
+        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+      tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df, False)
+      shutil.move(solr_config_path, instancedir)
+      shutil.rmtree(tmp_path)
+
+      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+      if not api.create_core(name, instancedir):
+        # Delete instance directory if we couldn't create a collection.
+        shutil.rmtree(instancedir)
+        raise PopupException(_('Could not create collection. Check error logs for more info.'))
+
+  def delete_collection(self, name, core):
+    """
+    Delete solr collection/core and instance dir
+    """
+    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    if core:
+      raise PopupException(_('Cannot remove Solr cores.'))
+    else:
+      if api.remove_collection(name):
+        # Delete instance directory.
+        process = subprocess.Popen([conf.SOLRCTL_PATH.get(), "instancedir", "--delete", name],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   env={
+                                     'SOLR_HOME': conf.SOLR_HOME.get(),
+                                     'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
+                                   })
+        if process.wait() != 0:
+          LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
+          raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
+      else:
+        raise PopupException(_('Could not remove collection. Check error logs for more info.'))
 
   def update_collection(self, name, fields):
     """

@@ -18,7 +18,6 @@
 
 import csv
 import logging
-import operator
 import os
 import pytz
 import re
@@ -47,6 +46,12 @@ DEFAULT_FIELD = {
   'required': 'true'
 }
 
+def get_config_template_path(solr_cloud_mode):
+  if solr_cloud_mode:
+    return os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'solrcloud')
+  else:
+    return os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'nonsolrcloud')
+
 class SchemaXml(object):
   def __init__(self, xml):
     self.xml = xml
@@ -71,15 +76,18 @@ class SolrConfigXml(object):
     self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df)))
 
 
-def copy_configs(fields, unique_key_field, df):
+def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
-  solr_config_path = os.path.join(tmp_path, os.path.basename(conf.CONFIG_TEMPLATE_PATH.get()))
-  shutil.copytree(conf.CONFIG_TEMPLATE_PATH.get(), solr_config_path)
+
+  config_template_path = get_config_template_path(solr_cloud_mode)
+
+  solr_config_path = os.path.join(tmp_path, 'solr_configs')
+  shutil.copytree(config_template_path, solr_config_path)
 
   if fields or unique_key_field:
     # Get complete schema.xml
-    with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/schema.xml')) as f:
+    with open(os.path.join(config_template_path, 'conf/schema.xml')) as f:
       schemaxml = SchemaXml(f.read())
       schemaxml.uniqueKeyField(unique_key_field)
       schemaxml.fields(fields)
@@ -90,7 +98,7 @@ def copy_configs(fields, unique_key_field, df):
 
   if df:
     # Get complete solrconfig.xml
-    with open(os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'conf/solrconfig.xml')) as f:
+    with open(os.path.join(config_template_path, 'conf/solrconfig.xml')) as f:
       solrconfigxml = SolrConfigXml(f.read())
       solrconfigxml.defaultField(df)
 

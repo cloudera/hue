@@ -21,7 +21,7 @@ from urlparse import urlparse
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 
 
 def solrctl():
@@ -51,12 +51,18 @@ BATCH_INDEXER_PATH = Config(
   type=str,
   default="/var/lib/search/search-mr-job.jar")
 
+CORE_INSTANCE_DIR = Config(
+  key="core_instance_dir",
+  help=_t("Local path to Hue folder where Solr instance directories will be created in non-solrcloud mode."),
+  type=str,
+  default=os.path.join(os.path.dirname(__file__), '../data/collections'))
+
 CONFIG_TEMPLATE_PATH = Config(
   key="config_template_path",
-  help=_t("The contents of this directory will be copied over to the solrctl host to its temporary directory."),
+  help=_t("Default template used at collection creation."),
   private=True,
   type=str,
-  default=os.path.join(os.path.dirname(__file__), '../data/solr_configs'))
+  default=os.path.join(os.path.dirname(__file__), '..', 'data', 'solrconfigs'))
 
 SOLRCTL_PATH = Config(
   key="solrctl_path",

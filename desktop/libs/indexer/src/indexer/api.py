@@ -110,10 +110,15 @@ def parse_fields(request):
 def collections(request):
   searcher = CollectionManagerController(request.user)
   solr_collections = searcher.get_collections()
-
+  massaged_collections = []
+  for collection in solr_collections:
+    massaged_collections.append({
+      'name': collection,
+      'isCoreOnly': solr_collections[collection]['isCoreOnly']
+    })
   response = {
     'status': 0,
-    'collections': [{'name': collection} for collection in solr_collections]
+    'collections': massaged_collections
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -216,7 +221,7 @@ def collections_remove(request):
     for collection in collections:
       if collection.get('name') in solr_collections:
         # Remove collection and instancedir
-        searcher.delete_collection(collection.get('name'))
+        searcher.delete_collection(collection.get('name'), collection.get('isCoreOnly'))
 
     response['status'] = 0
     response['message'] = _('Collections removed!')
