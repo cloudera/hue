@@ -1189,6 +1189,10 @@ function toggleDocDetails(doc) {
 
 function resizeFieldsList() {
   $(".fields-list").css("max-height", Math.max($("#result-container").height(), 230));
+  var _fillHeight = $("#result-container").height() - 40;
+  if ($(".fields-list").height() < _fillHeight) {
+    $(".fields-list").height(_fillHeight);
+  }
 }
 
 $(document).ready(function () {
