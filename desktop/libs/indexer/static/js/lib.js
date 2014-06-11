@@ -27,6 +27,7 @@ var Collection = function(name) {
   self.df = ko.observable().extend({'errors': null});
   self.hasHueCollection = ko.observable(true).extend({'errors': null});
   self.hasSolrCollection = ko.observable(true).extend({'errors': null});
+  self.isCoreOnly = ko.observable(false);
 
   self.removeField = function(field) {
     if (field.name() != self.uniqueKeyField()) {

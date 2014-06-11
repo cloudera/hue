@@ -102,7 +102,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
     <h3>${_('Delete collections')}</h3>
   </div>
   <div class="modal-body">
-    <ul data-bind="foreach: selectedCollections">
+    <ul data-bind="foreach: selectedCloudCollections">
       <li data-bind="text: name"></li>
     </ul>
   </div>
@@ -154,8 +154,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
           <div data-bind="visible: collections().length > 0 && !isLoading()">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
                 placeholder="${_('Filter collections...')}" class="input-xlarge search-query">
-            <button data-bind="clickBubble: false, disable: selectedCollections().length == 0" class="btn toolbarBtn"
-                title="${_('Delete the selected collections')}" data-toggle="modal" data-target="#deleteCollections">
+            <button data-bind="clickBubble: false, disable: selectedCloudCollections().length == 0" class="btn toolbarBtn"
+                title="${_('Delete the selected collections. These must be solr cloud collections. Cores cannot be deleted currently.')}" data-toggle="modal" data-target="#deleteCollections">
               <i class="fa fa-times"></i> ${_('Delete')}
             </button>
             <a href="#create" class="btn toolbarBtn pull-right">
@@ -346,7 +346,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
       <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>
-      <li><a href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
+      <li><a data-bind="visible: !collection().isCoreOnly()" href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>
 </div>
