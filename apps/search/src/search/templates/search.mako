@@ -364,7 +364,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div data-bind="foreach: $parent.counts">
           <div>
             <a href="javascript: void(0)">
-              <!-- ko if: $index() != $parent.properties.limit() -->
+              <!-- ko if: $index() < $parent.properties.limit() -->
                 <!-- ko if: ! $data.selected -->
                   <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                   <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
