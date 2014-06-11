@@ -412,6 +412,11 @@ var ManageCollectionsViewModel = function() {
       return collection.selected();
     });
   });
+  self.selectedCloudCollections = ko.computed(function() {
+    return ko.utils.arrayFilter(self.selectedCollections(), function(collection) {
+      return !ko.unwrap(collection).isCoreOnly();
+    });
+  });
 
   self.toggleSelectAll = function() {
     var direction = !self.selectedCollections().length;
@@ -456,6 +461,7 @@ var ManageCollectionsViewModel = function() {
           var new_collection = ko.observable(new Collection(collection.name)).extend({'selectable': null});
           new_collection().hasHueCollection(collection.hue);
           new_collection().hasSolrCollection(collection.solr);
+          new_collection().isCoreOnly(collection.isCoreOnly);
           collections.push(new_collection);
         });
         self.collections(collections);
@@ -472,7 +478,7 @@ var ManageCollectionsViewModel = function() {
 
   self.removeCollections = function(collection) {
     self.isLoading(true);
-    var collections = self.selectedCollections();
+    var collections = self.selectedCloudCollections();
     if (collections.length == 0) {
       collections = ($.isArray(collection)) ? collection : [collection];
     }

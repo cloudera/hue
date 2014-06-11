@@ -30,6 +30,8 @@ from jobbrowser.views import job_single_logs
 from oozie.models import Workflow, Shell, Ssh
 from oozie.views.editor import _submit_workflow
 
+import utils
+
 
 LOG = logging.getLogger(__name__)
 
@@ -82,7 +84,7 @@ class OozieApi(object):
       workflow=workflow,
       node_type='shell',
       command='rsync -av %(config_path)s %(solr_user)s@%(solr_host)s:%(solr_config_path)s' % {
-        'config_path': search_conf.CONFIG_TEMPLATE_PATH.get(),
+        'config_path': utils.get_config_template_path(),
         'solr_user': solr_user,
         'solr_host': solr_host,
         'solr_config_path': solr_config_path
