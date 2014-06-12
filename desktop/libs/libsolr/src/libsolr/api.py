@@ -62,7 +62,7 @@ class SolrApi(object):
 
     solr_query['collection'] = collection['name']
 
-    if query['download']:
+    if query.get('download'):
       solr_query['rows'] = 1000
       solr_query['start'] = 0
     else:
