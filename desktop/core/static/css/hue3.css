@@ -1648,3 +1648,7 @@ border-bottom-left-radius: 0px;
 .demi-modal .modal-footer {
   padding: 10px;
 }
+
+.control-group.error .input-prepend .add-on i, .control-group.error .input-append .add-on i {
+    color: #fff;
+}
