@@ -332,12 +332,12 @@ class NumberInput(TextInput):
 
 
 class CoordinatorForm(forms.ModelForm):
-  start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
+  start = forms.SplitDateTimeField(input_date_formats=[DATE_FORMAT], input_time_formats=[TIME_FORMAT],
                                    widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_start'},
-                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT))
-  end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
+                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT), localize=True)
+  end = forms.SplitDateTimeField(input_date_formats=[DATE_FORMAT], input_time_formats=[TIME_FORMAT],
                                  widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_end'},
-                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT), localize=True)
 
   class Meta:
     model = Coordinator
