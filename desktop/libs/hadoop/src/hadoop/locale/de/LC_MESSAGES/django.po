@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-11-07 13:06-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -118,48 +118,48 @@ msgstr "Kopie-src '%s' ist ein Verzeichnis"
 msgid "Copy dst '%s' is a directory"
 msgstr "Kopie-dst '%s' ist eine Verzeichnis"
 
-#: src/hadoop/fs/webhdfs.py:551
+#: src/hadoop/fs/webhdfs.py:552
 #, python-format
 msgid "File not found: %s"
 msgstr "Datei nicht gefunden: %s"
 
-#: src/hadoop/fs/webhdfs.py:567
+#: src/hadoop/fs/webhdfs.py:568
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "Zieldatei %s existiert und ist kein Verzeichnis."
 
-#: src/hadoop/fs/webhdfs.py:610
+#: src/hadoop/fs/webhdfs.py:611
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "'%s' konnte nicht erstellt werden. HDFS gab keine Umleitung aus."
 
-#: src/hadoop/fs/webhdfs.py:677
+#: src/hadoop/fs/webhdfs.py:678
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "Ist ein Verzeichnis: '%s'"
 
-#: src/hadoop/fs/webhdfs.py:695
+#: src/hadoop/fs/webhdfs.py:696
 msgid "Invalid argument to seek for whence"
 msgstr "Ungültiges zu suchendes Argument"
 
-#: src/hadoop/fs/webhdfs.py:715
+#: src/hadoop/fs/webhdfs.py:716
 msgid "File not open for writing"
 msgstr "Datei nicht zum Schreiben geöffnet"
 
-#: src/hadoop/fs/webhdfs.py:761
+#: src/hadoop/fs/webhdfs.py:762
 msgid "Filesystem root '/' should be owned by 'hdfs'"
 msgstr "Dateisystemstamm '/' darf nicht Eigentum von 'hdfs' sein"
 
-#: src/hadoop/fs/webhdfs.py:764
+#: src/hadoop/fs/webhdfs.py:765
 msgid "Failed to access filesystem root"
 msgstr "Dateisystemstamm konnte nicht aufgerufen werden"
 
-#: src/hadoop/fs/webhdfs.py:773
+#: src/hadoop/fs/webhdfs.py:774
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "Temporäre Datei '%s' konnte nicht erstellt werden"
 
-#: src/hadoop/fs/webhdfs.py:790
+#: src/hadoop/fs/webhdfs.py:791
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "Temporäre Datei '%s' konnte nicht entfernt werden"

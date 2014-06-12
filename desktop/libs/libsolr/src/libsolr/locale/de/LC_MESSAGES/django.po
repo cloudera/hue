@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 29.05.2014 17:10-0700\n"
+"PO-Revision-Date: 30.07.2012 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,73 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/librdbms/conf.py:26
-msgid "RDBMS server configurations."
-msgstr "RDBMS-Serverkonfigurationen."
-
-#: src/librdbms/conf.py:28
-msgid "RDBMS server configuration."
-msgstr "RDBMS-Serverkonfiguration."
-
-#: src/librdbms/conf.py:32
-msgid "Nice name of server."
-msgstr "Servername."
-
-#: src/librdbms/conf.py:38
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
-msgstr "Datenbankname oder Pfad zur Datenbankdatei. Wenn dies angegeben wird, ist das Auswählen anderer Datenbanken nicht zulässig."
-
-#: src/librdbms/conf.py:44
-msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
-msgstr "Datenbank-Engine wie postgresq_psycopg2, mysql oder sqlite3."
-
-#: src/librdbms/conf.py:50
-msgid "Database username."
-msgstr "Datenbank-Benutzername."
-
-#: src/librdbms/conf.py:56
-msgid "Database password."
-msgstr "Datenbank-Kennwort."
-
-#: src/librdbms/conf.py:62
-msgid "Database host."
-msgstr "Datenbank-Host."
-
-#: src/librdbms/conf.py:68
-msgid "Database port."
-msgstr "Datenbank-Port."
-
-#: src/librdbms/conf.py:74
-msgid "Database options to send to the server when connecting."
-msgstr "Datenbankoptionen zum Senden an den Server, wenn die Verbindung hergestellt wird."
-
-#: src/librdbms/conf.py:90
-msgid "Database name should not be empty for the SQLite backend."
-msgstr "Datenbankname darf für das SQLite-Backend nicht leer sein."
-
-#: src/librdbms/conf.py:92
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
-msgstr "Datenbankname darf für das Oracle-Backend nicht leer sein. Es muss die SID Ihrer Datenbank sein."
-
-#: src/librdbms/conf.py:94
-msgid "Database name should not be empty for the PostgreSQL backend."
-msgstr "Der Datenbankname darf für das PostgreSQL-Backend nicht leer sein."
-
-#: src/librdbms/design.py:110
-msgid "No server!"
-msgstr "Kein Server!"
-
-#: src/librdbms/design.py:112
-msgid "No database!"
-msgstr "Keine Datenbank!"
-
-#: src/librdbms/server/mysql_lib.py:80
-#, python-format
-msgid "Database '%s' is not allowed. Please use database '%s'."
-msgstr "Datenbank \"%s\" ist nicht zugelassen. Verwenden Sie Datenbank \"%s\"."
-
-#: src/librdbms/server/mysql_lib.py:107
-#, python-format
-msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
-msgstr "Datenbank %s nicht gefunden. Sind Sie sicher, dass Ihre Konfiguration korrekt ist?"
+#: src/libsolr/api.py:79 src/libsolr/api.py:90 src/libsolr/api.py:103
+#: src/libsolr/api.py:123 src/libsolr/api.py:141 src/libsolr/api.py:150
+#: src/libsolr/api.py:159 src/libsolr/api.py:169 src/libsolr/api.py:179
+#: src/libsolr/api.py:192 src/libsolr/api.py:202 src/libsolr/api.py:227
+msgid "Error while accessing Solr"
+msgstr "Fehler beim Zugriff auf Solr"
 
