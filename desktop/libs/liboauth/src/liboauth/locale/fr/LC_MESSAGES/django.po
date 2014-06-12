@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,91 +18,99 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboauth/backend.py:105 src/liboauth/backend.py:150
-#: src/liboauth/backend.py:158 src/liboauth/backend.py:167
-#: src/liboauth/backend.py:176 src/liboauth/backend.py:250
+#: src/liboauth/backend.py:158 src/liboauth/backend.py:171
+#: src/liboauth/backend.py:180 src/liboauth/backend.py:254
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "Réponse non valide du fournisseur OAuth : %s"
 
-#: src/liboauth/conf.py:26
+#: src/liboauth/conf.py:27
 msgid "The Consumer key of the twitter application."
 msgstr "Clé Consommateur de l'application Twitter."
 
-#: src/liboauth/conf.py:32
+#: src/liboauth/conf.py:33
 msgid "The Consumer key of the google application."
 msgstr "Clé Consommateur de l'application Google."
 
-#: src/liboauth/conf.py:38
+#: src/liboauth/conf.py:39
 msgid "The Consumer key of the facebook application."
 msgstr "Clé Consommateur de l'application Facebook."
 
-#: src/liboauth/conf.py:44
+#: src/liboauth/conf.py:45
 msgid "The Consumer key of the linkedin application."
 msgstr "Clé Consommateur de l'application LinkedIn."
 
-#: src/liboauth/conf.py:51
+#: src/liboauth/conf.py:52
 msgid "The Consumer secret of the twitter application."
 msgstr "Secret Consommateur de l'application Twitter."
 
-#: src/liboauth/conf.py:57
+#: src/liboauth/conf.py:58
 msgid "The Consumer secret of the google application."
 msgstr "Secret Consommateur de l'application Google."
 
-#: src/liboauth/conf.py:63
+#: src/liboauth/conf.py:64
 msgid "The Consumer secret of the facebook application."
 msgstr "Secret Consommateur de l'application Facebook."
 
-#: src/liboauth/conf.py:69
+#: src/liboauth/conf.py:70
 msgid "The Consumer secret of the linkedin application."
 msgstr "Secret Consommateur de l'application LinkedIn."
 
-#: src/liboauth/conf.py:77
+#: src/liboauth/conf.py:78
 msgid "The Twitter Request token URL."
 msgstr "URL du jeton de la requête Twitter."
 
-#: src/liboauth/conf.py:83
+#: src/liboauth/conf.py:84
 msgid "The Google Request token URL."
 msgstr "URL du jeton de la requête Google."
 
-#: src/liboauth/conf.py:89
+#: src/liboauth/conf.py:90
 msgid "The Facebook Request token URL."
 msgstr "URL du jeton de la requête Facebook."
 
-#: src/liboauth/conf.py:95
+#: src/liboauth/conf.py:96
 msgid "The Linkedin Request token URL."
 msgstr "URL du jeton de la requête LinkedIn."
 
-#: src/liboauth/conf.py:102
+#: src/liboauth/conf.py:103
 msgid "The Twitter Access token URL."
 msgstr "URL du jeton d'accès Twitter."
 
-#: src/liboauth/conf.py:108
+#: src/liboauth/conf.py:109
 msgid "The Google Access token URL."
 msgstr "URL du jeton d'accès Google."
 
-#: src/liboauth/conf.py:114
+#: src/liboauth/conf.py:115
 msgid "The Facebook Access token URL."
 msgstr "URL du jeton d'accès Facebook."
 
-#: src/liboauth/conf.py:120
+#: src/liboauth/conf.py:121
 msgid "The Linkedin Access token URL."
 msgstr "URL du jeton d'accès LinkedIn."
 
-#: src/liboauth/conf.py:128
+#: src/liboauth/conf.py:129
 msgid "The Twitter Authorize URL."
 msgstr "URL d'autorisation Twitter."
 
-#: src/liboauth/conf.py:134
+#: src/liboauth/conf.py:135
 msgid "The Google Authorize URL."
 msgstr "URL d'autorisation Google."
 
-#: src/liboauth/conf.py:140
+#: src/liboauth/conf.py:141
 msgid "The Facebook Authorize URL."
 msgstr "URL d'autorisation Facebook."
 
-#: src/liboauth/conf.py:146
+#: src/liboauth/conf.py:147
 msgid "The Linkedin Authorize URL."
 msgstr "URL d'autorisation LinkedIn."
+
+#: src/liboauth/conf.py:154
+msgid "Comma-separated list of whitelisted domains."
+msgstr "Liste des domaines acceptés, séparés par des virgules."
+
+#: src/liboauth/conf.py:161
+msgid "JSON formatted hash of username simplifications. Example: {\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} converts \"email@sub1.domain.com\" to \"email_S1\""
+msgstr "Hachage au format JSON des simplifications de noms d'utilisateur. Exemple : {\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} convertit \"email@sub1.domain.com\" en \"email_S1\""
 
 #: src/liboauth/views.py:72
 #, python-format

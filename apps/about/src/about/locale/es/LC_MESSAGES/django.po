@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -21,51 +21,51 @@ msgstr ""
 msgid "POST request required."
 msgstr "Se necesita una solicitud POST."
 
-#: src/about/templates/admin_wizard.mako:25 src/about/templates/header.mako:31
+#: src/about/templates/admin_wizard.mako:26 src/about/templates/header.mako:31
 msgid "Quick Start"
 msgstr "Inicio rápido"
 
-#: src/about/templates/admin_wizard.mako:33
+#: src/about/templates/admin_wizard.mako:34
 msgid "Quick Start Wizard"
 msgstr "Asistente de Inicio rápido"
 
-#: src/about/templates/admin_wizard.mako:35
+#: src/about/templates/admin_wizard.mako:36
 msgid "Visit the project website!"
 msgstr "Visite el sitio web del proyecto."
 
-#: src/about/templates/admin_wizard.mako:35
+#: src/about/templates/admin_wizard.mako:36
 msgid "The Hadoop UI"
 msgstr "IU de Hadoop"
 
-#: src/about/templates/admin_wizard.mako:46
+#: src/about/templates/admin_wizard.mako:47
 msgid "Step 1:"
 msgstr "Paso 1:"
 
-#: src/about/templates/admin_wizard.mako:47
+#: src/about/templates/admin_wizard.mako:48
 msgid "Check Configuration"
 msgstr "Comprobar configuración"
 
-#: src/about/templates/admin_wizard.mako:48
+#: src/about/templates/admin_wizard.mako:49
 msgid "Step 2:"
 msgstr "Paso 2:"
 
-#: src/about/templates/admin_wizard.mako:48
+#: src/about/templates/admin_wizard.mako:49
 msgid "Examples"
 msgstr "Ejemplos"
 
-#: src/about/templates/admin_wizard.mako:49
+#: src/about/templates/admin_wizard.mako:50
 msgid "Step 3:"
 msgstr "Paso 3:"
 
-#: src/about/templates/admin_wizard.mako:49
+#: src/about/templates/admin_wizard.mako:50
 msgid "Users"
 msgstr "Usuarios"
 
-#: src/about/templates/admin_wizard.mako:50
+#: src/about/templates/admin_wizard.mako:51
 msgid "Step 4:"
 msgstr "Paso 4:"
 
-#: src/about/templates/admin_wizard.mako:50
+#: src/about/templates/admin_wizard.mako:51
 msgid "Go!"
 msgstr "Ir"
 
@@ -165,7 +165,7 @@ msgid "Next"
 msgstr "Siguiente"
 
 #: src/about/templates/admin_wizard.mako:239
-#: src/about/templates/admin_wizard.mako:247
+#: src/about/templates/admin_wizard.mako:245
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue y el logotipo de Hue son marcas comerciales de Cloudera, Inc."
 
@@ -173,16 +173,20 @@ msgstr "Hue y el logotipo de Hue son marcas comerciales de Cloudera, Inc."
 msgid "Learn more about Hue and Hadoop on"
 msgstr "Obtenga más información de Hue y Hadoop en"
 
-#: src/about/templates/admin_wizard.mako:296
+#: src/about/templates/admin_wizard.mako:248
+msgid "Sign in now!"
+msgstr "¡Iniciar sesión ahora!"
+
+#: src/about/templates/admin_wizard.mako:299
 msgid "Check config failed: "
 msgstr "Error al comprobar configuración: "
 
-#: src/about/templates/admin_wizard.mako:305
-#: src/about/templates/admin_wizard.mako:323
+#: src/about/templates/admin_wizard.mako:308
+#: src/about/templates/admin_wizard.mako:326
 msgid "Examples refreshed"
 msgstr "Ejemplos actualizados"
 
-#: src/about/templates/admin_wizard.mako:387
+#: src/about/templates/admin_wizard.mako:390
 msgid "Configuration updated"
 msgstr "Configuración actualizada"
 

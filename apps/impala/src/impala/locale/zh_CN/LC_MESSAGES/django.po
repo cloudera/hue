@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -37,7 +37,15 @@ msgstr "与 Impala 对话时打开/关闭模拟机制。"
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
 msgstr "要求 Impala 缓存的结果集初始行数，用于支持重新获取这些结果并进行下载。设置为 0 将禁用选项和向后兼容性。"
 
-#: src/impala/conf.py:72
+#: src/impala/conf.py:62
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Thrift 调用的超时时间（以秒为单位）。"
+
+#: src/impala/conf.py:66
+msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
+msgstr "当用户离开编辑器页面时，Hue 将尝试关闭 Impala 查询。这将释放 Impala 中的所有查询资源，但也会让其结果变得无法访问。"
+
+#: src/impala/conf.py:86
 msgid "No available Impalad to send queries to."
 msgstr "没有可向其发送请求的 Impalad。"
 

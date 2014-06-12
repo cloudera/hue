@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,137 +17,137 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/useradmin/forms.py:43 src/useradmin/forms.py:113
+#: src/useradmin/forms.py:51 src/useradmin/forms.py:121
 #: src/useradmin/templates/list_users.mako:71
 msgid "Username"
 msgstr "ユーザー名"
 
-#: src/useradmin/forms.py:46
+#: src/useradmin/forms.py:54
 msgid "Required. 30 characters or fewer. No whitespaces or colons."
 msgstr "必須。文字数は 30以下。スペースとコロンは使用できません。"
 
-#: src/useradmin/forms.py:47 src/useradmin/forms.py:116
+#: src/useradmin/forms.py:55 src/useradmin/forms.py:124
 msgid "Whitespaces and ':' not allowed"
 msgstr "スペースと '.' は使用できません。"
 
-#: src/useradmin/forms.py:48
+#: src/useradmin/forms.py:56
 msgid "Password"
 msgstr "パスワード"
 
-#: src/useradmin/forms.py:49
+#: src/useradmin/forms.py:57
 msgid "Password confirmation"
 msgstr "パスワードの設定"
 
-#: src/useradmin/forms.py:50 src/useradmin/forms.py:122
+#: src/useradmin/forms.py:58 src/useradmin/forms.py:130
 msgid "Create home directory"
 msgstr "ホームディレクトリを作成"
 
-#: src/useradmin/forms.py:51
+#: src/useradmin/forms.py:59
 msgid "Create home directory if one doesn't already exist."
 msgstr "ホームディレクトリを作成してください（存在しない場合）。"
 
-#: src/useradmin/forms.py:71
+#: src/useradmin/forms.py:79
 msgid "Passwords do not match."
 msgstr "パスワードが一致しません。"
 
-#: src/useradmin/forms.py:77
+#: src/useradmin/forms.py:85
 msgid "You must specify a password when creating a new user."
 msgstr "新規ユーザーの作成ではパスワードを指定する必要があります。"
 
-#: src/useradmin/forms.py:115
+#: src/useradmin/forms.py:123
 msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
 msgstr "必須。ユーザー名は 30 文字以下、DN は 64 文字以下とし、スペースとコロンは使用できません。"
 
-#: src/useradmin/forms.py:117 src/useradmin/forms.py:155
+#: src/useradmin/forms.py:125 src/useradmin/forms.py:168
 msgid "Distinguished name"
 msgstr "識別名"
 
-#: src/useradmin/forms.py:118
-#: src/useradmin/management/commands/import_ldap_group.py:35
-#: src/useradmin/management/commands/import_ldap_user.py:33
+#: src/useradmin/forms.py:126
+#: src/useradmin/management/commands/import_ldap_group.py:38
+#: src/useradmin/management/commands/import_ldap_user.py:35
 msgid "Whether or not the user should be imported by distinguished name."
 msgstr "ユーザーを識別名指定でインポートするかどうかの指定です。"
 
-#: src/useradmin/forms.py:123
+#: src/useradmin/forms.py:131
 msgid "Create home directory for user if one doesn't already exist."
 msgstr "ユーザーのホームディレクトリを作成してください（存在しない場合）。"
 
-#: src/useradmin/forms.py:134
+#: src/useradmin/forms.py:147
 #, python-format
 msgid "Too long: 64 characters or fewer and not %s."
 msgstr "長すぎます。64 文字以下で %s ではないことが必要です。"
 
-#: src/useradmin/forms.py:140
+#: src/useradmin/forms.py:153
 #, python-format
 msgid "Too long: 30 characters or fewer and not %s."
 msgstr "長すぎます。30 文字以下で %s ではないことが必要です。"
 
-#: src/useradmin/forms.py:150
+#: src/useradmin/forms.py:163
 msgid "Name"
 msgstr "名前"
 
-#: src/useradmin/forms.py:153
+#: src/useradmin/forms.py:166
 msgid "Required. 80 characters or fewer."
 msgstr "必須。80 文字以下であることが必要です。"
 
-#: src/useradmin/forms.py:154
+#: src/useradmin/forms.py:167
 msgid "80 characters or fewer."
 msgstr "80 文字以下であることが必要です。"
 
-#: src/useradmin/forms.py:156
+#: src/useradmin/forms.py:169
 msgid "Whether or not the group should be imported by distinguished name."
 msgstr "グループを識別名指定でインポートするかどうかの指定です。"
 
-#: src/useradmin/forms.py:160
+#: src/useradmin/forms.py:173
 msgid "Import new members"
 msgstr "新規メンバーのインポート"
 
-#: src/useradmin/forms.py:161
+#: src/useradmin/forms.py:174
 msgid "Import unimported or new users from the group."
 msgstr "未インポートユーザーまたは新規ユーザーをグループからインポートします。"
 
-#: src/useradmin/forms.py:164
-msgid "Import new members from all subgroups"
-msgstr "すべてのサブグループから新規メンバーをインポート"
-
-#: src/useradmin/forms.py:165
-msgid "Import unimported or new users from the all subgroups."
-msgstr "未インポートユーザーまたは新規ユーザーをすべてのサブグループからインポートします。"
-
-#: src/useradmin/forms.py:168
+#: src/useradmin/forms.py:177
 msgid "Create home directories"
 msgstr "ホームディレクトリを作成"
 
-#: src/useradmin/forms.py:169
+#: src/useradmin/forms.py:178
 msgid "Create home directories for every member imported, if members are being imported."
 msgstr "インポートされる各メンバーのホームディレクトリを作成してください（メンバーをインポートする場合）。"
 
-#: src/useradmin/forms.py:180
+#: src/useradmin/forms.py:181
+msgid "Import new members from all subgroups"
+msgstr "すべてのサブグループから新規メンバーをインポート"
+
+#: src/useradmin/forms.py:182
+msgid "Import unimported or new users from the all subgroups."
+msgstr "未インポートユーザーまたは新規ユーザーをすべてのサブグループからインポートします。"
+
+#: src/useradmin/forms.py:198
 #, python-format
 msgid "Too long: 80 characters or fewer and not %s"
 msgstr "長すぎます。80 文字以下で %s ではないことが必要です"
 
-#: src/useradmin/forms.py:202
+#: src/useradmin/forms.py:220
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
 msgstr "グループ名には文字、数字、ハイフン、またはアンダースコアのみを使用できます。"
 
-#: src/useradmin/forms.py:217
+#: src/useradmin/forms.py:235
 msgid "members"
 msgstr "メンバー"
 
-#: src/useradmin/forms.py:218
+#: src/useradmin/forms.py:236
 msgid "permissions"
 msgstr "パーミッション"
 
-#: src/useradmin/forms.py:261
+#: src/useradmin/forms.py:279
 msgid "groups"
 msgstr "グループ"
 
-#: src/useradmin/forms.py:296
+#: src/useradmin/forms.py:314
 msgid "Create Home Directories"
 msgstr "ホームディレクトリを作成"
 
-#: src/useradmin/forms.py:297
+#: src/useradmin/forms.py:315
 msgid "Create home directory for every user, if one doesn't already exist."
 msgstr "各ユーザーのホームディレクトリを作成してください（存在しない場合）。"
 
@@ -156,147 +156,165 @@ msgstr "各ユーザーのホームディレクトリを作成してください
 msgid "You do not have permissions to %(description)s."
 msgstr "%(description)s のためのパーミッションがありません。"
 
-#: src/useradmin/views.py:112
+#: src/useradmin/views.py:114
 msgid "You must be a superuser to delete users."
 msgstr "ユーザーを削除するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:115
+#: src/useradmin/views.py:117
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/useradmin/views.py:122
+#: src/useradmin/views.py:124
 msgid "You cannot remove yourself."
 msgstr "自分自身を削除することはできません。"
 
-#: src/useradmin/views.py:129
+#: src/useradmin/views.py:131
 msgid "The users were deleted."
 msgstr "ユーザーが削除されました。"
 
-#: src/useradmin/views.py:135
+#: src/useradmin/views.py:137
 msgid "You must be a superuser to delete groups."
 msgstr "グループを削除するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:148
+#: src/useradmin/views.py:150
 msgid "The default user group may not be deleted."
 msgstr "デフォルトのユーザーグループは削除できません。"
 
-#: src/useradmin/views.py:153
+#: src/useradmin/views.py:155
 msgid "The group was deleted."
 msgstr "グループが削除されました。"
 
-#: src/useradmin/views.py:156
+#: src/useradmin/views.py:158
 msgid "Group not found."
 msgstr "グループが見つかりません。"
 
-#: src/useradmin/views.py:171
+#: src/useradmin/views.py:173
 msgid "You must be a superuser to add or edit another user."
 msgstr "別のユーザーを追加または編集するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:191
+#: src/useradmin/views.py:193
 msgid "You cannot change a username."
 msgstr "ユーザー名は変更できません。"
 
-#: src/useradmin/views.py:193
+#: src/useradmin/views.py:195
 msgid "You cannot make yourself inactive."
 msgstr "自分自身を非アクティブにすることはできません。"
 
-#: src/useradmin/views.py:205
+#: src/useradmin/views.py:207
 msgid "You cannot make yourself a superuser."
 msgstr "自分自身をスーパーユーザーにすることはできません。"
 
-#: src/useradmin/views.py:209
+#: src/useradmin/views.py:211
 msgid "User information updated"
 msgstr "ユーザー情報が更新されました"
 
-#: src/useradmin/views.py:218 src/useradmin/views.py:325
+#: src/useradmin/views.py:220 src/useradmin/views.py:329
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "ユーザー %s のホームディレクトリを作成できません。"
 
-#: src/useradmin/views.py:246
+#: src/useradmin/views.py:248
 msgid "You must be a superuser to add or edit a group."
 msgstr "グループを追加または編集するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:257
+#: src/useradmin/views.py:259
 msgid "Group information updated"
 msgstr "グループ情報が更新されました"
 
-#: src/useradmin/views.py:280
+#: src/useradmin/views.py:282
 msgid "You must be a superuser to change permissions."
 msgstr "パーミッションを変更するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:288
+#: src/useradmin/views.py:290
 msgid "Permission information updated"
 msgstr "パーミッション情報が更新されました"
 
-#: src/useradmin/views.py:307
+#: src/useradmin/views.py:309
 msgid "You must be a superuser to add another user."
 msgstr "別のユーザーを追加するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:318 src/useradmin/views.py:362
-#: src/useradmin/views.py:404
+#: src/useradmin/views.py:322 src/useradmin/views.py:368
+#: src/useradmin/views.py:412
 msgid "There was an error when communicating with LDAP"
 msgstr "LDAP で通信しているときにエラーが発生しました"
 
-#: src/useradmin/views.py:329
+#: src/useradmin/views.py:333
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
 msgstr "パターン %s のユーザーの LDAP 詳細を取得できませんでした。"
 
-#: src/useradmin/views.py:349
+#: src/useradmin/views.py:353
 msgid "You must be a superuser to add another group."
 msgstr "別のグループを追加するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:361
+#: src/useradmin/views.py:367
 #, python-format
 msgid "LDAP Exception: %s"
 msgstr "LDAP 例外：%s"
 
-#: src/useradmin/views.py:368
+#: src/useradmin/views.py:374
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
 msgstr "パターン %s のグループの LDAP 詳細を取得できませんでした"
 
-#: src/useradmin/views.py:385
+#: src/useradmin/views.py:391
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "LDAP ユーザー/グループの同期化ではスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:412
+#: src/useradmin/views.py:420
 msgid "The import may not be complete, sync again."
 msgstr "インポートが完全ではない可能性があります。同期を再度実行してください。"
 
-#: src/useradmin/views.py:433
+#: src/useradmin/views.py:441
 msgid "No active superuser configured."
 msgstr "アクティブなスーパーユーザーが未設定です。"
 
-#: src/useradmin/views.py:435
+#: src/useradmin/views.py:443
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "設定からアクティブな最後のスーパーユーザーを削除することはできません。"
 
-#: src/useradmin/views.py:493
+#: src/useradmin/views.py:501
 #, python-format
 msgid "Synced user %s from Unix"
 msgstr "UNIX からユーザー %s を同期しました"
 
-#: src/useradmin/views.py:523
+#: src/useradmin/views.py:530
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
 msgstr "ユーザー %(username)s のインポート中に名前の競合が発生しました"
 
-#: src/useradmin/views.py:592
+#: src/useradmin/views.py:672 src/useradmin/views.py:721
 #, python-format
 msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
 msgstr "パターン %(groupname_pattern)s のグループ %(groupname)s をインポートしている間に名前の競合が発生しました"
 
-#: src/useradmin/management/commands/import_ldap_group.py:39
+#: src/useradmin/management/commands/import_ldap_group.py:42
 msgid "Import users from the group."
 msgstr "グループからユーザーをインポートします。"
 
+#: src/useradmin/management/commands/import_ldap_group.py:45
+msgid "Import users from the group, but also do so recursively."
+msgstr "ユーザーをグループからインポートしますが、この操作を再帰的にも実行します。"
+
 #: src/useradmin/management/commands/import_ldap_group.py:48
+msgid "Sync users in the group."
+msgstr "グループ内のユーザーを同期します。"
+
+#: src/useradmin/management/commands/import_ldap_group.py:51
+#: src/useradmin/management/commands/import_ldap_user.py:42
+#: src/useradmin/management/commands/sync_ldap_users_and_groups.py:37
+msgid "Server to connect to."
+msgstr "接続先のサーバーです。"
+
+#: src/useradmin/management/commands/import_ldap_group.py:60
 msgid "A group name must be provided."
 msgstr "グループ名を指定する必要があります。"
 
-#: src/useradmin/management/commands/import_ldap_user.py:43
+#: src/useradmin/management/commands/import_ldap_user.py:39
+msgid "Sync groups of the users."
+msgstr "ユーザーのグループを同期します。"
+
+#: src/useradmin/management/commands/import_ldap_user.py:51
 msgid "A username must be provided."
 msgstr "ユーザー名を指定する必要があります。"
 
@@ -343,7 +361,7 @@ msgstr "ユーザーを追加／同期"
 #: src/useradmin/templates/add_ldap_users.mako:51
 #: src/useradmin/templates/edit_group.mako:77
 #: src/useradmin/templates/edit_permissions.mako:57
-#: src/useradmin/templates/sync_ldap_users_groups.mako:49
+#: src/useradmin/templates/sync_ldap_users_groups.mako:51
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -425,7 +443,7 @@ msgid "Add/Sync group"
 msgstr "グループを追加／同期"
 
 #: src/useradmin/templates/edit_group.mako:74
-#: src/useradmin/templates/list_groups.mako:47
+#: src/useradmin/templates/list_groups.mako:46
 msgid "Add group"
 msgstr "グループを追加"
 
@@ -622,19 +640,19 @@ msgstr "検索条件に一致するユーザーが存在しません。"
 msgid "Are you sure you want to delete the selected user(s)?"
 msgstr "選択したユーザーを削除しますか?"
 
-#: src/useradmin/templates/sync_ldap_users_groups.mako:37
+#: src/useradmin/templates/sync_ldap_users_groups.mako:39
 msgid "Sync LDAP users and groups"
 msgstr "LDAP ユーザー／グループを同期"
 
-#: src/useradmin/templates/sync_ldap_users_groups.mako:41
+#: src/useradmin/templates/sync_ldap_users_groups.mako:43
 msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
 msgstr "Hue にまだ存在しないユーザーおよびグループはインポートされません。LDAP からインポートされたユーザーおよびグループのみを同期できます。"
 
-#: src/useradmin/templates/sync_ldap_users_groups.mako:42
+#: src/useradmin/templates/sync_ldap_users_groups.mako:44
 msgid "All user information and group memberships will be updated based on the LDAP server's current state."
 msgstr "すべてのユーザー情報とグループメンバーシップは、LDAP サーバーの現在の状態に基づいて更新されます。"
 
-#: src/useradmin/templates/sync_ldap_users_groups.mako:50
+#: src/useradmin/templates/sync_ldap_users_groups.mako:52
 msgid "Sync"
 msgstr "同期"
 

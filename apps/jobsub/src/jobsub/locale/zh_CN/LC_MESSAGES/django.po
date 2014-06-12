@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr "未找到 Workflow"
 msgid "Permission denied. You are not the owner."
 msgstr "权限被拒绝。您不是所有者。"
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "必须是 POST 请求。"
 
@@ -108,16 +108,16 @@ msgstr "访问被拒绝：删除设计 %(id)s。"
 msgid "Could not find design %s."
 msgstr "找不到设计 %s。"
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "访问被拒绝：编辑设计 %(id)s。"
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "保存设计时出错"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "必须是 POST 请求。"
 

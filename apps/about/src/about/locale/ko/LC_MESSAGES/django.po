@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -21,51 +21,51 @@ msgstr ""
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/about/templates/admin_wizard.mako:25 src/about/templates/header.mako:31
+#: src/about/templates/admin_wizard.mako:26 src/about/templates/header.mako:31
 msgid "Quick Start"
 msgstr "빠른 시작"
 
-#: src/about/templates/admin_wizard.mako:33
+#: src/about/templates/admin_wizard.mako:34
 msgid "Quick Start Wizard"
 msgstr "빠른 시작 마법사"
 
-#: src/about/templates/admin_wizard.mako:35
+#: src/about/templates/admin_wizard.mako:36
 msgid "Visit the project website!"
 msgstr "프로젝트 웹 사이트를 방문합니다!"
 
-#: src/about/templates/admin_wizard.mako:35
+#: src/about/templates/admin_wizard.mako:36
 msgid "The Hadoop UI"
 msgstr "Hadoop UI"
 
-#: src/about/templates/admin_wizard.mako:46
+#: src/about/templates/admin_wizard.mako:47
 msgid "Step 1:"
 msgstr "1단계:"
 
-#: src/about/templates/admin_wizard.mako:47
+#: src/about/templates/admin_wizard.mako:48
 msgid "Check Configuration"
 msgstr "구성 확인"
 
-#: src/about/templates/admin_wizard.mako:48
+#: src/about/templates/admin_wizard.mako:49
 msgid "Step 2:"
 msgstr "2단계:"
 
-#: src/about/templates/admin_wizard.mako:48
+#: src/about/templates/admin_wizard.mako:49
 msgid "Examples"
 msgstr "예제"
 
-#: src/about/templates/admin_wizard.mako:49
+#: src/about/templates/admin_wizard.mako:50
 msgid "Step 3:"
 msgstr "3단계:"
 
-#: src/about/templates/admin_wizard.mako:49
+#: src/about/templates/admin_wizard.mako:50
 msgid "Users"
 msgstr "사용자"
 
-#: src/about/templates/admin_wizard.mako:50
+#: src/about/templates/admin_wizard.mako:51
 msgid "Step 4:"
 msgstr "4단계:"
 
-#: src/about/templates/admin_wizard.mako:50
+#: src/about/templates/admin_wizard.mako:51
 msgid "Go!"
 msgstr "이동!"
 
@@ -165,7 +165,7 @@ msgid "Next"
 msgstr "다음"
 
 #: src/about/templates/admin_wizard.mako:239
-#: src/about/templates/admin_wizard.mako:247
+#: src/about/templates/admin_wizard.mako:245
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue 및 Hue 로고는 Cloudera, Inc.의 상표입니다."
 
@@ -173,16 +173,20 @@ msgstr "Hue 및 Hue 로고는 Cloudera, Inc.의 상표입니다."
 msgid "Learn more about Hue and Hadoop on"
 msgstr "Hue 및 Hadoop에 대해 자세히 알아보기"
 
-#: src/about/templates/admin_wizard.mako:296
+#: src/about/templates/admin_wizard.mako:248
+msgid "Sign in now!"
+msgstr "지금 로그인!"
+
+#: src/about/templates/admin_wizard.mako:299
 msgid "Check config failed: "
 msgstr "구성 확인 실패: "
 
-#: src/about/templates/admin_wizard.mako:305
-#: src/about/templates/admin_wizard.mako:323
+#: src/about/templates/admin_wizard.mako:308
+#: src/about/templates/admin_wizard.mako:326
 msgid "Examples refreshed"
 msgstr "예제 새로 고쳐짐"
 
-#: src/about/templates/admin_wizard.mako:387
+#: src/about/templates/admin_wizard.mako:390
 msgid "Configuration updated"
 msgstr "구성 업데이트됨"
 

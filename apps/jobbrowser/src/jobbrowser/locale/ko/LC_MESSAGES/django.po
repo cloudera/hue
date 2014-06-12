@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -57,9 +57,9 @@ msgid "Error polling job %s: %s"
 msgstr "작업 %s을(를) 폴링하는 중 오류 발생: %s"
 
 #: src/jobbrowser/views.py:118 src/jobbrowser/views.py:119
-#: src/jobbrowser/templates/job.mako:455 src/jobbrowser/templates/job.mako:459
-#: src/jobbrowser/templates/job.mako:462 src/jobbrowser/templates/job.mako:466
-#: src/jobbrowser/templates/job.mako:471 src/jobbrowser/templates/jobs.mako:239
+#: src/jobbrowser/templates/job.mako:435 src/jobbrowser/templates/job.mako:439
+#: src/jobbrowser/templates/job.mako:442 src/jobbrowser/templates/job.mako:446
+#: src/jobbrowser/templates/job.mako:451 src/jobbrowser/templates/jobs.mako:239
 #: src/jobbrowser/templates/jobs.mako:240
 #: src/jobbrowser/templates/jobs.mako:243
 msgid "N/A"
@@ -88,7 +88,7 @@ msgstr "Job이 15초 내에 중지됨으로 나타나지 않았습니다."
 msgid "Cannot find job attempt '%(id)s'."
 msgstr "Job 시도 '%(id)s'을(를) 찾을 수 없습니다."
 
-#: src/jobbrowser/views.py:251 src/jobbrowser/yarn_models.py:238
+#: src/jobbrowser/views.py:251 src/jobbrowser/yarn_models.py:242
 #, python-format
 msgid "Failed to retrieve log: %s"
 msgstr "로그: %s을(를) 검색하지 못함"
@@ -202,7 +202,7 @@ msgstr "작업 ID"
 
 #: src/jobbrowser/templates/attempt.mako:89
 #: src/jobbrowser/templates/attempt_logs.mako:33
-#: src/jobbrowser/templates/job.mako:50 src/jobbrowser/templates/job.mako:530
+#: src/jobbrowser/templates/job.mako:50 src/jobbrowser/templates/job.mako:510
 msgid "View this task"
 msgstr "이 작업 보기"
 
@@ -265,8 +265,7 @@ msgstr "출력 크기"
 #: src/jobbrowser/templates/attempt.mako:185
 #: src/jobbrowser/templates/attempt_logs.mako:142
 #: src/jobbrowser/templates/attempt_logs.mako:158
-#: src/jobbrowser/templates/job.mako:355 src/jobbrowser/templates/job.mako:370
-#: src/jobbrowser/templates/job.mako:385 src/jobbrowser/templates/job.mako:407
+#: src/jobbrowser/templates/job.mako:355 src/jobbrowser/templates/job.mako:387
 #: src/jobbrowser/templates/jobs.mako:132
 #: src/jobbrowser/templates/task.mako:181
 #: src/jobbrowser/templates/task.mako:197
@@ -280,8 +279,7 @@ msgstr "데이터를 이용할 수 없음"
 #: src/jobbrowser/templates/attempt.mako:186
 #: src/jobbrowser/templates/attempt_logs.mako:143
 #: src/jobbrowser/templates/attempt_logs.mako:159
-#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/job.mako:371
-#: src/jobbrowser/templates/job.mako:386 src/jobbrowser/templates/job.mako:408
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/job.mako:388
 #: src/jobbrowser/templates/jobs.mako:133
 #: src/jobbrowser/templates/task.mako:182
 #: src/jobbrowser/templates/task.mako:198
@@ -483,23 +481,23 @@ msgstr "아니요"
 msgid "Yes"
 msgstr "예"
 
-#: src/jobbrowser/templates/job.mako:418 src/jobbrowser/templates/jobs.mako:140
+#: src/jobbrowser/templates/job.mako:398 src/jobbrowser/templates/jobs.mako:140
 msgid "There was a problem communicating with the server. Refresh the page."
 msgstr "서버와 통신하는 중에 문제가 발생했습니다. 페이지를 새로 고치십시오."
 
-#: src/jobbrowser/templates/job.mako:444 src/jobbrowser/templates/job.mako:445
+#: src/jobbrowser/templates/job.mako:424 src/jobbrowser/templates/job.mako:425
 #: src/jobbrowser/templates/jobs.mako:230
 #: src/jobbrowser/templates/jobs.mako:263
 msgid "Kill this job"
 msgstr "이 Job 중지"
 
-#: src/jobbrowser/templates/job.mako:452
+#: src/jobbrowser/templates/job.mako:432
 #: src/jobbrowser/templates/jobbrowser_components.mako:188
 #: src/jobbrowser/templates/jobs.mako:237
 msgid "Retired"
 msgstr "사용 중지됨"
 
-#: src/jobbrowser/templates/job.mako:557 src/jobbrowser/templates/jobs.mako:350
+#: src/jobbrowser/templates/job.mako:537 src/jobbrowser/templates/jobs.mako:350
 msgid "There was a problem killing this job."
 msgstr "이 Job을 중지하는 중에 문제가 발생했습니다."
 

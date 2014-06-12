@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -37,7 +37,15 @@ msgstr "Impala に通信する際の偽装メカニズムをオン／オフに�
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
 msgstr "ダウンロード用に行の再フェッチをサポートできるよう、Impala にキャッシュさせる結果セットの最初の行数です。オプションおよび下位互換性を無効にするには 0 に設定します。"
 
-#: src/impala/conf.py:72
+#: src/impala/conf.py:62
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Thrift コールのタイムアウト時間（秒）です。"
+
+#: src/impala/conf.py:66
+msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
+msgstr "ユーザーがエディタページを移動すると、Hue は Impala クエリを閉じようとします。これにより、Impala のクエリリソースがすべて解放されますが、結果にもアクセスできなくなります。"
+
+#: src/impala/conf.py:86
 msgid "No available Impalad to send queries to."
 msgstr "クエリの送信先の Impalad がありません。"
 

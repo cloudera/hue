@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr "サーバー"
 msgid "Database"
 msgstr "データベース"
 
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
 msgid "Query name"
 msgstr "クエリ名"
 
@@ -171,31 +171,31 @@ msgstr "便利な使い方"
 msgid "No query provided to save."
 msgstr "保存するクエリが指定されていません。"
 
-#: src/rdbms/templates/execute.mako:728
+#: src/rdbms/templates/execute.mako:727
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: src/rdbms/templates/execute.mako:741
+#: src/rdbms/templates/execute.mako:740
 msgid "Empty description"
 msgstr "空の説明"
 
-#: src/rdbms/templates/execute.mako:747
+#: src/rdbms/templates/execute.mako:746
 msgid "Query saved successfully!"
 msgstr "クエリが正常に保存されました。"
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:782
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/rdbms/templates/execute.mako:784
+#: src/rdbms/templates/execute.mako:783
 msgid "No matching records"
 msgstr "一致するレコードがありません"
 
-#: src/rdbms/templates/execute.mako:822
+#: src/rdbms/templates/execute.mako:821
 msgid "Server error occured: "
 msgstr "サーバーエラーが発生しました： "
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:824
 msgid "Unmanageable server error occured: "
 msgstr "管理不能なサーバーエラーが発生しました： "
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr "Servidor"
 msgid "Database"
 msgstr "Base de datos"
 
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
 msgid "Query name"
 msgstr "Nombre de consulta"
 
@@ -171,31 +171,31 @@ msgstr "¿Lo sabía?"
 msgid "No query provided to save."
 msgstr "No se ha indicado ninguna consulta que guardar."
 
-#: src/rdbms/templates/execute.mako:728
+#: src/rdbms/templates/execute.mako:727
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
 
-#: src/rdbms/templates/execute.mako:741
+#: src/rdbms/templates/execute.mako:740
 msgid "Empty description"
 msgstr "Descripción vacía"
 
-#: src/rdbms/templates/execute.mako:747
+#: src/rdbms/templates/execute.mako:746
 msgid "Query saved successfully!"
 msgstr "Consulta guardada correctamente."
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:782
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/rdbms/templates/execute.mako:784
+#: src/rdbms/templates/execute.mako:783
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
-#: src/rdbms/templates/execute.mako:822
+#: src/rdbms/templates/execute.mako:821
 msgid "Server error occured: "
 msgstr "Se ha producido un error del servidor: "
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:824
 msgid "Unmanageable server error occured: "
 msgstr "Se ha producido un error de servidor que no se puede gestionar: "
 

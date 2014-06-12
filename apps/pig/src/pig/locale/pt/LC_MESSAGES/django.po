@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSÃO DO PROJECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:234 src/pig/templates/app.mako:750
+#: src/pig/api.py:235 src/pig/templates/app.mako:750
 msgid "Unsaved script"
 msgstr "Script não guardado"
 
@@ -222,20 +222,20 @@ msgid "Stop this script"
 msgstr "Parar este script"
 
 #: src/pig/templates/app.mako:187
-msgid "Show the function navigator"
-msgstr "Apresentar o navegador de função"
+msgid "Show the assist"
+msgstr "Mostrar o assist"
 
 #: src/pig/templates/app.mako:193
-msgid "Hide the function navigator"
-msgstr "Ocultar o navegador de função"
+msgid "Hide the assist"
+msgstr "Ocultar o assist"
 
 #: src/pig/templates/app.mako:194
 msgid "Double click on function to insert it in the editor"
 msgstr "Faça duplo clique na função para a inserir no editor"
 
 #: src/pig/templates/app.mako:195
-msgid "Navigator"
-msgstr "Navigator"
+msgid "Assist"
+msgstr "Assist"
 
 #: src/pig/templates/app.mako:198
 msgid "Function name..."
@@ -317,7 +317,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "Não existem registos disponíveis."
 
-#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1082
+#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1092
 msgid "Running"
 msgstr "Em execução"
 
@@ -435,31 +435,31 @@ msgstr "Parar a execução."
 msgid "Saved"
 msgstr "Guardado"
 
-#: src/pig/templates/app.mako:1075
+#: src/pig/templates/app.mako:1085
 msgid "Saving"
 msgstr "A guardar"
 
-#: src/pig/templates/app.mako:1086
+#: src/pig/templates/app.mako:1096
 msgid "has been saved correctly."
 msgstr "foi guardado correctamente."
 
-#: src/pig/templates/app.mako:1357
+#: src/pig/templates/app.mako:1365
 msgid "Did you know?"
 msgstr "Sabia?"
 
-#: src/pig/templates/app.mako:1364
+#: src/pig/templates/app.mako:1372
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Nomes e valores de parâmetros e opções Pig, por exemplo"
 
-#: src/pig/templates/app.mako:1371
+#: src/pig/templates/app.mako:1379
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Nomes e valores de propriedades Hadoop, por exemplo"
 
-#: src/pig/templates/app.mako:1378
+#: src/pig/templates/app.mako:1386
 msgid "Include files or compressed files"
 msgstr "Incluir ficheiros ou ficheiros comprimidos"
 
-#: src/pig/templates/app.mako:1387
+#: src/pig/templates/app.mako:1395
 msgid "You have unsaved changes in this pig script."
 msgstr "Tem alterações não guardadas neste script Pig."
 

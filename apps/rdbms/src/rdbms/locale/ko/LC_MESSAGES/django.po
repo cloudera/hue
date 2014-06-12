@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr "서버"
 msgid "Database"
 msgstr "데이터베이스"
 
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
 msgid "Query name"
 msgstr "쿼리 이름"
 
@@ -171,31 +171,31 @@ msgstr "유용한 정보"
 msgid "No query provided to save."
 msgstr "저장할 쿼리를 제공하지 않았습니다."
 
-#: src/rdbms/templates/execute.mako:728
+#: src/rdbms/templates/execute.mako:727
 msgid "This field is required."
 msgstr "이 필드는 필수 항목입니다."
 
-#: src/rdbms/templates/execute.mako:741
+#: src/rdbms/templates/execute.mako:740
 msgid "Empty description"
 msgstr "설명 없음"
 
-#: src/rdbms/templates/execute.mako:747
+#: src/rdbms/templates/execute.mako:746
 msgid "Query saved successfully!"
 msgstr "쿼리가 저장되었습니다!"
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:782
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/rdbms/templates/execute.mako:784
+#: src/rdbms/templates/execute.mako:783
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
-#: src/rdbms/templates/execute.mako:822
+#: src/rdbms/templates/execute.mako:821
 msgid "Server error occured: "
 msgstr "서버 오류 발생: "
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:824
 msgid "Unmanageable server error occured: "
 msgstr "관리할 수 없는 서버 오류 발생: "
 
