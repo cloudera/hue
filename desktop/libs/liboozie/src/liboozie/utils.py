@@ -44,6 +44,8 @@ def parse_timestamp(timestamp, time_format=None):
   try:
     return time.strptime(timestamp, time_format)
   except ValueError:
+    return time.strptime(timestamp[:-4], time_format.replace(' %Z', ''))
+  except Exception:
     LOG.error("Failed to convert Oozie timestamp: %s" % (time_format,), exc_info=1)
     return None
 
