@@ -597,6 +597,7 @@ table.display td.center {
   background: url('../art/datatables/sort_asc.png') no-repeat center left;
   border-top: 3px solid #FFFFFF !important;
   padding-left: 20px !important;
+  vertical-align: middle!important;
 }
 
 .sorting_desc {
@@ -604,6 +605,7 @@ table.display td.center {
   background: url('../art/datatables/sort_desc.png') no-repeat center left;
   border-top: 3px solid #FFFFFF !important;
   padding-left: 20px !important;
+  vertical-align: middle!important;
 }
 
 .sorting {
@@ -611,6 +613,11 @@ table.display td.center {
   background: url('../art/datatables/sort_both.png') no-repeat center left;
   border-top: 3px solid #FFFFFF !important;
   padding-left: 20px !important;
+  vertical-align: middle!important;
+}
+
+.sorting_disabled {
+  vertical-align: middle!important;
 }
 
 .sorting:hover, .sorting_asc:hover, .sorting_desc:hover {
