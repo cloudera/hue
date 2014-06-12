@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -20,6 +20,10 @@ msgstr ""
 #: src/filebrowser/conf.py:25
 msgid "Max snappy decompression size in bytes."
 msgstr "Tamaño máximo de descompresión de Snappy en bites."
+
+#: src/filebrowser/conf.py:32
+msgid "Location on local filesystem where the uploaded archives are temporary stored."
+msgstr "Ubicación en el sistema de archivos local donde se almacenan de forma temporal los archivos cargados."
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -158,216 +162,212 @@ msgstr "Recursivo"
 msgid "Path to change permissions"
 msgstr "Ruta a la que cambiar permisos"
 
-#: src/filebrowser/views.py:111
+#: src/filebrowser/views.py:120
 #, python-format
 msgid "File not found: %(path)s."
 msgstr "Archivo no encontrado: %(path)s."
 
-#: src/filebrowser/views.py:113
+#: src/filebrowser/views.py:122
 #, python-format
 msgid "'%(path)s' is not a file."
 msgstr "'%(path)s' no es un archivo."
 
-#: src/filebrowser/views.py:156
+#: src/filebrowser/views.py:165
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "No se puede acceder: %(path)s."
 
-#: src/filebrowser/views.py:158
+#: src/filebrowser/views.py:167
 #, python-format
 msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " Nota: es un administrador de Hue, pero no un superusuario de HDFS (que es \"%(superuser)s\")."
 
-#: src/filebrowser/views.py:190
+#: src/filebrowser/views.py:199
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "No se puede editar un directorio: %(path)s"
 
-#: src/filebrowser/views.py:194
+#: src/filebrowser/views.py:203
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "Archivo demasiado largo para su edición: %(path)s"
 
-#: src/filebrowser/views.py:204
+#: src/filebrowser/views.py:213
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s."
 msgstr "El archivo no está codificado en %(encoding)s; no se puede editar: %(path)s."
 
-#: src/filebrowser/views.py:240
+#: src/filebrowser/views.py:249
 msgid "No path specified"
 msgstr "No se ha especificado ninguna ruta"
 
-#: src/filebrowser/views.py:253
+#: src/filebrowser/views.py:262
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s guardada."
 
-#: src/filebrowser/views.py:279
+#: src/filebrowser/views.py:288
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "No es un directorio: %(path)s"
 
-#: src/filebrowser/views.py:445 src/filebrowser/views.py:476
+#: src/filebrowser/views.py:454 src/filebrowser/views.py:485
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "Archivo no encontrado: %(path)s"
 
-#: src/filebrowser/views.py:497
+#: src/filebrowser/views.py:506
 #, python-format
 msgid "Not a file: '%(path)s'"
 msgstr "No es un archivo: '%(path)s'"
 
-#: src/filebrowser/views.py:527
+#: src/filebrowser/views.py:536
 msgid "First byte to display must be before last byte to display."
 msgstr "El primer byte que mostrar debe ser anterior al último byte que mostrar."
 
-#: src/filebrowser/views.py:537
+#: src/filebrowser/views.py:546
 msgid "Mode must be one of 'binary' or 'text'."
 msgstr "El modo debe ser 'binario' o 'texto'."
 
-#: src/filebrowser/views.py:539
+#: src/filebrowser/views.py:548
 msgid "Offset may not be less than zero."
 msgstr "El desplazamiento no puede ser inferior a cero."
 
-#: src/filebrowser/views.py:541
+#: src/filebrowser/views.py:550
 msgid "Length may not be less than zero."
 msgstr "La longitud no puede ser inferior a cero."
 
-#: src/filebrowser/views.py:543
+#: src/filebrowser/views.py:552
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes."
 msgstr "No se pueden solicitar fragmentos que tengan más de %(bytes)d bytes."
 
-#: src/filebrowser/views.py:659
+#: src/filebrowser/views.py:666
 msgid "Failed to decompress snappy compressed file."
 msgstr "Error al descomprimir el archivo comprimido de Snappy."
 
-#: src/filebrowser/views.py:664 src/filebrowser/views.py:674
+#: src/filebrowser/views.py:671
 msgid "Failed to decompress snappy compressed file. Snappy is not installed."
 msgstr "Error al descomprimir el archivo comprimido de Snappy. Snappy no está instalado."
 
-#: src/filebrowser/views.py:667 src/filebrowser/views.py:677
+#: src/filebrowser/views.py:674
 #, python-format
 msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
 msgstr "Error al descomprimir el archivo comprimido de Snappy. El tamaño del archivo es mayor que el tamaño máximo de descompresión de %d permitido por Snappy."
 
-#: src/filebrowser/views.py:701
+#: src/filebrowser/views.py:698
 msgid "Failed to read Avro file."
 msgstr "Error al leer el archivo Avro."
 
-#: src/filebrowser/views.py:708
+#: src/filebrowser/views.py:710
+msgid "Failed to read Parquet file."
+msgstr "Error al leer el archivo Parquet."
+
+#: src/filebrowser/views.py:716
 msgid "Offsets are not supported with Gzip compression."
 msgstr "Los desplazamientos no son compatibles con la compresión Gzip."
 
-#: src/filebrowser/views.py:713
+#: src/filebrowser/views.py:721
 msgid "Failed to decompress file."
 msgstr "Error al descomprimir el archivo."
 
-#: src/filebrowser/views.py:724
+#: src/filebrowser/views.py:732
 msgid "Failed to read file."
 msgstr "Error al leer el archivo."
 
-#: src/filebrowser/views.py:772 src/filebrowser/views.py:774
-#: src/filebrowser/templates/display.mako:56
-#: src/filebrowser/templates/display.mako:109
+#: src/filebrowser/views.py:787 src/filebrowser/views.py:789
 msgid "First Block"
 msgstr "Primer bloque"
 
-#: src/filebrowser/views.py:772 src/filebrowser/views.py:774
-#: src/filebrowser/templates/display.mako:57
-#: src/filebrowser/templates/display.mako:110
+#: src/filebrowser/views.py:787 src/filebrowser/views.py:789
 msgid "Previous Block"
 msgstr "Bloque anterior"
 
-#: src/filebrowser/views.py:777 src/filebrowser/views.py:780
-#: src/filebrowser/templates/display.mako:58
-#: src/filebrowser/templates/display.mako:111
+#: src/filebrowser/views.py:792 src/filebrowser/views.py:795
 msgid "Next Block"
 msgstr "Bloque siguiente"
 
-#: src/filebrowser/views.py:777 src/filebrowser/views.py:780
-#: src/filebrowser/templates/display.mako:59
-#: src/filebrowser/templates/display.mako:112
+#: src/filebrowser/views.py:792 src/filebrowser/views.py:795
 msgid "Last Block"
 msgstr "Último bloque"
 
-#: src/filebrowser/views.py:909
+#: src/filebrowser/views.py:924
 msgid "Cannot perform operation."
 msgstr "No se puede realizar la operación."
 
-#: src/filebrowser/views.py:911
+#: src/filebrowser/views.py:926
 #, python-format
 msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " Nota: es un administrador de Hue, pero no un superusuario de HDFS (que es \"%(superuser)s\")."
 
-#: src/filebrowser/views.py:944
+#: src/filebrowser/views.py:959
 #, python-format
 msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
 msgstr "No se ha podido cambiar el nombre de la carpeta \"%s\" a \"%s\": las almohadillas no están permitidas en los nombres de archivo."
 
-#: src/filebrowser/views.py:958
+#: src/filebrowser/views.py:973
 #, python-format
 msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
 msgstr "No se ha podido dar el nombre \"%s\" a la carpeta: las barras oblicuas y las almohadillas no están permitidas en los nombres de archivo."
 
-#: src/filebrowser/views.py:968
+#: src/filebrowser/views.py:983
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "No se ha podido cambiar el nombre del archivo \"%s\": las barras oblicuas no están permitidas en los nombres de archivo."
 
-#: src/filebrowser/views.py:1090 src/filebrowser/views.py:1169
+#: src/filebrowser/views.py:1105 src/filebrowser/views.py:1184
 msgid "A POST request is required."
 msgstr "Se necesita una solicitud POST."
 
-#: src/filebrowser/views.py:1093
+#: src/filebrowser/views.py:1108
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "Carga de %(destination)s satisfactoria"
 
-#: src/filebrowser/views.py:1115
+#: src/filebrowser/views.py:1130
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Lo sentimos, no se pueden \"%(sep)s\" utilizar en el nombre de archivo %(name)s.sep"
 
-#: src/filebrowser/views.py:1132 src/filebrowser/views.py:1226
+#: src/filebrowser/views.py:1147 src/filebrowser/views.py:1241
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "El destino %(name)s ya existe."
 
-#: src/filebrowser/views.py:1134 src/filebrowser/views.py:1228
+#: src/filebrowser/views.py:1149 src/filebrowser/views.py:1243
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Error al copiar en %(name)s: %(error)s"
 
-#: src/filebrowser/views.py:1145 src/filebrowser/views.py:1239
+#: src/filebrowser/views.py:1160 src/filebrowser/views.py:1254
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "Error en el formulario de carga: %s"
 
-#: src/filebrowser/views.py:1172
+#: src/filebrowser/views.py:1187
 #, python-format
 msgid "%(destination)s upload succeeded."
 msgstr "Carga de %(destination)s satisfactoria."
 
-#: src/filebrowser/views.py:1174
+#: src/filebrowser/views.py:1189
 #, python-format
 msgid "Upload failed: %(data)s."
 msgstr "Error al cargar: %(data)s."
 
-#: src/filebrowser/views.py:1193
+#: src/filebrowser/views.py:1208
 #, python-format
 msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
 msgstr "No se pueden utilizar \"%(sep)s\" en el nombre de archivo %(name)s.sep"
 
-#: src/filebrowser/views.py:1202 src/filebrowser/views.py:1209
+#: src/filebrowser/views.py:1217 src/filebrowser/views.py:1224
 msgid "Could not extract contents of file."
 msgstr "No se ha podido extraer el contenido del archivo."
 
-#: src/filebrowser/views.py:1213
+#: src/filebrowser/views.py:1228
 msgid "Could not interpret archive type."
 msgstr "No se ha podido interpretar el tipo de archivo."
 
-#: src/filebrowser/lib/archives.py:41
+#: src/filebrowser/lib/archives.py:43
 msgid "Must implement 'extract' method."
 msgstr "Debe implementar el método 'extract'."
 
@@ -377,22 +377,43 @@ msgstr "Debe implementar el método 'extract'."
 msgid "%(filename)s - File Viewer"
 msgstr "%(filename)s: visor de archivos"
 
-#: src/filebrowser/templates/display.mako:49
+#: src/filebrowser/templates/display.mako:89
+msgid "Page"
+msgstr "Página"
+
+#: src/filebrowser/templates/display.mako:97
+msgid "First page"
+msgstr "Primera página"
+
+#: src/filebrowser/templates/display.mako:98
+msgid "Previous page"
+msgstr "Página anterior"
+
+#: src/filebrowser/templates/display.mako:99
+#: src/filebrowser/templates/listdir_components.mako:188
+msgid "Next page"
+msgstr "Página siguiente"
+
+#: src/filebrowser/templates/display.mako:100
+msgid "Last page"
+msgstr "Última página"
+
+#: src/filebrowser/templates/display.mako:114
 msgid "The current file is empty."
 msgstr "El archivo actual está vacío."
 
-#: src/filebrowser/templates/display.mako:63
-msgid "Viewing Bytes:"
-msgstr "Visualizando bytes:"
-
-#: src/filebrowser/templates/display.mako:68
-#, python-format
-msgid "(%(length)s B block size)"
-msgstr "(Tamaño de bloque B de %(length)s)"
-
-#: src/filebrowser/templates/display.mako:78
+#: src/filebrowser/templates/display.mako:119
 msgid "Warning: some binary data has been masked out with '&#xfffd'."
 msgstr "Advertencia: algunos datos binarios se han enmascarado con '&#xfffd'."
+
+#: src/filebrowser/templates/display.mako:244
+#, python-format
+msgid "Sorry, you cannot request for more than %s pages."
+msgstr "Lo sentimos, no puede solicitar más de %s páginas."
+
+#: src/filebrowser/templates/display.mako:425
+msgid "There was an unexpected server error."
+msgstr "Se ha producido un error de servidor inesperado."
 
 #: src/filebrowser/templates/edit.mako:62
 #: src/filebrowser/templates/edit.mako:92
@@ -637,10 +658,6 @@ msgstr "Principio de la lista"
 #: src/filebrowser/templates/listdir_components.mako:185
 msgid "Previous Page"
 msgstr "Página anterior"
-
-#: src/filebrowser/templates/listdir_components.mako:188
-msgid "Next page"
-msgstr "Página siguiente"
 
 #: src/filebrowser/templates/listdir_components.mako:188
 msgid "Next Page"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr "服务器"
 msgid "Database"
 msgstr "数据库"
 
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
 msgid "Query name"
 msgstr "查询名称"
 
@@ -171,31 +171,31 @@ msgstr "您知道吗？"
 msgid "No query provided to save."
 msgstr "没有提供要保存的查询。"
 
-#: src/rdbms/templates/execute.mako:728
+#: src/rdbms/templates/execute.mako:727
 msgid "This field is required."
 msgstr "此字段为必填字段。"
 
-#: src/rdbms/templates/execute.mako:741
+#: src/rdbms/templates/execute.mako:740
 msgid "Empty description"
 msgstr "空描述"
 
-#: src/rdbms/templates/execute.mako:747
+#: src/rdbms/templates/execute.mako:746
 msgid "Query saved successfully!"
 msgstr "查询已成功保存！"
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:782
 msgid "No data available"
 msgstr "没有可用数据"
 
-#: src/rdbms/templates/execute.mako:784
+#: src/rdbms/templates/execute.mako:783
 msgid "No matching records"
 msgstr "没有匹配记录"
 
-#: src/rdbms/templates/execute.mako:822
+#: src/rdbms/templates/execute.mako:821
 msgid "Server error occured: "
 msgstr "发生服务器错误： "
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:824
 msgid "Unmanageable server error occured: "
 msgstr "发生无法管理的服务器错误： "
 

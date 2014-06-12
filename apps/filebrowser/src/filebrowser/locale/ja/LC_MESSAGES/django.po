@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -20,6 +20,10 @@ msgstr ""
 #: src/filebrowser/conf.py:25
 msgid "Max snappy decompression size in bytes."
 msgstr "snappy の最大解凍サイズ（バイト）です。"
+
+#: src/filebrowser/conf.py:32
+msgid "Location on local filesystem where the uploaded archives are temporary stored."
+msgstr "アップロードされたアーカイブが一時的に保存されているローカルファイルシステム上の場所です。"
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -158,216 +162,212 @@ msgstr "再帰的"
 msgid "Path to change permissions"
 msgstr "パーミッションを変更するパス"
 
-#: src/filebrowser/views.py:111
+#: src/filebrowser/views.py:120
 #, python-format
 msgid "File not found: %(path)s."
 msgstr "ファイルが見つかりません：%(path)s。"
 
-#: src/filebrowser/views.py:113
+#: src/filebrowser/views.py:122
 #, python-format
 msgid "'%(path)s' is not a file."
 msgstr "'%(path)s' はファイルではありません。"
 
-#: src/filebrowser/views.py:156
+#: src/filebrowser/views.py:165
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "アクセスできません：%(path)s."
 
-#: src/filebrowser/views.py:158
+#: src/filebrowser/views.py:167
 #, python-format
 msgid " Note: You are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " 注意：現在、Hue の管理者ですが、HDFS のスーパーユーザー（\"%(superuser)s\"）ではありません。"
 
-#: src/filebrowser/views.py:190
+#: src/filebrowser/views.py:199
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "ディレクトリを編集できません：%(path)s"
 
-#: src/filebrowser/views.py:194
+#: src/filebrowser/views.py:203
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "編集するにはファイルが大きすぎます：%(path)s"
 
-#: src/filebrowser/views.py:204
+#: src/filebrowser/views.py:213
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s."
 msgstr "ファイルが %(encoding)s でエンコードされていないので編集できません：%(path)s。"
 
-#: src/filebrowser/views.py:240
+#: src/filebrowser/views.py:249
 msgid "No path specified"
 msgstr "パスが指定されていません"
 
-#: src/filebrowser/views.py:253
+#: src/filebrowser/views.py:262
 #, python-format
 msgid "Saved %(path)s."
 msgstr "保存されている %(path)s。"
 
-#: src/filebrowser/views.py:279
+#: src/filebrowser/views.py:288
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "ディレクトリではありません：%(path)s"
 
-#: src/filebrowser/views.py:445 src/filebrowser/views.py:476
+#: src/filebrowser/views.py:454 src/filebrowser/views.py:485
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "ファイルが見つかりません：%(path)s"
 
-#: src/filebrowser/views.py:497
+#: src/filebrowser/views.py:506
 #, python-format
 msgid "Not a file: '%(path)s'"
 msgstr "ファイルではありません：'%(path)s'"
 
-#: src/filebrowser/views.py:527
+#: src/filebrowser/views.py:536
 msgid "First byte to display must be before last byte to display."
 msgstr "最初に表示するバイトは、最後に表示するバイトよりも前にあることが必要です。"
 
-#: src/filebrowser/views.py:537
+#: src/filebrowser/views.py:546
 msgid "Mode must be one of 'binary' or 'text'."
 msgstr "モードは「バイナリ」または「テキスト」のいずれか 1 つとする必要があります。"
 
-#: src/filebrowser/views.py:539
+#: src/filebrowser/views.py:548
 msgid "Offset may not be less than zero."
 msgstr "オフセットはゼロ以上であることが必要です。"
 
-#: src/filebrowser/views.py:541
+#: src/filebrowser/views.py:550
 msgid "Length may not be less than zero."
 msgstr "長さはゼロ以上であることが必要です。"
 
-#: src/filebrowser/views.py:543
+#: src/filebrowser/views.py:552
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes."
 msgstr "%(bytes)d バイトを超えるチャンクは要求できません。"
 
-#: src/filebrowser/views.py:659
+#: src/filebrowser/views.py:666
 msgid "Failed to decompress snappy compressed file."
 msgstr "snappy 圧縮ファイルを解凍できませんでした。"
 
-#: src/filebrowser/views.py:664 src/filebrowser/views.py:674
+#: src/filebrowser/views.py:671
 msgid "Failed to decompress snappy compressed file. Snappy is not installed."
 msgstr "snappy 圧縮ファイルを解凍できませんでした。snappy がインストールされていません。"
 
-#: src/filebrowser/views.py:667 src/filebrowser/views.py:677
+#: src/filebrowser/views.py:674
 #, python-format
 msgid "Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d."
 msgstr "snappy 圧縮ファイルを解凍できませんでした。ファイルサイズが snappy の最大許容解凍サイズ %d を上回っています。"
 
-#: src/filebrowser/views.py:701
+#: src/filebrowser/views.py:698
 msgid "Failed to read Avro file."
 msgstr "Avro ファイルの読み取りに失敗しました。"
 
-#: src/filebrowser/views.py:708
+#: src/filebrowser/views.py:710
+msgid "Failed to read Parquet file."
+msgstr "Parquet ファイルの読み取りに失敗しました。"
+
+#: src/filebrowser/views.py:716
 msgid "Offsets are not supported with Gzip compression."
 msgstr "Gzip 圧縮はオフセットに対応していません。"
 
-#: src/filebrowser/views.py:713
+#: src/filebrowser/views.py:721
 msgid "Failed to decompress file."
 msgstr "ファイルの解凍に失敗しました。"
 
-#: src/filebrowser/views.py:724
+#: src/filebrowser/views.py:732
 msgid "Failed to read file."
 msgstr "ファイルの読み取りに失敗しました。"
 
-#: src/filebrowser/views.py:772 src/filebrowser/views.py:774
-#: src/filebrowser/templates/display.mako:56
-#: src/filebrowser/templates/display.mako:109
+#: src/filebrowser/views.py:787 src/filebrowser/views.py:789
 msgid "First Block"
 msgstr "最初のブロック"
 
-#: src/filebrowser/views.py:772 src/filebrowser/views.py:774
-#: src/filebrowser/templates/display.mako:57
-#: src/filebrowser/templates/display.mako:110
+#: src/filebrowser/views.py:787 src/filebrowser/views.py:789
 msgid "Previous Block"
 msgstr "前のブロック"
 
-#: src/filebrowser/views.py:777 src/filebrowser/views.py:780
-#: src/filebrowser/templates/display.mako:58
-#: src/filebrowser/templates/display.mako:111
+#: src/filebrowser/views.py:792 src/filebrowser/views.py:795
 msgid "Next Block"
 msgstr "次のブロック"
 
-#: src/filebrowser/views.py:777 src/filebrowser/views.py:780
-#: src/filebrowser/templates/display.mako:59
-#: src/filebrowser/templates/display.mako:112
+#: src/filebrowser/views.py:792 src/filebrowser/views.py:795
 msgid "Last Block"
 msgstr "最後のブロック"
 
-#: src/filebrowser/views.py:909
+#: src/filebrowser/views.py:924
 msgid "Cannot perform operation."
 msgstr "操作を実行できません。"
 
-#: src/filebrowser/views.py:911
+#: src/filebrowser/views.py:926
 #, python-format
 msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " 注意：現在、Hue の管理者ですが、HDFS のスーパーユーザー（\"%(superuser)s\"）ではありません。"
 
-#: src/filebrowser/views.py:944
+#: src/filebrowser/views.py:959
 #, python-format
 msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
 msgstr "ファイル名にはハッシュを使用できないため、フォルダの名前を \"%s\" から \"%s\" に変更できません。"
 
-#: src/filebrowser/views.py:958
+#: src/filebrowser/views.py:973
 #, python-format
 msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
 msgstr "ファイル名にはスラッシュやハッシュを使用できないため、フォルダの名前を \"%s\" にできません。"
 
-#: src/filebrowser/views.py:968
+#: src/filebrowser/views.py:983
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "ファイル名にはスラッシュを使用できないため、ファイルに \"%s\" という名前を付けることはできません。"
 
-#: src/filebrowser/views.py:1090 src/filebrowser/views.py:1169
+#: src/filebrowser/views.py:1105 src/filebrowser/views.py:1184
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/filebrowser/views.py:1093
+#: src/filebrowser/views.py:1108
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s へのアップロードに成功しました"
 
-#: src/filebrowser/views.py:1115
+#: src/filebrowser/views.py:1130
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "申し訳ありませんが、\"%(sep)s\" がファイル名 %(name)s.sep にありません"
 
-#: src/filebrowser/views.py:1132 src/filebrowser/views.py:1226
+#: src/filebrowser/views.py:1147 src/filebrowser/views.py:1241
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "宛先 %(name)s はすでに存在します。"
 
-#: src/filebrowser/views.py:1134 src/filebrowser/views.py:1228
+#: src/filebrowser/views.py:1149 src/filebrowser/views.py:1243
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "%(name)s へのコピーに失敗しました：%(error)s"
 
-#: src/filebrowser/views.py:1145 src/filebrowser/views.py:1239
+#: src/filebrowser/views.py:1160 src/filebrowser/views.py:1254
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "アップロードフォームのエラー: %s"
 
-#: src/filebrowser/views.py:1172
+#: src/filebrowser/views.py:1187
 #, python-format
 msgid "%(destination)s upload succeeded."
 msgstr "%(destination)s へのアップロードに成功しました。"
 
-#: src/filebrowser/views.py:1174
+#: src/filebrowser/views.py:1189
 #, python-format
 msgid "Upload failed: %(data)s."
 msgstr "アップロードに失敗しました：%(data)s。"
 
-#: src/filebrowser/views.py:1193
+#: src/filebrowser/views.py:1208
 #, python-format
 msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
 msgstr "\"%(sep)s\" はファイル名 %(name)s.sep では使用できません"
 
-#: src/filebrowser/views.py:1202 src/filebrowser/views.py:1209
+#: src/filebrowser/views.py:1217 src/filebrowser/views.py:1224
 msgid "Could not extract contents of file."
 msgstr "ファイルの内容を抽出できませんでした。"
 
-#: src/filebrowser/views.py:1213
+#: src/filebrowser/views.py:1228
 msgid "Could not interpret archive type."
 msgstr "アーカイブタイプを解釈できませんでした。"
 
-#: src/filebrowser/lib/archives.py:41
+#: src/filebrowser/lib/archives.py:43
 msgid "Must implement 'extract' method."
 msgstr "'extract' メソッドを実装する必要があります。"
 
@@ -377,22 +377,43 @@ msgstr "'extract' メソッドを実装する必要があります。"
 msgid "%(filename)s - File Viewer"
 msgstr "%(filename)s - File Viewer"
 
-#: src/filebrowser/templates/display.mako:49
+#: src/filebrowser/templates/display.mako:89
+msgid "Page"
+msgstr "ページ"
+
+#: src/filebrowser/templates/display.mako:97
+msgid "First page"
+msgstr "最初のページ"
+
+#: src/filebrowser/templates/display.mako:98
+msgid "Previous page"
+msgstr "前のページ"
+
+#: src/filebrowser/templates/display.mako:99
+#: src/filebrowser/templates/listdir_components.mako:188
+msgid "Next page"
+msgstr "次のページ"
+
+#: src/filebrowser/templates/display.mako:100
+msgid "Last page"
+msgstr "最後のページ"
+
+#: src/filebrowser/templates/display.mako:114
 msgid "The current file is empty."
 msgstr "現在のファイルは空です。"
 
-#: src/filebrowser/templates/display.mako:63
-msgid "Viewing Bytes:"
-msgstr "バイトの表示："
-
-#: src/filebrowser/templates/display.mako:68
-#, python-format
-msgid "(%(length)s B block size)"
-msgstr "（%(length)s バイトのブロックサイズ）"
-
-#: src/filebrowser/templates/display.mako:78
+#: src/filebrowser/templates/display.mako:119
 msgid "Warning: some binary data has been masked out with '&#xfffd'."
 msgstr "警告：'&#xfffd' でマスクされているバイナリデータがあります。"
+
+#: src/filebrowser/templates/display.mako:244
+#, python-format
+msgid "Sorry, you cannot request for more than %s pages."
+msgstr "申し訳ありませんが、%s ページを超える要求はできません。"
+
+#: src/filebrowser/templates/display.mako:425
+msgid "There was an unexpected server error."
+msgstr "予期しないサーバーエラーが発生しました。"
 
 #: src/filebrowser/templates/edit.mako:62
 #: src/filebrowser/templates/edit.mako:92
@@ -639,10 +660,6 @@ msgid "Previous Page"
 msgstr "前のページ"
 
 #: src/filebrowser/templates/listdir_components.mako:188
-msgid "Next page"
-msgstr "次のページ"
-
-#: src/filebrowser/templates/listdir_components.mako:188
 msgid "Next Page"
 msgstr "次のページ"
 
@@ -848,7 +865,7 @@ msgstr "ファイルを選択"
 #: src/filebrowser/templates/listdir_components.mako:1278
 #: src/filebrowser/templates/listdir_components.mako:1328
 msgid "Failed"
-msgstr "失敗"
+msgstr "失敗しました"
 
 #: src/filebrowser/templates/listdir_components.mako:1287
 msgid "Error: "

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-11-07 13:05-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -118,48 +118,48 @@ msgstr "La copia de origen '%s' es un directorio"
 msgid "Copy dst '%s' is a directory"
 msgstr "La copia de destino '%s' es un directorio"
 
-#: src/hadoop/fs/webhdfs.py:551
+#: src/hadoop/fs/webhdfs.py:552
 #, python-format
 msgid "File not found: %s"
 msgstr "Archivo no encontrado: %s"
 
-#: src/hadoop/fs/webhdfs.py:567
+#: src/hadoop/fs/webhdfs.py:568
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "El archivo de destino %s existe y no es un directorio."
 
-#: src/hadoop/fs/webhdfs.py:610
+#: src/hadoop/fs/webhdfs.py:611
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "Error al crear '%s'. HDFS no ha devuelto un redireccionamiento"
 
-#: src/hadoop/fs/webhdfs.py:677
+#: src/hadoop/fs/webhdfs.py:678
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "Es un directorio: '%s'"
 
-#: src/hadoop/fs/webhdfs.py:695
+#: src/hadoop/fs/webhdfs.py:696
 msgid "Invalid argument to seek for whence"
 msgstr "Argumento de búsqueda de ubicación no válido"
 
-#: src/hadoop/fs/webhdfs.py:715
+#: src/hadoop/fs/webhdfs.py:716
 msgid "File not open for writing"
 msgstr "Archivo no abierto para escritura"
 
-#: src/hadoop/fs/webhdfs.py:761
+#: src/hadoop/fs/webhdfs.py:762
 msgid "Filesystem root '/' should be owned by 'hdfs'"
 msgstr "El propietario de la raíz del sistema de archivos '/' debe ser 'hdfs'"
 
-#: src/hadoop/fs/webhdfs.py:764
+#: src/hadoop/fs/webhdfs.py:765
 msgid "Failed to access filesystem root"
 msgstr "Error al acceder a la raíz del sistema de archivos"
 
-#: src/hadoop/fs/webhdfs.py:773
+#: src/hadoop/fs/webhdfs.py:774
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "Error al crear el archivo temporal \"%s\""
 
-#: src/hadoop/fs/webhdfs.py:790
+#: src/hadoop/fs/webhdfs.py:791
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "Error al eliminar el archivo temporal \"%s\""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:234 src/pig/templates/app.mako:750
+#: src/pig/api.py:235 src/pig/templates/app.mako:750
 msgid "Unsaved script"
 msgstr "저장 안 된 스크립트"
 
@@ -222,20 +222,20 @@ msgid "Stop this script"
 msgstr "이 스크립트 중지"
 
 #: src/pig/templates/app.mako:187
-msgid "Show the function navigator"
-msgstr "함수 탐색 창 표시"
+msgid "Show the assist"
+msgstr "지원 표시"
 
 #: src/pig/templates/app.mako:193
-msgid "Hide the function navigator"
-msgstr "함수 탐색 창 숨기기"
+msgid "Hide the assist"
+msgstr "지원 숨기기"
 
 #: src/pig/templates/app.mako:194
 msgid "Double click on function to insert it in the editor"
 msgstr "편집기에서 함수를 두 번 클릭하여 삽입"
 
 #: src/pig/templates/app.mako:195
-msgid "Navigator"
-msgstr "탐색 창"
+msgid "Assist"
+msgstr "지원"
 
 #: src/pig/templates/app.mako:198
 msgid "Function name..."
@@ -317,7 +317,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "사용할 수 있는 로그가 없습니다."
 
-#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1082
+#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1092
 msgid "Running"
 msgstr "실행 중"
 
@@ -435,31 +435,31 @@ msgstr "실행을 중지합니다."
 msgid "Saved"
 msgstr "저장됨"
 
-#: src/pig/templates/app.mako:1075
+#: src/pig/templates/app.mako:1085
 msgid "Saving"
 msgstr "저장하는 중"
 
-#: src/pig/templates/app.mako:1086
+#: src/pig/templates/app.mako:1096
 msgid "has been saved correctly."
 msgstr "저장되었습니다."
 
-#: src/pig/templates/app.mako:1357
+#: src/pig/templates/app.mako:1365
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/pig/templates/app.mako:1364
+#: src/pig/templates/app.mako:1372
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig 매개변수와 옵션 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1371
+#: src/pig/templates/app.mako:1379
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop 속성 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1378
+#: src/pig/templates/app.mako:1386
 msgid "Include files or compressed files"
 msgstr "파일 또는 압축 파일 포함"
 
-#: src/pig/templates/app.mako:1387
+#: src/pig/templates/app.mako:1395
 msgid "You have unsaved changes in this pig script."
 msgstr "이 pig 스크립트에 저장되지 않은 변경 내용이 있습니다."
 

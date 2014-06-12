@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr "Workflow nicht gefunden"
 msgid "Permission denied. You are not the owner."
 msgstr "Berechtigung abgelehnt. Sie sind nicht der Eigentümer."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "Muss POST-Anforderung sein."
 
@@ -108,16 +108,16 @@ msgstr "Zugriff verweigert: Design %(id)s löschen."
 msgid "Could not find design %s."
 msgstr "Design %s wurde nicht gefunden."
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "Zugriff abgelehnt: Design %(id)s bearbeiten."
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "Fehler beim Speichern des Designs"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "Muss eine POST-Anforderung sein."
 

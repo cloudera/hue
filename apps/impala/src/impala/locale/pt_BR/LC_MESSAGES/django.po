@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -37,7 +37,15 @@ msgstr "Ative/desative o mecanismo de representação ao falar com o Impala."
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
 msgstr "Número de linhas iniciais de um conjunto de resultados para pedir ao Impala para armazenar em cache a fim de suportar a nova busca deles para download. Defina como 0 para desativar a opção e fazer a compatibilidade com versões anteriores."
 
-#: src/impala/conf.py:72
+#: src/impala/conf.py:62
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Tempo limite em segundos para chamadas de Thrift."
+
+#: src/impala/conf.py:66
+msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
+msgstr "O Hue tentará fechar a consulta do Impala quando o usuário sair da página do editor. Isso liberará todos os recursos de consulta no Impala, mas também tornará os resultados inacessíveis."
+
+#: src/impala/conf.py:86
 msgid "No available Impalad to send queries to."
 msgstr "Nenhum Impalad disponível para enviar consultas."
 

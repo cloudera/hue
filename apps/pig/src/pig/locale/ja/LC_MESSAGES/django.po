@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:234 src/pig/templates/app.mako:750
+#: src/pig/api.py:235 src/pig/templates/app.mako:750
 msgid "Unsaved script"
 msgstr "未保存のスクリプト"
 
@@ -222,20 +222,20 @@ msgid "Stop this script"
 msgstr "このスクリプトを停止"
 
 #: src/pig/templates/app.mako:187
-msgid "Show the function navigator"
-msgstr "関数ナビゲータを表示"
+msgid "Show the assist"
+msgstr "アシストを表示"
 
 #: src/pig/templates/app.mako:193
-msgid "Hide the function navigator"
-msgstr "関数ナビゲータを非表示"
+msgid "Hide the assist"
+msgstr "アシストを非表示"
 
 #: src/pig/templates/app.mako:194
 msgid "Double click on function to insert it in the editor"
 msgstr "関数をダブルクリックしてエディタに挿入"
 
 #: src/pig/templates/app.mako:195
-msgid "Navigator"
-msgstr "Navigator"
+msgid "Assist"
+msgstr "アシスト"
 
 #: src/pig/templates/app.mako:198
 msgid "Function name..."
@@ -317,7 +317,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "利用可能なログがありません。"
 
-#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1082
+#: src/pig/templates/app.mako:537 src/pig/templates/app.mako:1092
 msgid "Running"
 msgstr "実行中"
 
@@ -435,31 +435,31 @@ msgstr "実行を停止します。"
 msgid "Saved"
 msgstr "保存済み"
 
-#: src/pig/templates/app.mako:1075
+#: src/pig/templates/app.mako:1085
 msgid "Saving"
 msgstr "保存中"
 
-#: src/pig/templates/app.mako:1086
+#: src/pig/templates/app.mako:1096
 msgid "has been saved correctly."
 msgstr "が正しく保存されました。"
 
-#: src/pig/templates/app.mako:1357
+#: src/pig/templates/app.mako:1365
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/pig/templates/app.mako:1364
+#: src/pig/templates/app.mako:1372
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig パラメータおよびオプションの名前と値。例："
 
-#: src/pig/templates/app.mako:1371
+#: src/pig/templates/app.mako:1379
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop プロパティの名前と値。例："
 
-#: src/pig/templates/app.mako:1378
+#: src/pig/templates/app.mako:1386
 msgid "Include files or compressed files"
 msgstr "ファイルまたは圧縮ファイルを含める"
 
-#: src/pig/templates/app.mako:1387
+#: src/pig/templates/app.mako:1395
 msgid "You have unsaved changes in this pig script."
 msgstr "この Pig スクリプトには未保存の変更があります。"
 

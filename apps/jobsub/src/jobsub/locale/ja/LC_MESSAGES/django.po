@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr "Workflow が見つかりません。"
 msgid "Permission denied. You are not the owner."
 msgstr "パーミッションが拒否されました。所有者ではありません。"
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:233
+#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
 msgid "Must be POST request."
 msgstr "POST 要求でなければなりません。"
 
@@ -108,16 +108,16 @@ msgstr "設計 %(id)s の削除でアクセスが拒否されました。"
 msgid "Could not find design %s."
 msgstr "設計 %s が見つかりませんでした。"
 
-#: src/jobsub/views.py:185
+#: src/jobsub/views.py:186
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "設計 %(id)s の編集でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:191 src/jobsub/views.py:240
+#: src/jobsub/views.py:192 src/jobsub/views.py:241
 msgid "Error saving design"
 msgstr "設計の保存中にエラーが発生しました"
 
-#: src/jobsub/views.py:272
+#: src/jobsub/views.py:273
 msgid "Must be a POST request."
 msgstr "POST 要求でなければなりません。"
 

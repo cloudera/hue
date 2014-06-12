@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -57,9 +57,9 @@ msgid "Error polling job %s: %s"
 msgstr "Fehler bei der Abfrage des Jobs %s: %s"
 
 #: src/jobbrowser/views.py:118 src/jobbrowser/views.py:119
-#: src/jobbrowser/templates/job.mako:455 src/jobbrowser/templates/job.mako:459
-#: src/jobbrowser/templates/job.mako:462 src/jobbrowser/templates/job.mako:466
-#: src/jobbrowser/templates/job.mako:471 src/jobbrowser/templates/jobs.mako:239
+#: src/jobbrowser/templates/job.mako:435 src/jobbrowser/templates/job.mako:439
+#: src/jobbrowser/templates/job.mako:442 src/jobbrowser/templates/job.mako:446
+#: src/jobbrowser/templates/job.mako:451 src/jobbrowser/templates/jobs.mako:239
 #: src/jobbrowser/templates/jobs.mako:240
 #: src/jobbrowser/templates/jobs.mako:243
 msgid "N/A"
@@ -88,7 +88,7 @@ msgstr "Job wurde nicht als innerhalb von 15 Sekunden beendet angezeigt."
 msgid "Cannot find job attempt '%(id)s'."
 msgstr "Jobversuch \"%(id)s\" nicht gefunden."
 
-#: src/jobbrowser/views.py:251 src/jobbrowser/yarn_models.py:238
+#: src/jobbrowser/views.py:251 src/jobbrowser/yarn_models.py:242
 #, python-format
 msgid "Failed to retrieve log: %s"
 msgstr "Protokoll konnte nicht abgerufen werden: %s"
@@ -202,7 +202,7 @@ msgstr "Task-ID"
 
 #: src/jobbrowser/templates/attempt.mako:89
 #: src/jobbrowser/templates/attempt_logs.mako:33
-#: src/jobbrowser/templates/job.mako:50 src/jobbrowser/templates/job.mako:530
+#: src/jobbrowser/templates/job.mako:50 src/jobbrowser/templates/job.mako:510
 msgid "View this task"
 msgstr "Diese Task anzeigen"
 
@@ -265,8 +265,7 @@ msgstr "Ausgabegröße"
 #: src/jobbrowser/templates/attempt.mako:185
 #: src/jobbrowser/templates/attempt_logs.mako:142
 #: src/jobbrowser/templates/attempt_logs.mako:158
-#: src/jobbrowser/templates/job.mako:355 src/jobbrowser/templates/job.mako:370
-#: src/jobbrowser/templates/job.mako:385 src/jobbrowser/templates/job.mako:407
+#: src/jobbrowser/templates/job.mako:355 src/jobbrowser/templates/job.mako:387
 #: src/jobbrowser/templates/jobs.mako:132
 #: src/jobbrowser/templates/task.mako:181
 #: src/jobbrowser/templates/task.mako:197
@@ -280,8 +279,7 @@ msgstr "Keine Daten verfügbar"
 #: src/jobbrowser/templates/attempt.mako:186
 #: src/jobbrowser/templates/attempt_logs.mako:143
 #: src/jobbrowser/templates/attempt_logs.mako:159
-#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/job.mako:371
-#: src/jobbrowser/templates/job.mako:386 src/jobbrowser/templates/job.mako:408
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/job.mako:388
 #: src/jobbrowser/templates/jobs.mako:133
 #: src/jobbrowser/templates/task.mako:182
 #: src/jobbrowser/templates/task.mako:198
@@ -483,23 +481,23 @@ msgstr "Nein"
 msgid "Yes"
 msgstr "Ja"
 
-#: src/jobbrowser/templates/job.mako:418 src/jobbrowser/templates/jobs.mako:140
+#: src/jobbrowser/templates/job.mako:398 src/jobbrowser/templates/jobs.mako:140
 msgid "There was a problem communicating with the server. Refresh the page."
 msgstr "Bei der Kommunikation mit dem Server ist ein Problem aufgetreten. Aktualisieren Sie die Seite."
 
-#: src/jobbrowser/templates/job.mako:444 src/jobbrowser/templates/job.mako:445
+#: src/jobbrowser/templates/job.mako:424 src/jobbrowser/templates/job.mako:425
 #: src/jobbrowser/templates/jobs.mako:230
 #: src/jobbrowser/templates/jobs.mako:263
 msgid "Kill this job"
 msgstr "Diesen Job beenden"
 
-#: src/jobbrowser/templates/job.mako:452
+#: src/jobbrowser/templates/job.mako:432
 #: src/jobbrowser/templates/jobbrowser_components.mako:188
 #: src/jobbrowser/templates/jobs.mako:237
 msgid "Retired"
 msgstr "Zurückgezogen"
 
-#: src/jobbrowser/templates/job.mako:557 src/jobbrowser/templates/jobs.mako:350
+#: src/jobbrowser/templates/job.mako:537 src/jobbrowser/templates/jobs.mako:350
 msgid "There was a problem killing this job."
 msgstr "Beim Beenden dieses Jobs ist ein Problem aufgetreten."
 

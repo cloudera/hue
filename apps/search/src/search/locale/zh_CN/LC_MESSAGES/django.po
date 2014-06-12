@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:05-0800\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,9 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/search/api.py:92 src/search/api.py:105 src/search/api.py:116
-#: src/search/api.py:129 src/search/api.py:138 src/search/api.py:148
-#: src/search/api.py:158 src/search/api.py:171
+#: src/search/api.py:300 src/search/api.py:311 src/search/api.py:324
+#: src/search/api.py:333 src/search/api.py:343 src/search/api.py:353
+#: src/search/api.py:366 src/search/api.py:376 src/search/api.py:386
+#: src/search/api.py:400 src/search/api.py:411 src/search/views.py:138
 msgid "Error while accessing Solr"
 msgstr "访问 Solr 时出错"
 
@@ -35,802 +36,151 @@ msgstr "未输入术语时发送的查询。"
 msgid "Whether Solr requires client to perform Kerberos authentication."
 msgstr "Solr 是否需要客户端执行 Kerberos 身份验证。"
 
-#: src/search/decorators.py:32
+#: src/search/decorators.py:35 src/search/decorators.py:49
 msgid "Permission denied. You are not an Administrator."
 msgstr "权限被拒绝。您不是管理员。"
 
-#: src/search/forms.py:95
-#, python-format
-msgid "No live Solr collection or core by the name %s."
-msgstr "没有名为 %s 的实时 Solr 集合或核心。"
-
-#: src/search/models.py:261
+#: src/search/models.py:233
 msgid "Solr index name pointing to"
 msgstr "Solr 索引名称指向"
 
-#: src/search/models.py:262
+#: src/search/models.py:234
 msgid "Friendlier name in UI"
 msgstr "UI 中更友好的名称"
 
-#: src/search/models.py:264
+#: src/search/models.py:236
 msgid "Collection with cores data"
 msgstr "带核心数据的集合"
 
-#: src/search/models.py:264
+#: src/search/models.py:236
 msgid "Solr json"
 msgstr "Solr json"
 
-#: src/search/models.py:266 src/search/templates/layout.mako:81
+#: src/search/models.py:238 src/search/templates/layout.mako:81
+#: src/search/templates/search.mako:545
 msgid "Properties"
 msgstr "属性"
 
-#: src/search/models.py:267
+#: src/search/models.py:239
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Hue 属性（例如，按页码排列的结果）"
 
-#: src/search/search_controller.py:80
-#, python-format
-msgid "Collection type does not exist: %s"
-msgstr "集合类型不存在：%s"
+#: src/search/models.py:516
+msgid "The Solr schema requires an id field for performing the result highlighting"
+msgstr "Solr 纲要需要用于执行结果突出显示的 ID 字段"
 
-#: src/search/search_controller.py:97
+#: src/search/search_controller.py:58
 msgid " (Copy)"
 msgstr " （副本）"
 
-#: src/search/views.py:80
+#: src/search/views.py:142 src/search/views.py:174
 msgid "There is no collection to search."
 msgstr "没有要搜索的集合。"
 
-#: src/search/views.py:103
-msgid "No collection to download."
-msgstr "没有要下载的集合。"
+#: src/search/views.py:172
+msgid "Page saved !"
+msgstr "页面已保存！"
 
-#: src/search/views.py:121 src/search/views.py:123
+#: src/search/views.py:193
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "无法下载搜索结果：%s"
 
-#: src/search/views.py:171
-msgid "Collection(s) or core(s) imported successfully!"
-msgstr "集合或核心已成功导入！"
-
-#: src/search/views.py:174
-msgid "There was an error importing the collection(s) or core(s)"
-msgstr "导入集合或核心时出错"
-
-#: src/search/views.py:177
-msgid "Collection(s) or core(s) partially imported"
-msgstr "集合或核心已部分导入"
-
-#: src/search/views.py:215 src/search/views.py:229
+#: src/search/views.py:226 src/search/views.py:240
 msgid "POST request required."
 msgstr "需要 POST 请求。"
 
-#: src/search/views.py:255
-#, python-format
-msgid "Errors on the form: %s."
-msgstr "格式错误：%s。"
+#: src/search/views.py:303
+msgid "This document does not have any index id."
+msgstr "该文档没有任何索引 ID。"
 
-#: src/search/views.py:295
-#, python-format
-msgid "No preview available, some facets are invalid: %s"
-msgstr "无可用预览，有些层面无效：%s"
-
-#: src/search/views.py:402
+#: src/search/views.py:473
 msgid "A POST request is required."
 msgstr "需要一个 POST 请求。"
 
-#: src/search/templates/admin_collection_facets.mako:25
-#: src/search/templates/admin_collection_highlighting.mako:25
-#: src/search/templates/admin_collection_highlighting.mako:140
-#: src/search/templates/admin_collection_properties.mako:27
-#: src/search/templates/admin_collection_sorting.mako:25
-#: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
-#: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:29 src/search/templates/search.mako:61
+#: src/search/templates/no_collections.mako:24
+#: src/search/templates/search.mako:22 src/search/templates/search.mako:59
 msgid "Search"
 msgstr "搜索"
 
-#: src/search/templates/admin_collection_facets.mako:29
-msgid "Facets for"
-msgstr "层面"
-
-#: src/search/templates/admin_collection_facets.mako:46
-#: src/search/templates/admin_collection_highlighting.mako:43
-#: src/search/templates/admin_collection_sorting.mako:48
-msgid "Enabled"
-msgstr "已启用"
-
-#: src/search/templates/admin_collection_facets.mako:49
-msgid "Facets"
-msgstr "层面"
-
-#: src/search/templates/admin_collection_facets.mako:50
-msgid "Facets provide an intuitive way to filter the results."
-msgstr "层面提供了一种直观的结果筛选方式。"
-
-#: src/search/templates/admin_collection_facets.mako:51
-msgid "Different types of facets can be added on the following steps."
-msgstr "可在以下步骤中添加不同类型的层面。"
-
-#: src/search/templates/admin_collection_facets.mako:52
-msgid "Facets are currently disabled."
-msgstr "当前已禁用层面。"
-
-#: src/search/templates/admin_collection_facets.mako:58
-msgid "Step 1: General"
-msgstr "第 1 步：综述"
-
-#: src/search/templates/admin_collection_facets.mako:59
-msgid "Step 2: Field Facets"
-msgstr "第 2 步：字段层面"
-
-#: src/search/templates/admin_collection_facets.mako:60
-msgid "Step 3: Range Facets"
-msgstr "第 3 步：范围层面"
-
-#: src/search/templates/admin_collection_facets.mako:61
-msgid "Step 4: Date Facets"
-msgstr "第 4 步：数据层面"
-
-#: src/search/templates/admin_collection_facets.mako:62
-msgid "Step 5: Graphical Facet"
-msgstr "第 5 步：图形层面"
-
-#: src/search/templates/admin_collection_facets.mako:63
-msgid "Step 6: Facets Order"
-msgstr "第 6 步：层面顺序"
-
-#: src/search/templates/admin_collection_facets.mako:68
-msgid "Limit"
-msgstr "限制"
-
-#: src/search/templates/admin_collection_facets.mako:74
-msgid "Mincount"
-msgstr "Mincount"
-
-#: src/search/templates/admin_collection_facets.mako:80
-msgid "Sort"
-msgstr "排序"
-
-#: src/search/templates/admin_collection_facets.mako:92
-msgid "There are currently no field facets defined."
-msgstr "当前没有已定义的字段层面。"
-
-#: src/search/templates/admin_collection_facets.mako:103
-#: src/search/templates/admin_collection_facets.mako:130
-#: src/search/templates/admin_collection_facets.mako:164
-#: src/search/templates/admin_collection_facets.mako:208
-#: src/search/templates/admin_collection_sorting.mako:74
-msgid "Field"
-msgstr "字段"
-
-#: src/search/templates/admin_collection_facets.mako:105
-#: src/search/templates/admin_collection_facets.mako:132
-#: src/search/templates/admin_collection_facets.mako:166
-#: src/search/templates/admin_collection_facets.mako:210
-#: src/search/templates/admin_collection_sorting.mako:76
-msgid "Label"
-msgstr "标签"
-
-#: src/search/templates/admin_collection_facets.mako:109
-msgid "Add to Field Facets"
-msgstr "添加到字段层面"
-
-#: src/search/templates/admin_collection_facets.mako:110
-msgid "The field you are trying to add is already in the list."
-msgstr "您尝试添加的字段已在列表中。"
-
-#: src/search/templates/admin_collection_facets.mako:116
-msgid "There are currently no range facets defined."
-msgstr "当前没有已定义的范围层面。"
-
-#: src/search/templates/admin_collection_facets.mako:136
-#: src/search/templates/admin_collection_facets.mako:214
-msgid "Start"
-msgstr "开始"
-
-#: src/search/templates/admin_collection_facets.mako:138
-#: src/search/templates/admin_collection_facets.mako:216
-msgid "End"
-msgstr "结束"
-
-#: src/search/templates/admin_collection_facets.mako:140
-#: src/search/templates/admin_collection_facets.mako:218
-msgid "Gap"
-msgstr "间距"
-
-#: src/search/templates/admin_collection_facets.mako:144
-msgid "Add to Range Facets"
-msgstr "添加到范围层面"
-
-#: src/search/templates/admin_collection_facets.mako:150
-msgid "There are currently no date facets defined."
-msgstr "当前没有已定义的日期层面。"
-
-#: src/search/templates/admin_collection_facets.mako:171
-msgid "Range from"
-msgstr "范围从今天之前"
-
-#: src/search/templates/admin_collection_facets.mako:175
-msgid "before today until"
-msgstr "直到今天之前"
-
-#: src/search/templates/admin_collection_facets.mako:179
-msgid "before today. Goes up by increments of"
-msgstr "。按以下增量上升"
-
-#: src/search/templates/admin_collection_facets.mako:184
-msgid "Date format"
-msgstr "日期格式"
-
-#: src/search/templates/admin_collection_facets.mako:188
-msgid "Add to Date Facets"
-msgstr "添加到日期层面"
-
-#: src/search/templates/admin_collection_facets.mako:194
-msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
-msgstr "当前没有已定义的图形层面。请记住，您只能添加一个字段作为图形层面。"
-
-#: src/search/templates/admin_collection_facets.mako:215
-msgid "ie. 0"
-msgstr "ie. 0"
-
-#: src/search/templates/admin_collection_facets.mako:215
-msgid "ie. NOW-12HOURS/MINUTES"
-msgstr "ie. NOW-12HOURS/MINUTES"
-
-#: src/search/templates/admin_collection_facets.mako:217
-msgid "ie. 100"
-msgstr "ie. 100"
-
-#: src/search/templates/admin_collection_facets.mako:217
-msgid "ie. NOW"
-msgstr "ie. NOW"
-
-#: src/search/templates/admin_collection_facets.mako:219
-msgid "ie. 10"
-msgstr "ie. 10"
-
-#: src/search/templates/admin_collection_facets.mako:219
-msgid "ie. +30MINUTES"
-msgstr "ie. +30MINUTES"
-
-#: src/search/templates/admin_collection_facets.mako:220
-msgid "If empty this will be treated as a simple Field Facet."
-msgstr "如果为空，则会将此视为简单的字段层面。"
-
-#: src/search/templates/admin_collection_facets.mako:220
-msgid "Read more about facets..."
-msgstr "阅读有关层面的更多信息..."
-
-#: src/search/templates/admin_collection_facets.mako:223
-msgid "Set as Graphical Facet"
-msgstr "设为图形层面"
-
-#: src/search/templates/admin_collection_facets.mako:224
-#: src/search/templates/admin_collection_facets.mako:225
-msgid "You can add just one field as graphical facet"
-msgstr "您可添加一个字段作为图形层面"
-
-#: src/search/templates/admin_collection_facets.mako:231
-msgid "There are currently no Facets defined."
-msgstr "当前没有已定义的层面。"
-
-#: src/search/templates/admin_collection_facets.mako:259
-msgid "Back"
-msgstr "返回"
-
-#: src/search/templates/admin_collection_facets.mako:260
-msgid "Next"
-msgstr "下一页"
-
-#: src/search/templates/admin_collection_facets.mako:261
-#: src/search/templates/admin_collection_highlighting.mako:61
-#: src/search/templates/admin_collection_properties.mako:75
-#: src/search/templates/admin_collection_sorting.mako:93
-#: src/search/templates/admin_collection_template.mako:276
-msgid "Save"
-msgstr "保存"
-
-#: src/search/templates/admin_collection_facets.mako:272
-msgid "Format Help"
-msgstr "格式帮助"
-
-#: src/search/templates/admin_collection_facets.mako:276
-msgid "You can specify here how you want the date to be formatted."
-msgstr "您可在此指定如何设置日期格式。"
-
-#: src/search/templates/admin_collection_facets.mako:278
-msgid "Use a predefined format:"
-msgstr "使用预定义格式："
-
-#: src/search/templates/admin_collection_facets.mako:312
-msgid "or any combination of these fields:"
-msgstr "或这些字段的任意组合："
-
-#: src/search/templates/admin_collection_facets.mako:318
-msgid "Token"
-msgstr "令牌"
-
-#: src/search/templates/admin_collection_facets.mako:319
-msgid "Output"
-msgstr "输出"
-
-#: src/search/templates/admin_collection_facets.mako:322
-msgid "Relative time"
-msgstr "相对时间"
-
-#: src/search/templates/admin_collection_facets.mako:324
-msgid "9 hours ago"
-msgstr "9 小时之前"
-
-#: src/search/templates/admin_collection_facets.mako:327
-msgid "Month"
-msgstr "月"
-
-#: src/search/templates/admin_collection_facets.mako:344
-msgid "Jan Feb ... Nov Dec"
-msgstr "一月、二月...十一月、十二月"
-
-#: src/search/templates/admin_collection_facets.mako:349
-msgid "January February ... November December"
-msgstr "一月、二月...十一月、十二月"
-
-#: src/search/templates/admin_collection_facets.mako:352
-msgid "Day of Month"
-msgstr "日期"
-
-#: src/search/templates/admin_collection_facets.mako:359
-msgid "1st 2nd ... 30th 31st"
-msgstr "1 日、2 日... 30 日、31 日"
-
-#: src/search/templates/admin_collection_facets.mako:367
-msgid "Day of Year"
-msgstr "一年中的一天"
-
-#: src/search/templates/admin_collection_facets.mako:374
-msgid "1st 2nd ... 364th 365th"
-msgstr "第 1 天，第 2 天...第 364 天、第 365 天"
-
-#: src/search/templates/admin_collection_facets.mako:382
-msgid "Day of Week"
-msgstr "一周中的一天"
-
-#: src/search/templates/admin_collection_facets.mako:389
-msgid "0th 1st ... 5th 6th"
-msgstr "第 0 天、第 1 天...第 5 天、第 6 天"
-
-#: src/search/templates/admin_collection_facets.mako:394
-msgid "Sun Mon ... Fri Sat"
-msgstr "星期日、星期一...星期五、星期六"
-
-#: src/search/templates/admin_collection_facets.mako:399
-msgid "Sunday Monday ... Friday Saturday"
-msgstr "星期日、星期一...星期五、星期六"
-
-#: src/search/templates/admin_collection_facets.mako:402
-msgid "Week of Year"
-msgstr "一年中的周"
-
-#: src/search/templates/admin_collection_facets.mako:409
-#: src/search/templates/admin_collection_facets.mako:424
-msgid "1st 2nd ... 52nd 53rd"
-msgstr "第 1 周、第 2 周...第 52 周、第 53 周"
-
-#: src/search/templates/admin_collection_facets.mako:417
-msgid "ISO Week of Year"
-msgstr "一年中的 ISO 周"
-
-#: src/search/templates/admin_collection_facets.mako:432
-msgid "Year"
-msgstr "年"
-
-#: src/search/templates/admin_collection_facets.mako:452
-msgid "Hour"
-msgstr "小时"
-
-#: src/search/templates/admin_collection_facets.mako:472
-msgid "Minute"
-msgstr "分钟"
-
-#: src/search/templates/admin_collection_facets.mako:482
-msgid "Second"
-msgstr "秒"
-
-#: src/search/templates/admin_collection_facets.mako:492
-msgid "Fractional Second"
-msgstr "小数位秒"
-
-#: src/search/templates/admin_collection_facets.mako:512
-msgid "Unix Timestamp"
-msgstr "Unix 时间戳"
-
-#: src/search/templates/admin_collection_facets.mako:521
-msgid "Close"
-msgstr "关闭"
-
-#: src/search/templates/admin_collection_facets.mako:598
-msgid "There was an error parsing your input"
-msgstr "解析输入时出错"
-
-#: src/search/templates/admin_collection_facets.mako:942
-msgid "Facets updated"
-msgstr "层面已更新"
-
-#: src/search/templates/admin_collection_facets.mako:946
-#: src/search/templates/admin_collection_highlighting.mako:118
-#: src/search/templates/admin_collection_sorting.mako:211
-#: src/search/templates/admin_collection_template.mako:692
-msgid "Error: "
-msgstr "错误： "
-
-#: src/search/templates/admin_collection_facets.mako:1036
-msgid "This field is required."
-msgstr "此字段为必填字段。"
-
-#: src/search/templates/admin_collection_highlighting.mako:29
-msgid "Highlighting for"
-msgstr "突出显示"
-
-#: src/search/templates/admin_collection_highlighting.mako:46
-msgid "Highlighting"
-msgstr "突出显示"
-
-#: src/search/templates/admin_collection_highlighting.mako:47
-msgid "Highlights the query keywords matching some of the fields below."
-msgstr "突出显示与下面某些字段匹配的查询关键字。"
-
-#: src/search/templates/admin_collection_highlighting.mako:50
-msgid "Highlighting is currently disabled."
-msgstr "当前已禁用突出显示。"
-
-#: src/search/templates/admin_collection_highlighting.mako:115
-msgid "Updated"
-msgstr "已更新"
-
-#: src/search/templates/admin_collection_highlighting.mako:139
-msgid "Select all"
-msgstr "全选"
-
-#: src/search/templates/admin_collection_highlighting.mako:141
-msgid "No fields found."
-msgstr "未找到字段。"
-
-#: src/search/templates/admin_collection_properties.mako:43
-msgid "Properties of"
-msgstr "属性"
-
-#: src/search/templates/admin_collection_properties.mako:54
-#: src/search/templates/layout.mako:79
-msgid "Collection"
-msgstr "集合"
-
-#: src/search/templates/admin_collection_properties.mako:57
-msgid "Schema"
-msgstr "架构"
-
-#: src/search/templates/admin_collection_properties.mako:60
+#: src/search/templates/admin_collections.mako:32
 msgid "Indexes"
 msgstr "索引"
 
-#: src/search/templates/admin_collection_properties.mako:71
-msgid "Autocomplete and suggest queries"
-msgstr "自动完成和建议查询"
+#: src/search/templates/admin_collections.mako:35
+msgid "Dashboards"
+msgstr "仪表板"
 
-#: src/search/templates/admin_collection_properties.mako:80
-#: src/search/templates/admin_collection_properties.mako:84
-msgid "Loading..."
-msgstr "正在加载..."
+#: src/search/templates/admin_collections.mako:43
+msgid "Filter dashboards..."
+msgstr "筛选器仪表板..."
 
-#: src/search/templates/admin_collection_properties_solr_properties.mako:30
-msgid "Property"
-msgstr "属性"
+#: src/search/templates/admin_collections.mako:46
+msgid "Create a new dashboard"
+msgstr "创建新仪表板"
 
-#: src/search/templates/admin_collection_properties_solr_properties.mako:31
-msgid "Value"
-msgstr "值"
+#: src/search/templates/admin_collections.mako:46
+#: src/search/templates/admin_collections.mako:59
+#: src/search/templates/no_collections.mako:51
+msgid "Dashboard"
+msgstr "控制面板"
 
-#: src/search/templates/admin_collection_sorting.mako:29
-msgid "Sorting for"
-msgstr "排序对象"
+#: src/search/templates/admin_collections.mako:57
+msgid "There are currently no dashboards defined."
+msgstr "当前没有已定义的仪表板。"
 
-#: src/search/templates/admin_collection_sorting.mako:51
-#: src/search/templates/admin_collection_sorting.mako:78
-msgid "Sorting"
-msgstr "排序"
+#: src/search/templates/admin_collections.mako:79
+msgid "Click to edit"
+msgstr "单击以编辑"
 
-#: src/search/templates/admin_collection_sorting.mako:52
-msgid "Specify on which fields and order the results are sorted by default."
-msgstr "指定默认情况下对结果进行排序所依据的字段和顺序。"
+#: src/search/templates/admin_collections.mako:81
+msgid "Copy"
+msgstr "复制"
 
-#: src/search/templates/admin_collection_sorting.mako:53
-msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
-msgstr "排序是将“默认排序”字段从左至右进行组合。"
+#: src/search/templates/admin_collections.mako:82
+msgid "Delete"
+msgstr "删除"
 
-#: src/search/templates/admin_collection_sorting.mako:54
-msgid "Sorting is currently disabled."
-msgstr "当前已禁用排序。"
+#: src/search/templates/admin_collections.mako:103
+msgid "Confirm Delete"
+msgstr "确认删除"
 
-#: src/search/templates/admin_collection_sorting.mako:60
-msgid "There are currently no fields defined."
-msgstr "当前没有已定义的字段。"
+#: src/search/templates/admin_collections.mako:106
+msgid "Are you sure you want to delete this collection?"
+msgstr "是否确定要删除此集合？"
 
-#: src/search/templates/admin_collection_sorting.mako:67
-msgid "Default sorting"
-msgstr "默认排序"
+#: src/search/templates/admin_collections.mako:109
+msgid "No"
+msgstr "否"
 
-#: src/search/templates/admin_collection_sorting.mako:84
-msgid "Include in default sorting"
-msgstr "包括在默认排序中"
+#: src/search/templates/admin_collections.mako:110
+msgid "Yes"
+msgstr "是"
 
-#: src/search/templates/admin_collection_sorting.mako:88
-msgid "Add to Sorting"
-msgstr "添加到排序"
+#: src/search/templates/admin_collections.mako:179
+msgid "Collection deleted successfully."
+msgstr "集合已成功删除。"
 
-#: src/search/templates/admin_collection_sorting.mako:208
-msgid "Sorting updated"
-msgstr "排序已更新"
+#: src/search/templates/admin_collections.mako:183
+msgid "Collection copied successfully."
+msgstr "集合已成功复制。"
 
-#: src/search/templates/admin_collection_template.mako:140
-msgid "Snippet editor for"
-msgstr "代码段编辑器"
-
-#: src/search/templates/admin_collection_template.mako:149
-msgid "Visual Editor"
-msgstr "可视编辑器"
-
-#: src/search/templates/admin_collection_template.mako:150
-msgid "Preview"
-msgstr "预览"
-
-#: src/search/templates/admin_collection_template.mako:151
-msgid "Source"
-msgstr "源"
-
-#: src/search/templates/admin_collection_template.mako:152
-msgid "Advanced"
-msgstr "高级"
-
-#: src/search/templates/admin_collection_template.mako:162
-msgid "Cloud Template"
-msgstr "云模板"
-
-#: src/search/templates/admin_collection_template.mako:167
-msgid "Layout"
-msgstr "布局"
-
-#: src/search/templates/admin_collection_template.mako:174
-#: src/search/templates/admin_collection_template.mako:220
-msgid "Available Fields"
-msgstr "可用字段"
-
-#: src/search/templates/admin_collection_template.mako:178
-#: src/search/templates/admin_collection_template.mako:202
-#: src/search/templates/admin_collection_template.mako:224
-#: src/search/templates/admin_collection_template.mako:248
-msgid "Click on this button to add the field"
-msgstr "单击此按钮以添加字段"
-
-#: src/search/templates/admin_collection_template.mako:186
-#: src/search/templates/admin_collection_template.mako:232
-msgid "Available Functions"
-msgstr "可用函数"
-
-#: src/search/templates/admin_collection_template.mako:189
-msgid "Formats date or timestamp in DD-MM-YYYY"
-msgstr "将日期或时间戳格式设置为 DD-MM-YYYY"
-
-#: src/search/templates/admin_collection_template.mako:190
-msgid "Formats date or timestamp in HH:mm:ss"
-msgstr "将日期或时间戳格式设置为 HH:mm:ss"
-
-#: src/search/templates/admin_collection_template.mako:191
-msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
-msgstr "将日期或时间戳格式设置为 DD-MM-YYYY HH:mm:ss"
-
-#: src/search/templates/admin_collection_template.mako:192
-#: src/search/templates/admin_collection_template.mako:238
-msgid "Formats a date in the full format"
-msgstr "将日期格式设置为全格式"
-
-#: src/search/templates/admin_collection_template.mako:193
-#: src/search/templates/admin_collection_template.mako:239
-msgid "Formats a date as a Unix timestamp"
-msgstr "将日期格式设置为 Unix 时间戳"
-
-#: src/search/templates/admin_collection_template.mako:194
-msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "将 Unix 时间戳格式设置为 N 秒、N 分钟、N 天...之前"
-
-#: src/search/templates/admin_collection_template.mako:195
-#: src/search/templates/admin_collection_template.mako:241
-msgid "Downloads and embed the file in the browser"
-msgstr "在浏览器中下载并嵌入文件"
-
-#: src/search/templates/admin_collection_template.mako:196
-#: src/search/templates/admin_collection_template.mako:242
-msgid "Downloads the linked file"
-msgstr "下载已链接文件"
-
-#: src/search/templates/admin_collection_template.mako:197
-#: src/search/templates/admin_collection_template.mako:243
-msgid "Preview file in File Browser"
-msgstr "在 File Browser 中预览文件"
-
-#: src/search/templates/admin_collection_template.mako:198
-#: src/search/templates/admin_collection_template.mako:244
-msgid "Truncate a value after 100 characters"
-msgstr "截断 100 个字符之后的值"
-
-#: src/search/templates/admin_collection_template.mako:199
-#: src/search/templates/admin_collection_template.mako:245
-msgid "Truncate a value after 250 characters"
-msgstr "截断 250 个字符之后的值"
-
-#: src/search/templates/admin_collection_template.mako:200
-#: src/search/templates/admin_collection_template.mako:246
-msgid "Truncate a value after 500 characters"
-msgstr "截断 500 个字符之后的值"
-
-#: src/search/templates/admin_collection_template.mako:235
-msgid "Formats a date in the DD-MM-YYYY format"
-msgstr "将日期格式设置为 DD-MM-YYYY 格式"
-
-#: src/search/templates/admin_collection_template.mako:236
-msgid "Formats a date in the HH:mm:ss format"
-msgstr "将日期格式设置为 HH:mm:ss 格式"
-
-#: src/search/templates/admin_collection_template.mako:237
-msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
-msgstr "将日期格式设置为 DD-MM-YYYY HH:mm:ss 格式"
-
-#: src/search/templates/admin_collection_template.mako:240
-msgid "Shows the relative time"
-msgstr "显示相对时间"
-
-#: src/search/templates/admin_collection_template.mako:267
-msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
-msgstr "您可在此定义可在模板中使用的自定义 CSS 类或 Javascript 函数。"
-
-#: src/search/templates/admin_collection_template.mako:282
-#: src/search/templates/admin_collection_template.mako:392
-msgid "Insert layout"
-msgstr "插入布局"
-
-#: src/search/templates/admin_collection_template.mako:391
-#: src/search/templates/admin_collection_template.mako:407
-#: src/search/templates/admin_collections.mako:100
-msgid "Cancel"
-msgstr "取消"
-
-#: src/search/templates/admin_collection_template.mako:399
-msgid "Load a template"
-msgstr "加载模板"
-
-#: src/search/templates/admin_collection_template.mako:408
-msgid "Load template"
-msgstr "加载模板"
-
-#: src/search/templates/admin_collection_template.mako:662
-msgid "Start with this!"
-msgstr "以此开始！"
-
-#: src/search/templates/admin_collection_template.mako:663
-msgid "You can add a layout from here"
-msgstr "您可在此添加布局"
-
-#: src/search/templates/admin_collection_template.mako:689
-msgid "Template updated"
-msgstr "模板已更新"
-
-#: src/search/templates/admin_collections.mako:31
 #: src/search/templates/layout.mako:32
 msgid "Search page"
 msgstr "搜索页面"
 
-#: src/search/templates/admin_collections.mako:33
-msgid "Collection Manager"
-msgstr "Collection Manager"
-
-#: src/search/templates/admin_collections.mako:41
-msgid "Filter collections by name..."
-msgstr "按名称筛选集合..."
-
-#: src/search/templates/admin_collections.mako:45
-msgid "Import"
-msgstr "导入"
-
-#: src/search/templates/admin_collections.mako:52
-msgid "There are currently no collections defined."
-msgstr "当前没有已定义的集合。"
-
-#: src/search/templates/admin_collections.mako:52
-msgid "Click here to add"
-msgstr "单击此处添加"
-
-#: src/search/templates/admin_collections.mako:52
-msgid "one or more."
-msgstr "一个或多个。"
-
-#: src/search/templates/admin_collections.mako:70
-msgid "Click to edit"
-msgstr "单击以编辑"
-
-#: src/search/templates/admin_collections.mako:72
-msgid "Copy"
-msgstr "复制"
-
-#: src/search/templates/admin_collections.mako:73
-msgid "Delete"
-msgstr "删除"
-
-#: src/search/templates/admin_collections.mako:85
-msgid "Import Collections and Cores"
-msgstr "导入集合和核心"
-
-#: src/search/templates/admin_collections.mako:90
-msgid "Collections"
-msgstr "集合"
-
-#: src/search/templates/admin_collections.mako:91
-msgid "All available collections from the Solr URL in hue.ini have been imported."
-msgstr "已从 hue.ini 中的 Solr URL 导入所有可用集合。"
-
-#: src/search/templates/admin_collections.mako:94
-msgid "Cores"
-msgstr "核心"
-
-#: src/search/templates/admin_collections.mako:95
-msgid "All available cores from the Solr URL in hue.ini have been imported."
-msgstr "已从 hue.ini 中的 Solr URL 导入所有可用核心。"
-
-#: src/search/templates/admin_collections.mako:101
-msgid "Import Selected"
-msgstr "导入所选项"
-
-#: src/search/templates/admin_collections.mako:117
-msgid "Confirm Delete"
-msgstr "确认删除"
-
-#: src/search/templates/admin_collections.mako:120
-msgid "Are you sure you want to delete this collection?"
-msgstr "是否确定要删除此集合？"
-
-#: src/search/templates/admin_collections.mako:123
-msgid "No"
-msgstr "否"
-
-#: src/search/templates/admin_collections.mako:124
-msgid "Yes"
-msgstr "是"
-
-#: src/search/templates/admin_collections.mako:213
-#: src/search/templates/admin_collections.mako:216
-msgid "Imported: "
-msgstr "已导入： "
-
-#: src/search/templates/admin_collections.mako:216
-#: src/search/templates/admin_collections.mako:219
-msgid "Not imported: "
-msgstr "未导入： "
-
-#: src/search/templates/admin_collections.mako:232
-msgid "Collection deleted successfully."
-msgstr "集合已成功删除。"
-
-#: src/search/templates/admin_collections.mako:236
-msgid "Collection copied successfully."
-msgstr "集合已成功复制。"
-
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:57
+#: src/search/templates/layout.mako:33
 msgid "Collection manager"
 msgstr "Collection Manager"
 
 #: src/search/templates/layout.mako:40
 msgid "Search Admin"
 msgstr "搜索管理员"
+
+#: src/search/templates/layout.mako:79
+msgid "Collection"
+msgstr "集合"
 
 #: src/search/templates/layout.mako:84
 msgid "Search it"
@@ -869,88 +219,413 @@ msgstr "回复"
 msgid "Retweet"
 msgstr "转推"
 
-#: src/search/templates/no_collections.mako:47
+#: src/search/templates/no_collections.mako:46
 msgid "It seems there is nothing to search on ..."
 msgstr "似乎没有要搜索的内容..."
 
-#: src/search/templates/search.mako:56
-msgid "Customize this collection"
-msgstr "自定义此集合"
+#: src/search/templates/no_collections.mako:49
+msgid "... First create a search dashboard with "
+msgstr "... 首先使用 ... 创建搜索仪表板， "
+
+#: src/search/templates/no_collections.mako:55
+msgid "... or create a search index with "
+msgstr "... 或使用索引器创建 "
+
+#: src/search/templates/no_collections.mako:57
+msgid "Indexer"
+msgstr "搜索索引"
+
+#: src/search/templates/search.mako:35
+msgid "Edit"
+msgstr "编辑"
+
+#: src/search/templates/search.mako:36
+msgid "Save"
+msgstr "保存"
+
+#: src/search/templates/search.mako:36
+msgid "Saving..."
+msgstr "正在保存..."
+
+#: src/search/templates/search.mako:37
+msgid "Settings"
+msgstr "设置"
+
+#: src/search/templates/search.mako:42
+msgid "Share"
+msgstr "共享"
+
+#: src/search/templates/search.mako:45
+msgid "New"
+msgstr "新建"
+
+#: src/search/templates/search.mako:46
+msgid "Collections"
+msgstr "集合"
+
+#: src/search/templates/search.mako:51
+msgid "Select a search index"
+msgstr "选择搜索索引"
 
 #: src/search/templates/search.mako:83
-msgid "XLS"
-msgstr "XLS"
+msgid "LAYOUT"
+msgstr "布局"
 
-#: src/search/templates/search.mako:84
-msgid "CSV"
-msgstr "CSV"
+#: src/search/templates/search.mako:103
+msgid "WIDGETS"
+msgstr "小工具"
 
-#: src/search/templates/search.mako:97
-msgid "A demo index is used. In order to be interactive, please "
-msgstr "使用了演示索引。为了实现交互性，请 "
+#: src/search/templates/search.mako:108
+msgid "Grid Results"
+msgstr "网格结果"
 
-#: src/search/templates/search.mako:97
-msgid "create the indexes"
-msgstr "创建索引"
+#: src/search/templates/search.mako:118
+msgid "HTML Results"
+msgstr "HTML 结果"
 
-#: src/search/templates/search.mako:97
-msgid " in Solr."
-msgstr " 在 Solr 中。"
+#: src/search/templates/search.mako:127
+msgid "Text Facet"
+msgstr "文本方面"
 
-#: src/search/templates/search.mako:220
-#, python-format
-msgid "Page %s of %s. Showing %s results (%s seconds)"
-msgstr "第 %s 页（共 %s 页）。显示 %s 结果（%s 秒）"
+#: src/search/templates/search.mako:136
+msgid "Pie Chart"
+msgstr "圆形统计图"
 
-#: src/search/templates/search.mako:286
-msgid "Previous Page"
-msgstr "上一页"
+#: src/search/templates/search.mako:141
+msgid "Hit Count"
+msgstr "命中次数"
 
-#: src/search/templates/search.mako:302
-msgid "Next Page"
-msgstr "下一页"
+#: src/search/templates/search.mako:146
+msgid "Bar Chart"
+msgstr "条形图"
 
-#: src/search/templates/search.mako:311
-msgid "Your search"
-msgstr "您的搜索"
+#: src/search/templates/search.mako:155
+msgid "Line Chart"
+msgstr "线形图"
 
-#: src/search/templates/search.mako:311
-msgid "did not match any documents."
-msgstr "与任何文档都不匹配。"
+#: src/search/templates/search.mako:164
+msgid "Timeline"
+msgstr "时间线"
 
-#: src/search/templates/search.mako:313
-msgid "Suggestions:"
-msgstr "建议："
+#: src/search/templates/search.mako:173
+msgid "Filter Bar"
+msgstr "筛选器工具栏"
 
-#: src/search/templates/search.mako:315
-msgid "Make sure all words are spelled correctly."
-msgstr "确保所有单词拼写正确。"
+#: src/search/templates/search.mako:182
+msgid "Map"
+msgstr "映射"
 
-#: src/search/templates/search.mako:316
-msgid "Try different keywords."
-msgstr "尝试不同关键字。"
+#: src/search/templates/search.mako:192
+msgid "Click on the pencil to get started with your dashboard!"
+msgstr "单击铅笔以从您的仪表板开始！"
 
-#: src/search/templates/search.mako:317
-msgid "Try more general keywords."
-msgstr "尝试更多常见关键字。"
+#: src/search/templates/search.mako:197
+msgid "Pick an index and Click on a layout to start your dashboard!"
+msgstr "选择索引并单击布局以启动您的仪表板！"
 
-#: src/search/templates/search.mako:318
-msgid "Try fewer keywords."
-msgstr "尝试更少关键字。"
+#: src/search/templates/search.mako:247
+msgid "Drag any of the widgets inside your empty row"
+msgstr "拖动空白行内部的任意小工具"
+
+#: src/search/templates/search.mako:252
+msgid "Row"
+msgstr "行"
+
+#: src/search/templates/search.mako:295
+msgid "This is an empty widget."
+msgstr "这是空白小工具。"
+
+#: src/search/templates/search.mako:303
+msgid "Label"
+msgstr "标签"
+
+#: src/search/templates/search.mako:325
+msgid "Limit"
+msgstr "限制"
+
+#: src/search/templates/search.mako:330
+msgid "Toggle range or field facet"
+msgstr "切换范围或字段方面"
+
+#: src/search/templates/search.mako:333
+msgid "Toggle sort order"
+msgstr "切换排序顺序"
 
 #: src/search/templates/search.mako:370
+msgid "Show more..."
+msgstr "显示更多..."
+
+#: src/search/templates/search.mako:375
+msgid "Show more"
+msgstr "显示更多"
+
+#: src/search/templates/search.mako:379
+msgid "less..."
+msgstr "更少..."
+
+#: src/search/templates/search.mako:428 src/search/templates/search.mako:904
+msgid "Filter fields"
+msgstr "筛选字段"
+
+#: src/search/templates/search.mako:431
+msgid "All"
+msgstr "所有"
+
+#: src/search/templates/search.mako:431
+msgid "Current"
+msgstr "当前"
+
+#: src/search/templates/search.mako:439
+msgid "Field Name"
+msgstr "字段名称"
+
+#: src/search/templates/search.mako:455 src/search/templates/search.mako:633
+msgid "Your search did not match any documents."
+msgstr "您的搜索与所有文档均不匹配。"
+
+#: src/search/templates/search.mako:481
+msgid "Click to sort"
+msgstr "单击以排序"
+
+#: src/search/templates/search.mako:542
+msgid "Editor"
+msgstr "编辑器"
+
+#: src/search/templates/search.mako:543
+msgid "HTML"
+msgstr "HTML"
+
+#: src/search/templates/search.mako:544
+msgid "CSS & JS"
+msgstr "CSS 和 JS"
+
+#: src/search/templates/search.mako:556 src/search/templates/search.mako:590
+msgid "Available Fields"
+msgstr "可用字段"
+
+#: src/search/templates/search.mako:558 src/search/templates/search.mako:592
+msgid "Click on this button to add the field"
+msgstr "单击此按钮以添加字段"
+
+#: src/search/templates/search.mako:562 src/search/templates/search.mako:596
+msgid "Available Functions"
+msgstr "可用函数"
+
+#: src/search/templates/search.mako:564
+msgid "Formats date or timestamp in DD-MM-YYYY"
+msgstr "将日期或时间戳格式设置为 DD-MM-YYYY"
+
+#: src/search/templates/search.mako:565
+msgid "Formats date or timestamp in HH:mm:ss"
+msgstr "将日期或时间戳格式设置为 HH:mm:ss"
+
+#: src/search/templates/search.mako:566
+msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
+msgstr "将日期或时间戳格式设置为 DD-MM-YYYY HH:mm:ss"
+
+#: src/search/templates/search.mako:567 src/search/templates/search.mako:601
+msgid "Formats a date in the full format"
+msgstr "将日期格式设置为全格式"
+
+#: src/search/templates/search.mako:568 src/search/templates/search.mako:602
+msgid "Formats a date as a Unix timestamp"
+msgstr "将日期格式设置为 Unix 时间戳"
+
+#: src/search/templates/search.mako:569
+msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
+msgstr "将 Unix 时间戳格式设置为 N 秒、N 分钟、N 天...之前"
+
+#: src/search/templates/search.mako:570 src/search/templates/search.mako:604
+msgid "Downloads and embed the file in the browser"
+msgstr "在浏览器中下载并嵌入文件"
+
+#: src/search/templates/search.mako:571 src/search/templates/search.mako:605
+msgid "Downloads the linked file"
+msgstr "下载已链接文件"
+
+#: src/search/templates/search.mako:572 src/search/templates/search.mako:606
+msgid "Preview file in File Browser"
+msgstr "在 File Browser 中预览文件"
+
+#: src/search/templates/search.mako:573 src/search/templates/search.mako:607
+msgid "Truncate a value after 100 characters"
+msgstr "截断 100 个字符之后的值"
+
+#: src/search/templates/search.mako:574 src/search/templates/search.mako:608
+msgid "Truncate a value after 250 characters"
+msgstr "截断 250 个字符之后的值"
+
+#: src/search/templates/search.mako:575 src/search/templates/search.mako:609
+msgid "Truncate a value after 500 characters"
+msgstr "截断 500 个字符之后的值"
+
+#: src/search/templates/search.mako:577 src/search/templates/search.mako:611
+msgid "Click on this button to add the function"
+msgstr "单击此按钮以添加函数"
+
+#: src/search/templates/search.mako:598
+msgid "Formats a date in the DD-MM-YYYY format"
+msgstr "将日期格式设置为 DD-MM-YYYY 格式"
+
+#: src/search/templates/search.mako:599
+msgid "Formats a date in the HH:mm:ss format"
+msgstr "将日期格式设置为 HH:mm:ss 格式"
+
+#: src/search/templates/search.mako:600
+msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
+msgstr "将日期格式设置为 DD-MM-YYYY HH:mm:ss 格式"
+
+#: src/search/templates/search.mako:603
+msgid "Shows the relative time"
+msgstr "显示相对时间"
+
+#: src/search/templates/search.mako:622
+msgid "Sorting"
+msgstr "排序"
+
+#: src/search/templates/search.mako:654
+msgid "Previous"
+msgstr "上一页"
+
+#: src/search/templates/search.mako:661
+msgid "Showing"
+msgstr "正在显示"
+
+#: src/search/templates/search.mako:663 src/search/templates/search.mako:845
+#: src/search/templates/search.mako:1631 src/search/templates/search.mako:1654
+#: src/search/templates/search.mako:1673
+msgid "to"
+msgstr "至"
+
+#: src/search/templates/search.mako:665
+msgid "of"
+msgstr "的"
+
+#: src/search/templates/search.mako:667
+msgid " results"
+msgstr " 结果"
+
+#: src/search/templates/search.mako:670
 msgid "Show"
 msgstr "显示"
 
-#: src/search/templates/search.mako:370
-msgid "more..."
-msgstr "移动..."
+#: src/search/templates/search.mako:674
+msgid "results per page"
+msgstr "每个页面的结果"
 
-#: src/search/templates/search.mako:654
-msgid "The graphical facets works just with numbers or dates. Please choose another field."
-msgstr "图形层面仅适用于数字或日期。请选择其他字段。"
+#: src/search/templates/search.mako:677
+msgid "Next"
+msgstr "下一页"
 
-#: src/search/templates/search.mako:658
-msgid "There was an error initializing the graphical facet component."
-msgstr "初始化图形层面组件时出错。"
+#: src/search/templates/search.mako:690
+msgid "Download as JSON"
+msgstr "以 JSON 格式下载"
+
+#: src/search/templates/search.mako:691
+msgid "Download as CSV"
+msgstr "以 CSV 格式下载"
+
+#: src/search/templates/search.mako:692
+msgid "Download as Excel"
+msgstr "以 Excel 格式下载"
+
+#: src/search/templates/search.mako:714
+msgid "Group by"
+msgstr "分组依据"
+
+#: src/search/templates/search.mako:824
+msgid "There are currently no filters applied."
+msgstr "当前未应用筛选器。"
+
+#: src/search/templates/search.mako:829 src/search/templates/search.mako:839
+msgid "field"
+msgstr "字段"
+
+#: src/search/templates/search.mako:832
+msgid "value"
+msgstr "值"
+
+#: src/search/templates/search.mako:843
+msgid "from"
+msgstr "自"
+
+#: src/search/templates/search.mako:861
+msgid "Scope"
+msgstr "范围"
+
+#: src/search/templates/search.mako:863
+msgid "World"
+msgstr "世界"
+
+#: src/search/templates/search.mako:864
+msgid "USA"
+msgstr "美国"
+
+#: src/search/templates/search.mako:888
+msgid "Share this dashboard"
+msgstr "共享该仪表板"
+
+#: src/search/templates/search.mako:891
+msgid "The following URL will show the current dashboard and the applied filters."
+msgstr "以下 URL 将显示当前仪表板和应用的筛选器。"
+
+#: src/search/templates/search.mako:895
+msgid "Close"
+msgstr "关闭"
+
+#: src/search/templates/search.mako:915
+msgid "There are no fields matching your search term."
+msgstr "没有与您的搜索条目匹配的字段。"
+
+#: src/search/templates/search.mako:926
+msgid "Solr index"
+msgstr "Solr 索引"
+
+#: src/search/templates/search.mako:932
+msgid "Visible to everybody"
+msgstr "所有人可见"
+
+#: src/search/templates/search.mako:1434 src/search/templates/search.mako:1661
+msgid "Custom"
+msgstr "自定义"
+
+#: src/search/templates/search.mako:1440
+msgid "Start"
+msgstr "开始"
+
+#: src/search/templates/search.mako:1451
+msgid "End"
+msgstr "结束"
+
+#: src/search/templates/search.mako:1462 src/search/templates/search.mako:1660
+msgid "Interval"
+msgstr "间隔"
+
+#: src/search/templates/search.mako:1571
+msgid "The end cannot be before the starting moment"
+msgstr "结束时间不能早于开始时间"
+
+#: src/search/templates/search.mako:1656
+msgid "Pick"
+msgstr "选择"
+
+#: src/search/templates/search.mako:1657
+msgid "Cancel"
+msgstr "取消"
+
+#: src/search/templates/search.mako:1658
+msgid "From"
+msgstr "自"
+
+#: src/search/templates/search.mako:1659
+msgid "To"
+msgstr "至"
+
+#: src/search/templates/search.mako:1852
+msgid "The current collection must be saved to be shared."
+msgstr "当前集合必须保存以共享。"
+
+#: src/search/templates/search.mako:1872
+msgid "The current collection cannot be shared."
+msgstr "无法共享当前集合。"
 
