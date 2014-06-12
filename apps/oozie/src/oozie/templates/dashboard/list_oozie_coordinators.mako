@@ -136,6 +136,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     return {
       id: c.id,
       endTime: c.endTime,
+      nextMaterializedTime: c.nextMaterializedTime,
       status: c.status,
       statusClass: "label " + getStatusClass(c.status),
       isRunning: c.isRunning,
@@ -176,7 +177,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         { "bSortable":false }
       ],
       "aaSorting":[
-        [ 5, "desc" ]
+        [ 0, "desc" ]
       ],
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
@@ -215,7 +216,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         null
       ],
       "aaSorting":[
-        [ 5, "desc" ]
+        [ 0, "desc" ]
       ],
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
@@ -401,7 +402,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(coord.status) > -1) {
                 try {
                   runningTable.fnAddData([
-                    emptyStringIfNull(coord.endTime),
+                    emptyStringIfNull(coord.nextMaterializedTime),
                     '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
                     coord.appName,
                     '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>',
