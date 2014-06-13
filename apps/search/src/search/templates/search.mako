@@ -341,7 +341,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- ko if: type() == 'field' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
-          <span class="facet-field-label facet-field-label-fixed-width">${ _('Limit') }</span> <input type="text" class="input-medium" data-bind="spinedit: properties.limit" />
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Limit') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
         </span>
       </div>
     <!-- /ko -->
