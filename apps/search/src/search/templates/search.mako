@@ -494,18 +494,18 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                 <th>${ ('Document') }</th>
               </tr>
             </thead>
-            <tbody data-bind="foreach: { data: $root.results, as: 'documents'}" class="result-tbody">
+            <tbody data-bind="foreach: { data: $root.results, as: 'doc'}" class="result-tbody">
               <tr class="result-row">
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
-                    <i class="fa" data-bind="css: {'fa-caret-right' : ! showDetails(), 'fa-caret-down' : showDetails() }"></i>
+                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails() }"></i>
                   </a>
                 </td>
                 <!-- ko foreach: row -->
                   <td data-bind="html: $data"></td>
                 <!-- /ko -->
               </tr>
-              <tr data-bind="visible: showDetails">
+              <tr data-bind="visible: doc.showDetails">
                 <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
                   <!-- ko if: $data.details().length == 0 -->
                     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -629,7 +629,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
 
     <div id="result-main" style="overflow-x: auto">
-      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+      <div data-bind="visible: ! $root.isRetrievingResults() && $root.results().length == 0">
         </br>
         ${ _('Your search did not match any documents.') }
       </div>

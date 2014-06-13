@@ -302,8 +302,12 @@ def get_document(request):
 
     if doc_id:
       result['doc'] = SolrApi(SOLR_URL.get(), request.user).get(collection['name'], doc_id)
-      result['status'] = 0
-      result['message'] = ''
+      if result['doc']['doc']:
+        result['status'] = 0
+        result['message'] = ''
+      else:
+        result['status'] = 1
+        result['message'] = _('No document was returned by Solr.')
     else:
       result['message'] = _('This document does not have any index id.')
       result['status'] = 1

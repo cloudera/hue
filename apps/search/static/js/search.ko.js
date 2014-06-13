@@ -1055,6 +1055,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
+        doc['details'].push(ko.mapping.fromJS({
+            key: '',
+            value: ''
+        }));
       }
       else {
         $(document).trigger("error", data.message);
