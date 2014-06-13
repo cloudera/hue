@@ -1,108 +1,39 @@
-# encoding: utf-8
-import datetime
+# -*- coding: utf-8 -*-
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import connection, models
 
-from desktop.models import Document
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
-        # Adding model 'DocumentPermission'
-        db.create_table('desktop_documentpermission', (
-            ('perms', self.gf('django.db.models.fields.TextField')(default='read')),
-            ('doc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['desktop.Document'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('desktop', ['DocumentPermission'])
+        try:
+            # Adding M2M table for field users on 'DocumentPermission'
+            if 'documentpermission_users' not in connection.introspection.table_names():
+                db.create_table('documentpermission_users', (
+                    ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                    ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
+                    ('user', models.ForeignKey(orm['auth.user'], null=False))
+                ))
+                db.create_unique('documentpermission_users', ['documentpermission_id', 'user_id'])
 
-        # Adding M2M table for field users on 'DocumentPermission'
-        db.create_table('documentpermission_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('documentpermission_users', ['documentpermission_id', 'user_id'])
+            if 'documentpermission_groups' not in connection.introspection.table_names():
+                # Adding M2M table for field groups on 'DocumentPermission'
+                db.create_table('documentpermission_groups', (
+                    ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                    ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
+                    ('group', models.ForeignKey(orm['auth.group'], null=False))
+                ))
+                db.create_unique('documentpermission_groups', ['documentpermission_id', 'group_id'])
+        except:
+            # Only want to make sure that these tables exist.
+            # The previous migration should create these tables,
+            # but it has been refactored to do so.
+            pass
 
-        # Adding M2M table for field groups on 'DocumentPermission'
-        db.create_table('documentpermission_groups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
-            ('group', models.ForeignKey(orm['auth.group'], null=False))
-        ))
-        db.create_unique('documentpermission_groups', ['documentpermission_id', 'group_id'])
-
-        # Adding model 'DocumentTag'
-        db.create_table('desktop_documenttag', (
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('tag', self.gf('django.db.models.fields.SlugField')(max_length=50, db_index=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('desktop', ['DocumentTag'])
-
-        # Adding model 'Document'
-        db.create_table('desktop_document', (
-            ('description', self.gf('django.db.models.fields.TextField')(default='')),
-            ('extra', self.gf('django.db.models.fields.TextField')(default='')),
-            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('version', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='doc_owner', to=orm['auth.User'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.TextField')(default='')),
-        ))
-        db.send_create_signal('desktop', ['Document'])
-
-        # Adding M2M table for field tags on 'Document'
-        db.create_table('desktop_document_tags', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('document', models.ForeignKey(orm['desktop.document'], null=False)),
-            ('documenttag', models.ForeignKey(orm['desktop.documenttag'], null=False))
-        ))
-        db.create_unique('desktop_document_tags', ['document_id', 'documenttag_id'])
-    
-    
-        Document.objects.sync()
-    
-    
     def backwards(self, orm):
-        
-        # Deleting model 'DocumentPermission'
-        db.delete_table('desktop_documentpermission')
+        pass
 
-        # Remove old m2m fields
-        try:
-            # Removing M2M table for field users on 'DocumentPermission'
-            db.delete_table('desktop_documentpermission_users')
-
-            # Removing M2M table for field groups on 'DocumentPermission'
-            db.delete_table('desktop_documentpermission_groups')
-        except:
-            pass
-
-        # Remove new m2m fields
-        try:
-            # Removing M2M table for field users on 'DocumentPermission'
-            db.delete_table('documentpermission_users')
-
-            # Removing M2M table for field groups on 'DocumentPermission'
-            db.delete_table('documentpermission_groups')
-        except:
-            pass
-
-        # Deleting model 'DocumentTag'
-        db.delete_table('desktop_documenttag')
-
-        # Deleting model 'Document'
-        db.delete_table('desktop_document')
-
-        # Removing M2M table for field tags on 'Document'
-        db.delete_table('desktop_document_tags')
-    
-    
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -181,5 +112,5 @@ class Migration(SchemaMigration):
             'value': ('django.db.models.fields.TextField', [], {'max_length': '4096'})
         }
     }
-    
+
     complete_apps = ['desktop']
