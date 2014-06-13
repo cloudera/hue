@@ -308,6 +308,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <!-- /ko -->
 </script>
 
+
 <script type="text/html" id="facet-toggle">
     <div class="facet-field-cnt" data-bind="visible: properties.canRange">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
@@ -483,28 +484,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             <thead>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0">
                 <th style="width: 18px">&nbsp;</th>
-                <!-- ko foreach: $root.collection.template.fieldsSelected -->
-                <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
-                  <div style="display: inline-block; width:20px;">
-                    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
-                      <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
-                      <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
-                    </a>
-                  </div>
-                  <div style="display: inline-block;">
-                    <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
-                      <span data-bind="text: name"></span>
-                      <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
-                    </a>
-                  </div>
-                  <div style="display: inline-block; width:20px;">
-                    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
-                      <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
-                      <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
-                    </a>
-                  </div>
-                </th>
-                <!-- /ko -->
+                <div data-bind="template: {name: 'result-sorting'}"></div>
               </tr>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
@@ -633,12 +613,14 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <div class="widget-section widget-css-section" style="display: none">
         <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
       </div>
-      <div class="widget-section widget-settings-section" style="display: none, min-height:200px">
+      <div class="widget-section widget-settings-section" style="display: none">
         ${ _('Sorting') }
 
-        <div data-bind="foreach: $root.collection.template.fieldsSelected">
-          <span data-bind="text: $data"></span>
-        </div>
+        <table>
+          <tr>
+            <div data-bind="template: {name: 'result-sorting'}"></div>
+           </tr>
+        </table>
         <br/>
       </div>
     <!-- /ko -->
@@ -664,6 +646,33 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </div>
   <!-- /ko -->
 </script>
+
+
+<script type="text/html" id="result-sorting">
+<!-- ko foreach: $root.collection.template.fieldsSelected -->
+<th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
+  <div style="display: inline-block; width:20px;">
+    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
+      <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
+      <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
+    </a>
+  </div>
+  <div style="display: inline-block;">
+    <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
+      <span data-bind="text: name"></span>
+      <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
+    </a>
+  </div>
+  <div style="display: inline-block; width:20px;">
+    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
+      <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
+      <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
+    </a>
+  </div>
+</th>
+<!-- /ko -->
+</script>
+
 
 <script type="text/html" id="resultset-pagination">
 <div style="text-align: center; margin-top: 4px">
@@ -1207,6 +1216,7 @@ $(document).ready(function () {
 
   $(document).on("click", ".widget-settings-pill", function(){
     $(this).parents(".card-body").find(".widget-section").hide();
+    selectAllCollectionFields(); // Make sure all the collection fields appear
     $(this).parents(".card-body").find(".widget-settings-section").show();
     $(this).parent().siblings().removeClass("active");
     $(this).parent().addClass("active");
@@ -1929,12 +1939,16 @@ $(document).ready(function () {
       viewModel.collection.template.fieldsSelected([])
     }
     else {
-      var _fields = [];
-      $.each(viewModel.collection.fields(), function (index, field) {
-        _fields.push(field.name());
-      });
-      viewModel.collection.template.fieldsSelected(_fields);
+      selectAllCollectionFields();
     }
+  }
+
+  function selectAllCollectionFields() {
+    var _fields = [];
+    $.each(viewModel.collection.fields(), function (index, field) {
+      _fields.push(field.name());
+    });
+    viewModel.collection.template.fieldsSelected(_fields);
   }
 
   var selectedWidget = null;

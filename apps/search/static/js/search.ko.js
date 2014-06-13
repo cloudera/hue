@@ -302,15 +302,15 @@ var Query = function (vm, query) {
       }));      
     } else {
       if (fq.filter().indexOf(data.from) > -1) { // Unselect
-      fq.filter.remove(data.from);
-      $.each(fq.properties(), function (index, prop) {
-        if (prop && prop.from() == data.from) {
-          fq.properties.remove(prop);
-        }
-      });
-      if (fq.filter().length == 0) {
+        fq.filter.remove(data.from);
+        $.each(fq.properties(), function (index, prop) {
+          if (prop && prop.from() == data.from) {
+            fq.properties.remove(prop);
+          }
+        });
+        if (fq.filter().length == 0) {
           self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
-      }      
+        }      
       } else {
        fq.filter.push(data.from);
        fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
@@ -337,12 +337,12 @@ var Query = function (vm, query) {
   };
 
   self.paginate = function (direction) {
-  if (direction == 'next') {
-    self.start(self.start() + vm.collection.template.rows() * 1.0);
-  } else {
-    self.start(self.start() - vm.collection.template.rows() * 1.0);
-  }
-  vm.search();
+    if (direction == 'next') {
+      self.start(self.start() + vm.collection.template.rows() * 1.0);
+    } else {
+      self.start(self.start() - vm.collection.template.rows() * 1.0);
+    }
+    vm.search();
   };
 };
 
@@ -411,7 +411,7 @@ var Collection = function (vm, collection) {
 
   self.availableFacetFields = ko.computed(function() {
     var facetFieldNames = $.map(self.facets(), function(facet) {
-    return facet.field(); //filter out text_general, __version__
+      return facet.field(); //filter out text_general, __version__
     });
     return $.grep(self.fields(), function(field) {
       return facetFieldNames.indexOf(field.name()) == -1;
@@ -533,9 +533,9 @@ var Collection = function (vm, collection) {
     }
   });
   self.template.availableWidgetFieldsNames = ko.computed(function() {
-  return $.map(self.template.availableWidgetFields(), function(field){
-    return field.name();
-  });
+    return $.map(self.template.availableWidgetFields(), function(field) {
+      return field.name();
+    });
   });
 
   self.template.fieldsModalFilter.subscribe(function(value) {
@@ -559,20 +559,20 @@ var Collection = function (vm, collection) {
         self.template.template(data.collection.collection.template.template);
         self.template.fieldsAttributes.removeAll();
         $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
-        self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-      });  
+          self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
+        });  
         self.fields.removeAll();
         $.each(data.collection.collection.fields, function(index, field) {
-        self.fields.push(ko.mapping.fromJS(field));
+          self.fields.push(ko.mapping.fromJS(field));
         });
       }
-  }).fail(function (xhr, textStatus, errorThrown) {});
+    }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
   function diff(A, B) {
-  return A.filter(function (a) {
-    return B.indexOf(a) == -1;
-  });
+    return A.filter(function (a) {
+      return B.indexOf(a) == -1;
+    });
   }
 
   function syncArray(currentObservable, newJson, isDynamic) {
@@ -585,7 +585,7 @@ var Collection = function (vm, collection) {
     });
     var _newFieldsNames = $.map(
       $.grep(newJson, function(field) {
-        return field.isDynamic == isDynamic;
+          return field.isDynamic == isDynamic;
         }), function(field) {
       return field.name;
     });
@@ -602,8 +602,8 @@ var Collection = function (vm, collection) {
     // New fields
     $.each(newJson, function(index, field) {
      if (_toAdd.indexOf(field.name) != -1) {
-        currentObservable.push(ko.mapping.fromJS(field));
-      }
+       currentObservable.push(ko.mapping.fromJS(field));
+     }
     });
   }
 
@@ -766,9 +766,9 @@ var NewTemplate = function (vm, initial) {
     if (self.inited()) {
       // If new dashboard
       vm.collection.name.subscribe(function(newValue) {
-      vm.collection.label(newValue);
-      vm.collection.switchCollection();
-      vm.search();
+        vm.collection.label(newValue);
+        vm.collection.switchCollection();
+        vm.search();
       });
     } else {
       self.syncCollections();
@@ -781,23 +781,23 @@ var NewTemplate = function (vm, initial) {
 
   self.syncCollections = function () {
     $.post("/search/get_collections", {
-    },function (data) {
-      if (data.status == 0) {
-      // Sync new and old names
-        $.each(data.collection, function(index, name) {
-          if (self.collections.indexOf(name) == -1) {
-            self.collections.push(name);
-          }
-        });
-        $.each(self.collections(), function(index, collection) {
-          if (data.collection.indexOf(collection) == -1) {
-            self.collections.remove(collection);
-          }
-        });
-      }
-      else {
-        $(document).trigger("error", data.message);
-      }
+      }, function (data) {
+        if (data.status == 0) {
+          // Sync new and old names
+          $.each(data.collection, function(index, name) {
+            if (self.collections.indexOf(name) == -1) {
+              self.collections.push(name);
+            }
+          });
+          $.each(self.collections(), function(index, collection) {
+            if (data.collection.indexOf(collection) == -1) {
+              self.collections.remove(collection);
+            }
+          });
+        }
+        else {
+          $(document).trigger("error", data.message);
+        }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     }).done(function() {
@@ -879,18 +879,16 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self.availableDraggableResultset = ko.computed(function() {
-    return getWidgets(function(widget){ return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
+    return getWidgets(function(widget) { return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
   });
   self.availableDraggableFilter = ko.computed(function() {
-    return getWidgets(function(widget){ return widget.widgetType() == 'filter-widget'; }).length == 0;
+    return getWidgets(function(widget) { return widget.widgetType() == 'filter-widget'; }).length == 0;
   });
   self.availableDraggableHistogram = ko.computed(function() {
-    return getWidgets(function(widget){ return widget.widgetType() == 'histogram-widget'; }).length == 0 &&
-    self.availableDateFields().length > 0;
+    return getWidgets(function(widget) { return widget.widgetType() == 'histogram-widget'; }).length == 0 && self.availableDateFields().length > 0;
   });
   self.availableDraggableNumbers = ko.computed(function() {
-    return getWidgets(function(widget){ return widget.widgetType() == 'line-widget'; }).length == 0 &&
-    self.availableNumberFields().length > 0;
+    return getWidgets(function(widget) { return widget.widgetType() == 'line-widget'; }).length == 0 && self.availableNumberFields().length > 0;
   });
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;
@@ -1047,12 +1045,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       id: doc.id
     }, function (data) {
       if (data.status == 0) {
-      $.each(data.doc.doc, function(key, val) {
-        doc['details'].push(ko.mapping.fromJS({
-          key: key,
-          value: val
-      }));                
-      });
+        $.each(data.doc.doc, function(key, val) {
+            doc['details'].push(ko.mapping.fromJS({
+              key: key,
+              value: val
+          }));                
+        });
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
@@ -1074,7 +1072,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       if (data.status == 0) {
         self.collection.id = data.id;
         $(document).trigger("info", data.message);
-        if (window.location.search.indexOf("collection") == -1){
+        if (window.location.search.indexOf("collection") == -1) {
           window.location.hash = '#collection=' + data.id;
         }
       }
