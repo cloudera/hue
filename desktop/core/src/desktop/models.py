@@ -339,7 +339,7 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
-  name = models.TextField(default='')
+  name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
@@ -563,8 +563,8 @@ class DocumentPermission(models.Model):
 
   doc = models.ForeignKey(Document)
 
-  users = models.ManyToManyField(auth_models.User, db_index=True)
-  groups = models.ManyToManyField(auth_models.Group, db_index=True)
+  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission_users')
+  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission_groups')
   perms = models.TextField(default=READ_PERM, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
