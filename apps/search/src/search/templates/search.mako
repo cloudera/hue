@@ -104,7 +104,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); }}}"
+                              'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); }}}"
          title="${_('Grid Results')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
@@ -114,7 +114,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableHtmlResultset(),
                     isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); $root.collection.template.isGridLayout(false); }}}"
+                              'stop': function(event, ui){
+                                  $('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});
+                                  $root.collection.template.isGridLayout(false);
+                                  checkResultHighlightingAvailability();
+                               }
+                             }
+                    }"
          title="${_('HTML Results')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
@@ -2016,7 +2022,11 @@ $(document).ready(function () {
     }
   }
 
-
+  function checkResultHighlightingAvailability() {
+    if (! viewModel.collection.idField()) {
+      $(document).trigger("warn", "${ _('Result highlighting is unavailable: the collection does not have an index field') }");
+    }
+  }
 </script>
 
 
