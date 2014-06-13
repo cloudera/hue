@@ -218,9 +218,6 @@ var Query = function (vm, query) {
   });
 
   self.selectedMultiq = ko.observable('query');
-  self.selectedMultiq.subscribe(function () {
-    vm.search();
-  });
 
   self.getFacetFilter = function(widget_id) {
     var _fq = null;
@@ -256,6 +253,10 @@ var Query = function (vm, query) {
   self.removeQ = function (query) {
     self.qs.remove(query);
   };
+
+  self.selectedMultiq.subscribe(function () { // To keep below the computeds!
+	vm.search();
+  });
 
   self.toggleFacet = function (data) {
     var fq = self.getFacetFilter(data.widget_id);
@@ -366,6 +367,7 @@ var Collection = function (vm, collection) {
     vm.search();
   });
   self.template.isGridLayout.subscribe(function () {
+    vm.results.removeAll();
     vm.search();
   });
 
@@ -1010,7 +1012,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.collection.removeFacet(widget_json.id);
     self.query.removeFilter(widget_json);
     self.removeWidgetById(widget_json.id());
-    self.search();
   }
 
   self.getWidgetById = function (widget_id) {
