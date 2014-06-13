@@ -236,10 +236,10 @@ var Query = function (vm, query) {
           return 'query';
         }
       } else {
-          var facet = self.getFacetFilter(self.selectedMultiq());
-          if (facet && facet.filter().length > 0) {
-            return 'facet';
-          }
+        var facet = self.getFacetFilter(self.selectedMultiq());
+        if (facet && facet.filter().length > 0) {
+          return 'facet';
+        }
       }
     }
     return null;
@@ -290,7 +290,7 @@ var Query = function (vm, query) {
       self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
     }
 
-  var fq = self.getFacetFilter(data.widget_id);
+    var fq = self.getFacetFilter(data.widget_id);
   
     if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
@@ -398,12 +398,12 @@ var Collection = function (vm, collection) {
 
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
-    facet.field.subscribe(function () {
+    facet.properties.limit.subscribe(function () {
       vm.search();
     });
   });
-  self.template.rows.subscribe(function(){
-  vm.search();
+  self.template.rows.subscribe(function() {
+    vm.search();
   });
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
@@ -411,7 +411,7 @@ var Collection = function (vm, collection) {
 
   self.availableFacetFields = ko.computed(function() {
     var facetFieldNames = $.map(self.facets(), function(facet) {
-      return facet.field(); //filter out text_general, __version__
+      return facet.field();
     });
     return $.grep(self.fields(), function(field) {
       return facetFieldNames.indexOf(field.name()) == -1;
@@ -432,7 +432,7 @@ var Collection = function (vm, collection) {
       }, function (data) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
-          facet.field.subscribe(function() {
+          facet.properties.limit.subscribe(function () {
             vm.search();
           });
           self.facets.push(facet);
