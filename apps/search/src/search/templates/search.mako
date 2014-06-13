@@ -743,7 +743,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.timeLineZoom"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label">${ _('Group by') }</span>
-      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id',optionsText: 'label', value: $root.query.selectedMultiq"></select>
+      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
 
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: extraSeries, widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,

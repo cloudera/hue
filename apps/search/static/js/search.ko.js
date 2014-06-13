@@ -209,14 +209,18 @@ var Query = function (vm, query) {
 
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
-  var histogram_id = vm.collection.getHistogramFacet();
+    var histogram_id = vm.collection.getHistogramFacet();
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
             return (fq.type() == 'field' || fq.type() == 'range') && (histogram_id == null || histogram_id.id() != fq.id());
         }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
       );
   });
-  self.selectedMultiq = ko.observable(defaultMultiqGroup);
+
+  self.selectedMultiq = ko.observable('query');
+  self.selectedMultiq.subscribe(function () {
+    vm.search();
+  });
 
   self.getFacetFilter = function(widget_id) {
     var _fq = null;
@@ -243,10 +247,6 @@ var Query = function (vm, query) {
       }
     }
     return null;
-  });
-
-  self.selectedMultiq.subscribe(function () { // To keep below the computed
-    vm.search();
   });
 
   self.addQ = function (data) {
