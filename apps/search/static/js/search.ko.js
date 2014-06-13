@@ -291,7 +291,7 @@ var Query = function (vm, query) {
     }
 
     var fq = self.getFacetFilter(data.widget_id);
-  
+
     if (fq == null) {
       self.fqs.push(ko.mapping.fromJS({
           'id': data.widget_id,
@@ -299,7 +299,7 @@ var Query = function (vm, query) {
           'filter': [data.from],
           'properties': [{'from': data.from, 'to': data.to}],
           'type': 'range'
-      }));      
+      }));
     } else {
       if (fq.filter().indexOf(data.from) > -1) { // Unselect
         fq.filter.remove(data.from);
@@ -310,7 +310,7 @@ var Query = function (vm, query) {
         });
         if (fq.filter().length == 0) {
           self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
-        }      
+        }
       } else {
        fq.filter.push(data.from);
        fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
@@ -329,7 +329,7 @@ var Query = function (vm, query) {
         // Also re-init range select widget
         var rangeWidget = vm.collection.getFacetById(fq.id());
         if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
-          vm.collection.timeLineZoom({'id': rangeWidget.id()});  
+          vm.collection.timeLineZoom({'id': rangeWidget.id()});
         }
         return false;
       }
@@ -422,7 +422,7 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     self.removeFacet(function(){return facet_json.widget_id});
-  
+
     $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
@@ -493,7 +493,7 @@ var Collection = function (vm, collection) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
       if (field.name() == name) {
-      _field = field;
+        _field = field;
         return false;
       }
     });
@@ -523,7 +523,7 @@ var Collection = function (vm, collection) {
   });
   self.template.availableWidgetFields = ko.computed(function() {
     if (self.template.fieldsModalType() == 'histogram-widget') {
-      return vm.availableDateFields();  
+      return vm.availableDateFields();
     }
     else if (self.template.fieldsModalType() == 'line-widget') {
       return vm.availableNumberFields();
@@ -555,12 +555,12 @@ var Collection = function (vm, collection) {
         name: self.name()
     }, function (data) {
       if (data.status == 0) {
-        self.idField(data.collection.collection.idField);  
+        self.idField(data.collection.collection.idField);
         self.template.template(data.collection.collection.template.template);
         self.template.fieldsAttributes.removeAll();
         $.each(data.collection.collection.template.fieldsAttributes, function(index, field) {
           self.template.fieldsAttributes.push(ko.mapping.fromJS(field));
-        });  
+        });
         self.fields.removeAll();
         $.each(data.collection.collection.fields, function(index, field) {
           self.fields.push(ko.mapping.fromJS(field));
@@ -594,16 +594,17 @@ var Collection = function (vm, collection) {
     var _toAdd = diff(_newFieldsNames, _currentFieldsNames);
 
     // Deleted fields
-    $.each(currentObservable(), function(index, field) {
-      if (_toDelete.indexOf(field.name()) != -1) {
-        currentObservable.remove(field);
-      }
-    });
+    self.template.fieldsSelected.removeAll(_toDelete);
+    var bulk = $.grep(currentObservable(), function(field) {
+      return (_toDelete.indexOf(field.name()) != -1)
+    });     	
+    currentObservable.removeAll(bulk);
+
     // New fields
     $.each(newJson, function(index, field) {
-     if (_toAdd.indexOf(field.name) != -1) {
-       currentObservable.push(ko.mapping.fromJS(field));
-     }
+      if (_toAdd.indexOf(field.name) != -1) {
+        currentObservable.push(ko.mapping.fromJS(field));
+      }
     });
   }
 
@@ -613,7 +614,7 @@ var Collection = function (vm, collection) {
       }, function (data) {
         if (data.status == 0) {
           self.idField(data.collection.collection.idField);
-          syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);  
+          syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);
           syncArray(self.fields, data.collection.collection.fields, false);
         }
         // After sync the dynamic fields
@@ -626,7 +627,7 @@ var Collection = function (vm, collection) {
         name: self.name()
       }, function (data) {
         if (data.status == 0) {
-          syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);  
+          syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);
           syncArray(self.fields, data.fields, true);
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
@@ -772,7 +773,7 @@ var NewTemplate = function (vm, initial) {
       });
     } else {
       self.syncCollections();
-    }  
+    }
 
     if (initial.autoLoad) {
       magicLayout(vm);
@@ -895,8 +896,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   });
 
   self.init = function (callback) {
-  self.initial.init();
-  self.collection.syncFields();
+    self.initial.init();
+    self.collection.syncFields();
     self.search(callback);
   }
 
@@ -1049,7 +1050,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             doc['details'].push(ko.mapping.fromJS({
               key: key,
               value: val
-          }));                
+          }));
         });
       }
       else if (data.status == 1) {
