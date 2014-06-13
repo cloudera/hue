@@ -85,7 +85,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               <li class="white">
                 <button title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
                    id="kill-btn"
-                   class="btn btn-small confirmationModal
+                   class="btn btn-small btn-danger disable-feedback confirmationModal
                    % if not oozie_workflow.is_running():
                      hide
                    % endif
@@ -342,7 +342,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 
@@ -513,8 +513,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       var _this = $(this);
       $("#confirmation .message").text(_this.data("confirmation-message"));
       $("#confirmation").modal("show");
-      $("#confirmation a.btn-danger").click(function() {
+      $("#confirmation a.btn-danger").on("click", function() {
         _this.trigger('confirmation');
+        $(this).attr("data-loading-text", $(this).text() + " ...");
+        $(this).button("loading");
       });
     });
 
@@ -525,6 +527,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         function(response) {
           if (response['status'] != 0) {
             $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+            $("#confirmation a.btn-danger").button("reset");
           } else {
             window.location.reload();
           }
@@ -540,6 +543,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         function(response) {
           if (response['status'] != 0) {
             $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+            $("#confirmation a.btn-danger").button("reset");
           } else {
             window.location.reload();
           }
@@ -555,6 +559,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         function(response) {
           if (response['status'] != 0) {
             $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+            $("#confirmation a.btn-danger").button("reset");
           } else {
             window.location.reload();
           }

@@ -111,7 +111,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 
@@ -291,21 +291,24 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       _this.bind("confirmation", function () {
         var _this = this;
         $.post($(this).attr("data-url"),
-                { "notification":$(this).attr("data-message") },
-                function (response) {
-                  if (response["status"] != 0) {
-                    $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
-                  } else {
-                    window.location.reload();
-                  }
-                }
+          { "notification":$(this).attr("data-message") },
+          function (response) {
+            if (response["status"] != 0) {
+              $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
+              $("#confirmation a.btn-danger").button("reset");
+            } else {
+              window.location.reload();
+            }
+          }
         );
         return false;
       });
       $("#confirmation .message").text(_this.attr("data-confirmation-message"));
       $("#confirmation").modal("show");
-      $("#confirmation a.btn-danger").click(function () {
+      $("#confirmation a.btn-danger").on("click", function () {
         _this.trigger("confirmation");
+        $(this).attr("data-loading-text", $(this).text() + " ...");
+        $(this).button("loading");
       });
     });
 
@@ -345,7 +348,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             var suspendCell = "";
             var resumeCell = "";
             if (wf.canEdit) {
-              killCell = '<a class="btn btn-small confirmationModal" ' +
+              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + wf.killUrl + '" ' +
                       'title="${ _('Kill') } ' + wf.id + '"' +
@@ -353,7 +356,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                       'data-message="${ _('The workflow was killed!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
                       '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-small confirmationModal" ' +
+              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + wf.suspendUrl + '" ' +
                       'title="${ _('Suspend') } ' + wf.id + '"' +
@@ -361,7 +364,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                       'data-message="${ _('The workflow was suspended!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
                       '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-small confirmationModal" ' +
+              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + wf.resumeUrl + '" ' +
                       'title="${ _('Resume') } ' + wf.id + '"' +

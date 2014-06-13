@@ -118,7 +118,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 
@@ -314,14 +314,15 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       _this.bind("confirmation", function () {
         var _this = this;
         $.post($(this).attr("data-url"),
-                { "notification":$(this).attr("data-message") },
-                function (response) {
-                  if (response["status"] != 0) {
-                    $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
-                  } else {
-                    window.location.reload();
-                  }
-                }
+          { "notification":$(this).attr("data-message") },
+          function (response) {
+            if (response["status"] != 0) {
+              $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
+              $("#confirmation a.btn-danger").button("reset");
+            } else {
+              window.location.reload();
+            }
+          }
         );
         return false;
       });
@@ -329,6 +330,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       $("#confirmation").modal("show");
       $("#confirmation a.btn-danger").click(function () {
         _this.trigger("confirmation");
+        $(this).attr("data-loading-text", $(this).text() + " ...");
+        $(this).button("loading");
       });
     });
 
@@ -373,7 +376,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             var suspendCell = "";
             var resumeCell = "";
             if (coord.canEdit) {
-              killCell = '<a class="btn btn-small confirmationModal" ' +
+              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + coord.killUrl + '" ' +
                       'title="${ _('Kill') } ' + coord.id + '"' +

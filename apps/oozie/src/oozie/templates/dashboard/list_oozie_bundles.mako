@@ -105,7 +105,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 
@@ -284,14 +284,15 @@ ${layout.menubar(section='bundles', dashboard=True)}
       _this.bind("confirmation", function () {
         var _this = this;
         $.post($(this).attr("data-url"),
-                { "notification":$(this).attr("data-message") },
-                function (response) {
-                  if (response["status"] != 0) {
-                    $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
-                  } else {
-                    window.location.reload();
-                  }
-                }
+          { "notification":$(this).attr("data-message") },
+          function (response) {
+            if (response["status"] != 0) {
+              $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
+              $("#confirmation a.btn-danger").button("reset");
+            } else {
+              window.location.reload();
+            }
+          }
         );
         return false;
       });
@@ -299,6 +300,8 @@ ${layout.menubar(section='bundles', dashboard=True)}
       $("#confirmation").modal("show");
       $("#confirmation a.btn-danger").click(function () {
         _this.trigger("confirmation");
+        $(this).attr("data-loading-text", $(this).text() + " ...");
+        $(this).button("loading");
       });
     });
 
@@ -338,7 +341,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
             var suspendCell = "";
             var resumeCell = "";
             if (bundle.canEdit) {
-              killCell = '<a class="btn btn-small confirmationModal" ' +
+              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + bundle.killUrl + '" ' +
                       'title="${ _('Kill') } ' + bundle.id + '"' +
@@ -346,7 +349,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
                       'data-message="${ _('The bundle was killed!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
                       '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-small confirmationModal" ' +
+              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + bundle.suspendUrl + '" ' +
                       'title="${ _('Suspend') } ' + bundle.id + '"' +
@@ -354,7 +357,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
                       'data-message="${ _('The bundle was suspended!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
                       '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-small confirmationModal" ' +
+              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + bundle.resumeUrl + '" ' +
                       'title="${ _('Resume') } ' + bundle.id + '"' +
