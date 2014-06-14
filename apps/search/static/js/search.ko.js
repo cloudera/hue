@@ -177,6 +177,8 @@ function setLayout(colSizes) {
   });
 
   viewModel.columns(_cols);
+
+  $(document).trigger("setLayout");
 }
 
 function loadLayout(viewModel, json_layout) {

@@ -1207,10 +1207,13 @@ function toggleDocDetails(doc) {
 
 function resizeFieldsList() {
   $(".fields-list").css("max-height", Math.max($("#result-container").height(), 230));
-  var _fillHeight = $("#result-container").height() - 40;
-  if ($(".fields-list").height() < _fillHeight) {
-    $(".fields-list").height(_fillHeight);
-  }
+  window.setTimeout(function () {
+    var _fillHeight = $("#result-container").height() - 40;
+    if ($(".fields-list").height() < _fillHeight) {
+      $(".fields-list").height(_fillHeight);
+      $(".fields-list").css("max-height", _fillHeight);
+    }
+  }, 100);
 }
 
 $(document).ready(function () {
@@ -1255,6 +1258,10 @@ $(document).ready(function () {
   });
 
   $(document).on("magicLayout", function(){
+    resizeFieldsList();
+  });
+
+  $(document).on("setLayout", function(){
     resizeFieldsList();
   });
 
@@ -2000,6 +2007,7 @@ $(document).ready(function () {
 
   $(document).on("setResultsHeight", function () {
     $("#result-main").height($("#result-container").outerHeight() + 100);
+    resizeFieldsList();
   });
 
   function highlightColumn(column) {
