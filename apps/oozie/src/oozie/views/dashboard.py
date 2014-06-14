@@ -727,8 +727,10 @@ def massaged_bundle_actions_for_json(bundle):
 def format_time(st_time):
   if st_time is None:
     return '-'
-  else:
+  elif type(st_time) == time.struct_time:
     return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
+  else:
+    return st_time
 
 
 def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):

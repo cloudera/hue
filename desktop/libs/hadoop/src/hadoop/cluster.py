@@ -172,9 +172,9 @@ def get_next_ha_yarncluster():
   for name in conf.YARN_CLUSTERS.keys():
     config = conf.YARN_CLUSTERS[name]
     if config.SUBMIT_TO.get():
+      rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get())
       if has_ha:
-        try:
-          rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get())
+        try:          
           cluster_info = rm.cluster()
           if cluster_info['clusterInfo']['haState'] == 'ACTIVE':
             MR_NAME_CACHE = name
