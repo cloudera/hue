@@ -144,7 +144,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-pie-chart"></i>
          </a>
     </div>
-    <!-- <div class="draggable-widget" data-bind="draggable: {data: draggableHit(), options: {'start': function(event, ui){$('.card-body').slideUp('fast');}, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}" title="${_('Hit Count')}" rel="tooltip" data-placement="top"><a data-bind="attr: {href: $root.availableDraggableResultset()}, css: {'btn-inverse': ! $root.availableDraggableResultset() }, style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }"><i class="fa fa-tachometer"></i></a></div> -->
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},

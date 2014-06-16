@@ -893,7 +893,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     return getWidgets(function(widget) { return widget.widgetType() == 'histogram-widget'; }).length == 0 && self.availableDateFields().length > 0;
   });
   self.availableDraggableNumbers = ko.computed(function() {
-    return getWidgets(function(widget) { return widget.widgetType() == 'line-widget'; }).length == 0 && self.availableNumberFields().length > 0;
+    return self.availableNumberFields().length > 0;
   });
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;
