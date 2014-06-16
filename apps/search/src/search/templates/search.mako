@@ -591,13 +591,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
             <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
           </div>
           <div class="span3">
-            <h5 class="editor-title">${_('Available Fields')}</h2>
+            <h5 class="editor-title">${_('Available Fields')}</h5>
             <select data-bind="options: $root.collection.fields, optionsText: 'name', value: $root.collection.template.selectedSourceField" class="input-medium chosen-select"></select>
             <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFieldToSource">
               <i class="fa fa-plus"></i>
             </button>
 
-            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h2>
+            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h5>
             <select id="sourceFunctions" data-bind="value: $root.collection.template.selectedSourceFunction" class="input-medium chosen-select">
               <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
               <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
@@ -623,13 +623,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
       </div>
       <div class="widget-section widget-settings-section" style="display: none">
-        ${ _('Sorting') }
 
-        <table>
-          <tr>
-            <div data-bind="template: {name: 'result-sorting'}"></div>
-           </tr>
-        </table>
+        <div class="facet-field-cnt">
+          <span class="facet-field-label" style="margin-left: 12px">${ _('Sorting') }</span>
+          <div style="overflow-x: scroll; min-height: 40px">
+            <table>
+              <tr data-bind="template: {name: 'result-sorting'}">
+              </tr>
+            </table>
+          </div>
+        </div>
         <br/>
       </div>
     <!-- /ko -->
