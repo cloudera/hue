@@ -305,7 +305,8 @@ from django.utils.translation import ugettext as _
       <ul class="dropdown-menu">
         <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="fa fa-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
         %if user.is_superuser:
-        <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage users')}</a></li>
+        <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
+        <li><a href="${ url('security:index') }">&nbsp;<i class="fa fa-lock"></i>&nbsp;&nbsp;${_('Hadoop Security')}</a></li>
         %endif
       </ul>
     </li>
