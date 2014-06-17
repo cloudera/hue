@@ -935,12 +935,9 @@ ${layout.menubar(section='query')}
 <script type="text/javascript" charset="utf-8">
 var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent;
 
-var HIVE_AUTOCOMPLETE_BASE_URL = "${ hive_autocomplete_base_url | n,unicode }";
+var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
 var HIVE_AUTOCOMPLETE_USER = "${ user }";
-var SENTRY_AUTOCOMPLETE_BASE_URL = "${ sentry_autocomplete_base_url | n,unicode }";
-var SENTRY_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
-var SENTRY_AUTOCOMPLETE_USER = "${ user }";
 
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   if (data != null && data.error) {
@@ -1390,129 +1387,60 @@ $(document).ready(function () {
     }
     $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
 
-    var _statementAtCursor = getStatementAtCursor();
-    if (_statementAtCursor.statement.toUpperCase().indexOf("GRANT") != -1 || _statementAtCursor.statement.toUpperCase().indexOf("REVOKE") != -1) {
-      // Not a SELECT/INSERT statement
-      CodeMirror.possibleSoloField = false;
-      CodeMirror.possibleRole = false;
-      CodeMirror.possibleObject = false;
-      CodeMirror.possiblePrivilege = false;
-      CodeMirror.tableMagic = false;
-      CodeMirror.roleMagic = false;
-      CodeMirror.objectMagic = false;
-
-      var _start = _statementAtCursor.statement.toUpperCase().indexOf("ROLE");
-      if ( _start != -1 && _start < 10 ) {
-        // GRANT/REVOKE ROLE
-        sac_getRoles(function (roles) {
-          CodeMirror.roles = Object.keys(roles).join(" ");
-          var _stop = _statementAtCursor.statement.indexOf("TO GROUP");
-          if (_stop == -1) {
-            _stop = _statementAtCursor.statement.indexOf("FROM GROUP");
-          }
-          // Make sure cursor is before "TO GROUP", which naturally follows the ROLES list
-          if (_stop == -1 || _statementAtCursor.relativeIndex <= _stop) {
-            CodeMirror.possibleRole = true;
-            CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-          } else {
-            CodeMirror.possibleRole = false;
-            CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-          }
-        });
-      } else {
-        // GRANT/REVOKE privileges
-        var _stop = _statementAtCursor.statement.indexOf("ON");
-        if (_stop == -1 || _statementAtCursor.relativeIndex <= _stop) {
-          // Choosing privilege
-          CodeMirror.possiblePrivilege = true;
-          CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-        } else {
-          // Choosing object or role
-          _stop = _statementAtCursor.statement.indexOf("TO");
-          if (_stop == -1) {
-            _stop = _statementAtCursor.statement.indexOf("FROM");
-          }
-
-          if (_stop == -1 || _statementAtCursor.relativeIndex <= _stop) {
-            // Choose object
-            CodeMirror.possibleObject = true;
-            CodeMirror.objectMagic = true;
-            hac_getTables(viewModel.database(), function (tables) {
-              CodeMirror.catalogTables = tables;
-              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-            });
-          } else {
-            // Choose role
-            sac_getRoles(function (roles) {
-              CodeMirror.roles = Object.keys(roles).join(" ");
-              CodeMirror.possibleRole = true;
-              CodeMirror.roleMagic = true;
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + viewModel.database()) == null) {
+      CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+      hac_getTables(viewModel.database(), function () {
+      }); // if preload didn't work, tries again
+    }
+    else {
+      hac_getTables(viewModel.database(), function (tables) {
+        CodeMirror.catalogTables = tables;
+        var _statementAtCursor = getStatementAtCursor();
+        var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
+        var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
+        if ($.trim(_before).substr(-1) == ".") {
+          var _statement = _statementAtCursor.statement;
+          var _line = codeMirror.getLine(codeMirror.getCursor().line);
+          var _partial = _line.substring(0, codeMirror.getCursor().ch);
+          var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+          if (_statement.indexOf("FROM") > -1) {
+            hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
+              var _cols = columns.split(" ");
+              for (var col in _cols) {
+                _cols[col] = "." + _cols[col];
+              }
+              CodeMirror.catalogFields = _cols.join(" ");
               CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             });
           }
-
-          CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
         }
-      }
-    } else {
-      // Not a GRANT/REVOKE statement
-      CodeMirror.possibleRole = false;
-      CodeMirror.possiblePrivilege = false;
-
-      if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + viewModel.database()) == null) {
-        CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-        hac_getTables(viewModel.database(), function () {
-        }); // if preload didn't work, tries again
-      } else {
-        hac_getTables(viewModel.database(), function (tables) {
-          CodeMirror.catalogTables = tables;
-          var _statementAtCursor = getStatementAtCursor();
-          var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
-          var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
-          if ($.trim(_before).substr(-1) == ".") {
-            var _statement = _statementAtCursor.statement;
-            var _line = codeMirror.getLine(codeMirror.getCursor().line);
-            var _partial = _line.substring(0, codeMirror.getCursor().ch);
-            var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-            if (_statement.indexOf("FROM") > -1) {
-              hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
-                var _cols = columns.split(" ");
-                for (var col in _cols) {
-                  _cols[col] = "." + _cols[col];
-                }
-                CodeMirror.catalogFields = _cols.join(" ");
-                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-              });
+        else {
+          CodeMirror.possibleTable = false;
+          CodeMirror.tableFieldMagic = false;
+          if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" ORDER BY ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
+              _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
+            CodeMirror.possibleTable = true;
+          }
+          CodeMirror.possibleSoloField = false;
+          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+            if (_after.toUpperCase().indexOf("FROM ") > -1 || $.trim(_before).substr(-1) == "(") {
+              fieldsAutocomplete(cm);
+            }
+            else {
+              CodeMirror.tableFieldMagic = true;
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
           }
           else {
-            CodeMirror.possibleTable = false;
-            CodeMirror.tableFieldMagic = false;
-            if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" ORDER BY ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
-                _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
-              CodeMirror.possibleTable = true;
-            }
-            CodeMirror.possibleSoloField = false;
-            if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-              if (_after.toUpperCase().indexOf("FROM ") > -1 || $.trim(_before).substr(-1) == "(") {
-                fieldsAutocomplete(cm);
-              }
-              else {
-                CodeMirror.tableFieldMagic = true;
-                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-              }
+            if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
+              fieldsAutocomplete(cm);
             }
             else {
-              if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
-                fieldsAutocomplete(cm);
-              }
-              else {
-                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-              }
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
           }
-        });
-      }
+        }
+      });
     }
   }
 

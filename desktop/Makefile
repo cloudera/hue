@@ -49,7 +49,6 @@ APPS := core \
 	libs/libsolr \
 	libs/libsentry \
 	libs/indexer
->>>>>>> [sentry] Add sentry client and API
 
 .PHONY: default
 default:: hue syncdb

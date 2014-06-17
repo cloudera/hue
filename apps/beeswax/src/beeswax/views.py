@@ -405,8 +405,7 @@ def execute_query(request, design_id=None, query_history_id=None):
     'design': design,
     'query': query_history, # Backward
     'query_history': query_history,
-    'hive_autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
-    'sentry_autocomplete_base_url': ('/%s/api/sentry/autocomplete' % get_app_name(request)),
+    'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'can_edit_name': design and design.id and not design.is_auto,
     'can_edit': design and design.id and design.doc.get().can_write(request.user),
     'action': action,
