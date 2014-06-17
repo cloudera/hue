@@ -14,9 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-// Hive
-
 function hac_jsoncalls(options) {
   if (typeof HIVE_AUTOCOMPLETE_BASE_URL != "undefined") {
     if (options.database == null) {
@@ -230,92 +227,5 @@ function hac_errorHandler(data) {
     else {
       $(document).trigger('error', data.error);
     }
-  }
-}
-
-
-// Sentry
-
-function sac_getTotalStorageUserPrefix(){
-  if (typeof SENTRY_AUTOCOMPLETE_USER != "undefined") {
-    return SENTRY_AUTOCOMPLETE_USER + "_";
-  }
-  return "";
-}
-
-function sac_jsoncalls(options) {
-  if (typeof SENTRY_AUTOCOMPLETE_BASE_URL != "undefined") {
-    $.getJSON(SENTRY_AUTOCOMPLETE_BASE_URL + '/roles', options.onDataReceived);
-  }
-  else {
-    try {
-      console.error("You need to specify a SENTRY_AUTOCOMPLETE_BASE_URL to use the autocomplete");
-    }
-    catch (e) {
-    }
-  }
-}
-
-function sac_hasExpired(timestamp){
-  var TIME_TO_LIVE_IN_MILLIS = 600000; // 10 minutes
-  return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
-}
-
-function sac_errorHandler(data) {
-  $(document).trigger('error.autocomplete');
-  if (typeof SENTRY_AUTOCOMPLETE_FAILS_QUIETLY_ON == "undefined" || data.code == null || SENTRY_AUTOCOMPLETE_FAILS_QUIETLY_ON.indexOf(data.code) == -1){
-    if (typeof SENTRY_AUTOCOMPLETE_FAILS_QUIETLY_ON != "undefined" && SENTRY_AUTOCOMPLETE_FAILS_QUIETLY_ON.indexOf(data.code) > -1){
-      $(document).trigger('info', data.error);
-    }
-    else {
-      $(document).trigger('error', data.error);
-    }
-  }
-}
-
-function sac_getRoles(callback) {
-  var key = sac_getTotalStorageUserPrefix() + 'roles';
-  var timestamp_key = sac_getTotalStorageUserPrefix() + 'timestamp_roles';
-
-  if ($.totalStorage(key) != null) {
-    if ($.totalStorage(timestamp_key) == null || sac_hasExpired($.totalStorage(timestamp_key))){
-      sac_jsoncalls({
-        onDataReceived: function (data) {
-          if (typeof SENTRY_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
-            SENTRY_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
-          }
-          if (data.error) {
-            sac_errorHandler(data);
-          }
-          else {
-            if (data.roles) {
-              $.totalStorage(key, JSON.stringify(data.roles));
-              $.totalStorage(timestamp_key, (new Date()).getTime());
-              callback($.parseJSON($.totalStorage(key)));
-            }
-          }
-        }
-      });
-    } else {
-      callback($.parseJSON($.totalStorage(key)));
-    }
-  } else {
-    console.log('here4');
-    sac_jsoncalls({
-      onDataReceived: function (data) {
-        if (typeof SENTRY_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
-          SENTRY_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
-        }
-        if (data.error) {
-          sac_errorHandler(data);
-        } else {
-          if (data.roles) {
-            $.totalStorage(key, JSON.stringify(data.roles));
-            $.totalStorage(timestamp_key, (new Date()).getTime());
-            callback($.parseJSON($.totalStorage(key)));
-          }
-        }
-      }
-    });
   }
 }

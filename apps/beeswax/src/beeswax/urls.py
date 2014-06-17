@@ -74,9 +74,3 @@ urlpatterns += patterns(
 
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
 )
-
-urlpatterns += patterns(
-  'libsentry.views',
-
-  url(r'^api/sentry/autocomplete/roles$', 'roles', name='api_sentry_roles')
-)
