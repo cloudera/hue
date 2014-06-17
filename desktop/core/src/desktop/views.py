@@ -370,7 +370,7 @@ def commonheader(title, section, user, padding="90px"):
     for app in apps:
       if app.display_name not in [
           'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
-          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark'] and app.display_name != 'indexer':
+          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security']:
         other_apps.append(app)
       if section == app.display_name:
         current_app = app

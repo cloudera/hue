@@ -47,7 +47,8 @@ APPS := about \
   sqoop \
   zookeeper \
   rdbms \
-  spark
+  spark \
+  security
 
 ################################################
 # Install all applications into the Desktop environment

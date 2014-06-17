@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
+DJANGO_APPS = [ "security" ]
+NICE_NAME = "Hadoop Security"
+REQUIRES_HADOOP = False
+ICON = "/security/static/art/icon_security_24.png"
+MENU_INDEX = 61
+
+IS_URL_NAMESPACED = True
 
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../gen-py'))
+#PERMISSION_ACTIONS = (
+#  ("access_view:security:edit_user", "Access to profile page on User Admin"),
+#)

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,8 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
+from desktop.lib.django_util import render
+
+from libsentry.api import get_api
+from beeswax.api import autocomplete
 
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../gen-py'))
+def index(request):
+  assist = autocomplete(request, database=None, table=None)
+  hadoop_groups = ['romain', 'sambashare', 'cdrom', 'lpadmin', 'admin', 'adm', 'lp', 'dialout', 'plugdev']
+  roles = get_api(request.user).list_sentry_roles_by_group()
+  
+  return render("index.mako", request, {      
+      'assist': assist,
+      'hadoop_groups': hadoop_groups,
+      'roles': roles
+  })

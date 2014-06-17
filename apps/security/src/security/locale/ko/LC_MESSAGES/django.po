@@ -1,0 +1,658 @@
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"PO-Revision-Date: 2012-07-30 18:47-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/security/forms.py:51 src/security/forms.py:121
+#: src/security/templates/list_users.mako:71
+msgid "Username"
+msgstr "사용자 이름"
+
+#: src/security/forms.py:54
+msgid "Required. 30 characters or fewer. No whitespaces or colons."
+msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
+
+#: src/security/forms.py:55 src/security/forms.py:124
+msgid "Whitespaces and ':' not allowed"
+msgstr "공백과 ':'은 허용되지 않습니다."
+
+#: src/security/forms.py:56
+msgid "Password"
+msgstr "암호"
+
+#: src/security/forms.py:57
+msgid "Password confirmation"
+msgstr "암호 확인"
+
+#: src/security/forms.py:58 src/security/forms.py:130
+msgid "Create home directory"
+msgstr "홈 디렉토리 생성"
+
+#: src/security/forms.py:59
+msgid "Create home directory if one doesn't already exist."
+msgstr "홈 디렉토리가 없으면 생성합니다."
+
+#: src/security/forms.py:79
+msgid "Passwords do not match."
+msgstr "암호가 일치하지 않습니다."
+
+#: src/security/forms.py:85
+msgid "You must specify a password when creating a new user."
+msgstr "새 사용자를 생성할 때 암호를 지정해야 합니다."
+
+#: src/security/forms.py:123
+msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
+msgstr "필수 입력 항목입니다. 사용자 이름에는 30자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
+
+#: src/security/forms.py:125 src/security/forms.py:168
+msgid "Distinguished name"
+msgstr "고유 이름"
+
+#: src/security/forms.py:126
+#: src/security/management/commands/import_ldap_group.py:38
+#: src/security/management/commands/import_ldap_user.py:35
+msgid "Whether or not the user should be imported by distinguished name."
+msgstr "사용자를 고유 이름별로 가져올지 여부입니다."
+
+#: src/security/forms.py:131
+msgid "Create home directory for user if one doesn't already exist."
+msgstr "사용자의 홈 디렉토리가 없으면 생성합니다."
+
+#: src/security/forms.py:147
+#, python-format
+msgid "Too long: 64 characters or fewer and not %s."
+msgstr "너무 깁니다. 64자 이하여야 하며, %s는 허용되지 않습니다."
+
+#: src/security/forms.py:153
+#, python-format
+msgid "Too long: 30 characters or fewer and not %s."
+msgstr "너무 깁니다. 30자 이하여야 하며, %s는 허용되지 않습니다."
+
+#: src/security/forms.py:163
+msgid "Name"
+msgstr "이름"
+
+#: src/security/forms.py:166
+msgid "Required. 80 characters or fewer."
+msgstr "필수 입력 항목입니다. 80자 이하로 입력하십시오."
+
+#: src/security/forms.py:167
+msgid "80 characters or fewer."
+msgstr "80자 이하로 입력하십시오."
+
+#: src/security/forms.py:169
+msgid "Whether or not the group should be imported by distinguished name."
+msgstr "그룹을 고유 이름별로 가져올지 여부입니다."
+
+#: src/security/forms.py:173
+msgid "Import new members"
+msgstr "새 구성원 가져오기"
+
+#: src/security/forms.py:174
+msgid "Import unimported or new users from the group."
+msgstr "그룹에서 새 사용자 또는 가져오지 않은 사용자를 가져옵니다."
+
+#: src/security/forms.py:177
+msgid "Create home directories"
+msgstr "홈 디렉토리 생성"
+
+#: src/security/forms.py:178
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "구성원을 가져올 경우 가져온 모든 구성원의 홈 디렉토리를 생성합니다."
+
+#: src/security/forms.py:181
+msgid "Import new members from all subgroups"
+msgstr "모든 하위 그룹에서 새 구성원을 가져옵니다."
+
+#: src/security/forms.py:182
+msgid "Import unimported or new users from the all subgroups."
+msgstr "모든 하위 그룹에서 새 사용자 또는 가져오지 않은 사용자를 가져옵니다."
+
+#: src/security/forms.py:198
+#, python-format
+msgid "Too long: 80 characters or fewer and not %s"
+msgstr "너무 깁니다. 80자 이하여야 하며, %s은(는) 사용할 수 없습니다."
+
+#: src/security/forms.py:220
+msgid "Group name may only contain letters, numbers, hyphens or underscores."
+msgstr "그룹 이름에는 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
+
+#: src/security/forms.py:235
+msgid "members"
+msgstr "구성원"
+
+#: src/security/forms.py:236
+msgid "permissions"
+msgstr "권한"
+
+#: src/security/forms.py:279
+msgid "groups"
+msgstr "그룹"
+
+#: src/security/forms.py:314
+msgid "Create Home Directories"
+msgstr "홈 디렉토리 생성"
+
+#: src/security/forms.py:315
+msgid "Create home directory for every user, if one doesn't already exist."
+msgstr "이미 있는 경우를 제외하고 모든 사용자의 홈 디렉토리를 생성합니다."
+
+#: src/security/models.py:128
+#, python-format
+msgid "You do not have permissions to %(description)s."
+msgstr "%(description)s에 대한 권한이 없습니다."
+
+#: src/security/views.py:114
+msgid "You must be a superuser to delete users."
+msgstr "사용자를 삭제하려면 superuser여야 합니다."
+
+#: src/security/views.py:117
+msgid "A POST request is required."
+msgstr "POST 요청이 필요합니다."
+
+#: src/security/views.py:124
+msgid "You cannot remove yourself."
+msgstr "자신을 제거할 수는 없습니다."
+
+#: src/security/views.py:131
+msgid "The users were deleted."
+msgstr "사용자가 삭제되었습니다."
+
+#: src/security/views.py:137
+msgid "You must be a superuser to delete groups."
+msgstr "그룹을 삭제하려면 superuser여야 합니다."
+
+#: src/security/views.py:150
+msgid "The default user group may not be deleted."
+msgstr "기본 사용자 그룹을 삭제할 수 없습니다."
+
+#: src/security/views.py:155
+msgid "The group was deleted."
+msgstr "그룹이 삭제되었습니다."
+
+#: src/security/views.py:158
+msgid "Group not found."
+msgstr "그룹을 찾을 수 없습니다."
+
+#: src/security/views.py:173
+msgid "You must be a superuser to add or edit another user."
+msgstr "다른 사용자를 추가하거나 편집하려면 superuser여야 합니다."
+
+#: src/security/views.py:193
+msgid "You cannot change a username."
+msgstr "사용자 이름을 변경할 수 없습니다."
+
+#: src/security/views.py:195
+msgid "You cannot make yourself inactive."
+msgstr "자신을 비활성화할 수는 없습니다."
+
+#: src/security/views.py:207
+msgid "You cannot make yourself a superuser."
+msgstr "자신을 수퍼 사용자로 지정할 수는 없습니다."
+
+#: src/security/views.py:211
+msgid "User information updated"
+msgstr "사용자 정보 업데이트됨"
+
+#: src/security/views.py:220 src/security/views.py:329
+#, python-format
+msgid "Cannot make home directory for user %s."
+msgstr "사용자 %s의 홈 디렉토리를 만들 수 없습니다."
+
+#: src/security/views.py:248
+msgid "You must be a superuser to add or edit a group."
+msgstr "그룹을 추가하거나 편집하려면 superuser여야 합니다."
+
+#: src/security/views.py:259
+msgid "Group information updated"
+msgstr "그룹 정보 업데이트됨"
+
+#: src/security/views.py:282
+msgid "You must be a superuser to change permissions."
+msgstr "권한을 변경하려면 superuser여야 합니다."
+
+#: src/security/views.py:290
+msgid "Permission information updated"
+msgstr "권한 정보 업데이트됨"
+
+#: src/security/views.py:309
+msgid "You must be a superuser to add another user."
+msgstr "다른 사용자를 추가하려면 superuser여야 합니다."
+
+#: src/security/views.py:322 src/security/views.py:368
+#: src/security/views.py:412
+msgid "There was an error when communicating with LDAP"
+msgstr "LDAP와 통신하는 중 오류가 발생했습니다."
+
+#: src/security/views.py:333
+#, python-format
+msgid "Could not get LDAP details for users in pattern %s."
+msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져오지 못했습니다."
+
+#: src/security/views.py:353
+msgid "You must be a superuser to add another group."
+msgstr "다른 그룹을 추가하려면 superuser여야 합니다."
+
+#: src/security/views.py:367
+#, python-format
+msgid "LDAP Exception: %s"
+msgstr "LDAP 예외: %s"
+
+#: src/security/views.py:374
+#, python-format
+msgid "Could not get LDAP details for groups in pattern %s"
+msgstr "패턴이 %s인 그룹의 LDAP 세부 정보를 가져오지 못했습니다."
+
+#: src/security/views.py:391
+msgid "You must be a superuser to sync the LDAP users/groups."
+msgstr "LDAP 사용자/그룹을 동기화하려면 superuser여야 합니다."
+
+#: src/security/views.py:420
+msgid "The import may not be complete, sync again."
+msgstr "가져오기를 완료할 수 없습니다. 다시 동기화하십시오."
+
+#: src/security/views.py:441
+msgid "No active superuser configured."
+msgstr "구성된 활성 superuser가 없습니다."
+
+#: src/security/views.py:443
+msgid "You cannot remove the last active superuser from the configuration."
+msgstr "구성에서 마지막 활성 수퍼 사용자를 제거할 수 없습니다."
+
+#: src/security/views.py:501
+#, python-format
+msgid "Synced user %s from Unix"
+msgstr "Unix에서 사용자 %s이(가) 업데이트됨"
+
+#: src/security/views.py:530
+#, python-format
+msgid "There was a naming conflict while importing user %(username)s"
+msgstr "사용자 %(username)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
+
+#: src/security/views.py:672 src/security/views.py:721
+#, python-format
+msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgstr "패턴이 %(groupname_pattern)s인 그룹 %(groupname)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
+
+#: src/security/management/commands/import_ldap_group.py:42
+msgid "Import users from the group."
+msgstr "그룹에서 사용자를 가져옵니다."
+
+#: src/security/management/commands/import_ldap_group.py:45
+msgid "Import users from the group, but also do so recursively."
+msgstr "그룹에서 사용자를 가져올 뿐만 아니라 반복 적용합니다."
+
+#: src/security/management/commands/import_ldap_group.py:48
+msgid "Sync users in the group."
+msgstr "그룹에 있는 사용자를 동기화합니다."
+
+#: src/security/management/commands/import_ldap_group.py:51
+#: src/security/management/commands/import_ldap_user.py:42
+#: src/security/management/commands/sync_ldap_users_and_groups.py:37
+msgid "Server to connect to."
+msgstr "연결할 서버입니다."
+
+#: src/security/management/commands/import_ldap_group.py:60
+msgid "A group name must be provided."
+msgstr "그룹 이름은 반드시 입력해야 합니다."
+
+#: src/security/management/commands/import_ldap_user.py:39
+msgid "Sync groups of the users."
+msgstr "사용자의 그룹을 동기화합니다."
+
+#: src/security/management/commands/import_ldap_user.py:51
+msgid "A username must be provided."
+msgstr "사용자 이름은 반드시 입력해야 합니다."
+
+#: src/security/management/commands/security_sync_with_unix.py:31
+msgid "Minimum UID to import (Inclusive)."
+msgstr "가져올 최소 UID입니다(포함)."
+
+#: src/security/management/commands/security_sync_with_unix.py:32
+msgid "Maximum UID to import (Exclusive)."
+msgstr "가져올 최대 UID입니다(제외)."
+
+#: src/security/management/commands/security_sync_with_unix.py:33
+msgid "Minimum GID to import (Inclusive)."
+msgstr "가져올 최소 GID입니다(포함)."
+
+#: src/security/management/commands/security_sync_with_unix.py:34
+msgid "Maximum GID to import (Exclusive)."
+msgstr "가져올 최대 GID입니다(제외)."
+
+#: src/security/management/commands/security_sync_with_unix.py:35
+msgid "Whether or not to check that the user's shell is not /bin/false."
+msgstr "사용자의 Shell이 /bin/false가 아닌지를 확인하는 검사 수행 여부입니다."
+
+#: src/security/templates/add_ldap_users.mako:25
+#: src/security/templates/edit_user.mako:23
+#: src/security/templates/list_users.mako:25
+#: src/security/templates/list_users.mako:30
+msgid "Hue Users"
+msgstr "Hue 사용자"
+
+#: src/security/templates/add_ldap_users.mako:31
+msgid "Hue Users - Add/Sync LDAP user"
+msgstr "Hue 사용자 - LDAP 사용자 추가/동기화"
+
+#: src/security/templates/add_ldap_users.mako:47
+#: src/security/templates/edit_user.mako:78
+msgid "Update user"
+msgstr "사용자 업데이트"
+
+#: src/security/templates/add_ldap_users.mako:49
+msgid "Add/Sync user"
+msgstr "사용자 추가/동기화"
+
+#: src/security/templates/add_ldap_users.mako:51
+#: src/security/templates/edit_group.mako:77
+#: src/security/templates/edit_permissions.mako:57
+#: src/security/templates/sync_ldap_users_groups.mako:51
+msgid "Cancel"
+msgstr "취소"
+
+#: src/security/templates/add_ldap_users.mako:60
+#: src/security/templates/edit_group.mako:86
+#: src/security/templates/edit_group.mako:93
+#: src/security/templates/edit_permissions.mako:66
+#: src/security/templates/edit_user.mako:93
+msgid "Select all"
+msgstr "모두 선택"
+
+#: src/security/templates/add_ldap_users.mako:61
+#: src/security/templates/edit_group.mako:87
+#: src/security/templates/edit_group.mako:94
+#: src/security/templates/edit_permissions.mako:67
+#: src/security/templates/edit_user.mako:94
+msgid "Search"
+msgstr "검색"
+
+#: src/security/templates/add_ldap_users.mako:62
+#: src/security/templates/edit_permissions.mako:68
+#: src/security/templates/edit_user.mako:95
+msgid "No groups found."
+msgstr "그룹을 찾을 수 없습니다."
+
+#: src/security/templates/add_ldap_users.mako:62
+#: src/security/templates/edit_user.mako:95
+msgid "Create a new group now"
+msgstr "지금 새 그룹 생성"
+
+#: src/security/templates/confirm.mako:22
+msgid "Confirm"
+msgstr "확인"
+
+#: src/security/templates/confirm.mako:25
+#: src/security/templates/delete_group.mako:26
+#: src/security/templates/list_users.mako:128
+msgid "Yes"
+msgstr "예"
+
+#: src/security/templates/delete_group.mako:22
+msgid "Are you sure you want to delete"
+msgstr "삭제하시겠습니까"
+
+#: src/security/templates/delete_group.mako:22
+msgid "?"
+msgstr "?"
+
+#: src/security/templates/delete_group.mako:25
+#: src/security/templates/list_users.mako:127
+msgid "No"
+msgstr "아니요"
+
+#: src/security/templates/edit_group.mako:26
+#: src/security/templates/list_groups.mako:25
+#: src/security/templates/list_groups.mako:30
+msgid "Hue Groups"
+msgstr "Hue 그룹"
+
+#: src/security/templates/edit_group.mako:48
+#, python-format
+msgid "Hue Groups - Edit group: %(name)s"
+msgstr "Hue 그룹 - 그룹 편집: %(name)s"
+
+#: src/security/templates/edit_group.mako:51
+msgid "Hue Groups - Add/Sync LDAP group"
+msgstr "Hue 그룹 - LDAP 그룹 추가/동기화"
+
+#: src/security/templates/edit_group.mako:53
+msgid "Hue Groups - Create group"
+msgstr "Hue 그룹 - 그룹 생성"
+
+#: src/security/templates/edit_group.mako:69
+msgid "Update group"
+msgstr "그룹 업데이트"
+
+#: src/security/templates/edit_group.mako:72
+msgid "Add/Sync group"
+msgstr "그룹 추가/동기화"
+
+#: src/security/templates/edit_group.mako:74
+#: src/security/templates/list_groups.mako:46
+msgid "Add group"
+msgstr "그룹 추가"
+
+#: src/security/templates/edit_group.mako:88
+msgid "No users found."
+msgstr "사용자를 찾을 수 없습니다."
+
+#: src/security/templates/edit_group.mako:88
+msgid "Create a new user now"
+msgstr "지금 새 사용자 생성"
+
+#: src/security/templates/edit_group.mako:95
+msgid "No permissions found."
+msgstr "권한을 찾을 수 없습니다."
+
+#: src/security/templates/edit_permissions.mako:23
+#: src/security/templates/list_permissions.mako:26
+#: src/security/templates/list_permissions.mako:31
+msgid "Hue Permissions"
+msgstr "Hue 권한"
+
+#: src/security/templates/edit_permissions.mako:44
+#, python-format
+msgid "Hue Permissions - Edit app: %(app)s"
+msgstr "Hue 권한 - 앱 편집: %(app)s"
+
+#: src/security/templates/edit_permissions.mako:56
+msgid "Update permission"
+msgstr "권한 업데이트"
+
+#: src/security/templates/edit_user.mako:29
+#, python-format
+msgid "Hue Users - Edit user: %(username)s"
+msgstr "Hue 사용자 - 사용자 편집: %(username)s"
+
+#: src/security/templates/edit_user.mako:31
+msgid "Hue Users - Create user"
+msgstr "Hue 사용자 - 사용자 생성"
+
+#: src/security/templates/edit_user.mako:38
+msgid "Step 1: Credentials (required)"
+msgstr "1단계: 자격 증명(필수)"
+
+#: src/security/templates/edit_user.mako:39
+msgid "Step 2: Names and Groups"
+msgstr "2단계: 이름 및 그룹"
+
+#: src/security/templates/edit_user.mako:39
+msgid "Step 2: Names"
+msgstr "2단계: 이름"
+
+#: src/security/templates/edit_user.mako:42
+msgid "Step 3: Advanced"
+msgstr "3단계: 고급"
+
+#: src/security/templates/edit_user.mako:74
+msgid "Back"
+msgstr "뒤로"
+
+#: src/security/templates/edit_user.mako:75
+msgid "Next"
+msgstr "다음"
+
+#: src/security/templates/edit_user.mako:80
+#: src/security/templates/list_users.mako:45
+msgid "Add user"
+msgstr "사용자 추가"
+
+#: src/security/templates/edit_user.mako:146
+msgid "This field is required."
+msgstr "이 필드는 필수 항목입니다."
+
+#: src/security/templates/layout.mako:59
+msgid "User Admin"
+msgstr "사용자 관리자"
+
+#: src/security/templates/layout.mako:63
+msgid "Users"
+msgstr "사용자"
+
+#: src/security/templates/layout.mako:64
+#: src/security/templates/list_permissions.mako:44
+#: src/security/templates/list_users.mako:75
+msgid "Groups"
+msgstr "그룹"
+
+#: src/security/templates/layout.mako:65
+#: src/security/templates/list_groups.mako:69
+msgid "Permissions"
+msgstr "권한"
+
+#: src/security/templates/list_groups.mako:35
+msgid "Search for name, members, etc..."
+msgstr "이름, 구성원 등을 검색합니다."
+
+#: src/security/templates/list_groups.mako:39
+#: src/security/templates/list_groups.mako:40
+#: src/security/templates/list_users.mako:39
+#: src/security/templates/list_users.mako:40
+msgid "Delete"
+msgstr "삭제"
+
+#: src/security/templates/list_groups.mako:49
+msgid "Add/Sync LDAP group"
+msgstr "LDAP 그룹 추가/동기화"
+
+#: src/security/templates/list_groups.mako:67
+msgid "Group Name"
+msgstr "그룹 이름"
+
+#: src/security/templates/list_groups.mako:68
+msgid "Members"
+msgstr "구성원"
+
+#: src/security/templates/list_groups.mako:85
+#, python-format
+msgid "Edit %(groupname)s"
+msgstr "%(groupname)s 편집"
+
+#: src/security/templates/list_groups.mako:101
+msgid "There are no groups matching the search criteria."
+msgstr "검색 기준과 일치하는 그룹이 없습니다."
+
+#: src/security/templates/list_groups.mako:129
+#: src/security/templates/list_permissions.mako:91
+#: src/security/templates/list_users.mako:167
+msgid "No data available"
+msgstr "데이터를 이용할 수 없음"
+
+#: src/security/templates/list_groups.mako:130
+#: src/security/templates/list_permissions.mako:92
+#: src/security/templates/list_users.mako:168
+msgid "No matching records"
+msgstr "일치하는 레코드가 없음"
+
+#: src/security/templates/list_permissions.mako:35
+msgid "Search for application, group, etc..."
+msgstr "애플리케이션, 그룹 등을 검색합니다."
+
+#: src/security/templates/list_permissions.mako:42
+msgid "Application"
+msgstr "애플리케이션"
+
+#: src/security/templates/list_permissions.mako:43
+msgid "Permission"
+msgstr "권한"
+
+#: src/security/templates/list_permissions.mako:53
+msgid "Edit permission"
+msgstr "권한 편집"
+
+#: src/security/templates/list_permissions.mako:69
+msgid "There are no permissions matching the search criteria."
+msgstr "검색 기준과 일치하는 권한이 없습니다."
+
+#: src/security/templates/list_users.mako:35
+msgid "Search for name, group, etc..."
+msgstr "이름, 그룹 등을 검색합니다."
+
+#: src/security/templates/list_users.mako:49
+msgid "Add/Sync LDAP user"
+msgstr "LDAP 사용자 추가/동기화"
+
+#: src/security/templates/list_users.mako:52
+msgid "Sync LDAP users/groups"
+msgstr "LDAP 사용자/그룹 동기화"
+
+#: src/security/templates/list_users.mako:72
+msgid "First Name"
+msgstr "이름"
+
+#: src/security/templates/list_users.mako:73
+msgid "Last Name"
+msgstr "성"
+
+#: src/security/templates/list_users.mako:74
+msgid "E-mail"
+msgstr "E-maill"
+
+#: src/security/templates/list_users.mako:76
+msgid "Last Login"
+msgstr "마지막 로그인"
+
+#: src/security/templates/list_users.mako:90
+#, python-format
+msgid "Edit %(username)s"
+msgstr "%(username)s 편집"
+
+#: src/security/templates/list_users.mako:109
+msgid "There are no users matching the search criteria."
+msgstr "검색 기준과 일치하는 사용자가 없습니다."
+
+#: src/security/templates/list_users.mako:124
+msgid "Are you sure you want to delete the selected user(s)?"
+msgstr "선택한 사용자를 삭제하시겠습니까?"
+
+#: src/security/templates/sync_ldap_users_groups.mako:39
+msgid "Sync LDAP users and groups"
+msgstr "LDAP 사용자 및 그룹 동기화"
+
+#: src/security/templates/sync_ldap_users_groups.mako:43
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP에서 가져온 사용자 및 그룹만 동기화할 수 있습니다."
+
+#: src/security/templates/sync_ldap_users_groups.mako:44
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태에 따라 업데이트됩니다."
+
+#: src/security/templates/sync_ldap_users_groups.mako:52
+msgid "Sync"
+msgstr "동기화"
+

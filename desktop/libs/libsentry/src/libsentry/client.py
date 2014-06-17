@@ -16,90 +16,98 @@
 # limitations under the License.
 
 import logging
-import sys
-import os
 
 from desktop.lib import thrift_util
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../gen-py'))
-
-from sentry_policy_service import SentryPolicyService, ttypes
+from sentry_policy_service import SentryPolicyService
+from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
+    TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
+    TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest
 
 
 LOG = logging.getLogger(__name__)
 
-"""
-from libsentry import api
-from django.contrib.auth.models import User
-user = User.objects.all()[0]
-c = api.SentryApi('solaris.abe.cloudera.com', 10001, user)
-response = c.get_roles()
-response = c.get_privileges_for_role('test')
-"""
+# TODO: kerberos
 
+"""
+struct TSentryPrivilege {
+1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE
+2: optional string privilegeName, # Generated on server side
+3: required string serverName,
+4: optional string dbName,
+5: optional string tableName,
+6: optional string URI,
+7: required string action,
+8: optional i64 createTime, # Set on server side
+9: optional string grantorPrincipal # Set on server side
+}
+
+struct TSentryAuthorizable {
+1: required string server,
+2: optional string uri,
+3: optional string db,
+4: optional string table,
+}
+"""
 
 class SentryClient(object):
 
-  def __init__(self, host, port, user):
-    """
-    Client for the sentry service.
+  def __init__(self, host, port, username):
+    self.username = username
 
-    Keyword arguments:
-    host       -- `host` the server is listening on
-    port       -- `port` the server is listening on
-    user       -- Django `user` object
-    """
-    # @TODO(Abe) Kerberos
-    self.user = user
+    self.client = thrift_util.get_client(
+        SentryPolicyService.Client,
+        host,
+        port,
+        service_name="SentryPolicyService",
+        username=self.username,
+        timeout_seconds=30,
+        multiple=True
+    )
+    
+  def create_sentry_role(self, roleName):
+    request = TCreateSentryRoleRequest(requestorUserName=self.username, roleName=roleName)
+    return self.client.create_sentry_role(request)
+  
+  
+  def drop_sentry_role(self, roleName):    
+    request = TDropSentryRoleRequest(requestorUserName=self.username, roleName=roleName, )
+    return self.client.drop_sentry_role(request)  
 
-    self.client = thrift_util.get_client(SentryPolicyService.Client,
-                                         host,
-                                         port,
-                                         service_name="SentryPolicyService",
-                                         username=self.user.username,
-                                         timeout_seconds=30,
-                                         multiple=True)
 
-  def roles(self):
-    """
-    Fetch a mapping of roles to groups.
-    """
-    request = ttypes.TListSentryRolesRequest(requestorUserName=self.user.username, requestorGroupNames=[group.name for group in self.user.groups.all()])
-    response = self.client.list_sentry_roles_by_group(request)
-    if response.status.value == 0:
-      roles = {}
-      for role in response.roles:
-        roles[role.roleName] = {
-          'grantor': role.grantorPrincipal,
-          'groups': [group.groupName for group in role.groups]
-        }
-      return roles
-    else:
-      raise RuntimeError(response.status.message)
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
+    privilege = TSentryPrivilege(**tSentryPrivilege)
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+    return self.client.alter_sentry_role_grant_privilege(request)
+    
+    
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
+    privilege = TSentryPrivilege(**tSentryPrivilege)
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+    return self.client.alter_sentry_role_revoke_privilege(request)
 
-  def privileges_for_role(self, role):
-    """
-    Fetch the privileges for a role.
 
-    Keyword arguments:
-    role     -- The `role` to fetch privileges for.
-    """
-    request = ttypes.TListSentryPrivilegesRequest(requestorUserName=self.user.username, requestorGroupNames=[group.name for group in self.user.groups.all()], roleName=role)
-    response = self.client.list_sentry_privileges_by_role(request)
-    if response.status.value == 0:
-      priviliges = []
-      for privilige in response.privileges:
-        priviliges.append({
-          'scope': privilige.privilegeScope,
-          'name': privilige.privilegeName,
-          'server': privilige.serverName,
-          'database': privilige.dbName,
-          'table': privilige.tableName,
-          'URI': privilige.URI,
-          'action': privilige.action,
-          'timestamp': privilige.createTime,
-          'grantor': privilige.grantorPrincipal
-        })
-      return priviliges
-    else:
-      raise RuntimeError(response.status.message)
+  def alter_sentry_role_add_groups(self, roleName, groups):
+    groups = [TSentryGroup(name) for name in groups]
+    request = TAlterSentryRoleAddGroupsRequest(requestorUserName=self.username, roleName=roleName, groups=groups)
+    return self.client.alter_sentry_role_add_groups(request)
+
+
+  def alter_sentry_role_delete_groups(self, roleName, groups):
+    groups = [TSentryGroup(name) for name in groups]
+    request = TAlterSentryRoleDeleteGroupsRequest(requestorUserName=self.username, roleName=roleName, groups=groups)
+    return self.client.alter_sentry_role_delete_groups(request)
+
+
+  def list_sentry_roles_by_group(self, groupName=None):
+    request = TListSentryRolesRequest(requestorUserName=self.username, groupName=groupName)
+    return self.client.list_sentry_roles_by_group(request)
+
+
+  def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
+    if authorizableHierarchy is not None:
+      authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
+    request = TListSentryPrivilegesRequest(requestorUserName=self.username, roleName=roleName, authorizableHierarchy=authorizableHierarchy)
+    return self.client.list_sentry_privileges_by_role(request)
+
+

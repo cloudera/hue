@@ -15,36 +15,118 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from libsentry.client import SentryClient
+from libsentry.conf import HOSTNAME, PORT
+
 import logging
 
 
 LOG = logging.getLogger(__name__)
 
 
+class SentryException(Exception):
+  def __init__(self, e, message=''):
+    super(SentryException, self).__init__(e)
+    self.message = message
+
+
+def get_api(user):
+  return SentryApi(SentryClient(HOSTNAME.get(), PORT.get(), user.username))
+
+
 class SentryApi(object):
 
   def __init__(self, client):
-    """
-    Parameters
-    ----------
-    client : SentryClient
-      The sentry client
-    """
     self.client = client
 
-  def get_roles_for_table(self, database, table):
-    roles = self.client.get_roles()
 
-    # Fetch privileges and filter out roles that don't have privileges for this table
-    old_roles = roles.copy()
-    for role, properties in old_roles.items():
-      properties['privileges'] = self.client.get_privileges_for_role(role)
+  def create_sentry_role(self, roleName):
+    response = self.client.create_sentry_role(roleName)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)  
 
-      if not filter(lambda privilege: privilege['scope'].lower() == 'table' and privilege['database'] == database and privilege['table'] == table, roles[role]['privileges']):
-        del roles[role]
 
-    return roles
+  def drop_sentry_role(self, roleName):
+    response = self.client.drop_sentry_role(roleName)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response) 
 
-  def get_roles(self, database):
-    roles = self.client.get_roles()
-    return roles
+
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
+    response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)
+    
+
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
+    response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response) 
+    
+    
+  def alter_sentry_role_add_groups(self, roleName, groups):
+    response = self.client.alter_sentry_role_add_groups(roleName, groups)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)
+        
+        
+  def alter_sentry_role_delete_groups(self, roleName, groups):
+    response = self.client.alter_sentry_role_delete_groups(roleName, groups)
+    
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)        
+        
+    
+  def list_sentry_roles_by_group(self, groupName=None):
+    response = self.client.list_sentry_roles_by_group()
+    
+    if response.status.value == 0:
+      roles = {}
+      for role in response.roles:
+        roles[role.roleName] = {
+          'grantorPrincipal': role.grantorPrincipal,
+          'groups': [group.groupName for group in role.groups]
+        }
+      return roles
+    else:
+      raise SentryException(response)  
+
+
+  def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
+    response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
+    
+    if response.status.value == 0:
+      priviliges = []
+      for privilige in response.privileges:
+        priviliges.append({
+          'scope': privilige.privilegeScope,
+          'name': privilige.privilegeName,
+          'server': privilige.serverName,
+          'database': privilige.dbName,
+          'table': privilige.tableName,
+          'URI': privilige.URI,
+          'action': privilige.action,
+          'timestamp': privilige.createTime,
+          'grantor': privilige.grantorPrincipal
+        })
+      return priviliges
+    else:
+      raise SentryException(response)
+    
