@@ -63,7 +63,8 @@ ko.bindingHandlers.pieChart = {
 
         return _chart;
       }, function () {
-        d3.selectAll(".nv-slice").on('click',
+        var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+        _d3.selectAll(".nv-slice").on('click',
           function (d, i) {
             chartsUpdatingState();
             _options.onClick(d);
@@ -74,19 +75,19 @@ ko.bindingHandlers.pieChart = {
 
 ko.bindingHandlers.barChart = {
   init: function (element, valueAccessor) {
-    barChart(element, valueAccessor(), false);
+    barChartBuilder(element, valueAccessor(), false);
   }
 };
 
 ko.bindingHandlers.timelineChart = {
   init: function (element, valueAccessor) {
-    barChart(element, valueAccessor(), true);
+    barChartBuilder(element, valueAccessor(), true);
   }
 };
 
 ko.bindingHandlers.lineChart = {
   init: function (element, valueAccessor) {
-    lineChart(element, valueAccessor());
+    lineChartBuilder(element, valueAccessor());
   }
 };
 
@@ -238,7 +239,7 @@ ko.bindingHandlers.mapChart = {
 
 
 
-function lineChart(element, options) {
+function lineChartBuilder(element, options) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
 
@@ -266,7 +267,8 @@ function lineChart(element, options) {
 
     return _chart;
   }, function () {
-    d3.selectAll(".nv-line").on('click',
+    var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+    _d3.selectAll(".nv-line").on('click',
       function (d, i) {
         chartsUpdatingState();
         options.onClick(d);
@@ -276,7 +278,7 @@ function lineChart(element, options) {
 }
 
 
-function barChart(element, options, isTimeline) {
+function barChartBuilder(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
 
@@ -371,7 +373,8 @@ function barChart(element, options, isTimeline) {
 
     return _chart;
   }, function () {
-    d3.selectAll(".nv-bar").on("click",
+    var _d3 = ($(element).find('svg').length > 0) ? d3.select($(element).find('svg')[0]) : d3.select($(element)[0]).append('svg');
+    _d3.selectAll(".nv-bar").on("click",
       function (d, i) {
         chartsUpdatingState();
         options.onClick(d);
