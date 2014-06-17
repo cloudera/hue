@@ -490,9 +490,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <div id="result-main" style="overflow-x: auto">
           <table id="result-container" data-bind="visible: ! $root.isRetrievingResults()" style="margin-top: 0; width: 100%">
             <thead>
-              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0">
-                <th style="width: 18px">&nbsp;</th>
-                <div data-bind="template: {name: 'result-sorting'}"></div>
+              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
               </tr>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
@@ -545,7 +543,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
         <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
         <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Properties')}</a></li>
+        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Sorting')}</a></li>
       </ul>
     </div>
 
@@ -562,7 +560,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
               <i class="fa fa-plus"></i>
             </button>
 
-            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h2>
+            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h5>
             <select id="visualFunctions" data-bind="value: $root.collection.template.selectedVisualFunction" class="input-large chosen-select">
               <option title="${ _('Formats date or timestamp in DD-MM-YYYY') }" value="{{#date}} {{/date}}">{{#date}}</option>
               <option title="${ _('Formats date or timestamp in HH:mm:ss') }" value="{{#time}} {{/time}}">{{#time}}</option>
@@ -622,15 +620,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <textarea data-bind="codemirror: {data: $root.collection.template.extracode, lineNumbers: true, htmlMode: true, mode: 'text/html' }"></textarea>
       </div>
       <div class="widget-section widget-settings-section" style="display: none">
-
-        <div class="facet-field-cnt">
-          <span class="facet-field-label" style="margin-left: 12px">${ _('Sorting') }</span>
-          <div style="overflow-x: scroll; min-height: 40px">
-            <table>
-              <tr data-bind="template: {name: 'result-sorting'}">
-              </tr>
-            </table>
-          </div>
+        <div style="overflow-x: scroll; min-height: 40px">
+          <table>
+            <tr data-bind="template: {name: 'result-sorting'}">
+            </tr>
+          </table>
         </div>
         <br/>
       </div>
@@ -660,6 +654,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 
 <script type="text/html" id="result-sorting">
+<th style="width: 18px">&nbsp;</th>
 <!-- ko foreach: $root.collection.template.fieldsSelected -->
 <th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
   <div style="display: inline-block; width:20px;">
