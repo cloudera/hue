@@ -151,7 +151,7 @@ def all_mrclusters():
 
 def get_yarn():
   global MR_NAME_CACHE
-  if MR_NAME_CACHE in conf.YARN_CLUSTERS:
+  if MR_NAME_CACHE in conf.YARN_CLUSTERS and conf.YARN_CLUSTERS[MR_NAME_CACHE].SUBMIT_TO.get():
     return conf.YARN_CLUSTERS[MR_NAME_CACHE]
 
   for name in conf.YARN_CLUSTERS.keys():
