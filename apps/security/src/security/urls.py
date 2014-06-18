@@ -19,5 +19,7 @@ from django.conf.urls.defaults import patterns, url
 
 
 urlpatterns = patterns('security.views',
-  url(r'^$', 'index', name='index'),
+  url(r'^$', 'hive', name='index'),
+  url(r'^hive$', 'hive', name='hive'),
+  url(r'^hdfs$', 'hdfs', name='hdfs'),
 )
