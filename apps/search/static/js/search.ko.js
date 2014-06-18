@@ -256,8 +256,8 @@ var Query = function (vm, query) {
     self.qs.remove(query);
   };
 
-  self.selectedMultiq.subscribe(function () { // To keep below the computeds!
-	vm.search();
+  self.selectedMultiq.subscribe(function () { // To keep below the computed objects!
+	  vm.search();
   });
 
   self.toggleFacet = function (data) {
