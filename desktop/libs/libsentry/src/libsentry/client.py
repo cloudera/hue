@@ -22,12 +22,12 @@ from desktop.lib import thrift_util
 from sentry_policy_service import SentryPolicyService
 from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
-    TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest
+    TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
+    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable
 
 
 LOG = logging.getLogger(__name__)
 
-# TODO: kerberos
 
 """
 struct TSentryPrivilege {
@@ -55,7 +55,7 @@ class SentryClient(object):
   def __init__(self, host, port, username):
     self.username = username
 
-    self.client = thrift_util.get_client(
+    self.client = thrift_util.get_client( # TODO: kerberos
         SentryPolicyService.Client,
         host,
         port,
@@ -111,3 +111,21 @@ class SentryClient(object):
     return self.client.list_sentry_privileges_by_role(request)
 
 
+  def list_sentry_privileges_for_provider(self, groups, roleSet=None, authorizableHierarchy=None):
+    """
+    struct TSentryActiveRoleSet {
+      1: required bool all,
+      2: required set<string> roles,
+    }
+    
+    struct TListSentryPrivilegesForProviderResponse {
+      1: required sentry_common_service.TSentryResponseStatus status
+      2: required set<string> privileges
+    }
+    """
+    if roleSet is not None:        
+      roleSet = TSentryActiveRoleSet(**roleSet)
+    if authorizableHierarchy is not None:
+      authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy) 
+    request = TListSentryPrivilegesForProviderRequest(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    return self.client.list_sentry_roles_by_group(request)
