@@ -15,19 +15,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from beeswax.api import autocomplete
 from desktop.lib.django_util import render
+from filebrowser.views import view
 
 from libsentry.api import get_api
-from beeswax.api import autocomplete
 
 
-def index(request):
+def get_hadoop_groups(): # Mock for now, maybe pull from LDAP
+  return ['romain', 'sambashare', 'cdrom', 'lpadmin', 'admin', 'adm', 'lp', 'dialout', 'plugdev']
+
+  
+def hive(request):
   assist = autocomplete(request, database=None, table=None)
-  hadoop_groups = ['romain', 'sambashare', 'cdrom', 'lpadmin', 'admin', 'adm', 'lp', 'dialout', 'plugdev']
+  hadoop_groups = get_hadoop_groups()
   roles = get_api(request.user).list_sentry_roles_by_group()
   
-  return render("index.mako", request, {      
+  return render("hive.mako", request, {      
       'assist': assist,
       'hadoop_groups': hadoop_groups,
       'roles': roles
+  })
+
+
+def hdfs(request):
+  request.ajax = True # Hack for now
+  hadoop_groups = get_hadoop_groups()
+  assist = view(request, '/')    
+  del request.ajax
+  
+  return render("hdfs.mako", request, {      
+      'assist': assist,
+      'hadoop_groups': hadoop_groups,
   })
