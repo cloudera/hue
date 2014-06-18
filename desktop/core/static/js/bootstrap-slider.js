@@ -44,7 +44,7 @@
         '<div id="tooltip_end" class="tooltip"><div class="tooltip-arrow"></div><input type="text" class="tooltip-inner" /></div>' +
         '<div id="tooltip_min" class="tooltip"><div class="tooltip-arrow"></div><input type="text" class="tooltip-inner" /></div>' +
         '<div id="tooltip_max" class="tooltip"><div class="tooltip-arrow"></div><input type="text" class="tooltip-inner" /></div>' +
-        '<div id="tooltip_step" class="tooltip"><div class="tooltip-arrow"></div><input type="text" class="tooltip-inner" /></div>' +
+        '<div id="tooltip_step" class="tooltip"><input type="text" class="tooltip-inner" style="border-width: 2px!important" /></div>' +
         '</div>')
         .insertBefore(this.element)
         .append(this.element);
@@ -371,7 +371,7 @@
       this.value[0] = this.reverseFormatter(this.tooltipInner_start.val());
       this.value[1] = this.reverseFormatter(this.tooltipInner_end.val());
       this.setAdditionalValues();
-      this.setValue(this.value, true);
+      this.setValue(this.value, true, true);
     },
 
     focus: function (idx, ev) {
@@ -659,7 +659,7 @@
       this.step = this.reverseStepFormatter(this.tooltipInner_step.val());
     },
 
-    setValue: function (val, triggerSlideEvent) {
+    setValue: function (val, triggerSlideEvent, triggerSlideStopEvent) {
       if (!val) {
         val = 0;
       }
@@ -704,6 +704,21 @@
         this.element
           .trigger({
             'type': "slide",
+            'value': slideEventValue,
+            'min': this.min,
+            'max': this.max,
+            'start': this.start,
+            'end': this.end,
+            'step': this.step
+          })
+          .data("value", this.value)
+          .prop("value", this.value);
+      }
+      if (triggerSlideStopEvent === true) {
+        var slideEventValue = this.range ? this.value : this.value[0];
+        this.element
+          .trigger({
+            'type': "slideStop",
             'value': slideEventValue,
             'min': this.min,
             'max': this.max,

@@ -335,7 +335,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
     <!-- ko if: type() == 'range' -->
       <!-- ko ifnot: properties.isDate() -->
-        <div class="slider-cnt" data-bind="slider: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
+        <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.gap, min: properties.start, max: properties.end}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.gap, min: properties.min, max: properties.max}"></div>
@@ -1413,7 +1413,7 @@ $(document).ready(function () {
   };
 
   ko.bindingHandlers.slider = {
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    init: function (element, valueAccessor) {
       var _el = $(element);
       var _options = $.extend(valueAccessor(), {});
       _el.slider({
@@ -1433,8 +1433,11 @@ $(document).ready(function () {
         _options.max(e.end);
         _options.gap(e.step);
       });
+      _el.on("slideStop", function (e) {
+        viewModel.search();
+      });
     },
-    update: function (element, valueAccessor, allBindingsAccessor) {
+    update: function (element, valueAccessor) {
       var _options = $.extend(valueAccessor(), {});
     }
   }
