@@ -60,18 +60,18 @@
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
   xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.schema_version | n,unicode }"
   ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>
-  % if coord.timeout or coord.concurrency or coord.execution or coord.throttle:
+  % if coord.timeout is not None or coord.concurrency is not None or coord.execution or coord.throttle is not None:
   <controls>
-    % if coord.timeout:
+    % if coord.timeout is not None:
     <timeout>${ coord.timeout }</timeout>
     % endif
-    % if coord.concurrency:
+    % if coord.concurrency is not None:
     <concurrency>${ coord.concurrency }</concurrency>
     % endif
     % if coord.execution:
     <execution>${ coord.execution }</execution>
     % endif
-    % if coord.throttle:
+    % if coord.throttle is not None:
     <throttle>${ coord.throttle }</throttle>
     % endif
   </controls>
