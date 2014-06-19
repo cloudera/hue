@@ -1417,7 +1417,7 @@ $(document).ready(function () {
       var _el = $(element);
       var _options = $.extend(valueAccessor(), {});
       _el.slider({
-        min: _options.start() ? _options.start() : 1,
+        min: _options.start() ? _options.start() : 0,
         max: _options.end() ? _options.end() : 10,
         step: _options.gap() ? _options.gap() : 1,
         handle: _options.handle ? _options.handle : 'triangle',
