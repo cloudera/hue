@@ -32,7 +32,7 @@ from django.db import models
 
 
 class Nonce(models.Model):
-    server_url = models.CharField(max_length=2047)
+    server_url = models.CharField(max_length=1000)
     timestamp = models.IntegerField()
     salt = models.CharField(max_length=40)
 
@@ -41,7 +41,7 @@ class Nonce(models.Model):
 
 
 class Association(models.Model):
-    server_url = models.TextField(max_length=2047)
+    server_url = models.TextField(max_length=1000)
     handle = models.CharField(max_length=255)
     secret = models.TextField(max_length=255) # Stored base64 encoded
     issued = models.IntegerField()
@@ -55,4 +55,4 @@ class Association(models.Model):
 class UserOpenID(models.Model):
     user = models.ForeignKey(User)
     claimed_id = models.CharField(max_length=255, unique=True)
-    display_id = models.TextField(max_length=2047)
+    display_id = models.TextField(max_length=1000)
