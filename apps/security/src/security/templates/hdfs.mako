@@ -31,47 +31,76 @@ ${ layout.menubar(section='hdfs') }
     <div class="span2">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#properties"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
-          <li><a href="#listDataset"><i class="fa fa-cubes"></i> ${ _('ACLs') }</a></li>
+          <li class="nav-header">${ _('ACLs') }</li>
+          <li class="active"><a href="#edits"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+          <li><a href="#view"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
         </ul>
       </div>
     </div>
     <div class="span10">
-      <div class="card card-small">
-        <h1 class="card-heading simple">${ _('View') }</h1>
-        <div class="card-body">
-          Assist: 
-          ${ assist }        
-        <div>
-        <div class="card-body">     
-          Hadoop Groups: 
-          ${ hadoop_groups }
-        <div>
-        <div class="form-actions" id="bottom-nav">
-          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+      <div id="edit" class="section card card-small">
+        <h1 class="card-heading simple">${ _('Edit ACLs') }</h1>        
+        <div class="card-body">          
+          <div>
+            <input type="text" class="input-xxlarge" value="/tmp"/>
+            <button type="submit" class="btn btn-inverse" style="margin-left:10px">
+              ## open in FB
+              <i class="fa fa-external-link"></i>                
+            </button>
+          </div>
+          <div>
+            <div class="span8">
+              <div data-bind="foreach: viewModel.assist.files">
+                <div data-bind="text: $data"></div>
+              </div>
+            </div>
+            <div class="span4">
+              <span data-bind="text: viewModel.assist.owner"></span>
+              <span data-bind="text: viewModel.assist.group"></span>
+              <div data-bind="foreach: viewModel.assist.acls">
+                ## xeditable for edition
+                <div data-bind="text: $data"></div><i class="fa fa-minus"></i>
+              </div>
+              <i class="fa fa-plus"></i>
+              <div data-bind="visible: viewModel.assist.changed">
+                <button type="button" rel="tooltip" data-placement="bottom" data-bind="click: save, css: {'btn': true}" data-original-title="${ _('Cancel') }" class="btn">
+                  <i class="fa fa-undo"></i>
+                </button>
+                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-bind="click: save, css: {'btn': true}" data-original-title="${ _('Save') }" class="btn">
+                  <i class="fa fa-save"></i>
+                </button>
+              <div>              
+            </div>
+          </div>
         </div>
+      </div>
 
-        </div>
+      <div id="listDataset" class="section card card-small hide">
+        <div class="alert alert-info"><h3>${ _('Existing datasets') }</h3></div>
+      </div>
 
-        <div id="listDataset" class="section hide">
-          <div class="alert alert-info"><h3>${ _('Existing datasets') }</h3></div>
-        </div>
-
-        <div id="listHistory" class="section hide">
-          <div class="alert alert-info"><h3>${ _('History') }</h3></div>          
-        </div>
-
-      </form>
-
-    </div>
+      <div id="listHistory" class="section  card card-small hide">
+        <div class="alert alert-info"><h3>${ _('History') }</h3></div>          
+      </div>
     </div>
 
   </div>
-
 </div>
 
 
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/security/static/js/hdfs.ko.js" type="text/javascript" charset="utf-8"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+  var viewModel;
+  
+  $(document).ready(function () {
+    viewModel = new HdfsViewModel(${ assist | n,unicode });
+    ko.applyBindings(viewModel);
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

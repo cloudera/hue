@@ -23,3 +23,8 @@ urlpatterns = patterns('security.views',
   url(r'^hive$', 'hive', name='hive'),
   url(r'^hdfs$', 'hdfs', name='hdfs'),
 )
+
+
+urlpatterns += patterns('security.api',
+  url(r'^api/get_acls$', 'get_acls', name='get_acls'),
+)
