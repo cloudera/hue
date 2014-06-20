@@ -480,7 +480,7 @@ class WebHdfs(Hdfs):
     params = self._getparams()
     params['op'] = 'MODIFYACLENTRIES'
     params['aclspec'] = aclspec
-    self._invoke_with_redirect('PUT', path, params)
+    return self._root.put(path, params)
 
 
   def remove_acl_entries(self, path, aclspec):
@@ -488,36 +488,36 @@ class WebHdfs(Hdfs):
       params = self._getparams()
       params['op'] = 'REMOVEACLENTRIES'
       params['aclspec'] = aclspec
-      self._invoke_with_redirect('PUT', path, params)
+      return self._root.put(path, params)
 
 
   def remove_default_acl(self, path):
       path = Hdfs.normpath(path)
       params = self._getparams()
       params['op'] = 'REMOVEDEFAULTACL'
-      self._invoke_with_redirect('PUT', path, params)
+      return self._root.put(path, params)
 
 
   def remove_acl(self, path):
       path = Hdfs.normpath(path)
       params = self._getparams()
       params['op'] = 'REMOVEACL'
-      self._invoke_with_redirect('PUT', path, params)
+      return self._root.put(path, params)
 
 
   def set_acl(self, path, aclspec):
       path = Hdfs.normpath(path)
       params = self._getparams()
-      params['op'] = 'REMOVEACL'
+      params['op'] = 'SETACL'
       params['aclspec'] = aclspec
-      self._invoke_with_redirect('PUT', path, params)
+      return self._root.put(path, params)
 
 
   def get_acl_status(self, path):
       path = Hdfs.normpath(path)
       params = self._getparams()
       params['op'] = 'GETACLSTATUS'
-      self._invoke_with_redirect('PUT', path, params)
+      return self._root.get(path, params)
 
 
   def copyfile(self, src, dst, skip_header=False):
