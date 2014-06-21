@@ -42,31 +42,32 @@ ${ layout.menubar(section='hdfs') }
         <h1 class="card-heading simple">${ _('Edit ACLs') }</h1>        
         <div class="card-body">          
           <div>
-            <input type="text" class="input-xxlarge" value="/tmp"/>
-            <button type="submit" class="btn btn-inverse" style="margin-left:10px">
-              ## open in FB
+            <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
+            <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
               <i class="fa fa-external-link"></i>                
-            </button>
+            </a>
           </div>
           <div>
             <div class="span8">
-              <div data-bind="foreach: viewModel.assist.files">
+              <div data-bind="foreach: $root.assist.files">
                 <div data-bind="text: $data"></div>
               </div>
             </div>
             <div class="span4">
-              <span data-bind="text: viewModel.assist.owner"></span>
-              <span data-bind="text: viewModel.assist.group"></span>
-              <div data-bind="foreach: viewModel.assist.acls">
+              <span data-bind="text: $root.assist.owner"></span>
+              <span data-bind="text: $root.assist.group"></span>
+              <div data-bind="foreach: $root.assist.acls">
                 ## xeditable for edition
-                <div data-bind="text: $data"></div><i class="fa fa-minus"></i>
+                <div data-bind="text: ko.mapping.toJSON($data)"></div><i class="fa fa-minus"></i>
               </div>
-              <i class="fa fa-plus"></i>
-              <div data-bind="visible: viewModel.assist.changed">
-                <button type="button" rel="tooltip" data-placement="bottom" data-bind="click: save, css: {'btn': true}" data-original-title="${ _('Cancel') }" class="btn">
+              <a href="javascript: void(0)" data-bind='click: $root.assist.addAcl'>
+                <i class="fa fa-plus"></i>
+              </a>
+              <div data-bind="visible: $root.assist.changed">
+                <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
                   <i class="fa fa-undo"></i>
                 </button>
-                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-bind="click: save, css: {'btn': true}" data-original-title="${ _('Save') }" class="btn">
+                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
                   <i class="fa fa-save"></i>
                 </button>
               <div>              
