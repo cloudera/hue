@@ -14,11 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function parseAcl(acl) {
+  m = acl.match(/(.*?):(.*?):(.)(.)(.)/);
+  return {
+    'type': m[1],
+    'name': m[2],
+     'r': m[3],
+     'w': m[4],
+     'x': m[5],
+  }
+}
+
+function printAcl(acl) {
+  return acl['type'] + ':' + acl['name'] + ':' + acl['r'] + acl['w'] + acl['x'];
+}
 
 var Assist = function (vm, assist) {
   var self = this;
 
-  self.path = ko.observable('/tmp');
+  self.path = ko.observable('');
+  self.path.subscribe(function () {
+	self.fetchPath()
+  });
   self.files = ko.observableArray();
 
   self.acls = ko.observableArray();
@@ -27,6 +44,11 @@ var Assist = function (vm, assist) {
   
   self.changed = ko.observable(true); // mocking to true
   
+  self.addAcl = function() {
+	// should have a good template, also understable for non user, user/group icons button
+	self.acls.push(parseAcl('::---'));
+  };
+    
   self.fetchPath = function () {
     $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) { // Will create a cleaner API by calling directly directly webhdfs#LISTDIR?
       self.files.removeAll();
@@ -47,16 +69,22 @@ var Assist = function (vm, assist) {
         $.each(data.entries, function(index, item) {
     	  self.acls.push(item); 
         });
-        self.acls.push("group::r-x"); // mocking
-        self.acls.push("group:execs:r--"); // mocking
+        self.acls.push(parseAcl("user:joe:r-x")); // mocking
+        self.acls.push(parseAcl("group::r--")); // mocking
+        self.acls.push(parseAcl("group:execs:rw-")); // mocking
         self.owner(data.owner);
         self.group(data.group);
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  };   
+  };
+  
+  self.save = function () {
+	// update acls, add new ones, remove ones?
+  }
 }
 
+// not sure if we should merge Assist here yet
 
 var HdfsViewModel = function (context_json) {
   var self = this;
@@ -64,7 +92,7 @@ var HdfsViewModel = function (context_json) {
   // Models
   self.assist = new Assist(self, context_json.assist);
 
-  self.assist.fetchPath();
+  self.assist.path('/tmp');
 
 
   function logGA(page) {
