@@ -80,7 +80,7 @@ your system:
       * libtidy-0.99-0 (for unit tests only)
       * libxml2-dev
       * libxslt-dev
-      * mvn (from ``maven2`` package or tarball)
+      * mvn (from ``maven`` package or maven3 tarball)
       * openldap-dev / libldap2-dev
       * python-dev
       * python-simplejson
@@ -97,7 +97,7 @@ your system:
       * libtidy (for unit tests only)
       * libxml2-devel
       * libxslt-devel
-      * mvn (from ``maven2`` package or tarball)
+      * mvn (from ``maven`` package or maven3 tarball)
       * mysql
       * mysql-devel
       * openldap-devel
