@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from beeswax.api import autocomplete
 from desktop.lib.django_util import render
 
@@ -27,12 +29,14 @@ def get_hadoop_groups(): # Mock for now, maybe pull from LDAP
   
 def hive(request):
   assist = autocomplete(request, database=None, table=None)
-  roles = get_api(request.user).list_sentry_roles_by_group()
+  
+#    url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
+#  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
+#  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
   
   return render("hive.mako", request, {      
       'assist': assist,
-      'hadoop_groups': get_hadoop_groups(),
-      'roles': roles
+      'initial': json.dumps({'hadoop_groups': get_hadoop_groups()}),
   })
 
 

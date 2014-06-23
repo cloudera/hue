@@ -101,6 +101,7 @@ class SentryApi(object):
       roles = {}
       for role in response.roles:
         roles[role.roleName] = {
+          'name': role.roleName,
           'grantorPrincipal': role.grantorPrincipal,
           'groups': [group.groupName for group in role.groups]
         }

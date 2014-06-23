@@ -32,51 +32,144 @@ ${ layout.menubar(section='hive') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#properties"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
-          <li><a href="#listDataset"><i class="fa fa-group"></i> ${ _('Groups') }</a></li>
-          <li><a href="#listDataset"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
+          <li class="active"><a href="#edit"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+          <li><a href="#view"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
+          <li><a href="#roles"><i class="fa fa-group"></i> ${ _('Roles') }</a></li>
+          <li><a href="#privileges"><i class="fa fa-cubes"></i> ${ _('Privileges') }</a></li>
         </ul>
       </div>
     </div>
+
     <div class="span10">
-      <div class="card card-small">
-        <h1 class="card-heading simple">${ _('View') }</h1>
+
+      <div id="edit" class="mainSection card card-small">
+        <h1 class="card-heading simple">${ _('Edit') }</h1>        
         <div class="card-body">
-          Assist: 
-          ${ assist }        
+          <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
+          <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }">
+            <i class="fa fa-external-link"></i>                
+          </a>
+        </div>
         <div>
-        <div class="card-body">     
-          Hadoop Groups: 
-          ${ hadoop_groups }
-        <div>            
-        <div class="card-body">     
-          Roles: 
-          ${ roles }
-        <div>      
-        <div class="form-actions" id="bottom-nav">
-          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+          <div class="span8">
+            <div data-bind="foreach: $root.assist.files">
+              <div data-bind="text: $data"></div>
+            </div>
+          </div>
+        </div>        
+                      
+        <div class="card-body">               
+          <div data-bind="with: $root.role">
+            Privileges
+            <div>
+              <div data-bind="foreach: priviledges">
+                <select data-bind="options: availablePriviledges, value: privilegeScope"></select>
+                <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
+                <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>                
+                <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
+                <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
+                <select data-bind="options: availableActions, value: action"></select>
+                <i class="fa fa-minus"></i>
+              </div>
+              <a href="javascript: void(0)" data-bind='click: addPriviledge'>
+                <i class="fa fa-plus"></i>
+              </a>
+            </div>
+            Groups
+            <div>
+              <select data-bind="options: $root.availableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
+            </div>
+            Name
+            <div>
+              <input type="text" data-bind="value: $data.name"></input>
+            </div>
+          </div>
+          <div>
+            <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
+              <i class="fa fa-undo"></i>
+            </button>
+            <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
+                data-bind="click: $root.role.edit">
+              <i class="fa fa-save"></i>
+            </button>
+          </div>          
         </div>
+      </div>
 
+      <div id="view" class="mainSection hide card card-small">
+        <div class="card-heading simple"><h3>${ _('View') }</h3></div>
+      </div>
+
+      <div id="roles" class="mainSection hide card card-small">
+        <div class="card-heading simple"><h3>${ _('Roles') }</h3></div>
+           
+        <div data-bind="foreach: $root.roles">
+          <div data-bind="text: ko.mapping.toJSON($data), click: $root.list_sentry_privileges_by_role"></div><i class="fa fa-minus"></i>
         </div>
+      </div>
 
-        <div id="listDataset" class="section hide">
-          <div class="alert alert-info"><h3>${ _('Existing datasets') }</h3></div>
+      <div id="privileges" class="mainSection hide card card-small">
+        <div class="card-heading simple"><h3>${ _('Privileges') }</h3></div>      
+        
+        <div data-bind="foreach: $root.privileges">
+          <div data-bind="text: ko.mapping.toJSON($data)"></div><i class="fa fa-minus"></i>
         </div>
-
-        <div id="listHistory" class="section hide">
-          <div class="alert alert-info"><h3>${ _('History') }</h3></div>          
-        </div>
-
-      </form>
+      </div>
 
     </div>
-    </div>
+  </div>
 
   </div>
 
 </div>
 
 
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+  var viewModel;
+  
+  $(document).ready(function () {
+    viewModel = new HiveViewModel(${ initial | n,unicode });
+    ko.applyBindings(viewModel);
+    
+    viewModel.init();
+  });
+  
+  function showMainSection(mainSection) {
+    if ($("#" + mainSection).is(":hidden")) {
+      $(".mainSection").hide();
+      $("#" + mainSection).show();
+      highlightMainMenu(mainSection);
+    }
+
+    logGA(mainSection);
+  }
+  
+  function highlightMainMenu(mainSection) {
+    $(".nav.nav-list li").removeClass("active");
+    $("a[href='#" + mainSection + "']").parent().addClass("active");
+  }
+  
+  routie({
+    "edit": function () {
+      showMainSection("edit");
+    },  
+    "roles": function () {
+      showMainSection("roles");
+    },
+    "privileges": function () {
+      showMainSection("privileges");
+    },
+    "view": function () {
+      showMainSection("view");
+    }
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

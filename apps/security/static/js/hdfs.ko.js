@@ -62,7 +62,7 @@ var Assist = function (vm, assist) {
   };  
   
   self.getAcls = function () {
-    $.getJSON('/security/api/get_acls', {
+    $.getJSON('/security/api/hdfs/get_acls', {
     	'path': self.path()
       }, function (data) {
         self.acls.removeAll();
