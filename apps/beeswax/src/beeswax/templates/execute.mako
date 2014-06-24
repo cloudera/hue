@@ -163,14 +163,6 @@ ${layout.menubar(section='query')}
                     <input data-bind="checked: design.isParameterized" type="checkbox"/>
                     ${_("Enable parameterization")}
                   </label>
-                  <label class="checkbox
-                  % if app_name == 'impala':
-                    hide
-                  % endif
-                  " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
-                    <input data-bind="checked: design.email" type="checkbox"/>
-                    ${_("Email me on completion")}
-                  </label>
                 </li>
                 % if app_name == 'impala':
                   <li class="nav-header">
