@@ -70,7 +70,25 @@ var Assist = function (vm) {
   var self = this;
 
   self.path = ko.observable('');
+  self.path.subscribe(function () {
+	self.fetchDatabases();
+  });
   self.files = ko.observableArray();
+  
+  self.fetchDatabases = function() {
+    var request = {
+      url: '/beeswax/api/autocomplete', // impala too
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        self.files(data.databases);
+      },
+      cache: false
+    };
+    $.ajax(request).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
 }
 
 
@@ -86,9 +104,9 @@ var HiveViewModel = function (initial) {
   // Edition
   self.role = new Role();
 
-  
   self.init = function() {
     self.list_sentry_roles_by_group();
+    self.assist.fetchDatabases();
   };
 
   self.list_sentry_roles_by_group = function() {
