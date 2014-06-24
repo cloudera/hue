@@ -228,8 +228,9 @@
     # Database engine is typically one of:
     # postgresql_psycopg2, mysql, or sqlite3
     #
-    # Note that for sqlite3, 'name', below is a filename;
-    # for other backends, it is the database name.
+    # Note that for sqlite3, 'name', below is a a path to the filename. For other backends, it is the database name.
+    # Note for Oracle, options={'threaded':true} must be set in order to avoid crashes.
+    # Note for Oracle, you can use the Oracle Service Name by setting "port=0" and then "name=<host>:<port>/<service_name>".
     ## engine=sqlite3
     ## host=
     ## port=

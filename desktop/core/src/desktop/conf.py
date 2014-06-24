@@ -41,6 +41,14 @@ def coerce_database(database):
     return str(database)
 
 
+def coerce_port(port):
+  port = int(port)
+  if port == 0:
+    return ''
+  else:
+    return port
+
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),
@@ -255,8 +263,8 @@ DATABASE = ConfigSection(
     PORT=Config(
       key='port',
       help=_('Database port.'),
-      type=int,
-      default=0,
+      type=coerce_port,
+      default='0',
     ),
     OPTIONS=Config(
       key='options',
