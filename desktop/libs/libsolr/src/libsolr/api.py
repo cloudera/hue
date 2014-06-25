@@ -190,7 +190,7 @@ class SolrApi(object):
 
   def create_collection(self, name, shards=1, replication=1):
     try:
-      params = (
+      params = self._get_params() + (
         ('action', 'CREATE'),
         ('name', name),
         ('numShards', shards),
@@ -210,7 +210,7 @@ class SolrApi(object):
 
   def create_core(self, name, instance_dir, shards=1, replication=1):
     try:
-      params = (
+      params = self._get_params() + (
         ('action', 'CREATE'),
         ('name', name),
         ('instanceDir', instance_dir),
@@ -232,7 +232,7 @@ class SolrApi(object):
 
   def remove_collection(self, name, replication=1):
     try:
-      params = (
+      params = self._get_params() + (
         ('action', 'DELETE'),
         ('name', name),
         ('replicationFactor', replication),
@@ -250,7 +250,7 @@ class SolrApi(object):
 
   def remove_core(self, name):
     try:
-      params = (
+      params = self._get_params() + (
         ('action', 'UNLOAD'),
         ('name', name),
         ('deleteIndex', 'true'),
@@ -268,10 +268,8 @@ class SolrApi(object):
 
   def add_fields(self, collection, fields):
     try:
-      
-      response = self._root.post('%s/schema/fields' % collection, data=json.dumps(fields), contenttype='application/json')
-
-      return response
+      params = self._get_params()
+      return self._root.post('%s/schema/fields' % collection, params=params, data=json.dumps(fields), contenttype='application/json')
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -339,7 +337,7 @@ class SolrApi(object):
 
   def stats(self, core, fields):
     try:
-      params = (
+      params = self._get_params() + (
           ('q', EMPTY_QUERY.get()),
           ('wt', 'json'),
           ('rows', 0),
@@ -353,7 +351,7 @@ class SolrApi(object):
 
   def get(self, core, doc_id):
     try:
-      params = (
+      params = self._get_params() + (
           ('id', doc_id),
           ('wt', 'json'),
       )
