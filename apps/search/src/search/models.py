@@ -502,7 +502,7 @@ def augment_solr_response(response, collection, query):
     doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()
-  if highlighted_fields:
+  if highlighted_fields and not query.get('download'):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
