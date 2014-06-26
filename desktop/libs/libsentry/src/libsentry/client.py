@@ -128,4 +128,4 @@ class SentryClient(object):
     if authorizableHierarchy is not None:
       authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy) 
     request = TListSentryPrivilegesForProviderRequest(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
-    return self.client.list_sentry_roles_by_group(request)
+    return self.client.list_sentry_privileges_for_provider(request)

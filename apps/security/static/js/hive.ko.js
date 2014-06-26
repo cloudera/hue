@@ -128,6 +128,7 @@ var HiveViewModel = function (initial) {
         'roleName': role.name
       },
       success: function (data) {
+    	self.privileges.removeAll();
         $.each(data.sentry_privileges, function(index, item) {
           self.privileges.push(item); 
         });
@@ -137,6 +138,23 @@ var HiveViewModel = function (initial) {
       $(document).trigger("error", xhr.responseText);
     });
   };  
+  
+  self.list_sentry_privileges_for_provider = function(role) {
+    $.ajax({
+      type: "POST",
+      url: "/security/api/hive/list_sentry_privileges_for_provider",
+      data: {    	
+    	groups: ko.mapping.toJSON(['sambashare']),
+    	roleSet: ko.mapping.toJSON({all: true, roles: []}),
+        authorizableHierarchy: ko.mapping.toJSON({'server': 'aa', 'db': 'default'}),
+      },
+      success: function (data) {
+    	alert(ko.mapping.toJSON(data));
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  }; 
 };
 
 function logGA(page) {

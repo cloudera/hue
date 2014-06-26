@@ -123,7 +123,7 @@ class SentryApi(object):
     response = self.client.list_sentry_privileges_for_provider(groups, roleSet, authorizableHierarchy)
     
     if response.status.value == 0:
-      return  [self._massage_priviledges(privilige) for privilige in response.privileges]
+      return list(response.privileges) # e.g. set(['server=+'])
     else:
       raise SentryException(response)
     
