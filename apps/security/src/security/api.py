@@ -45,6 +45,24 @@ def list_sentry_roles_by_group(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def list_sentry_privileges_for_provider(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    groups = json.loads(request.POST['groups'])
+    roleSet = json.loads(request.POST['roleSet'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    result['sentry_privileges'] = sentry_privileges
+    result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
 def list_sentry_privileges_by_role(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -90,6 +108,20 @@ def hive_edit_role(request):
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
+
+def create_sentry_role(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    roleName = request.POST['roleName']
+
+    get_api(request.user).create_sentry_role(roleName)
+    result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
 def create_sentry_role(request):

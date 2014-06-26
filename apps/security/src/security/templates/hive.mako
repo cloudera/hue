@@ -53,7 +53,7 @@ ${ layout.menubar(section='hive') }
         <div>
           <div class="span8">
             <div data-bind="foreach: $root.assist.files">
-              <div data-bind="text: $data"></div>
+              <div data-bind="text: $data, click: $root.list_sentry_privileges_for_provider"></div>
             </div>
           </div>
         </div>        
