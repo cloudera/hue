@@ -570,7 +570,8 @@ class HiveServerClient:
 
   def explain(self, query):
     query_statement = query.get_query_statement(0)
-    return self.execute_query_statement('EXPLAIN %s' % query_statement)
+    configuration = self._get_query_configuration(query)
+    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration)
 
 
   def get_log(self, operation_handle):
