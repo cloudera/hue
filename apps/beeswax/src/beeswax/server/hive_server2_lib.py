@@ -329,7 +329,7 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=username,
-					  password=password,
+					                                password=password,
                                           timeout_seconds=timeout,
                                           use_ssl=ssl_enabled,
                                           ca_certs=beeswax_conf.SSL.CACERTS.get(),
@@ -370,7 +370,7 @@ class HiveServerClient:
 
   def open_session(self, user):
     kwargs = {
-        'username': user.username, # If SASL, it gets the username from the authentication mechanism" since it dependents on it.
+        'username': user.username, # If SASL or LDAP, it gets the username from the authentication mechanism" since it dependents on it.
         'configuration': {},
     }
 
