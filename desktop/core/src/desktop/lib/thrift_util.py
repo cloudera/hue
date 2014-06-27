@@ -74,6 +74,7 @@ class ConnectionConfig(object):
                kerberos_principal="thrift",
                mechanism='GSSAPI',
                username='hue',
+	       password='hue',
                ca_certs=None,
                keyfile=None,
                certfile=None,
@@ -88,7 +89,8 @@ class ConnectionConfig(object):
     @param use_sasl If true, will use KERBEROS or PLAIN over SASL to authenticate
     @param use_ssl If true, will use ca_certs, keyfile, and certfile to create TLS connection
     @param mechanism: GSSAPI or PLAIN if SASL
-    @param username: username if PLAIN SASL only
+    @param username: username if PLAIN SASL or LDAP only
+    @param password: password if PLAIN LDAP only
     @param kerberos_principal The Kerberos service name to connect to.
               NOTE: for a service like fooservice/foo.blah.com@REALM only
               specify "fooservice", NOT the full principal name.
@@ -107,6 +109,7 @@ class ConnectionConfig(object):
     self.use_ssl = use_ssl
     self.mechanism = mechanism
     self.username = username
+    self.password = password
     self.kerberos_principal = kerberos_principal
     self.ca_certs = ca_certs
     self.keyfile = keyfile
@@ -246,7 +249,7 @@ def connect_to_thrift(conf):
       saslc.setAttr("service", str(conf.kerberos_principal))
       if conf.mechanism == 'PLAIN':
         saslc.setAttr("username", str(conf.username))
-        saslc.setAttr("password", 'hue') # Just a non empty string
+	saslc.setAttr("password", str(conf.password)) # defaults to hue for a non-empty string unless using ldap
       saslc.init()
       return saslc
 
