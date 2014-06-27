@@ -18,6 +18,8 @@
 import json
 
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
+
 from libsentry.api import get_api
 
 
@@ -78,19 +80,12 @@ def list_sentry_privileges_by_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def hive_edit_role(request):  
-  result = {'status': -1, 'message': 'Error'}
-
-  try:
-    role = json.loads(request.POST['role'])
-    
+def _hive_add_privileges(role, privileges):  
     api = get_api(request.user)
-    
-    try:
-      api.create_sentry_role(role['name'])
-    except Exception, e:
-      print e
-    for priviledge in role['priviledges']:
+  
+    _priviledges = {}
+  
+    for priviledge in privileges:
       api.alter_sentry_role_grant_privilege(role['name'], {
           'privilegeScope': priviledge['privilegeScope'],
           'serverName': priviledge['serverName'],
@@ -99,7 +94,40 @@ def hive_edit_role(request):
           'URI': priviledge['URI'],
           'action': priviledge['action']
       })
+  
+    
+    return _priviledges
+
+
+def hive_create_role(request):  
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    role = json.loads(request.POST['role'])
+    
+    api = get_api(request.user)
+  
+    api.create_sentry_role(role['name'])
+    result['privileges'] = _hive_add_privileges(role, role['privileges'])
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
+
+    result['role'] = {"name": role['name'], "groups": [], "grantorPrincipal": request.user.username}
+
+    result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def hive_add_privileges(request):  
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    role = json.loads(request.POST['role'])
+
+    result['privileges'] = _hive_add_privileges(role, role['newPrivileges'])
 
     result['message'] = ''
     result['status'] = 0
@@ -146,7 +174,7 @@ def drop_sentry_role(request):
     roleName = request.POST['roleName']
 
     get_api(request.user).drop_sentry_role(roleName)
-    result['message'] = ''
+    result['message'] = _('Role and privileges deleted.')
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")

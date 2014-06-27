@@ -19,11 +19,21 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
+
+
+<script type="text/html" id="privilege-template">
+  <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+  <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
+  <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>                
+  <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
+  <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
+  <i class="fa fa-minus"></i>
+</script>
 
 
 <div class="container-fluid">
@@ -32,10 +42,14 @@ ${ layout.menubar(section='hive') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#edit"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
-          <li><a href="#view"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
-          <li><a href="#roles"><i class="fa fa-group"></i> ${ _('Roles') }</a></li>
-          <li><a href="#privileges"><i class="fa fa-cubes"></i> ${ _('Privileges') }</a></li>
+          <li class="active"><a href="#edit"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
+          <li><a href="#roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
+            </br>
+            <input type="checkbox" checked></input> All
+            </br>
+            <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>            
+          </li>
         </ul>
       </div>
     </div>
@@ -57,63 +71,113 @@ ${ layout.menubar(section='hive') }
             </div>
           </div>
         </div>        
-                      
-        <div class="card-body">               
-          <div data-bind="with: $root.role">
-            Privileges
-            <div>
-              <div data-bind="foreach: priviledges">
-                <select data-bind="options: availablePriviledges, value: privilegeScope"></select>
-                <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
-                <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>                
-                <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
-                <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
-                <select data-bind="options: availableActions, value: action"></select>
-                <i class="fa fa-minus"></i>
+      </div>
+
+      <div id="roles" class="mainSection hide card card-small">      
+        <div class="card-heading simple">
+        <h3>${ _('Roles') }</h3>
+		  <%actionbar:render>
+		    <%def name="search()">
+		      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
+		    </%def>
+		
+		    <%def name="actions()">
+		      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+		        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+		      </div>
+		    </%def>
+		
+		    <%def name="creation()">
+		      <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+		    </%def>
+		  </%actionbar:render>        
+        </div>
+          
+          
+        <div class="card-body">                       
+          <div data-bind="with: $root.role, visible: showCreateRole">            
+            <div class="span3">
+              Name
+              <input type="text" data-bind="value: $data.name"></input>
+            </div>                      
+            <div class="span5">
+              Privileges
+              <div data-bind="template: { name: 'privilege-template', foreach: privileges}">
               </div>
-              <a href="javascript: void(0)" data-bind='click: addPriviledge'>
+              <a href="javascript: void(0)" data-bind="click: addPrivilege">
                 <i class="fa fa-plus"></i>
               </a>
-            </div>
-            Groups
-            <div>
+            </div>            
+            <div class="span4">
+              Groups
               <select data-bind="options: $root.availableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
             </div>
-            Name
-            <div>
-              <input type="text" data-bind="value: $data.name"></input>
-            </div>
-          </div>
-          <div>
             <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
-              <i class="fa fa-undo"></i>
+              <i class="fa fa-times"></i>
             </button>
             <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-                data-bind="click: $root.role.edit">
+                data-bind="click: $root.role.create">
               <i class="fa fa-save"></i>
-            </button>
+            </button>            
           </div>          
+          <div>
+          </div>          
+        </div>           
+          
+        </br></br>
+          
+        <div>
+        <table>
+          <theader>
+            <th width="1%"><div class="hueCheckbox selectAll fa"></div></th>
+            <th width="3%"></th>
+            <th>${ _('Name') }</th>
+            <th>${ _('Groups') }</th>
+            <th>${ _('Grantor Principal') }</th>
+          </theader> 
+          <tbody data-bind="foreach: $root.roles">          
+            <tr>
+              <td>
+                <input type="checkbox" data-bind="click: $root.role.remove"></input>
+              </td>
+              <td>                                              
+                <a href="javascript:void(0);"><i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i></a>
+              </td>
+              <td data-bind="text: name"></td>
+              <td data-bind="text: groups"></td>
+              <td>
+                <a href=""><span data-bind="text: grantorPrincipal"></span></a>
+              </td>
+            </tr>
+            <tr data-bind="foreach: $data.privileges, visible: $data.showPrivileges">
+              <td colspan="2"></td>
+              <td colspan="3">
+                <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0);"><i class="fa fa-minus"></i></a>
+              </td>
+            </tr>
+            <tr data-bind="visible: $data.showPrivileges">
+              <td colspan="2"></td>
+              <td>
+                <div data-bind="template: { name: 'privilege-template', foreach: newPrivileges }">
+                </div>
+                <div data-bind="visible: newPrivileges().length > 0">
+		          <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
+		            <i class="fa fa-times"></i>
+		          </button>
+		          <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
+		              data-bind="click: $root.role.saveNewPrivileges">
+		            <i class="fa fa-save"></i>
+		          </button>
+                </div>
+                <a href="javascript:void(0)" data-bind="click: $root.role.addNewPrivilege">
+                  <i class="fa fa-plus"></i>
+                </a>
+              </td>
+            </tr>
+          </div>        
+        </tbody>
         </div>
-      </div>
-
-      <div id="view" class="mainSection hide card card-small">
-        <div class="card-heading simple"><h3>${ _('View') }</h3></div>
-      </div>
-
-      <div id="roles" class="mainSection hide card card-small">
-        <div class="card-heading simple"><h3>${ _('Roles') }</h3></div>
-           
-        <div data-bind="foreach: $root.roles">
-          <div data-bind="text: ko.mapping.toJSON($data), click: $root.list_sentry_privileges_by_role"></div><i class="fa fa-minus"></i>
-        </div>
-      </div>
-
-      <div id="privileges" class="mainSection hide card card-small">
-        <div class="card-heading simple"><h3>${ _('Privileges') }</h3></div>      
         
-        <div data-bind="foreach: $root.privileges">
-          <div data-bind="text: ko.mapping.toJSON($data)"></div><i class="fa fa-minus"></i>
-        </div>
       </div>
 
     </div>
