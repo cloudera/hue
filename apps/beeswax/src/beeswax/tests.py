@@ -65,7 +65,7 @@ from beeswax.test_base import BeeswaxSampleProvider
 from beeswax.hive_site import get_metastore
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import LDAP_PASSWORD
+from desktop.conf import LDAP_USERNAME, LDAP_PASSWORD
 
 
 LOG = logging.getLogger(__name__)
@@ -2011,11 +2011,14 @@ def test_hiveserver2_get_security():
     assert_equal((True, 'PLAIN', 'hive', False, None, None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # HiveServer2 LDAP passthrough
-    finish = LDAP_PASSWORD.set_for_testing('abcd')
+    finish = []
+    finish.append(LDAP_USERNAME.set_for_testing('hueabcd'))
+    finish.append(LDAP_PASSWORD.set_for_testing('abcd'))
     try:
-      assert_equal((True, 'PLAIN', 'hive', False, 'hue', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
+      assert_equal((True, 'PLAIN', 'hive', False, 'hueabcd', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
     finally:
-      finish()
+      for f in finish:
+        f()
 
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
