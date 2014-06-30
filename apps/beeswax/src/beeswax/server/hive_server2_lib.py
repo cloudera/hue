@@ -21,7 +21,7 @@ import re
 from operator import itemgetter
 
 from desktop.lib import thrift_util
-from desktop.conf import LDAP_PASSWORD
+from desktop.conf import LDAP_PASSWORD, LDAP_USERNAME
 from hadoop import cluster
 
 from TCLIService import TCLIService
@@ -362,7 +362,7 @@ class HiveServerClient:
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
       if LDAP_PASSWORD.get(): # HiveServer2 supports pass-through LDAP authentication.
-        ldap_username = 'hue'
+        ldap_username = LDAP_USERNAME.get()
         ldap_password = LDAP_PASSWORD.get()
 
     return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, ldap_username, ldap_password

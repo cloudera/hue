@@ -89,6 +89,12 @@ LDAP_PASSWORD = Config(
   private=True,
   default=None)
 
+LDAP_USERNAME = Config(
+  key="ldap_username",
+  help=_("LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2."),
+  private=True,
+  default="hue")
+
 ENABLE_SERVER = Config(
   key="enable_server",
   help=_("If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."),
