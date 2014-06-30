@@ -74,8 +74,9 @@ def rm_ha(funct):
     try:
       return funct(api, *args, **kwargs)
     except Exception, ex:
-      if 'Connection refused' in str(ex):
-        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
+      ex_message = str(ex)
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+        LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
         rm_ha = get_next_ha_yarncluster()
         if rm_ha is not None:
           config, api.resource_manager_api = rm_ha
@@ -224,6 +225,9 @@ class YarnApi(JobBrowserApi):
       filters['finalStatus'] = state_filters[kwargs['state']]
 
     json = self.resource_manager_api.apps(**filters)
+    if type(json) == str and 'This is standby RM' in json:
+      raise Exception(json)
+
     if json['apps']:
       jobs = [Application(app) for app in json['apps']['app']]
     else:
