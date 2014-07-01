@@ -40,6 +40,20 @@ class SearchController(object):
     # TODO perms
     return Collection.objects.filter(enabled=True)
 
+  def delete_collections(self, collection_ids):
+    if isinstance(collection_ids, basestring):
+      collection_ids = collection_ids.split();
+
+    for x in collection_ids:
+      id = x.id
+      try:
+        Collection.objects.get(id=x.id).delete()
+      except Exception, e:
+        LOG.warn('Error deleting collection: %s' % e)
+        id = -1
+
+      return id
+
   def delete_collection(self, collection_id):
     id = collection_id
     try:
@@ -49,6 +63,42 @@ class SearchController(object):
       id = -1
 
     return id
+
+  def copy_collections(self, collection_ids):
+    if isinstance(collection_ids, basestring):
+      collection_ids = collection_ids.split();
+      
+    for x in collection_ids:
+      id = -1
+
+      try:
+        copy = Collection.objects.get(id=x)
+        copy.label += _(' (Copy)')
+        copy.id = copy.pk = None
+        copy.save()
+
+        facets = copy.facets
+        facets.id = None
+        facets.save()
+        copy.facets = facets
+
+        result = copy.result
+        result.id = None
+        result.save()
+        copy.result = result
+
+        sorting = copy.sorting
+        sorting.id = None
+        sorting.save()
+        copy.sorting = sorting
+
+        copy.save()
+
+        id = copy.id
+      except Exception, e:
+        LOG.warn('Error copying collection: %s' % e)
+
+      return id
 
   def copy_collection(self, collection_id):
     id = -1
