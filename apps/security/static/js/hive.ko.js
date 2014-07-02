@@ -44,7 +44,6 @@ var Role = function(vm, privilege) {
 	self.name('');
     self.groups.removeAll();
     self.privileges.removeAll();
-    self.newPrivileges.removeAll();
   }
   
   self.addGroup = function() {
@@ -63,6 +62,7 @@ var Role = function(vm, privilege) {
         if (data.status == 0) {
           $(document).trigger("info", data.message);
           data.role['privileges'] = ko.observableArray();
+          data.role['newPrivileges'] = ko.observableArray();
           data.role['showPrivileges'] = ko.observable(false);          
           vm.roles.unshift(data.role);
           self.reset();
@@ -100,15 +100,14 @@ var Role = function(vm, privilege) {
   self.saveNewPrivileges = function(role) {
 	$(".jHueNotify").hide();
     $.post("/security/api/hive/add_privileges", {
-        role: ko.mapping.toJSON(self)
+        role: ko.mapping.toJSON(role)
       }, function (data) {
         if (data.status == 0) {
-          $(document).trigger("info", data.message);
-          data.role['privileges'] = ko.observableArray();
-          data.role['showPrivileges'] = ko.observable(false);          
-          vm.roles.unshift(data.role);
-          self.reset();
-          vm.showCreateRole(false);
+          $.each(data.privileges, function(index, privileges) { // TODO: get back a set<TSentryPrivilege>
+            //role['privileges'] = ko.observableArray();
+            //vm.roles.unshift(data.role); privileges            
+          });
+          // self.reset();
         }
         else {
           $(document).trigger("error", data.message);

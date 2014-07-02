@@ -65,6 +65,10 @@ ${ layout.menubar(section='hive') }
           </a>
         </div>
         <div>
+          <i class="fa fa-eye"></i>
+          <i class="fa fa-eye-slash"></i>
+        </div>
+        <div>
           <div class="span8">
             <div data-bind="foreach: $root.assist.files">
               <div data-bind="text: $data, click: $root.list_sentry_privileges_for_provider"></div>
@@ -129,11 +133,11 @@ ${ layout.menubar(section='hive') }
         <div>
         <table>
           <theader>
-            <th width="1%"><div class="hueCheckbox selectAll fa"></div></th>
-            <th width="3%"></th>
-            <th>${ _('Name') }</th>
-            <th>${ _('Groups') }</th>
-            <th>${ _('Grantor Principal') }</th>
+            <th style="width:1%"><div class="hueCheckbox selectAll fa"></div></th>
+            <th style="width:3%"></th>
+            <th style="width:20%">${ _('Name') }</th>
+            <th style="width:67%">${ _('Groups') }</th>
+            <th style="width:10%">${ _('Grantor Principal') }</th>
           </theader> 
           <tbody data-bind="foreach: $root.roles">          
             <tr>
@@ -144,7 +148,11 @@ ${ layout.menubar(section='hive') }
                 <a href="javascript:void(0);"><i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i></a>
               </td>
               <td data-bind="text: name"></td>
-              <td data-bind="text: groups"></td>
+              <td>
+                <span data-bind="foreach: groups">
+                  <a href="/useradmin/groups"><span data-bind="text: $data"></span></a>
+                </span>
+              </td>
               <td>
                 <a href=""><span data-bind="text: grantorPrincipal"></span></a>
               </td>
@@ -152,6 +160,15 @@ ${ layout.menubar(section='hive') }
             <tr data-bind="foreach: $data.privileges, visible: $data.showPrivileges">
               <td colspan="2"></td>
               <td colspan="3">
+                <span data-bind="text: name"></span>
+                <span data-bind="text: timestamp"></span>    
+                <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
+                <span data-bind="text: action"></span>
+                <span data-bind="text: scope"></span>
+                <span data-bind="text: table"></span>
+                <span data-bind="text: URI"></span>
+                <span data-bind="text: grantor"></span>
+                <span data-bind="text: server"></span>
                 <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0);"><i class="fa fa-minus"></i></a>
               </td>
             </tr>
