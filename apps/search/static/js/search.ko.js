@@ -14,171 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-// Start dashboard lib to move out
-
-var Column = function (size, rows) {
-  var self = this;
-  self.size = ko.observable(size);
-  self.rows = ko.observableArray(rows);
-  self.drops = ko.observableArray(["temp"]);
-  self.klass = ko.computed(function () {
-    return "card card-home card-column span" + self.size();
-  });
-  self.addEmptyRow = function (atBeginning) {
-    return self.addRow(null, atBeginning);
-  };
-  self.addRow = function (row, atBeginning) {
-    if (typeof row == "undefined" || row == null) {
-      row = new Row([]);
-    }
-    if (typeof atBeginning == "undefined" || atBeginning == null) {
-      self.rows.push(row);
-    }
-    else {
-      self.rows.unshift(row);
-    }
-    return row;
-  };
-}
-
-var Row = function (widgets) {
-  var self = this;
-  self.widgets = ko.observableArray(widgets);
-
-  self.addWidget = function (widget) {
-    self.widgets.push(widget);
-  };
-
-  self.move = function (from, to) {
-    try {
-      viewModel.columns()[to].addRow(self);
-      viewModel.columns()[from].rows.remove(self);
-    }
-    catch (exception) {
-    }
-  }
-
-  self.moveDown = function (col, row) {
-    var _i = col.rows().indexOf(row);
-    if (_i < col.rows().length - 1) {
-      var _arr = col.rows();
-      col.rows.splice(_i, 2, _arr[_i + 1], _arr[_i]);
-    }
-  }
-
-  self.moveUp = function (col, row) {
-    var _i = col.rows().indexOf(row);
-    if (_i >= 1) {
-      var _arr = col.rows();
-      col.rows.splice(_i - 1, 2, _arr[_i], _arr[_i - 1]);
-    }
-  }
-
-  self.remove = function (col, row) {
-    $.each(self.widgets(), function(i, widget) {
-      viewModel.removeWidget(widget);
-    });
-    col.rows.remove(row);
-  }
-}
-
-// A widget is generic. It has an id that refer to another object (e.g. facet) with the same id.
-var Widget = function (size, id, name, widgetType, properties, offset, loading) {
-  var self = this;
-  self.size = ko.observable(size).extend({ numeric: 0 });
-
-  self.name = ko.observable(name);
-  self.id = ko.observable(id);
-  self.widgetType = ko.observable(typeof widgetType != "undefined" && widgetType != null ? widgetType : "empty-widget");
-  self.properties = ko.observable(typeof properties != "undefined" && properties != null ? properties : {});
-  self.offset = ko.observable(typeof offset != "undefined" && offset != null ? offset : 0).extend({ numeric: 0 });
-  self.isLoading = ko.observable(typeof loading != "undefined" && loading != null ? loading : false);
-
-
-  self.klass = ko.computed(function () {
-    return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
-  });
-
-  self.expand = function () {
-    self.size(self.size() + 1);
-    $("#wdg_" + self.id()).trigger("resize");
-  }
-
-  self.compress = function () {
-    self.size(self.size() - 1);
-    $("#wdg_" + self.id()).trigger("resize");
-  }
-
-  self.moveLeft = function () {
-    self.offset(self.offset() - 1);
-  }
-
-  self.moveRight = function () {
-    self.offset(self.offset() + 1);
-  }
-
-  self.remove = function (row, widget) {
-    viewModel.removeWidget(widget);
-    row.widgets.remove(widget);
-  }
-};
-
-Widget.prototype.clone = function () {
-  return new Widget(this.size(), UUID(), this.name(), this.widgetType());
-};
-
-function fullLayout() {
-  setLayout([12]);
-}
-
-function oneThirdLeftLayout() {
-  setLayout([2, 10]);
-}
-
 function magicLayout(vm) {
   loadLayout(vm, vm.initial.layout);
   $(document).trigger("magicLayout");
-}
-
-function setLayout(colSizes) {
-  // Save previous widgets
-  var _allRows = [];
-  $(viewModel.columns()).each(function (cnt, col) {
-    var _tRows = [];
-    $(col.rows()).each(function (icnt, row) {
-      if (row.widgets().length > 0) {
-        _tRows.push(row);
-      }
-    });
-    _allRows = _allRows.concat(_tRows);
-  });
-
-  var _cols = [];
-  var _highestCol = {
-    idx: -1,
-    size: -1
-  };
-  $(colSizes).each(function (cnt, size) {
-    _cols.push(new Column(size, []));
-    if (size > _highestCol.size) {
-      _highestCol.idx = cnt;
-      _highestCol.size = size;
-    }
-  });
-  if (_allRows.length > 0 && _highestCol.idx > -1) {
-    _cols[_highestCol.idx].rows(_allRows);
-  }
-
-  $(_cols).each(function (cnt, col) {
-    if (col.rows().length == 0) {
-      col.rows([new Row([])]);
-    }
-  });
-
-  viewModel.columns(_cols);
-
-  $(document).trigger("setLayout");
 }
 
 function loadLayout(viewModel, json_layout) {
@@ -187,9 +25,18 @@ function loadLayout(viewModel, json_layout) {
   $(json_layout).each(function (cnt, json_col) {
     var _rows = [];
     $(json_col.rows).each(function (rcnt, json_row) {
-      var row = new Row();
+      var row = new Row([], viewModel);
       $(json_row.widgets).each(function (wcnt, widget) {
-        row.addWidget(new Widget(widget.size, widget.id, widget.name, widget.widgetType, widget.properties, widget.offset, true));
+        row.addWidget(new Widget({
+          size:widget.size,
+          id: widget.id,
+          name: widget.name,
+          widgetType: widget.widgetType,
+          properties: widget.properties,
+          offset: widget.offset,
+          loading: true,
+          vm: viewModel
+        }));
       });
       _rows.push(row);
     });
@@ -861,16 +708,25 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
   self.isRetrievingResults = ko.observable(false);
 
-  self.draggableHit = ko.observable(new Widget(12, UUID(), "Hit Count", "hit-widget"));
-  self.draggableFacet = ko.observable(new Widget(12, UUID(), "Facet", "facet-widget"));
-  self.draggableResultset = ko.observable(new Widget(12, UUID(), "Grid Results", "resultset-widget"));
-  self.draggableHtmlResultset = ko.observable(new Widget(12, UUID(), "HTML Results", "html-resultset-widget"));
-  self.draggableHistogram = ko.observable(new Widget(12, UUID(), "Histogram", "histogram-widget"));
-  self.draggableBar = ko.observable(new Widget(12, UUID(), "Bar Chart", "bar-widget"));
-  self.draggableMap = ko.observable(new Widget(12, UUID(), "Map", "map-widget"));
-  self.draggableLine = ko.observable(new Widget(12, UUID(), "Line Chart", "line-widget"));
-  self.draggablePie = ko.observable(new Widget(12, UUID(), "Pie Chart", "pie-widget"));
-  self.draggableFilter = ko.observable(new Widget(12, UUID(), "Filter Bar", "filter-widget"));
+  function bareWidgetBuilder(name, type){
+    return new Widget({
+      size: 12,
+      id: UUID(),
+      name: name,
+      widgetType: type
+    });
+  }
+
+  self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget"));
+  self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget"));
+  self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget"));
+  self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget"));
+  self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget"));
+  self.draggableBar = ko.observable(bareWidgetBuilder("Bar Chart", "bar-widget"));
+  self.draggableMap = ko.observable(bareWidgetBuilder("Map", "map-widget"));
+  self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget"));
+  self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
+  self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
