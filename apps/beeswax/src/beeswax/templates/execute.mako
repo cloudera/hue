@@ -46,7 +46,7 @@ ${layout.menubar(section='query')}
           <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
             <li class="nav-header">${_('database')}</li>
           </ul>
-          <select data-bind="options: databases, value: database" class="input-medium chosen-select" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
+          <select data-bind="options: databases, value: database" class="input-medium chosen-select hide" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
           <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div id="navigatorNoTables">${_('The selected database has no tables.')}</div>
           <ul id="navigatorTables" class="unstyled"></ul>
@@ -1077,9 +1077,12 @@ $(document).ready(function () {
   resetNavigator = function () {
     var _db = viewModel.database();
     if (_db != null) {
-      $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
-      $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
-      renderNavigator();
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
+      getDatabases(function(){
+        $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
+        $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
+        renderNavigator();
+      });
     }
   }
 
@@ -1179,29 +1182,15 @@ $(document).ready(function () {
     reinitializeTable();
   });
 
-  renderNavigator();
-
   $("#refreshNavigator").on("click", function () {
     resetNavigator();
   });
 
   resizeNavigator();
 
-  viewModel.databases.subscribe(function () {
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database") != null && $.inArray($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"), viewModel.databases())) {
-      viewModel.database($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"));
-    }
-  });
-
   viewModel.database.subscribe(function (value) {
     $(".chosen-select").trigger("chosen:updated");
     renderNavigator();
-  });
-
-  $(".chosen-select").chosen({
-    disable_search_threshold: 5,
-    width: "100%",
-    no_results_text: "${_('Oops, no database found!')}"
   });
 
   $(document).on("click", ".column-selector", function () {
@@ -2496,15 +2485,42 @@ function cacheQueryTextEvents() {
   });
 }
 
-function databaseCacheWriter() {
-  $(".chosen-select").chosen().change(function () {
-    $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", viewModel.database());
+function getDatabases(callback){
+  $(document).one('fetched.databases', function() {
+    window.setTimeout(function(){
+      $(".chosen-select").chosen({
+        disable_search_threshold: 5,
+        width: "100%",
+        no_results_text: "${_('Oops, no database found!')}"
+      }).change(function () {
+        saveLastUsedDatabase();
+      });
+      $(".chosen-select").trigger("chosen:updated");
+      if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database") != null && $.inArray($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"), viewModel.databases()) > -1) {
+        viewModel.database($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"));
+      }
+      else {
+        $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", null);
+      }
+      renderNavigator();
+    }, 200)
+  });
+  hac_getDatabases(function (dbs) {
+    viewModel.updateDatabases(dbs);
+
+    if (typeof callback != "undefined"){
+      callback(dbs);
+    }
+    $(document).trigger('fetched.databases', [dbs]);
   });
 }
 
+function saveLastUsedDatabase(){
+  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", viewModel.database());
+}
+
 function loadEditor() {
-  $(document).one('fetched.databases', databaseCacheWriter);
-  viewModel.fetchDatabases();
+  getDatabases();
 }
 
 function loadDesign(design_id) {
@@ -2513,7 +2529,7 @@ function loadDesign(design_id) {
     viewModel.fetchDesign();
   });
 
-  $(document).one('fetched.design', databaseCacheWriter);
+  $(document).one('fetched.design', saveLastUsedDatabase);
 
   var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
     viewModel.queryEditorBlank(true);
@@ -2530,7 +2546,7 @@ function loadQueryHistory(query_history_id) {
     viewModel.fetchQueryHistory();
   });
 
-  $(document).one('fetched.query', databaseCacheWriter);
+  $(document).one('fetched.query', saveLastUsedDatabase);
 
   var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
     viewModel.queryEditorBlank(true);

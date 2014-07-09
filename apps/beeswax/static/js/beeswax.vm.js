@@ -360,21 +360,6 @@ function BeeswaxViewModel(server) {
     }
   };
 
-  self.fetchDatabases = function() {
-    var request = {
-      url: '/' + self.server() + '/api/autocomplete',
-      dataType: 'json',
-      type: 'GET',
-      success: function(data) {
-        self.updateDatabases(data.databases);
-        $(document).trigger('fetched.databases', [data]);
-      },
-      error: error_fn,
-      cache: false
-    };
-    $.ajax(request);
-  };
-
   self.fetchDesign = function() {
     $(document).trigger('fetch.design');
 

@@ -38,7 +38,7 @@ function hac_jsoncalls(options) {
 }
 
 function hac_hasExpired(timestamp){
-  var TIME_TO_LIVE_IN_MILLIS = 600000; // 10 minutes
+  var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
   return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
 }
 
@@ -170,6 +170,47 @@ function hac_getTables(databaseName, callback) {
             $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
             $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
             callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName));
+          }
+        }
+      }
+    });
+  }
+}
+
+function hac_getDatabases(callback) {
+  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases') != null) {
+    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases'));
+    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases') == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases'))){
+      hac_jsoncalls({
+        onDataReceived: function (data) {
+          if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+            HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+          }
+          if (data.error) {
+            hac_errorHandler(data);
+          }
+          else {
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', data.databases);
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
+          }
+        }
+      });
+    }
+  }
+  else {
+    hac_jsoncalls({
+      onDataReceived: function (data) {
+        if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+          HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+        }
+        if (data.error) {
+          hac_errorHandler(data);
+        }
+        else {
+          if (data.databases) {
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', data.databases);
+            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
+            callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases'));
           }
         }
       }
