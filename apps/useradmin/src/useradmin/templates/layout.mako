@@ -55,7 +55,7 @@ def is_selected(section, matcher):
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="/useradmin/static/art/icon_useradmin_24.png" />
+                  <img src="/useradmin/static/art/icon_useradmin_48.png" class="app-icon" />
                   ${ _('User Admin') }
                 </a>
               </li>

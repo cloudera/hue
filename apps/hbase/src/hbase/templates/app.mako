@@ -31,7 +31,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <ul class="nav">
           <li class="currentApp">
             <a href="/${app_name}">
-              <img src="/hbase/static/art/icon_24.png" />
+              <img src="/hbase/static/art/icon_hbase_48.png" class="app-icon" />
               ${ _('HBase Browser') }
             </a>
           </li>

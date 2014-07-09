@@ -1659,3 +1659,8 @@ border-bottom-left-radius: 0px;
 .control-group.error .input-prepend .add-on i, .control-group.error .input-append .add-on i {
     color: #fff;
 }
+
+.app-icon {
+  width: 24px;
+  height: 24px;
+}

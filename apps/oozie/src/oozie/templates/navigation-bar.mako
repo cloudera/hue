@@ -30,9 +30,9 @@
               <li class="currentApp">
                 <a href="/${app_name}">
                   % if dashboard:
-                    <img src="/oozie/static/art/icon_oozie_dashboard_24.png" />
+                    <img src="/oozie/static/art/icon_oozie_dashboard_48.png" class="app-icon" />
                   % else:
-                    <img src="/oozie/static/art/icon_oozie_editor_24.png" />
+                    <img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" />
                   % endif
                   ${ _('Oozie Dashboard') if dashboard else _('Oozie Editor') }
                 </a>

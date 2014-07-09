@@ -117,6 +117,17 @@ from django.template.defaultfilters import escape, escapejs
           return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
     %endif
+
+
+##    if (window.devicePixelRatio > 1) {
+##        $('img').each(function(i) {
+##            var lowres = $(this).attr('src');
+##            var highres = lowres.replace(".", "@2x.");
+##            $(this).attr('src', highres).attr("width", "24").attr("height", "24");
+##        });
+##    }
+
+
   });
 
   function resetPrimaryButtonsStatus() {
@@ -147,6 +158,7 @@ from django.template.defaultfilters import escape, escapejs
       }
     }
   });
+
 
     %if collect_usage:
 

@@ -34,7 +34,7 @@ def is_selected(section, matcher):
           <ul class="nav">
             <li class="currentApp">
               <a href="/spark">
-                <img src="/spark/static/art/icon_spark_24.png" />
+                <img src="/spark/static/art/icon_spark_48.png" class="app-icon"/>
                 ${ _('Spark Igniter') }
               </a>
             </li>

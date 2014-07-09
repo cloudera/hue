@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
           <div class="nav-collapse">
             <ul class="nav">
               <li class="currentApp">
-                <a href="/${app_name}"><img src="/static/art/icon_hue_24.png" />
+                <a href="/${app_name}"><img src="/static/art/icon_hue_48.png" class="app-icon" />
                 ${ _('About Hue') }</a>
                </li>
                % if user.is_superuser:

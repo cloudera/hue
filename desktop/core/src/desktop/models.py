@@ -449,10 +449,10 @@ class Document(models.Model):
       elif self.content_type.app_label in apps:
         return apps[self.content_type.app_label].icon_path
       else:
-        return '/static/art/favicon.png'
+        return '/static/art/icon_hue_48.png'
     except Exception, e:
       LOG.warn(force_unicode(e))
-      return '/static/art/favicon.png'
+      return '/static/art/icon_hue_48.png'
 
   def share(self, users, groups, name='read'):
     DocumentPermission.objects.filter(document=self, name=name).update(users=users, groups=groups, add=True)

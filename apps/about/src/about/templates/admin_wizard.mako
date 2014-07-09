@@ -160,7 +160,7 @@ ${ header.menubar() }
                 <div class="card-body">
                   <p>
                     <a href="${ url('useradmin.views.list_users') }" target="_blank" style="padding-left: 2px"><img
-                        src="/useradmin/static/art/icon_useradmin_24.png"
+                        src="/useradmin/static/art/icon_useradmin_48.png" class="app-icon"
                         style="margin-right: 4px;"> ${ _('User Admin') }</a>
                   </p>
                 </div>

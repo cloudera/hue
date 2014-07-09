@@ -26,7 +26,7 @@
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="/metastore/static/art/icon_metastore_24.png" />
+                  <img src="/metastore/static/art/icon_metastore_48.png" class="app-icon" />
                   ${ _('Metastore Manager') }
                 </a>
               </li>

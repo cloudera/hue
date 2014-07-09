@@ -37,7 +37,7 @@ def is_selected(section, matcher):
           <ul class="nav">
             <li class="currentApp">
               <a href="/spark">
-                <img src="/spark/static/art/icon_spark_24.png" />
+                <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
                 ${ _('Spark Igniter') }
               </a>
             </li>
@@ -62,13 +62,13 @@ def is_selected(section, matcher):
               <li class="currentApp">
                 <a href="/${app_name}">
                 % if app_name == 'impala':
-                  <img src="/impala/static/art/icon_impala_24.png" />
+                  <img src="/impala/static/art/icon_impala_48.png" class="app-icon" />
                   Impala
                 % elif app_name == 'rdbms':
-                  <img src="/rdbms/static/art/icon_rdbms_24.png" />
+                  <img src="/rdbms/static/art/icon_rdbms_48.png" class="app-icon" />
                   DB Query
                 % else:
-                  <img src="/beeswax/static/art/icon_beeswax_24.png" />
+                  <img src="/beeswax/static/art/icon_beeswax_48.png" class="app-icon" />
                   Hive Editor
                 % endif
                 </a>
@@ -93,7 +93,7 @@ def is_selected(section, matcher):
             <ul class="nav">
               <li class="currentApp">
                 <a href="/metastore">
-                  <img src="/metastore/static/art/icon_metastore_24.png" />
+                  <img src="/metastore/static/art/icon_metastore_48.png" class="app-icon" />
                   ${ _('Metastore Manager') }
                 </a>
               </li>
