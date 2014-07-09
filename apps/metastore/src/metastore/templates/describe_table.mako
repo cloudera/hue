@@ -156,8 +156,8 @@ ${ components.menubar() }
                   <tbody>
                     % for name, value in table.properties:
                       <tr>
-                        <td>${ name }</td>
-                        <td>${ value }</td>
+                        <td>${ smart_unicode(name) }</td>
+                        <td>${ smart_unicode(value) }</td>
                       </tr>
                      % endfor
                   </tbody>
