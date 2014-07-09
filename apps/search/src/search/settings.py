@@ -17,7 +17,7 @@
 DJANGO_APPS = ["search"]
 NICE_NAME = "Solr Search"
 MENU_INDEX = 42
-ICON = "/search/static/art/icon_search_24.png"
+ICON = "/search/static/art/icon_search_48.png"
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True

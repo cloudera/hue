@@ -29,7 +29,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="/pig/static/art/icon_pig_24.png" />
+                <img src="/pig/static/art/icon_pig_48.png" class="app-icon"/>
                 ${ _('Pig Editor') }
               </a>
             </li>

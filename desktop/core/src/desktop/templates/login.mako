@@ -42,13 +42,21 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
-    background: #FFF url("/static/art/hue-login-logo-ellie.png") 50% 14px no-repeat;
+    background: #FFF url("/static/art/hue-login-logo-ellie.png") 50% 2px no-repeat;
     width: 130px;
     height: 130px;
     -webkit-border-radius: 65px;
     -moz-border-radius: 65px;
     border-radius: 65px;
     border: 1px solid #EEE;
+  }
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    #logo {
+      background: #FFF url("/static/art/hue-login-logo-ellie@2x.png") 50% 2px no-repeat;
+      background-size: 114px 114px;
+
+    }
   }
 
   #logo.waiting {

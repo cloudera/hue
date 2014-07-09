@@ -30,7 +30,7 @@ ${'<%'}def name="menubar(section='')">
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="/${app_name}/static/art/icon_${app_name}_24.png" />
+                <img src="/${app_name}/static/art/icon_${app_name}_48.png" class="app-icon" />
                 ${" ".join(word.capitalize() for word in app_name.split("_"))}
               </a>
              </li>

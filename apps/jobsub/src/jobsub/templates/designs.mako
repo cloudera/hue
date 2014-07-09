@@ -47,7 +47,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="/jobsub/static/art/icon_jobsub_24.png" />
+                <img src="/jobsub/static/art/icon_jobsub_48.png" class="app-icon" />
                 ${ _('Job Designer') }
               </a>
             </li>

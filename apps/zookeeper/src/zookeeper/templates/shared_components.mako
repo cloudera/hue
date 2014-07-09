@@ -77,7 +77,7 @@
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="/zookeeper/static/art/icon_24.png" />
+                  <img src="/zookeeper/static/art/icon_zookeeper_48.png" class="app-icon"/>
                   ${ _('ZooKeeper Browser') }
                 </a>
                </li>

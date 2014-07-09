@@ -17,7 +17,7 @@
 DJANGO_APPS = ['rdbms']
 NICE_NAME = 'RDBMS UI'
 MENU_INDEX = 11
-ICON = '/rdbms/static/art/icon_rdbms_24.png'
+ICON = '/rdbms/static/art/icon_rdbms_48.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True
