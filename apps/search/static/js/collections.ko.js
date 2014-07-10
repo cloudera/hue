@@ -30,6 +30,7 @@ var Collection = function (coll) {
   self.id = ko.observable(coll.id);
   self.name = ko.observable(coll.name);
   self.label = ko.observable(coll.label);
+  self.enabled = ko.observable(coll.enabled);
   self.isCoreOnly = ko.observable(coll.isCoreOnly);
   self.absoluteUrl = ko.observable(coll.absoluteUrl);
   self.selected = ko.observable(false);
@@ -44,7 +45,14 @@ var Collection = function (coll) {
 }
 
 var SearchCollectionsModel = function (props) {
-  var self = this;
+  var cleanCollections,
+    self = this;
+
+  cleanCollections = function () {
+    self.isLoading(true);
+    self.collections.removeAll();
+    self.filteredCollections.removeAll();
+  };
 
   self.LABELS = props.labels;
 
@@ -53,6 +61,7 @@ var SearchCollectionsModel = function (props) {
   self.IMPORT_URL = props.importUrl;
   self.DELETE_URL = props.deleteUrl;
   self.COPY_URL = props.copyUrl;
+  self.INDEXER_URL = props.indexerUrl;
 
   self.isLoading = ko.observable(true);
   self.isLoadingImportables = ko.observable(false);
@@ -63,8 +72,6 @@ var SearchCollectionsModel = function (props) {
 
   self.importableCollections = ko.observableArray([]);
   self.importableCores = ko.observableArray([]);
-
-  self.collectionToDelete = null; // --> replace by self.selectedCollections()
 
   self.selectedCollections = ko.computed(function () {
     return ko.utils.arrayFilter(self.collections(), function (coll) {
@@ -98,10 +105,14 @@ var SearchCollectionsModel = function (props) {
     }));
   };
 
+  self.viewIndex = function (collection) {
+    var idx = [self.INDEXER_URL, collection.label()].join('');
+    cleanCollections();
+    location.href = idx;
+  };
+
   self.editCollection = function (collection) {
-    self.isLoading(true);
-    self.collections.removeAll();
-    self.filteredCollections.removeAll();
+    cleanCollections();
     location.href = collection.absoluteUrl();
   };
 
@@ -111,9 +122,10 @@ var SearchCollectionsModel = function (props) {
   };
 
   self.deleteCollections = function () {
-    self.isLoading = true;
+    self.isLoading(true);
     $(document).trigger("deleting");
-    $.post(self.DELETE_URL, {
+    $.post(self.DELETE_URL,
+      {
         collections: ko.mapping.toJSON(self.selectedCollections())
       },
       function (data) {
@@ -125,8 +137,9 @@ var SearchCollectionsModel = function (props) {
 
   self.copyCollections = function (collections) {
     $(document).trigger("copying");
-    $.post(self.COPY_URL, {
-    	collections: ko.mapping.toJSON(self.selectedCollections())
+    $.post(self.COPY_URL,
+      {
+        collections: ko.mapping.toJSON(self.selectedCollections())
       }, function (data) {
         self.updateCollections();
       }, "json"

@@ -54,32 +54,32 @@ class SearchController(object):
   def copy_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      for collection in Collection.objects.filter(id__in=collection_ids): 
+      for collection in Collection.objects.filter(id__in=collection_ids):
         copy = collection
         copy.label += _(' (Copy)')
         copy.id = copy.pk = None
-  
+
         facets = copy.facets
         facets.id = None
         facets.save()
         copy.facets = facets
-  
+
         result_ = copy.result
         result_.id = None
         result_.save()
         copy.result = result_
-  
+
         sorting = copy.sorting
         sorting.id = None
         sorting.save()
         copy.sorting = sorting
-  
+
         copy.save()
       result['status'] = 0
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)
       result['message'] = unicode(str(e), "utf8")
-      
+
     return result
 
   def is_collection(self, collection_name):
@@ -100,4 +100,3 @@ class SearchController(object):
     except:
       pass
     return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
-
