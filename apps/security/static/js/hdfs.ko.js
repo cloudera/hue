@@ -15,20 +15,20 @@
 // limitations under the License.
 
 function parseAcl(acl) {
+  // ^(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?(,(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?)*$
   m = acl.match(/(.*?):(.*?):(.)(.)(.)/);
   return ko.mapping.fromJS({
     'type': m[1],
     'name': m[2],
-     'r': m[3],
-     'w': m[4],
-     'x': m[5],
-     'changed': false,
+     'r': m[3] != '-',
+     'w': m[4] != '-',
+     'x': m[5] != '-',
+     'status': '',
   });
 }
 
 function printAcl(acl) {
-  // ^(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?(,(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?)*$
-  return acl.type() + ':' + acl.name() + ':' + acl.r() + acl.w() + acl.x();
+  return acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
 
 var Assist = function (vm, assist) {
@@ -50,14 +50,18 @@ var Assist = function (vm, assist) {
   
   self.addAcl = function() {
 	var newAcl = parseAcl('group::---');
-	newAcl.changed(true);
+	newAcl.status('new');
 	self.acls.push(newAcl);
   };
   
   self.removeAcl = function(acl) {
-	self.acls.remove(acl);
-  };  
-    
+	if (acl.status() == 'new') {
+	  self.acls.remove(acl);
+	} else {
+	  acl.status('deleted');
+	}
+  };
+
   self.fetchPath = function () {
     $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) { // Might need to create a cleaner API by calling directly webhdfs#LISTDIR
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
@@ -94,12 +98,24 @@ var Assist = function (vm, assist) {
 	$.each(self.acls(), function (index, acl) {
 	  aclSpec.push(printAcl(acl));
 	});
-	// grep modified + update them: printAcl
+    
+    $.ajax({
+      type: "POST",
+      url: "/security/api/hdfs/remove_acl_entries",
+      data: {
+        'path': self.path(),
+        'aclspec': $.grep(self.acls(), function(acl){ return acl.status() == 'deleted'; }).join()
+      },
+      async: false
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+
     $.getJSON('/security/api/hdfs/modify_acl_entries', {
     	'path': self.path(),
     	'aclspec': aclSpec.join()
       }, function (data) {
-      $(document).trigger("info", 'Done!');
+        $(document).trigger("info", 'Done!');
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     }); 
@@ -111,10 +127,8 @@ var Assist = function (vm, assist) {
 var HdfsViewModel = function (context_json) {
   var self = this;
 
-  // Models
   self.assist = new Assist(self, context_json.assist);
-
-  self.assist.path('/tmp');
+  self.assist.path('/tmp/acl');
 
 
   function logGA(page) {

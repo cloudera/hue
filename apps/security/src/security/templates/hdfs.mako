@@ -58,13 +58,13 @@ ${ layout.menubar(section='hdfs') }
               <span data-bind="text: $root.assist.group"></span>
               <div data-bind="foreach: $root.assist.acls">
                 ## Xeditable for edition?
-                <div>
+                <div data-bind="visible: status() != 'deleted'">
                   <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index()} "/> ${ _('Group') }
                   <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index()}"/> ${ _('User') }
                   <input type="text" data-bind="value: name" class="input-small" placeholder="${ _('name...') }"/>
-                  <input type="checkbox" data-bind="checked: r() != '-'"/>
-                  <input type="checkbox" data-bind="checked: w() != '-'"/>
-                  <input type="checkbox" data-bind="checked: x() != '-'"/>
+                  <input type="checkbox" data-bind="checked: r"/>
+                  <input type="checkbox" data-bind="checked: w"/>
+                  <input type="checkbox" data-bind="checked: x"/>
                   <a href="javascript: void(0)"
                     <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
                   </a>
