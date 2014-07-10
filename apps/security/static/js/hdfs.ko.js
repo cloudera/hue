@@ -16,17 +16,19 @@
 
 function parseAcl(acl) {
   m = acl.match(/(.*?):(.*?):(.)(.)(.)/);
-  return {
+  return ko.mapping.fromJS({
     'type': m[1],
     'name': m[2],
      'r': m[3],
      'w': m[4],
      'x': m[5],
-  }
+     'changed': false,
+  });
 }
 
 function printAcl(acl) {
-  return acl['type'] + ':' + acl['name'] + ':' + acl['r'] + acl['w'] + acl['x'];
+  // ^(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?(,(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?)*$
+  return acl.type() + ':' + acl.name() + ':' + acl.r() + acl.w() + acl.x();
 }
 
 var Assist = function (vm, assist) {
@@ -42,19 +44,28 @@ var Assist = function (vm, assist) {
   self.owner = ko.observable('');
   self.group = ko.observable('');
   
-  self.changed = ko.observable(true); // mocking to true
+  self.changed = ko.computed(function() {
+	return [1]; //$.grep(self.acls(), function(acl){ return acl.changed(); });
+  });
   
   self.addAcl = function() {
-	// should have a good template, also understable for non user, user/group icons button
-	self.acls.push(parseAcl('::---'));
+	var newAcl = parseAcl('group::---');
+	newAcl.changed(true);
+	self.acls.push(newAcl);
   };
+  
+  self.removeAcl = function(acl) {
+	self.acls.remove(acl);
+  };  
     
   self.fetchPath = function () {
-    $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) { // Will create a cleaner API by calling directly directly webhdfs#LISTDIR?
-      self.files.removeAll();
-      $.each(data.files, function(index, item) {
-    	self.files.push(item.path); 
-      });
+    $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) { // Might need to create a cleaner API by calling directly webhdfs#LISTDIR
+      if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
+        self.files.removeAll();
+        $.each(data.files, function(index, item) {
+    	  self.files.push(item.path); 
+        });
+      }
       self.getAcls();
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
@@ -67,24 +78,35 @@ var Assist = function (vm, assist) {
       }, function (data) {
         self.acls.removeAll();
         $.each(data.entries, function(index, item) {
-    	  self.acls.push(item); 
+    	  self.acls.push(parseAcl(item));
         });
-        self.acls.push(parseAcl("user:joe:r-x")); // mocking
-        self.acls.push(parseAcl("group::r--")); // mocking
-        self.acls.push(parseAcl("group:execs:rw-")); // mocking
         self.owner(data.owner);
         self.group(data.group);
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      if (xhr.responseText.search('FileNotFoundException') == -1) { // TODO only fetch on existing path
+        $(document).trigger("error", xhr.responseText);
+      }
     });
   };
   
-  self.save = function () {
-	// update acls, add new ones, remove ones?
+  self.updateAcls = function () {
+	var aclSpec = []
+	$.each(self.acls(), function (index, acl) {
+	  aclSpec.push(printAcl(acl));
+	});
+	// grep modified + update them: printAcl
+    $.getJSON('/security/api/hdfs/modify_acl_entries', {
+    	'path': self.path(),
+    	'aclspec': aclSpec.join()
+      }, function (data) {
+      $(document).trigger("info", 'Done!');
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    }); 
   }
 }
 
-// not sure if we should merge Assist here yet
+// Might rename Assist to Acls and create Assist for the tree widget?
 
 var HdfsViewModel = function (context_json) {
   var self = this;
