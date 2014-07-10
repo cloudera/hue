@@ -23,12 +23,21 @@ from django.utils.translation import ugettext as _
 from libsentry.api import get_api
 
 
+# TODO split by module
+
 # HDFS
 
 def get_acls(request):  
   path = request.GET.get('path')
   acls = request.fs.get_acl_status(path)
   return HttpResponse(json.dumps(acls['AclStatus']), mimetype="application/json")
+
+
+def modify_acl_entries(request):  
+  path = request.GET.get('path')
+  aclspec = request.GET.get('aclspec')
+  info = request.fs.modify_acl_entries(path, aclspec)
+  return HttpResponse(json.dumps(info), mimetype="application/json")
 
 
 # Hive

@@ -57,17 +57,27 @@ ${ layout.menubar(section='hdfs') }
               <span data-bind="text: $root.assist.owner"></span>
               <span data-bind="text: $root.assist.group"></span>
               <div data-bind="foreach: $root.assist.acls">
-                ## xeditable for edition
-                <div data-bind="text: ko.mapping.toJSON($data)"></div><i class="fa fa-minus"></i>
+                ## Xeditable for edition?
+                <div>
+                  <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index()} "/> ${ _('Group') }
+                  <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index()}"/> ${ _('User') }
+                  <input type="text" data-bind="value: name" class="input-small" placeholder="${ _('name...') }"/>
+                  <input type="checkbox" data-bind="checked: r() != '-'"/>
+                  <input type="checkbox" data-bind="checked: w() != '-'"/>
+                  <input type="checkbox" data-bind="checked: x() != '-'"/>
+                  <a href="javascript: void(0)"
+                    <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
+                  </a>
+                </div>
               </div>
-              <a href="javascript: void(0)" data-bind='click: $root.assist.addAcl'>
+              <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl">
                 <i class="fa fa-plus"></i>
               </a>
-              <div data-bind="visible: $root.assist.changed">
+              <div data-bind="visible: $root.assist.changed().length">
                 <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
-                  <i class="fa fa-undo"></i>
+                  <i class="fa fa-times"></i>
                 </button>
-                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
+                <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
                   <i class="fa fa-save"></i>
                 </button>
               <div>              

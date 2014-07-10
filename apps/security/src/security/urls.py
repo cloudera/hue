@@ -27,6 +27,7 @@ urlpatterns = patterns('security.views',
 
 urlpatterns += patterns('security.api',
   url(r'^api/hdfs/get_acls$', 'get_acls', name='get_acls'),
+  url(r'^api/hdfs/modify_acl_entries', 'modify_acl_entries', name='modify_acl_entries'),
 )
 
 urlpatterns += patterns('security.api',
