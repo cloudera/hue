@@ -77,7 +77,7 @@ ${ header.menubar() }
                 <p>
                 <ul>
                   <li>
-                    <a href="#" class="installAllBtn" data-loading-text="${ _('Installing...') }">
+                    <a href="javascript:void(0)" class="installAllBtn" data-loading-text="${ _('Installing...') }">
                       <i class="fa fa-download"></i> ${ _('All') }
                     </a>
                   </li>
@@ -93,7 +93,7 @@ ${ header.menubar() }
           <ul>
           % if 'beeswax' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('beeswax:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['beeswax'].nice_name }
                 </a>
@@ -101,7 +101,7 @@ ${ header.menubar() }
           % endif
           % if 'impala' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('impala:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
                 </a>
@@ -109,7 +109,7 @@ ${ header.menubar() }
           % endif
           % if 'search' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('search:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['search'].nice_name }
                 </a>
@@ -117,7 +117,7 @@ ${ header.menubar() }
           % endif
           % if 'oozie' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['oozie'].nice_name }
                 </a>
@@ -125,7 +125,7 @@ ${ header.menubar() }
           % endif
           % if 'hbase' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('hbase:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['hbase'].nice_name }
                 </a>
@@ -133,7 +133,7 @@ ${ header.menubar() }
           % endif
           % if 'pig' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('pig:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
                 </a>
@@ -141,7 +141,7 @@ ${ header.menubar() }
           % endif
           % if 'jobsub' in app_names:
               <li>
-                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                 </a>
