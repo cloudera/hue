@@ -570,7 +570,7 @@ var Collection = function (vm, collection) {
           self.fields.push(ko.mapping.fromJS(field));
         });
       }
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }); //.fail(function (xhr, textStatus, errorThrown) {});
   };
 
   function diff(A, B) {
@@ -623,7 +623,7 @@ var Collection = function (vm, collection) {
         }
         // After sync the dynamic fields
         self.syncDynamicFields()
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }); //.fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.syncDynamicFields = function () {
@@ -634,7 +634,7 @@ var Collection = function (vm, collection) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);
           syncArray(self.fields, data.fields, true);
         }
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }); //.fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.toggleSortColumnGridLayout = function (template_field) {
@@ -801,10 +801,11 @@ var NewTemplate = function (vm, initial) {
           });
         }
         else {
-          $(document).trigger("error", data.message);
+          //$(document).trigger("error", data.message);
+          self.collections.push(vm.collection.name());
         }
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      //$(document).trigger("error", xhr.responseText);
     }).done(function() {
       self.inited(true);
     });
