@@ -20,7 +20,7 @@ var Importable = function (importable) {
   self.name = ko.observable(importable.name);
   self.selected = ko.observable(false);
   self.handleSelect = function (row, e) {
-    self.selected(!self.selected());
+    self.selected(! self.selected());
   };
 };
 
@@ -36,10 +36,10 @@ var Collection = function (coll) {
   self.hovered = ko.observable(false);
 
   self.handleSelect = function (row, e) {
-    self.selected(!self.selected());
+    self.selected(! self.selected());
   };
   self.toggleHover = function (row, e) {
-    self.hovered(!self.hovered());
+    self.hovered(! self.hovered());
   };
 }
 
@@ -64,7 +64,7 @@ var SearchCollectionsModel = function (props) {
   self.importableCollections = ko.observableArray([]);
   self.importableCores = ko.observableArray([]);
 
-  self.collectionToDelete = null;
+  self.collectionToDelete = null; // --> replace by self.selectedCollections()
 
   self.selectedCollections = ko.computed(function () {
     return ko.utils.arrayFilter(self.collections(), function (coll) {
@@ -105,64 +105,32 @@ var SearchCollectionsModel = function (props) {
     location.href = collection.absoluteUrl();
   };
 
-  self.markForDeletion = function (collection) {
-    self.collectionToDelete = collection;
-    $(document).trigger("confirmDelete");
-  };
-
   self.markManyForDeletion = function (collections) {
     self.collectionToDelete = collections;
-    $(document).trigger("confirmDeleteMany")
-  };
-
-  self.deleteCollection = function () {
-    $(document).trigger("deleting");
-    $.post(self.DELETE_URL,
-      {
-        id: self.collectionToDelete.id()
-      },
-      function (data) {
-        self.updateCollections();
-        $(document).trigger("collectionDeleted");
-      }, "json");
+    $(document).trigger("confirmDelete")
   };
 
   self.deleteCollections = function () {
     self.isLoading = true;
     $(document).trigger("deleting");
-    $.post(self.DELETE_URL,
-    {
-      id: self.selectedCollections()
-    },
-    function (data) {
-      self.updateCollections();
-    }, "json");
-    $(document).trigger("collectionDeleted");
-  };
-
-  self.copyCollection = function (collection) {
-    $(document).trigger("copying");
-    $.post(self.COPY_URL,
-      {
-        id: collection.id(),
-        type: collection.isCoreOnly()?"core":"collection"
+    $.post(self.DELETE_URL, {
+        collections: ko.mapping.toJSON(self.selectedCollections())
       },
       function (data) {
         self.updateCollections();
-        $(document).trigger("collectionCopied");
-      }, "json");
+      }, "json"
+    ).fail(function (xhr, textStatus, errorThrown) {});
+    $(document).trigger("collectionDeleted");
   };
 
   self.copyCollections = function (collections) {
     $(document).trigger("copying");
-    $.post(self.COPY_URL,
-    {
-      id: self.selectedCollections(),
-      //type: coll.isCoreOnly() ? "core" : "collection"
-    },
-    function (data) {
-      self.updateCollections();
-    }, "json");
+    $.post(self.COPY_URL, {
+    	collections: ko.mapping.toJSON(self.selectedCollections())
+      }, function (data) {
+        self.updateCollections();
+      }, "json"
+    ).fail(function (xhr, textStatus, errorThrown) {});
     $(document).trigger("collectionCopied");
   };
 
@@ -217,7 +185,7 @@ var SearchCollectionsModel = function (props) {
   };
 
   self.toggleSelectAll = function() { // duplicated from hue/desktop/libs/indexer/static/js/collections.js
-    var direction = !self.selectedCollections().length;
+    var direction = ! self.selectedCollections().length;
     ko.utils.arrayForEach(self.filteredCollections(), function(collection) {
       collection.selected(direction);
     });
@@ -226,7 +194,7 @@ var SearchCollectionsModel = function (props) {
   self.toggleCollectionSelect = function(collection, e) { // duplicated from hue/desktop/libs/indexer/static/js/collections.js
     ko.utils.arrayForEach(self.collections(), function(other_collection) {
       if(ko.unwrap(other_collection).id() == collection.id()) {
-        other_collection.selected(!other_collection.selected());
+        other_collection.selected(! other_collection.selected());
       }
     });
   };
