@@ -97,9 +97,6 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   </div>
 </div>
 
-<!-- PAUL - REMOVE before committing -->
-<pre data-bind="text: ko.toJSON($root, null, 2)"></pre>
-
 <script id="importableTemplate" type="text/html">
   <tr>
     <td width="24">
@@ -115,33 +112,20 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     <h3>${_('Confirm Delete')}</h3>
   </div>
   <div class="modal-body">
-    <p>${_('Are you sure you want to delete this collection?')}</p>
+    <p>${_('Are you sure you want to delete the selected collections?')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a id="deleteModalBtn" class="btn btn-danger disable-feedback" data-bind="click: deleteCollection">${_('Yes')}</a>
-  </div>
-</div>
-
-<div id="deleteManyModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Delete')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>${_('Are you sure you want to delete this collection?')}</p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a id="deleteModalBtn" class="btn btn-danger disable-feedback" data-bind="click: deleteCollections">${_('Yes')}</a>
+    <a class="btn" data-dismiss="modal">${ _('No') }</a>
+    <a id="deleteModalBtn" class="btn btn-danger disable-feedback" data-bind="click: deleteCollections">${ _('Yes') }</a>
   </div>
 </div>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+
 <script src="/search/static/js/collections.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
-//(function () {
   var appProperties = {
     labels: [],
     listCollectionsUrl: "${ url("search:admin_collections") }?format=json",
@@ -172,7 +156,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       }, 300);
     });
 
-    $("#deleteModal, #deleteManyModal").modal({
+    $("#deleteModal").modal({
       show: false
     });
 
@@ -183,7 +167,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     });
 
     $(document).on("collectionDeleted", function () {
-      $("#deleteModal, #deleteManyModal").modal("hide");
+      $("#deleteModal").modal("hide");
       $("#deleteModalBtn").button("reset");
       $(document).trigger("info", "${ _("Collection deleted successfully.") }");
     });
@@ -195,13 +179,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     $(document).on("confirmDelete", function () {
       $("#deleteModal").modal('show');
     });
-
-    $(document).on("confirmDeleteMany", function () {
-      $("#deleteManyModal").modal('show');
-    });
-
   });
-//}());
 </script>
 
 ${ commonfooter(messages) | n,unicode }

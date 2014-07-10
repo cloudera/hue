@@ -230,10 +230,10 @@ def admin_collection_delete(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
 
-  id = request.POST.get('id')
+  collections = json.loads(request.POST.get('collections'))
   searcher = SearchController(request.user)
   response = {
-    'id': searcher.delete_collection(id)
+    'result': searcher.delete_collections([collection['id'] for collection in collections])
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -244,10 +244,10 @@ def admin_collection_copy(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
 
-  id = request.POST.get('id')
+  collections = json.loads(request.POST.get('collections'))
   searcher = SearchController(request.user)
   response = {
-    'id': searcher.copy_collection(id)
+    'result': searcher.copy_collections([collection['id'] for collection in collections])
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")

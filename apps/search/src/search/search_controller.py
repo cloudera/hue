@@ -41,95 +41,46 @@ class SearchController(object):
     return Collection.objects.filter(enabled=True)
 
   def delete_collections(self, collection_ids):
-    if isinstance(collection_ids, basestring):
-      collection_ids = collection_ids.split();
-
-    for x in collection_ids:
-      id = x.id
-      try:
-        Collection.objects.get(id=x.id).delete()
-      except Exception, e:
-        LOG.warn('Error deleting collection: %s' % e)
-        id = -1
-
-      return id
-
-  def delete_collection(self, collection_id):
-    id = collection_id
+    result = {'status': -1, 'message': ''}
     try:
-      Collection.objects.get(id=collection_id).delete()
+      Collection.objects.filter(id__in=collection_ids).delete()
+      result['status'] = 0
     except Exception, e:
       LOG.warn('Error deleting collection: %s' % e)
-      id = -1
+      result['message'] = unicode(str(e), "utf8")
 
-    return id
+    return result
 
   def copy_collections(self, collection_ids):
-    if isinstance(collection_ids, basestring):
-      collection_ids = collection_ids.split();
-      
-    for x in collection_ids:
-      id = -1
-
-      try:
-        copy = Collection.objects.get(id=x)
+    result = {'status': -1, 'message': ''}
+    try:
+      for collection in Collection.objects.filter(id__in=collection_ids): 
+        copy = collection
         copy.label += _(' (Copy)')
         copy.id = copy.pk = None
-        copy.save()
-
+  
         facets = copy.facets
         facets.id = None
         facets.save()
         copy.facets = facets
-
-        result = copy.result
-        result.id = None
-        result.save()
-        copy.result = result
-
+  
+        result_ = copy.result
+        result_.id = None
+        result_.save()
+        copy.result = result_
+  
         sorting = copy.sorting
         sorting.id = None
         sorting.save()
         copy.sorting = sorting
-
+  
         copy.save()
-
-        id = copy.id
-      except Exception, e:
-        LOG.warn('Error copying collection: %s' % e)
-
-      return id
-
-  def copy_collection(self, collection_id):
-    id = -1
-
-    try:
-      copy = Collection.objects.get(id=collection_id)
-      copy.label += _(' (Copy)')
-      copy.id = copy.pk = None
-      copy.save()
-
-      facets = copy.facets
-      facets.id = None
-      facets.save()
-      copy.facets = facets
-
-      result = copy.result
-      result.id = None
-      result.save()
-      copy.result = result
-
-
-      sorting = copy.sorting
-      sorting.id = None
-      sorting.save()
-      copy.sorting = sorting
-
-      copy.save()
-
-      id = copy.id
+      result['status'] = 0
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)
+      result['message'] = unicode(str(e), "utf8")
+      
+    return result
 
   def is_collection(self, collection_name):
     solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
