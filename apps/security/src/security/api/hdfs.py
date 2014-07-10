@@ -32,3 +32,11 @@ def modify_acl_entries(request):
   aclspec = request.GET.get('aclspec')
   info = request.fs.modify_acl_entries(path, aclspec)
   return HttpResponse(json.dumps(info), mimetype="application/json")
+
+
+def remove_acl_entries(request):  
+  path = request.GET.get('path')
+  aclspec = request.GET.get('aclspec')
+  info = request.fs.remove_acl_entries(path, aclspec)
+  return HttpResponse(json.dumps(info), mimetype="application/json")
+
