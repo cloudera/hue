@@ -35,7 +35,6 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   <h4><a href="">${_('Dashboards')}</a></h4>
 </div>
 
-
 <div class="container-fluid">
   <div class="card">
     <%actionbar:render>
@@ -43,7 +42,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
         &nbsp;
         &nbsp;
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>
+        <span>
+          <a class="btn" data-bind="click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a> &nbsp;&nbsp;
+          <a class="btn" data-bind="click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
+        </span>
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn pull-right" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>
       </%def>
 
       <%def name="creation()">
@@ -61,7 +64,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </h1>
       </div>
     </div>
-    
+
     <div class="row-fluid" data-bind="visible: isLoading()">
       <div class="span10 offset1 center">
         <i class="fa fa-spinner fa-spin spinner"></i>
@@ -75,21 +78,19 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             <th>
               <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
             </th>
-            <th width="100%">
-              <span class="coll-heading">${_('Name')}</span>
-              <span class="pull-right collection-actions">
-                <a data-bind="click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a> &nbsp;&nbsp;
-                <a data-bind="click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
-              </span>
-            </th>
+            <th>${ _('Name') }</th>
+            <th>${ _('Solr Index') }</th>
+            <th class="center">${ _('Shared') }</th>
           </tr>
         </thead>
         <tbody data-bind="foreach: filteredCollections">
-          <tr class="pointer">
+          <tr>
             <td data-bind="click: $root.toggleCollectionSelect.bind($root), clickBubble: false">
               <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
             </td>
-            <td data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }"></td>
+            <td><a data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
+            <td data-bind="text: name"></td>
+            <td class="center"><span data-bind="css: { 'fa fa-check': enabled }"></span></td>
           </tr>
         </tbody>
       </table>
@@ -122,7 +123,6 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-
 <script src="/search/static/js/collections.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
@@ -130,10 +130,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     labels: [],
     listCollectionsUrl: "${ url("search:admin_collections") }?format=json",
     deleteUrl: "${ url("search:admin_collection_delete") }",
-    copyUrl: "${ url("search:admin_collection_copy") }"
+    copyUrl: "${ url("search:admin_collection_copy") }",
+    indexerUrl: "/indexer/#edit/"
   }
 
   var viewModel = new SearchCollectionsModel(appProperties);
+
   ko.applyBindings(viewModel);
 
   $(document).ready(function () {

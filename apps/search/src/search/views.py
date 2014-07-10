@@ -213,6 +213,7 @@ def admin_collections(request, is_redirect=False):
         'id': collection.id,
         'name': collection.name,
         'label': collection.label,
+        'enabled': collection.enabled,
         'isCoreOnly': collection.is_core_only,
         'absoluteUrl': collection.get_absolute_url()
       }
