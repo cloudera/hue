@@ -27,7 +27,7 @@ var Privilege = function (vm, privilege) {
   self.tableName = ko.observable(typeof privilege.tableName != "undefined" && privilege.tableName != null ? privilege.tableName : "");
   self.URI = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null ? privilege.URI : "");
   self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : "");
-  
+
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
 }
@@ -45,15 +45,15 @@ var Role = function(vm, privilege) {
     self.groups.removeAll();
     self.privileges.removeAll();
   }
-  
+
   self.addGroup = function() {
     self.groups.push('');
   }
-  
+
   self.addPrivilege = function() {
 	self.privileges.push(new Privilege(vm, {}));
   }
-  
+
   self.create = function() {
 	$(".jHueNotify").hide();
     $.post("/security/api/hive/create_role", {
@@ -63,7 +63,7 @@ var Role = function(vm, privilege) {
           $(document).trigger("info", data.message);
           data.role['privileges'] = ko.observableArray();
           data.role['newPrivileges'] = ko.observableArray();
-          data.role['showPrivileges'] = ko.observable(false);          
+          data.role['showPrivileges'] = ko.observable(false);
           vm.roles.unshift(data.role);
           self.reset();
           vm.showCreateRole(false);
@@ -92,11 +92,11 @@ var Role = function(vm, privilege) {
       $(document).trigger("error", xhr.responseText);
     });
   }
-  
+
   self.addNewPrivilege = function(role) {
     role['newPrivileges'].push(new Privilege(self, {}));
   }
-  
+
   self.saveNewPrivileges = function(role) {
 	$(".jHueNotify").hide();
     $.post("/security/api/hive/add_privileges", {
@@ -105,7 +105,7 @@ var Role = function(vm, privilege) {
         if (data.status == 0) {
           $.each(data.privileges, function(index, privileges) { // TODO: get back a set<TSentryPrivilege>
             //role['privileges'] = ko.observableArray();
-            //vm.roles.unshift(data.role); privileges            
+            //vm.roles.unshift(data.role); privileges
           });
           // self.reset();
         }
@@ -115,7 +115,7 @@ var Role = function(vm, privilege) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  }  
+  }
 }
 
 
@@ -127,7 +127,7 @@ var Assist = function (vm) {
 	self.fetchDatabases();
   });
   self.files = ko.observableArray();
-  
+
   self.fetchDatabases = function() {
     var request = {
       url: '/beeswax/api/autocomplete', // impala too
@@ -153,12 +153,12 @@ var HiveViewModel = function (initial) {
   self.privileges = ko.observableArray();
   self.availableHadoopGroups = ko.mapping.fromJS(initial.hadoop_groups);
   self.assist = new Assist(self);
-  
+
   // Edition
   self.showCreateRole = ko.observable(false);
   self.role = new Role(self);
   self.privilege = new Privilege(self, {});
-  
+
 
   self.init = function() {
     self.list_sentry_roles_by_group();
@@ -169,10 +169,10 @@ var HiveViewModel = function (initial) {
     $.each(self.roles(), function (index, role) {
       if (role.name == roleName) {
         self.roles.remove(role);
-        return false;  
+        return false;
       }
     });
-  }; 
+  };
 
   self.list_sentry_roles_by_group = function() {
     $.getJSON('/security/api/hive/list_sentry_roles_by_group', {    	
@@ -181,13 +181,13 @@ var HiveViewModel = function (initial) {
           item['privileges'] = ko.observableArray();
           item['showPrivileges'] = ko.observable(false);
           item['newPrivileges'] = ko.observableArray();
-    	  self.roles.push(item); 
+    	  self.roles.push(item);
         });
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
-  
+
   self.list_sentry_privileges_by_role = function(role) {
     $.ajax({
       type: "POST",
@@ -197,16 +197,16 @@ var HiveViewModel = function (initial) {
       },
       success: function (data) {
     	role.privileges.removeAll();
-        $.each(data.sentry_privileges, function(index, item) {          
-          role.privileges.push(ko.mapping.fromJS(item)); 
+        $.each(data.sentry_privileges, function(index, item) {
+          role.privileges.push(ko.mapping.fromJS(item));
         });
         role.showPrivileges(true);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  };  
-  
+  };
+
   self.list_sentry_privileges_for_provider = function(role) {
     $.ajax({
       type: "POST",
@@ -222,7 +222,7 @@ var HiveViewModel = function (initial) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  }; 
+  };
 };
 
 function logGA(page) {

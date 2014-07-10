@@ -21,22 +21,36 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 
-def get_acls(request):  
+def _get_acl_name(acl):
+  return acl['type'] + ':' + acl['name'] + ':'
+
+def _get_acl(acl):
+  return _get_acl_name(acl) + ('r' if acl['r']  else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
+
+
+
+def get_acls(request):
   path = request.GET.get('path')
   acls = request.fs.get_acl_status(path)
   return HttpResponse(json.dumps(acls['AclStatus']), mimetype="application/json")
 
 
-def modify_acl_entries(request):  
-  path = request.GET.get('path')
-  aclspec = request.GET.get('aclspec')
-  info = request.fs.modify_acl_entries(path, aclspec)
-  return HttpResponse(json.dumps(info), mimetype="application/json")
+def update_acls(request):
+  path = request.POST.get('path')
+  acls = json.loads(request.POST.get('acls'))
+
+  _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
+  _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
+
+  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 
 
-def remove_acl_entries(request):  
-  path = request.GET.get('path')
-  aclspec = request.GET.get('aclspec')
-  info = request.fs.remove_acl_entries(path, aclspec)
-  return HttpResponse(json.dumps(info), mimetype="application/json")
 
+def _modify_acl_entries(fs, path, acls):
+  aclspec = ','.join([_get_acl(acl) for acl in acls])
+  return fs.modify_acl_entries(path, aclspec)
+
+
+def _remove_acl_entries(fs, path, acls):
+  aclspec = ','.join([_get_acl_name(acl) for acl in acls])
+  return fs.remove_acl_entries(path, aclspec)

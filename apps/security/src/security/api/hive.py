@@ -70,11 +70,11 @@ def list_sentry_privileges_by_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def _hive_add_privileges(user, role, privileges):  
+def _hive_add_privileges(user, role, privileges):
     api = get_api(user)
-  
+
     _priviledges = {}
-  
+
     for priviledge in privileges:
       api.alter_sentry_role_grant_privilege(role['name'], {
           'privilegeScope': priviledge['privilegeScope'],
@@ -84,18 +84,18 @@ def _hive_add_privileges(user, role, privileges):
           'URI': priviledge['URI'],
           'action': priviledge['action']
       })
-  
+
     return _priviledges
 
 
-def hive_create_role(request):  
+def hive_create_role(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
     role = json.loads(request.POST['role'])
-    
+
     api = get_api(request.user)
-  
+
     api.create_sentry_role(role['name'])
     result['privileges'] = _hive_add_privileges(request.user, role, role['privileges'])
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
@@ -110,7 +110,7 @@ def hive_create_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def hive_add_privileges(request):  
+def hive_add_privileges(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:

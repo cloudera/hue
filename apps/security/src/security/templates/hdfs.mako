@@ -39,12 +39,12 @@ ${ layout.menubar(section='hdfs') }
     </div>
     <div class="span10">
       <div id="edit" class="section card card-small">
-        <h1 class="card-heading simple">${ _('Edit ACLs') }</h1>        
-        <div class="card-body">          
+        <h1 class="card-heading simple">${ _('Edit ACLs') }</h1>
+        <div class="card-body">
           <div>
             <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
             <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
-              <i class="fa fa-external-link"></i>                
+              <i class="fa fa-external-link"></i>
             </a>
           </div>
           <div>
@@ -57,7 +57,6 @@ ${ layout.menubar(section='hdfs') }
               <span data-bind="text: $root.assist.owner"></span>
               <span data-bind="text: $root.assist.group"></span>
               <div data-bind="foreach: $root.assist.acls">
-                ## Xeditable for edition?
                 <div data-bind="visible: status() != 'deleted'">
                   <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index()} "/> ${ _('Group') }
                   <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index()}"/> ${ _('User') }
@@ -74,13 +73,10 @@ ${ layout.menubar(section='hdfs') }
                 <i class="fa fa-plus"></i>
               </a>
               <div data-bind="visible: $root.assist.changed().length">
-                <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
-                  <i class="fa fa-times"></i>
-                </button>
                 <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
                   <i class="fa fa-save"></i>
                 </button>
-              <div>              
+              <div>
             </div>
           </div>
         </div>
@@ -91,7 +87,7 @@ ${ layout.menubar(section='hdfs') }
       </div>
 
       <div id="listHistory" class="section  card card-small hide">
-        <div class="alert alert-info"><h3>${ _('History') }</h3></div>          
+        <div class="alert alert-info"><h3>${ _('History') }</h3></div>
       </div>
     </div>
 
@@ -107,7 +103,7 @@ ${ layout.menubar(section='hdfs') }
 
 <script type="text/javascript" charset="utf-8">
   var viewModel;
-  
+
   $(document).ready(function () {
     viewModel = new HdfsViewModel(${ assist | n,unicode });
     ko.applyBindings(viewModel);
