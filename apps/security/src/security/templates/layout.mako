@@ -55,8 +55,8 @@ def is_selected(section, matcher):
 			    <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom"><i class="fa fa-pencil"></i></button>
 			    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"><i class="fa fa-save"></i></button>
 			  % endif
-			</div>           
-            <ul class="nav">           
+			</div>
+            <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
                   <i class="fa fa-lock"></i>

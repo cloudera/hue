@@ -29,7 +29,7 @@ ${ layout.menubar(section='hive') }
 <script type="text/html" id="privilege-template">
   <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
   <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
-  <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>                
+  <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>
   <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
   <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
   <i class="fa fa-minus"></i>
@@ -48,7 +48,7 @@ ${ layout.menubar(section='hive') }
             </br>
             <input type="checkbox" checked></input> All
             </br>
-            <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>            
+            <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>
           </li>
         </ul>
       </div>
@@ -57,11 +57,11 @@ ${ layout.menubar(section='hive') }
     <div class="span10">
 
       <div id="edit" class="mainSection card card-small">
-        <h1 class="card-heading simple">${ _('Edit') }</h1>        
+        <h1 class="card-heading simple">${ _('Edit') }</h1>
         <div class="card-body">
           <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
           <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }">
-            <i class="fa fa-external-link"></i>                
+            <i class="fa fa-external-link"></i>
           </a>
         </div>
         <div>
@@ -74,10 +74,10 @@ ${ layout.menubar(section='hive') }
               <div data-bind="text: $data, click: $root.list_sentry_privileges_for_provider"></div>
             </div>
           </div>
-        </div>        
+        </div>
       </div>
 
-      <div id="roles" class="mainSection hide card card-small">      
+      <div id="roles" class="mainSection hide card card-small">
         <div class="card-heading simple">
         <h3>${ _('Roles') }</h3>
 		  <%actionbar:render>
@@ -94,16 +94,16 @@ ${ layout.menubar(section='hive') }
 		    <%def name="creation()">
 		      <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
 		    </%def>
-		  </%actionbar:render>        
+		  </%actionbar:render>
         </div>
-          
-          
-        <div class="card-body">                       
-          <div data-bind="with: $root.role, visible: showCreateRole">            
+
+
+        <div class="card-body">
+          <div data-bind="with: $root.role, visible: showCreateRole">
             <div class="span3">
               Name
               <input type="text" data-bind="value: $data.name"></input>
-            </div>                      
+            </div>
             <div class="span5">
               Privileges
               <div data-bind="template: { name: 'privilege-template', foreach: privileges}">
@@ -111,7 +111,7 @@ ${ layout.menubar(section='hive') }
               <a href="javascript: void(0)" data-bind="click: addPrivilege">
                 <i class="fa fa-plus"></i>
               </a>
-            </div>            
+            </div>
             <div class="span4">
               Groups
               <select data-bind="options: $root.availableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
@@ -122,14 +122,14 @@ ${ layout.menubar(section='hive') }
             <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
                 data-bind="click: $root.role.create">
               <i class="fa fa-save"></i>
-            </button>            
-          </div>          
+            </button>
+          </div>
           <div>
-          </div>          
-        </div>           
-          
+          </div>
+        </div>
+
         </br></br>
-          
+
         <div>
         <table>
           <theader>
@@ -138,13 +138,13 @@ ${ layout.menubar(section='hive') }
             <th style="width:20%">${ _('Name') }</th>
             <th style="width:67%">${ _('Groups') }</th>
             <th style="width:10%">${ _('Grantor Principal') }</th>
-          </theader> 
-          <tbody data-bind="foreach: $root.roles">          
+          </theader>
+          <tbody data-bind="foreach: $root.roles">
             <tr>
               <td>
                 <input type="checkbox" data-bind="click: $root.role.remove"></input>
               </td>
-              <td>                                              
+              <td>
                 <a href="javascript:void(0);"><i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i></a>
               </td>
               <td data-bind="text: name"></td>
@@ -161,7 +161,7 @@ ${ layout.menubar(section='hive') }
               <td colspan="2"></td>
               <td colspan="3">
                 <span data-bind="text: name"></span>
-                <span data-bind="text: timestamp"></span>    
+                <span data-bind="text: timestamp"></span>
                 <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
                 <span data-bind="text: action"></span>
                 <span data-bind="text: scope"></span>
@@ -191,10 +191,10 @@ ${ layout.menubar(section='hive') }
                 </a>
               </td>
             </tr>
-          </div>        
+          </div>
         </tbody>
         </div>
-        
+
       </div>
 
     </div>
@@ -214,14 +214,14 @@ ${ layout.menubar(section='hive') }
 
 <script type="text/javascript" charset="utf-8">
   var viewModel;
-  
+
   $(document).ready(function () {
     viewModel = new HiveViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
-    
+
     viewModel.init();
   });
-  
+
   function showMainSection(mainSection) {
     if ($("#" + mainSection).is(":hidden")) {
       $(".mainSection").hide();
@@ -231,16 +231,16 @@ ${ layout.menubar(section='hive') }
 
     logGA(mainSection);
   }
-  
+
   function highlightMainMenu(mainSection) {
     $(".nav.nav-list li").removeClass("active");
     $("a[href='#" + mainSection + "']").parent().addClass("active");
   }
-  
+
   routie({
     "edit": function () {
       showMainSection("edit");
-    },  
+    },
     "roles": function () {
       showMainSection("roles");
     },
