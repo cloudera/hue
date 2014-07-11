@@ -73,9 +73,12 @@ ${ layout.menubar(section='hdfs') }
               </a>
               <div data-bind="foreach: $root.assist.acls">
                 <div data-bind="visible: status() != 'deleted'">
-                  <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index()} "/> ${ _('Group') }
-                  <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index()}"/> ${ _('User') }
-                  <input type="text" data-bind="value: name" class="input-small" placeholder="${ _('name...') }"/>
+                ##                   <span data-bind="visible: isDefault">Default</span>
+                  <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Group') }
+                  <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('User') }
+                  <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Mask') }
+                  <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Other') }
+                  <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
                   <input type="checkbox" data-bind="checked: r"/>
                   <input type="checkbox" data-bind="checked: w"/>
                   <input type="checkbox" data-bind="checked: x"/>

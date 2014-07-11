@@ -15,29 +15,31 @@
 // limitations under the License.
 
 function parseAcl(acl) {
-  // ^(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?(,(default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?)*$
-  m = acl.match(/(.*?):(.*?):(.)(.)(.)/);
+  // (default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?
+  m = acl.match(/(default:)?(user|group|mask|other):(.*?):(.)(.)(.)/);
   var acl = ko.mapping.fromJS({
-    'type': m[1],
-    'name': m[2],
-     'r': m[3] != '-',
-     'w': m[4] != '-',
-     'x': m[5] != '-',
+	'isDefault': m[1] != null,
+    'type': m[2],
+    'name': m[3],
+     'r': m[4] != '-',
+     'w': m[5] != '-',
+     'x': m[6] != '-',
      'status': '',
   });
-  acl.type.subscribe(function(){
+
+  acl.type.subscribe(function() {
     acl.status('modified');
   });
-  acl.name.subscribe(function(){
+  acl.name.subscribe(function() {
 	acl.status('modified');
   });
-  acl.r.subscribe(function(){
+  acl.r.subscribe(function() {
 	acl.status('modified');
   });
-  acl.w.subscribe(function(){
+  acl.w.subscribe(function() {
 	acl.status('modified');
   });
-  acl.x.subscribe(function(){
+  acl.x.subscribe(function() {
 	acl.status('modified');
   });
 
@@ -48,7 +50,7 @@ function printAcl(acl) {
   return acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
 
-var Assist = function (vm, assist) {
+var Assist = function(vm, assist) {
   var self = this;
 
   self.path = ko.observable('');
@@ -79,7 +81,7 @@ var Assist = function (vm, assist) {
 	}
   };
 
-  self.fetchPath = function () {
+  self.fetchPath = function() {
     $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) {
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
@@ -97,7 +99,7 @@ var Assist = function (vm, assist) {
     });
   };
 
-  self.getAcls = function () {
+  self.getAcls = function() {
     $(".jHueNotify").hide();
 	logGA('get_acls');
 
@@ -117,7 +119,7 @@ var Assist = function (vm, assist) {
     });
   };
 
-  self.updateAcls = function () {
+  self.updateAcls = function() {
 	$(".jHueNotify").hide();
 	logGA('updateAcls');
 
@@ -146,11 +148,11 @@ var Assist = function (vm, assist) {
 
 // Might rename Assist to Acls and create Assist for the tree widget?
 
-var HdfsViewModel = function (context_json) {
+var HdfsViewModel = function(context_json) {
   var self = this;
 
   self.assist = new Assist(self, context_json.assist);
-  self.assist.path('/tmp/acl');
+  self.assist.path('/tmp/dir');
 };
 
 function logGA(page) {
