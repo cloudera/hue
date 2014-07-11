@@ -28,7 +28,6 @@ def _get_acl(acl):
   return _get_acl_name(acl) + ('r' if acl['r']  else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
 
 
-
 def get_acls(request):
   path = request.GET.get('path')
   acls = request.fs.get_acl_status(path)

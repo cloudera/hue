@@ -34,6 +34,18 @@ ${ layout.menubar(section='hdfs') }
           <li class="nav-header">${ _('ACLs') }</li>
           <li class="active"><a href="#edits"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
           <li><a href="#view"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
+            </br>
+            <input type="checkbox" checked></input> Me
+            </br>
+            <select size="10" multiple="true"></select>
+          </li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Users') }
+            </br>
+            <input type="checkbox" checked></input> Me
+            </br>          
+            <select size="10" multiple="true"></select>
+          </li>    
         </ul>
       </div>
     </div>
@@ -50,12 +62,15 @@ ${ layout.menubar(section='hdfs') }
           <div>
             <div class="span8">
               <div data-bind="foreach: $root.assist.files">
-                <div data-bind="text: $data"></div>
+                <div data-bind="text: path, style: { color: aclBit() ? 'blue' : '' }"></div>
               </div>
             </div>
             <div class="span4">
               <span data-bind="text: $root.assist.owner"></span>
               <span data-bind="text: $root.assist.group"></span>
+              <a href="javascript: void(0)">
+                <i class="fa fa-header"></i> View in text
+              </a>
               <div data-bind="foreach: $root.assist.acls">
                 <div data-bind="visible: status() != 'deleted'">
                   <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index()} "/> ${ _('Group') }
