@@ -60,7 +60,7 @@ def compress_mode(tup):
       mode += n
   return mode
 
-def rwx(mode):
+def rwx(mode, aclBit=False):
   """
   Returns "rwx"-style string like that ls would give you.
 
@@ -75,4 +75,4 @@ def rwx(mode):
   # Sticky bit should either be 't' or no char.
   if not bools[-1]:
     s = s[:-1]
-  return rwxtype(mode) + "".join(s)
+  return rwxtype(mode) + "".join(s) + ('+' if aclBit else '')
