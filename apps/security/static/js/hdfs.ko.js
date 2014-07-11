@@ -80,11 +80,15 @@ var Assist = function (vm, assist) {
   };
 
   self.fetchPath = function () {
-    $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) { // Might need to create a cleaner API by calling directly webhdfs#LISTDIR
+    $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) {
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
         $.each(data.files, function(index, item) {
-    	  self.files.push(item.path);
+    	  self.files.push(ko.mapping.fromJS({
+    		  'path': item.path,
+    		  'aclBit': item.rwx.indexOf('+') != -1
+    	    })
+    	  );
         });
       }
       self.getAcls();

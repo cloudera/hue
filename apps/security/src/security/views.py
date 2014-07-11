@@ -20,23 +20,21 @@ import json
 from beeswax.api import autocomplete
 from desktop.lib.django_util import render
 
-from libsentry.api import get_api
 
-
-def get_hadoop_groups(): # Mock for now, maybe pull from LDAP
+def _get_hadoop_groups(): # Mock for now, maybe pull from LDAP
   return ['romain', 'sambashare', 'cdrom', 'lpadmin', 'admin', 'adm', 'lp', 'dialout', 'plugdev']
 
 
 def hive(request):
   assist = autocomplete(request, database=None, table=None)
 
-#    url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
-#  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
-#  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
+  #  url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
+  #  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
+  #  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
 
   return render("hive.mako", request, {
       'assist': assist,
-      'initial': json.dumps({'hadoop_groups': get_hadoop_groups()}),
+      'initial': json.dumps({'hadoop_groups': _get_hadoop_groups()}),
   })
 
 
@@ -44,5 +42,5 @@ def hdfs(request):
 
   return render("hdfs.mako", request, {
       'assist': {},
-      'hadoop_groups': get_hadoop_groups(),
+      'hadoop_groups': _get_hadoop_groups(),
   })
