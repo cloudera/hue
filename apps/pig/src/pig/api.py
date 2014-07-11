@@ -144,6 +144,7 @@ class OozieApi:
 
   def get_log(self, request, oozie_workflow):
     logs = {}
+    is_really_done = False
 
     for action in oozie_workflow.get_working_actions():
       try:
@@ -152,6 +153,8 @@ class OozieApi:
           if data:
             matched_logs = self._match_logs(data)
             logs[action.name] = self._make_links(matched_logs)
+            is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
+
       except Exception, e:
         LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
 
@@ -164,13 +167,14 @@ class OozieApi:
         'name': action.name,
         'status': action.status,
         'logs': logs.get(action.name, ''),
+        'isReallyDone': is_really_done,
         'progress': progress,
         'progressPercent': '%d%%' % progress,
         'absoluteUrl': oozie_workflow.get_absolute_url(),
       }
       workflow_actions.append(appendable)
 
-    return logs, workflow_actions
+    return logs, workflow_actions, is_really_done
 
   def _match_logs(self, data):
     """Difficult to match multi lines of text"""

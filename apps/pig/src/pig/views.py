@@ -202,7 +202,7 @@ def delete(request):
 @show_oozie_error
 def watch(request, job_id):
   oozie_workflow = check_job_access_permission(request, job_id)
-  logs, workflow_actions = api.get(request.jt, request.jt, request.user).get_log(request, oozie_workflow)
+  logs, workflow_actions, is_really_done = api.get(request.jt, request.jt, request.user).get_log(request, oozie_workflow)
   output = get_workflow_output(oozie_workflow, request.fs)
 
   workflow = {
@@ -218,6 +218,7 @@ def watch(request, job_id):
   response = {
     'workflow': workflow,
     'logs': logs,
+    'isReallyDone': is_really_done,
     'output': hdfs_link(output)
   }
 

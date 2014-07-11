@@ -514,13 +514,13 @@ ${ commonheader(None, "pig", user) | n,unicode }
           </div>
           <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
           <script id="logTemplate" type="text/html">
-            <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
+            <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
               <div class="pull-right">
                   ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
               </div>
               <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
               <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
-                <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
+                <div data-bind="css: {'bar': name != '', 'bar-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'bar-warning': status == 'RUNNING' || status == 'PREP' || !isReallyDone, 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
               </div>
             </div>
           </script>
@@ -1114,20 +1114,10 @@ ${ commonheader(None, "pig", user) | n,unicode }
       $("#filter").val("");
     });
 
-    var logsRefreshInterval;
     $(document).on("startLogsRefresh", function () {
       logsAtEnd = true;
-      window.clearInterval(logsRefreshInterval);
       $("#withLogs").text("");
       refreshLogs();
-      logsRefreshInterval = window.setInterval(function () {
-        refreshLogs();
-      }, 500);
-    });
-
-    $(document).on("stopLogsRefresh", function () {
-      window.clearInterval(logsRefreshInterval);
-      $.jHueTitleUpdater.reset();
     });
 
     $(document).on("clearLogs", function () {
@@ -1210,22 +1200,26 @@ ${ commonheader(None, "pig", user) | n,unicode }
               }
             }, 100);
           }
-          if (data.workflow && data.workflow.isRunning) {
+          if ((data.workflow && data.workflow.isRunning) || !data.isReallyDone) {
             viewModel.currentScript().actions(data.workflow.actions);
             if (data.workflow.actions != null && data.workflow.actions.length > 0) {
               $.jHueTitleUpdater.set(data.workflow.actions[data.workflow.actions.length-1].progress + "%");
             }
+            else {
+              $.jHueTitleUpdater.reset();
+            }
+            window.setTimeout(function () {
+              refreshLogs();
+            }, 1000);
           }
           else {
             viewModel.currentScript().actions(data.workflow.actions);
             viewModel.currentScript().isRunning(false);
-            $(document).trigger("stopLogsRefresh");
             $.jHueTitleUpdater.reset();
           }
         });
       }
       else {
-        $(document).trigger("stopLogsRefresh");
         $.jHueTitleUpdater.reset();
       }
     }
