@@ -43,6 +43,7 @@ class WebHdfsStat(object):
     self.size = file_status['length']
     self.blockSize = file_status['blockSize']
     self.replication = file_status['replication']
+    self.aclBit = file_status.get('aclBit')
 
     self.mode = int(file_status['permission'], 8)
     if self.isDir:

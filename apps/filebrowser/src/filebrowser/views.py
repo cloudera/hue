@@ -468,7 +468,7 @@ def _massage_stats(request, stats):
         'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p'),
         'humansize': filesizeformat(stats['size']),
         'type': filetype(stats['mode']),
-        'rwx': rwx(stats['mode']),
+        'rwx': rwx(stats['mode'], stats['aclBit']),
         'mode': stringformat(stats['mode'], "o"),
         'url': make_absolute(request, "view", dict(path=urlquote(normalized))),
         }
