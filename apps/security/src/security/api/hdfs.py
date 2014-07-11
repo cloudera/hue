@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 
 def _get_acl_name(acl):
-  return acl['type'] + ':' + acl['name'] + ':'
+  return ('default:' if acl['isDefault'] else '') + acl['type'] + ':' + acl['name'] + ':'
 
 def _get_acl(acl):
   return _get_acl_name(acl) + ('r' if acl['r']  else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
