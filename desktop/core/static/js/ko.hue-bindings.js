@@ -169,12 +169,12 @@ ko.bindingHandlers.slider = {
     var _el = $(element);
     var _options = $.extend(valueAccessor(), {});
     _el.slider({
-      min: _options.start() ? _options.start() : 0,
-      max: _options.end() ? _options.end() : 10,
-      step: _options.gap() ? _options.gap() : 1,
+      min: !isNaN(parseFloat(_options.start())) ? parseFloat(_options.start()) : 0,
+      max: !isNaN(parseFloat(_options.end())) ? parseFloat(_options.end()) : 10,
+      step: !isNaN(parseFloat(_options.gap())) ? parseFloat(_options.gap()) : 1,
       handle: _options.handle ? _options.handle : 'triangle',
-      start: _options.min(),
-      end: _options.max(),
+      start: parseFloat(_options.min()),
+      end: parseFloat(_options.max()),
       tooltip_split: true,
       tooltip: 'always'
     });
