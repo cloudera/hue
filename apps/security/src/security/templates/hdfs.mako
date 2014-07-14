@@ -26,6 +26,23 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hdfs') }
 
 
+<script type="text/html" id="acl-edition">
+  <div data-bind="visible: status() != 'deleted'">
+    <span data-bind="visible: isDefault">Default</span>
+    <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
+    <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
+    <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
+    <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('other') }
+    <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
+    <input type="checkbox" data-bind="checked: r"/>
+    <input type="checkbox" data-bind="checked: w"/>
+    <input type="checkbox" data-bind="checked: x"/>
+    <a href="javascript: void(0)"
+      <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
+    </a>
+  </div>
+</script>
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -71,26 +88,22 @@ ${ layout.menubar(section='hdfs') }
               <a href="javascript: void(0)">
                 <i class="fa fa-header"></i> View in text
               </a>
-              <div data-bind="foreach: $root.assist.acls">
-                <div data-bind="visible: status() != 'deleted'">
-                ##                   <span data-bind="visible: isDefault">Default</span>
-                  <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Group') }
-                  <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('User') }
-                  <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Mask') }
-                  <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() }"/> ${ _('Other') }
-                  <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
-                  <input type="checkbox" data-bind="checked: r"/>
-                  <input type="checkbox" data-bind="checked: w"/>
-                  <input type="checkbox" data-bind="checked: x"/>
-                  <a href="javascript: void(0)"
-                    <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
-                  </a>
-                </div>
+              </br>
+              <div data-bind="foreach: $root.assist.regularAcls">
+                <div data-bind="template: {name: 'acl-edition'}"></div>                 
               </div>
               <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl">
                 <i class="fa fa-plus"></i>
-              </a>
-              <div data-bind="visible: $root.assist.changed().length">
+              </a>  
+              </br>
+              Default            
+              <div data-bind="foreach: $root.assist.defaultAcls">
+                <div data-bind="template: {name: 'acl-edition'}"></div>
+              </div>
+              <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl">
+                <i class="fa fa-plus"></i>
+              </a>              
+              <div data-bind="visible: $root.assist.changedAcls().length">
                 <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
                   <i class="fa fa-save"></i>
                 </button>
