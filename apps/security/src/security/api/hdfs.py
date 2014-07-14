@@ -19,6 +19,7 @@ import json
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from desktop.lib.exceptions_renderable import PopupException
 
 
 def _get_acl_name(acl):
@@ -37,9 +38,12 @@ def get_acls(request):
 def update_acls(request):
   path = request.POST.get('path')
   acls = json.loads(request.POST.get('acls'))
-
-  _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
-  _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
+  
+  try:
+    _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
+    _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
+  except Exception, e:
+    raise PopupException(unicode(str(e.message), "utf8"))
 
   return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 

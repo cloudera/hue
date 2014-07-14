@@ -30,7 +30,7 @@ function parseAcl(acl) {
   acl.type.subscribe(function() {
     acl.status('modified');
   });
-  acl.name.subscribe(function() {
+  acl.name.subscribe(function() { // TODO duplicates
 	acl.status('modified');
   });
   acl.r.subscribe(function() {
@@ -60,12 +60,18 @@ var Assist = function(vm, assist) {
   self.files = ko.observableArray();
 
   self.acls = ko.observableArray();
-  self.owner = ko.observable('');
-  self.group = ko.observable('');
-
-  self.changed = ko.computed(function() {
+  self.regularAcls = ko.computed(function() {
+	return $.grep(self.acls(), function(acl){ return ! acl.isDefault(); });
+  });
+  self.defaultAcls = ko.computed(function() {
+	return $.grep(self.acls(), function(acl){ return acl.isDefault(); });
+  });
+  self.changedAcls = ko.computed(function() {
 	return $.grep(self.acls(), function(acl){ return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1 });
   });
+
+  self.owner = ko.observable('');
+  self.group = ko.observable('');
 
   self.addAcl = function() {
 	var newAcl = parseAcl('group::---');
@@ -73,6 +79,12 @@ var Assist = function(vm, assist) {
 	self.acls.push(newAcl);
   };
 
+  self.addDefaultAcl = function() {
+	var newAcl = parseAcl('default:group::---');
+	newAcl.status('new');
+	self.acls.push(newAcl);
+  };  
+  
   self.removeAcl = function(acl) {
 	if (acl.status() == 'new') {
 	  self.acls.remove(acl);
@@ -141,7 +153,7 @@ var Assist = function(vm, assist) {
         $(document).trigger("info", 'Done!');
       }
     ).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
     });
   }
 }
