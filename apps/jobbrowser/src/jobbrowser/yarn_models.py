@@ -88,7 +88,7 @@ class Job:
     setattr(self, 'status', self.state)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
-    setattr(self, 'is_retired', True)
+    setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
     setattr(self, 'duration', self.finishTime - self.startTime)
