@@ -53,21 +53,21 @@ ${ layout.menubar(section='hdfs') }
       <div id="edit" class="section card card-small">
         <h1 class="card-heading simple">${ _('Edit ACLs') }</h1>
         <div class="card-body">
-          <div>
-            <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
-            <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
-              <i class="fa fa-external-link"></i>
-            </a>
-          </div>
-          <div>
+          <div class="row-fluid">
             <div class="span8">
+              <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
               <div data-bind="foreach: $root.assist.files">
                 <div data-bind="text: path, style: { color: aclBit() ? 'blue' : '' }"></div>
               </div>
             </div>
             <div class="span4">
-              <span data-bind="text: $root.assist.owner"></span>
-              <span data-bind="text: $root.assist.group"></span>
+              ${_('Path')} &nbsp;&nbsp;<a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
+                <strong><span data-bind="text:$root.assist.path"></span></strong>
+                <i class="fa fa-external-link"></i>
+              </a><br/>
+              ${_('Owned by')} &nbsp;&nbsp;<i class="fa fa-user" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.owner"></span></strong>
+               &nbsp;&nbsp;<i class="fa fa-users" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.group"></span></strong><br/>
+              <br/>
               <a href="javascript: void(0)">
                 <i class="fa fa-header"></i> View in text
               </a>
