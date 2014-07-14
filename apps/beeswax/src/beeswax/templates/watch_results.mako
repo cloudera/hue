@@ -686,7 +686,7 @@ $(document).ready(function () {
   });
 
   % if app_name == 'impala':
-    window.onbeforeunload = function(e) {
+    window.onload = function(e) {
       $.ajax({url: "${ url(app_name + ':close_operation', query.id) }", type: 'post', async: false});
     }
   % endif
