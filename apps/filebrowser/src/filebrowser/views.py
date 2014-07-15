@@ -300,9 +300,6 @@ def listdir(request, path, chooser):
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
         'current_dir_path': path,
-        # These could also be put in automatically via
-        # http://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-request,
-        # but manually seems cleaner, since we only need it here.
         'current_request_path': request.path,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'cwd_set': True,
@@ -361,11 +358,17 @@ def listdir_paged(request, path):
 
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
+    do_as = None
+    if request.user.is_superuser:
+      do_as = request.GET.get('doas', request.user.username)
 
     home_dir_path = request.user.get_home_directory()
     breadcrumbs = parse_breadcrumbs(path)
 
-    all_stats = request.fs.listdir_stats(path)
+    if do_as:
+      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
+    else:
+      all_stats = request.fs.listdir_stats(path)
 
 
     # Filter first
