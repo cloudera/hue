@@ -26,6 +26,34 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hdfs') }
 
 
+<style type="text/css">
+#nav-bar ul {
+	list-style-type: none;
+  padding: 0;
+  margin-left: 6px;
+}
+
+.tree {
+  margin-left: 0!important;
+	padding-left: 0!important;
+}
+
+.node-row {
+  margin: 4px;
+  padding: 2px;
+  background-color: #F6F6F6;
+}
+
+.node-row:hover {
+  background-color: #EEE;
+}
+
+.pointer-icon {
+	cursor: pointer;
+}
+</style>
+
+
 <script type="text/html" id="acl-edition">
   <div data-bind="visible: status() != 'deleted'">
     <span data-bind="visible: isDefault">Default</span>
@@ -40,7 +68,7 @@ ${ layout.menubar(section='hdfs') }
     <input type="checkbox" data-bind="checked: r"/>
     <input type="checkbox" data-bind="checked: w"/>
     <input type="checkbox" data-bind="checked: x"/>
-    <a href="javascript: void(0)"
+    <a href="javascript: void(0)">
       <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
     </a>
   </div>
@@ -56,13 +84,13 @@ ${ layout.menubar(section='hdfs') }
           <li><a href="#view"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             </br>
-            <input type="checkbox" checked></input> Me
+            <input type="checkbox" checked="checked"> ${_('Me')}
             </br>
             <select data-bind="options: availableHadoopGroups" size="10" multiple="true"></select>
           </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Users') }
             </br>
-            <input type="checkbox" checked></input> Me
+            <input type="checkbox" checked="checked"> ${_('Me')}
             </br>          
             <select data-bind="options: availableHadoopUsers" size="10" multiple="true"></select>
           </li>    
@@ -75,10 +103,9 @@ ${ layout.menubar(section='hdfs') }
         <div class="card-body">
           <div class="row-fluid">
             <div class="span8">
-              <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
-              <div data-bind="foreach: $root.assist.files">
-                <div data-bind="text: path, style: { color: aclBit() ? 'blue' : '' }"></div>
-              </div>
+              <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path"/>
+
+              <div id="nav-bar" data-bind="template: { name: 'tree-template', data: $root.assist.treeData }"></div>
             </div>
             <div class="span4">
               ${_('Path')} &nbsp;&nbsp;<a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
@@ -129,10 +156,92 @@ ${ layout.menubar(section='hdfs') }
 </div>
 
 
+<script type="text/html" id="tree-template">
+<!-- ko if: nodes != null -->
+<ul class="tree" data-bind="foreach: nodes">
+    <li>
+        <span data-bind="
+            template: { name: 'node-name-template', data: $data },
+            css: { 'pointer-icon': nodes().length > 0 },
+            click: toggleVisibility"></span>
+        <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
+    </li>
+</ul>
+<!-- /ko -->
+</script>
+
+<script type="text/html" id="folder-template">
+<!-- ko if: nodes != null -->
+    <ul data-bind="foreach: nodes">
+        <li>
+            <div data-bind="template: { name: 'node-template', data: $data }"></div>
+        </li>
+    </ul>
+<!-- /ko -->
+</script>
+
+<script type="text/html" id="node-template">
+    <!-- ko if: nodes != null -->
+    <span data-bind="
+        template: { name: 'node-name-template', data: $data },
+        css: { 'pointer-icon': nodes().length > 0 },
+        click: toggleVisibility"></span>
+    <!-- /ko -->
+
+    <!-- ko if: nodes().length !== 0 -->
+
+        <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
+
+    <!-- /ko -->
+
+</script>
+
+<script type="text/html" id="node-name-template">
+    <div class="node-row">
+      <i data-bind="
+      css: {
+          'fa': true,
+          'fa-folder-open-o': isExpanded() && nodes().length > 0,
+          'fa-folder-o': !isExpanded() && nodes().length > 0,
+          'fa-file-o': nodes().length === 0
+      }
+      "></i>
+      <a style="display: inline-block" data-bind="text:name,style: { color: aclBit() ? 'blue' : '' },click: $root.assist.setPath"></a>
+##      <div class="pull-right" style="margin-right: 20px">
+##        <span class="badge badge-info"><i class="fa fa-eye"></i> <span data-bind="text: properties.read.groups().length + properties.read.users().length"></span> </span>
+##        <span class="badge badge-warning"><i class="fa fa-pencil"></i> <span data-bind="text: properties.write.groups().length + properties.write.users().length"></span> </span>
+##        <span class="badge badge-important"><i class="fa fa-cog"></i> <span data-bind="text: properties.execute.groups().length + properties.execute.users().length"></span> </span>
+##      </div>
+    </div>
+</script>
+
+
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/security/static/js/hdfs.ko.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+
+  ko.bindingHandlers.tooltip = {
+    init: function(element, valueAccessor) {
+        var local = ko.utils.unwrapObservable(valueAccessor()),
+            options = {};
+
+        ko.utils.extend(options, local);
+
+        $(element).tooltip(options);
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            $(element).tooltip("destroy");
+        });
+    }
+};
+
+
+
+
+</script>
 
 
 <script type="text/javascript" charset="utf-8">
