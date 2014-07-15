@@ -18,29 +18,29 @@ function parseAcl(acl) {
   // (default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?
   m = acl.match(/(default:)?(user|group|mask|other):(.*?):(.)(.)(.)/);
   var acl = ko.mapping.fromJS({
-	'isDefault': m[1] != null,
+    'isDefault': m[1] != null,
     'type': m[2],
     'name': m[3],
     'r': m[4] != '-',
     'w': m[5] != '-',
     'x': m[6] != '-',
-    'status': '',
+    'status': ''
   });
 
-  acl.type.subscribe(function() {
+  acl.type.subscribe(function () {
     acl.status('modified');
   });
-  acl.name.subscribe(function() {
-	acl.status('modified');
+  acl.name.subscribe(function () {
+    acl.status('modified');
   });
-  acl.r.subscribe(function() {
-	acl.status('modified');
+  acl.r.subscribe(function () {
+    acl.status('modified');
   });
-  acl.w.subscribe(function() {
-	acl.status('modified');
+  acl.w.subscribe(function () {
+    acl.status('modified');
   });
-  acl.x.subscribe(function() {
-	acl.status('modified');
+  acl.x.subscribe(function () {
+    acl.status('modified');
   });
 
   return acl;
@@ -50,61 +50,133 @@ function printAcl(acl) {
   return acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
 
-var Assist = function(vm, assist) {
+var Assist = function (vm, assist) {
   var self = this;
+
+  self.treeData = ko.observable({nodes:[]});
+  self.loadData = function(data) {
+    self.treeData(new NodeModel(data));
+  };
+
+  self.growingTree = ko.observable({
+    name: "/",
+    path: "/",
+    aclBit: false,
+    nodes: []
+  });
 
   self.path = ko.observable('');
   self.path.subscribe(function () {
-	self.fetchPath()
+    self.fetchPath();
   });
   self.files = ko.observableArray();
 
   self.acls = ko.observableArray();
   self.originalAcls = ko.observableArray();
-  self.regularAcls = ko.computed(function() {
-	return $.grep(self.acls(), function(acl){ return ! acl.isDefault(); });
+  self.regularAcls = ko.computed(function () {
+    return $.grep(self.acls(), function (acl) {
+      return !acl.isDefault();
+    });
   });
-  self.defaultAcls = ko.computed(function() {
-	return $.grep(self.acls(), function(acl){ return acl.isDefault(); });
+  self.defaultAcls = ko.computed(function () {
+    return $.grep(self.acls(), function (acl) {
+      return acl.isDefault();
+    });
   });
-  self.changedAcls = ko.computed(function() {
-	return $.grep(self.acls(), function(acl){ return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1 });
+  self.changedAcls = ko.computed(function () {
+    return $.grep(self.acls(), function (acl) {
+      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1
+    });
   });
 
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
-  self.addAcl = function() {
-	var newAcl = parseAcl('group::---');
-	newAcl.status('new');
-	self.acls.push(newAcl);
+  self.addAcl = function () {
+    var newAcl = parseAcl('group::---');
+    newAcl.status('new');
+    self.acls.push(newAcl);
   };
 
-  self.addDefaultAcl = function() {
-	var newAcl = parseAcl('default:group::---');
-	newAcl.status('new');
-	self.acls.push(newAcl);
-  };  
-  
-  self.removeAcl = function(acl) {
-	if (acl.status() == 'new') {
-	  self.acls.remove(acl);
-	} else {
-	  acl.status('deleted');
-	}
+  self.addDefaultAcl = function () {
+    var newAcl = parseAcl('default:group::---');
+    newAcl.status('new');
+    self.acls.push(newAcl);
   };
 
-  self.fetchPath = function() {
+  self.removeAcl = function (acl) {
+    if (acl.status() == 'new') {
+      self.acls.remove(acl);
+    } else {
+      acl.status('deleted');
+    }
+  };
+
+  self.convertItemToObject = function (item) {
+    var _path = item.path;
+    var _parent =  _path.substr(0, _path.lastIndexOf("/"));
+    if (_parent == ""){
+      _parent = "/";
+    }
+    if (_path != "/"){
+      self.growingTree(self.traversePath(self.growingTree(), _parent, item));
+    }
+  }
+
+  self.traversePath = function(leaf, parent, item){
+    var _mainFound = false;
+    leaf.nodes.forEach(function(node){
+      if (node.path == item.path){
+        _mainFound = true;
+      }
+      if (parent.indexOf(node.path) > -1){
+        self.traversePath(node, parent, item);
+      }
+    });
+    if (!_mainFound && leaf.path == parent){
+      var _chunks = item.path.split("/");
+      leaf.nodes.push({
+        name: _chunks[_chunks.length-1],
+        path: item.path,
+        aclBit: item.rwx.indexOf('+') != -1,
+        isDir: item.type == "dir",
+        nodes: []
+      });
+    }
+    return leaf;
+  }
+
+  self.setPath = function (obj) {
+    self.path(obj.path());
+  }
+
+  self.loadParents = function(breadcrumbs){
+    breadcrumbs.forEach(function(crumb, idx){
+      if (idx < breadcrumbs.length - 1 && crumb.url != ""){
+        var _item = {
+          path: crumb.url,
+          name: crumb.label,
+          rwx: ""
+        }
+        self.convertItemToObject(_item);
+      }
+    });
+  }
+
+  self.fetchPath = function () {
     $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) {
+      self.loadParents(data.breadcrumbs);
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
-        $.each(data.files, function(index, item) {
-    	  self.files.push(ko.mapping.fromJS({
-    		  'path': item.path,
-    		  'aclBit': item.rwx.indexOf('+') != -1
-    	    })
-    	  );
+        $.each(data.files, function (index, item) {
+          self.convertItemToObject(item);
+          self.files.push(ko.mapping.fromJS({
+                'path': item.path,
+                'aclBit': item.rwx.indexOf('+') != -1
+              })
+          );
         });
+        self.loadData(self.growingTree());
       }
       self.getAcls();
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -112,21 +184,21 @@ var Assist = function(vm, assist) {
     });
   };
 
-  self.getAcls = function() {
+  self.getAcls = function () {
     $(".jHueNotify").hide();
-	logGA('get_acls');
+    logGA('get_acls');
 
     $.getJSON('/security/api/hdfs/get_acls', {
-    	'path': self.path()
-      }, function (data) {
-        self.acls.removeAll();
-        self.originalAcls.removeAll();
-        $.each(data.entries, function(index, item) {
-    	  self.acls.push(parseAcl(item));
-    	  self.originalAcls.push(parseAcl(item));
-        });
-        self.owner(data.owner);
-        self.group(data.group);
+      'path': self.path()
+    }, function (data) {
+      self.acls.removeAll();
+      self.originalAcls.removeAll();
+      $.each(data.entries, function (index, item) {
+        self.acls.push(parseAcl(item));
+        self.originalAcls.push(parseAcl(item));
+      });
+      self.owner(data.owner);
+      self.group(data.group);
     }).fail(function (xhr, textStatus, errorThrown) {
       if (xhr.responseText.search('FileNotFoundException') == -1) { // TODO only fetch on existing path
         $(document).trigger("error", xhr.responseText);
@@ -134,60 +206,87 @@ var Assist = function(vm, assist) {
     });
   };
 
-  self.updateAcls = function() {
-	$(".jHueNotify").hide();
-	logGA('updateAcls');
+  self.updateAcls = function () {
+    $(".jHueNotify").hide();
+    logGA('updateAcls');
 
     $.post("/security/api/hdfs/update_acls", {
-        'path': self.path(),
-        'acls': ko.mapping.toJSON(self.acls()),
-        'originalAcls': ko.mapping.toJSON(self.originalAcls()),
-      }, function (data) {
-        var toDelete = []
-    	$.each(self.acls(), function(index, item) {
-    	  if (item.status() == 'deleted') {
-    		toDelete.push(item);
-    	  } else {
-            item.status('');
-    	  }
-    	});
-        $.each(toDelete, function(index, item) {
-          self.acls.remove(item);
-        });
-        $(document).trigger("info", 'Done!');
-      }
+          'path': self.path(),
+          'acls': ko.mapping.toJSON(self.acls()),
+          'originalAcls': ko.mapping.toJSON(self.originalAcls())
+        }, function (data) {
+          var toDelete = []
+          $.each(self.acls(), function (index, item) {
+            if (item.status() == 'deleted') {
+              toDelete.push(item);
+            } else {
+              item.status('');
+            }
+          });
+          $.each(toDelete, function (index, item) {
+            self.acls.remove(item);
+          });
+          $(document).trigger("info", 'Done!');
+        }
     ).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", JSON.parse(xhr.responseText).message);
-    });
+          $(document).trigger("error", JSON.parse(xhr.responseText).message);
+        });
   }
 }
 
+
+var NodeModel = function(data) {
+
+	var self = this;
+
+	self.isExpanded = ko.observable(true);
+	self.description = ko.observable();
+	self.name = ko.observable();
+	self.nodes = ko.observableArray([]);
+
+	self.toggleVisibility = function() {
+		self.isExpanded(!self.isExpanded());
+	};
+
+	ko.mapping.fromJS(data, self.mapOptions, self);
+
+};
+
+NodeModel.prototype.mapOptions = {
+	nodes: {
+		create: function(args) {
+			return new NodeModel(args.data);
+		}
+	}
+};
+
 // Might rename Assist to Acls and create Assist for the tree widget?
 
-var HdfsViewModel = function(initial) {
+var HdfsViewModel = function (initial) {
   var self = this;
 
   self.assist = new Assist(self, initial);
-  self.assist.path('/tmp/dir');
-  
+  //self.assist.path('/user/hue/nano');
+  self.assist.path('/user/hue/oozie-oozi/0000001-140325184036225-oozie-oozi-W/pig--pig');
+
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
-  
-  self.init = function() {
-	self.fetchUsers();
+
+  self.init = function () {
+    self.fetchUsers();
   }
 
 
-  self.fetchUsers = function() {
+  self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', function (data) {
-	  $.each(data.users, function(i, user) {
-	    self.availableHadoopUsers.push(user.username);
-	  });
+      $.each(data.users, function (i, user) {
+        self.availableHadoopUsers.push(user.username);
+      });
 
-	  $.each(data.groups, function(i, group) {
+      $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
-	  });
-	});  
+      });
+    });
   }
 };
 
