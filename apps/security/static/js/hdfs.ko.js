@@ -164,11 +164,31 @@ var Assist = function(vm, assist) {
 
 // Might rename Assist to Acls and create Assist for the tree widget?
 
-var HdfsViewModel = function(context_json) {
+var HdfsViewModel = function(initial) {
   var self = this;
 
-  self.assist = new Assist(self, context_json.assist);
+  self.assist = new Assist(self, initial);
   self.assist.path('/tmp/dir');
+  
+  self.availableHadoopUsers = ko.observableArray();
+  self.availableHadoopGroups = ko.observableArray();
+  
+  self.init = function() {
+	self.fetchUsers();
+  }
+
+
+  self.fetchUsers = function() {
+    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+	  $.each(data.users, function(i, user) {
+	    self.availableHadoopUsers.push(user.username);
+	  });
+
+	  $.each(data.groups, function(i, group) {
+        self.availableHadoopGroups.push(group.name);
+	  });
+	});  
+  }
 };
 
 function logGA(page) {

@@ -74,7 +74,7 @@ def list_permissions(request):
 
 
 def list_for_autocomplete(request):
-  # Restrict to what the current user can interact withreverse('desktop.views.home')
+  # Restrict to what the current user can interact with reverse('desktop.views.home')
   if request.ajax:
     user_groups = request.user.groups.all()
     response = {
