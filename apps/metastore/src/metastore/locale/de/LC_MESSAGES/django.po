@@ -122,13 +122,13 @@ msgstr "Nach Datenbanknamen suchen"
 
 #: src/metastore/templates/databases.mako:50
 msgid "Drop the selected databases"
-msgstr "Ausgewählte Datenbanken ablegen"
+msgstr "Ausgewählte Datenbanken löschen"
 
 #: src/metastore/templates/databases.mako:50
 #: src/metastore/templates/describe_table.mako:72
 #: src/metastore/templates/tables.mako:61
 msgid "Drop"
-msgstr "Ablegen"
+msgstr "Löschen"
 
 #: src/metastore/templates/databases.mako:59
 msgid "Database Name"
@@ -239,7 +239,7 @@ msgstr "Partitionsspalten"
 
 #: src/metastore/templates/describe_table.mako:96
 msgid "Sample"
-msgstr "Beispiel"
+msgstr "Stichprobe"
 
 #: src/metastore/templates/describe_table.mako:98
 msgid "Properties"
@@ -256,11 +256,11 @@ msgstr "Wert"
 
 #: src/metastore/templates/describe_table.mako:179
 msgid "Drop Table"
-msgstr "Tabelle ablegen"
+msgstr "Tabelle löschen"
 
 #: src/metastore/templates/describe_table.mako:187
 msgid "Yes, drop this table"
-msgstr "Ja, diese Tabelle ablegen"
+msgstr "Ja, diese Tabelle löschen"
 
 #: src/metastore/templates/tables.mako:24
 msgid "Tables"
@@ -321,5 +321,5 @@ msgstr "Beachten Sie, dass beim Laden Daten von deren Speicherort zum Speicheror
 
 #: src/metastore/templates/popups/load_data.mako:61
 msgid "Submit"
-msgstr "Übermitteln"
+msgstr "Abschicken"
 
