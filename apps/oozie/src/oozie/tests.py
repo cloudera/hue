@@ -3003,7 +3003,7 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_java_action(self):
-    wf = Document.objects.get_docs(self.user, Workflow).get(name='Sequential Java', owner__username='sample', extra='').content_object
+    wf = Document.objects.get_docs(self.user, Workflow).get(name='TeraSort', owner__username='sample', extra='').content_object
     wf.owner = User.objects.get(username='sample')
     wf.save()
 
