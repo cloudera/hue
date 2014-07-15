@@ -140,7 +140,7 @@ def massage_job_for_json(job, request):
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
-    'canKill': (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2 and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
+    'canKill': job.status.lower() in ('running', 'pending') and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
   }
   return job
@@ -194,17 +194,19 @@ def job_counters(request, job):
 @check_job_permission
 def kill_job(request, job):
   if request.method != "POST":
-    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % dict(method=request.method))
+    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
 
   if job.user != request.user.username and not request.user.is_superuser:
     access_warn(request, _('Insufficient permission'))
-    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") %
-                           dict(username=request.user.username, user=job.user))
+    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
 
   job.kill()
+
   cur_time = time.time()
+  api = get_api(request.user, request.jt)
+
   while time.time() - cur_time < 15:
-    job = Job.from_id(jt=request.jt, jobid=job.jobId)
+    job = api.get_job(jobid=job.jobId)
 
     if job.status not in ["RUNNING", "QUEUED"]:
       if request.REQUEST.get("next"):
@@ -214,10 +216,8 @@ def kill_job(request, job):
       else:
         raise MessageException("Job Killed")
     time.sleep(1)
-    job = Job.from_id(jt=request.jt, jobid=job.jobId)
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))
-
 
 @check_job_permission
 def job_attempt_logs(request, job, attempt_index=0):
