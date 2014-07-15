@@ -51,10 +51,6 @@ def is_selected(section, matcher):
         <div class="container-fluid">
           <div class="nav-collapse">
 			<div class="pull-right" style="padding-right:50px; padding-top:10px">
-			  % if user.is_superuser:
-			    <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom"><i class="fa fa-pencil"></i></button>
-			    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"><i class="fa fa-save"></i></button>
-			  % endif
 			</div>
             <ul class="nav">
               <li class="currentApp">

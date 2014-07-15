@@ -56,7 +56,6 @@ ${ layout.menubar(section='hdfs') }
 
 <script type="text/html" id="acl-edition">
   <div data-bind="visible: status() != 'deleted'">
-    <span data-bind="visible: isDefault">Default</span>
     <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
     <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
     <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
@@ -92,7 +91,7 @@ ${ layout.menubar(section='hdfs') }
             </br>
             <input type="checkbox" checked="checked"> ${_('Me')}
             </br>          
-            <select data-bind="options: availableHadoopUsers" size="10" multiple="true"></select>
+            <select data-bind="options: availableHadoopUsers, value: doAs" size="10"></select>
           </li>    
         </ul>
       </div>
@@ -113,7 +112,7 @@ ${ layout.menubar(section='hdfs') }
                 <i class="fa fa-external-link"></i>
               </a><br/>
               ${_('Owned by')} &nbsp;&nbsp;<i class="fa fa-user" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.owner"></span></strong>
-               &nbsp;&nbsp;<i class="fa fa-users" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.group"></span></strong><br/>
+              &nbsp;&nbsp;<i class="fa fa-users" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.group"></span></strong><br/>
               <br/>
               <a href="javascript: void(0)">
                 <i class="fa fa-header"></i> View in text
@@ -124,7 +123,7 @@ ${ layout.menubar(section='hdfs') }
               </div>
               <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl">
                 <i class="fa fa-plus"></i>
-              </a>  
+              </a>
               </br>
               Default (<i class="fa fa-times"></i> bulk delete?)
               <div data-bind="foreach: $root.assist.defaultAcls">
@@ -132,7 +131,7 @@ ${ layout.menubar(section='hdfs') }
               </div>
               <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl">
                 <i class="fa fa-plus"></i>
-              </a>              
+              </a>
               <div data-bind="visible: $root.assist.changedAcls().length">
                 <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
                   <i class="fa fa-save"></i>
@@ -145,10 +144,6 @@ ${ layout.menubar(section='hdfs') }
 
       <div id="listDataset" class="section card card-small hide">
         <div class="alert alert-info"><h3>${ _('Existing datasets') }</h3></div>
-      </div>
-
-      <div id="listHistory" class="section  card card-small hide">
-        <div class="alert alert-info"><h3>${ _('History') }</h3></div>
       </div>
     </div>
 
@@ -165,7 +160,7 @@ ${ layout.menubar(section='hdfs') }
             css: { 'pointer-icon': nodes().length > 0 },
             click: toggleVisibility"></span>
         <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
-    </li>
+    </li>    
 </ul>
 <!-- /ko -->
 </script>
@@ -176,6 +171,14 @@ ${ layout.menubar(section='hdfs') }
         <li>
             <div data-bind="template: { name: 'node-template', data: $data }"></div>
         </li>
+    ## Should fetch more files here if needed
+    <!-- ko if: $index() == 14 -->
+      <li>
+        <a href="javascript: void(0)">         
+          <i class="fa fa-plus"> Next</i> 
+        </a>
+      </li>
+    <!-- /ko -->        
     </ul>
 <!-- /ko -->
 </script>
@@ -189,11 +192,8 @@ ${ layout.menubar(section='hdfs') }
     <!-- /ko -->
 
     <!-- ko if: nodes().length !== 0 -->
-
         <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
-
     <!-- /ko -->
-
 </script>
 
 <script type="text/html" id="node-name-template">

@@ -85,7 +85,7 @@ var Assist = function (vm, assist) {
   });
   self.changedAcls = ko.computed(function () {
     return $.grep(self.acls(), function (acl) {
-      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1
+      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1;
     });
   });
 
@@ -115,10 +115,10 @@ var Assist = function (vm, assist) {
   self.convertItemToObject = function (item) {
     var _path = item.path;
     var _parent =  _path.substr(0, _path.lastIndexOf("/"));
-    if (_parent == ""){
+    if (_parent == "") {
       _parent = "/";
     }
-    if (_path != "/"){
+    if (_path != "/") {
       self.growingTree(self.traversePath(self.growingTree(), _parent, item));
     }
   }
@@ -164,16 +164,20 @@ var Assist = function (vm, assist) {
   }
 
   self.fetchPath = function () {
-    $.getJSON('/filebrowser/view' + self.path() + "?pagesize=15&format=json", function (data) {
+    $.getJSON('/filebrowser/view' + self.path(), {
+    	'pagesize': 15,
+    	'format': 'json',
+    	'doas': vm.doAs(),
+    }, function (data) {
       self.loadParents(data.breadcrumbs);
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
         $.each(data.files, function (index, item) {
           self.convertItemToObject(item);
           self.files.push(ko.mapping.fromJS({
-                'path': item.path,
-                'aclBit': item.rwx.indexOf('+') != -1
-              })
+              'path': item.path,
+              'aclBit': item.rwx.indexOf('+') != -1
+            })
           );
         });
         self.loadData(self.growingTree());
@@ -229,8 +233,8 @@ var Assist = function (vm, assist) {
           $(document).trigger("info", 'Done!');
         }
     ).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", JSON.parse(xhr.responseText).message);
-        });
+        $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 }
 
@@ -260,19 +264,18 @@ NodeModel.prototype.mapOptions = {
 	}
 };
 
-// Might rename Assist to Acls and create Assist for the tree widget?
 
 var HdfsViewModel = function (initial) {
   var self = this;
 
   self.assist = new Assist(self, initial);
-  //self.assist.path('/user/hue/nano');
-  self.assist.path('/user/hue/oozie-oozi/0000001-140325184036225-oozie-oozi-W/pig--pig');
+  
 
+  self.doAs = ko.observable('');
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
-  self.init = function () {
+  self.init = function () {	
     self.fetchUsers();
   }
 
@@ -286,6 +289,9 @@ var HdfsViewModel = function (initial) {
       $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
       });
+      
+      self.assist.path('/');
+      self.doAs('admin');      
     });
   }
 };
