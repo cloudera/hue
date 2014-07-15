@@ -1601,7 +1601,7 @@ msgstr "Im Metastore Browser anzeigen"
 
 #: src/beeswax/templates/execute.mako:674
 msgid "Data sample for"
-msgstr "Datenmuster für"
+msgstr "Stichprobe für"
 
 #: src/beeswax/templates/execute.mako:684
 msgid "Ok"
@@ -1638,7 +1638,7 @@ msgstr "Ergebnisse anzeigen..."
 
 #: src/beeswax/templates/execute.mako:1106
 msgid "Preview Sample data"
-msgstr "Vorschau der Musterdaten anzeigen"
+msgstr "Vorschau der Stichprobe anzeigen"
 
 #: src/beeswax/templates/execute.mako:1152
 msgid "There was a problem loading the table preview."
