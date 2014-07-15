@@ -348,12 +348,18 @@ class HiveServer2Dbms(object):
     handle = self.client.query(query)
     curr = time.time()
     end = curr + timeout_sec
+
     while curr <= end:
       state = self.client.get_state(handle)
       if state not in (QueryHistory.STATE.running, QueryHistory.STATE.submitted):
         return handle
       time.sleep(sleep_interval)
       curr = time.time()
+
+    try:
+      self.cancel_operation(handle)
+    except:
+      self.close_operation(handle)
     return None
 
 
