@@ -116,9 +116,6 @@ ${ layout.menubar(section='hive') }
               Groups
               <select data-bind="options: $root.availableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
             </div>
-            <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
-              <i class="fa fa-times"></i>
-            </button>
             <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
                 data-bind="click: $root.role.create">
               <i class="fa fa-save"></i>
@@ -178,9 +175,6 @@ ${ layout.menubar(section='hive') }
                 <div data-bind="template: { name: 'privilege-template', foreach: newPrivileges }">
                 </div>
                 <div data-bind="visible: newPrivileges().length > 0">
-		          <button type="button" rel="tooltip" data-placement="bottom" data-original-title="${ _('Cancel') }" class="btn">
-		            <i class="fa fa-times"></i>
-		          </button>
 		          <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
 		              data-bind="click: $root.role.saveNewPrivileges">
 		            <i class="fa fa-save"></i>

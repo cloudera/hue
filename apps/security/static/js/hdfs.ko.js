@@ -150,9 +150,9 @@ var Assist = function (vm, assist) {
     self.path(obj.path());
   }
 
-  self.loadParents = function(breadcrumbs){
+  self.loadParents = function(breadcrumbs) {
     breadcrumbs.forEach(function(crumb, idx){
-      if (idx < breadcrumbs.length - 1 && crumb.url != ""){
+      if (idx < breadcrumbs.length - 1 && crumb.url != "") {
         var _item = {
           path: crumb.url,
           name: crumb.label,
@@ -165,9 +165,9 @@ var Assist = function (vm, assist) {
 
   self.fetchPath = function () {
     $.getJSON('/filebrowser/view' + self.path(), {
-    	'pagesize': 15,
-    	'format': 'json',
-    	'doas': vm.doAs(),
+      'pagesize': 15,
+      'format': 'json',
+      'doas': vm.doAs(),
     }, function (data) {
       self.loadParents(data.breadcrumbs);
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
@@ -240,28 +240,26 @@ var Assist = function (vm, assist) {
 
 
 var NodeModel = function(data) {
+  var self = this;
 
-	var self = this;
+  self.isExpanded = ko.observable(true);
+  self.description = ko.observable();
+  self.name = ko.observable();
+  self.nodes = ko.observableArray([]);
 
-	self.isExpanded = ko.observable(true);
-	self.description = ko.observable();
-	self.name = ko.observable();
-	self.nodes = ko.observableArray([]);
+  self.toggleVisibility = function() {
+    self.isExpanded(!self.isExpanded());
+  };
 
-	self.toggleVisibility = function() {
-		self.isExpanded(!self.isExpanded());
-	};
-
-	ko.mapping.fromJS(data, self.mapOptions, self);
-
+  ko.mapping.fromJS(data, self.mapOptions, self);
 };
 
 NodeModel.prototype.mapOptions = {
-	nodes: {
-		create: function(args) {
-			return new NodeModel(args.data);
-		}
-	}
+  nodes: {
+    create: function(args) {
+      return new NodeModel(args.data);
+    }
+  }
 };
 
 
@@ -269,14 +267,17 @@ var HdfsViewModel = function (initial) {
   var self = this;
 
   self.assist = new Assist(self, initial);
-  
 
   self.doAs = ko.observable('');
+  self.doAs.subscribe(function() {
+    self.assist.fetchPath();
+  });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
-  self.init = function () {	
+  self.init = function () {  
     self.fetchUsers();
+    self.assist.path('/');
   }
 
 
@@ -288,10 +289,7 @@ var HdfsViewModel = function (initial) {
 
       $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
-      });
-      
-      self.assist.path('/');
-      self.doAs('admin');      
+      });      
     });
   }
 };
