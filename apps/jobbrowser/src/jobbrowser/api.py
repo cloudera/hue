@@ -29,7 +29,7 @@ import hadoop.yarn.node_manager_api as node_manager_api
 
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
-from jobbrowser.yarn_models import Application, Job as YarnJob, Container
+from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container
 from hadoop.cluster import get_next_ha_mrcluster, get_next_ha_yarncluster
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -260,6 +260,8 @@ class YarnApi(JobBrowserApi):
 
       if job['state'] == 'ACCEPTED':
         raise ApplicationNotRunning(jobid, job)
+      elif job['state'] == 'KILLED':
+        return KilledYarnJob(self.resource_manager_api, job)
 
       # MR id, assume 'applicationType': 'MAPREDUCE'
       jobid = jobid.replace('application', 'job')

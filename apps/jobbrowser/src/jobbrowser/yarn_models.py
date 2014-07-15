@@ -72,7 +72,7 @@ class Application:
     setattr(self, 'durationFormatted', format_duration_in_millis(self.durationInMillis))
 
 
-class Job:
+class Job(object):
 
   def __init__(self, api, attrs):
     self.api = api
@@ -91,6 +91,9 @@ class Job:
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
+    if self.state in ('FINISHED', 'FAILED', 'KILLED'):
+      setattr(self, 'finishTime', self.finishedTime)
+      setattr(self, 'startTime', self.startedTime)
     setattr(self, 'duration', self.finishTime - self.startTime)
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
@@ -101,6 +104,9 @@ class Job:
 
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
+
+  def kill(self):
+    return self.api.kill(self.id)
 
   @property
   def counters(self):
@@ -126,14 +132,47 @@ class Job:
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
     return [Task(self, task) for task in self.api.tasks(self.id).get('tasks', {}).get('task', [])
-            if (not task_types or task['type'].lower() in task_types) and
-               (not task_states or task['state'].lower() in task_states)]
+          if (not task_types or task['type'].lower() in task_types) and
+             (not task_states or task['state'].lower() in task_states)]
 
   @property
   def job_attempts(self):
     if not hasattr(self, '_job_attempts'):
       self._job_attempts = self.api.job_attempts(self.id)['jobAttempts']
     return self._job_attempts
+
+
+class KilledJob(Job):
+
+  def __init__(self, api, attrs):
+    self._fixup()
+
+    super(KilledJob, self).__init__(api, attrs)
+    super(KilledJob, self)._fixup()
+
+    setattr(self, 'jobId_short', self.jobId.replace('application_', ''))
+
+  def _fixup(self):
+    if not hasattr(self, 'mapsCompleted'):
+      setattr(self, 'mapsCompleted', 1)
+    if not hasattr(self, 'reducesCompleted'):
+      setattr(self, 'reducesCompleted', 1)
+
+
+  @property
+  def counters(self):
+    return {}
+
+  @property
+  def full_job_conf(self):
+    return {'property': []}
+
+  def filter_tasks(self, task_types=None, task_states=None, task_text=None):
+    return []
+
+  @property
+  def job_attempts(self):
+    return {'jobAttempt': []}
 
 
 class Task:

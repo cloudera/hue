@@ -453,6 +453,14 @@ class TestMapReduce2NoHadoop:
     assert_false(can_view_job('test2', response.context['job']))
     assert_false(can_modify_job('test2', response.context['job']))
 
+  def test_kill_job(self):
+    job_id = 'application_1356251510842_0054'
+    try:
+      response = self.c.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
+      assert_equal(json.loads(response.content), {"status": 0})
+    finally:
+      MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
+
 
 class MockResourceManagerApi:
   APPS = {
@@ -597,6 +605,11 @@ class MockMapreduce2Api(object):
        }
     }
 
+  def kill(self, job_id):
+    job_id = job_id.replace('job', 'application')
+    MockResourceManagerApi.APPS[job_id]['state'] = 'KILLED'
+    return {}
+
 
 class MockMapreduceApi(MockMapreduce2Api):
   def job(self, user, job_id):
@@ -606,7 +619,7 @@ class MockMapreduceApi(MockMapreduce2Api):
               u'reducesCompleted': 0, u'mapsRunning': 1, u'id': u'job_1356251510842_0054', u'successfulReduceAttempts': 0, u'successfulMapAttempts': 0,
               u'uberized': False, u'reducesTotal': 1, u'elapsedTime': 3426, u'mapsPending': 0, u'state': u'RUNNING', u'failedReduceAttempts': 0,
               u'mapsCompleted': 0, u'killedMapAttempts': 0, u'killedReduceAttempts': 0, u'runningReduceAttempts': 0, u'failedMapAttempts': 0, u'mapsTotal': 1,
-              u'user': u'romain', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
+              u'user': u'test', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
               u'name': u'select avg(salary) from sample_07(Stage-1)', u'reducesRunning': 0, u'newMapAttempts': 0, u'diagnostics': u'', u'mapProgress': 0.0,
               u'runningMapAttempts': 1, u'newReduceAttempts': 1,
               "acls" : [{

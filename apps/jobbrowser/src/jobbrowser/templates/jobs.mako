@@ -285,6 +285,7 @@ ${ components.menubar() }
 
     function callJsonData(callback, justRunning) {
       var _url = "?format=json";
+
       if (justRunning == undefined) {
         if ($(".btn-status.active").length > 0) {
           _url += "&state=" + $(".btn-status.active").data("value");
@@ -297,13 +298,17 @@ ${ components.menubar() }
         isUpdating = true;
         _url += "&state=running";
       }
+
       _url += "&user=" + $("#userFilter").val().trim();
+
       if ($("#textFilter").val().trim() != "") {
         _url += "&text=" + $("#textFilter").val().trim();
       }
+
       if ($("#showRetired").is(":checked")) {
         _url += "&retired=on";
       }
+
       $.getJSON(_url, callback);
     }
 
@@ -339,20 +344,19 @@ ${ components.menubar() }
       var _this = $(this);
       _this.attr("data-loading-text", _this.text() + " ...");
       _this.button("loading");
-      $.post(_this.data("killurl"),
-              {
-                "format": "json"
-              },
-              function (response) {
-                _this.button("reset");
-                $("#killModal").modal("hide");
-                if (response.status != 0) {
-                  $(document).trigger("error", "${ _('There was a problem killing this job.') }");
-                }
-                else {
-                  callJobDetails({ url: _this.data("url")});
-                }
-              }
+      $.post(_this.data("killurl"), {
+          "format": "json"
+        },
+        function (response) {
+          _this.button("reset");
+          $("#killModal").modal("hide");
+          if (response.status != 0) {
+            $(document).trigger("error", "${ _('There was a problem killing this job.') }");
+          }
+          else {
+            callJobDetails({ url: _this.data("url")});
+          }
+        }
       );
     });
 
@@ -364,7 +368,7 @@ ${ components.menubar() }
     callJsonData(populateTable);
 
     var _runningInterval = window.setInterval(function () {
-      if (!isUpdating) {
+      if (! isUpdating) {
         callJsonData(updateRunning, true);
       }
     }, 2000);

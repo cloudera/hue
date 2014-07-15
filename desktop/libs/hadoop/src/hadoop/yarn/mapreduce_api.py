@@ -22,6 +22,7 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from hadoop import cluster
+from hadoop.yarn.resource_manager_api import get_resource_manager
 
 
 LOG = logging.getLogger(__name__)
@@ -108,3 +109,7 @@ class MapreduceApi(object):
     app_id = job_id.replace('job', 'application')
     job_id = job_id.replace('application', 'job')
     return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s' % {'app_id': app_id, 'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id, 'version': _API_VERSION}, headers={'Accept': _JSON_CONTENT_TYPE})
+
+  def kill(self, job_id):
+    app_id = job_id.replace('job', 'application')
+    get_resource_manager().kill(app_id) # We need to call the RM
