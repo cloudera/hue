@@ -25,13 +25,15 @@
     <label class="control-label">${ _('When') }</label>
     <div class="controls">
       <div class="row-fluid">
-        <div class="span12">
-          <div style="display: inline-block; min-height: 29px; line-height: 29px">
-            <span data-bind="visible: isAdvancedCron">${ _('Crontab') }</span>
-            <a data-bind="visible: isAdvancedCron" href="http://quartz-scheduler.org/api/2.0.0/org/quartz/CronExpression.html" target="_blank" title="${ _('View syntax rules') }" rel="tooltip"><i class="fa fa-question-circle"></i></a>
-            <input type="text" data-bind="visible: isAdvancedCron" id="coord-frequency" name="cron_frequency" style="margin-right: 20px"/>
-          </div>
+        <div class="span9">
+          <a data-bind="visible: isAdvancedCron" href="http://quartz-scheduler.org/api/2.0.0/org/quartz/CronExpression.html" class="pull-right" target="_blank">&nbsp;<i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
+          <input data-bind="visible: isAdvancedCron" id="coord-frequency" name="cron_frequency" class="pull-right"/>
+          <span data-bind="visible: isAdvancedCron" class="pull-right" style="padding-right:20px">
+            ${ _('Crontab') }
+          </span>&nbsp;
           <label class="checkbox" style="display: inline-block"><input type="checkbox" name="isAdvancedCron" data-bind="checked: isAdvancedCron" /> (${ _('advanced') })</label>
+        </div>
+        <div class="span3">
         </div>
       </div>
       <span class="help-block">${ _('The time frequency at which interval a workflow should be submitted by the coordinator. For example, once a day, every Monday at midnight, every week days, every three days...') }</span>

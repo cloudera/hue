@@ -58,7 +58,7 @@ ${ layout.menubar(section='bundles') }
 
           <li class="nav-header">${ _('Coordinators') }</li>
           % if bundle.is_editable(user):
-          <li><a href="#addBundledCoordinator"><i class="fa fa-plus"></i>${ _('Add') }</a></li>
+          <li><a href="#addBundledCoordinator"><i class="fa fa-plus"></i> ${ _('Add') }</a></li>
           % endif
           <li><a href="#listCoordinators"><i class="fa fa-cloud"></i> ${ _('Show selected') }</a></li>
 
