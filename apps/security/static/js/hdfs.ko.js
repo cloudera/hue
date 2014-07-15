@@ -21,16 +21,16 @@ function parseAcl(acl) {
 	'isDefault': m[1] != null,
     'type': m[2],
     'name': m[3],
-     'r': m[4] != '-',
-     'w': m[5] != '-',
-     'x': m[6] != '-',
-     'status': '',
+    'r': m[4] != '-',
+    'w': m[5] != '-',
+    'x': m[6] != '-',
+    'status': '',
   });
 
   acl.type.subscribe(function() {
     acl.status('modified');
   });
-  acl.name.subscribe(function() { // TODO duplicates
+  acl.name.subscribe(function() {
 	acl.status('modified');
   });
   acl.r.subscribe(function() {
@@ -60,6 +60,7 @@ var Assist = function(vm, assist) {
   self.files = ko.observableArray();
 
   self.acls = ko.observableArray();
+  self.originalAcls = ko.observableArray();
   self.regularAcls = ko.computed(function() {
 	return $.grep(self.acls(), function(acl){ return ! acl.isDefault(); });
   });
@@ -119,8 +120,10 @@ var Assist = function(vm, assist) {
     	'path': self.path()
       }, function (data) {
         self.acls.removeAll();
+        self.originalAcls.removeAll();
         $.each(data.entries, function(index, item) {
     	  self.acls.push(parseAcl(item));
+    	  self.originalAcls.push(parseAcl(item));
         });
         self.owner(data.owner);
         self.group(data.group);
@@ -138,6 +141,7 @@ var Assist = function(vm, assist) {
     $.post("/security/api/hdfs/update_acls", {
         'path': self.path(),
         'acls': ko.mapping.toJSON(self.acls()),
+        'originalAcls': ko.mapping.toJSON(self.originalAcls()),
       }, function (data) {
         var toDelete = []
     	$.each(self.acls(), function(index, item) {
