@@ -40,7 +40,6 @@ def hive(request):
 
 def hdfs(request):
 
-  return render("hdfs.mako", request, {
-      'assist': {},
-      'hadoop_groups': _get_hadoop_groups(),
+  return render("hdfs.mako", request, {      
+      'initial': json.dumps({}),
   })

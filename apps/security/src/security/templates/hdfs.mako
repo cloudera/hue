@@ -33,7 +33,10 @@ ${ layout.menubar(section='hdfs') }
     <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
     <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
     <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('other') }
+
     <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
+    ##<select data-bind="options: $root.availableHadoopGroups, value: name, optionsCaption: '', valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
+
     <input type="checkbox" data-bind="checked: r"/>
     <input type="checkbox" data-bind="checked: w"/>
     <input type="checkbox" data-bind="checked: x"/>
@@ -55,13 +58,13 @@ ${ layout.menubar(section='hdfs') }
             </br>
             <input type="checkbox" checked></input> Me
             </br>
-            <select size="10" multiple="true"></select>
+            <select data-bind="options: availableHadoopGroups" size="10" multiple="true"></select>
           </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Users') }
             </br>
             <input type="checkbox" checked></input> Me
             </br>          
-            <select size="10" multiple="true"></select>
+            <select data-bind="options: availableHadoopUsers" size="10" multiple="true"></select>
           </li>    
         </ul>
       </div>
@@ -96,7 +99,7 @@ ${ layout.menubar(section='hdfs') }
                 <i class="fa fa-plus"></i>
               </a>  
               </br>
-              Default            
+              Default (<i class="fa fa-times"></i> bulk delete?)
               <div data-bind="foreach: $root.assist.defaultAcls">
                 <div data-bind="template: {name: 'acl-edition'}"></div>
               </div>
@@ -136,8 +139,10 @@ ${ layout.menubar(section='hdfs') }
   var viewModel;
 
   $(document).ready(function () {
-    viewModel = new HdfsViewModel(${ assist | n,unicode });
+    viewModel = new HdfsViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
+    
+    viewModel.init();
   });
 </script>
 
