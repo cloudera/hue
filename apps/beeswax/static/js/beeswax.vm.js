@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 function BeeswaxViewModel(server) {
   var self = this;
 
@@ -642,9 +641,10 @@ function BeeswaxViewModel(server) {
     self.design.results.errors.removeAll();
     var request = {
       url: self.design.results.url(),
-      dataType: 'json',
+      dataType: 'text',
       type: 'GET',
       success: function(data) {
+        data = JSON.bigdataParse(data);
         if (data.error) {
           self.design.results.errors.push(data.message);
           self.design.isRunning(false);
