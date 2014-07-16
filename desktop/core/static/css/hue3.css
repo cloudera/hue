@@ -1266,12 +1266,6 @@ a#advanced-btn:hover {
   z-index: 9999;
 }
 
-
-.card table {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
 .tooltip {
   border: 0;
   z-index: 1032;
@@ -1673,44 +1667,15 @@ border-bottom-left-radius: 0px;
 
 /*********************************************************
  *
- * Styles from admin_collections.mako template
- *
- ********************************************************/
-
-#collections {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.coll-heading {
-  position: relative;
-  top: 10px;
-}
-
-.placeholder {
-  background-color: #F5F5F5;
-  border: 1px solid #E3E3E3;
-  height: 40px;
-}
-
-.collection-actions {
-   cursor: pointer;
-   margin: 10px 10px 0 0;
- }
-
-/*********************************************************
- *
  * Misc styles that can be reused as needed
  * - from admin_collections.mako template
  *
  ********************************************************/
- .spinner {
-   color: #ddd;
-   font-size: 60px;
- }
+.spinner {
+ color: #ddd;
+ font-size: 60px;
+}
 
- .pointer {
-   cursor: pointer;
- }
+.pointer {
+ cursor: pointer;
+}

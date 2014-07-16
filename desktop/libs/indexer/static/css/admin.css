@@ -93,7 +93,13 @@ h3 {
 }
 
 .search-bar h4 {
-  margin-top: 4px;
+  font-size: 20px !important;
+  color: #338BB8 !important;
+  padding: 0 !important;
+  margin-top: 4px !important;
+  margin-left: 20px;
+  border: none !important;
+  max-width: none!important;
 }
 
 .waiting {

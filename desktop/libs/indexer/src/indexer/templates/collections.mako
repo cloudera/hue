@@ -22,7 +22,7 @@
 <%namespace name="macros" file="macros.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
+${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
 
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <link rel="stylesheet" href="/indexer/static/css/admin.css">
@@ -57,12 +57,12 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 
 
 <div class="search-bar" style="height: 30px">
-  <div class="pull-right" style="margin-right: 20px">
+  <div class="pull-right">
     <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i> ${ _('Dashboards') }
     </a>
   </div>
-  <h4><a href="#manage">${_('Solr Indexer')}</a></h4>
+  <h4><a href="#manage"><i class="fa fa-database"></i> ${_('Indexes')}</a></h4>
 </div>
 
 <div class="container-fluid">
@@ -99,7 +99,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete collections')}</h3>
+    <h3>${_('Delete indexes')}</h3>
   </div>
   <div class="modal-body">
     <ul data-bind="foreach: selectedCloudCollections">
@@ -116,7 +116,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
   <div data-bind="if: collection()" class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete collection ')} <span data-bind="text: collection().name"></span></h3>
+    <h3>${_('Delete index ')} <span data-bind="text: collection().name"></span></h3>
   </div>
   <div class="modal-body"></div>
   <div data-bind="if: collection()" class="modal-footer">
@@ -126,36 +126,35 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 </div>
 
 
-<!-- Breadcrum component -->
-<script id="breadcrum" type="text/html">
-<ul data-bind="foreach: breadcrum.list" class="nav nav-pills hueBreadcrumbBar">
+<!-- breadcrumb component -->
+<script id="breadcrumb" type="text/html">
+<ul data-bind="foreach: breadcrumb.list" class="nav nav-pills hueBreadcrumbBar">
   <li class="nowrap">
-    <!-- ko if: $index() == ( $root.breadcrum.list().length - 1 ) -->
+    <!-- ko if: $index() == ( $root.breadcrumb.list().length - 1 ) -->
     <span data-bind="text: label" style="padding-left:12px"></span>
     <!-- /ko -->
-    <!-- ko if: $index() != ( $root.breadcrum.list().length - 1 ) -->
+    <!-- ko if: $index() != ( $root.breadcrumb.list().length - 1 ) -->
     <a data-bind="routie: url, text: label" href="javascript:void(0)"></a>
     <span class="divider">&gt;</span>
     <!-- /ko -->
   </li>
 </ul>
 </script>
-<!-- /Breadcrum component -->
+<!-- /breadcrumb component -->
 
 
 <!-- Manage collections page -->
 <script id="manage-page" type="text/html">
 <div class="span12" >
-  <div class="card wizard">
-    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root, 'if': manage.collections().length != 0 }"></div>
-    <div class="card-body" data-bind="with: manage">
+  <div class="card card-home card-small wizard">
+    <div data-bind="with: manage">
       <%actionbar:render>
         <%def name="search()">
           <div data-bind="visible: collections().length > 0 && !isLoading()">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
-                placeholder="${_('Filter collections...')}" class="input-xlarge search-query">
+                placeholder="${_('Filter indexes...')}" class="input-xlarge search-query">
             <button data-bind="clickBubble: false, disable: selectedCloudCollections().length == 0" class="btn toolbarBtn"
-                title="${_('Delete the selected collections. These must be solr cloud collections. Cores cannot be deleted currently.')}" data-toggle="modal" data-target="#deleteCollections">
+                title="${_('Delete the selected indexes. These must be solr cloud collections. Cores cannot be deleted currently.')}" data-toggle="modal" data-target="#deleteCollections">
               <i class="fa fa-times"></i> ${_('Delete')}
             </button>
             <a href="#create" class="btn toolbarBtn pull-right">
@@ -170,7 +169,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
       <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
         <div class="span10 offset1 center importBtn" style="cursor: pointer">
           <i class="fa fa-plus-circle waiting"></i>
-          <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/><a href="#create">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
+          <h1 class="emptyMessage">${ _('There are currently no indexes defined.') }<br/><a href="#create">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
         </div>
       </div>
       <div class="row-fluid" data-bind="visible: collections().length > 0 && !isLoading()">
@@ -204,8 +203,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <!-- Create by file -->
 <script id="create-page" type="text/html">
 <div class="span12">
-  <div class="card wizard">
-    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+  <div class="card card-home card-small wizard">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrumb', 'data': $root }"></div>
     <div class="card-body" data-bind="with: create">
       <form data-bind="if: wizard.currentPage()" class="form form-horizontal">
         <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
@@ -228,7 +227,7 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   <div class="control-group" data-bind="css: {'error': collection.name.errors().length > 0}">
     <label for="name" class="control-label">${_("Name")}</label>
     <div class="controls">
-      <input data-bind="value: collection.name" name="name" type="text" placeholder="${_('Name of collection')}" />
+      <input data-bind="value: collection.name" name="name" type="text" placeholder="${_('Name of index')}" />
     </div>
   </div>
 
@@ -351,8 +350,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
   </div>
 </div>
 <div class="span9">
-  <div class="card wizard">
-    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+  <div class="card card-home card-small wizard">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrumb', 'data': $root }"></div>
     <div data-bind="with: edit"  class="card-body">
       <form class="form">
         <table class="table">
@@ -406,8 +405,8 @@ ${ commonheader(_('Collection Manager'), "indexer", user, "29px") | n,unicode }
 <!-- Upload wizard -->
 <script id="upload-page" type="text/html">
 <div class="span12">
-  <div class="card wizard">
-    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrum', 'data': $root }"></div>
+  <div class="card card-home card-small wizard">
+    <div class="card-heading simple" data-bind="template: { 'name': 'breadcrumb', 'data': $root }"></div>
     <div class="card-body" data-bind="with: edit">
       <form data-bind="if: wizard.currentPage()" class="form form-horizontal">
         <div data-bind="template: { 'name': wizard.currentPage().name, 'afterRender': afterRender}"></div>
@@ -514,9 +513,9 @@ function validateFields(collection) {
 }
 
 var vm = new CollectionsViewModel({
-  'breadcrum': {
+  'breadcrumb': {
     'labels': {
-      '': "${_('Collections')}",
+      '': "${_('Indexes')}",
       'data': "${_('Upload data')}"
     },
     'skip': ['manage', 'upload', 'edit', 'create', 'wizard']
@@ -543,26 +542,34 @@ vm.edit.sourceType.subscribe(function(value) {
 
 routie({
   "": function() {
-    vm.breadcrum("manage");
+    vm.breadcrumb("manage");
     vm.page('manage-page');
   },
   "manage": function() {
-    vm.breadcrum(window.location.hash.substring(1));
+    vm.breadcrumb(window.location.hash.substring(1));
     vm.page('manage-page');
   },
   "create": function() {
     vm.page('create-page');
-    vm.breadcrum("create/wizard/" + vm.create.wizard.currentPage().url());
+    vm.breadcrumb("create/wizard/" + vm.create.wizard.currentPage().url());
   },
   "create/wizard": function() {
     vm.page('create-page');
-    vm.breadcrum("create/wizard/" + vm.create.wizard.currentPage().url());
+    vm.breadcrumb("create/wizard/" + vm.create.wizard.currentPage().url());
   },
   "create/wizard/:step": function(step) {
-    vm.breadcrum(window.location.hash.substring(1));
+    vm.breadcrumb(window.location.hash.substring(1));
     vm.page('create-page');
     vm.create.wizard.setPageByUrl(step);
     routie('create/wizard/' + vm.create.wizard.currentPage().url());
+  },
+  "link/:name": function(name) {
+    var _interval = window.setInterval(function(){
+      if (vm.manage.hasLoadedOnce()){
+        window.clearInterval(_interval);
+        routie("edit/"+name);
+      }
+    }, 300);
   },
   "edit/:name": function(name) {
     ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
@@ -571,7 +578,7 @@ routie({
     if (vm.manage.selectedCollections().length == 0) {
       routie('manage');
     } else {
-      vm.breadcrum(window.location.hash.substring(1));
+      vm.breadcrumb(window.location.hash.substring(1));
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.edit.fetchFields();
       vm.page('edit-page');
@@ -584,7 +591,7 @@ routie({
     if (vm.manage.selectedCollections().length == 0) {
       routie('manage');
     } else {
-      vm.breadcrum('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
+      vm.breadcrumb('edit/' + name + '/upload/' + vm.edit.wizard.currentPage().url());
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.page('upload-page');
     }
@@ -596,7 +603,7 @@ routie({
     if (vm.manage.selectedCollections().length == 0) {
       routie('manage');
     } else {
-      vm.breadcrum(window.location.hash.substring(1));
+      vm.breadcrumb(window.location.hash.substring(1));
       vm.edit.collection(vm.manage.selectedCollections()[0]());
       vm.page('upload-page');
     }
@@ -606,8 +613,8 @@ routie({
 });
 
 vm.manage.fetchCollections();
-
 ko.applyBindings(vm);
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }

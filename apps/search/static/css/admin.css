@@ -15,69 +15,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-
-h3 {
-  line-height: 24px;
-}
-
-.sidebar-nav {
-  padding: 9px 0;
-}
-
-#content-editor {
-  border: 1px dotted #DDD;
-}
-
-.available-fields {
-  padding: 0;
-  padding-left:10px;
-}
-
-.available-fields ul {
-  list-style: none outside none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-}
-
-.available-fields ul li {
-  cursor: pointer;
-  color: #666;
-}
-
-.form-actions {
-  padding-left: 0!important;
-}
-
-.bubble {
-  float: left;
-  background-color: #EEEEEE;
-  border: 1px solid #E0E0E0;
-  padding: 8px;
-  margin: 4px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-
-.section {
-  background-color: #FAFAFA;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-
-.miniform {
-  margin-top: 20px;
-  background-color: #F3F3F3;
-  padding: 10px;
-  border-top: 1px solid #DDD;
-}
-
-.select-mini {
-  width: 100%;
-}
-
 .search-bar {
   background-color: #fafafa;
   border-bottom: 1px solid #e3e3e3;
@@ -93,65 +30,34 @@ h3 {
 }
 
 .search-bar h4 {
-  margin-top: 4px;
+  font-size: 20px !important;
+  color: #338BB8 !important;
+  padding: 0 !important;
+  margin-top: 4px !important;
+  margin-left: 20px;
+  border: none !important;
+  max-width: none!important;
 }
 
-.waiting {
-  font-size: 196px;
-  color: #DDD;
-}
-
-h1.emptyMessage {
-  margin-top: 50px;
-  color: #BBB;
-  line-height: 60px;
-}
-
-.stepDetails {
-  padding: 5px;
-}
-
-.editable {
-  cursor: pointer;
-}
-
-.collectionRow {
-  cursor: pointer;
-  margin-bottom: 10px;
-  padding: 10px;
-  height: 40px;
-}
-
-.collectionRow:hover {
-  background-color: #EFEFEF;
-}
-
-.hue-colorchart {
+#collections {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
   width: 100%;
 }
 
-.hue-colorchart td {
-  padding: 4px;
-  cursor: pointer;
+.coll-heading {
+  position: relative;
+  top: 10px;
 }
 
-.cloud-tmpl {
-  border: 1px dashed #FFFFFF;
-  padding: 10px;
-  margin-bottom: 10px;
-  color: #666;
-  cursor: pointer;
+.placeholder {
+  background-color: #F5F5F5;
+  border: 1px solid #E3E3E3;
+  height: 40px;
 }
 
-.cloud-tmpl h4 {
-  margin-top: 0;
-}
-
-.cloud-tmpl.selected {
-  border: 1px dashed #338BB8;
-}
-
-.cloud-tmpl:hover, .cloud-tmpl.selected:hover  {
-  color: #000;
-  border: 1px dashed #CCCCCC;
-}
+.collection-actions {
+   cursor: pointer;
+   margin: 10px 10px 0 0;
+ }

@@ -406,6 +406,7 @@ var ManageCollectionsViewModel = function() {
 
   // UI
   self.isLoading = ko.observable();
+  self.hasLoadedOnce = ko.observable(false);
   self.filteredCollections = ko.observableArray();
   self.selectedCollections = ko.computed(function() {
     return ko.utils.arrayFilter(self.collections(), function(collection) {
@@ -465,6 +466,7 @@ var ManageCollectionsViewModel = function() {
           collections.push(new_collection);
         });
         self.collections(collections);
+        self.hasLoadedOnce(true);
       } else {
         $(document).trigger("error", data.message);
       }
@@ -523,9 +525,9 @@ var CollectionsViewModel = function(config) {
 
   // Models
   self.page = ko.observable();
-  self.breadcrum = ko.observable();
-  self.breadcrum.list = ko.computed(function() {
-    var breadcrum_config = _config.breadcrum || {};
+  self.breadcrumb = ko.observable();
+  self.breadcrumb.list = ko.computed(function() {
+    var breadcrum_config = _config.breadcrumb || {};
     var labels = breadcrum_config.labels || {};
     var skip = breadcrum_config.skip || [];
     var breadcrums = [];
@@ -535,9 +537,9 @@ var CollectionsViewModel = function(config) {
       'label': labels[crum] || crum,
       'crum': crum
     });
-    if (self.breadcrum()) {
+    if (self.breadcrumb()) {
       var crums = [];
-      var newcrums = ko.utils.arrayMap( self.breadcrum().split('/'), function(crum) {
+      var newcrums = ko.utils.arrayMap( self.breadcrumb().split('/'), function(crum) {
         crums.push(crum);
         if (skip.indexOf(crum) != -1) {
           return null;
@@ -548,8 +550,8 @@ var CollectionsViewModel = function(config) {
           'crum': crum
         };
       });
-      breadcrums.push.apply( breadcrums, ko.utils.arrayFilter(newcrums, function(breadcrum) {
-        return !!breadcrum;
+      breadcrums.push.apply( breadcrums, ko.utils.arrayFilter(newcrums, function(breadcrumb) {
+        return !!breadcrumb;
       }) );
     }
     return breadcrums;
