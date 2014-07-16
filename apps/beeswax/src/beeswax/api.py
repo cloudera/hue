@@ -178,7 +178,7 @@ def watch_query_refresh_json(request, id):
   job_urls = massage_job_urls_for_json(jobs)
 
   result = {
-    'status': 0,
+    'status': -1,
     'log': log,
     'jobs': jobs,
     'jobUrls': job_urls,
@@ -192,11 +192,14 @@ def watch_query_refresh_json(request, id):
   # Run time error
   if query_history.is_failure():
     res = db.get_operation_status(handle)
-    if hasattr(res, 'errorMessage') and res.errorMessage:
+    if query_history.is_canceled(res):
+      result['status'] = 0
+    elif hasattr(res, 'errorMessage') and res.errorMessage:
       result['message'] = res.errorMessage
     else:
       result['message'] = _('Bad status for request %s:\n%s') % (id, res)
-    result['status'] = -1
+  else:
+    result['status'] = 0
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
