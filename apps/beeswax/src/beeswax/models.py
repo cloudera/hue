@@ -213,6 +213,10 @@ class HiveServerQueryHistory(QueryHistory):
     self.last_state = new_state.index
     self.save()
 
+  @classmethod
+  def is_canceled(self, res):
+    return res.operationState in (TOperationState.CANCELED_STATE, TOperationState.CLOSED_STATE)
+
 
 class SavedQuery(models.Model):
   """
