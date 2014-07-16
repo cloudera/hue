@@ -460,6 +460,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     if range_properties:
       facet_type = 'range'
       properties.update(range_properties)
+      properties['initial_gap'] = properties['gap']
     elif widget_type == 'hit-widget':
       facet_type = 'query'
     else:
@@ -497,7 +498,7 @@ def get_range_facet(request):
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
     else:
-      properties = _zoom_range_facet(solr_api, collection, facet)
+      properties = _zoom_range_facet(solr_api, collection, facet) # Zoom out
 
     result['properties'] = properties
     result['status'] = 0

@@ -162,7 +162,7 @@ var Query = function (vm, query) {
 
   self.selectRangeFacet = function (data) {
     if (data.force != undefined) {
-      self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+      self.removeFilter(ko.mapping.fromJS({'id': data.widget_id, 'dontZoomOut': true}));
     }
 
     var fq = self.getFacetFilter(data.widget_id);
@@ -216,8 +216,8 @@ var Query = function (vm, query) {
         self.fqs.remove(fq);
         // Also re-init range select widget
         var rangeWidget = vm.collection.getFacetById(fq.id());
-        if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
-          vm.collection.timeLineZoom({'id': rangeWidget.id()});
+        if (data.dontZoomOut == undefined && rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
+          vm.collection.rangeZoomOut({'id': rangeWidget.id()});
         }
         found = true;
         return false;
@@ -763,35 +763,13 @@ var Collection = function (vm, collection) {
     vm.search();
   }
 
-  self.timeLineZoom = function (facet_json) {
+  self.rangeZoomOut = function (facet_json) {
     var facet = self.getFacetById(facet_json.id);
 
-    facet.properties.start(facet.from);
-    facet.properties.end(facet.to);
-
-    $.ajax({
-      type: "POST",
-      url: "/search/get_range_facet",
-      data: {
-        collection: ko.mapping.toJSON(self),
-        facet: ko.mapping.toJSON(facet),
-        action: "zoom_out"
-      },
-      success: function (data) {
-        if (data.status == 0) {
-          facet.properties.start(data.properties.start);
-          facet.properties.end(data.properties.end);
-          facet.properties.gap(data.properties.gap);
-
-          var fq = vm.query.getFacetFilter(facet_json.id);
-          if (fq != null) {
-            fq.properties()[0].from(data.properties.start);
-            fq.properties()[0].to(data.properties.end);
-          }
-        }
-      },
-      async: false
-    });
+    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_json.id}));
+    if (facet.properties.gap() != null) { // Bar, line charts don't have gap
+      facet.properties.gap(facet.properties.initial_gap());
+    }
 
     vm.search();
   }
