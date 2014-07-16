@@ -23,12 +23,12 @@
   <parent>
     <groupId>com.cloudera.cdh</groupId>
     <artifactId>cdh-root</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.1-SNAPSHOT</version>
   </parent>
 
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>3.6.0-cdh5.1.0</version>
+  <version>3.6.0-cdh5.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
