@@ -279,7 +279,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       </div>
 
       <div class="tab-pane" id="log">
-        <pre>${ oozie_coordinator.log.decode('utf-8', 'replace') }</pre>
+        <pre></pre>
       </div>
 
       <div class="tab-pane" id="definition">

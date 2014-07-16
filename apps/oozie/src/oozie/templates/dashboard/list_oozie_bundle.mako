@@ -261,7 +261,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       </div>
 
       <div class="tab-pane" id="log">
-        <pre>${ oozie_bundle.log.decode('utf-8', 'replace') }</pre>
+        <pre></pre>
       </div>
 
       <div class="tab-pane" id="definition">

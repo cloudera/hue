@@ -348,6 +348,19 @@ def list_oozie_workflow_action(request, action):
 
 
 @show_oozie_error
+def get_oozie_job_log(request, job_id):
+  oozie_job = check_job_access_permission(request, job_id)
+
+  return_obj = {
+    'id': oozie_job.id,
+    'status':  oozie_job.status,
+    'log': oozie_job.log,
+  }
+
+  return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
+
+
+@show_oozie_error
 def list_oozie_info(request):
   api = get_oozie(request.user)
 

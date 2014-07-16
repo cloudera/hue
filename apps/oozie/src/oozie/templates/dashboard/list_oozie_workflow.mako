@@ -279,7 +279,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </div>
 
         <div class="tab-pane" id="log">
-          <pre>${ oozie_workflow.log.decode('utf-8', 'replace') }</pre>
+          <pre></pre>
         </div>
 
         <div class="tab-pane" id="definition">
