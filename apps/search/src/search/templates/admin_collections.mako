@@ -27,29 +27,28 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="search-bar" style="height: 30px">
-    <div class="pull-right" style="margin-right: 20px">
+  <div class="pull-right">
     <a class="btn importBtn" href="${ url('indexer:collections') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
-    </div>
-  <h4><a href="">${_('Dashboards')}</a></h4>
+  </div>
+  <h4><i class="fa fa-tags"></i> ${_('Dashboards')}</h4>
 </div>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-home card-small">
     <%actionbar:render>
       <%def name="search()">
         <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
-        &nbsp;
-        &nbsp;
-        <span>
-          <a class="btn" data-bind="click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a> &nbsp;&nbsp;
-          <a class="btn" data-bind="click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
-        </span>
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn pull-right" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Dashboard') }</a>
+      </%def>
+
+      <%def name="actions()">
+        <a class="btn" data-bind="click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
+        <a class="btn" data-bind="click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </%def>
 
       <%def name="creation()">
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       </%def>
     </%actionbar:render>
 
@@ -72,28 +71,30 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     </div>
 
     <div class="row-fluid" data-bind="visible: collections().length > 0 && !isLoading()">
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th>
-              <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
-            </th>
-            <th>${ _('Name') }</th>
-            <th>${ _('Solr Index') }</th>
-            <th class="center">${ _('Shared') }</th>
-          </tr>
-        </thead>
-        <tbody data-bind="foreach: filteredCollections">
-          <tr>
-            <td data-bind="click: $root.toggleCollectionSelect.bind($root), clickBubble: false">
-              <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
-            </td>
-            <td><a data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
-            <td data-bind="text: name"></td>
-            <td class="center"><span data-bind="css: { 'fa fa-check': enabled }"></span></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="span12">
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th style="width: 1%">
+                <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
+              </th>
+              <th>${ _('Name') }</th>
+              <th>${ _('Solr Index') }</th>
+              <th width="1%" class="center">${ _('Shared') }</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: filteredCollections">
+            <tr>
+              <td data-bind="click: $root.toggleCollectionSelect.bind($root), clickBubble: false">
+                <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
+              </td>
+              <td><a data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
+              <td><a data-bind="text: name, click: $root.editIndex" title="${ _('Click to edit the index') }" class="pointer"></a></td>
+              <td class="center"><span data-bind="css: { 'fa fa-check': enabled }"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -113,7 +114,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     <h3>${_('Confirm Delete')}</h3>
   </div>
   <div class="modal-body">
-    <p>${_('Are you sure you want to delete the selected collections?')}</p>
+    <p>${_('Are you sure you want to delete the selected dashboards?')}</p>
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -131,7 +132,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     listCollectionsUrl: "${ url("search:admin_collections") }?format=json",
     deleteUrl: "${ url("search:admin_collection_delete") }",
     copyUrl: "${ url("search:admin_collection_copy") }",
-    indexerUrl: "/indexer/#edit/"
+    indexerUrl: "/indexer/#link/"
   }
 
   var viewModel = new SearchCollectionsModel(appProperties);
@@ -171,11 +172,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     $(document).on("collectionDeleted", function () {
       $("#deleteModal").modal("hide");
       $("#deleteModalBtn").button("reset");
-      $(document).trigger("info", "${ _("Collection deleted successfully.") }");
+      $(document).trigger("info", "${ _("Dashboard deleted successfully.") }");
     });
 
     $(document).on("collectionCopied", function () {
-      $(document).trigger("info", "${ _("Collection copied successfully.") }");
+      $(document).trigger("info", "${ _("Dashboard copied successfully.") }");
     });
 
     $(document).on("confirmDelete", function () {

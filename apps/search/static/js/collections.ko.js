@@ -105,15 +105,13 @@ var SearchCollectionsModel = function (props) {
     }));
   };
 
-  self.viewIndex = function (collection) {
-    var idx = [self.INDEXER_URL, collection.label()].join('');
-    cleanCollections();
-    location.href = idx;
-  };
-
   self.editCollection = function (collection) {
     cleanCollections();
     location.href = collection.absoluteUrl();
+  };
+
+  self.editIndex = function (collection) {
+    location.href = self.INDEXER_URL + collection.name();
   };
 
   self.markManyForDeletion = function (collections) {
