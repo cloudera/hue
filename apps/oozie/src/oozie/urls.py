@@ -98,6 +98,7 @@ urlpatterns += patterns(
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),
 
   url(r'^submit_external_job/(?P<application_path>.+?)$', 'submit_external_job', name='submit_external_job'),
+  url(r'^get_oozie_job_log/(?P<job_id>[-\w]+)$', 'get_oozie_job_log', name='get_oozie_job_log'),
 
   url(r'^list_oozie_info/$', 'list_oozie_info', name='list_oozie_info'),
 
