@@ -41,9 +41,15 @@ ${ layout.menubar(section='hive') }
     <div class="span2">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#edit"><i class="fa fa-eye"></i> ${ _('View') }</a></li>
+          <li class="nav-header">${ _('Privileges') }</li>
+          <li class="active"><a href="#edit"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
           <li><a href="#roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Users') }
+            </br>
+            <input type="checkbox" checked="checked"> ${_('Me')}
+            </br>          
+            <select data-bind="options: availableHadoopUsers" size="10"></select>
+          </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             </br>
             <input type="checkbox" checked></input> All
@@ -55,11 +61,10 @@ ${ layout.menubar(section='hive') }
     </div>
 
     <div class="span10">
-
       <div id="edit" class="mainSection card card-small">
         <h1 class="card-heading simple">${ _('Edit') }</h1>
         <div class="card-body">
-          <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate:'afterkeydown'"/>
+          <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'"/>
           <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }">
             <i class="fa fa-external-link"></i>
           </a>
@@ -69,10 +74,17 @@ ${ layout.menubar(section='hive') }
           <i class="fa fa-eye-slash"></i>
         </div>
         <div>
-          <div class="span8">
+          <div class="span6">
             <div data-bind="foreach: $root.assist.files">
               <div data-bind="text: $data, click: $root.list_sentry_privileges_for_provider"></div>
             </div>
+          </div>
+          <div class="span6">
+            <span data-bind="text: ko.mapping.toJSON($root.assist.privilege)"></span>
+            <!-- ko if: $root.assist.privilege() -->              
+              sentry_privileges: <span data-bind="text: $root.assist.privilege.sentry_privileges"></span>
+              message: <span data-bind="text: $root.assist.privilege.message"></span>
+            <!-- /ko -->
           </div>
         </div>
       </div>

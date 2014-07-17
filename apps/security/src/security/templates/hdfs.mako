@@ -102,8 +102,7 @@ ${ layout.menubar(section='hdfs') }
         <div class="card-body">
           <div class="row-fluid">
             <div class="span8">
-              <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path"/>
-
+              <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'"/>
               <div id="nav-bar" data-bind="template: { name: 'tree-template', data: $root.assist.treeData }"></div>
             </div>
             <div class="span4">

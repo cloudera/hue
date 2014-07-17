@@ -248,7 +248,7 @@ var NodeModel = function(data) {
   self.nodes = ko.observableArray([]);
 
   self.toggleVisibility = function() {
-    self.isExpanded(!self.isExpanded());
+    self.isExpanded(! self.isExpanded());
   };
 
   ko.mapping.fromJS(data, self.mapOptions, self);
