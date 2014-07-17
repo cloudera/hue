@@ -42,3 +42,7 @@
   padding-left: 6px !important;
   border-bottom: none !important;
 }
+
+.sampleTable td, .sampleTable th {
+  white-space: nowrap;
+}
