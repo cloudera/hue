@@ -123,18 +123,25 @@ var Assist = function (vm) {
   var self = this;
 
   self.path = ko.observable('');
-  self.path.subscribe(function () {
+  self.path.subscribe(function() {
 	self.fetchDatabases();
   });
   self.files = ko.observableArray();
+  self.privilege = ko.observable();
 
   self.fetchDatabases = function() {
+	var path = self.path().replace('.', '/');
+
     var request = {
-      url: '/beeswax/api/autocomplete', // impala too
+      url: '/beeswax/api/autocomplete/' + path,
       dataType: 'json',
       type: 'GET',
       success: function(data) {
-        self.files(data.databases);
+    	if (data.databases) {
+          self.files(data.databases);
+    	} else if (data.tables && data.tables.length > 0) {
+    	  self.files(data.tables);
+    	}
       },
       cache: false
     };
@@ -159,8 +166,11 @@ var HiveViewModel = function (initial) {
   self.role = new Role(self);
   self.privilege = new Privilege(self, {});
 
+  self.availableHadoopUsers = ko.observableArray();
+  self.availableHadoopGroups = ko.observableArray();
 
   self.init = function() {
+	self.fetchUsers();
     self.list_sentry_roles_by_group();
     self.assist.fetchDatabases();
   };
@@ -217,12 +227,24 @@ var HiveViewModel = function (initial) {
         authorizableHierarchy: ko.mapping.toJSON({'server': 'aa', 'db': 'default'}),
       },
       success: function (data) {
-    	alert(ko.mapping.toJSON(data));
+    	self.assist.privilege(ko.mapping.fromJS(data));
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+  
+  self.fetchUsers = function () {
+    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+      $.each(data.users, function (i, user) {
+        self.availableHadoopUsers.push(user.username);
+      });
+
+      $.each(data.groups, function (i, group) {
+        self.availableHadoopGroups.push(group.name);
+      });      
+    });
+  }
 };
 
 function logGA(page) {
