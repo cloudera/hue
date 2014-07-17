@@ -151,12 +151,12 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           </tbody>
           <tfoot>
             <tr data-bind="visible: isLoading()">
-              <td colspan="2" class="left">
+              <td colspan="3" class="left">
                 <img src="/static/art/spinner.gif" />
               </td>
             </tr>
             <tr data-bind="visible: actions().length == 0 && !isLoading()">
-              <td colspan="2">
+              <td colspan="3">
                 <div class="alert">
                   ${ _('There are no actions to be shown.') }
                 </div>
@@ -428,7 +428,23 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
     resizeLogs();
     refreshView();
+    refreshLogs();
+
     var logsAtEnd = true;
+    function refreshLogs() {
+      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_bundle.id) }", function (data) {
+        var _logsEl = $("#log pre");
+        _logsEl.text(data.log);
+
+        if (logsAtEnd) {
+          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+        }
+        if (data.status != "RUNNING" && data.status != "PREP"){
+          return;
+        }
+        window.setTimeout(refreshLogs, 20000);
+      });
+    }
 
     function refreshView() {
       $.getJSON("${ oozie_bundle.get_absolute_url(format='json') }", function (data) {
@@ -469,17 +485,10 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
-        var _logsEl = $("#log pre");
-        _logsEl.text(data.log);
-
-        if (logsAtEnd) {
-          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
-        }
-
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
-        window.setTimeout(refreshView, 20000);
+        window.setTimeout(refreshView, 5000);
       });
     }
 

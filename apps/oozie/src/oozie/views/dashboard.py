@@ -206,7 +206,6 @@ def list_oozie_workflow(request, job_id):
       'status':  oozie_workflow.status,
       'progress': oozie_workflow.get_progress(full_node_list),
       'graph': workflow_graph,
-      'log': oozie_workflow.log,
       'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions(), oozie_coordinator, oozie_bundle)
     }
     return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
@@ -262,7 +261,6 @@ def list_oozie_coordinator(request, job_id):
       'progress': oozie_coordinator.get_progress(),
       'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
       'endTime': format_time(oozie_coordinator.endTime),
-      'log': oozie_coordinator.log,
       'actions': actions,
       'show_all_actions': show_all_actions
     }
@@ -308,7 +306,6 @@ def list_oozie_bundle(request, job_id):
       'status':  oozie_bundle.status,
       'progress': oozie_bundle.get_progress(),
       'endTime': format_time(oozie_bundle.endTime),
-      'log': oozie_bundle.log,
       'actions': massaged_bundle_actions_for_json(oozie_bundle)
     }
     return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), mimetype="application/json")
