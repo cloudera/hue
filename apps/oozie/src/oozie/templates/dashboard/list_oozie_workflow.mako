@@ -582,7 +582,24 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     resizeLogs();
     refreshView();
+    refreshLogs();
+
     var logsAtEnd = true;
+    function refreshLogs() {
+      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_workflow.id) }", function (data) {
+        var _logsEl = $("#log pre");
+        _logsEl.text(data.log);
+
+        if (logsAtEnd) {
+          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+        }
+        if (data.status != "RUNNING" && data.status != "PREP"){
+          return;
+        }
+        window.setTimeout(refreshLogs, 3000);
+      });
+    }
+
 
     function refreshView() {
       $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
@@ -619,13 +636,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
         $("#graph").html(data.graph);
 
-        var _logsEl = $("#log pre");
-
-        _logsEl.text(data.log);
-
-        if (logsAtEnd) {
-          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
-        }
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
