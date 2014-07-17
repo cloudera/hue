@@ -20,7 +20,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-
 <%namespace name="components" file="components.mako" />
 
 <%
@@ -31,6 +30,7 @@ from django.utils.translation import ugettext as _
 %>
 
 ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
+<link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
 ${ components.menubar() }
 
 <%def name="column_table(cols)">
@@ -197,14 +197,6 @@ ${ components.menubar() }
 <div id="import-data-modal" class="modal hide fade"></div>
 </div>
 
-<style type="text/css">
-  .sampleTable td, .sampleTable th {
-    white-space: nowrap;
-  }
-</style>
-
-<link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
-
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     $(".datatables").dataTable({
@@ -268,6 +260,9 @@ ${ components.menubar() }
         }
       );
     });
+
+    // convert link text to URLs in comment column (Columns tab)
+    hue.text2Url(document.querySelectorAll('.datatables td:last-child'));
   });
 </script>
 

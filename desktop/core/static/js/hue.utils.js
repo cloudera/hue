@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Array polyfills for older browsers
 if (!('clean' in Array.prototype)) {
   Array.prototype.clean = function (deleteValue) {
     for (var i = 0; i < this.length; i++) {
@@ -60,3 +61,41 @@ if (!('filter' in Array.prototype)) {
     return other;
   };
 }
+
+/*
+ * Add utility methods to the HUE object
+*/
+(function (hue) {
+  'use strict';
+
+  /*
+   * Convert text to URLs
+   * Selector arg can be jQuery or document.querySelectorAll()
+  */
+  hue.text2Url = function (selectors) {
+    var i = 0,
+      len = selectors.length;
+
+    for (i; i < len; i++) {
+      var arr = [],
+        selector = selectors[i],
+        val = selector.innerHTML.replace(/&nbsp;/g, ' ').split(' ');
+
+      val.forEach(function(word) {
+        var matched = null,
+          re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
+
+        if (re.test(word)) {
+          matched = word.match(re);
+          word = word.replace(matched, '<a href="' + matched + '">' + matched + '</a>')
+          arr.push(word);
+        } else {
+          arr.push(word);
+        }
+      });
+
+      selector.innerHTML = arr.join(' ');
+    }
+    return this;
+  };
+}(hue = window.hue || {}));
