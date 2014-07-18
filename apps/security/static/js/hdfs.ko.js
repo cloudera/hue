@@ -53,6 +53,8 @@ function printAcl(acl) {
 var Assist = function (vm, assist) {
   var self = this;
 
+  self.isLoadingAcls = ko.observable(false);
+
   self.treeData = ko.observable({nodes:[]});
   self.loadData = function(data) {
     self.treeData(new NodeModel(data));
@@ -62,6 +64,7 @@ var Assist = function (vm, assist) {
     name: "/",
     path: "/",
     aclBit: false,
+    selected: false,
     nodes: []
   });
 
@@ -151,16 +154,18 @@ var Assist = function (vm, assist) {
   }
 
   self.loadParents = function(breadcrumbs) {
-    breadcrumbs.forEach(function(crumb, idx){
-      if (idx < breadcrumbs.length - 1 && crumb.url != "") {
-        var _item = {
-          path: crumb.url,
-          name: crumb.label,
-          rwx: ""
+    if (typeof breadcrumbs != "undefined" && breadcrumbs != null) {
+      breadcrumbs.forEach(function (crumb, idx) {
+        if (idx < breadcrumbs.length - 1 && crumb.url != "") {
+          var _item = {
+            path: crumb.url,
+            name: crumb.label,
+            rwx: ""
+          }
+          self.convertItemToObject(_item);
         }
-        self.convertItemToObject(_item);
-      }
-    });
+      });
+    }
   }
 
   self.fetchPath = function () {
@@ -190,22 +195,31 @@ var Assist = function (vm, assist) {
 
   self.getAcls = function () {
     $(".jHueNotify").hide();
+    var _isLoading = window.setTimeout(function(){
+      self.isLoadingAcls(true);
+    }, 1000);
     logGA('get_acls');
 
     $.getJSON('/security/api/hdfs/get_acls', {
       'path': self.path()
     }, function (data) {
-      self.acls.removeAll();
-      self.originalAcls.removeAll();
-      $.each(data.entries, function (index, item) {
-        self.acls.push(parseAcl(item));
-        self.originalAcls.push(parseAcl(item));
-      });
-      self.owner(data.owner);
-      self.group(data.group);
+      window.clearTimeout(_isLoading);
+      if (data != null) {
+        self.acls.removeAll();
+        self.originalAcls.removeAll();
+        $.each(data.entries, function (index, item) {
+          self.acls.push(parseAcl(item));
+          self.originalAcls.push(parseAcl(item));
+        });
+        self.owner(data.owner);
+        self.group(data.group);
+        self.isLoadingAcls(false);
+        $(document).trigger("loaded.acls");
+      }
     }).fail(function (xhr, textStatus, errorThrown) {
       if (xhr.responseText.search('FileNotFoundException') == -1) { // TODO only fetch on existing path
         $(document).trigger("error", xhr.responseText);
+        self.isLoadingAcls(false);
       }
     });
   };

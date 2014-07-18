@@ -27,30 +27,51 @@ ${ layout.menubar(section='hdfs') }
 
 
 <style type="text/css">
-#nav-bar ul {
-	list-style-type: none;
-  padding: 0;
-  margin-left: 6px;
-}
+  #nav-bar ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
-.tree {
-  margin-left: 0!important;
-	padding-left: 0!important;
-}
+  .tree {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
 
-.node-row {
-  margin: 4px;
-  padding: 2px;
-  background-color: #F6F6F6;
-}
+  .node-row {
+    margin: 4px;
+    padding: 2px;
+    cursor: pointer;
+    border: 1px dashed #FFFFFF;
+  }
 
-.node-row:hover {
-  background-color: #EEE;
-}
+  .node-row:hover {
+    background-color: #F6F6F6;
+  }
 
-.pointer-icon {
-	cursor: pointer;
-}
+  .node-row a {
+    cursor: pointer;
+  }
+
+  .node-row.selected {
+    border: 1px dashed #CCCCCC;
+  }
+
+  #aclPopover {
+    position: absolute;
+    z-index: 1028;
+    # # under the top menu
+  }
+
+  .loading-popover {
+    width: 200px;
+    height: 120px;
+    line-height: 120px;
+    color: #999999;
+  }
+
+  .popover-title {
+    word-break: break-all;
+  }
 </style>
 
 
@@ -106,36 +127,44 @@ ${ layout.menubar(section='hdfs') }
               <div id="nav-bar" data-bind="template: { name: 'tree-template', data: $root.assist.treeData }"></div>
             </div>
             <div class="span4">
-              ${_('Path')} &nbsp;&nbsp;<a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }">
-                <strong><span data-bind="text:$root.assist.path"></span></strong>
-                <i class="fa fa-external-link"></i>
-              </a><br/>
-              ${_('Owned by')} &nbsp;&nbsp;<i class="fa fa-user" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.owner"></span></strong>
-              &nbsp;&nbsp;<i class="fa fa-users" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.group"></span></strong><br/>
-              <br/>
-              <a href="javascript: void(0)">
-                <i class="fa fa-header"></i> View in text
-              </a>
-              </br>
-              <div data-bind="foreach: $root.assist.regularAcls">
-                <div data-bind="template: {name: 'acl-edition'}"></div>                 
+
+              <div id="aclPopover" class="popover right">
+                <div class="arrow"></div>
+                <h3 class="popover-title"><a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }"><span data-bind="text:$root.assist.path"></span> <i class="fa fa-external-link"></i></a></h3>
+                <div class="popover-content">
+                  <p>
+                    <div class="left" data-bind="visible: !$root.assist.isLoadingAcls()">
+                      <i class="fa fa-user" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.owner"></span></strong>&nbsp;&nbsp;
+                      <i class="fa fa-users" style="color: #999999"></i> <strong><span data-bind="text: $root.assist.group"></span></strong>
+
+                      <a href="javascript: void(0)"><i class="fa fa-header"></i> View in text</a>
+
+                      <br/>
+                      <div data-bind="foreach: $root.assist.regularAcls">
+                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                      </div>
+
+                      <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl"><i class="fa fa-plus"></i></a>
+
+                      <br/>
+
+                      Default (<i class="fa fa-times"></i> bulk delete?)
+                      <div data-bind="foreach: $root.assist.defaultAcls">
+                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                      </div>
+                      <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></a>
+
+                      <div data-bind="visible: $root.assist.changedAcls().length">
+                        <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
+                          <i class="fa fa-save"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
+                  </p>
+                </div>
               </div>
-              <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl">
-                <i class="fa fa-plus"></i>
-              </a>
-              </br>
-              Default (<i class="fa fa-times"></i> bulk delete?)
-              <div data-bind="foreach: $root.assist.defaultAcls">
-                <div data-bind="template: {name: 'acl-edition'}"></div>
-              </div>
-              <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl">
-                <i class="fa fa-plus"></i>
-              </a>
-              <div data-bind="visible: $root.assist.changedAcls().length">
-                <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
-                  <i class="fa fa-save"></i>
-                </button>
-              <div>
+
             </div>
           </div>
         </div>
@@ -149,15 +178,12 @@ ${ layout.menubar(section='hdfs') }
   </div>
 </div>
 
-
 <script type="text/html" id="tree-template">
 <!-- ko if: nodes != null -->
 <ul class="tree" data-bind="foreach: nodes">
     <li>
         <span data-bind="
-            template: { name: 'node-name-template', data: $data },
-            css: { 'pointer-icon': nodes().length > 0 },
-            click: toggleVisibility"></span>
+            template: { name: 'node-name-template', data: $data }"></span>
         <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
     </li>    
 </ul>
@@ -186,8 +212,7 @@ ${ layout.menubar(section='hdfs') }
     <!-- ko if: nodes != null -->
     <span data-bind="
         template: { name: 'node-name-template', data: $data },
-        css: { 'pointer-icon': nodes().length > 0 },
-        click: toggleVisibility"></span>
+        css: { 'pointer-icon': nodes().length > 0 }"></span>
     <!-- /ko -->
 
     <!-- ko if: nodes().length !== 0 -->
@@ -196,21 +221,19 @@ ${ layout.menubar(section='hdfs') }
 </script>
 
 <script type="text/html" id="node-name-template">
-    <div class="node-row">
+    <div class="node-row" data-bind="click: $root.assist.setPath,style: { backgroundColor: aclBit() ? '#F6F6F6': '' }, css:{selected: $root.assist.path() == path()}">
       <i data-bind="
       css: {
           'fa': true,
-          'fa-folder-open-o': isExpanded() && nodes().length > 0,
-          'fa-folder-o': !isExpanded() && nodes().length > 0,
-          'fa-file-o': nodes().length === 0
+          'fa-folder-open-o': isDir() && nodes().length > 0,
+          'fa-folder-o': isDir() && nodes().length == 0,
+          'fa-file-o': !isDir()
       }
-      "></i>
-      <a style="display: inline-block" data-bind="text:name,style: { color: aclBit() ? 'blue' : '' },click: $root.assist.setPath"></a>
-##      <div class="pull-right" style="margin-right: 20px">
-##        <span class="badge badge-info"><i class="fa fa-eye"></i> <span data-bind="text: properties.read.groups().length + properties.read.users().length"></span> </span>
-##        <span class="badge badge-warning"><i class="fa fa-pencil"></i> <span data-bind="text: properties.write.groups().length + properties.write.users().length"></span> </span>
-##        <span class="badge badge-important"><i class="fa fa-cog"></i> <span data-bind="text: properties.execute.groups().length + properties.execute.users().length"></span> </span>
-##      </div>
+      " style="color: #999"></i>
+      <strong><a style="display: inline-block" data-bind="text:name"></a></strong>
+      <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
+        <i class="fa fa-lock"></i>
+      </div>
     </div>
 </script>
 
@@ -223,35 +246,46 @@ ${ layout.menubar(section='hdfs') }
 <script type="text/javascript">
 
   ko.bindingHandlers.tooltip = {
-    init: function(element, valueAccessor) {
-        var local = ko.utils.unwrapObservable(valueAccessor()),
-            options = {};
+    init: function (element, valueAccessor) {
+      var local = ko.utils.unwrapObservable(valueAccessor()),
+          options = {};
 
-        ko.utils.extend(options, local);
+      ko.utils.extend(options, local);
 
-        $(element).tooltip(options);
+      $(element).tooltip(options);
 
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            $(element).tooltip("destroy");
-        });
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        $(element).tooltip("destroy");
+      });
     }
-};
+  };
 
+  function movePopover() {
+    var _selectedRow = $(".node-row.selected");
+    if (_selectedRow.length > 0) {
+      $("#aclPopover")
+          .css("left", _selectedRow.offset().left + _selectedRow.width())
+          .css("top", _selectedRow.offset().top - $("#aclPopover").outerHeight() / 2 + _selectedRow.outerHeight() / 2)
+          .show();
+    }
+  }
 
-
-
-</script>
-
-
-<script type="text/javascript" charset="utf-8">
   var viewModel;
 
   $(document).ready(function () {
     viewModel = new HdfsViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
-    
+
     viewModel.init();
+
+    $(document).on("click", ".node-row", function () {
+      movePopover();
+    });
+
+    $(document).on("loaded.acls", movePopover);
   });
 </script>
+
+
 
 ${ commonfooter(messages) | n,unicode }
