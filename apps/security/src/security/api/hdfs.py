@@ -31,8 +31,12 @@ def _get_acl(acl):
 
 def get_acls(request):
   path = request.GET.get('path')
-  acls = request.fs.get_acl_status(path)
-  return HttpResponse(json.dumps(acls['AclStatus']), mimetype="application/json")
+  try:
+    acls = request.fs.get_acl_status(path)
+  except Exception, e:
+    acls = None
+
+  return HttpResponse(json.dumps(acls is not None and acls['AclStatus'] or None), mimetype="application/json")
 
 
 def update_acls(request):
