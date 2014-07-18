@@ -48,7 +48,7 @@ ${ layout.menubar(section='hive') }
             </br>
             <input type="checkbox" checked="checked"> ${_('Me')}
             </br>          
-            <select data-bind="options: availableHadoopUsers" size="10"></select>
+            <select data-bind="options: availableHadoopUsers, value: doAs" size="10"></select>
           </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             </br>
