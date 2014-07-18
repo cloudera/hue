@@ -166,6 +166,10 @@ var HiveViewModel = function (initial) {
   self.role = new Role(self);
   self.privilege = new Privilege(self, {});
 
+  self.doAs = ko.observable('');
+  self.doAs.subscribe(function() {
+	self.assist.fetchDatabases();
+  });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
@@ -235,7 +239,9 @@ var HiveViewModel = function (initial) {
   };
   
   self.fetchUsers = function () {
-    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+    $.getJSON('/desktop/api/users/autocomplete', {
+      
+    }, function (data) {
       $.each(data.users, function (i, user) {
         self.availableHadoopUsers.push(user.username);
       });

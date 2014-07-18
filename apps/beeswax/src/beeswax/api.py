@@ -19,14 +19,15 @@ import json
 import logging
 import re
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
 from thrift.transport.TTransport import TTransportException
-
 from desktop.context_processors import get_app_name
-
+from desktop.lib.i18n import force_unicode
+from desktop.lib.exceptions_renderable import PopupException
 from jobsub.parameterization import substitute_variables
 
 import beeswax.models
@@ -35,13 +36,10 @@ from beeswax.forms import QueryForm
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config,\
-  QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
                           _parse_out_hadoop_jobs
-from desktop.lib.i18n import force_unicode
-from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -83,7 +81,10 @@ def error_handler(view_fn):
 def autocomplete(request, database=None, table=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
-  db = dbms.get(request.user, query_server)
+  do_as = request.user
+  if request.user.is_superuser and 'doas' in request.GET:
+    do_as = User.object.get(username=request.GET.get('doas'))
+  db = dbms.get(do_as, query_server)
   response = {}
 
   try:
