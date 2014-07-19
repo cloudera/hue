@@ -407,7 +407,7 @@ def listdir_paged(request, path):
     # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
     current_stat['path'] = path
     current_stat['name'] = "."
-    shown_stats.insert(0, current_stat)
+    shown_stats.insert(1, current_stat)
 
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
