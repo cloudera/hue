@@ -539,6 +539,7 @@ def test_listdir_sort_and_filter():
 
     # Check sorting (size)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=size').context['files']
+    #assert_equal(expect, [ f['name'] for f in listing ])
     assert_equal(expect, [ f['name'] for f in listing ])
 
     # Check sorting (mtime)
