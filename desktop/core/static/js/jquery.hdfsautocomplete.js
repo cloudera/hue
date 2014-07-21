@@ -205,7 +205,7 @@
             }
           });
           window.setTimeout(function () {
-            $("#jHueHdfsAutocomplete").css("top", _el.position().top + _el.outerHeight()).css("left", _el.position().left).width(_el.width());
+            $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
             $("#jHueHdfsAutocomplete").find("ul").empty().html(_currentFiles.join(""));
             $("#jHueHdfsAutocomplete").find("li").on("click", function (e) {
               smartTooltipMaker();
