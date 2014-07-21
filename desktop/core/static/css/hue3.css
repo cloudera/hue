@@ -1696,3 +1696,18 @@ border-bottom-left-radius: 0px;
 .actionbar-actions {
   margin: 0px 0px 10px 0px;
 }
+
+
+#jHueHdfsAutocomplete ul li {
+  cursor: pointer;
+}
+
+#jHueHdfsAutocomplete ul li:hover,  #jHueHdfsAutocomplete ul li.active {
+  color: #FFFFFF;
+  background: #338BB8;
+}
+
+#jHueHdfsAutocomplete .popover-content {
+  max-height: 200px;
+  overflow-y: auto;
+}

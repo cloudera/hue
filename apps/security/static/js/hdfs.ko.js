@@ -153,6 +153,10 @@ var Assist = function (vm, assist) {
     self.path(obj.path());
   }
 
+  self.openPath = function (obj) {
+    window.open("/filebrowser/view" + obj.path(), '_blank');
+  }
+
   self.loadParents = function(breadcrumbs) {
     if (typeof breadcrumbs != "undefined" && breadcrumbs != null) {
       breadcrumbs.forEach(function (crumb, idx) {
