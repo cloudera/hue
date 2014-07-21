@@ -394,6 +394,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script type="text/javascript" charset="utf-8">
   var viewModel, JSON_USERS_GROUPS;
 
+  var JSON_TAGS = ${ json_tags | n,unicode };
+  var JSON_DOCS = ${ json_documents | n,unicode };
+
   function prettifyUsername(userId) {
     var _user = null;
     for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
@@ -408,7 +411,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   }
 
   $(document).ready(function () {
-    viewModel = new HomeViewModel(${ json_tags | n,unicode }, ${ json_documents | n,unicode });
+    viewModel = new HomeViewModel(JSON_TAGS, JSON_DOCS);
     ko.applyBindings(viewModel);
 
     var selectedUserOrGroup, map, dropdown = null;
@@ -474,6 +477,26 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       $.totalStorage("hueHomeSelectedTag", value.id());
     });
 
+    function getFirstAvailableDoc() {
+      var _found = null;
+      JSON_TAGS.mine.forEach(function(tag){
+        if (_found == null && tag.docs.length > 0){
+          _found = tag.id;
+        }
+      });
+      JSON_TAGS.notmine.forEach(function(tag){
+        tag.projects.forEach(function(project){
+          if (_found == null && project.docs.length > 0){
+            _found = project.id;
+          }
+        });
+      });
+      if (_found != null){
+        return viewModel.getTagById(_found);
+      }
+      return viewModel.history();
+    }
+
     if ($.totalStorage("hueHomeSelectedTag") != null) {
       var _preselectedTag = viewModel.getTagById($.totalStorage("hueHomeSelectedTag"));
       if (_preselectedTag != null) {
@@ -481,7 +504,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       }
     }
     else {
-      viewModel.filterDocs(viewModel.history());
+      viewModel.filterDocs(getFirstAvailableDoc());
     }
 
     $("#searchInput").jHueDelayedInput(function () {
