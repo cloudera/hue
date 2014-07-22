@@ -17,7 +17,6 @@
 var TreeNodeModel = function(data) {
   var self = this;
 
-  self.isExpanded = ko.observable(true);
   self.description = ko.observable();
   self.name = ko.observable();
   self.nodes = ko.observableArray([]);
