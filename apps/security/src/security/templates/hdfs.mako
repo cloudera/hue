@@ -110,8 +110,16 @@ ${ layout.menubar(section='hdfs') }
       <div class="card card-small">
         <h1 class="card-heading simple">
           <div class="pull-right">
-            <i class="fa fa-eye"></i>
-            <div class="btn-group pull-right">              
+            <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(false); }" title="${ _('Show non accessible files') }">
+              <i class="fa fa-eye" data-bind="visible: $root.assist.isDiffMode"></i>
+            </a>
+            <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(true); }" title="${ _('Show as the user would see') }">
+              <i class="fa fa-eye-slash" data-bind="visible: ! $root.assist.isDiffMode()"></i>
+            </a>
+            <i class="fa fa-compress"></i>
+            <i class="fa fa-refresh"></i>
+            <span data-bind="text: $root.doAs"></span>
+            <div class="btn-group pull-right">
               <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                 View as...
                 <span class="caret"></span>
@@ -120,7 +128,7 @@ ${ layout.menubar(section='hdfs') }
                 <li><a href="#"><strong>USERS</strong></a></li>
                 <li><a href="#">My user</a></li>
                 <!-- ko foreach: availableHadoopUsers -->
-                  <li><a href="#" data-bind="text: $data"></a></li>
+                  <li><a href="#" data-bind="text: $data, click: function() { $root.doAs($data); }"></a></li>
                 <!-- /ko -->
                 <li class="divider"></li>
                 <li><a href="#"><strong>GROUPS</strong></a></li>
@@ -148,8 +156,7 @@ ${ layout.menubar(section='hdfs') }
             <div class="span4">
               <div class="acl-panel" data-bind="visible: !$root.assist.isLoadingAcls()">
                   <a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(! $root.assist.showAclsAsText()); }">
-                    <i class="fa" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }">
-                    </i>
+                    <i class="fa" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }"></i>
                     <span data-bind="visible: $root.assist.showAclsAsText()">${ _('Text view') }</span>
                     <span data-bind="visible: ! $root.assist.showAclsAsText()">${ _('Edit') }</span>
                   </a>
@@ -181,8 +188,7 @@ ${ layout.menubar(section='hdfs') }
                       </dt>
                     </dl>
 
-                    ${ _('ACLs') }
-                    <br/>
+                    <h4>${ _('ACLs') }</h4>
                     <div data-bind="foreach: $root.assist.regularAcls">
                       <div data-bind="template: {name: 'acl-edition'}"></div>
                     </div>
@@ -191,7 +197,7 @@ ${ layout.menubar(section='hdfs') }
 
                     <br/>
 
-                    ${ _('Default ACLs') }
+                    <h4>${ _('Default ACLs') }</h4>
                     <div data-bind="foreach: $root.assist.defaultAcls">
                       <div data-bind="template: {name: 'acl-edition'}"></div>
                     </div>
@@ -205,8 +211,6 @@ ${ layout.menubar(section='hdfs') }
                   </span>
                 </div>
                 <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
-
-
             </div>
           </div>
           </div>

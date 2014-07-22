@@ -55,6 +55,7 @@ var Assist = function (vm, assist) {
 
   self.isLoadingAcls = ko.observable(false);
   self.showAclsAsText = ko.observable(false);
+  self.isDiffMode = ko.observable(false);
 
   self.treeData = ko.observable({nodes:[]});
   self.loadData = function(data) {
