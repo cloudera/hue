@@ -59,20 +59,28 @@ var Assist = function (vm, assist) {
 
   self.treeData = ko.observable({nodes:[]});
   self.loadData = function(data) {
-    self.treeData(new NodeModel(data));
+    self.treeData(new TreeNodeModel(data));
   };
 
   self.growingTree = ko.observable({
-    name: "/",
-    path: "/",
+    name: "__HUEROOT__",
+    path: "__HUEROOT__",
     aclBit: false,
     selected: false,
-    nodes: []
+    nodes: [{
+      name: "/",
+      path: "/",
+      isDir: true,
+      aclBit: false,
+      selected: false,
+      nodes: []
+    }]
   });
 
   self.path = ko.observable('');
-  self.path.subscribe(function () {
+  self.path.subscribe(function (path) {
     self.fetchPath();
+    window.location.hash = path;
   });
   self.files = ko.observableArray();
 
@@ -180,7 +188,7 @@ var Assist = function (vm, assist) {
     $.getJSON('/filebrowser/view' + self.path(), {
       'pagesize': 15,
       'format': 'json',
-      'doas': vm.doAs(),
+      'doas': vm.doAs()
     }, function (data) {
       self.loadParents(data.breadcrumbs);
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
@@ -193,8 +201,11 @@ var Assist = function (vm, assist) {
             })
           );
         });
-        self.loadData(self.growingTree());
       }
+      else {
+        self.convertItemToObject(data);
+      }
+      self.loadData(self.growingTree());
       self.getAcls();
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
@@ -261,30 +272,6 @@ var Assist = function (vm, assist) {
 }
 
 
-var NodeModel = function(data) {
-  var self = this;
-
-  self.isExpanded = ko.observable(true);
-  self.description = ko.observable();
-  self.name = ko.observable();
-  self.nodes = ko.observableArray([]);
-
-  self.toggleVisibility = function() {
-    self.isExpanded(! self.isExpanded());
-  };
-
-  ko.mapping.fromJS(data, self.mapOptions, self);
-};
-
-NodeModel.prototype.mapOptions = {
-  nodes: {
-    create: function(args) {
-      return new NodeModel(args.data);
-    }
-  }
-};
-
-
 var HdfsViewModel = function (initial) {
   var self = this;
 
@@ -297,9 +284,9 @@ var HdfsViewModel = function (initial) {
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
-  self.init = function () {  
+  self.init = function (path) {
     self.fetchUsers();
-    self.assist.path('/');
+    self.assist.path(path);
   }
 
 
