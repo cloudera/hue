@@ -227,6 +227,10 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 <%def name="aclBitPullRight()">
+  <span data-bind="visible: striked">
+    This is not visible by current user <span data-bind="text: $root.doAs">
+  </span></span>
+  
   <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
     <i class="fa fa-lock"></i>
   </div>
@@ -328,7 +332,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
     }
   });
 </script>
-
 
 
 ${ commonfooter(messages) | n,unicode }

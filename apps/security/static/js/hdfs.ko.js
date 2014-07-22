@@ -68,6 +68,7 @@ var Assist = function (vm, assist) {
     name: "__HUEROOT__",
     path: "__HUEROOT__",
     aclBit: false,
+    striked: false,
     selected: false,
     nodes: [
       {
@@ -76,6 +77,7 @@ var Assist = function (vm, assist) {
         isDir: true,
         isExpanded: true,
         aclBit: false,
+        striked: false,
         selected: false,
         nodes: []
       }
@@ -165,6 +167,7 @@ var Assist = function (vm, assist) {
         name: _chunks[_chunks.length - 1],
         path: item.path,
         aclBit: item.rwx.indexOf('+') != -1,
+        striked: item.striked != null,
         isExpanded: true,
         isDir: item.type == "dir",
         nodes: []
@@ -215,10 +218,11 @@ var Assist = function (vm, assist) {
   }
 
   self.fetchPath = function () {
-    $.getJSON('/filebrowser/view' + self.path(), {
+	$.getJSON('/security/api/hdfs/list' + self.path(), {
       'pagesize': 15,
       'format': 'json',
-      'doas': vm.doAs()
+      'doas': vm.doAs(),
+      'isDiffMode': self.isDiffMode(),
     }, function (data) {
       self.treeLoadingStatus[self.path()] = true;
       self.loadParents(data.breadcrumbs);
@@ -228,7 +232,8 @@ var Assist = function (vm, assist) {
           self.convertItemToObject(item);
           self.files.push(ko.mapping.fromJS({
               'path': item.path,
-              'aclBit': item.rwx.indexOf('+') != -1
+              'aclBit': item.rwx.indexOf('+') != -1,
+              'striked': item.striked != null,
             })
           );
         });
@@ -319,7 +324,6 @@ var HdfsViewModel = function (initial) {
     self.fetchUsers();
     self.assist.path(path);
   }
-
 
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', function (data) {

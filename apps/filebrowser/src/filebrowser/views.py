@@ -361,6 +361,8 @@ def listdir_paged(request, path):
     do_as = None
     if request.user.is_superuser:
       do_as = request.GET.get('doas', request.user.username)
+    if request.user.is_superuser and hasattr(request, 'doas'):
+      do_as = request.doas
 
     home_dir_path = request.user.get_home_directory()
     breadcrumbs = parse_breadcrumbs(path)
