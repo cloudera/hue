@@ -25,7 +25,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, limitCount=None, limitFunction=None)">
+<%def name="import_templates(itemClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, limitCount=None, limitFunction=None, anchorProperty=None)">
 
   <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
 
@@ -100,6 +100,9 @@
           style: { color: '#999999'}
         %endif
         "></i>
+      %if anchorProperty:
+        <a href="#" class="anchor" data-bind="attr: {href: ${anchorProperty}}"></a>
+      %endif
       <strong><a style="display: inline-block" data-bind="text:name"></a></strong>
 
       %if styleModifierPullRight:
@@ -110,7 +113,7 @@
 
 </%def>
 
-<%def name="render(id=None, data=None)">
-  <div id="${id}" data-bind="template: { name: 'tree-template', data: ${data} }"></div>
+<%def name="render(id=None, data=None, afterRender='void(0)')">
+  <div id="${id}" data-bind="template: { name: 'tree-template', data: ${data}, afterRender: ${afterRender} }"></div>
 </%def>
 
