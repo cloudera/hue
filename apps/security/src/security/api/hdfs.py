@@ -19,7 +19,9 @@ import json
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
+from filebrowser.views import listdir_paged
 
 
 def _get_acl_name(acl):
@@ -27,6 +29,36 @@ def _get_acl_name(acl):
 
 def _get_acl(acl):
   return _get_acl_name(acl) + ('r' if acl['r']  else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
+
+def _diff_list_dir(user_listing, hdfs_listing):
+  user_files = [f['stats']['path'] for f in user_listing['files']]
+  hdfs_files = [f['stats']['path'] for f in hdfs_listing['files']]
+  
+  # Files visible by hdfs only  
+  hdfs_only = list(set(hdfs_files) - set(user_files))
+  new_hdfs = filter(lambda f: f['stats']['path'] in hdfs_only, hdfs_listing['files'])
+
+  for f in new_hdfs:
+    f['striked'] = True
+    
+  listing = user_listing['files'] + new_hdfs
+  
+  return sorted(listing, key=lambda f: f['path']) 
+
+
+def list_hdfs(request, path):
+  try:
+    json_response = listdir_paged(request, path)
+  except:
+    json_response = HttpResponse(json.dumps({'files': []}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+  if json.loads(request.GET.get('isDiffMode', 'false')):
+    request.doas = 'hdfs'
+    hdfs_response = listdir_paged(request, path)
+    resp = json.loads(json_response.content)
+    resp['files'] = _diff_list_dir(resp, json.loads(hdfs_response.content))
+    json_response.content = json.dumps(resp)
+      
+  return json_response
 
 
 def get_acls(request):
