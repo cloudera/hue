@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 
 
 <%namespace name="layout" file="layout.mako" />
+<%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hdfs') }
@@ -151,7 +152,7 @@ ${ layout.menubar(section='hdfs') }
                 </div>
               </div>
               <div class="path-container-ghost hide"></div>
-              <div id="hdfsTree" data-bind="template: { name: 'tree-template', data: $root.assist.treeData }"></div>
+              ${ tree.render(id='hdfsTree', data='$root.assist.treeData') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: !$root.assist.isLoadingAcls()">
@@ -219,66 +220,20 @@ ${ layout.menubar(section='hdfs') }
   </div>
 </div>
 
+<%def name="treeIcons()">
+  'fa-folder-open-o': isDir() && nodes().length > 0,
+  'fa-folder-o': isDir() && nodes().length == 0,
+  'fa-file-o': !isDir()
+</%def>
+
+<%def name="aclBitPullRight()">
+  <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
+    <i class="fa fa-lock"></i>
+  </div>
+</%def>
 
 
-<script type="text/html" id="tree-template">
-<!-- ko if: nodes != null -->
-<ul class="tree" data-bind="foreach: nodes">
-    <li>
-        <span data-bind="
-            template: { name: 'node-name-template', data: $data }"></span>
-        <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
-    </li>    
-</ul>
-<!-- /ko -->
-</script>
-
-<script type="text/html" id="folder-template">
-<!-- ko if: nodes != null -->
-    <ul data-bind="foreach: nodes">
-        <li>
-            <div data-bind="template: { name: 'node-template', data: $data }"></div>
-        </li>
-    ## Should fetch more files here if needed
-    <!-- ko if: $index() == 14 -->
-      <li>
-        <a href="javascript: void(0)">         
-          <i class="fa fa-plus"></i> 
-        </a>
-      </li>
-    <!-- /ko -->        
-    </ul>
-<!-- /ko -->
-</script>
-
-<script type="text/html" id="node-template">
-    <!-- ko if: nodes != null -->
-    <span data-bind="
-        template: { name: 'node-name-template', data: $data },
-        css: { 'pointer-icon': nodes().length > 0 }"></span>
-    <!-- /ko -->
-
-    <!-- ko if: nodes().length !== 0 -->
-        <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
-    <!-- /ko -->
-</script>
-
-<script type="text/html" id="node-name-template">
-    <div class="node-row" data-bind="click: $root.assist.setPath, event : { dblclick: $root.assist.openPath },  style: { border: aclBit() ? '1px dashed #CCCCCC': '' }, css:{selected: $root.assist.path() == path()}">
-      <i data-bind="
-      css: {
-          'fa': true,
-          'fa-folder-open-o': isDir() && nodes().length > 0,
-          'fa-folder-o': isDir() && nodes().length == 0,
-          'fa-file-o': !isDir()
-      }
-      " style="color: #999"></i>
-      <strong><a style="display: inline-block" data-bind="text:name"></a></strong>
-      <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
-        <i class="fa fa-lock"></i>
-      </div>
-    </div>
-</script>
+${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight) }
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -310,7 +265,11 @@ ${ layout.menubar(section='hdfs') }
     viewModel = new HdfsViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
 
-    viewModel.init();
+    var _initialPath = "/";
+    if (window.location.hash != ""){
+      _initialPath = window.location.hash.substr(1);
+    }
+    viewModel.init(_initialPath);
 
     //$(document).on("loaded.acls", movePopover);
 
