@@ -47,13 +47,14 @@ function parseAcl(acl) {
 }
 
 function printAcl(acl) {
-  return acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
+  return (acl.isDefault() ? 'default:' : '') + acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
 
 var Assist = function (vm, assist) {
   var self = this;
 
   self.isLoadingAcls = ko.observable(false);
+  self.showAclsAsText = ko.observable(false);
 
   self.treeData = ko.observable({nodes:[]});
   self.loadData = function(data) {
@@ -78,7 +79,7 @@ var Assist = function (vm, assist) {
   self.originalAcls = ko.observableArray();
   self.regularAcls = ko.computed(function () {
     return $.grep(self.acls(), function (acl) {
-      return !acl.isDefault();
+      return ! acl.isDefault();
     });
   });
   self.defaultAcls = ko.computed(function () {
@@ -95,6 +96,7 @@ var Assist = function (vm, assist) {
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
+  
   self.addAcl = function () {
     var newAcl = parseAcl('group::---');
     newAcl.status('new');
@@ -136,6 +138,7 @@ var Assist = function (vm, assist) {
         self.traversePath(node, parent, item);
       }
     });
+
     if (!_mainFound && leaf.path == parent){
       var _chunks = item.path.split("/");
       leaf.nodes.push({

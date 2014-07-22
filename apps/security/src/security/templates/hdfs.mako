@@ -78,6 +78,12 @@ ${ layout.menubar(section='hdfs') }
 
 </style>
 
+<script type="text/html" id="acl-display">
+  <div data-bind="visible: status() != 'deleted'">
+    <span data-bind="text: printAcl($data)"></span>
+  </div>
+</script>
+
 
 <script type="text/html" id="acl-edition">
   <div data-bind="visible: status() != 'deleted'">
@@ -89,9 +95,9 @@ ${ layout.menubar(section='hdfs') }
     <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
     ##<select data-bind="options: $root.availableHadoopGroups, value: name, optionsCaption: '', valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
 
-    <input type="checkbox" data-bind="checked: r"/>
-    <input type="checkbox" data-bind="checked: w"/>
-    <input type="checkbox" data-bind="checked: x"/>
+    <input type="checkbox" title="r, ${ _('Read') }" data-bind="checked: r"/>
+    <input type="checkbox" title="w, ${ _('Write') }" data-bind="checked: w"/>
+    <input type="checkbox" title="x, ${ _('Execute') }" data-bind="checked: x"/>
     <a href="javascript: void(0)">
       <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
     </a>
@@ -104,7 +110,8 @@ ${ layout.menubar(section='hdfs') }
       <div class="card card-small">
         <h1 class="card-heading simple">
           <div class="pull-right">
-            <div class="btn-group pull-right">
+            <i class="fa fa-eye"></i>
+            <div class="btn-group pull-right">              
               <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                 View as...
                 <span class="caret"></span>
@@ -128,7 +135,7 @@ ${ layout.menubar(section='hdfs') }
         </h1>
         <div class="card-body">
           <div class="row-fluid">
-            <div class="span9">
+            <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" type="text" style="width: 96%" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
@@ -138,40 +145,64 @@ ${ layout.menubar(section='hdfs') }
               <div class="path-container-ghost hide"></div>
               <div id="hdfsTree" data-bind="template: { name: 'tree-template', data: $root.assist.treeData }"></div>
             </div>
-            <div class="span3">
+            <div class="span4">
               <div class="acl-panel" data-bind="visible: !$root.assist.isLoadingAcls()">
-                <h4>${_('Selected ACL')}</h4>
-                <dl>
-                  <dt>${_('Path')}</dt>
-                  <dd><a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }"></a></dd>
-                  <dt>${_('User')}</dt>
-                  <dd><i class="fa fa-user" style="color: #999999"></i> <span data-bind="text: $root.assist.owner"></span></dd>
-                  <dt>${_('Group')}</dt>
-                  <dd><i class="fa fa-users" style="color: #999999"></i> <span data-bind="text: $root.assist.group"></span></dd>
-                  </dl>
-
-                  <a href="javascript: void(0)"><i class="fa fa-header"></i> View in text</a>
-
-                  <br/>
-                  <div data-bind="foreach: $root.assist.regularAcls">
-                    <div data-bind="template: {name: 'acl-edition'}"></div>
-                  </div>
-
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl"><i class="fa fa-plus"></i></a>
+                  <a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(! $root.assist.showAclsAsText()); }">
+                    <i class="fa" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }">
+                    </i>
+                    <span data-bind="visible: $root.assist.showAclsAsText()">${ _('Text view') }</span>
+                    <span data-bind="visible: ! $root.assist.showAclsAsText()">${ _('Edit') }</span>
+                  </a>
 
                   <br/>
 
-                  Default (<i class="fa fa-times"></i> bulk delete?)
-                  <div data-bind="foreach: $root.assist.defaultAcls">
-                    <div data-bind="template: {name: 'acl-edition'}"></div>
-                  </div>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></a>
+                  <span data-bind="visible: $root.assist.showAclsAsText">
+                    <br/>
+                    # file: <span data-bind="text: $root.assist.path"></span>
+                    <br/>
+                    # owner: <span data-bind="text: $root.assist.owner"></span>
+                    <br/>
+                    # group: <span data-bind="text: $root.assist.group"></span>
+                    <br/>                  
+                    <div data-bind="foreach: $root.assist.regularAcls">                    
+                      <div data-bind="template: {name: 'acl-display'}"></div>
+                    </div>
+                    <div data-bind="foreach: $root.assist.defaultAcls">
+                      <div data-bind="template: {name: 'acl-display'}"></div>
+                    </div>
+                  </span>
 
-                  <div data-bind="visible: $root.assist.changedAcls().length">
-                    <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
-                      <i class="fa fa-save"></i>
-                    </button>
-                  </div>
+                  <span data-bind="visible: ! $root.assist.showAclsAsText()">
+                    <dl>
+                      <dt><a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }"></a></dt>
+                      <dt>
+                        <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>
+                        <i class="fa fa-users" style="color: #999999" title="${_('Group')}"></i> <span title="${_('Group')}" data-bind="text: $root.assist.group"></span>
+                      </dt>
+                    </dl>
+
+                    ${ _('ACLs') }
+                    <br/>
+                    <div data-bind="foreach: $root.assist.regularAcls">
+                      <div data-bind="template: {name: 'acl-edition'}"></div>
+                    </div>
+
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl"><i class="fa fa-plus"></i></a>
+
+                    <br/>
+
+                    ${ _('Default ACLs') }
+                    <div data-bind="foreach: $root.assist.defaultAcls">
+                      <div data-bind="template: {name: 'acl-edition'}"></div>
+                    </div>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></a>
+
+                    <div data-bind="visible: $root.assist.changedAcls().length">
+                      <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
+                        <i class="fa fa-save"></i>
+                      </button>
+                    </div>
+                  </span>
                 </div>
                 <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
 
