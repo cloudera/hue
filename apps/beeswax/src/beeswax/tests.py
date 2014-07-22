@@ -1732,12 +1732,21 @@ def test_search_log_line():
 
 
 def test_split_statements():
-  assert_equal([''], hql_query(";;;").statements)
+  assert_equal([], hql_query(";;;").statements)
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10'").statements)
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10';").statements)
   assert_equal(['select', "select * where id == '10;' limit 100"], hql_query("select; select * where id == '10;' limit 100;").statements)
   assert_equal(['select', "select * where id == \"10;\" limit 100"], hql_query("select; select * where id == \"10;\" limit 100;").statements)
   assert_equal(['select', "select * where id == '\"10;\"\"\"' limit 100"], hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements)
+
+  query_with_comments = """--First query;
+select concat('--', name)  -- The '--' in quotes is not a comment
+where id = '10';
+-- Second query
+select * where id = '10';"""
+  assert_equal(["--First query;\nselect concat(\'--\', name)  -- The \'--\' in quotes is not a comment\nwhere id = \'10\'",
+"-- Second query\nselect * where id = \'10\'"], hql_query(query_with_comments).statements)
+
   query = """CREATE DATABASE IF NOT EXISTS functional;
 DROP TABLE IF EXISTS functional.alltypes;
 CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (

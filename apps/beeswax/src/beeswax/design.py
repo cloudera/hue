@@ -21,6 +21,7 @@ The HQLdesign class can (de)serialize a design to/from a QueryDict.
 
 import json
 import logging
+import os
 import re
 import urlparse
 
@@ -184,26 +185,45 @@ class HQLdesign(object):
 
 def split_statements(hql):
   """
-  Just check if the semicolon is between two non escaped quotes,
-  meaning it is inside a string or a real separator.
+  Split statments at semicolons ignoring the ones inside
+  quotes and comments. The comment symbols that come
+  inside quotes should be ignored.
   """
+
   statements = []
   current = ''
+  prev = ''
   between_quotes = None
+  is_comment = None
 
-  for c in hql:
-    current += c
-    if c in ('"', "'"):
-      if between_quotes == c:
-        between_quotes = None
-      elif between_quotes is None:
-        between_quotes = c
-    elif c == ';':
-      if between_quotes is None:
-        statements.append(current)
-        current = ''
+  lines = hql.splitlines()
+
+  for line in lines:
+    for c in line:
+      current += c
+      if c in ('"', "'") and is_comment is None:
+        if between_quotes == c:
+          between_quotes = None
+        elif between_quotes is None:
+          between_quotes = c
+      elif c == '-' and prev == '-' and between_quotes is None and is_comment is None:
+        is_comment = True
+      elif c == ';':
+        if between_quotes is None and is_comment is None:
+          current = current.strip()
+          # Strip off the trailing semicolon
+          current = current[:-1]
+          if len(current) > 1:
+            statements.append(current)
+          current = ''
+      prev = c
+    is_comment = None
+    prev = os.linesep
+    if current != '':
+      current += os.linesep
 
   if current and current != ';':
+    current = current.strip()
     statements.append(current)
 
   return statements
