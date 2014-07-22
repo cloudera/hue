@@ -152,7 +152,7 @@ ${ layout.menubar(section='hdfs') }
                 </div>
               </div>
               <div class="path-container-ghost hide"></div>
-              ${ tree.render(id='hdfsTree', data='$root.assist.treeData') }
+              ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: !$root.assist.isLoadingAcls()">
@@ -233,7 +233,7 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight) }
+${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path') }
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -275,10 +275,25 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
 
     $("#path").jHueHdfsAutocomplete({
       home: viewModel.assist.path(),
+      onPathChange: function (path) {
+        viewModel.assist.path(path);
+      },
       onEnter: function (el) {
         viewModel.assist.path(el.val());
       },
       smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
+    });
+
+    $(document).on("rendered.tree", function() {
+      var _path = viewModel.assist.path();
+      if (_path[_path.length-1] == "/"){
+        _path = _path.substr(0, _path.length - 1);
+      }
+      if ($("a.anchor[href^='"+_path+"']").length > 0){
+        $("html, body").animate({
+          scrollTop: ($("a.anchor[href^='"+_path+"']").position().top - 140)+"px"
+        });
+      }
     });
 
 

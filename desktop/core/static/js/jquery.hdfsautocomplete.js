@@ -26,6 +26,8 @@
         },
         onBlur: function () {
         },
+        onPathChange: function () {
+        },
         smartTooltip: "",
         smartTooltipThreshold: 10 // needs 10 up/down or click actions and no tab to activate the smart tooltip
       };
@@ -109,6 +111,10 @@
         }
       }
     }
+
+    $(window).on("scroll", function(){
+      $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
+    });
 
     var _hdfsAutocompleteSelectedIndex = -1;
     var _filterTimeout = -1;
@@ -220,6 +226,7 @@
               }
               if ($(this).html().indexOf("folder") > -1) {
                 _el.val(_el.val() + "/");
+                _this.options.onPathChange(_el.val());
                 showHdfsAutocomplete();
               }
               else {

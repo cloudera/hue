@@ -110,6 +110,10 @@ var Assist = function (vm, assist) {
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
+  self.afterRender = function() {
+    $(document).trigger("rendered.tree");
+  }
+
 
   self.addAcl = function () {
     var newAcl = parseAcl('group::---');
@@ -132,13 +136,15 @@ var Assist = function (vm, assist) {
   };
 
   self.convertItemToObject = function (item) {
-    var _path = item.path;
-    var _parent = _path.substr(0, _path.lastIndexOf("/"));
-    if (_parent == "") {
-      _parent = "/";
-    }
-    if (_path != "/") {
-      self.growingTree(self.traversePath(self.growingTree(), _parent, item));
+    if (item.path != null) {
+      var _path = item.path;
+      var _parent = _path.substr(0, _path.lastIndexOf("/"));
+      if (_parent == "") {
+        _parent = "/";
+      }
+      if (_path != "/") {
+        self.growingTree(self.traversePath(self.growingTree(), _parent, item));
+      }
     }
   }
 
