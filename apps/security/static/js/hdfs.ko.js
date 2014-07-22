@@ -57,8 +57,10 @@ var Assist = function (vm, assist) {
   self.showAclsAsText = ko.observable(false);
   self.isDiffMode = ko.observable(false);
 
-  self.treeData = ko.observable({nodes:[]});
-  self.loadData = function(data) {
+  self.treeCollapseStatus = {};
+  self.treeLoadingStatus = {};
+  self.treeData = ko.observable({nodes: []});
+  self.loadData = function (data) {
     self.treeData(new TreeNodeModel(data));
   };
 
@@ -67,14 +69,17 @@ var Assist = function (vm, assist) {
     path: "__HUEROOT__",
     aclBit: false,
     selected: false,
-    nodes: [{
-      name: "/",
-      path: "/",
-      isDir: true,
-      aclBit: false,
-      selected: false,
-      nodes: []
-    }]
+    nodes: [
+      {
+        name: "/",
+        path: "/",
+        isDir: true,
+        isExpanded: true,
+        aclBit: false,
+        selected: false,
+        nodes: []
+      }
+    ]
   });
 
   self.path = ko.observable('');
@@ -88,7 +93,7 @@ var Assist = function (vm, assist) {
   self.originalAcls = ko.observableArray();
   self.regularAcls = ko.computed(function () {
     return $.grep(self.acls(), function (acl) {
-      return ! acl.isDefault();
+      return !acl.isDefault();
     });
   });
   self.defaultAcls = ko.computed(function () {
@@ -105,7 +110,7 @@ var Assist = function (vm, assist) {
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
-  
+
   self.addAcl = function () {
     var newAcl = parseAcl('group::---');
     newAcl.status('new');
@@ -128,7 +133,7 @@ var Assist = function (vm, assist) {
 
   self.convertItemToObject = function (item) {
     var _path = item.path;
-    var _parent =  _path.substr(0, _path.lastIndexOf("/"));
+    var _parent = _path.substr(0, _path.lastIndexOf("/"));
     if (_parent == "") {
       _parent = "/";
     }
@@ -137,23 +142,24 @@ var Assist = function (vm, assist) {
     }
   }
 
-  self.traversePath = function(leaf, parent, item){
+  self.traversePath = function (leaf, parent, item) {
     var _mainFound = false;
-    leaf.nodes.forEach(function(node){
-      if (node.path == item.path){
+    leaf.nodes.forEach(function (node) {
+      if (node.path == item.path) {
         _mainFound = true;
       }
-      if (parent.indexOf(node.path) > -1){
+      if (parent.indexOf(node.path) > -1) {
         self.traversePath(node, parent, item);
       }
     });
 
-    if (!_mainFound && leaf.path == parent){
+    if (!_mainFound && leaf.path == parent) {
       var _chunks = item.path.split("/");
       leaf.nodes.push({
-        name: _chunks[_chunks.length-1],
+        name: _chunks[_chunks.length - 1],
         path: item.path,
         aclBit: item.rwx.indexOf('+') != -1,
+        isExpanded: true,
         isDir: item.type == "dir",
         nodes: []
       });
@@ -161,7 +167,24 @@ var Assist = function (vm, assist) {
     return leaf;
   }
 
+  self.updatePathExpanded = function (leaf, path, expanded) {
+    if (leaf.path == path) {
+      leaf.isExpanded = expanded;
+    }
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        self.updatePathExpanded(node, path, expanded);
+      });
+    }
+    return leaf;
+  }
+
   self.setPath = function (obj) {
+    if (self.treeLoadingStatus[obj.path()] != null && self.treeLoadingStatus[obj.path()]) {
+      obj.isExpanded(!obj.isExpanded());
+      self.updatePathExpanded(self.growingTree(), obj.path(), obj.isExpanded());
+      self.treeCollapseStatus[obj.path()] = obj.isExpanded();
+    }
     self.path(obj.path());
   }
 
@@ -169,14 +192,15 @@ var Assist = function (vm, assist) {
     window.open("/filebrowser/view" + obj.path(), '_blank');
   }
 
-  self.loadParents = function(breadcrumbs) {
+  self.loadParents = function (breadcrumbs) {
     if (typeof breadcrumbs != "undefined" && breadcrumbs != null) {
       breadcrumbs.forEach(function (crumb, idx) {
         if (idx < breadcrumbs.length - 1 && crumb.url != "") {
           var _item = {
             path: crumb.url,
             name: crumb.label,
-            rwx: ""
+            rwx: "",
+            isDir: true
           }
           self.convertItemToObject(_item);
         }
@@ -190,6 +214,7 @@ var Assist = function (vm, assist) {
       'format': 'json',
       'doas': vm.doAs()
     }, function (data) {
+      self.treeLoadingStatus[self.path()] = true;
       self.loadParents(data.breadcrumbs);
       if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
@@ -214,7 +239,7 @@ var Assist = function (vm, assist) {
 
   self.getAcls = function () {
     $(".jHueNotify").hide();
-    var _isLoading = window.setTimeout(function(){
+    var _isLoading = window.setTimeout(function () {
       self.isLoadingAcls(true);
     }, 1000);
     logGA('get_acls');
@@ -248,26 +273,26 @@ var Assist = function (vm, assist) {
     logGA('updateAcls');
 
     $.post("/security/api/hdfs/update_acls", {
-          'path': self.path(),
-          'acls': ko.mapping.toJSON(self.acls()),
-          'originalAcls': ko.mapping.toJSON(self.originalAcls())
-        }, function (data) {
-          var toDelete = []
-          $.each(self.acls(), function (index, item) {
-            if (item.status() == 'deleted') {
-              toDelete.push(item);
-            } else {
-              item.status('');
-            }
-          });
-          $.each(toDelete, function (index, item) {
-            self.acls.remove(item);
-          });
-          $(document).trigger("info", 'Done!');
-        }
+        'path': self.path(),
+        'acls': ko.mapping.toJSON(self.acls()),
+        'originalAcls': ko.mapping.toJSON(self.originalAcls())
+      }, function (data) {
+        var toDelete = []
+        $.each(self.acls(), function (index, item) {
+          if (item.status() == 'deleted') {
+            toDelete.push(item);
+          } else {
+            item.status('');
+          }
+        });
+        $.each(toDelete, function (index, item) {
+          self.acls.remove(item);
+        });
+        $(document).trigger("info", 'Done!');
+      }
     ).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", JSON.parse(xhr.responseText).message);
-    });
+      });
   }
 }
 
@@ -278,7 +303,7 @@ var HdfsViewModel = function (initial) {
   self.assist = new Assist(self, initial);
 
   self.doAs = ko.observable('');
-  self.doAs.subscribe(function() {
+  self.doAs.subscribe(function () {
     self.assist.fetchPath();
   });
   self.availableHadoopUsers = ko.observableArray();
@@ -298,7 +323,7 @@ var HdfsViewModel = function (initial) {
 
       $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
-      });      
+      });
     });
   }
 };
