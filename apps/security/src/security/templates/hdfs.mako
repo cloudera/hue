@@ -300,6 +300,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
       }
     });
 
+    window.onpopstate = function() {
+      viewModel.assist.path(window.location.hash.substr(1));
+    };
+
     function resetPathContainer() {
       $(".path-container").attr("style", "min-width: 190px");
       $(".acl-panel").attr("style", "min-width: 190px");
