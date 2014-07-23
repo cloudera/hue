@@ -28,10 +28,6 @@ def _get_hadoop_groups(): # Mock for now, maybe pull from LDAP
 def hive(request):
   assist = autocomplete(request, database=None, table=None)
 
-  #  url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
-  #  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
-  #  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
-
   return render("hive.mako", request, {
       'assist': assist,
       'initial': json.dumps({'hadoop_groups': _get_hadoop_groups()}),

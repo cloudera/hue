@@ -56,6 +56,9 @@ ${ layout.menubar(section='hive') }
             </br>
             <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>
           </li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Server') }
+            <input type="text" data-bind="value: $root.assist.server">
+          </li>
         </ul>
       </div>
     </div>
@@ -76,7 +79,7 @@ ${ layout.menubar(section='hive') }
         <div>
           <div class="span6">
             <div data-bind="foreach: $root.assist.files">
-              <div data-bind="text: $data, click: $root.list_sentry_privileges_for_provider"></div>
+              <div data-bind="text: $data, click: $root.list_sentry_privileges_by_authorizable"></div>
             </div>
           </div>
           <div class="span6">
@@ -154,7 +157,9 @@ ${ layout.menubar(section='hive') }
                 <input type="checkbox" data-bind="click: $root.role.remove"></input>
               </td>
               <td>
-                <a href="javascript:void(0);"><i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i></a>
+                <a href="javascript:void(0);">
+                  <i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i>
+                </a>
               </td>
               <td data-bind="text: name"></td>
               <td>

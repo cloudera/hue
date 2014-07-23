@@ -122,9 +122,16 @@ var Role = function(vm, privilege) {
 var Assist = function (vm) {
   var self = this;
 
-  self.path = ko.observable('');
+  self.path = ko.observable('');  
   self.path.subscribe(function() {
 	self.fetchDatabases();
+  });
+  self.server = ko.observable('server1');
+  self.db = ko.computed(function() {
+    return self.path().split(/[.]/)[0];
+  });
+  self.table = ko.computed(function() {
+    return self.path().split(/[.]/)[1];
   });
   self.files = ko.observableArray();
   self.privilege = ko.observable();
@@ -140,7 +147,8 @@ var Assist = function (vm) {
     	if (data.databases) {
           self.files(data.databases);
     	} else if (data.tables && data.tables.length > 0) {
-    	  self.files(data.tables);
+    	  var tables = $.map(data.tables, function(table, index) {return self.db() + '.' + table;});
+    	  self.files(tables);
     	}
       },
       cache: false
@@ -221,14 +229,19 @@ var HiveViewModel = function (initial) {
     });
   };
 
-  self.list_sentry_privileges_for_provider = function(role) {
+  self.list_sentry_privileges_by_authorizable = function(path) {
+	self.assist.path(path);
     $.ajax({
       type: "POST",
-      url: "/security/api/hive/list_sentry_privileges_for_provider",
+      url: "/security/api/hive/list_sentry_privileges_by_authorizable",
       data: {    	
-    	groups: ko.mapping.toJSON(['sambashare']),
+    	groups: ko.mapping.toJSON(['sambashare', 'hadoop']),
     	roleSet: ko.mapping.toJSON({all: true, roles: []}),
-        authorizableHierarchy: ko.mapping.toJSON({'server': 'aa', 'db': 'default'}),
+        authorizableHierarchy: ko.mapping.toJSON({
+            'server': self.assist.server(),
+            'db': self.assist.db(),
+            'table': self.assist.table(),
+        }),
       },
       success: function (data) {
     	self.assist.privilege(ko.mapping.fromJS(data));

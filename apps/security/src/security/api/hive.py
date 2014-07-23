@@ -141,21 +141,6 @@ def create_sentry_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def create_sentry_role(request):
-  result = {'status': -1, 'message': 'Error'}
-
-  try:
-    roleName = request.POST['roleName']
-
-    get_api(request.user).create_sentry_role(roleName)
-    result['message'] = ''
-    result['status'] = 0
-  except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
-
-  return HttpResponse(json.dumps(result), mimetype="application/json")
-
-
 def drop_sentry_role(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -164,6 +149,29 @@ def drop_sentry_role(request):
 
     get_api(request.user).drop_sentry_role(roleName)
     result['message'] = _('Role and privileges deleted.')
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+# Mocked!
+def list_sentry_privileges_by_authorizable(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    groups = json.loads(request.POST['groups'])
+    roleSet = json.loads(request.POST['roleSet'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    from collections import defaultdict
+    d = defaultdict(int)
+    d.update(authorizableHierarchy)
+
+    result['privileges'] = json.loads('{"status": 0, "sentry_privileges": [{"name": "serverA+databaseA+tableA+INSERT", "timestamp": 1404171968718, "database": "databaseA", "action": "INSERT", "scope": "TABLE", "table": "tableA", "URI": "", "grantor": null, "server": "serverA"},{"name": "%(server)s+%(database)s+%(table)s+INSERT", "timestamp": 1404171968718, "database": "%(database)s", "action": "INSERT", "scope": "TABLE", "table": "%(table)s", "URI": "", "grantor": null, "server": "%(server)s"}], "message": ""}' % d)
+
+    result['message'] = ''
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
