@@ -119,26 +119,8 @@ ${ layout.menubar(section='hdfs') }
             </a>
             <i class="fa fa-compress"></i>
             <i class="fa fa-refresh"></i>
-            <span data-bind="text: $root.doAs"></span>
-            <div class="btn-group pull-right">
-              <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                View as...
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="#"><strong>USERS</strong></a></li>
-                <li><a href="#">My user</a></li>
-                <!-- ko foreach: availableHadoopUsers -->
-                  <li><a href="#" data-bind="text: $data, click: function() { $root.doAs($data); }"></a></li>
-                <!-- /ko -->
-                <li class="divider"></li>
-                <li><a href="#"><strong>GROUPS</strong></a></li>
-                <li><a href="#">My group</a></li>
-                <!-- ko foreach: availableHadoopGroups -->
-                  <li><a href="#" data-bind="text: $data"></a></li>
-                <!-- /ko -->
-              </ul>
-            </div>
+              ${ _('View as') }
+              <input type="text" class="doas-input input-small" data-bind="value: $root.doAs">
           </div>
           ${ _('HDFS ACLs') }
         </h1>
@@ -147,17 +129,19 @@ ${ layout.menubar(section='hdfs') }
             <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" type="text" style="width: 96%" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
-                  <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse"><i class="fa fa-external-link"></i></a>
+                  <input id="path" type="text" style="width: 96%; height: 40px; font-size: 14pt" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
+                  <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
+                    <i class="fa fa-external-link"></i>
+                  </a>
                 </div>
               </div>
               <div class="path-container-ghost hide"></div>
               ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
             <div class="span4">
-              <div class="acl-panel" data-bind="visible: !$root.assist.isLoadingAcls()">
+              <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
                   <a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(! $root.assist.showAclsAsText()); }">
-                    <i class="fa" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }"></i>
+                    <i class="fa fa-2x" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }"></i>
                     <span data-bind="visible: $root.assist.showAclsAsText()">${ _('Text view') }</span>
                     <span data-bind="visible: ! $root.assist.showAclsAsText()">${ _('Edit') }</span>
                   </a>
@@ -270,7 +254,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
     ko.applyBindings(viewModel);
 
     var _initialPath = "/";
-    if (window.location.hash != ""){
+    if (window.location.hash != "") {
       _initialPath = window.location.hash.substr(1);
     }
     viewModel.init(_initialPath);
@@ -299,7 +283,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
         });
       }
     });
-
 
     $(".path-container").data("originalWidth", $(".path-container").width());
     $(".acl-panel").data("originalWidth", $(".acl-panel").width());
