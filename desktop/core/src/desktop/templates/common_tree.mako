@@ -25,7 +25,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, limitCount=None, limitFunction=None, anchorProperty=None)">
+<%def name="import_templates(itemClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None)">
 
   <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
 
@@ -41,20 +41,22 @@
   </script>
 
   <script type="text/html" id="folder-template">
-    <!-- ko if: nodes != null -->
-    <ul data-bind="foreach: nodes">
+    <ul>
+      <!-- ko foreach: nodes -->
       <li>
         <div data-bind="template: { name: 'node-template', data: $data }"></div>
       </li>
-      <!-- ko if: $index() == 14 -->
+      <!-- /ko -->
+      %if showMore:
+      <!-- ko if: page().number() != page().num_pages() -->
       <li>
-        <a href="javascript: void(0)">
-          <i class="fa fa-plus"></i>
+        <a href="javascript: void(0)" data-bind="click: ${showMore}" style="padding-left: 8px">
+          <i class="fa fa-plus"></i> ${_('Show more...')}
         </a>
       </li>
       <!-- /ko -->
+      %endif
     </ul>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="node-template">

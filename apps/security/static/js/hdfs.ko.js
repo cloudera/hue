@@ -64,8 +64,8 @@ var Assist = function (vm, assist) {
   self.showAclsAsText = ko.observable(false);
   self.isDiffMode = ko.observable(false);
 
-  self.treeCollapseStatus = {};
-  self.treeLoadingStatus = {};
+  self.treeAdditionalData = {};
+  self.treeAdditionalDataObservable = ko.observable({});
   self.treeData = ko.observable({nodes: []});
   self.loadData = function (data) {
     self.treeData(new TreeNodeModel(data));
@@ -77,6 +77,7 @@ var Assist = function (vm, assist) {
     aclBit: false,
     striked: false,
     selected: false,
+    page: {},
     nodes: [
       {
         name: "/",
@@ -86,6 +87,7 @@ var Assist = function (vm, assist) {
         aclBit: false,
         striked: false,
         selected: false,
+        page: {},
         nodes: []
       }
     ]
@@ -93,9 +95,11 @@ var Assist = function (vm, assist) {
 
   self.path = ko.observable('');
   self.path.subscribe(function (path) {
+    self.pagenum(1);
     self.fetchPath();
     window.location.hash = path;
   });
+  self.pagenum = ko.observable(1);
   self.files = ko.observableArray();
 
   self.acls = ko.observableArray();
@@ -178,29 +182,41 @@ var Assist = function (vm, assist) {
         striked: item.striked != null,
         isExpanded: true,
         isDir: item.type == "dir",
+        page: {},
         nodes: []
       });
     }
     return leaf;
   }
 
-  self.updatePathExpanded = function (leaf, path, expanded) {
+  self.getTreeAdditionalDataForPath = function (path) {
+    if (typeof self.treeAdditionalData[path] == "undefined"){
+      var _add = {
+        loaded: false,
+        page: {}
+      }
+      self.treeAdditionalData[path] = _add;
+      self.treeAdditionalDataObservable(self.treeAdditionalData);
+    }
+    return self.treeAdditionalData[path];
+  }
+
+  self.updatePathProperty = function (leaf, path, property, value) {
     if (leaf.path == path) {
-      leaf.isExpanded = expanded;
+      leaf[property] = value;
     }
     if (leaf.nodes.length > 0) {
       leaf.nodes.forEach(function (node) {
-        self.updatePathExpanded(node, path, expanded);
+        self.updatePathProperty(node, path, property, value);
       });
     }
     return leaf;
   }
 
   self.setPath = function (obj) {
-    if (self.treeLoadingStatus[obj.path()] != null && self.treeLoadingStatus[obj.path()]) {
+    if (self.getTreeAdditionalDataForPath(obj.path()).loaded == true) {
       obj.isExpanded(!obj.isExpanded());
-      self.updatePathExpanded(self.growingTree(), obj.path(), obj.isExpanded());
-      self.treeCollapseStatus[obj.path()] = obj.isExpanded();
+      self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
   }
@@ -228,20 +244,25 @@ var Assist = function (vm, assist) {
   self.fetchPath = function () {
 	$.getJSON('/security/api/hdfs/list' + self.path(), {
       'pagesize': 15,
+      'pagenum': self.pagenum(),
       'format': 'json',
       'doas': vm.doAs(),
-      'isDiffMode': self.isDiffMode(),
-    }, function (data) {
-      self.treeLoadingStatus[self.path()] = true;
+      'isDiffMode': self.isDiffMode()
+    },
+    function (data) {
+      self.getTreeAdditionalDataForPath(self.path()).loaded = true;
+      self.getTreeAdditionalDataForPath(self.path()).page = data.page;
+      self.treeAdditionalDataObservable(self.treeAdditionalData);
+      self.updatePathProperty(self.growingTree(), self.path(), "page", data.page);
       self.loadParents(data.breadcrumbs);
-      if (data['files'] && data['files'][0]['type'] == 'dir') { // Hack for now
+      if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
         self.files.removeAll();
         $.each(data.files, function (index, item) {
           self.convertItemToObject(item);
           self.files.push(ko.mapping.fromJS({
               'path': item.path,
               'aclBit': item.rwx.indexOf('+') != -1,
-              'striked': item.striked != null,
+              'striked': item.striked != null
             })
           );
         });
@@ -255,6 +276,11 @@ var Assist = function (vm, assist) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+
+  self.loadMore = function (what) {
+    self.pagenum(what.page().next_page_number());
+    self.fetchPath();
+  }
 
   self.getAcls = function () {
     $(".jHueNotify").hide();

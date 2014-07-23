@@ -21,7 +21,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from filebrowser.views import listdir_paged
+from filebrowser.views import display, listdir_paged
 
 
 def _get_acl_name(acl):
@@ -48,7 +48,11 @@ def _diff_list_dir(user_listing, hdfs_listing):
 
 def list_hdfs(request, path):
   try:
-    json_response = listdir_paged(request, path)
+    stats = request.fs.stats(path)
+    if stats.isDir:
+        json_response = listdir_paged(request, path)
+    else:
+        json_response = display(request, path)
   except:
     json_response = HttpResponse(json.dumps({'files': []}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
   if json.loads(request.GET.get('isDiffMode', 'false')):

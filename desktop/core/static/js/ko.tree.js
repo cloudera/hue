@@ -20,6 +20,7 @@ var TreeNodeModel = function(data) {
   self.description = ko.observable();
   self.name = ko.observable();
   self.nodes = ko.observableArray([]);
+  self.page = ko.observable();
 
   self.toggleVisibility = function() {
     self.isExpanded(! self.isExpanded());

@@ -218,7 +218,7 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path') }
+${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore') }
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
