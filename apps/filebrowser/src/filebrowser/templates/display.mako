@@ -41,16 +41,16 @@ ${ fb_components.menubar() }
     <div class="span10">
       <div class="card card-small" style="margin-bottom: 5px">
         % if not view['compression'] or view['compression'] in ("none", "avro"):
-          <div class="pull-right" style="margin-right: 20px; margin-top: 14px">
-            <div class="form-inline" style="display: inline">
+          <div class="pull-right">
+            <div class="form-inline inline">
               <span>${_('Page')}</span>
               <input type="text" data-bind="value: page, valueUpdate: 'afterkeydown', event: { change: pageChanged }" style="width: 40px; text-align: center"/>
               <span data-bind="visible: totalPages() > MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == 'binary'">
               to <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" style="width: 40px; text-align: center"/></span>
               of <span data-bind="text: totalPages"></span>
             </div>
-            <div class="pagination" style="display: inline;">
-              <ul style="margin-bottom: -10px; margin-left: 10px">
+            <div class="pagination inline">
+              <ul>
                 <li class="first-page prev disabled"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
                 <li class="previous-page disabled"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
                 <li class="next-page"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
@@ -100,18 +100,19 @@ ${ fb_components.menubar() }
 <script src="/static/ext/js/jquery/plugins/jquery.visible.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
-<%
-  MAX_ALLOWED_PAGES_PER_REQUEST = 255
-%>
-(function() {
+(function () {
+  <%
+    MAX_ALLOWED_PAGES_PER_REQUEST = 255
+  %>
+
   var pages = {};
 
-  var resizeText = function () {
+  function resizeText () {
     $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 26);
     $("#loader").css("marginLeft", ($("#fileArea").width() - $("#loader").width()) / 2);
-  };
+  }
 
-  var formatHex function = (number, padding) {
+  function formatHex (number, padding) {
     if ("undefined" != typeof number){
       var _filler = "";
       for (var i = 0; i < padding - 1; i++) {
@@ -120,9 +121,9 @@ ${ fb_components.menubar() }
       return (_filler + number.toString(16)).substr(-padding);
     }
     return "";
-  };
+  }
 
-  var pageContent = function (page) {
+  function pageContent (page) {
     var _html = "";
     if ($("#page" + page).length == 0) {
       if (pages[page] == null) {
@@ -138,9 +139,9 @@ ${ fb_components.menubar() }
       }
     }
     return _html;
-  };
+  }
 
-  var renderPages = function () {
+  function renderPages () {
     var _html = "";
     if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING) { // enable scrolling
       for (var i = 1; i <= viewModel.totalPages(); i++) {
@@ -152,9 +153,9 @@ ${ fb_components.menubar() }
     if (_html != "") {
       $("#fileArea pre").html(_html);
     }
-  };
+  }
 
-  var getContent = function (callback) {
+  function getContent (callback) {
     viewModel.isLoading(true);
     var _baseUrl = "${url('filebrowser.views.view', path=path_enc)}";
     $.getJSON(_baseUrl, viewModel.jsonParams(), function (data) {
@@ -179,21 +180,21 @@ ${ fb_components.menubar() }
       }
       viewModel.isLoading(false);
     });
-  };
+  }
 
-  var DisplayViewModel = function (params) {
+  function DisplayViewModel (params) {
     var self = this;
 
-    var changePage = function () {
+    function changePage () {
       getContent(function () {
         if (viewModel.totalPages() >= viewModel.MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == "binary") {
-          window.location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
+          location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
           $("#fileArea").scrollTop(0);
         } else {
-          window.location.hash = "#page" + viewModel.page();
+          location.hash = "#page" + viewModel.page();
         }
       });
-    };
+    }
 
     self.MAX_ALLOWED_PAGES_PER_REQUEST = ${MAX_ALLOWED_PAGES_PER_REQUEST};
     self.MAX_PAGES_TO_ENABLE_SCROLLING = 300;
@@ -348,31 +349,34 @@ ${ fb_components.menubar() }
         viewModel.upperPage(Math.min(self.totalPages(), 50));
         changePage();
       }
-    }
-  };
+    };
+  }
+
+  window.viewModel = new DisplayViewModel({
+    base_url: "${ base_url }",
+    compression: "${view['compression']}",
+    mode: "${ view['mode'] }",
+    begin: ${view['offset'] + 1},
+    end: ${view['end']},
+    length: ${view['length']},
+    size: ${stats['size']},
+    max_size: ${view['max_chunk_size']}
+  });
 
   $(document).ready(function () {
-    var viewModel = new DisplayViewModel({
-      base_url: "${ base_url }",
-      compression: "${view['compression']}",
-      mode: "${ view['mode'] }",
-      begin: ${view['offset'] + 1},
-      end: ${view['end']},
-      length: ${view['length']},
-      size: ${stats['size']},
-      max_size: ${view['max_chunk_size']}
-    });
-
     ko.applyBindings(viewModel);
 
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
     });
 
-    var _hash = window.location.hash;
+    var _hashPage, _hashUpperPage, _resizeTimeout, _fileAreaScrollTimeout, i,
+      _hash = location.hash;
+
     if (_hash != "") {
-      var _hashPage = 1;
-      var _hashUpperPage = 1;
+      _hashPage = 1;
+      _hashUpperPage = 1;
+
       if (_hash.indexOf("-") > -1) {
         _hashPage = _hash.split("-")[0].substr(2) * 1;
         _hashUpperPage = _hash.split("-")[1].substr(1) * 1;
@@ -380,36 +384,40 @@ ${ fb_components.menubar() }
         _hashPage = _hash.substr(2) * 1;
         _hashUpperPage = Math.min(viewModel.totalPages(), _hashPage + 50 - 1);
       }
+
       if (isNaN(_hashPage)) {
         _hashPage = 1;
       }
+
       if (isNaN(_hashUpperPage)) {
         _hashUpperPage = Math.min(viewModel.totalPages(), 50);
       }
+
       if (_hashUpperPage - _hashPage > viewModel.MAX_ALLOWED_PAGES_PER_REQUEST) {
         _hashUpperPage = _hashPage + viewModel.MAX_ALLOWED_PAGES_PER_REQUEST;
       }
       viewModel.page(_hashPage);
       viewModel.upperPage(_hashUpperPage);
-    };
+    }
 
     viewModel.toggleDisables();
 
-    window.setTimeout(function () {
+    setTimeout(function () {
       getContent(function () {
-        if (window.location.hash != "") {
-          window.location.hash = "#page" + viewModel.page();
-          window.location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
+        if (location.hash != "") {
+          location.hash = "#page" + viewModel.page();
+          location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
         }
       });
     }, 100);
 
     resizeText();
 
-    var _resizeTimeout = -1;
+    _resizeTimeout = -1;
+
     $(window).on("resize", function () {
-      window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(function () {
+      clearTimeout(_resizeTimeout);
+      _resizeTimeout = setTimeout(function () {
         resizeText();
         renderPages();
       }, 300);
@@ -418,21 +426,21 @@ ${ fb_components.menubar() }
     $("#fileArea").jHueScrollUp();
 
     if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING && viewModel.mode() == "text") { // enable scrolling
-      var _fileAreaScrollTimeout = -1;
+      _fileAreaScrollTimeout = -1;
       $("#fileArea").on("scroll", function () {
         if ($("#fileArea").scrollTop() < 30) {
           viewModel.page(1);
           viewModel.upperPage(viewModel.page());
         } else {
-          for (var i = 1; i <= viewModel.totalPages(); i++) {
+          for (i = 1; i <= viewModel.totalPages(); i++) {
             if ($("#page" + i + " div").visible(true)) {
               viewModel.page(i);
               viewModel.upperPage(viewModel.page());
             }
           }
         }
-        window.clearTimeout(_fileAreaScrollTimeout);
-        _fileAreaScrollTimeout = window.setTimeout(function () {
+        clearTimeout(_fileAreaScrollTimeout);
+        _fileAreaScrollTimeout = setTimeout(function () {
           location.hash = "#p" + viewModel.page();
           if (pages[viewModel.page()] == null) {
             getContent();

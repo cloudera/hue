@@ -68,18 +68,10 @@ pre a:hover {
   border-color: #B94A48 !important;
 }
 
-.pagination {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: #f5f5f5;
-  margin: 0;
-  border-top: 1px solid #e3e3e3;
-  -webkit-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
-  -moz-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
-  box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
-  padding: 0px;
+.form-inline {
+  position: relative;
+  right: 10px;
+  top: -10px;
 }
 
 .pagination p {

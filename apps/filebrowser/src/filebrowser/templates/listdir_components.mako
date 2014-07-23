@@ -422,13 +422,13 @@ from django.utils.translation import ugettext as _
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {
       $.ajax({
-        url:"/filebrowser/chown",
-        data:{"path":path, "user":user, "group":group, "next":next},
-        beforeSend:function (xhr) {
+        url: "/filebrowser/chown",
+        data: {"path": path, "user": user, "group": group, "next": next},
+        beforeSend: function (xhr) {
           xhr.setRequestHeader("X-Requested-With", "Hue");
         },
-        dataType:"html",
-        success:function (data) {
+        dataType: "html",
+        success: function (data) {
           $("#changeOwnerModal").html(data);
           $("#changeOwnerModal").modal({
             keyboard:true,
@@ -525,7 +525,7 @@ from django.utils.translation import ugettext as _
 
           viewModel.targetPageNum(1);
           viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(this.url));
-          window.location.hash = this.url;
+          location.hash = this.url;
         }
       }
     };
@@ -666,10 +666,10 @@ from django.utils.translation import ugettext as _
 
       self.goToPage = function (pageNumber) {
         self.targetPageNum(pageNumber);
-        if (window.location.hash.indexOf("!!") > -1){
-          window.location.hash =  window.location.hash.substring(0, window.location.hash.indexOf("!!")) + "!!" + pageNumber;
+        if (location.hash.indexOf("!!") > -1){
+          location.hash =  location.hash.substring(0, location.hash.indexOf("!!")) + "!!" + pageNumber;
         } else {
-          window.location.hash += "!!" + pageNumber;
+          location.hash += "!!" + pageNumber;
         }
       };
 
@@ -714,7 +714,7 @@ from django.utils.translation import ugettext as _
           // Reset page number so that we don't hit a page that doesn't exist
           self.targetPageNum(1);
           self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
-          window.location.hash = stripHashes(file.path);
+          location.hash = stripHashes(file.path);
         } else {
           location.href = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(file.path);
         }
@@ -954,7 +954,7 @@ from django.utils.translation import ugettext as _
             if (response.status != 0) {
               $(document).trigger("error", "${ _('Error: ') }" + response['data']);
             } else if (num_of_pending_uploads == 0) {
-              window.location = "/filebrowser/view" + self.currentPath();
+              location = "/filebrowser/view" + self.currentPath();
             }
           },
           onSubmit:function (id, fileName, responseJSON) {
@@ -1002,7 +1002,7 @@ from django.utils.translation import ugettext as _
           onComplete:function (id, fileName, responseJSON) {
             num_of_pending_uploads--;
             if (num_of_pending_uploads == 0) {
-              window.location = "/filebrowser/view" + self.currentPath();
+              location = "/filebrowser/view" + self.currentPath();
             }
           },
           onSubmit:function (id, fileName, responseJSON) {
@@ -1255,8 +1255,8 @@ from django.utils.translation import ugettext as _
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
 
-      if (window.location.hash != null && window.location.hash.length > 1) {
-        var targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(window.location.hash.substring(2));
+      if (location.hash != null && location.hash.length > 1) {
+        var targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(location.hash.substring(2));
 
         viewModel.targetPath(targetPath);
 
@@ -1289,7 +1289,7 @@ from django.utils.translation import ugettext as _
               location.href = data.url;
               return false;
             } else {
-              window.location.hash = stripHashes(el.val());
+              location.hash = stripHashes(el.val());
             }
           });
         },
@@ -1312,7 +1312,7 @@ from django.utils.translation import ugettext as _
 
       $(window).bind("hashchange", function () {
         var targetPath = "";
-        var hash = window.location.hash.substring(1);
+        var hash = location.hash.substring(1);
 
         if (hash != null && hash != "") {
           targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(hash.substring(1));
@@ -1324,7 +1324,7 @@ from django.utils.translation import ugettext as _
           }
         }
 
-        if (window.location.href.indexOf("#") == -1) {
+        if (location.href.indexOf("#") == -1) {
           viewModel.targetPageNum(1)
           targetPath = "${current_request_path}";
         }
