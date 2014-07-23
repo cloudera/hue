@@ -553,17 +553,25 @@ ko.bindingHandlers.clearable = {
     }
 
     _el.addClass("clearable");
-    _el.on("input", function () {
-      _el[tog(this.value)]("x");
-      valueAccessor()(_el.val());
-    }).on("mousemove", function (e) {
-      _el[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
-    }).on("click", function (e) {
-      if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
-        _el.removeClass("x onX").val("");
-        valueAccessor()("");
-      }
-    });
+    _el
+      .on("input", function () {
+        _el[tog(this.value)]("x");
+      })
+      .on("change", function () {
+        valueAccessor()(_el.val());
+      })
+      .on("blur", function () {
+        valueAccessor()(_el.val());
+      })
+      .on("mousemove", function (e) {
+        _el[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
+      })
+      .on("click", function (e) {
+        if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
+          _el.removeClass("x onX").val("");
+          valueAccessor()("");
+        }
+      });
   },
   update: function (element, valueAccessor, allBindingsAccessor) {
     $(element).val(ko.unwrap(valueAccessor()));
