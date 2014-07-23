@@ -41,5 +41,5 @@ def hive(request):
 def hdfs(request):
 
   return render("hdfs.mako", request, {      
-      'initial': json.dumps({}),
+      'initial': json.dumps({'user': request.user.username}),
   })

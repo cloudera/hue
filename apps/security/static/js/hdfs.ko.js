@@ -313,7 +313,7 @@ var HdfsViewModel = function (initial) {
 
   self.assist = new Assist(self, initial);
 
-  self.doAs = ko.observable('');
+  self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
     self.assist.fetchPath();
   });
@@ -330,6 +330,8 @@ var HdfsViewModel = function (initial) {
       $.each(data.users, function (i, user) {
         self.availableHadoopUsers.push(user.username);
       });
+      
+      $(".doas-input").typeahead({'source': self.availableHadoopUsers()});
 
       $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
