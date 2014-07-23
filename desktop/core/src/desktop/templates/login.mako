@@ -55,7 +55,6 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     #logo {
       background: #FFF url("/static/art/hue-login-logo-ellie@2x.png") 50% 2px no-repeat;
       background-size: 114px 114px;
-
     }
   }
 

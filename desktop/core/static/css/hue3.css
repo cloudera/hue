@@ -1665,6 +1665,11 @@ border-bottom-left-radius: 0px;
   height: 24px;
 }
 
+.brand img {
+  width: 60px;
+  height: 16px;
+}
+
 /*********************************************************
  *
  * Misc styles that can be reused as needed
