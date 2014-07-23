@@ -1684,3 +1684,7 @@ border-bottom-left-radius: 0px;
 .pointer {
  cursor: pointer;
 }
+
+.inline {
+  display: inline;
+}
