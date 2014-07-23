@@ -106,7 +106,7 @@ var Assist = function (vm, assist) {
   self.originalAcls = ko.observableArray();
   self.regularAcls = ko.computed(function () {
     return $.grep(self.acls(), function (acl) {
-      return !acl.isDefault();
+      return ! acl.isDefault();
     });
   });
   self.defaultAcls = ko.computed(function () {

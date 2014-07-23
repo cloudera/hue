@@ -98,13 +98,13 @@ class SentryApi(object):
     response = self.client.list_sentry_roles_by_group()
     
     if response.status.value == 0:
-      roles = {}
+      roles = []
       for role in response.roles:
-        roles[role.roleName] = {
+        roles.append({
           'name': role.roleName,
           'grantorPrincipal': role.grantorPrincipal,
           'groups': [group.groupName for group in role.groups]
-        }
+        })
       return roles
     else:
       raise SentryException(response)  
@@ -114,7 +114,7 @@ class SentryApi(object):
     response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
     
     if response.status.value == 0:
-      return [self._massage_priviledges(privilige) for privilige in response.privileges]
+      return [self._massage_priviledges(privilege) for privilege in response.privileges]
     else:
       raise SentryException(response)
     
@@ -128,15 +128,15 @@ class SentryApi(object):
       raise SentryException(response)
     
     
-  def _massage_priviledges(self, privilige):
+  def _massage_priviledges(self, privilege):
     return {
-        'scope': privilige.privilegeScope,
-        'name': privilige.privilegeName,
-        'server': privilige.serverName,
-        'database': privilige.dbName,
-        'table': privilige.tableName,
-        'URI': privilige.URI,
-        'action': privilige.action,
-        'timestamp': privilige.createTime,
-        'grantor': privilige.grantorPrincipal
+        'scope': privilege.privilegeScope,
+        'name': privilege.privilegeName,
+        'server': privilege.serverName,
+        'database': privilege.dbName,
+        'table': privilege.tableName,
+        'URI': privilege.URI,
+        'action': privilege.action,
+        'timestamp': privilege.createTime,
+        'grantor': privilege.grantorPrincipal
     }     
