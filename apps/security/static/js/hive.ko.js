@@ -75,9 +75,7 @@ var Role = function(vm, role) {
       }, function (data) {
         if (data.status == 0) {
           $(document).trigger("info", data.message);
-          data.role['privileges'] = ko.observableArray();
-          data.role['showPrivileges'] = ko.observable(false);
-          vm.roles.unshift(data.role);
+          vm.roles.unshift(new Role(vm, data.role));
           self.reset();
           vm.showCreateRole(false);
         }
@@ -105,10 +103,6 @@ var Role = function(vm, role) {
       $(document).trigger("error", xhr.responseText);
     });
   }
-
-  /**self.addNewPrivilege = function(role) {
-    role['newPrivileges'].push(new Privilege(vm, {'serverName': vm.assist.server()}));
-  }*/
 
   self.saveNewPrivileges = function(role) {
 	$(".jHueNotify").hide();
