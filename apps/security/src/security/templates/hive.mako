@@ -26,13 +26,43 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
 
-<script type="text/html" id="privilege-template">
-  <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
-  <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
-  <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>
-  <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
-  <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
-  <i class="fa fa-minus"></i>
+<script type="text/html" id="privilege">
+  <!-- ko if: edition() -->
+    <div data-bind="template: { name: 'edit-privilege'}"></div>
+  <!-- /ko -->
+  
+  <!-- ko ifnot: edition() -->
+    <div data-bind="template: { name: 'display-privilege'}"></div>
+  <!-- /ko -->  
+</script>
+
+
+<script type="text/html" id="edit-privilege">
+  <div data-bind="visible: status() != 'deleted'">
+    <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+    <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
+    <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>
+    <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
+    <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
+    <input type="text" data-bind="value: $data.action" placeholder="action"></input>
+    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
+  </div>
+</script>
+
+
+<script type="text/html" id="display-privilege">
+  <div data-bind="visible: status() != 'deleted', with: $data.properties">
+    <span data-bind="text: name"></span>
+    <span data-bind="text: timestamp"></span>
+    <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
+    <span data-bind="text: action"></span>
+    <span data-bind="text: scope"></span>
+    <span data-bind="text: table"></span>
+    <span data-bind="text: URI"></span>
+    <span data-bind="text: grantor"></span>
+    <span data-bind="text: server"></span>
+    <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0);"><i class="fa fa-minus"></i></a>
+  </div>
 </script>
 
 
@@ -101,9 +131,12 @@ ${ layout.menubar(section='hive') }
 		    </%def>
 		
 		    <%def name="actions()">
+              <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+                <button class="btn toolbarBtn"><i class="fa fa-pencil"></i> ${ _('Edit') }</button>
+              </div>
 		      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-		        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-times"></i> ${ _('Delete') }</button>
-		      </div>
+		        <button class="btn toolbarBtn"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+		      </div>		      
 		    </%def>
 		
 		    <%def name="creation()">
@@ -117,11 +150,11 @@ ${ layout.menubar(section='hive') }
           <div data-bind="with: $root.role, visible: showCreateRole">
             <div class="span3">
               Name
-              <input type="text" data-bind="value: $data.name"></input>
+              <input type="text" class="input-small" data-bind="value: $data.name"></input>
             </div>
             <div class="span5">
               Privileges
-              <div data-bind="template: { name: 'privilege-template', foreach: privileges}">
+              <div data-bind="template: { name: 'edit-privilege', foreach: privileges}">
               </div>
               <a href="javascript: void(0)" data-bind="click: addPrivilege">
                 <i class="fa fa-plus"></i>
@@ -171,35 +204,31 @@ ${ layout.menubar(section='hive') }
                 <a href=""><span data-bind="text: grantorPrincipal"></span></a>
               </td>
             </tr>
-            <tr data-bind="foreach: $data.privileges, visible: $data.showPrivileges">
+            
+            <!-- ko if: $data.showPrivileges -->
+            <!-- ko foreach: $data.privileges -->
+            <tr>
               <td colspan="2"></td>
               <td colspan="3">
-                <span data-bind="text: name"></span>
-                <span data-bind="text: timestamp"></span>
-                <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
-                <span data-bind="text: action"></span>
-                <span data-bind="text: scope"></span>
-                <span data-bind="text: table"></span>
-                <span data-bind="text: URI"></span>
-                <span data-bind="text: grantor"></span>
-                <span data-bind="text: server"></span>
-                <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0);"><i class="fa fa-minus"></i></a>
+                <div data-bind="template: { name: 'privilege'}"></div>
               </td>
             </tr>
-            <tr data-bind="visible: $data.showPrivileges">
+            <!-- /ko -->
+            <!-- /ko -->
+            <tr>
               <td colspan="2"></td>
-              <td>
-                <div data-bind="template: { name: 'privilege-template', foreach: newPrivileges }">
-                </div>
-                <div data-bind="visible: newPrivileges().length > 0">
-		          <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-		              data-bind="click: $root.role.saveNewPrivileges">
-		            <i class="fa fa-save"></i>
-		          </button>
-                </div>
-                <a href="javascript:void(0)" data-bind="click: $root.role.addNewPrivilege">
-                  <i class="fa fa-plus"></i>
-                </a>
+              <td colspan="3">
+              <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
+                <i class="fa fa-plus"></i>
+              </a>
+              </td>
+            </tr>
+            <tr data-bind="visible: privilegesChanged().length">
+              <td colspan="5">
+                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
+                  data-bind="click: $root.role.create">
+                  <i class="fa fa-save"></i>
+                </button>
               </td>
             </tr>
           </div>

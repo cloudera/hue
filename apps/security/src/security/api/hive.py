@@ -28,25 +28,7 @@ def list_sentry_roles_by_group(request):
 
   try:
     roles = get_api(request.user).list_sentry_roles_by_group()
-    result['roles'] = roles
-    result['message'] = ''
-    result['status'] = 0
-  except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
-
-  return HttpResponse(json.dumps(result), mimetype="application/json")
-
-
-def list_sentry_privileges_for_provider(request):
-  result = {'status': -1, 'message': 'Error'}
-
-  try:
-    groups = json.loads(request.POST['groups'])
-    roleSet = json.loads(request.POST['roleSet'])
-    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
-
-    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
-    result['sentry_privileges'] = sentry_privileges
+    result['roles'] = sorted(roles, key= lambda role: role['name'])
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
@@ -76,14 +58,15 @@ def _hive_add_privileges(user, role, privileges):
     _priviledges = {}
 
     for priviledge in privileges:
-      api.alter_sentry_role_grant_privilege(role['name'], {
-          'privilegeScope': priviledge['privilegeScope'],
-          'serverName': priviledge['serverName'],
-          'dbName': priviledge['dbName'],
-          'tableName': priviledge['tableName'],
-          'URI': priviledge['URI'],
-          'action': priviledge['action']
-      })
+      if priviledge['status'] not in ('deleted'):
+        api.alter_sentry_role_grant_privilege(role['name'], {
+            'privilegeScope': priviledge['privilegeScope'],
+            'serverName': priviledge['serverName'],
+            'dbName': priviledge['dbName'],
+            'tableName': priviledge['tableName'],
+            'URI': priviledge['URI'],
+            'action': priviledge['action']
+        })
 
     return _priviledges
 
@@ -165,12 +148,34 @@ def list_sentry_privileges_by_authorizable(request):
     roleSet = json.loads(request.POST['roleSet'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
 
-    from collections import defaultdict
-    d = defaultdict(int)
-    d.update(authorizableHierarchy)
+    privileges = []
+    roles = get_api(request.user).list_sentry_roles_by_group()
 
-    result['privileges'] = json.loads('{"status": 0, "sentry_privileges": [{"name": "serverA+databaseA+tableA+INSERT", "timestamp": 1404171968718, "database": "databaseA", "action": "INSERT", "scope": "TABLE", "table": "tableA", "URI": "", "grantor": null, "server": "serverA"},{"name": "%(server)s+%(database)s+%(table)s+INSERT", "timestamp": 1404171968718, "database": "%(database)s", "action": "INSERT", "scope": "TABLE", "table": "%(table)s", "URI": "", "grantor": null, "server": "%(server)s"}], "message": ""}' % d)
+    for role in roles:
+      for privilege in get_api(request.user).list_sentry_privileges_by_role(role['name']): # authorizableHierarchy not working here?
+        if privilege['database'] == authorizableHierarchy['db'] and ('table' not in authorizableHierarchy or privilege['table'] == authorizableHierarchy['table']): 
+          privileges.append(privilege)
+    
+    result['privileges'] = privileges
 
+    result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def list_sentry_privileges_for_provider(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    groups = json.loads(request.POST['groups'])
+    roleSet = json.loads(request.POST['roleSet'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    result['sentry_privileges'] = sentry_privileges
     result['message'] = ''
     result['status'] = 0
   except Exception, e:

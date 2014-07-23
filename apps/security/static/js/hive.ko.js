@@ -15,9 +15,6 @@
 // limitations under the License.
 
 
-// groups, privileges
-
-
 var Privilege = function (vm, privilege) {
   var self = this;
 
@@ -28,17 +25,34 @@ var Privilege = function (vm, privilege) {
   self.URI = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null ? privilege.URI : "");
   self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : "");
 
+  self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
+  self.edition = ko.observable(typeof privilege.edition != "undefined" && privilege.edition != null ? privilege.edition : false);
+
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
+  
+  self.remove = function(privilege) {
+	privilege.status('deleted');
+  }
 }
 
-var Role = function(vm, privilege) {
+var Role = function(vm, role) {
   var self = this;
 
-  self.name = ko.observable('');
+  self.name = ko.observable(typeof role.name != "undefined" && role.name != null ? role.name : "");
+  self.grantorPrincipal = ko.observable(typeof role.grantorPrincipal != "undefined" && role.grantorPrincipal != null ? role.grantorPrincipal : "");
   self.groups = ko.observableArray();
-  self.privileges = ko.observableArray();
+  $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function(index, group) {
+	self.groups.push(group);
+  });
+  self.privileges = ko.observableArray(); // Not included in the API
+  self.showPrivileges = ko.observable(false);
 
+  self.privilegesChanged = ko.computed(function () {
+    return $.grep(self.privileges(), function (privilege) {
+      return ['new', 'deleted', 'modified'].indexOf(privilege.status()) != -1;
+    });
+  });  
 
   self.reset = function() {
 	self.name('');
@@ -51,7 +65,7 @@ var Role = function(vm, privilege) {
   }
 
   self.addPrivilege = function() {
-	self.privileges.push(new Privilege(vm, {}));
+	self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'edition': true}));
   }
 
   self.create = function() {
@@ -62,7 +76,6 @@ var Role = function(vm, privilege) {
         if (data.status == 0) {
           $(document).trigger("info", data.message);
           data.role['privileges'] = ko.observableArray();
-          data.role['newPrivileges'] = ko.observableArray();
           data.role['showPrivileges'] = ko.observable(false);
           vm.roles.unshift(data.role);
           self.reset();
@@ -93,9 +106,9 @@ var Role = function(vm, privilege) {
     });
   }
 
-  self.addNewPrivilege = function(role) {
-    role['newPrivileges'].push(new Privilege(self, {}));
-  }
+  /**self.addNewPrivilege = function(role) {
+    role['newPrivileges'].push(new Privilege(vm, {'serverName': vm.assist.server()}));
+  }*/
 
   self.saveNewPrivileges = function(role) {
 	$(".jHueNotify").hide();
@@ -171,7 +184,7 @@ var HiveViewModel = function (initial) {
 
   // Edition
   self.showCreateRole = ko.observable(false);
-  self.role = new Role(self);
+  self.role = new Role(self, {});
   self.privilege = new Privilege(self, {});
 
   self.doAs = ko.observable('');
@@ -200,10 +213,7 @@ var HiveViewModel = function (initial) {
     $.getJSON('/security/api/hive/list_sentry_roles_by_group', {    	
       }, function (data) {
         $.each(data.roles, function(index, item) {
-          item['privileges'] = ko.observableArray();
-          item['showPrivileges'] = ko.observable(false);
-          item['newPrivileges'] = ko.observableArray();
-    	  self.roles.push(item);
+    	  self.roles.push(new Role(self, item));
         });
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
@@ -220,7 +230,16 @@ var HiveViewModel = function (initial) {
       success: function (data) {
     	role.privileges.removeAll();
         $.each(data.sentry_privileges, function(index, item) {
-          role.privileges.push(ko.mapping.fromJS(item));
+          var privilege = new Privilege(self, {
+        	  'privilegeScope': item.scope,
+               'serverName': item.server,
+               'dbName': item.database,
+               'tableName': item.table,
+               'URI': item.URI,
+               'action': item.action
+          });
+          privilege.properties = ko.mapping.fromJS(item);
+          role.privileges.push(privilege);
         });
         role.showPrivileges(true);
       }

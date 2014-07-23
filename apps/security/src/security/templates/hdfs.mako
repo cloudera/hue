@@ -118,6 +118,7 @@ ${ layout.menubar(section='hdfs') }
             <i class="fa fa-refresh"></i>
             ${ _('View as') }
             <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
+            <i class="fa fa-group"></i>
           </div>
           ${ _('HDFS ACLs') }
         </h1>
