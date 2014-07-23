@@ -29,6 +29,7 @@ function parseAcl(acl) {
 
   acl.type.subscribe(function () {
     acl.status('modified');
+    updateTypeAheads(viewModel);
   });
   acl.name.subscribe(function () {
     acl.status('modified');
@@ -49,6 +50,12 @@ function parseAcl(acl) {
 function printAcl(acl) {
   return (acl.isDefault() ? 'default:' : '') + acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
+
+function updateTypeAheads(vm) { 
+  $(".group-list").typeahead({'source': vm.availableHadoopGroups()});
+  $(".user-list").typeahead({'source': vm.availableHadoopUsers()});
+}
+
 
 var Assist = function (vm, assist) {
   var self = this;
@@ -121,6 +128,7 @@ var Assist = function (vm, assist) {
     var newAcl = parseAcl('group::---');
     newAcl.status('new');
     self.acls.push(newAcl);
+    updateTypeAheads(vm);
   };
 
   self.addDefaultAcl = function () {
@@ -330,12 +338,12 @@ var HdfsViewModel = function (initial) {
       $.each(data.users, function (i, user) {
         self.availableHadoopUsers.push(user.username);
       });
-      
-      $(".doas-input").typeahead({'source': self.availableHadoopUsers()});
 
       $.each(data.groups, function (i, group) {
         self.availableHadoopGroups.push(group.name);
       });
+      
+      updateTypeAheads(self);
     });
   }
 };

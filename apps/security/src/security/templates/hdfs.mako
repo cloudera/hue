@@ -92,10 +92,7 @@ ${ layout.menubar(section='hdfs') }
     <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
     <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
     <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('other') }
-
-    <input type="text" data-bind="value: name, valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
-    ##<select data-bind="options: $root.availableHadoopGroups, value: name, optionsCaption: '', valueUpdate:'afterkeydown'" class="input-small" placeholder="${ _('name...') }"/>
-
+    <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', css: { 'user-list': type() == 'user', 'group-list': type() == 'group' }" class="input-small" placeholder="${ _('name...') }"/>
     <input type="checkbox" title="r, ${ _('Read') }" data-bind="checked: r"/>
     <input type="checkbox" title="w, ${ _('Write') }" data-bind="checked: w"/>
     <input type="checkbox" title="x, ${ _('Execute') }" data-bind="checked: x"/>
@@ -119,8 +116,8 @@ ${ layout.menubar(section='hdfs') }
             </a>
             <i class="fa fa-compress"></i>
             <i class="fa fa-refresh"></i>
-              ${ _('View as') }
-              <input type="text" class="doas-input input-small" data-bind="value: $root.doAs">
+            ${ _('View as') }
+            <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
           </div>
           ${ _('HDFS ACLs') }
         </h1>
