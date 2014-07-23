@@ -83,7 +83,7 @@ def hive_create_role(request):
     result['privileges'] = _hive_add_privileges(request.user, role, role['privileges'])
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
 
-    result['role'] = {"name": role['name'], "groups": [], "grantorPrincipal": request.user.username}
+    result['role'] = {"name": role['name'], "groups": role['groups'], "grantorPrincipal": request.user.username}
 
     result['message'] = ''
     result['status'] = 0
@@ -116,7 +116,7 @@ def create_sentry_role(request):
     roleName = request.POST['roleName']
 
     get_api(request.user).create_sentry_role(roleName)
-    result['message'] = ''
+    result['message'] = _('Role and privileges created.')
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
