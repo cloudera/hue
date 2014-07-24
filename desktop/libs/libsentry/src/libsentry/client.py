@@ -111,9 +111,9 @@ class SentryClient(object):
     return self.client.list_sentry_privileges_by_role(request)
 
 
-  def drop_sentry_privilege(self, authorizableHierarchy):
-    authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
-    request = TDropPrivilegesRequest(requestorUserName=self.username, authorizableHierarchy=authorizableHierarchy)
+  def drop_sentry_privilege(self, authorizable):
+    authorizable = TSentryAuthorizable(**authorizable)
+    request = TDropPrivilegesRequest(requestorUserName=self.username, authorizable=authorizable)
     return self.client.drop_sentry_privilege(request)
 
 
