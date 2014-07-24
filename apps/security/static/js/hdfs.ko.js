@@ -246,7 +246,6 @@ var Assist = function (vm, assist) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     Object.keys(self.treeAdditionalData).forEach(function (path) {
       if (self.treeAdditionalData[path].loaded) {
-        console.log("Fetching", path);
         self.fetchPath(path);
       }
     });
