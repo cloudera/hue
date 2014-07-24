@@ -27,45 +27,38 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="privilege">
+<tr data-bind="visible: status() != 'deleted', click: function() { if (! edition()) { edition(true); } }">
+
   <!-- ko if: edition() -->
-    <div data-bind="template: { name: 'edit-privilege'}"></div>
+    <td><select data-bind="options: availablePrivileges, value: privilegeScope"></select></td>
+    <td><input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.URI" placeholder="URI"></input></td>
+    <td><input type="text" data-bind="value: $data.action" placeholder="action"></input></td>
+    <td><a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a></td>
+  </div>
   <!-- /ko -->
   
   <!-- ko ifnot: edition() -->
-    <div data-bind="template: { name: 'display-privilege'}"></div>
+    <td><span data-bind="text: properties.name"></span></td>
+    <td><span data-bind="text: properties.timestamp"></span></td>
+    <td><a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a></td>
+    <td><span data-bind="text: properties.action"></span></td>
+    <td><span data-bind="text: properties.scope"></span></td>
+    <td><span data-bind="text: properties.table"></span></td>
+    <td><span data-bind="text: properties.URI"></span></td>
+    <td><span data-bind="text: properties.grantor"></span></td>
+    <td><span data-bind="text: properties.server"></span></td>
+    <td>
+      <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
+    </td>
   <!-- /ko -->  
+
+</tr>
 </script>
 
 
-<script type="text/html" id="edit-privilege">
-  <div data-bind="visible: status() != 'deleted'">
-    <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
-    <input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input>
-    <input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input>
-    <input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input>
-    <input type="text" data-bind="value: $data.URI" placeholder="URI"></input>
-    <input type="text" data-bind="value: $data.action" placeholder="action"></input>
-    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
-  </div>
-</script>
-
-
-<script type="text/html" id="display-privilege">
-  <div data-bind="visible: status() != 'deleted'">
-    <span data-bind="with: $data.properties">
-      <span data-bind="text: name"></span>
-      <span data-bind="text: timestamp"></span>
-      <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
-      <span data-bind="text: action"></span>
-      <span data-bind="text: scope"></span>
-      <span data-bind="text: table"></span>
-      <span data-bind="text: URI"></span>
-      <span data-bind="text: grantor"></span>
-      <span data-bind="text: server"></span>
-    </span>
-    <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
-  </div>
-</script>
 
 
 <div class="container-fluid">
@@ -150,13 +143,13 @@ ${ layout.menubar(section='hive') }
 
         <div class="card-body">
           <div data-bind="with: $root.role, visible: showCreateRole">
-            <div class="span3">
+            <div class="span1">
               Name
               <input type="text" class="input-small" data-bind="value: $data.name"></input>
             </div>
-            <div class="span5">
+            <div class="span7">
               Privileges
-              <div data-bind="template: { name: 'edit-privilege', foreach: privileges}">
+              <div data-bind="template: { name: 'privilege', foreach: privileges}">
               </div>
               <a href="javascript: void(0)" data-bind="click: addPrivilege">
                 <i class="fa fa-plus"></i>
@@ -205,23 +198,23 @@ ${ layout.menubar(section='hive') }
               <td>
                 <a href=""><span data-bind="text: grantorPrincipal"></span></a>
               </td>
-            </tr>            
-            <!-- ko if: $data.showPrivileges -->
-              <!-- ko foreach: $data.privileges -->
-              <tr>
+            </tr> 
+            <tr>
+                       
+
+              
                 <td colspan="2"></td>
                 <td colspan="3">
-                  <div data-bind="template: { name: 'privilege'}"></div>
-                </td>
-              </tr>
-              <!-- /ko -->
-            <!-- /ko -->
+                  <table data-bind="template: { name: 'privilege', foreach: $data.privileges}, visible: $data.showPrivileges">
+                  </table>
+                </td>              
+            </tr>
             <tr>
               <td colspan="2"></td>
               <td colspan="3">
-              <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
-                <i class="fa fa-plus"></i>
-              </a>
+                <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
+                  <i class="fa fa-plus"></i>
+                </a>
               </td>
             </tr>
             <tr data-bind="visible: privilegesChanged().length">
