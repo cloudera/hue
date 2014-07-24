@@ -41,4 +41,5 @@ urlpatterns += patterns('security.api.hive',
   url(r'^api/hive/drop_sentry_role', 'drop_sentry_role', name='drop_sentry_role'),
   url(r'^api/hive/create_role$', 'create_role', name='create_role'),
   url(r'^api/hive/save_privileges$', 'save_privileges', name='save_privileges'),
+  url(r'^api/hive/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),
 )

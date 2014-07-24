@@ -110,7 +110,7 @@ var Role = function(vm, role) {
         role: ko.mapping.toJSON(role)
       }, function (data) {
         if (data.status == 0) {
-          vm.list_sentry_privileges_by_role(role);
+          vm.list_sentry_privileges_by_role(role); // Refresh all role privileges
         } else {
           $(document).trigger("error", data.message);
         }
