@@ -63,6 +63,9 @@ var Assist = function (vm, assist) {
   self.isLoadingAcls = ko.observable(false);
   self.showAclsAsText = ko.observable(false);
   self.isDiffMode = ko.observable(false);
+  self.isDiffMode.subscribe(function () {
+    self.refreshTree();
+  });
 
   self.treeAdditionalData = {};
   self.treeData = ko.observable({nodes: []});
@@ -322,13 +325,13 @@ var Assist = function (vm, assist) {
   self.getAcls = function () {
     $(".jHueNotify").hide();
     var _isLoading = window.setTimeout(function () {
-      self.isLoadingAcls(true);
-    }, 1000);
-    logGA('get_acls');
+        self.isLoadingAcls(true);
+      }, 1000);
+        logGA('get_acls');
 
-    $.getJSON('/security/api/hdfs/get_acls', {
-      'path': self.path()
-    }, function (data) {
+        $.getJSON('/security/api/hdfs/get_acls', {
+        'path': self.path()
+      }, function (data) {
       window.clearTimeout(_isLoading);
       if (data != null) {
         self.acls.removeAll();
@@ -386,7 +389,7 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-    self.assist.fetchPath();
+	self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
