@@ -75,20 +75,18 @@ ${ layout.menubar(section='hdfs') }
     padding-top: 6px;
     padding-left: 12px;
     min-height: 300px;
-    margin-left: 12px;
   }
 
   #path {
-    width: 96%;
-    height: 40px;
-    font-size: 14pt;
+    height: 34px;
+    font-size: 14px;
   }
 
   .path-container .btn-inverse {
-    height: 40px;
-    width: 40px;
-    font-size: 14pt;
-    line-height: 40px;
+    height: 34px;
+    width: 34px;
+    font-size: 14px;
+    line-height: 34px;
   }
 
   .fake-pre {
@@ -106,6 +104,30 @@ ${ layout.menubar(section='hdfs') }
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
+  }
+
+  .tree-toolbar {
+    padding: 3px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .tree-toolbar .fa {
+    margin-left: 5px;
+  }
+
+  .tree-toolbar .fa-sitemap {
+    color: #cccccc;
+    margin-right: 6px;
+  }
+
+  .tree-toolbar input {
+    margin-bottom: 0;
+    height: 25px;
+    min-height: 25px;
+  }
+
+  .tree-toolbar .pull-right {
+    margin-top: -3px;
   }
 
 </style>
@@ -138,19 +160,6 @@ ${ layout.menubar(section='hdfs') }
     <div class="span12">
       <div class="card card-small">
         <h1 class="card-heading simple">
-          <div class="pull-right">
-            <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(false); }" title="${ _('Show non accessible files') }">
-              <i class="fa fa-eye" data-bind="visible: $root.assist.isDiffMode"></i>
-            </a>
-            <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(true); }" title="${ _('Show as the user would see') }">
-              <i class="fa fa-eye-slash" data-bind="visible: ! $root.assist.isDiffMode()"></i>
-            </a>
-            <i class="fa fa-compress"></i>
-            <i class="fa fa-refresh"></i>
-            ${ _('View as') }
-            <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
-            <i class="fa fa-group"></i>
-          </div>
           ${ _('HDFS ACLs') }
         </h1>
         <div class="card-body">
@@ -158,14 +167,38 @@ ${ layout.menubar(section='hdfs') }
             <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
+                  <input id="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
                   <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
                 <div class="clearfix"></div>
+                <div class="tree-toolbar">
+                  <div class="pull-right">
+                    <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(false); }" title="${ _('Show non accessible files') }">
+                      <i class="fa fa-eye" data-bind="visible: $root.assist.isDiffMode"></i>
+                    </a>
+                    <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(true); }" title="${ _('Show as the user would see') }">
+                      <i class="fa fa-eye-slash" data-bind="visible: ! $root.assist.isDiffMode()"></i>
+                    </a>
+                    ${ _('View as') }
+                    <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
+                      <i class="fa fa-group"></i>
+                  </div>
+                  <i class="fa fa-sitemap fa-rotate-270"></i>
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseTree">
+                    <i class="fa fa-compress"></i> ${_('Collapse')}
+                  </a>
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.expandTree">
+                    <i class="fa fa-expand"></i> ${_('Expand')}
+                  </a>
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
+                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
+                  </a>
+                </div>
               </div>
               <div class="path-container-ghost hide"></div>
+
               ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
             <div class="span4">
@@ -296,6 +329,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
       smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
     });
 
+    function resizePathInput () {
+      $("#path").width($(".tree-toolbar").width() - 64);
+    }
+
+    resizePathInput();
+
     $(document).on("rendered.tree", function() {
       var _path = viewModel.assist.path();
       if (_path[_path.length-1] == "/"){
@@ -324,6 +363,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
       else {
         resetPathContainer();
       }
+    });
+
+    var _resizeTimeout = -1;
+    $(window).resize(function(){
+      window.clearTimeout(_resizeTimeout);
+      _resizeTimeout = window.setTimeout(resizePathInput, 100);
     });
 
     window.onpopstate = function() {
