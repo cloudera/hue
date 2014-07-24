@@ -810,6 +810,10 @@ def test_view_gz():
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz')
     assert_equal(response.context['view']['contents'], "sdf\n")
 
+    # ensure compression note is rendered
+    assert_equal(response.context['view']['compression'], "gzip")
+    assert_true('Output rendered from compressed' in response.content, response.content)
+
     # offset should do nothing
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz?compression=gzip&offset=1')
     assert_true("Offsets are not supported" in response.context['message'], response.context['message'])
