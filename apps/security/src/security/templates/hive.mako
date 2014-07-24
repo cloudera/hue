@@ -132,7 +132,7 @@ ${ layout.menubar(section='hive') }
 		
 		    <%def name="actions()">
               <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-                <button class="btn toolbarBtn"><i class="fa fa-pencil"></i> ${ _('Edit') }</button>
+                <button class="btn toolbarBtn"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
               </div>
 		      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
 		        <button class="btn toolbarBtn"><i class="fa fa-times"></i> ${ _('Delete') }</button>
@@ -226,7 +226,7 @@ ${ layout.menubar(section='hive') }
             <tr data-bind="visible: privilegesChanged().length">
               <td colspan="5">
                 <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-                  data-bind="click: $root.role.create">
+                  data-bind="click: $root.role.savePrivileges">
                   <i class="fa fa-save"></i>
                 </button>
               </td>

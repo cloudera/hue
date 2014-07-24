@@ -104,19 +104,14 @@ var Role = function(vm, role) {
     });
   }
 
-  self.saveNewPrivileges = function(role) {
+  self.savePrivileges = function(role) {
 	$(".jHueNotify").hide();
-    $.post("/security/api/hive/add_privileges", {
+    $.post("/security/api/hive/save_privileges", {
         role: ko.mapping.toJSON(role)
       }, function (data) {
         if (data.status == 0) {
-          $.each(data.privileges, function(index, privileges) { // TODO: get back a set<TSentryPrivilege>
-            //role['privileges'] = ko.observableArray();
-            //vm.roles.unshift(data.role); privileges
-          });
-          // self.reset();
-        }
-        else {
+          vm.list_sentry_privileges_by_role(role);
+        } else {
           $(document).trigger("error", data.message);
         }
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -224,16 +219,7 @@ var HiveViewModel = function (initial) {
       success: function (data) {
     	role.privileges.removeAll();
         $.each(data.sentry_privileges, function(index, item) {
-          var privilege = new Privilege(self, {
-        	  'privilegeScope': item.scope,
-               'serverName': item.server,
-               'dbName': item.database,
-               'tableName': item.table,
-               'URI': item.URI,
-               'action': item.action
-          });
-          privilege.properties = ko.mapping.fromJS(item);
-          role.privileges.push(privilege);
+          role.privileges.push(_create_ko_privilege(item));
         });
         role.showPrivileges(true);
       }
@@ -241,6 +227,19 @@ var HiveViewModel = function (initial) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+  
+  function _create_ko_privilege(privilege) {
+	var _privilege = new Privilege(self, {
+        'privilegeScope': privilege.scope,
+        'serverName': privilege.server,
+        'dbName': privilege.database,
+        'tableName': privilege.table,
+        'URI': privilege.URI,
+        'action': privilege.action
+    });
+    _privilege.properties = ko.mapping.fromJS(privilege);
+    return _privilege;
+  }
 
   self.list_sentry_privileges_by_authorizable = function(path) {
 	self.assist.path(path);
