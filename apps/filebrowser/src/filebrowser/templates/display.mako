@@ -63,7 +63,6 @@ ${ fb_components.menubar() }
           ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif
         <div class="card-body">
-        <p>
           % if stats['size'] == 0:
             <div class="center empty-wrapper">
               <i class="fa fa-frown-o"></i>
@@ -75,6 +74,9 @@ ${ fb_components.menubar() }
           % if 'contents' in view and view['masked_binary_data']:
             <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
           % endif
+          %if view['compression'] in ('avro', 'gzip', 'parquet', 'snappy'):
+            <p class="muted"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</p>
+          %endif
             <div id="fileArea" data-bind="css: {'loading': isLoading}">
               <div id="loader" data-bind="visible: isLoading">
                 <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
@@ -90,7 +92,6 @@ ${ fb_components.menubar() }
               % endif
             </div>
           % endif
-          </p>
         </div>
       </div>
     </div>
@@ -156,28 +157,39 @@ ${ fb_components.menubar() }
   }
 
   function getContent (callback) {
-    viewModel.isLoading(true);
     var _baseUrl = "${url('filebrowser.views.view', path=path_enc)}";
+
+    viewModel.isLoading(true);
+
     $.getJSON(_baseUrl, viewModel.jsonParams(), function (data) {
+      var _html = "";
+
       if (data.view.contents != null) {
         pages[viewModel.page()] = data.view.contents;
         renderPages();
       }
+
       if (data.view.xxd != null) {
         pages[viewModel.page()] = data.view.xxd;
-        var _html = "";
+
         $(data.view.xxd).each(function (cnt, item) {
+          var i;
           _html += "<tr><td>" + formatHex(item[0], 7) + ":&nbsp;</td><td>";
-          for (var i = 0; i < item[1].length; i++) {
+
+          for (i = 0; i < item[1].length; i++) {
             _html += formatHex(item[1][i][0], 2) + " " + formatHex(item[1][i][1], 2) + " ";
           }
+
           _html += "</td><td>&nbsp;&nbsp;" + $("<span>").text(item[2]).html() + "</td></tr>";
         });
+
         $(".binary tbody").html(_html);
       }
+
       if (callback) {
         callback();
       }
+
       viewModel.isLoading(false);
     });
   }
