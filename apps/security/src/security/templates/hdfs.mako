@@ -71,10 +71,41 @@ ${ layout.menubar(section='hdfs') }
   }
 
   .acl-panel {
-    border-left: 1px solid #CCC;
+    border-left: 1px solid #e5e5e5;
     padding-top: 6px;
-    padding-left: 6px;
+    padding-left: 12px;
     min-height: 300px;
+    margin-left: 12px;
+  }
+
+  #path {
+    width: 96%;
+    height: 40px;
+    font-size: 14pt;
+  }
+
+  .path-container .btn-inverse {
+    height: 40px;
+    width: 40px;
+    font-size: 14pt;
+    line-height: 40px;
+  }
+
+  .fake-pre {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 12px;
+    line-height: 20px;
+    word-break: break-all;
+    word-wrap: break-word;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
   }
 
 </style>
@@ -127,34 +158,29 @@ ${ layout.menubar(section='hdfs') }
             <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" type="text" style="width: 96%; height: 40px; font-size: 14pt" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
+                  <input id="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off"/>
                   <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
+                <div class="clearfix"></div>
               </div>
               <div class="path-container-ghost hide"></div>
               ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
-                  <a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(! $root.assist.showAclsAsText()); }">
-                    <i class="fa fa-2x" data-bind="css: { 'fa-header': $root.assist.showAclsAsText(), 'fa-pencil': ! $root.assist.showAclsAsText() }"></i>
-                    <span data-bind="visible: $root.assist.showAclsAsText()">${ _('Text view') }</span>
-                    <span data-bind="visible: ! $root.assist.showAclsAsText()">${ _('Edit') }</span>
-                  </a>
 
-                  <br/>
+                  <ul class="nav nav-tabs">
+                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
+                  </ul>
 
-                  <span data-bind="visible: $root.assist.showAclsAsText">
-                    <br/>
-                    # file: <span data-bind="text: $root.assist.path"></span>
-                    <br/>
-                    # owner: <span data-bind="text: $root.assist.owner"></span>
-                    <br/>
-                    # group: <span data-bind="text: $root.assist.group"></span>
-                    <br/>                  
-                    <div data-bind="foreach: $root.assist.regularAcls">                    
+                  <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
+                    # file: <span data-bind="text: $root.assist.path"></span><br/>
+                    # owner: <span data-bind="text: $root.assist.owner"></span><br/>
+                    # group: <span data-bind="text: $root.assist.group"></span><br/>
+                    <div data-bind="foreach: $root.assist.regularAcls">
                       <div data-bind="template: {name: 'acl-display'}"></div>
                     </div>
                     <div data-bind="foreach: $root.assist.defaultAcls">
