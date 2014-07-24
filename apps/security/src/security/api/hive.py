@@ -108,6 +108,8 @@ def save_privileges(request):
     role = json.loads(request.POST['role'])
 
     new_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'new']
+    deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
+
     result['privileges'] = _hive_add_privileges(request.user, role, new_privileges)
     result['message'] = ''
     result['status'] = 0

@@ -51,17 +51,19 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="display-privilege">
-  <div data-bind="visible: status() != 'deleted', with: $data.properties">
-    <span data-bind="text: name"></span>
-    <span data-bind="text: timestamp"></span>
-    <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
-    <span data-bind="text: action"></span>
-    <span data-bind="text: scope"></span>
-    <span data-bind="text: table"></span>
-    <span data-bind="text: URI"></span>
-    <span data-bind="text: grantor"></span>
-    <span data-bind="text: server"></span>
-    <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0);"><i class="fa fa-minus"></i></a>
+  <div data-bind="visible: status() != 'deleted'">
+    <span data-bind="with: $data.properties">
+      <span data-bind="text: name"></span>
+      <span data-bind="text: timestamp"></span>
+      <a data-bind="attr: { href: '/metastore/' + database() }" target="_blank"><span data-bind="text: database"></span></a>
+      <span data-bind="text: action"></span>
+      <span data-bind="text: scope"></span>
+      <span data-bind="text: table"></span>
+      <span data-bind="text: URI"></span>
+      <span data-bind="text: grantor"></span>
+      <span data-bind="text: server"></span>
+    </span>
+    <span data-bind="text: ko.mapping.toJSON($data)"></span> <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   </div>
 </script>
 
@@ -203,17 +205,16 @@ ${ layout.menubar(section='hive') }
               <td>
                 <a href=""><span data-bind="text: grantorPrincipal"></span></a>
               </td>
-            </tr>
-            
+            </tr>            
             <!-- ko if: $data.showPrivileges -->
-            <!-- ko foreach: $data.privileges -->
-            <tr>
-              <td colspan="2"></td>
-              <td colspan="3">
-                <div data-bind="template: { name: 'privilege'}"></div>
-              </td>
-            </tr>
-            <!-- /ko -->
+              <!-- ko foreach: $data.privileges -->
+              <tr>
+                <td colspan="2"></td>
+                <td colspan="3">
+                  <div data-bind="template: { name: 'privilege'}"></div>
+                </td>
+              </tr>
+              <!-- /ko -->
             <!-- /ko -->
             <tr>
               <td colspan="2"></td>

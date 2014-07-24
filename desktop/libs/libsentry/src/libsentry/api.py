@@ -42,61 +42,61 @@ class SentryApi(object):
 
   def create_sentry_role(self, roleName):
     response = self.client.create_sentry_role(roleName)
-    
+
     if response.status.value == 0:
       return response
     else:
-      raise SentryException(response)  
+      raise SentryException(response)
 
 
   def drop_sentry_role(self, roleName):
     response = self.client.drop_sentry_role(roleName)
-    
+
     if response.status.value == 0:
       return response
     else:
-      raise SentryException(response) 
+      raise SentryException(response)
 
 
   def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
     response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege)
-    
+
     if response.status.value == 0:
       return response
     else:
       raise SentryException(response)
-    
+
 
   def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
     response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege)
-    
-    if response.status.value == 0:
-      return response
-    else:
-      raise SentryException(response) 
-    
-    
-  def alter_sentry_role_add_groups(self, roleName, groups):
-    response = self.client.alter_sentry_role_add_groups(roleName, groups)
-    
+
     if response.status.value == 0:
       return response
     else:
       raise SentryException(response)
-        
-        
-  def alter_sentry_role_delete_groups(self, roleName, groups):
-    response = self.client.alter_sentry_role_delete_groups(roleName, groups)
-    
+
+
+  def alter_sentry_role_add_groups(self, roleName, groups):
+    response = self.client.alter_sentry_role_add_groups(roleName, groups)
+
     if response.status.value == 0:
       return response
     else:
-      raise SentryException(response)        
-        
-    
+      raise SentryException(response)
+
+
+  def alter_sentry_role_delete_groups(self, roleName, groups):
+    response = self.client.alter_sentry_role_delete_groups(roleName, groups)
+
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)
+
+
   def list_sentry_roles_by_group(self, groupName=None):
     response = self.client.list_sentry_roles_by_group()
-    
+
     if response.status.value == 0:
       roles = []
       for role in response.roles:
@@ -107,27 +107,45 @@ class SentryApi(object):
         })
       return roles
     else:
-      raise SentryException(response)  
+      raise SentryException(response)
 
 
   def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
     response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
-    
+
     if response.status.value == 0:
       return [self._massage_priviledges(privilege) for privilege in response.privileges]
     else:
       raise SentryException(response)
-    
-    
+
+
   def list_sentry_privileges_for_provider(self, groups, roleSet=None, authorizableHierarchy=None):
     response = self.client.list_sentry_privileges_for_provider(groups, roleSet, authorizableHierarchy)
-    
+
     if response.status.value == 0:
-      return list(response.privileges) # e.g. set(['server=+'])
+      return response
     else:
       raise SentryException(response)
-    
-    
+
+
+  def drop_sentry_privilege(self, authorizableHierarchy):
+    response = self.client.drop_sentry_privilege(authorizableHierarchy)
+
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)
+
+
+  def rename_sentry_privilege(self, oldAuthorizable, newAuthorizable):
+    response = self.client.rename_sentry_privilege(oldAuthorizable, newAuthorizable)
+
+    if response.status.value == 0:
+      return response
+    else:
+      raise SentryException(response)
+
+
   def _massage_priviledges(self, privilege):
     return {
         'scope': privilege.privilegeScope,
@@ -139,4 +157,4 @@ class SentryApi(object):
         'action': privilege.action,
         'timestamp': privilege.createTime,
         'grantor': privilege.grantorPrincipal
-    }     
+    }

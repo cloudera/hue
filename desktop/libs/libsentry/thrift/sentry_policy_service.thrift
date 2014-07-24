@@ -149,6 +149,28 @@ struct TListSentryPrivilegesResponse {
 2: optional set<TSentryPrivilege> privileges
 }
 
+# Drop privilege
+struct TDropPrivilegesRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+2: required string requestorUserName, # user on whose behalf the request is issued
+3: required TSentryAuthorizable authorizable
+}
+
+struct TDropPrivilegesResponse {
+1: required sentry_common_service.TSentryResponseStatus status
+}
+
+struct TRenamePrivilegesRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+2: required string requestorUserName, # user on whose behalf the request is issued
+3: required TSentryAuthorizable oldAuthorizable
+4: required TSentryAuthorizable newAuthorizable
+}
+
+struct TRenamePrivilegesResponse {
+1: required sentry_common_service.TSentryResponseStatus status
+}
+
 # This API was created specifically for ProviderBackend.getPrivileges
 # and is not mean for general purpose privilege retrieval.
 # This request/response pair are created specifically so we can
@@ -185,4 +207,8 @@ service SentryPolicyService
 
   # For use with ProviderBackend.getPrivileges only
   TListSentryPrivilegesForProviderResponse list_sentry_privileges_for_provider(1:TListSentryPrivilegesForProviderRequest request)
+
+ TDropPrivilegesResponse drop_sentry_privilege(1:TDropPrivilegesRequest request);
+
+ TRenamePrivilegesResponse rename_sentry_privilege(1:TRenamePrivilegesRequest request);
 }
