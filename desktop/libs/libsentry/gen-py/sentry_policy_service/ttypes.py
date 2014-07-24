@@ -1798,6 +1798,329 @@ class TListSentryPrivilegesResponse(object):
   def __ne__(self, other):
     return not (self == other)
 
+class TDropPrivilegesRequest(object):
+  """
+  Attributes:
+   - protocol_version
+   - requestorUserName
+   - authorizable
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (2, TType.STRING, 'requestorUserName', None, None, ), # 2
+    (3, TType.STRUCT, 'authorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
+  )
+
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, authorizable=None,):
+    self.protocol_version = protocol_version
+    self.requestorUserName = requestorUserName
+    self.authorizable = authorizable
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.I32:
+          self.protocol_version = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.requestorUserName = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.STRUCT:
+          self.authorizable = TSentryAuthorizable()
+          self.authorizable.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TDropPrivilegesRequest')
+    if self.protocol_version is not None:
+      oprot.writeFieldBegin('protocol_version', TType.I32, 1)
+      oprot.writeI32(self.protocol_version)
+      oprot.writeFieldEnd()
+    if self.requestorUserName is not None:
+      oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
+      oprot.writeString(self.requestorUserName)
+      oprot.writeFieldEnd()
+    if self.authorizable is not None:
+      oprot.writeFieldBegin('authorizable', TType.STRUCT, 3)
+      self.authorizable.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.protocol_version is None:
+      raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
+    if self.requestorUserName is None:
+      raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
+    if self.authorizable is None:
+      raise TProtocol.TProtocolException(message='Required field authorizable is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TDropPrivilegesResponse(object):
+  """
+  Attributes:
+   - status
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, status=None,):
+    self.status = status
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.status = sentry_common_service.ttypes.TSentryResponseStatus()
+          self.status.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TDropPrivilegesResponse')
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.STRUCT, 1)
+      self.status.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.status is None:
+      raise TProtocol.TProtocolException(message='Required field status is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TRenamePrivilegesRequest(object):
+  """
+  Attributes:
+   - protocol_version
+   - requestorUserName
+   - oldAuthorizable
+   - newAuthorizable
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (2, TType.STRING, 'requestorUserName', None, None, ), # 2
+    (3, TType.STRUCT, 'oldAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
+    (4, TType.STRUCT, 'newAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 4
+  )
+
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, oldAuthorizable=None, newAuthorizable=None,):
+    self.protocol_version = protocol_version
+    self.requestorUserName = requestorUserName
+    self.oldAuthorizable = oldAuthorizable
+    self.newAuthorizable = newAuthorizable
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.I32:
+          self.protocol_version = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.requestorUserName = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.STRUCT:
+          self.oldAuthorizable = TSentryAuthorizable()
+          self.oldAuthorizable.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRUCT:
+          self.newAuthorizable = TSentryAuthorizable()
+          self.newAuthorizable.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TRenamePrivilegesRequest')
+    if self.protocol_version is not None:
+      oprot.writeFieldBegin('protocol_version', TType.I32, 1)
+      oprot.writeI32(self.protocol_version)
+      oprot.writeFieldEnd()
+    if self.requestorUserName is not None:
+      oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
+      oprot.writeString(self.requestorUserName)
+      oprot.writeFieldEnd()
+    if self.oldAuthorizable is not None:
+      oprot.writeFieldBegin('oldAuthorizable', TType.STRUCT, 3)
+      self.oldAuthorizable.write(oprot)
+      oprot.writeFieldEnd()
+    if self.newAuthorizable is not None:
+      oprot.writeFieldBegin('newAuthorizable', TType.STRUCT, 4)
+      self.newAuthorizable.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.protocol_version is None:
+      raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
+    if self.requestorUserName is None:
+      raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
+    if self.oldAuthorizable is None:
+      raise TProtocol.TProtocolException(message='Required field oldAuthorizable is unset!')
+    if self.newAuthorizable is None:
+      raise TProtocol.TProtocolException(message='Required field newAuthorizable is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TRenamePrivilegesResponse(object):
+  """
+  Attributes:
+   - status
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, status=None,):
+    self.status = status
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.status = sentry_common_service.ttypes.TSentryResponseStatus()
+          self.status.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TRenamePrivilegesResponse')
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.STRUCT, 1)
+      self.status.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.status is None:
+      raise TProtocol.TProtocolException(message='Required field status is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class TSentryActiveRoleSet(object):
   """
   Attributes:

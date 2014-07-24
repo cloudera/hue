@@ -23,7 +23,7 @@ from sentry_policy_service import SentryPolicyService
 from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
-    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable
+    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest
 
 
 LOG = logging.getLogger(__name__)
@@ -64,23 +64,23 @@ class SentryClient(object):
         timeout_seconds=30,
         multiple=True
     )
-    
+
   def create_sentry_role(self, roleName):
     request = TCreateSentryRoleRequest(requestorUserName=self.username, roleName=roleName)
     return self.client.create_sentry_role(request)
-  
-  
-  def drop_sentry_role(self, roleName):    
+
+
+  def drop_sentry_role(self, roleName):
     request = TDropSentryRoleRequest(requestorUserName=self.username, roleName=roleName, )
-    return self.client.drop_sentry_role(request)  
+    return self.client.drop_sentry_role(request)
 
 
   def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
     privilege = TSentryPrivilege(**tSentryPrivilege)
     request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
     return self.client.alter_sentry_role_grant_privilege(request)
-    
-    
+
+
   def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
     privilege = TSentryPrivilege(**tSentryPrivilege)
     request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
@@ -111,21 +111,34 @@ class SentryClient(object):
     return self.client.list_sentry_privileges_by_role(request)
 
 
+  def drop_sentry_privilege(self, authorizableHierarchy):
+    authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
+    request = TDropPrivilegesRequest(requestorUserName=self.username, authorizableHierarchy=authorizableHierarchy)
+    return self.client.drop_sentry_privilege(request)
+
+
+  def rename_sentry_privilege(self, oldAuthorizable, newAuthorizable):
+    oldAuthorizable = TSentryAuthorizable(**oldAuthorizable)
+    newAuthorizable = TSentryAuthorizable(**newAuthorizable)
+    request = TRenamePrivilegesRequest(requestorUserName=self.username, oldAuthorizable=oldAuthorizable, newAuthorizable=newAuthorizable)
+    return self.client.rename_sentry_privilege(request)
+
+
   def list_sentry_privileges_for_provider(self, groups, roleSet=None, authorizableHierarchy=None):
     """
     struct TSentryActiveRoleSet {
       1: required bool all,
       2: required set<string> roles,
     }
-    
+
     struct TListSentryPrivilegesForProviderResponse {
       1: required sentry_common_service.TSentryResponseStatus status
       2: required set<string> privileges
     }
     """
-    if roleSet is not None:        
+    if roleSet is not None:
       roleSet = TSentryActiveRoleSet(**roleSet)
     if authorizableHierarchy is not None:
-      authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy) 
+      authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
     request = TListSentryPrivilegesForProviderRequest(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
     return self.client.list_sentry_privileges_for_provider(request)
