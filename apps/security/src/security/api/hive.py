@@ -55,10 +55,10 @@ def list_sentry_privileges_by_role(request):
 def _hive_add_privileges(user, role, privileges):
     api = get_api(user)
 
-    _priviledges = {}
+    _priviledges = []
 
     for priviledge in privileges:
-      if priviledge['status'] not in ('deleted'):
+      if priviledge['status'] not in ('deleted',):
         api.alter_sentry_role_grant_privilege(role['name'], {
             'privilegeScope': priviledge['privilegeScope'],
             'serverName': priviledge['serverName'],
@@ -67,11 +67,19 @@ def _hive_add_privileges(user, role, privileges):
             'URI': priviledge['URI'],
             'action': priviledge['action']
         })
+        # Mocked until Sentry API returns the info!
+        _priviledges.append({
+            "name": "%s+%s+%s" % (priviledge.get('serverName', ''), priviledge.get('dbName', ''), priviledge.get('tableName', '')),
+            "timestamp": 1406160830864, "database": priviledge.get('dbName', ''), "action": priviledge.get('action', ''), 
+            "scope": priviledge.get('privilegeScope', ''), "table": priviledge.get('tableName', ''),
+            "URI": priviledge.get('URI', ''), "grantor": user.username,
+            "server": priviledge.get('serverName', '')
+        })
 
     return _priviledges
 
 
-def hive_create_role(request):
+def create_role(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
@@ -93,14 +101,14 @@ def hive_create_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def hive_add_privileges(request):
+def save_privileges(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
     role = json.loads(request.POST['role'])
 
-    result['privileges'] = _hive_add_privileges(request.user, role, role['newPrivileges'])
-
+    new_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'new']
+    result['privileges'] = _hive_add_privileges(request.user, role, new_privileges)
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
@@ -139,7 +147,7 @@ def drop_sentry_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# Mocked!
+# Mocked until Sentry API returns the info!
 def list_sentry_privileges_by_authorizable(request):
   result = {'status': -1, 'message': 'Error'}
 
