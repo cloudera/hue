@@ -65,19 +65,21 @@ var Assist = function (vm, assist) {
   self.isDiffMode = ko.observable(false);
 
   self.treeAdditionalData = {};
-  self.treeAdditionalDataObservable = ko.observable({});
   self.treeData = ko.observable({nodes: []});
   self.loadData = function (data) {
     self.treeData(new TreeNodeModel(data));
   };
 
-  self.growingTree = ko.observable({
+  self.initialGrowingTree = {
     name: "__HUEROOT__",
     path: "__HUEROOT__",
     aclBit: false,
     striked: false,
     selected: false,
-    page: {},
+    page: {
+      number: -1,
+      num_pages: -1
+    },
     nodes: [
       {
         name: "/",
@@ -87,11 +89,16 @@ var Assist = function (vm, assist) {
         aclBit: false,
         striked: false,
         selected: false,
-        page: {},
+        page: {
+          number: -1,
+          num_pages: -1
+        },
         nodes: []
       }
     ]
-  });
+  };
+
+  self.growingTree = ko.observable(jQuery.extend(true, {}, self.initialGrowingTree));
 
   self.path = ko.observable('');
   self.path.subscribe(function (path) {
@@ -182,7 +189,10 @@ var Assist = function (vm, assist) {
         striked: item.striked != null,
         isExpanded: true,
         isDir: item.type == "dir",
-        page: {},
+        page: {
+          number: -1,
+          num_pages: -1
+        },
         nodes: []
       });
     }
@@ -192,11 +202,9 @@ var Assist = function (vm, assist) {
   self.getTreeAdditionalDataForPath = function (path) {
     if (typeof self.treeAdditionalData[path] == "undefined"){
       var _add = {
-        loaded: false,
-        page: {}
+        loaded: false
       }
       self.treeAdditionalData[path] = _add;
-      self.treeAdditionalDataObservable(self.treeAdditionalData);
     }
     return self.treeAdditionalData[path];
   }
@@ -213,8 +221,39 @@ var Assist = function (vm, assist) {
     return leaf;
   }
 
+  self.updateTreeProperty = function (leaf, property, value) {
+    leaf[property] = value;
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        self.updateTreeProperty(node, property, value);
+      });
+    }
+    return leaf;
+  }
+
+  self.collapseTree = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
+    self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
+    self.loadData(self.growingTree());
+  }
+
+  self.expandTree = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", true);
+    self.loadData(self.growingTree());
+  }
+
+  self.refreshTree = function () {
+    self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
+    Object.keys(self.treeAdditionalData).forEach(function (path) {
+      if (self.treeAdditionalData[path].loaded) {
+        console.log("Fetching", path);
+        self.fetchPath(path);
+      }
+    });
+  }
+
   self.setPath = function (obj) {
-    if (self.getTreeAdditionalDataForPath(obj.path()).loaded == true) {
+    if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (! obj.isExpanded() && ! self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
       obj.isExpanded(!obj.isExpanded());
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
@@ -241,45 +280,44 @@ var Assist = function (vm, assist) {
     }
   }
 
-  self.fetchPath = function () {
-	$.getJSON('/security/api/hdfs/list' + self.path(), {
-      'pagesize': 15,
-      'pagenum': self.pagenum(),
-      'format': 'json',
-      'doas': vm.doAs(),
-      'isDiffMode': self.isDiffMode()
-    },
-    function (data) {
-      self.getTreeAdditionalDataForPath(self.path()).loaded = true;
-      self.getTreeAdditionalDataForPath(self.path()).page = data.page;
-      self.treeAdditionalDataObservable(self.treeAdditionalData);
-      self.updatePathProperty(self.growingTree(), self.path(), "page", data.page);
-      self.loadParents(data.breadcrumbs);
-      if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
-        self.files.removeAll();
-        $.each(data.files, function (index, item) {
-          self.convertItemToObject(item);
-          self.files.push(ko.mapping.fromJS({
-              'path': item.path,
-              'aclBit': item.rwx.indexOf('+') != -1,
-              'striked': item.striked != null
-            })
-          );
-        });
-      }
-      else {
-        self.convertItemToObject(data);
-      }
-      self.loadData(self.growingTree());
-      self.getAcls();
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+  self.fetchPath = function (optionalPath) {
+    var _path = typeof optionalPath != "undefined" ? optionalPath : self.path();
+    $.getJSON('/security/api/hdfs/list' + _path, {
+        'pagesize': 15,
+        'pagenum': self.pagenum(),
+        'format': 'json',
+        'doas': vm.doAs(),
+        'isDiffMode': self.isDiffMode()
+      },
+      function (data) {
+        self.loadParents(data.breadcrumbs);
+        if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+          self.files.removeAll();
+          $.each(data.files, function (index, item) {
+            self.convertItemToObject(item);
+            self.files.push(ko.mapping.fromJS({
+                'path': item.path,
+                'aclBit': item.rwx.indexOf('+') != -1,
+                'striked': item.striked != null
+              })
+            );
+          });
+        }
+        else {
+          self.convertItemToObject(data);
+        }
+        self.getTreeAdditionalDataForPath(_path).loaded = true;
+        self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+        self.loadData(self.growingTree());
+        self.getAcls();
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
   };
 
   self.loadMore = function (what) {
     self.pagenum(what.page().next_page_number());
-    self.fetchPath();
+    self.fetchPath(what.path());
   }
 
   self.getAcls = function () {
