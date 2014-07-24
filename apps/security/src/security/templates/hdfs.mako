@@ -176,14 +176,14 @@ ${ layout.menubar(section='hdfs') }
                 <div class="tree-toolbar">
                   <div class="pull-right">
                     <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(false); }" title="${ _('Show non accessible files') }">
-                      <i class="fa fa-eye" data-bind="visible: $root.assist.isDiffMode"></i>
+                      <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
                     </a>
                     <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(true); }" title="${ _('Show as the user would see') }">
-                      <i class="fa fa-eye-slash" data-bind="visible: ! $root.assist.isDiffMode()"></i>
+                      <i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i>
                     </a>
                     ${ _('View as') }
                     <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
-                      <i class="fa fa-group"></i>
+                    <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
                   <i class="fa fa-sitemap fa-rotate-270"></i>
                   <a href="javascript: void(0)" data-bind="click: $root.assist.collapseTree">
