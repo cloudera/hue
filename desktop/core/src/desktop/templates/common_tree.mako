@@ -105,7 +105,7 @@
       %if anchorProperty:
         <a href="#" class="anchor" data-bind="attr: {href: ${anchorProperty}}"></a>
       %endif
-      <strong><a style="display: inline-block" data-bind="text:name"></a></strong>
+      <strong><a style="display: inline-block" data-bind="text:name, css:{'striked': striked}"></a></strong>
 
       %if styleModifierPullRight:
       ${styleModifierPullRight()}

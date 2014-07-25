@@ -649,3 +649,29 @@ ko.bindingHandlers.codemirror = {
     editor.refresh();
   }
 };
+
+ko.bindingHandlers.chosen = {
+  init: function (element) {
+    ko.bindingHandlers.options.init(element);
+    $(element).chosen({disable_search_threshold: 5});
+  },
+  update: function (element, valueAccessor, allBindings) {
+    ko.bindingHandlers.options.update(element, valueAccessor, allBindings);
+    $(element).trigger('chosen:updated');
+  }
+};
+
+ko.bindingHandlers.tooltip = {
+  init: function (element, valueAccessor) {
+    var local = ko.utils.unwrapObservable(valueAccessor()),
+      options = {};
+
+    ko.utils.extend(options, local);
+
+    $(element).tooltip(options);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      $(element).tooltip("destroy");
+    });
+  }
+};

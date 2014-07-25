@@ -54,6 +54,10 @@ ${ layout.menubar(section='hdfs') }
     cursor: pointer;
   }
 
+  .node-row a.striked {
+    text-decoration: line-through;
+  }
+
   .node-row.selected {
     background-color: #F6F6F6;
   }
@@ -130,6 +134,10 @@ ${ layout.menubar(section='hdfs') }
     margin-top: -3px;
   }
 
+  .inline-block {
+    display: inline-block;
+  }
+
 </style>
 
 <script type="text/html" id="acl-display">
@@ -175,14 +183,15 @@ ${ layout.menubar(section='hdfs') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
-                    <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(false); }" title="${ _('Show non accessible files') }">
-                      <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
-                    </a>
-                    <a href="javascript: void(0)" data-bind="click: function() { $root.assist.isDiffMode(true); }" title="${ _('Show as the user would see') }">
-                      <i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i>
-                    </a>
-                    ${ _('View as') }
-                    <input type="text" class="user-list input-small" data-bind="value: $root.doAs">
+
+                    <div class="dropdown inline-block" style="margin-right: 6px">
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i><i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i> <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible files for') }</span><span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span></a>
+                      <ul class="dropdown-menu">
+                        <li data-bind="click: function() { $root.assist.isDiffMode(true); }"><a tabindex="-1" href="#">${ _('Show non accessible files for') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                        <li data-bind="click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                      </ul>
+                    </div>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
                   <i class="fa fa-sitemap fa-rotate-270"></i>
@@ -268,9 +277,9 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 <%def name="aclBitPullRight()">
-  <span data-bind="visible: striked">
-    This is not visible by current user <span data-bind="text: $root.doAs">
-  </span></span>
+  <div class="pull-right muted"  data-bind="visible: striked">
+    This is not visible by current user <span data-bind="text: $root.doAs"></span>
+  </div>
   
   <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
     <i class="fa fa-lock"></i>
@@ -287,28 +296,36 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
 <script src="/security/static/js/hdfs.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
 
+<link rel="stylesheet" href="/static/ext/select2/select2.css">
+<script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
+
+
 <script type="text/javascript">
 
-  ko.bindingHandlers.tooltip = {
-    init: function (element, valueAccessor) {
-      var local = ko.utils.unwrapObservable(valueAccessor()),
-          options = {};
-
-      ko.utils.extend(options, local);
-
-      $(element).tooltip(options);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        $(element).tooltip("destroy");
+  ko.bindingHandlers.select2 = {
+    init: function(element, valueAccessor, allBindingsAccessor, vm) {
+      var options = ko.toJS(valueAccessor()) || {};
+      $(element).select2(options).on("change", function(e){
+        if (typeof e.val != "undefined"){
+          vm.doAs(e.val);
+        }
       });
+    },
+    update: function(element, valueAccessor, allBindingsAccessor, vm) {
+      $(element).select2("val", vm.doAs());
     }
-  };
+};
 
-  var viewModel;
+  var INITIAL = ${ initial | n,unicode };
+  var viewModel = new HdfsViewModel(INITIAL);
+  ko.applyBindings(viewModel);
 
   $(document).ready(function () {
-    viewModel = new HdfsViewModel(${ initial | n,unicode });
-    ko.applyBindings(viewModel);
+
+    $(document).on("loaded.users", function(){
+      $(".user-list").select2("val", viewModel.doAs());
+    });
+
 
     var _initialPath = "/";
     if (window.location.hash != "") {
