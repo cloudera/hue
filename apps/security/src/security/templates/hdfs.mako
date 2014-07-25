@@ -28,15 +28,15 @@ ${ layout.menubar(section='hdfs') }
 
 
 <style type="text/css">
+  #hdfsTree {
+    width: 100%;
+    overflow-y: scroll;
+    min-height: 100px;
+  }
+
   #hdfsTree ul {
     list-style-type: none;
     padding: 0;
-  }
-
-  .tree {
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-    min-height: 300px;
   }
 
   .node-row {
@@ -59,7 +59,7 @@ ${ layout.menubar(section='hdfs') }
   }
 
   .node-row.selected {
-    background-color: #F6F6F6;
+    background-color: #F6F6F6!important;
   }
 
   .loading-popover {
@@ -78,7 +78,40 @@ ${ layout.menubar(section='hdfs') }
     border-left: 1px solid #e5e5e5;
     padding-top: 6px;
     padding-left: 12px;
-    min-height: 300px;
+  }
+
+  .acl-panel .nav-tabs {
+    margin-bottom: 0;
+  }
+
+  .acl-panel h4:not(:first-child) {
+    margin-top: 20px;
+  }
+
+  .acl-panel-content {
+    padding: 6px;
+    overflow-y: scroll;
+  }
+
+  .acl-block {
+    background-color: #f6f6f6;
+    padding: 3px;
+    margin-bottom: 4px;
+  }
+
+  .acl-block .checkbox, .acl-block .radio {
+    margin-left: 6px;
+  }
+
+  .add-acl {
+    padding: 5px;
+    text-align: center;
+    color: #CCC;
+    font-size: 20px;
+  }
+
+  .add-acl:hover {
+    color: #999;
   }
 
   #path {
@@ -131,11 +164,19 @@ ${ layout.menubar(section='hdfs') }
   }
 
   .tree-toolbar .pull-right {
-    margin-top: -3px;
+    margin-top: -5px;
   }
 
   .inline-block {
     display: inline-block;
+  }
+
+  .force-word-break {
+    word-break: break-all;
+  }
+
+  .pointer {
+    cursor: pointer;
   }
 
 </style>
@@ -148,18 +189,47 @@ ${ layout.menubar(section='hdfs') }
 
 
 <script type="text/html" id="acl-edition">
-  <div data-bind="visible: status() != 'deleted'">
-    <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
-    <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
-    <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
-    <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('other') }
-    <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', css: { 'user-list': type() == 'user', 'group-list': type() == 'group' }" class="input-small" placeholder="${ _('name...') }"/>
-    <input type="checkbox" title="r, ${ _('Read') }" data-bind="checked: r"/>
-    <input type="checkbox" title="w, ${ _('Write') }" data-bind="checked: w"/>
-    <input type="checkbox" title="x, ${ _('Execute') }" data-bind="checked: x"/>
-    <a href="javascript: void(0)">
-      <i class="fa fa-minus" data-bind="click: $root.assist.removeAcl"></i>
+  <div data-bind="visible: status() != 'deleted'" class="acl-block">
+    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
+      <i class="fa fa-times" data-bind="click: $root.assist.removeAcl"></i>
     </a>
+    <label class="radio inline-block">
+      <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
+    </label>
+    <label class="radio inline-block">
+      <input type="radio" value="user" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('user') }
+    </label>
+    <label class="radio inline-block">
+      <input type="radio" value="mask" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('mask') }
+    </label>
+    <label class="radio inline-block">
+      <input type="radio" value="other" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('other') }
+    </label>
+    <div style="margin-left: 6px">
+      <div data-bind="visible: type() == 'user'">
+        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: name}" style="width: 200px"></select>
+      </div>
+
+      <div data-bind="visible: type() == 'group'">
+        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _("Select a group") }', update: name}" style="width: 200px"></select>
+      </div>
+
+      <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ad...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
+    </div>
+
+    <br/>
+    <label class="checkbox inline-block">
+      <input type="checkbox" data-bind="checked: r"/>
+      ${ _('Read') } <span class="muted">(r)</span>
+    </label>
+    <label class="checkbox inline-block">
+      <input type="checkbox" data-bind="checked: w"/>
+      ${ _('Write') } <span class="muted">(w)</span>
+    </label>
+    <label class="checkbox inline-block">
+      <input type="checkbox" data-bind="checked: x"/>
+      ${ _('Execute') } <span class="muted">(x)</span>
+    </label>
   </div>
 </script>
 
@@ -187,8 +257,8 @@ ${ layout.menubar(section='hdfs') }
                     <div class="dropdown inline-block" style="margin-right: 6px">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i><i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i> <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible files for') }</span><span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span></a>
                       <ul class="dropdown-menu">
-                        <li data-bind="click: function() { $root.assist.isDiffMode(true); }"><a tabindex="-1" href="#">${ _('Show non accessible files for') } <strong data-bind="text: $root.doAs"></strong></a></li>
-                        <li data-bind="click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                        <li data-bind="visible: ! $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(true); }"><a tabindex="-1" href="#">${ _('Show non accessible files for') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                        <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
                       </ul>
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs}" style="width: 120px"></select>
@@ -213,53 +283,57 @@ ${ layout.menubar(section='hdfs') }
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
 
+                  <div data-bind="visible: $root.assist.changedAcls().length" class="pull-right" style="margin-right: 6px; margin-top: 4px">
+                    <button type="button" data-bind="click: $root.assist.updateAcls" class="btn disable-feedback">
+                      <i class="fa fa-save"></i> ${ _('Save') }
+                    </button>
+                  </div>
+
                   <ul class="nav nav-tabs">
                     <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
                     <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
                   </ul>
 
-                  <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
-                    # file: <span data-bind="text: $root.assist.path"></span><br/>
-                    # owner: <span data-bind="text: $root.assist.owner"></span><br/>
-                    # group: <span data-bind="text: $root.assist.group"></span><br/>
-                    <div data-bind="foreach: $root.assist.regularAcls">
-                      <div data-bind="template: {name: 'acl-display'}"></div>
-                    </div>
-                    <div data-bind="foreach: $root.assist.defaultAcls">
-                      <div data-bind="template: {name: 'acl-display'}"></div>
-                    </div>
-                  </span>
+                  <div class="acl-panel-content">
+                    <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
+                      # file: <span data-bind="text: $root.assist.path"></span><br/>
+                      # owner: <span data-bind="text: $root.assist.owner"></span><br/>
+                      # group: <span data-bind="text: $root.assist.group"></span><br/>
+                      <div data-bind="foreach: $root.assist.regularAcls">
+                        <div data-bind="template: {name: 'acl-display'}"></div>
+                      </div>
+                      <div data-bind="foreach: $root.assist.defaultAcls">
+                        <div data-bind="template: {name: 'acl-display'}"></div>
+                      </div>
+                    </span>
 
-                  <span data-bind="visible: ! $root.assist.showAclsAsText()">
-                    <dl>
-                      <dt><a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }"></a></dt>
-                      <dt>
-                        <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>
-                        <i class="fa fa-users" style="color: #999999" title="${_('Group')}"></i> <span title="${_('Group')}" data-bind="text: $root.assist.group"></span>
-                      </dt>
-                    </dl>
+                    <span data-bind="visible: ! $root.assist.showAclsAsText()">
+                      <h4>${ _('Path') }</h4>
+                      <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a>
 
-                    <h4>${ _('ACLs') }</h4>
-                    <div data-bind="foreach: $root.assist.regularAcls">
-                      <div data-bind="template: {name: 'acl-edition'}"></div>
-                    </div>
+                      <h4>${ _('User/Group') }</h4>
+                      <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>&nbsp;
+                      <i class="fa fa-users" style="color: #999999" title="${_('Group')}"></i> <span title="${_('Group')}" data-bind="text: $root.assist.group"></span>
 
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.addAcl"><i class="fa fa-plus"></i></a>
+                      <h4>${ _('ACLs') }</h4>
+                      <div data-bind="foreach: $root.assist.regularAcls">
+                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                      </div>
 
-                    <br/>
+                      <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addAcl">
+                        <i class="fa fa-plus"></i>
+                      </div>
 
-                    <h4>${ _('Default ACLs') }</h4>
-                    <div data-bind="foreach: $root.assist.defaultAcls">
-                      <div data-bind="template: {name: 'acl-edition'}"></div>
-                    </div>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></a>
+                      <h4>${ _('Default ACLs') }</h4>
+                      <div data-bind="foreach: $root.assist.defaultAcls">
+                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                      </div>
 
-                    <div data-bind="visible: $root.assist.changedAcls().length">
-                      <button type="button" data-bind="click: $root.assist.updateAcls" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn">
-                        <i class="fa fa-save"></i>
-                      </button>
-                    </div>
-                  </span>
+                      <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addDefaultAcl">
+                        <i class="fa fa-plus"></i>
+                      </div>
+                    </span>
+                  </div>
                 </div>
                 <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
             </div>
@@ -287,7 +361,7 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.assist.openPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore') }
+${ tree.import_templates(itemClick='$root.assist.setPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore') }
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -306,13 +380,15 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
     init: function(element, valueAccessor, allBindingsAccessor, vm) {
       var options = ko.toJS(valueAccessor()) || {};
       $(element).select2(options).on("change", function(e){
-        if (typeof e.val != "undefined"){
-          vm.doAs(e.val);
+        if (typeof e.val != "undefined" && typeof valueAccessor().update != "undefined"){
+          valueAccessor().update(e.val);
         }
       });
     },
     update: function(element, valueAccessor, allBindingsAccessor, vm) {
-      $(element).select2("val", vm.doAs());
+      if (typeof valueAccessor().update != "undefined"){
+        $(element).select2("val", valueAccessor().update());
+      }
     }
 };
 
@@ -325,7 +401,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
     $(document).on("loaded.users", function(){
       $(".user-list").select2("val", viewModel.doAs());
     });
-
 
     var _initialPath = "/";
     if (window.location.hash != "") {
@@ -346,11 +421,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
       smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
     });
 
-    function resizePathInput () {
+    function resizeComponents () {
       $("#path").width($(".tree-toolbar").width() - 64);
+      $("#hdfsTree").height($(window).height() - 260);
+      $(".acl-panel-content").height($(window).height() - 260);
     }
 
-    resizePathInput();
+    resizeComponents();
 
     $(document).on("rendered.tree", function() {
       var _path = viewModel.assist.path();
@@ -364,41 +441,16 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemDblClick='$root.a
       }
     });
 
-    $(".path-container").data("originalWidth", $(".path-container").width());
-    $(".acl-panel").data("originalWidth", $(".acl-panel").width());
-    $(".path-container-ghost").height($(".path-container").outerHeight());
-    resetPathContainer();
-
-    $(window).scroll(function () {
-      if ($(window).scrollTop() > 85) {
-        $(".path-container").width($(".path-container").data("originalWidth"));
-        $(".acl-panel").width($(".acl-panel").data("originalWidth"));
-        $(".path-container").css("position", "fixed").css("top", "70px");
-        $(".acl-panel").css("position", "fixed").css("top", "70px");
-        $(".path-container-ghost").removeClass("hide");
-      }
-      else {
-        resetPathContainer();
-      }
-    });
-
     var _resizeTimeout = -1;
     $(window).resize(function(){
       window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(resizePathInput, 100);
+      _resizeTimeout = window.setTimeout(resizeComponents, 100);
     });
 
     window.onpopstate = function() {
       viewModel.assist.path(window.location.hash.substr(1));
     };
 
-    function resetPathContainer() {
-      $(".path-container").attr("style", "min-width: 190px");
-      $(".acl-panel").attr("style", "min-width: 190px");
-      $(".path-container").data("originalWidth", $(".path-container").width());
-      $(".acl-panel").data("originalWidth", $(".acl-panel").width());
-      $(".path-container-ghost").addClass("hide");
-    }
   });
 </script>
 

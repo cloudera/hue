@@ -401,6 +401,13 @@ var HdfsViewModel = function (initial) {
     return _users.sort();
   }, self);
 
+  self.selectableHadoopGroups = ko.computed(function() {
+    var _users = ko.utils.arrayMap(self.availableHadoopGroups(), function(group) {
+        return group.name;
+    });
+    return _users.sort();
+  }, self);
+
 
   self.init = function (path) {
     self.fetchUsers();
