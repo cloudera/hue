@@ -52,6 +52,17 @@ def list_sentry_privileges_by_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def _to_sentry_privilege(privilege):
+  return {
+      'privilegeScope': privilege['privilegeScope'],
+      'serverName': privilege['serverName'],
+      'dbName': privilege['dbName'],
+      'tableName': privilege['tableName'],
+      'URI': privilege['URI'],
+      'action': privilege['action']
+  }  
+
+
 def _hive_add_privileges(user, role, privileges):
     api = get_api(user)
 
@@ -59,14 +70,7 @@ def _hive_add_privileges(user, role, privileges):
 
     for privilege in privileges:
       if privilege['status'] not in ('deleted',):
-        api.alter_sentry_role_grant_privilege(role['name'], {
-            'privilegeScope': privilege['privilegeScope'],
-            'serverName': privilege['serverName'],
-            'dbName': privilege['dbName'],
-            'tableName': privilege['tableName'],
-            'URI': privilege['URI'],
-            'action': privilege['action']
-        })
+        api.alter_sentry_role_grant_privilege(role['name'], _to_sentry_privilege(privilege))
         # Mocked until Sentry API returns the info!
         _privileges.append({
             "name": "%s+%s+%s" % (privilege.get('serverName', ''), privilege.get('dbName', ''), privilege.get('tableName', '')),
@@ -79,8 +83,8 @@ def _hive_add_privileges(user, role, privileges):
     return _privileges
 
 
-def _drop_sentry_privilege(user, authorizable):
-  return get_api(user).drop_sentry_privilege(authorizable)
+def _drop_sentry_privilege(user, role, authorizable):
+  return get_api(user).alter_sentry_role_revoke_privilege(role['name'], _to_sentry_privilege(authorizable))
 
 
 def create_role(request):
@@ -116,12 +120,9 @@ def save_privileges(request):
     
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
-      _drop_sentry_privilege(request.user, {
-            'server': privilege['serverName'],
-            'uri': privilege['URI'] if privilege['URI'] else None,
-            'db': privilege['dbName'] if privilege['dbName'] else None,
-            'table': privilege['tableName'] if privilege['tableName'] else None,
-        })
+      print _drop_sentry_privilege(request.user, role, privilege)
+    
+    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
     
     result['message'] = ''
     result['status'] = 0

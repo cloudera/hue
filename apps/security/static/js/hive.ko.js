@@ -21,12 +21,34 @@ var Privilege = function (vm, privilege) {
   self.privilegeScope = ko.observable(typeof privilege.privilegeScope != "undefined" && privilege.privilegeScope != null ? privilege.privilegeScope : "");
   self.serverName = ko.observable(typeof privilege.serverName != "undefined" && privilege.serverName != null ? privilege.serverName : "");
   self.serverName.subscribe(function() {
-	  
+    if (self.status() == '') {
+      self.status('modified');
+    }
   });
   self.dbName = ko.observable(typeof privilege.dbName != "undefined" && privilege.dbName != null ? privilege.dbName : "");
+  self.dbName.subscribe(function() {
+	if (self.status() == '') {
+	  self.status('modified');
+	}
+  });
   self.tableName = ko.observable(typeof privilege.tableName != "undefined" && privilege.tableName != null ? privilege.tableName : "");
+  self.tableName.subscribe(function() {
+	if (self.status() == '') {
+	  self.status('modified');
+	}
+  });
   self.URI = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null ? privilege.URI : "");
+  self.URI.subscribe(function() {
+	if (self.status() == '') {
+	  self.status('modified');
+	}
+  });
   self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : "");
+  self.action.subscribe(function() {
+	if (self.status() == '') {
+	  self.status('modified');
+	}
+  });
 
   self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
   self.edition = ko.observable(typeof privilege.edition != "undefined" && privilege.edition != null ? privilege.edition : false);

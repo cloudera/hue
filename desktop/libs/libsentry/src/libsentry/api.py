@@ -128,6 +128,7 @@ class SentryApi(object):
       raise SentryException(response)
 
 
+  # Use alter_sentry_role_revoke_privilege instead?
   def drop_sentry_privilege(self, authorizableHierarchy):
     response = self.client.drop_sentry_privilege(authorizableHierarchy)
 
