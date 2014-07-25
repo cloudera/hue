@@ -50,9 +50,9 @@ def is_selected(section, matcher):
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
-			<div class="pull-right" style="padding-right:50px; padding-top:10px">
-              <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true, 'btn-inverse': true}"><i class="fa fa-pencil"></i></button>
-			</div>
+##			<div class="pull-right" style="padding-right:50px; padding-top:10px">
+##              <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true, 'btn-inverse': true}"><i class="fa fa-pencil"></i></button>
+##			</div>
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">

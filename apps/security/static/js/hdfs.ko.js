@@ -389,10 +389,18 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	self.assist.refreshTree();
+	  self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
+
+  self.selectableHadoopUsers = ko.computed(function() {
+    var _users = ko.utils.arrayMap(self.availableHadoopUsers(), function(user) {
+        return user.username;
+    });
+    return _users.sort();
+  }, self);
+
 
   self.init = function (path) {
     self.fetchUsers();
@@ -400,16 +408,13 @@ var HdfsViewModel = function (initial) {
   }
 
   self.fetchUsers = function () {
-    $.getJSON('/desktop/api/users/autocomplete', function (data) {
-      $.each(data.users, function (i, user) {
-        self.availableHadoopUsers.push(user.username);
-      });
-
-      $.each(data.groups, function (i, group) {
-        self.availableHadoopGroups.push(group.name);
-      });
-      
-      updateTypeAheads(self);
+    $.getJSON('/desktop/api/users/autocomplete', {
+      'include_myself': true,
+      'extend_user': true
+    }, function (data) {
+      self.availableHadoopUsers(data.users);
+      self.availableHadoopGroups(data.groups);
+      $(document).trigger("loaded.users");
     });
   }
 };

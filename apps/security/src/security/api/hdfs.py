@@ -56,10 +56,12 @@ def list_hdfs(request, path):
   except:
     json_response = HttpResponse(json.dumps({'files': []}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
   if json.loads(request.GET.get('isDiffMode', 'false')):
+    print "@@@@@@@@"
     request.doas = 'hdfs'
-    hdfs_response = listdir_paged(request, path)
+    hdfs_response = json.loads(listdir_paged(request, path).content)
     resp = json.loads(json_response.content)
-    resp['files'] = _diff_list_dir(resp, json.loads(hdfs_response.content))
+    resp['page'] = hdfs_response['page']
+    resp['files'] = _diff_list_dir(resp, hdfs_response)
     json_response.content = json.dumps(resp)
       
   return json_response
