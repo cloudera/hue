@@ -435,8 +435,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', itemSelected='$root.a
         _path = _path.substr(0, _path.length - 1);
       }
       if ($("a.anchor[href^='"+_path+"']").length > 0){
-        $("html, body").animate({
-          scrollTop: ($("a.anchor[href^='"+_path+"']").position().top - 140)+"px"
+        $("#hdfsTree").animate({
+          scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#hdfsTree").scrollTop() - $("#hdfsTree").position().top - 4)+"px"
         });
       }
     });
