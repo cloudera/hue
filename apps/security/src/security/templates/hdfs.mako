@@ -206,11 +206,11 @@ ${ layout.menubar(section='hdfs') }
     </label>
     <div style="margin-left: 6px">
       <div data-bind="visible: type() == 'user'">
-        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: name}" style="width: 200px"></select>
+        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
       </div>
 
       <div data-bind="visible: type() == 'group'">
-        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _("Select a group") }', update: name}" style="width: 200px"></select>
+        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
       </div>
 
       <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ad...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
@@ -260,7 +260,7 @@ ${ layout.menubar(section='hdfs') }
                         <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
                   <i class="fa fa-sitemap fa-rotate-270" data-bind="css: {'fa-spin': $root.assist.isLoadingTree()}"></i>
@@ -378,11 +378,33 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
   ko.bindingHandlers.select2 = {
     init: function(element, valueAccessor, allBindingsAccessor, vm) {
       var options = ko.toJS(valueAccessor()) || {};
-      $(element).select2(options).on("change", function(e){
-        if (typeof e.val != "undefined" && typeof valueAccessor().update != "undefined"){
-          valueAccessor().update(e.val);
-        }
-      });
+      $(element)
+          .select2(options)
+          .on("change", function(e){
+            if (typeof e.val != "undefined" && typeof valueAccessor().update != "undefined"){
+              valueAccessor().update(e.val);
+            }
+          })
+          .on("select2-open", function(){
+            $(".select2-input").off("keyup").data("type", options.type).on("keyup", function(e) {
+              if(e.keyCode === 13){
+                var _newVal = $(this).val();
+                var _type = $(this).data("type");
+                if (_type == "user"){
+                  viewModel.availableHadoopUsers.push({
+                    username: _newVal
+                  });
+                }
+                if (_type == "group"){
+                  viewModel.availableHadoopGroups.push({
+                    name: _newVal
+                  });
+                }
+                $(element).select2("val",  _newVal, true);
+                $(element).select2("close");
+              }
+            });
+          })
     },
     update: function(element, valueAccessor, allBindingsAccessor, vm) {
       if (typeof valueAccessor().update != "undefined"){
