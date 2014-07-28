@@ -74,7 +74,7 @@
   <script type="text/html" id="node-name-template">
     <div class="node-row" data-bind="
     %if styleModifier:
-      style: { border: ${styleModifier}() ? '1px dashed #bce8f1': '',  background: ${styleModifier}() ? '#d9edf7': ''},
+      style: { border: ${styleModifier}() ? '1px dashed #eed3d7': '',  background: ${styleModifier}() ? '#f2dede': ''},
     %endif
     %if itemSelected:
      css:{selected: ${itemSelected}}">
@@ -94,7 +94,7 @@
             %endif
         },
         %if styleModifier:
-          style: { color: ${styleModifier}() ? '#338bb8': '#999999'}
+          style: { color: ${styleModifier}() ? '#b94a48': '#999999'}
         %else:
           style: { color: '#999999'}
         %endif
@@ -108,6 +108,9 @@
       %endif
       %if itemDblClick:
         event : { dblclick: ${itemDblClick} },
+      %endif
+      %if styleModifier:
+        style: { color: ${styleModifier}() ? '#b94a48': ''},
       %endif
       css:{'striked': striked}"></a></strong>
 

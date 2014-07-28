@@ -263,7 +263,7 @@ ${ layout.menubar(section='hdfs') }
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
-                  <i class="fa fa-sitemap fa-rotate-270"></i>
+                  <i class="fa fa-sitemap fa-rotate-270" data-bind="css: {'fa-spin': $root.assist.isLoadingTree()}"></i>
                   <a href="javascript: void(0)" data-bind="click: $root.assist.collapseTree">
                     <i class="fa fa-compress"></i> ${_('Collapse')}
                   </a>
@@ -406,8 +406,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       _initialPath = window.location.hash.substr(1);
     }
     viewModel.init(_initialPath);
-
-    //$(document).on("loaded.acls", movePopover);
 
     $("#path").jHueHdfsAutocomplete({
       home: viewModel.assist.path(),
