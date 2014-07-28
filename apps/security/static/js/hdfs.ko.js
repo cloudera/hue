@@ -53,7 +53,16 @@ function printAcl(acl) {
 var Assist = function (vm, assist) {
   var self = this;
 
+  self.compareNames = function (a,b) {
+    if (a.name.toLowerCase() < b.name.toLowerCase())
+      return -1;
+    if (a.name.toLowerCase() > b.name.toLowerCase())
+      return 1;
+    return 0;
+  }
+
   self.isLoadingAcls = ko.observable(false);
+  self.isLoadingTree = ko.observable(false);
   self.showAclsAsText = ko.observable(false);
   self.isDiffMode = ko.observable(false);
   self.isDiffMode.subscribe(function () {
@@ -105,6 +114,7 @@ var Assist = function (vm, assist) {
   self.pagenum = ko.observable(1);
   self.files = ko.observableArray();
   self.fromLoadMore = false;
+  self.fromRebuildTree = false;
 
   self.acls = ko.observableArray();
   self.originalAcls = ko.observableArray();
@@ -128,10 +138,11 @@ var Assist = function (vm, assist) {
   self.group = ko.observable('');
 
   self.afterRender = function() {
-    if (! self.fromLoadMore) {
+    if (! self.fromLoadMore && ! self.fromRebuildTree) {
       $(document).trigger("rendered.tree");
     }
     self.fromLoadMore = false;
+    self.fromRebuildTree = false;
   }
 
 
@@ -187,13 +198,14 @@ var Assist = function (vm, assist) {
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
         isExpanded: true,
-        isDir: item.type == "dir",
+        isDir: item.type == "dir" || item.isDir == true,
         page: {
           number: -1,
           num_pages: -1
         },
         nodes: []
       });
+      leaf.nodes.sort(self.compareNames);
     }
     return leaf;
   }
@@ -241,13 +253,30 @@ var Assist = function (vm, assist) {
     self.loadData(self.growingTree());
   }
 
-  self.refreshTree = function () {
+  self.refreshTree = function (force) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     Object.keys(self.treeAdditionalData).forEach(function (path) {
-      if (self.treeAdditionalData[path].loaded) {
+      if (typeof force == "boolean" && force){
         self.fetchPath(path);
       }
+      else {
+        if (self.treeAdditionalData[path].loaded) {
+          self.fetchPath(path);
+        }
+      }
     });
+  }
+
+  self.rebuildTree = function (leaf, paths) {
+    paths.push(leaf.path);
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        if (node.isDir){
+          self.rebuildTree(node, paths);
+        }
+      });
+    }
+    return paths;
   }
 
   self.setPath = function (obj, toggle) {
@@ -284,10 +313,11 @@ var Assist = function (vm, assist) {
           self.convertItemToObject(_item);
         }
       });
+      $(document).trigger("loaded.parents");
     }
   }
 
-  self.fetchPath = function (optionalPath) {
+  self.fetchPath = function (optionalPath, loadCallback) {
     var _path = typeof optionalPath != "undefined" ? optionalPath : self.path();
     $.getJSON('/security/api/hdfs/list' + _path, {
         'pagesize': 15,
@@ -315,8 +345,15 @@ var Assist = function (vm, assist) {
         }
         self.getTreeAdditionalDataForPath(_path).loaded = true;
         self.updatePathProperty(self.growingTree(), _path, "page", data.page);
-        self.loadData(self.growingTree());
-        self.getAcls();
+        if (typeof loadCallback != "undefined"){
+          loadCallback(data);
+        }
+        else {
+          self.loadData(self.growingTree());
+        }
+        if (typeof optionalPath == "undefined"){
+          self.getAcls();
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -418,6 +455,19 @@ var HdfsViewModel = function (initial) {
   self.init = function (path) {
     self.fetchUsers();
     self.assist.path(path);
+    $(document).one("loaded.parents", function(){
+      self.assist.isLoadingTree(true);
+      var _paths = self.assist.rebuildTree(self.assist.growingTree().nodes[0], []);
+      _paths.forEach(function(path, cnt){
+        self.assist.fetchPath(path, function(){
+          if (cnt == _paths.length -1){
+            self.assist.fromRebuildTree = true;
+            self.assist.loadData(self.assist.growingTree());
+            self.assist.isLoadingTree(false);
+          }
+        });
+      });
+    });
   }
 
   self.fetchUsers = function () {
