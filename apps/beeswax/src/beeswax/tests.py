@@ -1762,7 +1762,7 @@ date_string_col string,
 string_col string,
 timestamp_col timestamp)
 PARTITIONED BY (year int, month int)
-ROW FORMAT delimited fields terminated by ','  escaped by '\\'
+ROW FORMAT delimited fields terminated by ','  escaped by '\\\\'
 STORED AS TEXTFILE
 LOCATION '/user/admin/alltypes/alltypes';
 
@@ -1771,7 +1771,7 @@ ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1);
 ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
   assert_equal(['CREATE DATABASE IF NOT EXISTS functional',
                 'DROP TABLE IF EXISTS functional.alltypes',
-                "CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (\nid int COMMENT 'Add a comment',\nbool_col boolean,\ntinyint_col tinyint,\nsmallint_col smallint,\nint_col int,\nbigint_col bigint,\nfloat_col float,\ndouble_col double,\ndate_string_col string,\nstring_col string,\ntimestamp_col timestamp)\nPARTITIONED BY (year int, month int)\nROW FORMAT delimited fields terminated by ','  escaped by '\\'\nSTORED AS TEXTFILE\nLOCATION '/user/admin/alltypes/alltypes'",
+                "CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (\nid int COMMENT 'Add a comment',\nbool_col boolean,\ntinyint_col tinyint,\nsmallint_col smallint,\nint_col int,\nbigint_col bigint,\nfloat_col float,\ndouble_col double,\ndate_string_col string,\nstring_col string,\ntimestamp_col timestamp)\nPARTITIONED BY (year int, month int)\nROW FORMAT delimited fields terminated by ','  escaped by '\\\\'\nSTORED AS TEXTFILE\nLOCATION '/user/admin/alltypes/alltypes'",
                 'USE functional',
                 'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1)',
                 'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2)'
