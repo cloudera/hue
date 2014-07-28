@@ -478,7 +478,7 @@ class HiveServerClient:
       query = 'DESCRIBE %s' % table_name
     else:
       query = 'DESCRIBE EXTENDED %s' % table_name
-    (desc_results, desc_schema), operation_handle = self.execute_statement(query)
+    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000)
     self.close_operation(operation_handle)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
