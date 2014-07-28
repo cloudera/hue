@@ -42,7 +42,6 @@ ${ layout.menubar(section='hdfs') }
   .node-row {
     margin: 4px;
     padding: 2px;
-    cursor: pointer;
     border: 1px dashed #FFFFFF;
   }
 
@@ -50,7 +49,7 @@ ${ layout.menubar(section='hdfs') }
     background-color: #F6F6F6;
   }
 
-  .node-row a {
+  .node-row a, .node-row i {
     cursor: pointer;
   }
 
@@ -361,7 +360,7 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore') }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore') }
 
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
