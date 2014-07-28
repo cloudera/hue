@@ -201,7 +201,7 @@ def split_statements(hql):
   for line in lines:
     for c in line:
       current += c
-      if c in ('"', "'") and is_comment is None:
+      if c in ('"', "'") and prev != '\\' and is_comment is None:
         if between_quotes == c:
           between_quotes = None
         elif between_quotes is None:
@@ -216,6 +216,9 @@ def split_statements(hql):
           if len(current) > 1:
             statements.append(current)
           current = ''
+      # This character holds no significance if it was escaped within a string
+      if prev == '\\' and between_quotes is not None:
+        c = ''
       prev = c
     is_comment = None
     prev = os.linesep
