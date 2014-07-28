@@ -71,6 +71,7 @@ var Role = function (vm, role) {
     self.groups.push(group);
   });
   self.privileges = ko.observableArray(); // Not included in the API
+  self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
 
   self.privilegesChanged = ko.computed(function () {
@@ -83,6 +84,7 @@ var Role = function (vm, role) {
     self.name('');
     self.groups.removeAll();
     self.privileges.removeAll();
+    self.originalPrivileges.removeAll();
   }
 
   self.addGroup = function () {
@@ -161,14 +163,15 @@ var Assist = function (vm) {
   self.path.subscribe(function () {
     self.fetchHivePath();
   });
-  self.server = ko.observable('server1');
+  self.server = ko.observable('');
   self.db = ko.computed(function () {
     return self.path().split(/[.]/)[0];
   });
   self.table = ko.computed(function () {
     return self.path().split(/[.]/)[1];
   });
-  self.privilege = ko.observable();
+  self.privileges = ko.observableArray();
+  self.isDiffMode = ko.observable(false);
 
   self.isDiffMode = ko.observable(false);
   self.isDiffMode.subscribe(function () {
@@ -408,7 +411,6 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.roles = ko.observableArray();
-  self.privileges = ko.observableArray();
   self.availableHadoopGroups = ko.mapping.fromJS(initial.hadoop_groups);
   self.assist = new Assist(self);
 
@@ -481,8 +483,11 @@ var HiveViewModel = function (initial) {
         }
         else {
           role.privileges.removeAll();
+          role.originalPrivileges.removeAll();
           $.each(data.sentry_privileges, function (index, item) {
-            role.privileges.push(_create_ko_privilege(item));
+              var privilege = _create_ko_privilege(item);
+              role.privileges.push(privilege);
+              role.originalPrivileges.push(privilege);
           });
           role.showPrivileges(true);
         }
@@ -520,7 +525,10 @@ var HiveViewModel = function (initial) {
           })
         },
         success: function (data) {
-          self.assist.privilege(ko.mapping.fromJS(data));
+          self.assist.privileges.removeAll();
+          $.each(data.privileges, function (index, item) {
+        	self.assist.privileges.push(_create_ko_privilege(item));
+          });
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);

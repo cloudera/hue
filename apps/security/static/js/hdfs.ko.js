@@ -273,10 +273,9 @@ var Assist = function (vm, assist) {
   self.refreshTree = function (force) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     Object.keys(self.treeAdditionalData).forEach(function (path) {
-      if (typeof force == "boolean" && force){
+      if (typeof force == "boolean" && force) {
         self.fetchPath(path);
-      }
-      else {
+      } else {
         if (self.treeAdditionalData[path].loaded) {
           self.fetchPath(path);
         }
@@ -300,8 +299,7 @@ var Assist = function (vm, assist) {
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (! obj.isExpanded() && ! self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
       if (typeof toggle == "boolean" && toggle){
         obj.isExpanded(!obj.isExpanded());
-      }
-      else {
+      } else {
         obj.isExpanded(true);
       }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
@@ -442,7 +440,7 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	  self.assist.refreshTree();
+	self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
