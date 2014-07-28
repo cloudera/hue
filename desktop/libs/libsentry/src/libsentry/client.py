@@ -84,7 +84,6 @@ class SentryClient(object):
   def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
     privilege = TSentryPrivilege(**tSentryPrivilege)
     request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
-    print request
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 

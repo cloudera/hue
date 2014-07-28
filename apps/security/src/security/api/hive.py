@@ -122,8 +122,11 @@ def save_privileges(request):
     for privilege in deleted_privileges:
       print _drop_sentry_privilege(request.user, role, privilege)
     
-    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
-    
+    # todo
+#    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
+# delete modified_privileges "names"
+#    result['privileges'] += _hive_add_privileges(request.user, role, modified_privileges)
+
     result['message'] = ''
     result['status'] = 0
   except Exception, e:

@@ -59,17 +59,20 @@ ${ layout.menubar(section='hive') }
 </tr>
 </script>
 
-
-
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Privileges') }</li>
-          <li class="active"><a href="#edit"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+          <li class="active"><a href="#edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
           <li><a href="#roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
+          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
+            </br>
+            <input type="checkbox" checked> All
+            </br>
+            <select data-bind="options: $root.selectableHadoopGroups" size="10" multiple="true"></select>
+          </li>          
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Server') }
             <input type="text" data-bind="value: $root.assist.server" class="input-small" />
           </li>
@@ -81,7 +84,7 @@ ${ layout.menubar(section='hive') }
 
       <div id="edit" class="mainSection card card-small">
         <h1 class="card-heading simple">
-          ${ _('Edit privileges') }
+          ${ _('Database and Tables privileges') }
         </h1>
 
         <div class="card-body">
@@ -97,12 +100,20 @@ ${ layout.menubar(section='hive') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
-
                     <div class="dropdown inline-block" style="margin-right: 6px">
-                      <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i><i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i> <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible paths for') }</span><span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span></a>
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
+                        <i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i>
+                        <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible paths for') }</span>
+                        <span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span>
+                      </a>
                       <ul class="dropdown-menu">
-                        <li data-bind="visible: ! $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(true); }"><a tabindex="-1" href="#">${ _('Show non accessible paths for') } <strong data-bind="text: $root.doAs"></strong></a></li>
-                        <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                        <li data-bind="visible: ! $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(true); }">
+                          <a tabindex="-1" href="#">${ _('Show non accessible paths for') }</a>
+                        </li>
+                        <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }">
+                          <a tabindex="-1" href="#">${ _('Impersonate the user') }</a>
+                        </li>
                       </ul>
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
@@ -119,15 +130,11 @@ ${ layout.menubar(section='hive') }
               </div>
 
               ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+
             </div>
             <div class="span4">
-              <span data-bind="text: ko.mapping.toJSON($root.assist.privilege)"></span>
-              <!-- ko if: $root.assist.privilege() -->
-                sentry_privileges: <span data-bind="text: $root.assist.privilege.sentry_privileges"></span>
-                message: <span data-bind="text: $root.assist.privilege.message"></span>
-              <!-- /ko -->
-
-
+               <table data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
+               </table>
             </div>
           </div>
         </div>
@@ -166,7 +173,7 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span7">
               Privileges
-              <div data-bind="template: { name: 'privilege', foreach: privileges}">
+              <div data-bind="template: { name: 'privilege', foreach: privileges }">
               </div>
               <a href="javascript: void(0)" data-bind="click: addPrivilege">
                 <i class="fa fa-plus"></i>
@@ -174,15 +181,13 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span4">
               Groups
-              <select data-bind="options: $root.availableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
+              <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
             </div>
             <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
                 data-bind="click: $root.role.create">
               <i class="fa fa-save"></i>
             </button>
           </div>
-
-
 
         <table>
           <theader>
@@ -199,7 +204,7 @@ ${ layout.menubar(section='hive') }
               </td>
               <td>
                 <a href="javascript:void(0);">
-                  <i class="fa fa-2x" data-bind="click: $root.list_sentry_privileges_by_role, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i>
+                  <i class="fa fa-2x" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i>
                 </a>
               </td>
               <td data-bind="text: name"></td>
@@ -215,7 +220,7 @@ ${ layout.menubar(section='hive') }
             <tr>
                 <td colspan="2"></td>
                 <td colspan="3">
-                  <table data-bind="template: { name: 'privilege', foreach: $data.privileges}, visible: $data.showPrivileges">
+                  <table data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
                   </table>
                 </td>
             </tr>
