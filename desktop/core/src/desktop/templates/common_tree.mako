@@ -25,7 +25,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None)">
+<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None)">
 
   <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
 
@@ -73,12 +73,6 @@
 
   <script type="text/html" id="node-name-template">
     <div class="node-row" data-bind="
-    %if itemClick:
-      click: ${itemClick},
-    %endif
-    %if itemDblClick:
-      event : { dblclick: ${itemDblClick} },
-    %endif
     %if styleModifier:
       style: { border: ${styleModifier}() ? '1px dashed #bce8f1': '',  background: ${styleModifier}() ? '#d9edf7': ''},
     %endif
@@ -88,6 +82,9 @@
      css:{unselected: true">
     %endif
       <i data-bind="
+        %if iconClick:
+          click: ${iconClick},
+        %endif
         css: {
             'fa': true,
             %if iconModifier:
@@ -105,7 +102,14 @@
       %if anchorProperty:
         <a href="#" class="anchor" data-bind="attr: {href: ${anchorProperty}}"></a>
       %endif
-      <strong><a style="display: inline-block" data-bind="text:name, css:{'striked': striked}"></a></strong>
+      <strong><a style="display: inline-block" data-bind="text:name,
+      %if itemClick:
+        click: ${itemClick},
+      %endif
+      %if itemDblClick:
+        event : { dblclick: ${itemDblClick} },
+      %endif
+      css:{'striked': striked}"></a></strong>
 
       %if styleModifierPullRight:
       ${styleModifierPullRight()}

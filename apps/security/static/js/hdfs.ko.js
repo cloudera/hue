@@ -29,7 +29,6 @@ function parseAcl(acl) {
 
   acl.type.subscribe(function () {
     acl.status('modified');
-    updateTypeAheads(viewModel);
   });
   acl.name.subscribe(function () {
     acl.status('modified');
@@ -50,12 +49,6 @@ function parseAcl(acl) {
 function printAcl(acl) {
   return (acl.isDefault() ? 'default:' : '') + acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
 }
-
-function updateTypeAheads(vm) { 
-  $(".group-list").typeahead({'source': vm.availableHadoopGroups()});
-  $(".user-list").typeahead({'source': vm.availableHadoopUsers()});
-}
-
 
 var Assist = function (vm, assist) {
   var self = this;
@@ -111,6 +104,7 @@ var Assist = function (vm, assist) {
   });
   self.pagenum = ko.observable(1);
   self.files = ko.observableArray();
+  self.fromLoadMore = false;
 
   self.acls = ko.observableArray();
   self.originalAcls = ko.observableArray();
@@ -134,7 +128,10 @@ var Assist = function (vm, assist) {
   self.group = ko.observable('');
 
   self.afterRender = function() {
-    $(document).trigger("rendered.tree");
+    if (! self.fromLoadMore) {
+      $(document).trigger("rendered.tree");
+    }
+    self.fromLoadMore = false;
   }
 
 
@@ -142,7 +139,6 @@ var Assist = function (vm, assist) {
     var newAcl = parseAcl('group::---');
     newAcl.status('new');
     self.acls.push(newAcl);
-    updateTypeAheads(vm);
   };
 
   self.addDefaultAcl = function () {
@@ -254,12 +250,21 @@ var Assist = function (vm, assist) {
     });
   }
 
-  self.setPath = function (obj) {
+  self.setPath = function (obj, toggle) {
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (! obj.isExpanded() && ! self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
-      obj.isExpanded(!obj.isExpanded());
+      if (typeof toggle == "boolean" && toggle){
+        obj.isExpanded(!obj.isExpanded());
+      }
+      else {
+        obj.isExpanded(true);
+      }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
+  }
+
+  self.togglePath = function (obj) {
+    self.setPath(obj, true);
   }
 
   self.openPath = function (obj) {
@@ -320,6 +325,7 @@ var Assist = function (vm, assist) {
   self.loadMore = function (what) {
     self.pagenum(what.page().next_page_number());
     self.fetchPath(what.path());
+    self.fromLoadMore = true;
   }
 
   self.getAcls = function () {
