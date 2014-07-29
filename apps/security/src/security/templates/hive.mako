@@ -31,15 +31,27 @@ ${ layout.menubar(section='hive') }
 <div data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }">
 
   <!-- ko if: editing() -->
-    <input type="text" data-bind="value: $data.dbName" placeholder="dbName">
-    <input type="text" data-bind="value: $data.tableName" placeholder="tableName">
+    ## todo, role name
+    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/> 
+    <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
 
+    <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
     <input type="text" data-bind="value: $data.URI" placeholder="URI">
 
-    <input type="text" data-bind="value: $data.action" placeholder="action">
+    ## <input type="text" class="input-small" data-bind="value: $data.action" placeholder="action">
+    <select data-bind="options: $data.availableActions, select2: { update: $data.action, type: 'user'}" style="width: 100px"></select>
     
-    <input type="text" data-bind="value: $data.serverName" placeholder="serverName">
-    <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+    <div>
+      <label class="checkbox inline-block">
+        <i class="fa fa-cog"></i>
+        <input type="checkbox" data-bind="checked: showAdvanced"/>
+      </label>    
+    </div>
+
+    <span data-bind="visible: showAdvanced">
+      <input type="text" data-bind="value: $data.server" placeholder="serverName">
+      <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+    </span>
     
     <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   <!-- /ko -->
@@ -189,7 +201,10 @@ ${ layout.menubar(section='hive') }
               <i class="fa fa-save"></i>
             </button>
           </div>
-
+          <br/>
+          <br/>
+          <br/>
+      <div>
         <table>
           <theader>
             <th style="width:1%"><div class="hueCheckbox selectAll fa"></div></th>
@@ -243,6 +258,7 @@ ${ layout.menubar(section='hive') }
             </tr>
         </tbody>
         </table>
+      </div>        
         </div>
       </div>
 
