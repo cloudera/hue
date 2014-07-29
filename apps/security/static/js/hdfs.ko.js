@@ -81,6 +81,7 @@ var Assist = function (vm, assist) {
     aclBit: false,
     striked: false,
     selected: false,
+    rwx: "",
     page: {
       number: -1,
       num_pages: -1
@@ -94,6 +95,7 @@ var Assist = function (vm, assist) {
         aclBit: false,
         striked: false,
         selected: false,
+        rwx: "",
         page: {
           number: -1,
           num_pages: -1
@@ -197,6 +199,7 @@ var Assist = function (vm, assist) {
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
         isExpanded: true,
+        rwx: item.rwx,
         isDir: item.type == "dir" || item.isDir == true,
         page: {
           number: -1,
