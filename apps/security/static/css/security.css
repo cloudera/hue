@@ -27,6 +27,10 @@
   padding: 0;
 }
 
+.tree {
+  margin-left: 0;
+}
+
 .node-row {
   margin: 4px;
   padding: 2px;
@@ -47,11 +51,6 @@
 
 .node-row.selected {
   background-color: #F6F6F6 !important;
-}
-
-.path-container {
-  background-color: #FFF;
-  padding-top: 8px;
 }
 
 .acl-panel {
@@ -95,8 +94,13 @@
 }
 
 .path {
-  height: 34px;
+  height: 34px!important;
   font-size: 14px;
+}
+
+.path-container {
+  background-color: #FFF;
+  padding-top: 8px;
 }
 
 .path-container .btn-inverse {

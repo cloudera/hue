@@ -30,7 +30,7 @@ def hive(request):
 
   return render("hive.mako", request, {
       'assist': assist,
-      'initial': json.dumps({'hadoop_groups': _get_hadoop_groups()}),
+      'initial': json.dumps({'user': request.user.username, 'hadoop_groups': _get_hadoop_groups()}),
   })
 
 
