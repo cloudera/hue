@@ -77,7 +77,7 @@ ${ layout.menubar(section='hive') }
           </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             </br>
-            <input type="checkbox" checked></input> All
+            <input type="checkbox" checked> All
             </br>
             <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>
           </li>

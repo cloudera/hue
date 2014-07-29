@@ -1,0 +1,160 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hue-tree {
+  width: 100%;
+  overflow-y: scroll;
+  min-height: 100px;
+}
+
+.hue-tree ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.node-row {
+  margin: 4px;
+  padding: 2px;
+  border: 1px dashed #FFFFFF;
+}
+
+.node-row:hover {
+  background-color: #F6F6F6;
+}
+
+.node-row a, .node-row i {
+  cursor: pointer;
+}
+
+.node-row a.striked {
+  text-decoration: line-through;
+}
+
+.node-row.selected {
+  background-color: #F6F6F6 !important;
+}
+
+.path-container {
+  background-color: #FFF;
+  padding-top: 8px;
+}
+
+.acl-panel {
+  border-left: 1px solid #e5e5e5;
+  padding-top: 6px;
+  padding-left: 12px;
+}
+
+.acl-panel .nav-tabs {
+  margin-bottom: 0;
+}
+
+.acl-panel h4:not(:first-child) {
+  margin-top: 20px;
+}
+
+.acl-panel-content {
+  padding: 6px;
+  overflow-y: scroll;
+}
+
+.acl-block {
+  background-color: #f6f6f6;
+  padding: 3px;
+  margin-bottom: 4px;
+}
+
+.acl-block .checkbox, .acl-block .radio {
+  margin-left: 6px;
+}
+
+.add-acl {
+  padding: 5px;
+  text-align: center;
+  color: #CCC;
+  font-size: 20px;
+}
+
+.add-acl:hover {
+  color: #999;
+}
+
+.path {
+  height: 34px;
+  font-size: 14px;
+}
+
+.path-container .btn-inverse {
+  height: 34px;
+  width: 34px;
+  font-size: 14px;
+  line-height: 34px;
+}
+
+.fake-pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 20px;
+  word-break: break-all;
+  word-wrap: break-word;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+
+.tree-toolbar {
+  padding: 3px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tree-toolbar .fa {
+  margin-left: 5px;
+}
+
+.tree-toolbar .fa-spin {
+  color: #cccccc;
+  margin-right: 6px;
+}
+
+.tree-toolbar input {
+  margin-bottom: 0;
+  height: 25px;
+  min-height: 25px;
+}
+
+.tree-toolbar .pull-right {
+  margin-top: -5px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.force-word-break {
+  word-break: break-all;
+}
+
+.pointer {
+  cursor: pointer;
+}

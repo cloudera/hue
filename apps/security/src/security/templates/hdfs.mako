@@ -27,159 +27,6 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hdfs') }
 
 
-<style type="text/css">
-  #hdfsTree {
-    width: 100%;
-    overflow-y: scroll;
-    min-height: 100px;
-  }
-
-  #hdfsTree ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  .node-row {
-    margin: 4px;
-    padding: 2px;
-    border: 1px dashed #FFFFFF;
-  }
-
-  .node-row:hover {
-    background-color: #F6F6F6;
-  }
-
-  .node-row a, .node-row i {
-    cursor: pointer;
-  }
-
-  .node-row a.striked {
-    text-decoration: line-through;
-  }
-
-  .node-row.selected {
-    background-color: #F6F6F6!important;
-  }
-
-  .loading-popover {
-    width: 200px;
-    height: 120px;
-    line-height: 120px;
-    color: #999999;
-  }
-
-  .path-container {
-    background-color: #FFF;
-    padding-top: 8px;
-  }
-
-  .acl-panel {
-    border-left: 1px solid #e5e5e5;
-    padding-top: 6px;
-    padding-left: 12px;
-  }
-
-  .acl-panel .nav-tabs {
-    margin-bottom: 0;
-  }
-
-  .acl-panel h4:not(:first-child) {
-    margin-top: 20px;
-  }
-
-  .acl-panel-content {
-    padding: 6px;
-    overflow-y: scroll;
-  }
-
-  .acl-block {
-    background-color: #f6f6f6;
-    padding: 3px;
-    margin-bottom: 4px;
-  }
-
-  .acl-block .checkbox, .acl-block .radio {
-    margin-left: 6px;
-  }
-
-  .add-acl {
-    padding: 5px;
-    text-align: center;
-    color: #CCC;
-    font-size: 20px;
-  }
-
-  .add-acl:hover {
-    color: #999;
-  }
-
-  #path {
-    height: 34px;
-    font-size: 14px;
-  }
-
-  .path-container .btn-inverse {
-    height: 34px;
-    width: 34px;
-    font-size: 14px;
-    line-height: 34px;
-  }
-
-  .fake-pre {
-    display: block;
-    padding: 9.5px;
-    margin: 0 0 10px;
-    font-size: 12px;
-    line-height: 20px;
-    word-break: break-all;
-    word-wrap: break-word;
-    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-  }
-
-  .tree-toolbar {
-    padding: 3px;
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-  .tree-toolbar .fa {
-    margin-left: 5px;
-  }
-
-  .tree-toolbar .fa-sitemap {
-    color: #cccccc;
-    margin-right: 6px;
-  }
-
-  .tree-toolbar input {
-    margin-bottom: 0;
-    height: 25px;
-    min-height: 25px;
-  }
-
-  .tree-toolbar .pull-right {
-    margin-top: -5px;
-  }
-
-  .inline-block {
-    display: inline-block;
-  }
-
-  .force-word-break {
-    word-break: break-all;
-  }
-
-  .pointer {
-    cursor: pointer;
-  }
-
-</style>
-
 <script type="text/html" id="acl-display">
   <div data-bind="visible: status() != 'deleted'">
     <span data-bind="text: printAcl($data)"></span>
@@ -244,7 +91,7 @@ ${ layout.menubar(section='hdfs') }
             <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
+                  <input id="path" class="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
                   <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
@@ -263,16 +110,13 @@ ${ layout.menubar(section='hdfs') }
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
-                  <i class="fa fa-sitemap fa-rotate-270" data-bind="css: {'fa-spin': $root.assist.isLoadingTree()}"></i>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseTree">
-                    <i class="fa fa-compress"></i> ${_('Collapse')}
-                  </a>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.expandTree">
-                    <i class="fa fa-expand"></i> ${_('Expand')}
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
+                    <i class="fa fa-compress"></i> ${_('Close others')}
                   </a>
                   <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
                     <i class="fa fa-refresh"></i>  ${_('Refresh')}
                   </a>
+                  <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                 </div>
               </div>
               <div class="path-container-ghost hide"></div>

@@ -248,6 +248,24 @@ var Assist = function (vm, assist) {
     self.loadData(self.growingTree());
   }
 
+  self.collapseOthers = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
+    self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
+
+    var _path = self.path();
+    var _crumb = "";
+    for (var i = 0; i < _path.length; i++) {
+      if ((_path[i] === "/" && _crumb != "")) {
+        self.updatePathProperty(self.growingTree(), _crumb, "isExpanded", true);
+      }
+      _crumb += _path[i];
+    }
+
+    self.updatePathProperty(self.growingTree(), _path, "isExpanded", true);
+
+    self.loadData(self.growingTree());
+  }
+
   self.expandTree = function () {
     self.updateTreeProperty(self.growingTree(), "isExpanded", true);
     self.loadData(self.growingTree());

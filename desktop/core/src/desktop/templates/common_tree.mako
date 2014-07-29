@@ -123,6 +123,6 @@
 </%def>
 
 <%def name="render(id=None, data=None, afterRender='void(0)')">
-  <div id="${id}" data-bind="template: { name: 'tree-template', data: ${data}, afterRender: ${afterRender} }"></div>
+  <div id="${id}" class="hue-tree" data-bind="template: { name: 'tree-template', data: ${data}, afterRender: ${afterRender} }"></div>
 </%def>
 
