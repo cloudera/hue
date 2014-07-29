@@ -101,7 +101,7 @@ def create_role(request):
 
     result['role'] = {"name": role['name'], "groups": role['groups'], "grantorPrincipal": request.user.username}
 
-    result['message'] = ''
+    result['message'] = _('Role created!')
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")

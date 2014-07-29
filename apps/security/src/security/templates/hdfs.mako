@@ -60,7 +60,7 @@ ${ layout.menubar(section='hdfs') }
         <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
       </div>
 
-      <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ad...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
+      <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
     </div>
 
     <br/>

@@ -18,7 +18,9 @@
 var Privilege = function (vm, privilege) {
   var self = this;
 
-  self.privilegeScope = ko.observable(typeof privilege.privilegeScope != "undefined" && privilege.privilegeScope != null ? privilege.privilegeScope : "");
+  self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
+  self.editing = ko.observable(typeof privilege.editing != "undefined" && privilege.editing != null ? privilege.editing : false);
+  //self.privilegeScope = ko.observable(typeof privilege.privilegeScope != "undefined" && privilege.privilegeScope != null ? privilege.privilegeScope : "");
   self.serverName = ko.observable(typeof privilege.serverName != "undefined" && privilege.serverName != null ? privilege.serverName : "");
   self.serverName.subscribe(function () {
     if (self.status() == '') {
@@ -50,9 +52,38 @@ var Privilege = function (vm, privilege) {
     }
   });
 
-  self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
-  self.editing = ko.observable(typeof privilege.editing != "undefined" && privilege.editing != null ? privilege.editing : false);
-
+  // UI
+  self.showAdvanced = ko.observable(false);
+  self.path = ko.computed({
+	read: function () {
+	  if (self.tableName().length > 0) {
+	    return self.dbName() + "." + self.tableName();
+	  } else {
+        return self.dbName();
+	  }
+	},
+	write: function (value) {
+	  var lastSpacePos = value.lastIndexOf(".");
+	    if (lastSpacePos > 0) {
+	      this.dbName(value.substring(0, lastSpacePos));
+	      this.tableName(value.substring(lastSpacePos + 1));
+	    } else {
+	      this.dbName(value);
+	      this.tableName('');
+	    }
+	  },
+	owner: self
+  });
+  self.privilegeScope = ko.computed(function() {
+      if (self.tableName().length > 0) {
+        return 'TABLE';	
+      } else if (self.dbName().length > 0) {
+    	return 'DATABASE';
+      } else {
+    	return 'SERVER';
+      }
+  });  
+  
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
 
@@ -105,8 +136,7 @@ var Role = function (vm, role) {
         vm.roles.unshift(new Role(vm, data.role));
         self.reset();
         vm.showCreateRole(false);
-      }
-      else {
+      } else {
         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
