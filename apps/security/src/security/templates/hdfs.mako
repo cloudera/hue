@@ -186,19 +186,21 @@ ${ layout.menubar(section='hdfs') }
 </div>
 
 <%def name="treeIcons()">
-  'fa-folder-open-o': isDir() && nodes().length > 0,
-  'fa-folder-o': isDir() && nodes().length == 0,
-  'fa-file-o': !isDir()
+  'fa-folder-open-o': isDir() && nodes().length > 0 && !aclBit(),
+  'fa-folder-open': isDir() && nodes().length > 0 && aclBit(),
+  'fa-folder-o': isDir() && nodes().length == 0 && !aclBit(),
+  'fa-folder': isDir() && nodes().length == 0 && aclBit(),
+  'fa-file-o': !isDir() && !aclBit(),
+  'fa-file': !isDir() && aclBit(),
+  'striked': striked()
 </%def>
 
 <%def name="aclBitPullRight()">
-  <div class="pull-right muted rwx" data-bind="text: rwx"></div>
-  <div class="pull-right muted" data-bind="visible: striked">
-    This is not visible by current user <span data-bind="text: $root.doAs"></span>
+  <div class="pull-right rwx" data-bind="style: { color: aclBit() ? '#338bb8': '#999999'}">
+    <span data-bind="text: rwx"></span>
   </div>
-  
-  <div class="pull-right" style="margin-right: 20px" data-bind="visible: aclBit()">
-    <i class="fa fa-lock"></i>
+  <div class="pull-right">
+    <i class="fa fa-lock" data-bind="visible: aclBit()" style="color: #338bb8"></i>
   </div>
 </%def>
 
