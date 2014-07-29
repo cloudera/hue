@@ -21,26 +21,27 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+<%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="privilege">
-<tr data-bind="visible: status() != 'deleted', click: function() { if (! edition()) { edition(true); } }">
+<tr data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }">
 
-  <!-- ko if: edition() -->
+  <!-- ko if: editing() -->
     <td><select data-bind="options: availablePrivileges, value: privilegeScope"></select></td>
-    <td><input type="text" data-bind="value: $data.serverName" placeholder="serverName"></input></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.dbName" placeholder="dbName"></input></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.tableName" placeholder="tableName"></input></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.URI" placeholder="URI"></input></td>
-    <td><input type="text" data-bind="value: $data.action" placeholder="action"></input></td>
+    <td><input type="text" data-bind="value: $data.serverName" placeholder="serverName"></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.dbName" placeholder="dbName"></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.tableName" placeholder="tableName"></td>
+    <td colspan="2"><input type="text" data-bind="value: $data.URI" placeholder="URI"></td>
+    <td><input type="text" data-bind="value: $data.action" placeholder="action"></td>
     <td><a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a></td>
   </div>
   <!-- /ko -->
   
-  <!-- ko ifnot: edition() -->
+  <!-- ko ifnot: editing() -->
     <td><span data-bind="text: properties.name"></span></td>
     <td><span data-bind="text: properties.timestamp"></span></td>
     <td><a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a></td>
@@ -69,79 +70,95 @@ ${ layout.menubar(section='hive') }
           <li class="nav-header">${ _('Privileges') }</li>
           <li class="active"><a href="#edit"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
           <li><a href="#roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
-          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Users') }
-            </br>
-            <input type="checkbox" checked="checked"> ${_('Me')}
-            </br>          
-            <select data-bind="options: availableHadoopUsers, value: doAs" size="10"></select>
-          </li>
-          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
-            </br>
-            <input type="checkbox" checked> All
-            </br>
-            <select data-bind="options: $root.availableHadoopGroups" size="10" multiple="true"></select>
-          </li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Server') }
-            <input type="text" data-bind="value: $root.assist.server">
+            <input type="text" data-bind="value: $root.assist.server" class="input-small" />
           </li>
         </ul>
       </div>
     </div>
 
     <div class="span10">
+
       <div id="edit" class="mainSection card card-small">
-        <h1 class="card-heading simple">${ _('Edit') }</h1>
+        <h1 class="card-heading simple">
+          ${ _('Edit privileges') }
+        </h1>
+
         <div class="card-body">
-          <input type="text" class="input-xxlarge" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'"/>
-          <a class="btn btn-inverse" style="margin-left:10px", data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }">
-            <i class="fa fa-external-link"></i>
-          </a>
-        </div>
-        <div>
-          <i class="fa fa-eye"></i>
-          <i class="fa fa-eye-slash"></i>
-        </div>
-        <div>
-          <div class="span6">
-            <div data-bind="foreach: $root.assist.files">
-              <div data-bind="text: $data, click: $root.list_sentry_privileges_by_authorizable"></div>
+          <div class="row-fluid">
+            <div class="span8">
+              <div class="path-container">
+                <div class="input-append span12">
+                  <input id="path" class="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
+                  <a data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                    <i class="fa fa-external-link"></i>
+                  </a>
+                </div>
+                <div class="clearfix"></div>
+                <div class="tree-toolbar">
+                  <div class="pull-right">
+
+                    <div class="dropdown inline-block" style="margin-right: 6px">
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i><i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i> <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible paths for') }</span><span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span></a>
+                      <ul class="dropdown-menu">
+                        <li data-bind="visible: ! $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(true); }"><a tabindex="-1" href="#">${ _('Show non accessible paths for') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                        <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') } <strong data-bind="text: $root.doAs"></strong></a></li>
+                      </ul>
+                    </div>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <i class="fa fa-group" title="List of groups in popover for this user?"></i>
+                  </div>
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
+                    <i class="fa fa-compress"></i> ${_('Close others')}
+                  </a>
+                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
+                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
+                  </a>
+                  <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                </div>
+              </div>
+
+              ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
-          </div>
-          <div class="span6">
-            <span data-bind="text: ko.mapping.toJSON($root.assist.privilege)"></span>
-            <!-- ko if: $root.assist.privilege() -->              
-              sentry_privileges: <span data-bind="text: $root.assist.privilege.sentry_privileges"></span>
-              message: <span data-bind="text: $root.assist.privilege.message"></span>
-            <!-- /ko -->
+            <div class="span4">
+              <span data-bind="text: ko.mapping.toJSON($root.assist.privilege)"></span>
+              <!-- ko if: $root.assist.privilege() -->
+                sentry_privileges: <span data-bind="text: $root.assist.privilege.sentry_privileges"></span>
+                message: <span data-bind="text: $root.assist.privilege.message"></span>
+              <!-- /ko -->
+
+
+            </div>
           </div>
         </div>
       </div>
 
+
       <div id="roles" class="mainSection hide card card-small">
-        <div class="card-heading simple">
-        <h3>${ _('Roles') }</h3>
-		  <%actionbar:render>
+        <h1 class="card-heading simple">
+          ${ _('Roles') }
+        </h1>
+
+        <div class="card-body">
+          <%actionbar:render>
 		    <%def name="search()">
 		      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
 		    </%def>
-		
+
 		    <%def name="actions()">
               <div class="btn-toolbar" style="display: inline; vertical-align: middle">
                 <button class="btn toolbarBtn"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
               </div>
 		      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
 		        <button class="btn toolbarBtn"><i class="fa fa-times"></i> ${ _('Delete') }</button>
-		      </div>		      
+		      </div>
 		    </%def>
-		
+
 		    <%def name="creation()">
 		      <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
 		    </%def>
 		  </%actionbar:render>
-        </div>
 
-
-        <div class="card-body">
           <div data-bind="with: $root.role, visible: showCreateRole">
             <div class="span1">
               Name
@@ -164,13 +181,9 @@ ${ layout.menubar(section='hive') }
               <i class="fa fa-save"></i>
             </button>
           </div>
-          <div>
-          </div>
-        </div>
 
-        </br></br>
 
-        <div>
+
         <table>
           <theader>
             <th style="width:1%"><div class="hueCheckbox selectAll fa"></div></th>
@@ -198,16 +211,13 @@ ${ layout.menubar(section='hive') }
               <td>
                 <a href=""><span data-bind="text: grantorPrincipal"></span></a>
               </td>
-            </tr> 
+            </tr>
             <tr>
-                       
-
-              
                 <td colspan="2"></td>
                 <td colspan="3">
                   <table data-bind="template: { name: 'privilege', foreach: $data.privileges}, visible: $data.showPrivileges">
                   </table>
-                </td>              
+                </td>
             </tr>
             <tr>
               <td colspan="2"></td>
@@ -225,38 +235,46 @@ ${ layout.menubar(section='hive') }
                 </button>
               </td>
             </tr>
-          </div>
         </tbody>
+        </table>
         </div>
-
       </div>
 
-    </div>
-  </div>
-
-  </div>
-
+    </div> <!-- /span10 -->
 </div>
 
+<%def name="treeIcons()">
+  'fa-database': isDb(),
+  'fa-table': isTable(),
+  'fa-columns': isColumn()
+</%def>
+
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()',iconModifier=treeIcons) }
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/security/static/js/common.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript" charset="utf-8">
-  var viewModel;
+  var viewModel = new HiveViewModel(${ initial | n,unicode });
+  ko.applyBindings(viewModel);
 
   $(document).ready(function () {
-    viewModel = new HiveViewModel(${ initial | n,unicode });
-    ko.applyBindings(viewModel);
-
     viewModel.init();
-  });
 
-  function showMainSection(mainSection) {
+    function resizeComponents () {
+      $("#path").width($(".tree-toolbar").width() - 64);
+      $("#hdfsTree").height($(window).height() - 260);
+      $(".acl-panel-content").height($(window).height() - 260);
+    }
+
+    resizeComponents();
+
+    function showMainSection(mainSection) {
     if ($("#" + mainSection).is(":hidden")) {
       $(".mainSection").hide();
       $("#" + mainSection).show();
@@ -285,6 +303,9 @@ ${ layout.menubar(section='hive') }
       showMainSection("view");
     }
   });
+  });
+
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }

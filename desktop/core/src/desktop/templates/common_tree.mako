@@ -25,7 +25,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None)">
+<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None)">
 
   <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
 
@@ -112,7 +112,10 @@
       %if styleModifier:
         style: { color: ${styleModifier}() ? '#b94a48': ''},
       %endif
-      css:{'striked': striked}"></a></strong>
+      %if strikedProperty:
+      css:{'striked': striked},
+      %endif
+      visible: true"></a></strong>
 
       %if styleModifierPullRight:
       ${styleModifierPullRight()}

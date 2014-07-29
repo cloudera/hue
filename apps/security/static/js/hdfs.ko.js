@@ -112,7 +112,6 @@ var Assist = function (vm, assist) {
     window.location.hash = path;
   });
   self.pagenum = ko.observable(1);
-  self.files = ko.observableArray();
   self.fromLoadMore = false;
   self.fromRebuildTree = false;
 
@@ -347,15 +346,8 @@ var Assist = function (vm, assist) {
       function (data) {
         self.loadParents(data.breadcrumbs);
         if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
-          self.files.removeAll();
           $.each(data.files, function (index, item) {
             self.convertItemToObject(item);
-            self.files.push(ko.mapping.fromJS({
-                'path': item.path,
-                'aclBit': item.rwx.indexOf('+') != -1,
-                'striked': item.striked != null
-              })
-            );
           });
         }
         else {
