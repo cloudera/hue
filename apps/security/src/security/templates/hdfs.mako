@@ -192,7 +192,8 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 <%def name="aclBitPullRight()">
-  <div class="pull-right muted"  data-bind="visible: striked">
+  <div class="pull-right muted rwx" data-bind="text: rwx"></div>
+  <div class="pull-right muted" data-bind="visible: striked">
     This is not visible by current user <span data-bind="text: $root.doAs"></span>
   </div>
   
