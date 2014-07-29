@@ -28,35 +28,36 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="privilege">
-<tr data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }">
+<div data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }">
 
   <!-- ko if: editing() -->
-    <td><select data-bind="options: availablePrivileges, value: privilegeScope"></select></td>
-    <td><input type="text" data-bind="value: $data.serverName" placeholder="serverName"></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.dbName" placeholder="dbName"></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.tableName" placeholder="tableName"></td>
-    <td colspan="2"><input type="text" data-bind="value: $data.URI" placeholder="URI"></td>
-    <td><input type="text" data-bind="value: $data.action" placeholder="action"></td>
-    <td><a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a></td>
-  </div>
+    <input type="text" data-bind="value: $data.dbName" placeholder="dbName">
+    <input type="text" data-bind="value: $data.tableName" placeholder="tableName">
+
+    <input type="text" data-bind="value: $data.URI" placeholder="URI">
+
+    <input type="text" data-bind="value: $data.action" placeholder="action">
+    
+    <input type="text" data-bind="value: $data.serverName" placeholder="serverName">
+    <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+    
+    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   <!-- /ko -->
   
   <!-- ko ifnot: editing() -->
-    <td><span data-bind="text: properties.name"></span></td>
-    <td><span data-bind="text: properties.timestamp"></span></td>
-    <td><a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a></td>
-    <td><span data-bind="text: properties.action"></span></td>
-    <td><span data-bind="text: properties.scope"></span></td>
-    <td><span data-bind="text: properties.table"></span></td>
-    <td><span data-bind="text: properties.URI"></span></td>
-    <td><span data-bind="text: properties.grantor"></span></td>
-    <td><span data-bind="text: properties.server"></span></td>
-    <td>
-      <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
-    </td>
+    <span data-bind="text: properties.name"></span>
+    <span data-bind="text: properties.timestamp"></span>
+    <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a>
+    <span data-bind="text: properties.action"></span>
+    <span data-bind="text: properties.scope"></span>
+    <span data-bind="text: properties.table"></span>
+    <span data-bind="text: properties.URI"></span>
+    <span data-bind="text: properties.grantor"></span>
+    <span data-bind="text: properties.server"></span>
+    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   <!-- /ko -->  
 
-</tr>
+</div>
 </script>
 
 <div class="container-fluid">
@@ -133,8 +134,8 @@ ${ layout.menubar(section='hive') }
 
             </div>
             <div class="span4">
-               <table data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
-               </table>
+               <div data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
+               </div>
             </div>
           </div>
         </div>
@@ -220,8 +221,8 @@ ${ layout.menubar(section='hive') }
             <tr>
                 <td colspan="2"></td>
                 <td colspan="3">
-                  <table data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
-                  </table>
+                  <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
+                  </div>
                 </td>
             </tr>
             <tr>
