@@ -223,7 +223,7 @@ ${ fb_components.menubar() }
     self.isLoading = ko.observable(true);
 
     self.totalPages = ko.computed(function () {
-      return Math.max(Math.floor(self.size() / self.length()), 1);
+      return Math.max(Math.ceil(self.size() / self.length()), 1);
     });
 
     self.upperPage = ko.observable(Math.min(self.totalPages(), 50));
@@ -346,10 +346,7 @@ ${ fb_components.menubar() }
     self.lastPage = function () {
       if (! ($(".last-page").hasClass("disabled"))) {
         var _page = viewModel.totalPages();
-        if (_page > 50) {
-          _page = Math.min(viewModel.totalPages() - viewModel.totalPages()%50 + 1, viewModel.totalPages());
-        }
-        viewModel.page(_page);
+        viewModel.page(viewModel.totalPages());
         viewModel.upperPage(viewModel.totalPages());
         changePage();
       }
@@ -385,9 +382,9 @@ ${ fb_components.menubar() }
     var _hashPage, _hashUpperPage, _resizeTimeout, _fileAreaScrollTimeout, i,
       _hash = location.hash;
 
+    _hashPage = 1;
+    _hashUpperPage = 1;
     if (_hash != "") {
-      _hashPage = 1;
-      _hashUpperPage = 1;
 
       if (_hash.indexOf("-") > -1) {
         _hashPage = _hash.split("-")[0].substr(2) * 1;
@@ -408,9 +405,9 @@ ${ fb_components.menubar() }
       if (_hashUpperPage - _hashPage > viewModel.MAX_ALLOWED_PAGES_PER_REQUEST) {
         _hashUpperPage = _hashPage + viewModel.MAX_ALLOWED_PAGES_PER_REQUEST;
       }
-      viewModel.page(_hashPage);
-      viewModel.upperPage(_hashUpperPage);
     }
+    viewModel.page(_hashPage);
+    viewModel.upperPage(_hashUpperPage);
 
     viewModel.toggleDisables();
 
