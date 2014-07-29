@@ -73,17 +73,10 @@
 
   <script type="text/html" id="node-name-template">
     <div class="node-row" data-bind="
-    %if styleModifier:
-      style: { border: ${styleModifier}() ? '1px dashed #bce8f1': ''},
-    %endif
-    css: {
     %if itemSelected:
-     selected: ${itemSelected},
+     css: { selected: ${itemSelected}}
     %endif
-    %if styleModifier:
-     'with-acl': ${styleModifier}(),
-    %endif
-      dummy: true}">
+    ">
       <i data-bind="
         %if iconClick:
           click: ${iconClick},
