@@ -168,7 +168,7 @@ var Assist = function (vm, assist) {
   };
 
   self.convertItemToObject = function (item) {
-    if (item.path != null) {
+    if (item.path != null && item.name != "." && item.name != "..") {
       var _path = item.path;
       var _parent = _path.substr(0, _path.lastIndexOf("/"));
       if (_parent == "") {
@@ -326,7 +326,11 @@ var Assist = function (vm, assist) {
             path: crumb.url,
             name: crumb.label,
             rwx: "",
-            isDir: true
+            isDir: true,
+            page: {
+              number: -1,
+              num_pages: -1
+            }
           }
           self.convertItemToObject(_item);
         }
@@ -355,7 +359,9 @@ var Assist = function (vm, assist) {
           self.convertItemToObject(data);
         }
         self.getTreeAdditionalDataForPath(_path).loaded = true;
-        self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+        if (data.page != null && data.page.number != null){
+          self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+        }
         if (typeof loadCallback != "undefined"){
           loadCallback(data);
         }
