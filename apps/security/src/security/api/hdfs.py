@@ -54,7 +54,7 @@ def list_hdfs(request, path):
     else:
       json_response = display(request, path)
   except:
-    json_response = HttpResponse(json.dumps({'files': [], 'page': {}, 'status': 403}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    json_response = HttpResponse(json.dumps({'files': [], 'page': {}}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
 
   if json.loads(request.GET.get('isDiffMode', 'false')):
     request.doas = 'hdfs'

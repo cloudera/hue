@@ -116,7 +116,6 @@ var Assist = function (vm, assist) {
   self.pagenum = ko.observable(1);
   self.fromLoadMore = false;
   self.fromRebuildTree = false;
-  self.excludePath = "";
 
   self.acls = ko.observableArray();
   self.originalAcls = ko.observableArray();
@@ -277,17 +276,14 @@ var Assist = function (vm, assist) {
   self.refreshTree = function (force) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     Object.keys(self.treeAdditionalData).forEach(function (path) {
-      if (path.indexOf(self.excludePath) > -1 ){
-        if (typeof force == "boolean" && force) {
+      if (typeof force == "boolean" && force) {
+        self.fetchPath(path);
+      } else {
+        if (self.treeAdditionalData[path].loaded) {
           self.fetchPath(path);
-        } else {
-          if (self.treeAdditionalData[path].loaded) {
-            self.fetchPath(path);
-          }
         }
       }
     });
-    self.excludePath = "";
   }
 
   self.rebuildTree = function (leaf, paths) {
@@ -353,36 +349,28 @@ var Assist = function (vm, assist) {
         'isDiffMode': self.isDiffMode()
       },
       function (data) {
-        if (data.status != null && data.status == 403){
-          self.updatePathProperty(self.growingTree(), _path, "nodes", []);
-          self.excludePath = _path;
-          self.loadData(self.growingTree());
+        self.loadParents(data.breadcrumbs);
+        if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+          $.each(data.files, function (index, item) {
+            self.convertItemToObject(item);
+          });
         }
         else {
-          self.loadParents(data.breadcrumbs);
-          if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
-            $.each(data.files, function (index, item) {
-              self.convertItemToObject(item);
-            });
-          }
-          else {
-            self.convertItemToObject(data);
-          }
-          self.getTreeAdditionalDataForPath(_path).loaded = true;
-          if (data.page != null && data.page.number != null){
-            self.updatePathProperty(self.growingTree(), _path, "page", data.page);
-          }
-          if (typeof loadCallback != "undefined"){
-            loadCallback(data);
-          }
-          else {
-            self.loadData(self.growingTree());
-          }
-          if (typeof optionalPath == "undefined"){
-            self.getAcls();
-          }
+          self.convertItemToObject(data);
         }
-
+        self.getTreeAdditionalDataForPath(_path).loaded = true;
+        if (data.page != null && data.page.number != null){
+          self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+        }
+        if (typeof loadCallback != "undefined"){
+          loadCallback(data);
+        }
+        else {
+          self.loadData(self.growingTree());
+        }
+        if (typeof optionalPath == "undefined"){
+          self.getAcls();
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -461,7 +449,7 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	  self.assist.refreshTree();
+	self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
