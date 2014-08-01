@@ -78,8 +78,8 @@ ${ layout.menubar(section='hive') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Privileges') }</li>
-          <li class="active"><a href="#edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
-          <li><a href="#roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
+          <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
+          <li><a href="javascript:void(0)" data-toggleSection="roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             </br>
             <input type="checkbox" checked> All
@@ -281,53 +281,58 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
 
-<script type="text/javascript" charset="utf-8">
-  var viewModel = new HiveViewModel(${ initial | n,unicode });
-  ko.applyBindings(viewModel);
+  <script type="text/javascript" charset="utf-8">
+    var viewModel = new HiveViewModel(${ initial | n,unicode });
+    ko.applyBindings(viewModel);
 
-  $(document).ready(function () {
-    viewModel.init();
+    $(document).ready(function () {
 
-    function resizeComponents () {
-      $("#path").width($(".tree-toolbar").width() - 64);
-      $("#hdfsTree").height($(window).height() - 260);
-      $(".acl-panel-content").height($(window).height() - 260);
-    }
+      var _initialPath = "";
+      if (window.location.hash != "") {
+        _initialPath = window.location.hash.substr(1);
+      }
+      viewModel.init(_initialPath);
 
-    resizeComponents();
+      function resizeComponents() {
+        $("#path").width($(".tree-toolbar").width() - 64);
+        $("#hdfsTree").height($(window).height() - 260);
+        $(".acl-panel-content").height($(window).height() - 260);
+      }
 
-    function showMainSection(mainSection) {
-    if ($("#" + mainSection).is(":hidden")) {
-      $(".mainSection").hide();
-      $("#" + mainSection).show();
-      highlightMainMenu(mainSection);
-    }
+      resizeComponents();
 
-    logGA(mainSection);
-  }
+      function showMainSection(mainSection) {
+        console.log("show", mainSection)
+        if ($("#" + mainSection).is(":hidden")) {
+          $(".mainSection").hide();
+          $("#" + mainSection).show();
+          highlightMainMenu(mainSection);
+        }
 
-  function highlightMainMenu(mainSection) {
-    $(".nav.nav-list li").removeClass("active");
-    $("a[href='#" + mainSection + "']").parent().addClass("active");
-  }
+        logGA(mainSection);
+      }
 
-  routie({
-    "edit": function () {
-      showMainSection("edit");
-    },
-    "roles": function () {
-      showMainSection("roles");
-    },
-    "privileges": function () {
-      showMainSection("privileges");
-    },
-    "view": function () {
-      showMainSection("view");
-    }
-  });
-  });
+      function highlightMainMenu(mainSection) {
+        $(".nav.nav-list li").removeClass("active");
+        $("a[data-toggleSection='" + mainSection + "']").parent().addClass("active");
+      }
+
+      $("[data-toggleSection]").on("click", function(){
+        showMainSection($(this).attr("data-toggleSection"));
+      });
+
+      var _resizeTimeout = -1;
+      $(window).resize(function(){
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(resizeComponents, 100);
+      });
+
+      window.onpopstate = function() {
+        viewModel.assist.path(window.location.hash.substr(1));
+      };
 
 
+    });
 </script>
 
 ${ commonfooter(messages) | n,unicode }
