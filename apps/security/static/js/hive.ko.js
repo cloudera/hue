@@ -320,6 +320,60 @@ var Assist = function (vm) {
     self.loadData(self.growingTree());
   }
 
+  self.collapseTree = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
+    self.updatePathProperty(self.growingTree(), "__HUEROOT__", "isExpanded", true);
+    self.loadData(self.growingTree());
+  }
+
+  self.collapseOthers = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
+    self.updatePathProperty(self.growingTree(), "__HUEROOT__", "isExpanded", true);
+
+    var _path = self.path();
+    var _crumb = "";
+    for (var i = 0; i < _path.length; i++) {
+      if ((_path[i] === "." && _crumb != "")) {
+        self.updatePathProperty(self.growingTree(), _crumb, "isExpanded", true);
+      }
+      _crumb += _path[i];
+    }
+
+    self.updatePathProperty(self.growingTree(), _path, "isExpanded", true);
+
+    self.loadData(self.growingTree());
+  }
+
+  self.expandTree = function () {
+    self.updateTreeProperty(self.growingTree(), "isExpanded", true);
+    self.loadData(self.growingTree());
+  }
+
+  self.refreshTree = function (force) {
+    self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
+    Object.keys(self.treeAdditionalData).forEach(function (path) {
+      if (typeof force == "boolean" && force) {
+        self.fetchPath(path);
+      } else {
+        if (self.treeAdditionalData[path].loaded) {
+          self.fetchPath(path);
+        }
+      }
+    });
+  }
+
+  self.rebuildTree = function (leaf, paths) {
+    paths.push(leaf.path);
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        if (node.isDir){
+          self.rebuildTree(node, paths);
+        }
+      });
+    }
+    return paths;
+  }
+
   self.setPath = function (obj, toggle) {
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (!obj.isExpanded() && !self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
       if (typeof toggle == "boolean" && toggle) {
@@ -370,31 +424,6 @@ var Assist = function (vm) {
     return leaf;
   }
 
-  self.collapseTree = function () {
-    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
-    self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
-    self.loadData(self.growingTree());
-  }
-
-  self.collapseOthers = function () {
-    self.updateTreeProperty(self.growingTree(), "isExpanded", false);
-    self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
-
-    var _path = self.path();
-    var _crumb = "";
-    for (var i = 0; i < _path.length; i++) {
-      if ((_path[i] === "/" && _crumb != "")) {
-        self.updatePathProperty(self.growingTree(), _crumb, "isExpanded", true);
-      }
-      _crumb += _path[i];
-    }
-
-    self.updatePathProperty(self.growingTree(), _path, "isExpanded", true);
-
-    self.loadData(self.growingTree());
-  }
-
-
   self.fetchHivePath = function () {
     if (self.path().split(".").length < 3) {
       var _path = self.path().replace('.', '/');
@@ -416,6 +445,8 @@ var Assist = function (vm) {
           else if (data.columns && data.columns.length > 0) {
             self.addColumns(data.columns);
           }
+
+          self.getTreeAdditionalDataForPath(self.path()).loaded = true;
 
           vm.list_sentry_privileges_by_authorizable();
         },

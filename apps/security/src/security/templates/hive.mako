@@ -84,11 +84,9 @@ ${ layout.menubar(section='hive') }
             </br>
             <input type="checkbox" checked> All
             </br>
-            <select data-bind="options: $root.selectableHadoopGroups" size="10" multiple="true"></select>
+            <select data-bind="options: $root.selectableHadoopGroups" size="10" multiple="true" style="width: 100%"></select>
           </li>          
-          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Server') }
-            <input type="text" data-bind="value: $root.assist.server" class="input-small" />
-          </li>
+
         </ul>
       </div>
     </div>
@@ -272,6 +270,8 @@ ${ layout.menubar(section='hive') }
 </%def>
 
 ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()',iconModifier=treeIcons) }
+
+##${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked') }
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
