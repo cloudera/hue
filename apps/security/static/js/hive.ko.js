@@ -189,9 +189,10 @@ var Assist = function (vm) {
     return 0;
   }
 
-  self.path = ko.observable('');
-  self.path.subscribe(function () {
-    self.fetchHivePath();
+  self.path = ko.observable("");
+  self.path.subscribe(function (path) {
+    //self.fetchHivePath();
+    window.location.hash = path;
   });
   self.server = ko.observable('');
   self.db = ko.computed(function () {
@@ -225,7 +226,7 @@ var Assist = function (vm) {
 
   self.growingTree = ko.observable(jQuery.extend(true, {}, self.initialGrowingTree));
 
-  self.addDatabases = function (databases) {
+  self.addDatabases = function (path, databases, skipLoading) {
     var _tree = self.growingTree();
     databases.forEach(function (db) {
       var _mainFound = false;
@@ -247,20 +248,22 @@ var Assist = function (vm) {
         _tree.nodes.push(_item);
       }
     });
-    self.loadData(self.growingTree());
+    if (typeof skipLoading == "undefined" || !skipLoading){
+      self.loadData(self.growingTree());
+    }
   }
 
-  self.addTables = function (tables) {
+  self.addTables = function (path, tables, skipLoading) {
     var _branch = self.growingTree();
     _branch.nodes.forEach(function (node) {
-      if (node.path == self.path()) {
+      if (node.path == path) {
         _branch = node;
       }
     });
 
     tables.forEach(function (table) {
       var _mainFound = false;
-      var _path = self.path() + "." + table;
+      var _path = path + "." + table;
       _branch.nodes.forEach(function (node) {
         if (node.path == _path) {
           _mainFound = true;
@@ -279,16 +282,18 @@ var Assist = function (vm) {
         _branch.nodes.push(_item);
       }
     });
-    self.loadData(self.growingTree());
+    if (typeof skipLoading == "undefined" || !skipLoading){
+      self.loadData(self.growingTree());
+    }
   }
 
-  self.addColumns = function (columns) {
+  self.addColumns = function (path, columns, skipLoading) {
     var _branch = self.growingTree();
     _branch.nodes.forEach(function (node) {
-      if (node.path == self.path().split(".")[0]) {
+      if (node.path == path.split(".")[0]) {
 
         node.nodes.forEach(function (inode) {
-          if (inode.path == self.path()) {
+          if (inode.path == path) {
             _branch = inode;
           }
         });
@@ -298,7 +303,7 @@ var Assist = function (vm) {
 
     columns.forEach(function (column) {
       var _mainFound = false;
-      var _path = self.path() + "." + column;
+      var _path = path + "." + column;
       _branch.nodes.forEach(function (node) {
         if (node.path == _path) {
           _mainFound = true;
@@ -317,7 +322,9 @@ var Assist = function (vm) {
         _branch.nodes.push(_item);
       }
     });
-    self.loadData(self.growingTree());
+    if (typeof skipLoading == "undefined" || !skipLoading){
+      self.loadData(self.growingTree());
+    }
   }
 
   self.collapseTree = function () {
@@ -385,6 +392,7 @@ var Assist = function (vm) {
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
+    self.fetchHivePath();
   }
 
   self.togglePath = function (obj) {
@@ -424,31 +432,50 @@ var Assist = function (vm) {
     return leaf;
   }
 
-  self.fetchHivePath = function () {
-    if (self.path().split(".").length < 3) {
-      var _path = self.path().replace('.', '/');
+  self.loadParents = function () {
+    self.fetchHivePath("", function(){
+      var _crumbs = self.path().split(".");
+      self.fetchHivePath(_crumbs[0], function(){
+        if (_crumbs.length > 1){
+          self.fetchHivePath(_crumbs[0] + "." + _crumbs[1], function(){
+            self.loadData(self.growingTree());
+            self.collapseOthers();
+          });
+        }
+      });
+    });
+
+  }
+
+  self.fetchHivePath = function (optionalPath, loadCallback) {
+    var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
+    if (_originalPath.split(".").length < 3) {
+      var _path = _originalPath.replace('.', '/');
 
       var request = {
         url: '/beeswax/api/autocomplete/' + _path,
         dataType: 'json',
         type: 'GET',
         success: function (data) {
+          var _hasCallback = typeof loadCallback != "undefined";
           if (data.databases) {
-            self.addDatabases(data.databases);
+            self.addDatabases(_originalPath, data.databases, _hasCallback);
           }
           else if (data.tables && data.tables.length > 0) {
-            self.addTables(data.tables);
-            var tables = $.map(data.tables, function (table, index) {
-              return self.db() + '.' + table;
-            });
+            self.addTables(_originalPath, data.tables, _hasCallback);
           }
           else if (data.columns && data.columns.length > 0) {
-            self.addColumns(data.columns);
+            self.addColumns(_originalPath, data.columns, _hasCallback);
           }
 
           self.getTreeAdditionalDataForPath(self.path()).loaded = true;
 
-          vm.list_sentry_privileges_by_authorizable();
+          if (_hasCallback){
+            loadCallback(data);
+          }
+          else {
+            vm.list_sentry_privileges_by_authorizable();
+          }
         },
         cache: false
       };
@@ -501,10 +528,18 @@ var HiveViewModel = function (initial) {
     return _users.sort();
   }, self);
 
-  self.init = function () {
+  self.init = function (path) {
     self.fetchUsers();
+    self.assist.path(path);
     self.list_sentry_roles_by_group();
-    self.assist.fetchHivePath();
+
+    if (path != ""){
+      self.assist.loadParents();
+    }
+    else {
+      self.assist.fetchHivePath();
+    }
+
   };
 
   self.removeRole = function (roleName) {
