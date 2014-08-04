@@ -19,12 +19,12 @@
 
 <%def name="render()">
     <div style="padding: 10px;">
-        <div class="pull-right" style="margin:0">
+        <div class="pull-right actionbar-creation">
             %if hasattr(caller, "creation"):
                 ${caller.creation()}
             %endif
         </div>
-        <div style="margin: 0px 0px 10px 0px">
+        <div class="actionbar-actions">
             %if hasattr(caller, "search"):
                 ${caller.search()}
             %else:

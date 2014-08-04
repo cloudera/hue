@@ -43,8 +43,8 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       </%def>
 
       <%def name="actions()">
-        <a class="btn" data-bind="click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
-        <a class="btn" data-bind="click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
+        <a class="btn" data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
+        <a class="btn" data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </%def>
 
       <%def name="creation()">
@@ -54,12 +54,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
     <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
       <div class="span10 offset1 center importBtn pointer">
-        <i class="fa fa-plus-circle waiting"></i>
+        <a href="${ url('search:new_search') }"><i class="fa fa-plus-circle waiting"></i></a>
         <h1 class="emptyMessage">
           ${ _('There are currently no dashboards defined.') }<br/>
-          <a class="btn importBtn" href="${ url('search:new_search') }">
-            <i class="fa fa-plus-circle"></i> ${ _('Dashboard') }
-          </a>
+          <a href="${ url('search:new_search') }">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
         </h1>
       </div>
     </div>

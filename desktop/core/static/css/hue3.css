@@ -1688,3 +1688,11 @@ border-bottom-left-radius: 0px;
 .inline {
   display: inline;
 }
+
+.actionbar-creation {
+  margin: 0;
+}
+
+.actionbar-actions {
+  margin: 0px 0px 10px 0px;
+}
