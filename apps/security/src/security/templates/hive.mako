@@ -140,7 +140,7 @@ ${ layout.menubar(section='hive') }
                 </div>
               </div>
 
-              ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
 
             </div>
             <div class="span4">
@@ -269,7 +269,7 @@ ${ layout.menubar(section='hive') }
   'fa-columns': isColumn()
 </%def>
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()',iconModifier=treeIcons) }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, anchorProperty='path') }
 
 ##${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked') }
 
@@ -295,11 +295,24 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       function resizeComponents() {
         $("#path").width($(".tree-toolbar").width() - 64);
-        $("#hdfsTree").height($(window).height() - 260);
+        $("#expandableTree").height($(window).height() - 260);
         $(".acl-panel-content").height($(window).height() - 260);
       }
 
       resizeComponents();
+
+      $(document).on("rendered.tree", function() {
+        var _path = viewModel.assist.path();
+        if (_path[_path.length-1] == "/"){
+          _path = _path.substr(0, _path.length - 1);
+        }
+        if ($("a.anchor[href^='"+_path+"']").length > 0){
+          $("#expandableTree").animate({
+            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
+          });
+        }
+      });
+
 
       function showMainSection(mainSection) {
         console.log("show", mainSection)

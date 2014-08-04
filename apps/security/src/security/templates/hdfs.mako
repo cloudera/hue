@@ -119,7 +119,7 @@ ${ layout.menubar(section='hdfs') }
                 </div>
               </div>
 
-              ${ tree.render(id='hdfsTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
@@ -245,7 +245,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     function resizeComponents () {
       $("#path").width($(".tree-toolbar").width() - 64);
-      $("#hdfsTree").height($(window).height() - 260);
+      $("#expandableTree").height($(window).height() - 260);
       $(".acl-panel-content").height($(window).height() - 260);
     }
 
@@ -257,8 +257,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         _path = _path.substr(0, _path.length - 1);
       }
       if ($("a.anchor[href^='"+_path+"']").length > 0){
-        $("#hdfsTree").animate({
-          scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#hdfsTree").scrollTop() - $("#hdfsTree").position().top - 4)+"px"
+        $("#expandableTree").animate({
+          scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
         });
       }
     });
