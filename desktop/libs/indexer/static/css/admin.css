@@ -161,3 +161,7 @@ h1.emptyMessage {
   color: #000;
   border: 1px dashed #CCCCCC;
 }
+
+.actionbar-actions {
+  min-height: 20px;
+}

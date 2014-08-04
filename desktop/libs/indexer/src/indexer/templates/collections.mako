@@ -150,7 +150,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
     <div data-bind="with: manage">
       <%actionbar:render>
         <%def name="search()">
-          <div data-bind="visible: collections().length > 0 && !isLoading()">
+          <div data-bind="visible: collections().length > 0 && !isLoading()" style="min-height: 20px">
             <input type="text" data-bind="filter: { 'list': collections, 'filteredList': filteredCollections, 'test': filterTest }"
                 placeholder="${_('Filter indexes...')}" class="input-xlarge search-query">
             <button data-bind="clickBubble: false, disable: selectedCloudCollections().length == 0" class="btn toolbarBtn"
@@ -168,7 +168,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
 
       <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
         <div class="span10 offset1 center importBtn" style="cursor: pointer">
-          <i class="fa fa-plus-circle waiting"></i>
+          <a href="#create"><i class="fa fa-plus-circle waiting"></i></a>
           <h1 class="emptyMessage">${ _('There are currently no indexes defined.') }<br/><a href="#create">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
         </div>
       </div>

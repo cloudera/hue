@@ -60,4 +60,15 @@
 .collection-actions {
    cursor: pointer;
    margin: 10px 10px 0 0;
- }
+}
+
+.waiting {
+  font-size: 196px;
+  color: #DDD;
+}
+
+h1.emptyMessage {
+  margin-top: 50px;
+  color: #BBB;
+  line-height: 60px;
+}
