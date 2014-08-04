@@ -84,9 +84,6 @@ var Privilege = function (vm, privilege) {
       }
   });  
   
-  self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
-  self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
-
   self.remove = function (privilege) {
     privilege.status('deleted');
   }
@@ -519,6 +516,9 @@ var Assist = function (vm) {
 var HiveViewModel = function (initial) {
   var self = this;
 
+  self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
+  self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
+
   // Models
   self.roles = ko.observableArray();
   self.availableHadoopGroups = ko.mapping.fromJS(initial.hadoop_groups);
@@ -534,7 +534,6 @@ var HiveViewModel = function (initial) {
     self.assist.fetchHivePath();
   });
   self.availableHadoopUsers = ko.observableArray();
-  self.availableHadoopGroups = ko.observableArray();
 
   self.selectableHadoopUsers = ko.computed(function () {
     var _users = ko.utils.arrayMap(self.availableHadoopUsers(), function (user) {
