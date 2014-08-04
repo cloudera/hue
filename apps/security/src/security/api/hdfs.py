@@ -53,8 +53,10 @@ def list_hdfs(request, path):
       json_response = listdir_paged(request, path)
     else:
       json_response = display(request, path)
-  except:
-    json_response = HttpResponse(json.dumps({'files': [], 'page': {}}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+  except IOError:
+    json_response = HttpResponse(json.dumps({'files': [], 'page': {}, 'error': 'FILE_NOT_FOUND'}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+  except Exception, e:
+    json_response = HttpResponse(json.dumps({'files': [], 'page': {}, 'error': e.message}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
 
   if json.loads(request.GET.get('isDiffMode', 'false')):
     request.doas = 'hdfs'
