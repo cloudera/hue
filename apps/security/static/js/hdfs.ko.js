@@ -454,7 +454,7 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	self.assist.refreshTree();
+	  self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
