@@ -29,6 +29,9 @@ ko.bindingHandlers.select2 = {
           name: options.update
         });
       }
+      if (options.type == "action" && viewModel.availableActions().indexOf(options.update) == -1) {
+        viewModel.availableActions.push(options.update);
+      }
     }
     $(element)
         .select2(options)
@@ -51,6 +54,9 @@ ko.bindingHandlers.select2 = {
                 viewModel.availableHadoopGroups.push({
                   name: _newVal
                 });
+              }
+              if (_type == "action") {
+                viewModel.availableActions.push(_newVal);
               }
               $(element).select2("val", _newVal, true);
               $(element).select2("close");

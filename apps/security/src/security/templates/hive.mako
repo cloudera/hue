@@ -39,7 +39,7 @@ ${ layout.menubar(section='hive') }
     <input type="text" data-bind="value: $data.URI" placeholder="URI">
 
     ## <input type="text" class="input-small" data-bind="value: $data.action" placeholder="action">
-    <select data-bind="options: $data.availableActions, select2: { update: $data.action, type: 'user'}" style="width: 100px"></select>
+    <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
     
     <div>
       <label class="checkbox inline-block">
@@ -50,13 +50,14 @@ ${ layout.menubar(section='hive') }
 
     <span data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: $data.server" placeholder="serverName">
-      <select data-bind="options: availablePrivileges, value: privilegeScope"></select>
+      <select data-bind="options: $root.availablePrivileges, value: privilegeScope"></select>
     </span>
     
     <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   <!-- /ko -->
   
   <!-- ko ifnot: editing() -->
+  lala
     <span data-bind="text: properties.name"></span>
     <span data-bind="text: properties.timestamp"></span>
     <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a>
@@ -313,9 +314,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
       });
 
-
       function showMainSection(mainSection) {
-        console.log("show", mainSection)
         if ($("#" + mainSection).is(":hidden")) {
           $(".mainSection").hide();
           $("#" + mainSection).show();
@@ -343,7 +342,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       window.onpopstate = function() {
         viewModel.assist.path(window.location.hash.substr(1));
       };
-
 
     });
 </script>
