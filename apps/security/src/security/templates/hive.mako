@@ -50,7 +50,8 @@ ${ layout.menubar(section='hive') }
 
     <span data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: $data.server" placeholder="serverName">
-      <select data-bind="options: $root.availablePrivileges, value: privilegeScope"></select>
+##      <select data-bind="options: $root.availablePrivileges, value: privilegeScope"></select>
+      <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </span>
     
     <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
@@ -160,23 +161,19 @@ ${ layout.menubar(section='hive') }
 
         <div class="card-body">
           <%actionbar:render>
-		    <%def name="search()">
-		      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
-		    </%def>
+            <%def name="search()">
+              <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
+            </%def>
 
-		    <%def name="actions()">
-              <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-                <button class="btn toolbarBtn"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-              </div>
-		      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-		        <button class="btn toolbarBtn"><i class="fa fa-times"></i> ${ _('Delete') }</button>
-		      </div>
-		    </%def>
+            <%def name="actions()">
+              <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
+              <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+            </%def>
 
-		    <%def name="creation()">
-		      <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
-		    </%def>
-		  </%actionbar:render>
+            <%def name="creation()">
+              <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+            </%def>
+          </%actionbar:render>
 
           <div data-bind="with: $root.role, visible: showCreateRole">
             <div class="span1">
@@ -200,26 +197,22 @@ ${ layout.menubar(section='hive') }
               <i class="fa fa-save"></i>
             </button>
           </div>
-          <br/>
-          <br/>
-          <br/>
-      <div>
-        <table>
-          <theader>
-            <th style="width:1%"><div class="hueCheckbox selectAll fa"></div></th>
-            <th style="width:3%"></th>
-            <th style="width:20%">${ _('Name') }</th>
-            <th style="width:67%">${ _('Groups') }</th>
-            <th style="width:10%">${ _('Grantor Principal') }</th>
-          </theader>
+        <table class="card-marginbottom">
+          <thead>
+            <th width="1%"><div data-bind="click: $root.selectAllRoles, css: {hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected}"></div></th>
+            <th width="2%"></th>
+            <th width="20%">${ _('Name') }</th>
+            <th width="57%">${ _('Groups') }</th>
+            <th width="20%">${ _('Grantor Principal') }</th>
+          </thead>
           <tbody data-bind="foreach: $root.roles">
             <tr>
-              <td>
-                <input type="checkbox" data-bind="click: $root.role.remove"></input>
+              <td class="center" data-bind="click: handleSelect" style="cursor: default">
+                <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
               </td>
-              <td>
+              <td class="center">
                 <a href="javascript:void(0);">
-                  <i class="fa fa-2x" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }""></i>
+                  <i class="fa" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                 </a>
               </td>
               <td data-bind="text: name"></td>
@@ -257,7 +250,6 @@ ${ layout.menubar(section='hive') }
             </tr>
         </tbody>
         </table>
-      </div>        
         </div>
       </div>
 

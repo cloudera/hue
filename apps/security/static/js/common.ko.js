@@ -32,6 +32,9 @@ ko.bindingHandlers.select2 = {
       if (options.type == "action" && viewModel.availableActions().indexOf(options.update) == -1) {
         viewModel.availableActions.push(options.update);
       }
+      if (options.type == "scope" && viewModel.availablePrivileges().indexOf(options.update) == -1) {
+        viewModel.availablePrivileges.push(options.update);
+      }
     }
     $(element)
         .select2(options)
@@ -57,6 +60,9 @@ ko.bindingHandlers.select2 = {
               }
               if (_type == "action") {
                 viewModel.availableActions.push(_newVal);
+              }
+              if (_type == "scope") {
+                viewModel.availablePrivileges.push(_newVal);
               }
               $(element).select2("val", _newVal, true);
               $(element).select2("close");

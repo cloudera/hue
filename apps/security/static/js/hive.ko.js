@@ -93,6 +93,10 @@ var Role = function (vm, role) {
   var self = this;
 
   self.name = ko.observable(typeof role.name != "undefined" && role.name != null ? role.name : "");
+  self.selected = ko.observable(false);
+  self.handleSelect = function (row, e) {
+    self.selected(!self.selected());
+  }
   self.grantorPrincipal = ko.observable(typeof role.grantorPrincipal != "undefined" && role.grantorPrincipal != null ? role.grantorPrincipal : "");
   self.groups = ko.observableArray();
   $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function (index, group) {
@@ -548,6 +552,42 @@ var HiveViewModel = function (initial) {
     });
     return _users.sort();
   }, self);
+
+
+  self.selectAllRoles = function () {
+    self.allRolesSelected(!self.allRolesSelected());
+    ko.utils.arrayForEach(self.roles(), function (role) {
+      role.selected(self.allRolesSelected());
+    });
+    return true;
+  };
+
+  self.allRolesSelected = ko.observable(false);
+
+  self.selectedRoles = ko.computed(function () {
+    return ko.utils.arrayFilter(self.roles(), function (role) {
+      return role.selected();
+    });
+  }, self);
+
+  self.selectedRole = ko.computed(function () {
+    return self.selectedRoles()[0];
+  }, self);
+
+  self.deleteSelectedRoles = function () {
+    ko.utils.arrayForEach(self.selectedRoles(), function (role) {
+      role.remove(role);
+    });
+  };
+
+  self.expandSelectedRoles = function () {
+    if (self.selectedRoles().length == 0){
+      self.selectAllRoles();
+    }
+    ko.utils.arrayForEach(self.selectedRoles(), function (role) {
+      self.list_sentry_privileges_by_role(role)
+    });
+  };
 
   self.init = function (path) {
     self.fetchUsers();
