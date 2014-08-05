@@ -160,101 +160,115 @@ ${ layout.menubar(section='hive') }
         </h1>
 
         <div class="card-body">
-          <%actionbar:render>
-            <%def name="search()">
-              <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
-            </%def>
-
-            <%def name="actions()">
-              <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-              <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles"><i class="fa fa-times"></i> ${ _('Delete') }</button>
-            </%def>
-
-            <%def name="creation()">
-              <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
-            </%def>
-          </%actionbar:render>
-
-          <div data-bind="with: $root.role, visible: showCreateRole">
-            <div class="span1">
-              Name
-              <input type="text" class="input-small" data-bind="value: $data.name"></input>
-            </div>
-            <div class="span7">
-              Privileges
-              <div data-bind="template: { name: 'privilege', foreach: privileges }">
-              </div>
-              <a href="javascript: void(0)" data-bind="click: addPrivilege">
-                <i class="fa fa-plus"></i>
-              </a>
-            </div>
-            <div class="span4">
-              Groups
-              <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
-            </div>
-            <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-                data-bind="click: $root.role.create">
-              <i class="fa fa-save"></i>
-            </button>
+          <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
+            <i class="fa fa-plus-circle waiting"></i>
+            <h1 class="emptyMessage">${ _('There are currently no roles defined.') }<br/><a href="javascript: void(0)">${ _('Click here to add') }</a> ${ _('one.') }</h1>
           </div>
-        <table class="card-marginbottom">
-          <thead>
-            <th width="1%"><div data-bind="click: $root.selectAllRoles, css: {hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected}"></div></th>
-            <th width="2%"></th>
-            <th width="20%">${ _('Name') }</th>
-            <th width="57%">${ _('Groups') }</th>
-            <th width="20%">${ _('Grantor Principal') }</th>
-          </thead>
-          <tbody data-bind="foreach: $root.roles">
-            <tr>
-              <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
-              </td>
-              <td class="center">
-                <a href="javascript:void(0);">
-                  <i class="fa" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
-                </a>
-              </td>
-              <td data-bind="text: name"></td>
-              <td>
-                <span data-bind="foreach: groups">
-                  <a href="/useradmin/groups"><span data-bind="text: $data"></span></a>
-                </span>
-              </td>
-              <td>
-                <a href=""><span data-bind="text: grantorPrincipal"></span></a>
-              </td>
-            </tr>
-            <tr>
+          <div class="clearfix" data-bind="visible: $root.roles().length == 0"></div>
+          <div data-bind="visible: $root.roles().length > 0">
+            <%actionbar:render>
+              <%def name="search()">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
+              </%def>
+
+              <%def name="actions()">
+                <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
+                <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+              </%def>
+
+              <%def name="creation()">
+                <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+              </%def>
+            </%actionbar:render>
+          </div>
+
+          <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0">
+            <thead>
+              <th width="1%"><div data-bind="click: $root.selectAllRoles, css: {hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected}"></div></th>
+              <th width="2%"></th>
+              <th width="20%">${ _('Name') }</th>
+              <th width="57%">${ _('Groups') }</th>
+              <th width="20%">${ _('Grantor Principal') }</th>
+            </thead>
+            <tbody data-bind="foreach: $root.roles">
+              <tr>
+                <td class="center" data-bind="click: handleSelect" style="cursor: default">
+                  <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+                </td>
+                <td class="center">
+                  <a href="javascript:void(0);">
+                    <i class="fa" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
+                  </a>
+                </td>
+                <td data-bind="text: name"></td>
+                <td>
+                  <span data-bind="foreach: groups">
+                    <a href="/useradmin/groups"><span data-bind="text: $data"></span></a>
+                  </span>
+                </td>
+                <td>
+                  <a href=""><span data-bind="text: grantorPrincipal"></span></a>
+                </td>
+              </tr>
+              <tr>
+                  <td colspan="2"></td>
+                  <td colspan="3">
+                    <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
+                    </div>
+                  </td>
+              </tr>
+              <tr>
                 <td colspan="2"></td>
                 <td colspan="3">
-                  <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
-                  </div>
+                  <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
+                    <i class="fa fa-plus"></i>
+                  </a>
                 </td>
-            </tr>
-            <tr>
-              <td colspan="2"></td>
-              <td colspan="3">
-                <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
-                  <i class="fa fa-plus"></i>
-                </a>
-              </td>
-            </tr>
-            <tr data-bind="visible: privilegesChanged().length">
-              <td colspan="5">
-                <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-                  data-bind="click: $root.role.savePrivileges">
-                  <i class="fa fa-save"></i>
-                </button>
-              </td>
-            </tr>
-        </tbody>
-        </table>
+              </tr>
+              <tr data-bind="visible: privilegesChanged().length">
+                <td colspan="5">
+                  <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
+                    data-bind="click: $root.role.savePrivileges">
+                    <i class="fa fa-save"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
     </div> <!-- /span10 -->
 </div>
+
+
+
+<div id="createRoleModal" class="modal hide fade" role="dialog">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Add role') }</h3>
+  </div>
+  <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
+    <p>
+      Name <input type="text" class="input-small" data-bind="value: $data.name" />
+      <br/>
+      Privileges
+      <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
+      <a href="javascript: void(0)" data-bind="click: addPrivilege">
+        <i class="fa fa-plus"></i>
+      </a>
+      <br/>
+      Groups
+      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
+
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Add role') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
+  </div>
+</div>
+
 
 <%def name="treeIcons()">
   'fa-database': isDb(),
@@ -306,6 +320,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
       });
 
+      $(document).on("created.role", function(){
+        $("#createRoleModal").modal("hide");
+      });
+
       function showMainSection(mainSection) {
         if ($("#" + mainSection).is(":hidden")) {
           $(".mainSection").hide();
@@ -334,6 +352,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       window.onpopstate = function() {
         viewModel.assist.path(window.location.hash.substr(1));
       };
+
+      $("#createRoleModal").modal({
+        show: false
+      });
 
     });
 </script>
