@@ -26,11 +26,13 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
-
 <script type="text/html" id="privilege">
-<div data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }">
+<div data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
+    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
+      <i class="fa fa-times" data-bind="click: remove"></i>
+    </a>
     ## todo, role name
     <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/> 
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
@@ -40,36 +42,31 @@ ${ layout.menubar(section='hive') }
 
     ## <input type="text" class="input-small" data-bind="value: $data.action" placeholder="action">
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
-    
-    <div>
-      <label class="checkbox inline-block">
-        <i class="fa fa-cog"></i>
-        <input type="checkbox" data-bind="checked: showAdvanced"/>
-      </label>    
+
+    &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true);}, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
+
+    <div class="acl-block-section" data-bind="visible: showAdvanced">
+      <input type="text" data-bind="value: $data.server" placeholder="serverName">
+      <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </div>
 
-    <span data-bind="visible: showAdvanced">
-      <input type="text" data-bind="value: $data.server" placeholder="serverName">
-##      <select data-bind="options: $root.availablePrivileges, value: privilegeScope"></select>
-      <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
-    </span>
-    
-    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
   <!-- /ko -->
   
   <!-- ko ifnot: editing() -->
-  lala
-    <span data-bind="text: properties.name"></span>
-    <span data-bind="text: properties.timestamp"></span>
-    <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a>
+    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
+      <i class="fa fa-times" data-bind="click: remove"></i>
+    </a>
+
+    <strong data-bind="text: properties.name"></strong><br/>
+    <em class="muted" data-bind="text: moment(properties.timestamp()).fromNow()"></em><br/>
+    ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a><br/>
     <span data-bind="text: properties.action"></span>
     <span data-bind="text: properties.scope"></span>
     <span data-bind="text: properties.table"></span>
     <span data-bind="text: properties.URI"></span>
     <span data-bind="text: properties.grantor"></span>
     <span data-bind="text: properties.server"></span>
-    <a href="javascript:void(0)"><i class="fa fa-minus" data-bind="click: remove"></i></a>
-  <!-- /ko -->  
+  <!-- /ko -->
 
 </div>
 </script>
@@ -86,7 +83,7 @@ ${ layout.menubar(section='hive') }
             </br>
             <input type="checkbox" checked> All
             </br>
-            <select data-bind="options: $root.selectableHadoopGroups" size="10" multiple="true" style="width: 100%"></select>
+            <select data-bind="options: $root.selectableHadoopGroups, select2: { update: $data.action, type: 'action'}" size="10" multiple="true" style="width: 100%"></select>
           </li>          
 
         </ul>
@@ -145,9 +142,13 @@ ${ layout.menubar(section='hive') }
               ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
 
             </div>
-            <div class="span4">
-               <div data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
-               </div>
+            <div class="span4 acl-panel">
+              <div class="acl-panel-content">
+                <h4>${ _('Privileges') }</h4>
+                <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
+                <div data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -187,20 +188,21 @@ ${ layout.menubar(section='hive') }
               <th width="1%"><div data-bind="click: $root.selectAllRoles, css: {hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected}"></div></th>
               <th width="2%"></th>
               <th width="20%">${ _('Name') }</th>
-              <th width="57%">${ _('Groups') }</th>
+              <th width="54%">${ _('Groups') }</th>
               <th width="20%">${ _('Grantor Principal') }</th>
+              <th width="3%"></th>
             </thead>
             <tbody data-bind="foreach: $root.roles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                  <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+                  <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
                 </td>
                 <td class="center">
                   <a href="javascript:void(0);">
                     <i class="fa" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
-                <td data-bind="text: name"></td>
+                <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
                 <td>
                   <span data-bind="foreach: groups">
                     <a href="/useradmin/groups"><span data-bind="text: $data"></span></a>
@@ -209,28 +211,26 @@ ${ layout.menubar(section='hive') }
                 <td>
                   <a href=""><span data-bind="text: grantorPrincipal"></span></a>
                 </td>
+                <td>
+                  <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn btn-primary"
+                    data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length">
+                    <i class="fa fa-save"></i>
+                  </button>
+                </td>
               </tr>
               <tr>
                   <td colspan="2"></td>
-                  <td colspan="3">
+                  <td colspan="4">
                     <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
                     </div>
                   </td>
               </tr>
               <tr>
                 <td colspan="2"></td>
-                <td colspan="3">
-                  <a href="javascript: void(0)" data-bind="click: addPrivilege, visible: $data.showPrivileges">
+                <td colspan="4">
+                  <div class="acl-block pointer add-acl" data-bind="click: addPrivilege, visible: $data.showPrivileges">
                     <i class="fa fa-plus"></i>
-                  </a>
-                </td>
-              </tr>
-              <tr data-bind="visible: privilegesChanged().length">
-                <td colspan="5">
-                  <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn"
-                    data-bind="click: $root.role.savePrivileges">
-                    <i class="fa fa-save"></i>
-                  </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -259,7 +259,7 @@ ${ layout.menubar(section='hive') }
       </a>
       <br/>
       Groups
-      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups" size="5" multiple="true"></select>
+      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 120px"></select>
 
     </p>
   </div>
@@ -278,8 +278,6 @@ ${ layout.menubar(section='hive') }
 
 ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, anchorProperty='path') }
 
-##${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked') }
-
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
@@ -287,6 +285,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/security/static/js/common.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript" charset="utf-8">
     var viewModel = new HiveViewModel(${ initial | n,unicode });
@@ -303,7 +302,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       function resizeComponents() {
         $("#path").width($(".tree-toolbar").width() - 64);
         $("#expandableTree").height($(window).height() - 260);
-        $(".acl-panel-content").height($(window).height() - 260);
+        $(".acl-panel-content").height($(window).height() - 240);
       }
 
       resizeComponents();
