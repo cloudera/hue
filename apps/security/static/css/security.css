@@ -87,6 +87,22 @@
   margin-left: 6px;
 }
 
+.acl-block-airy {
+  padding: 6px;
+}
+
+.acl-block-airy input {
+  margin-bottom: 0;
+}
+
+.acl-block-section {
+  margin-top: 10px;
+}
+
+.acl-block-section input {
+  margin-left: 14px;
+}
+
 .add-acl {
   padding: 5px;
   text-align: center;

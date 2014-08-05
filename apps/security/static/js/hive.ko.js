@@ -452,6 +452,7 @@ var Assist = function (vm) {
             }
             else {
               self.collapseOthers();
+              vm.list_sentry_privileges_by_authorizable();
             }
           });
         }
@@ -462,6 +463,7 @@ var Assist = function (vm) {
           }
           else {
             self.collapseOthers();
+            vm.list_sentry_privileges_by_authorizable();
           }
         }
       });
