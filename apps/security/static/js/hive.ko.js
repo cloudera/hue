@@ -75,17 +75,21 @@ var Privilege = function (vm, privilege) {
 	owner: self
   });
   self.privilegeScope = ko.computed(function() {
-      if (self.tableName().length > 0) {
-        return 'TABLE';	
-      } else if (self.dbName().length > 0) {
-    	return 'DATABASE';
-      } else {
-    	return 'SERVER';
-      }
+    if (self.tableName().length > 0) {
+      return 'TABLE';	
+    } else if (self.dbName().length > 0) {
+  	  return 'DATABASE';
+    } else {
+      return 'SERVER';
+    }
   });  
   
   self.remove = function (privilege) {
-    privilege.status('deleted');
+	if (privilege.status() == 'new') {
+	  privilege.status('alreadydeleted');
+	} else {
+      privilege.status('deleted');
+	}
   }
 }
 
