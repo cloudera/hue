@@ -52,7 +52,7 @@ ${ components.menubar() }
         <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
         <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-        <a class="btn btn-status btn-danger disable-feedback" data-value="killed">${ _('Killed') }</a>
+        <a class="btn btn-status btn-inverse disable-feedback" data-value="killed">${ _('Killed') }</a>
       </span>
     </%def>
   </%actionbar:render>
