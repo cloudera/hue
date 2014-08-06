@@ -195,7 +195,7 @@ ${ layout.menubar(section='hive') }
                   <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
                 </td>
                 <td class="center">
-                  <a href="javascript:void(0);">
+                  <a href="javascript:void(0);" title="${ _('Show privileges') }">
                     <i class="fa fa-2x fa-caret" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
@@ -221,7 +221,7 @@ ${ layout.menubar(section='hive') }
               <tr>
                 <td colspan="2"></td>
                 <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: addPrivilege, visible: $data.showPrivileges">
+                  <div class="acl-block pointer add-acl" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }">
                     <i class="fa fa-plus"></i>
                   </div>
                 </td>
@@ -229,8 +229,11 @@ ${ layout.menubar(section='hive') }
               <tr>
                 <td colspan="2"></td>
                 <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0">
-                    <i class="fa fa-save"></i>
+                  <div class="acl-block pointer add-acl" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }">
+                    <i class="fa fa-undo"></i>
+                  </div>
+                  <div class="acl-block pointer add-acl" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }">
+                    <i class="fa fa-save"></i>                    
                   </div>
                 </td>
               </tr>              
