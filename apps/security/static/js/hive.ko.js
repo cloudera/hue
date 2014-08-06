@@ -553,10 +553,11 @@ var HiveViewModel = function (initial) {
   }, self);
 
   self.selectableHadoopGroups = ko.computed(function () {
-    var _users = ko.utils.arrayMap(self.availableHadoopGroups(), function (group) {
+    var _groups = ko.utils.arrayMap(self.availableHadoopGroups(), function (group) {
       return group.name;
     });
-    return _users.sort();
+    _groups.push("");
+    return _groups.sort();
   }, self);
   
   self.selectAllRoles = function () {
@@ -672,7 +673,7 @@ var HiveViewModel = function (initial) {
       'tableName': privilege.table,
       'URI': privilege.URI,
       'action': privilege.action,
-      'timestamp': privilege.timestamp,
+      'timestamp': privilege.timestamp
     });
     return _privilege;
   }
