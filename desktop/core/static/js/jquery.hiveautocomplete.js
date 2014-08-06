@@ -46,9 +46,9 @@
 
     // creates autocomplete popover
     if ($("#jHueHiveAutocomplete").length == 0) {
-      $("<div>").attr("id", "jHueHiveAutocomplete").addClass("popover")
-          .addClass("bottom").attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
-          .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p><ul class="unstyled"></ul></p></div></div>')
+      $("<div>").attr("id", "jHueHiveAutocomplete").addClass("jHueAutocomplete popover")
+          .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
+          .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
           .appendTo($("body"));
     }
 
@@ -113,7 +113,7 @@
     }
 
     $(window).on("scroll", function(){
-      $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
+      $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
     });
 
     var _hdfsAutocompleteSelectedIndex = -1;
@@ -227,7 +227,7 @@
             _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
           });
 
-            $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
+            $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
             $("#jHueHiveAutocomplete").find("ul").empty().html(_currentFiles.join(""));
             $("#jHueHiveAutocomplete").find("li").on("click", function (e) {
               smartTooltipMaker();
@@ -266,8 +266,7 @@
                 }
                 $("#jHueHiveAutocomplete").hide();
                 _hdfsAutocompleteSelectedIndex = -1;
-                //_this.options.onEnter(_el);
-                _this.options.onPathChange(_el.val());
+                _this.options.onEnter(_el);
               }
 
             });
