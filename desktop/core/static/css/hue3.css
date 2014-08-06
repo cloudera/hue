@@ -1702,18 +1702,33 @@ border-bottom-left-radius: 0px;
 }
 
 
-#jHueHdfsAutocomplete ul li, #jHueHiveAutocomplete ul li {
-  cursor: pointer;
+.jHueAutocomplete {
+   -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      border-radius: 0;
+
+  -webkit-box-shadow: none;
+     -moz-box-shadow: none;
+          box-shadow: none;
+  border-top: none;
 }
 
-#jHueHdfsAutocomplete ul li:hover, #jHueHdfsAutocomplete ul li.active, #jHueHiveAutocomplete ul li:hover, #jHueHiveAutocomplete ul li.active {
-  color: #FFFFFF;
-  background: #338BB8;
-}
-
-#jHueHdfsAutocomplete .popover-content, #jHueHiveAutocomplete .popover-content {
+.jHueAutocomplete .popover-content {
+  padding: 0;
   max-height: 200px;
   overflow-y: auto;
+}
+
+.jHueAutocomplete .popover-content ul li {
+  cursor: pointer;
+  margin: 3px;
+  padding: 2px;
+}
+
+
+.jHueAutocomplete .popover-content ul li:hover, .jHueAutocomplete .popover-content ul li.active {
+  color: #FFFFFF;
+  background: #338BB8;
 }
 
 .fa-1halfx {

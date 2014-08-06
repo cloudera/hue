@@ -46,8 +46,8 @@
 
     // creates autocomplete popover
     if ($("#jHueHdfsAutocomplete").length == 0) {
-      $("<div>").attr("id", "jHueHdfsAutocomplete").addClass("popover")
-          .addClass("bottom").attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
+      $("<div>").attr("id", "jHueHdfsAutocomplete").addClass("jHueAutocomplete popover")
+          .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
           .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p><ul class="unstyled"></ul></p></div></div>')
           .appendTo($("body"));
     }
@@ -113,7 +113,7 @@
     }
 
     $(window).on("scroll", function(){
-      $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
+      $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
     });
 
     var _hdfsAutocompleteSelectedIndex = -1;
@@ -211,7 +211,7 @@
             }
           });
           window.setTimeout(function () {
-            $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight()).css("left", _el.offset().left).width(_el.width());
+            $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
             $("#jHueHdfsAutocomplete").find("ul").empty().html(_currentFiles.join(""));
             $("#jHueHdfsAutocomplete").find("li").on("click", function (e) {
               smartTooltipMaker();
