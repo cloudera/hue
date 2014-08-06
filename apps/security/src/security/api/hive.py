@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import time
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -59,7 +60,8 @@ def _to_sentry_privilege(privilege):
       'dbName': privilege['dbName'],
       'tableName': privilege['tableName'],
       'URI': privilege['URI'],
-      'action': privilege['action']
+      'action': privilege['action'],
+      'createTime': privilege['timestamp']
   }  
 
 
@@ -71,12 +73,16 @@ def _hive_add_privileges(user, role, privileges):
     for privilege in privileges:
       if privilege['status'] not in ('deleted',):
         api.alter_sentry_role_grant_privilege(role['name'], _to_sentry_privilege(privilege))
-        # Mocked until Sentry API returns the info!
+        # Mocked until Sentry API returns the info. Not used currently as we refresh the whole role.
         _privileges.append({
-            "timestamp": 1406160830864, "database": privilege.get('dbName', ''), "action": privilege.get('action', ''),
-            "scope": privilege.get('privilegeScope', ''), "table": privilege.get('tableName', ''),
-            "URI": privilege.get('URI', ''), "grantor": user.username,
-            "server": privilege.get('serverName', '')
+            'timestamp': int(time.time()),
+            'grantor': user.username,
+            'database': privilege.get('dbName'),
+            'action': privilege.get('action'),
+            'scope': privilege.get('privilegeScope'),
+            'table': privilege.get('tableName'),
+            'URI': privilege.get('URI'),            
+            'server': privilege.get('serverName')
         })
 
     return _privileges
@@ -119,7 +125,7 @@ def save_privileges(request):
     
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
-      print _drop_sentry_privilege(request.user, role, privilege)
+      _drop_sentry_privilege(request.user, role, privilege)
     
     # todo
 #    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']

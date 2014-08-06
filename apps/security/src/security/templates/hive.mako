@@ -40,7 +40,6 @@ ${ layout.menubar(section='hive') }
     <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
     <input type="text" data-bind="value: $data.URI" placeholder="URI">
 
-    ## <input type="text" class="input-small" data-bind="value: $data.action" placeholder="action">
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
     &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true);}, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
@@ -57,14 +56,14 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-times" data-bind="click: remove"></i>
     </a>
 
-    <em class="muted" data-bind="text: moment(properties.timestamp()).fromNow()"></em><br/>
-    ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a><br/>
-    <span data-bind="text: properties.action"></span>
-    <span data-bind="text: properties.scope"></span>
-    <span data-bind="text: properties.table"></span>
-    <span data-bind="text: properties.URI"></span>
-    <span data-bind="text: properties.grantor"></span>
-    <span data-bind="text: properties.server"></span>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
+    ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
+    <span data-bind="text: action"></span>
+    <span data-bind="text: privilegeScope"></span>
+    <span data-bind="text: tableName"></span>
+    <span data-bind="text: URI"></span>
+    <span data-bind="text: grantor"></span>
+    <span data-bind="text: serverName"></span>
   <!-- /ko -->
 
 </div>
@@ -172,8 +171,8 @@ ${ layout.menubar(section='hive') }
               </%def>
 
               <%def name="actions()">
-                <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-                <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+                <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
+                <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
               </%def>
 
               <%def name="creation()">
