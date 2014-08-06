@@ -27,7 +27,7 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
 <script type="text/html" id="privilege">
-<div data-bind="visible: status() != 'deleted', click: function() { if (! editing()) { editing(true); } }" class="acl-block acl-block-airy">
+<div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted', click: function() { if (! editing()) { editing(true); } }" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
     <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
@@ -212,18 +212,14 @@ ${ layout.menubar(section='hive') }
                   <a href=""><span data-bind="text: grantorPrincipal"></span></a>
                 </td>
                 <td>
-                  <button type="button" rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Save') }" class="btn btn-primary"
-                    data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length">
-                    <i class="fa fa-save"></i>
-                  </button>
                 </td>
               </tr>
               <tr>
-                  <td colspan="2"></td>
-                  <td colspan="4">
-                    <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
-                    </div>
-                  </td>
+                <td colspan="2"></td>
+                <td colspan="4">
+                  <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td colspan="2"></td>
@@ -233,6 +229,14 @@ ${ layout.menubar(section='hive') }
                   </div>
                 </td>
               </tr>
+              <tr>
+                <td colspan="2"></td>
+                <td colspan="4">
+                  <div class="acl-block pointer add-acl" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0">
+                    <i class="fa fa-save"></i>
+                  </div>
+                </td>
+              </tr>              
             </tbody>
           </table>
         </div>
