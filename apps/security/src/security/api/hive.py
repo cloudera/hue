@@ -28,7 +28,8 @@ def list_sentry_roles_by_group(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    roles = get_api(request.user).list_sentry_roles_by_group()
+    groupName = request.POST['groupName'] if request.POST['groupName'] else None
+    roles = get_api(request.user).list_sentry_roles_by_group(groupName)
     result['roles'] = sorted(roles, key= lambda role: role['name'])
     result['message'] = ''
     result['status'] = 0

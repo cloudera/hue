@@ -78,12 +78,11 @@ ${ layout.menubar(section='hive') }
           <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
           <li><a href="javascript:void(0)" data-toggleSection="roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
-            </br>
-            <input type="checkbox" checked> All
-            </br>
-            <select data-bind="options: $root.selectableHadoopGroups, select2: { update: $data.action, type: 'action'}" size="10" multiple="true" style="width: 100%"></select>
-          </li>          
-
+            <div>
+            <br/>
+             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -262,7 +261,6 @@ ${ layout.menubar(section='hive') }
       <br/>
       Groups
       <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 120px"></select>
-
     </p>
   </div>
   <div class="modal-footer">
@@ -288,7 +286,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/jquery.hiveautocomplete.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.hiveautocomplete.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript" charset="utf-8">
     var viewModel = new HiveViewModel(${ initial | n,unicode });
@@ -387,6 +385,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
+      $("#selectedGroup").select2("val", "");
+      $("#selectedGroup").change(function() { viewModel.list_sentry_roles_by_group(); });
     });
 </script>
 
