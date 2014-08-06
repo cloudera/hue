@@ -23,7 +23,6 @@ class TSentryPrivilege(object):
   """
   Attributes:
    - privilegeScope
-   - privilegeName
    - serverName
    - dbName
    - tableName
@@ -36,19 +35,18 @@ class TSentryPrivilege(object):
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'privilegeScope', None, None, ), # 1
-    (2, TType.STRING, 'privilegeName', None, None, ), # 2
+    None, # 2
     (3, TType.STRING, 'serverName', None, None, ), # 3
-    (4, TType.STRING, 'dbName', None, None, ), # 4
-    (5, TType.STRING, 'tableName', None, None, ), # 5
-    (6, TType.STRING, 'URI', None, None, ), # 6
-    (7, TType.STRING, 'action', None, None, ), # 7
+    (4, TType.STRING, 'dbName', None, "", ), # 4
+    (5, TType.STRING, 'tableName', None, "", ), # 5
+    (6, TType.STRING, 'URI', None, "", ), # 6
+    (7, TType.STRING, 'action', None, "", ), # 7
     (8, TType.I64, 'createTime', None, None, ), # 8
     (9, TType.STRING, 'grantorPrincipal', None, None, ), # 9
   )
 
-  def __init__(self, privilegeScope=None, privilegeName=None, serverName=None, dbName=None, tableName=None, URI=None, action=None, createTime=None, grantorPrincipal=None,):
+  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantorPrincipal=None,):
     self.privilegeScope = privilegeScope
-    self.privilegeName = privilegeName
     self.serverName = serverName
     self.dbName = dbName
     self.tableName = tableName
@@ -69,11 +67,6 @@ class TSentryPrivilege(object):
       if fid == 1:
         if ftype == TType.STRING:
           self.privilegeScope = iprot.readString();
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.privilegeName = iprot.readString();
         else:
           iprot.skip(ftype)
       elif fid == 3:
@@ -124,10 +117,6 @@ class TSentryPrivilege(object):
     if self.privilegeScope is not None:
       oprot.writeFieldBegin('privilegeScope', TType.STRING, 1)
       oprot.writeString(self.privilegeScope)
-      oprot.writeFieldEnd()
-    if self.privilegeName is not None:
-      oprot.writeFieldBegin('privilegeName', TType.STRING, 2)
-      oprot.writeString(self.privilegeName)
       oprot.writeFieldEnd()
     if self.serverName is not None:
       oprot.writeFieldBegin('serverName', TType.STRING, 3)

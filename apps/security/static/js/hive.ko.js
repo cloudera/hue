@@ -138,7 +138,9 @@ var Role = function (vm, role) {
     }, function (data) {
       if (data.status == 0) {
         $(document).trigger("info", data.message);
-        vm.roles.unshift(new Role(vm, data.role));
+        var role = new Role(vm, data.role);
+        role.showPrivileges(true);
+        vm.roles.unshift(role);
         self.reset();
         $(document).trigger("created.role");
         vm.showCreateRole(false);

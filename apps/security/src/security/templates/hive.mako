@@ -57,7 +57,6 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-times" data-bind="click: remove"></i>
     </a>
 
-    <strong data-bind="text: properties.name"></strong><br/>
     <em class="muted" data-bind="text: moment(properties.timestamp()).fromNow()"></em><br/>
     ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + properties.database() }" target="_blank"><span data-bind="text: properties.database"></span></a><br/>
     <span data-bind="text: properties.action"></span>
