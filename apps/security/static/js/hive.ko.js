@@ -558,8 +558,7 @@ var HiveViewModel = function (initial) {
     });
     return _users.sort();
   }, self);
-
-
+  
   self.selectAllRoles = function () {
     self.allRolesSelected(!self.allRolesSelected());
     ko.utils.arrayForEach(self.roles(), function (role) {
@@ -616,14 +615,22 @@ var HiveViewModel = function (initial) {
   };
 
   self.list_sentry_roles_by_group = function () {
-    $.getJSON('/security/api/hive/list_sentry_roles_by_group', function (data) {
-      if (typeof data.status !== "undefined" && data.status == -1) {
-        $(document).trigger("error", data.message);
-      }
-      else {
-        $.each(data.roles, function (index, item) {
-          self.roles.push(new Role(self, item));
-        });
+    $.ajax({
+      type: "POST",
+      url: "/security/api/hive/list_sentry_roles_by_group",
+      data: {
+        'groupName': $('#selectedGroup').val()
+      },
+      success: function (data) {
+        if (typeof data.status !== "undefined" && data.status == -1) {
+          $(document).trigger("error", data.message);
+        } 
+        else {
+          self.roles.removeAll();
+          $.each(data.roles, function (index, item) {
+            self.roles.push(new Role(self, item));
+          });
+        }
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);

@@ -95,7 +95,7 @@ class SentryApi(object):
 
 
   def list_sentry_roles_by_group(self, groupName=None):
-    response = self.client.list_sentry_roles_by_group()
+    response = self.client.list_sentry_roles_by_group(groupName)
 
     if response.status.value == 0:
       roles = []
