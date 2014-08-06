@@ -150,7 +150,6 @@ class SentryApi(object):
   def _massage_priviledges(self, privilege):
     return {
         'scope': privilege.privilegeScope,
-        'name': privilege.privilegeName,
         'server': privilege.serverName,
         'database': privilege.dbName,
         'table': privilege.tableName,

@@ -43,7 +43,7 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST['roleName']
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key= lambda privilege: privilege['name'])
+    result['sentry_privileges'] = sorted(sentry_privileges, key= lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
@@ -73,7 +73,6 @@ def _hive_add_privileges(user, role, privileges):
         api.alter_sentry_role_grant_privilege(role['name'], _to_sentry_privilege(privilege))
         # Mocked until Sentry API returns the info!
         _privileges.append({
-            "name": "%s+%s+%s" % (privilege.get('serverName', ''), privilege.get('dbName', ''), privilege.get('tableName', '')),
             "timestamp": 1406160830864, "database": privilege.get('dbName', ''), "action": privilege.get('action', ''),
             "scope": privilege.get('privilegeScope', ''), "table": privilege.get('tableName', ''),
             "URI": privilege.get('URI', ''), "grantor": user.username,

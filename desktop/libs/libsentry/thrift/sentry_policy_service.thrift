@@ -33,12 +33,11 @@ namespace cpp Apache.Sentry.Provider.Db.Service.Thrift
 # Represents a Privilege in transport from the client to the server
 struct TSentryPrivilege {
 1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE
-2: optional string privilegeName, # Generated on server side
 3: required string serverName,
-4: optional string dbName,
-5: optional string tableName,
-6: optional string URI,
-7: required string action,
+4: optional string dbName = "",
+5: optional string tableName = "",
+6: optional string URI = "",
+7: required string action = "",
 8: optional i64 createTime, # Set on server side
 9: optional string grantorPrincipal # Set on server side
 }

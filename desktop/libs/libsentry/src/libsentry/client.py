@@ -32,7 +32,6 @@ LOG = logging.getLogger(__name__)
 """
 struct TSentryPrivilege {
 1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE
-2: optional string privilegeName, # Generated on server side
 3: required string serverName,
 4: optional string dbName,
 5: optional string tableName,
