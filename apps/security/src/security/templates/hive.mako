@@ -99,10 +99,10 @@ ${ layout.menubar(section='hive') }
 
         <div class="card-body">
           <div class="row-fluid">
-            <div class="span8">
+            <div class="span6">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" class="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
+                  <input id="path" class="path" type="text" autocomplete="off" />
                   <a data-bind="attr: { href: '/metastore/' + $root.assist.path() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
@@ -142,7 +142,7 @@ ${ layout.menubar(section='hive') }
               ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
 
             </div>
-            <div class="span4 acl-panel">
+            <div class="span6 acl-panel">
               <div class="acl-panel-content">
                 <h4>${ _('Privileges') }</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
@@ -199,7 +199,7 @@ ${ layout.menubar(section='hive') }
                 </td>
                 <td class="center">
                   <a href="javascript:void(0);">
-                    <i class="fa" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
+                    <i class="fa fa-2x fa-caret" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
                 <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
@@ -286,6 +286,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/js/jquery.hiveautocomplete.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript" charset="utf-8">
     var viewModel = new HiveViewModel(${ initial | n,unicode });
@@ -298,6 +299,28 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         _initialPath = window.location.hash.substr(1);
       }
       viewModel.init(_initialPath);
+      $("#path").val(_initialPath);
+
+
+      function setPathFromAutocomplete(path){
+        if (path.lastIndexOf(".") == path.length -1){
+          path = path.substring(0, path.length - 1);
+        }
+        viewModel.assist.path(path);
+        viewModel.assist.updatePathProperty(viewModel.assist.growingTree(), path, "isExpanded", true);
+        viewModel.assist.fetchHivePath();
+      }
+
+      $("#path").jHueHiveAutocomplete({
+        home: viewModel.assist.path(),
+        onPathChange: function (path) {
+          setPathFromAutocomplete(path);
+        },
+        onEnter: function (el) {
+          setPathFromAutocomplete(el.val());
+        },
+        smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
+      });
 
       function resizeComponents() {
         $("#path").width($(".tree-toolbar").width() - 64);
@@ -321,6 +344,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $(document).on("created.role", function(){
         $("#createRoleModal").modal("hide");
+      });
+
+      $(document).on("changed.path", function(){
+        if ($("#path").val() != viewModel.assist.path()){
+          $("#path").val(viewModel.assist.path());
+        }
       });
 
       function showMainSection(mainSection) {

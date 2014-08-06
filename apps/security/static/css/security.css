@@ -200,3 +200,7 @@ h1.emptyMessage {
   color: #BBB;
   line-height: 60px;
 }
+
+.fa-caret {
+  padding-top: 2px;
+}

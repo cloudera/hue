@@ -193,7 +193,6 @@ var Assist = function (vm) {
 
   self.path = ko.observable("");
   self.path.subscribe(function (path) {
-    //self.fetchHivePath();
     window.location.hash = path;
   });
   self.server = ko.observable('');
@@ -397,6 +396,7 @@ var Assist = function (vm) {
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
+    $(document).trigger("changed.path");
     self.fetchHivePath();
   }
 
