@@ -51,19 +51,22 @@ ${ comps.menubar() }
             <div class="tab-content">
               <div class="tab-pane active" id="stdout">
                 <pre id="stdout-container">
-                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 </pre>
               </div>
 
               <div class="tab-pane" id="stderr">
                 <pre id="stderr-container">
-                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 </pre>
               </div>
 
               <div class="tab-pane" id="syslog">
                 <pre id="syslog-container">
-                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 </pre>
               </div>
             </div>
