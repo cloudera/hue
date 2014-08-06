@@ -1702,16 +1702,20 @@ border-bottom-left-radius: 0px;
 }
 
 
-#jHueHdfsAutocomplete ul li {
+#jHueHdfsAutocomplete ul li, #jHueHiveAutocomplete ul li {
   cursor: pointer;
 }
 
-#jHueHdfsAutocomplete ul li:hover,  #jHueHdfsAutocomplete ul li.active {
+#jHueHdfsAutocomplete ul li:hover, #jHueHdfsAutocomplete ul li.active, #jHueHiveAutocomplete ul li:hover, #jHueHiveAutocomplete ul li.active {
   color: #FFFFFF;
   background: #338BB8;
 }
 
-#jHueHdfsAutocomplete .popover-content {
+#jHueHdfsAutocomplete .popover-content, #jHueHiveAutocomplete .popover-content {
   max-height: 200px;
   overflow-y: auto;
+}
+
+.fa-1halfx {
+  font-size: 1.5em;
 }

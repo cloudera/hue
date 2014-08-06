@@ -60,6 +60,7 @@ urlpatterns += patterns(
   url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
   url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/$', 'autocomplete', name='api_autocomplete_columns'),
   url(r'^api/design/(?P<design_id>\d+)?$', 'save_query_design', name='api_save_design'),
   url(r'^api/design/(?P<design_id>\d+)/get$', 'fetch_saved_design', name='api_fetch_saved_design'),
   url(r'^api/query/(?P<query_history_id>\d+)/get$', 'fetch_query_history', name='api_fetch_query_history'),
