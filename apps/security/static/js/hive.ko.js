@@ -209,7 +209,7 @@ var Assist = function (vm) {
 
   self.path = ko.observable("");
   self.path.subscribe(function (path) {
-    window.location.hash = path;
+    vm.updatePathHash(path);
   });
   self.server = ko.observable('');
   self.db = ko.computed(function () {
@@ -721,6 +721,52 @@ var HiveViewModel = function (initial) {
       self.availableHadoopGroups(data.groups);
       $(document).trigger("loaded.users");
     });
+  }
+
+  self.updatePathHash = function (path) {
+    var _hash = window.location.hash;
+    if (_hash.indexOf("@") == -1){
+      window.location.hash = path;
+    }
+    else {
+      window.location.hash = path + "@" + _hash.split("@")[1];
+    }
+  }
+
+  self.updateSectionHash = function (section) {
+    var _hash = window.location.hash;
+    if (_hash == ""){
+      window.location.hash = "@" + section;
+    }
+    if (_hash.indexOf("@") == -1){
+      window.location.hash = _hash + "@" + section;
+    }
+    else {
+      window.location.hash = _hash.split("@")[0] + "@" + section;
+    }
+  }
+
+  self.getPathHash = function () {
+    if (window.location.hash != "") {
+      var _hash = window.location.hash.substr(1);
+      if (_hash.indexOf("@") > -1){
+        return _hash.split("@")[0];
+      }
+      else {
+        return _hash;
+      }
+    }
+    return "";
+  }
+
+  self.getSectionHash = function () {
+    if (window.location.hash != "") {
+      var _hash = window.location.hash.substr(1);
+      if (_hash.indexOf("@") > -1){
+        return _hash.split("@")[1];
+      }
+    }
+    return "edit";
   }
 };
 
