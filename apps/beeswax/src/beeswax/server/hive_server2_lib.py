@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import itertools
 import re
 
 from itertools import imap
@@ -33,7 +34,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TTypeId,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
-  TCloseOperationReq, TFetchResultsResp, TRowSet
+  TCloseOperationReq, TFetchResultsResp, TRowSet, TProtocolVersion
 
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
@@ -53,9 +54,15 @@ class HiveServerTable(Table):
   Impala only supports a simple DESCRIBE.
   """
   def __init__(self, table_results, table_schema, desc_results, desc_schema):
-    if not table_results.rows:
-      raise NoSuchObjectException()
-    self.table = table_results.rows and table_results.rows[0] or ''
+    if beeswax_conf.THRIFT_VERSION.get() >= 7:
+      if not table_results.columns:
+        raise NoSuchObjectException()
+      self.table = table_results.columns or ''
+    else: # Deprecated. To remove in Hue 4.
+      if not table_results.rows:
+        raise NoSuchObjectException()
+      self.table = table_results.rows and table_results.rows[0] or ''
+
     self.table_schema = table_schema
     self.desc_results = desc_results
     self.desc_schema = desc_schema
@@ -155,7 +162,7 @@ class HiveServerTable(Table):
     return props
 
 
-class HiveServerTRowSet:
+class HiveServerTRowSet2:
   def __init__(self, row_set, schema):
     self.row_set = row_set
     self.rows = row_set.rows
@@ -167,23 +174,69 @@ class HiveServerTRowSet:
 
   def cols(self, col_names):
     cols_rows = []
-    for row in self.rows:
-      row = HiveServerTRow(row, self.schema)
-      cols = {}
-      for col_name in col_names:
-        cols[col_name] = row.col(col_name)
-      cols_rows.append(cols)
+
+    rs = HiveServerTRow2(self.row_set.columns, self.schema)
+    cols = [rs.full_col(name) for name in col_names]
+
+    for cols_row in itertools.izip(*cols):
+      cols_rows.append(dict(zip(col_names, cols_row)))
+
     return cols_rows
 
   def __iter__(self):
     return self
 
   def next(self):
-    if self.rows:
-      return HiveServerTRow(self.rows.pop(0), self.schema)
+    if self.row_set.columns:
+      return HiveServerTRow2(self.row_set.columns, self.schema)
     else:
       raise StopIteration
 
+
+class HiveServerTRow2:
+  def __init__(self, cols, schema):
+    self.cols = cols
+    self.schema = schema
+
+  def col(self, colName):
+    pos = self._get_col_position(colName)
+    return HiveServerTColumnValue2(self.cols[pos]).val[0] # Return only first element
+
+  def full_col(self, colName):
+    pos = self._get_col_position(colName)
+    return HiveServerTColumnValue2(self.cols[pos]).val # Return the full column and its values
+
+  def _get_col_position(self, column_name):
+    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
+
+  def fields(self):
+    try:
+      return [HiveServerTColumnValue2(field).val.pop(0) for field in self.cols]
+    except IndexError:
+      raise StopIteration
+
+
+class HiveServerTColumnValue2:
+  def __init__(self, tcolumn_value):
+    self.column_value = tcolumn_value
+
+  @property
+  def val(self):
+    # TODO get index from schema
+    if self.column_value.boolVal is not None:
+      return self.column_value.boolVal.values
+    elif self.column_value.byteVal is not None:
+      return self.column_value.byteVal.values
+    elif self.column_value.i16Val is not None:
+      return self.column_value.i16Val.values
+    elif self.column_value.i32Val is not None:
+      return self.column_value.i32Val.values
+    elif self.column_value.i64Val is not None:
+      return self.column_value.i64Val.values
+    elif self.column_value.doubleVal is not None:
+      return self.column_value.doubleVal.values
+    elif self.column_value.stringVal is not None:
+      return self.column_value.stringVal.values
 
 
 class HiveServerDataTable(DataTable):
@@ -218,7 +271,7 @@ class HiveServerTTableSchema:
   def cols(self):
     try:
       return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
-    except:
+    except Exception:
       # Impala API is different
       cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
       for col in cols:
@@ -234,20 +287,54 @@ class HiveServerTTableSchema:
     return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
 
 
-class HiveServerTRow:
-  def __init__(self, row, schema):
-    self.row = row
-    self.schema = schema
+if beeswax_conf.THRIFT_VERSION.get() >= 7:
+  HiveServerTRow = HiveServerTRow2
+  HiveServerTRowSet = HiveServerTRowSet2
+else:
+  # Deprecated. To remove in Hue 4.
+  class HiveServerTRow:
+    def __init__(self, row, schema):
+      self.row = row
+      self.schema = schema
 
-  def col(self, colName):
-    pos = self._get_col_position(colName)
-    return HiveServerTColumnValue(self.row.colVals[pos]).val
+    def col(self, colName):
+      pos = self._get_col_position(colName)
+      return HiveServerTColumnValue(self.row.colVals[pos]).val
 
-  def _get_col_position(self, column_name):
-    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
+    def _get_col_position(self, column_name):
+      return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
 
-  def fields(self):
-    return [HiveServerTColumnValue(field).val for field in self.row.colVals]
+    def fields(self):
+      return [HiveServerTColumnValue(field).val for field in self.row.colVals]
+
+  class HiveServerTRowSet:
+    def __init__(self, row_set, schema):
+      self.row_set = row_set
+      self.rows = row_set.rows
+      self.schema = schema
+      self.startRowOffset = row_set.startRowOffset
+
+    def is_empty(self):
+      return len(self.rows) == 0
+
+    def cols(self, col_names):
+      cols_rows = []
+      for row in self.rows:
+        row = HiveServerTRow(row, self.schema)
+        cols = {}
+        for col_name in col_names:
+          cols[col_name] = row.col(col_name)
+        cols_rows.append(cols)
+      return cols_rows
+
+    def __iter__(self):
+      return self
+
+    def next(self):
+      if self.rows:
+        return HiveServerTRow(self.rows.pop(0), self.schema)
+      else:
+        raise StopIteration
 
 
 class HiveServerTColumnValue:

@@ -60,7 +60,7 @@ SERVER_CONN_TIMEOUT = Config(
   type=int,
   help=_t('Timeout in seconds for Thrift calls.'))
 
-USE_GET_LOG_API = Config(
+USE_GET_LOG_API = Config( # To remove in Hue 4
   key='use_get_log_api',
   default=False,
   type=coerce_bool,
@@ -92,7 +92,7 @@ THRIFT_VERSION = Config(
   key="thrift_version",
   help=_t("Thrift version to use when communicating with HiveServer2"),
   type=int,
-  default=5
+  default=7
 )
 
 SSL = ConfigSection(
