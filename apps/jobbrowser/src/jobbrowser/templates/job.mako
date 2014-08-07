@@ -59,9 +59,9 @@
 </%def>
 
 <%def name="rows_for_conf_vars(rows)">
-    %  for k, v in rows.iteritems():
+    %  for k, v in sorted(rows.iteritems()):
         <tr>
-            <td>${format_counter_name(k)}</td>
+            <td>${k}</td>
         <%
             splitArray = v.split(",")
         %>
@@ -72,19 +72,9 @@
                 is_hdfs_uri = bool(url_splitted[1])
             %>
             % if is_hdfs_uri:
-                <%
-                  try:
-                    if request.fs.isfile(url_splitted[2]):
-                      target = "FileViewer"
-                    else:
-                      target = "FileBrowser"
-                  except WebHdfsException, e:
-                    # Permissions error... see HUE-1593
-                    target = "FileBrowser"
-                %>
-                    <a href="${location_to_url(val)}" title="${val}" target="${target}">${val}</a>
+                <a href="${location_to_url(val)}" title="${val}">${val}</a>
                 % if i != len(splitArray) - 1:
-                        <br>
+                  <br>
                 % endif
             % else:
                 ${val}
