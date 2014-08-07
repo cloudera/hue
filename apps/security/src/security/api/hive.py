@@ -115,6 +115,30 @@ def create_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def update_role_groups(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    role = json.loads(request.POST['role'])
+    
+    new_groups = set(role['groups']) - set(role['originalGroups'])
+    deleted_groups = set(role['originalGroups']) - set(role['groups'])
+
+    api = get_api(request.user)
+    
+    if new_groups:
+      api.alter_sentry_role_add_groups(role['name'], new_groups)
+    if deleted_groups:
+      api.alter_sentry_role_delete_groups(role['name'], deleted_groups)
+
+    result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
 def save_privileges(request):
   result = {'status': -1, 'message': 'Error'}
 
