@@ -269,8 +269,9 @@ def execute(request, design_id=None):
   design = safe_get_design(request, query_type, design_id)
 
   try:
+    print 'aaa'
     query_form = get_query_form(request)
-
+    print 'bb'
     if query_form.is_valid():
       query_str = query_form.query.cleaned_data["query"]
       explain = request.GET.get('explain', 'false').lower() == 'true'

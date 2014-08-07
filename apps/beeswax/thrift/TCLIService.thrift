@@ -41,19 +41,19 @@ enum TProtocolVersion {
   HIVE_CLI_SERVICE_PROTOCOL_V1,
   
   // V2 adds support for asynchronous execution
-  HIVE_CLI_SERVICE_PROTOCOL_V2
+  HIVE_CLI_SERVICE_PROTOCOL_V2,
 
   // V3 add varchar type, primitive type qualifiers
-  HIVE_CLI_SERVICE_PROTOCOL_V3
+  HIVE_CLI_SERVICE_PROTOCOL_V3,
 
   // V4 add decimal precision/scale, char type
-  HIVE_CLI_SERVICE_PROTOCOL_V4
+  HIVE_CLI_SERVICE_PROTOCOL_V4,
 
   // V5 adds error details when GetOperationStatus returns in error state
-  HIVE_CLI_SERVICE_PROTOCOL_V5
+  HIVE_CLI_SERVICE_PROTOCOL_V5,
 
   // V6 uses binary type for binary payload (was string) and uses columnar result set
-  HIVE_CLI_SERVICE_PROTOCOL_V6
+  HIVE_CLI_SERVICE_PROTOCOL_V6,
 
   // V7 adds support for delegation token based connection
   HIVE_CLI_SERVICE_PROTOCOL_V7
