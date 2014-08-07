@@ -310,10 +310,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     $(document).ready(function () {
 
-      var _initialPath = "";
-      if (window.location.hash != "") {
-        _initialPath = window.location.hash.substr(1);
-      }
+      var _initialPath = viewModel.getPathHash();
       viewModel.init(_initialPath);
       $("#path").val(_initialPath);
 
@@ -373,6 +370,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           $(".mainSection").hide();
           $("#" + mainSection).show();
           highlightMainMenu(mainSection);
+          viewModel.updateSectionHash(mainSection);
         }
 
         logGA(mainSection);
@@ -387,6 +385,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         showMainSection($(this).attr("data-toggleSection"));
       });
 
+      showMainSection(viewModel.getSectionHash());
+
       var _resizeTimeout = -1;
       $(window).resize(function(){
         window.clearTimeout(_resizeTimeout);
@@ -394,7 +394,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       window.onpopstate = function() {
-        viewModel.assist.path(window.location.hash.substr(1));
+        viewModel.assist.path(viewModel.getPathHash());
       };
 
       $("#createRoleModal").modal({
