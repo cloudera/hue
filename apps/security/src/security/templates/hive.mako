@@ -281,7 +281,7 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Add role') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
   </div>
 </div>
 

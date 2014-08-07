@@ -24,10 +24,21 @@ ko.bindingHandlers.select2 = {
           username: options.update
         });
       }
-      if (options.type == "group" && viewModel.selectableHadoopGroups().indexOf(options.update) == -1) {
-        viewModel.availableHadoopGroups.push({
-          name: options.update
-        });
+      if (options.type == "group") {
+        if (options.update instanceof Array) {
+          options.update.forEach(function(opt){
+            if (viewModel.selectableHadoopGroups().indexOf(opt) == -1){
+              viewModel.availableHadoopGroups.push({
+                name: options.update
+              });
+            }
+          });
+        }
+        else if (viewModel.selectableHadoopGroups().indexOf(options.update) == -1){
+          viewModel.availableHadoopGroups.push({
+            name: options.update
+          });
+        }
       }
       if (options.type == "action" && viewModel.availableActions().indexOf(options.update) == -1) {
         viewModel.availableActions.push(options.update);
