@@ -21,16 +21,12 @@ from beeswax.api import autocomplete
 from desktop.lib.django_util import render
 
 
-def _get_hadoop_groups(): # Mock for now, maybe pull from LDAP
-  return ['romain', 'sambashare', 'cdrom', 'lpadmin', 'admin', 'adm', 'lp', 'dialout', 'plugdev']
-
-
 def hive(request):
   assist = autocomplete(request, database=None, table=None)
 
   return render("hive.mako", request, {
       'assist': assist,
-      'initial': json.dumps({'user': request.user.username, 'hadoop_groups': _get_hadoop_groups()}),
+      'initial': json.dumps({'user': request.user.username}),
   })
 
 

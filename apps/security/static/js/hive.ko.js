@@ -104,12 +104,15 @@ var Role = function (vm, role) {
   }
   self.grantorPrincipal = ko.observable(typeof role.grantorPrincipal != "undefined" && role.grantorPrincipal != null ? role.grantorPrincipal : "");
   self.groups = ko.observableArray();
+  self.originalGroups = ko.observableArray();
   $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function (index, group) {
     self.groups.push(group);
+    self.originalGroups.push(group);
   });
   self.privileges = ko.observableArray(); // Not included in the API
   self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
+  self.showEditGroups = ko.observable(false);
 
   self.privilegesChanged = ko.computed(function () {
     return $.grep(self.privileges(), function (privilege) {
@@ -117,6 +120,12 @@ var Role = function (vm, role) {
     });
   });
 
+  self.groupsChanged = ko.computed(function () {
+    var a = ko.utils.compareArrays(self.groups(), self.originalGroups());
+    //alert(ko.mapping.toJSON(a));
+    return a;
+  });
+  
   self.reset = function () {
     self.name('');
     self.groups.removeAll();
@@ -369,7 +378,7 @@ var Assist = function (vm) {
     // load root first
     self.fetchHivePath("", function(){
       Object.keys(self.treeAdditionalData).forEach(function (path) {
-        if (path.indexOf(".") == -1 && path != ""){
+        if (path.indexOf(".") == -1 && path != "") {
           if (typeof force == "boolean" && force) {
             self.fetchHivePath(path);
           }
@@ -378,7 +387,7 @@ var Assist = function (vm) {
               self.fetchHivePath(path, function(){
                 Object.keys(self.treeAdditionalData).forEach(function (ipath) {
                   if (ipath.split(".").length == 2 && ipath.split(".")[0] == path){
-                    self.fetchHivePath(ipath, function(){
+                    self.fetchHivePath(ipath, function() {
                       self.updateTreeProperty(self.growingTree(), "isExpanded", true);
                     });
                   }
@@ -448,13 +457,13 @@ var Assist = function (vm) {
     self.fetchHivePath("", function(){
       self.updatePathProperty(self.growingTree(), "", "isExpanded", true);
       var _crumbs = self.path().split(".");
-      self.fetchHivePath(_crumbs[0], function(){
+      self.fetchHivePath(_crumbs[0], function() {
         self.updatePathProperty(self.growingTree(), _crumbs[0], "isExpanded", true);
         if (_crumbs.length > 1){
           self.fetchHivePath(_crumbs[0] + "." + _crumbs[1], function(){
             self.updatePathProperty(self.growingTree(), _crumbs[0] + "." + _crumbs[1], "isExpanded", true);
             self.loadData(self.growingTree());
-            if (typeof callback != "undefined"){
+            if (typeof callback != "undefined") {
               callback();
             }
             else {
@@ -465,7 +474,7 @@ var Assist = function (vm) {
         }
         else {
           self.loadData(self.growingTree());
-          if (typeof callback != "undefined"){
+          if (typeof callback != "undefined") {
             callback();
           }
           else {
@@ -499,7 +508,6 @@ var Assist = function (vm) {
             self.addColumns(_originalPath, data.columns, _hasCallback);
           }
 
-
           if (_hasCallback) {
             loadCallback(data);
           } else {
@@ -531,7 +539,7 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.roles = ko.observableArray();
-  self.availableHadoopGroups = ko.mapping.fromJS(initial.hadoop_groups);
+  self.availableHadoopGroups = ko.observableArray();
   self.assist = new Assist(self);
 
   // Editing

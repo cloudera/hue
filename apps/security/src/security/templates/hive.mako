@@ -124,7 +124,7 @@ ${ layout.menubar(section='hive') }
                       </ul>
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
-                    <i class="fa fa-group" title="List of groups in popover for this user?"></i>
+                    <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
                     <i class="fa fa-compress"></i> ${_('Close others')}
@@ -182,7 +182,7 @@ ${ layout.menubar(section='hive') }
 
           <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0">
             <thead>
-              <th width="1%"><div data-bind="click: $root.selectAllRoles, css: {hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected}"></div></th>
+              <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
               <th width="2%"></th>
               <th width="20%">${ _('Name') }</th>
               <th width="54%">${ _('Groups') }</th>
@@ -192,7 +192,7 @@ ${ layout.menubar(section='hive') }
             <tbody data-bind="foreach: $root.roles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                  <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+                  <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
                 </td>
                 <td class="center">
                   <a href="javascript:void(0);" title="${ _('Show privileges') }">
@@ -201,9 +201,22 @@ ${ layout.menubar(section='hive') }
                 </td>
                 <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
                 <td>
-                  <span data-bind="foreach: groups">
-                    <a href="/useradmin/groups"><span data-bind="text: $data"></span></a>
-                  </span>
+                  <a href="javascript: void(0)" data-bind="click: function() { showEditGroups(true); }">
+                    <span data-bind="foreach: groups, visible: ! showEditGroups()">
+                      <span data-bind="text: $data"></span>
+                    </span>
+                  </a>
+                  <div data-bind="visible: showEditGroups() || groups().length == 0">
+                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 400px"></select>
+                    <div data-bind="visible: groupsChanged().length > 0">
+                      <a href="javascript: void(0)">
+                        <i class="fa fa-undo"></i>
+                      </a>
+                      <a href="javascript: void(0)">
+                        <i class="fa fa-save"></i>
+                      </a>
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <a href=""><span data-bind="text: grantorPrincipal"></span></a>
@@ -254,20 +267,20 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
     <p>
-      Name <input type="text" class="input-small" data-bind="value: $data.name" />
+      ${ _('Name') } <input type="text" class="input-small" data-bind="value: $data.name" />
       <br/>
-      Privileges
+      ${ _('Privileges') }
       <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
       <a href="javascript: void(0)" data-bind="click: addPrivilege">
         <i class="fa fa-plus"></i>
       </a>
       <br/>
-      Groups
+      ${ _('Groups') }
       <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 120px"></select>
     </p>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button rel="tooltip" data-placement="bottom" data-loading-text="${ _('Saving...') }" data-original-title="${ _('Add role') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
   </div>
 </div>
