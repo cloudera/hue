@@ -121,9 +121,7 @@ var Role = function (vm, role) {
   });
 
   self.groupsChanged = ko.computed(function () {
-    var a = ko.utils.compareArrays(self.groups(), self.originalGroups());
-    //alert(ko.mapping.toJSON(a));
-    return a;
+	return ! ($(self.groups()).not(self.originalGroups()).length == 0 && $(self.originalGroups()).not(self.groups()).length == 0);
   });
   
   self.reset = function () {
@@ -139,6 +137,32 @@ var Role = function (vm, role) {
 
   self.addPrivilege = function () {
     self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
+  }
+  
+  self.resetGroups = function () {
+	self.groups.removeAll();
+	$.each(self.originalGroups(), function (index, group) {
+	  self.groups.push(group);
+	});
+  }
+  
+  self.saveGroups = function() {
+    $(".jHueNotify").hide();
+    $.post("/security/api/hive/update_role_groups", {
+    	role: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        self.showEditGroups(false);
+    	self.originalGroups.removeAll();
+    	$.each(self.groups(), function (index, group) {
+    	  self.originalGroups.push(group);
+    	});        
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+	});
   }
 
   self.create = function () {
@@ -168,10 +192,8 @@ var Role = function (vm, role) {
       roleName: role.name
     }, function (data) {
       if (data.status == 0) {
-        $(document).trigger("info", data.message);
         vm.removeRole(role.name);
-      }
-      else {
+      } else {
         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {

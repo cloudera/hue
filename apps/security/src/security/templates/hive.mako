@@ -202,20 +202,18 @@ ${ layout.menubar(section='hive') }
                 <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
                 <td>
                   <a href="javascript: void(0)" data-bind="click: function() { showEditGroups(true); }">
-                    <span data-bind="foreach: groups, visible: ! showEditGroups()">
+                    <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
                       <span data-bind="text: $data"></span>
                     </span>
                   </a>
-                  <div data-bind="visible: showEditGroups() || groups().length == 0">
+                  <div data-bind="visible: showEditGroups() || groups().length == 0 || groupsChanged()">
                     <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 400px"></select>
-                    <div data-bind="visible: groupsChanged().length > 0">
-                      <a href="javascript: void(0)">
-                        <i class="fa fa-undo"></i>
-                      </a>
-                      <a href="javascript: void(0)">
-                        <i class="fa fa-save"></i>
-                      </a>
-                    </div>
+                    <a href="javascript: void(0)" data-bind="visible: groupsChanged, click: resetGroups">
+                      <i class="fa fa-undo"></i>
+                    </a>
+                    <a href="javascript: void(0)" data-bind="visible: groupsChanged, click: saveGroups">
+                      <i class="fa fa-save"></i>
+                    </a>
                   </div>
                 </td>
                 <td>
