@@ -92,6 +92,7 @@ var Assist = function (vm, assist) {
         path: "/",
         isDir: true,
         isExpanded: true,
+        isChecked: false,
         aclBit: false,
         striked: false,
         selected: false,
@@ -199,6 +200,7 @@ var Assist = function (vm, assist) {
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
         isExpanded: true,
+        isChecked: false,
         rwx: item.rwx,
         isDir: item.type == "dir" || item.isDir == true,
         page: {
@@ -312,6 +314,11 @@ var Assist = function (vm, assist) {
 
   self.togglePath = function (obj) {
     self.setPath(obj, true);
+  }
+
+  self.checkPath = function (obj) {
+    obj.isChecked(!obj.isChecked());
+    self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
   }
 
   self.openPath = function (obj) {

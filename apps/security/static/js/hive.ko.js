@@ -260,6 +260,7 @@ var Assist = function (vm) {
           isTable: false,
           isColumn: false,
           isExpanded: false,
+          isChecked: false,
           nodes: []
         };
         _tree.nodes.push(_item);
@@ -294,6 +295,7 @@ var Assist = function (vm) {
           isTable: true,
           isColumn: false,
           isExpanded: false,
+          isChecked: false,
           nodes: []
         };
         _branch.nodes.push(_item);
@@ -334,6 +336,7 @@ var Assist = function (vm) {
           isTable: false,
           isColumn: true,
           isExpanded: false,
+          isChecked: false,
           nodes: []
         };
         _branch.nodes.push(_item);
@@ -420,6 +423,10 @@ var Assist = function (vm) {
     self.setPath(obj, true);
   }
 
+  self.checkPath = function (obj) {
+    obj.isChecked(!obj.isChecked());
+    self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
+  }
 
   self.getTreeAdditionalDataForPath = function (path) {
     if (typeof self.treeAdditionalData[path] == "undefined") {

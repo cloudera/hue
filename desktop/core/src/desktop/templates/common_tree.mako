@@ -25,7 +25,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None)">
+<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None, itemChecked=None)">
 
   <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
 
@@ -77,6 +77,9 @@
      css: { selected: ${itemSelected}}
     %endif
     ">
+      %if itemChecked:
+      <i data-bind="css: {'fa': true, 'fa-fw': true, 'fa-square-o': ! ${itemChecked}(), 'fa-check-square-o': ${itemChecked}()}, click: $root.assist.checkPath, style: { color: '#999999'}"></i>
+      %endif
       <i data-bind="
         %if iconClick:
           click: ${iconClick},
