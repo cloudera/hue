@@ -425,6 +425,7 @@ var Assist = function (vm) {
                   if (ipath.split(".").length == 2 && ipath.split(".")[0] == path){
                     self.fetchHivePath(ipath, function() {
                       self.updateTreeProperty(self.growingTree(), "isExpanded", true);
+                      self.loadData(self.growingTree());
                     });
                   }
                 });
@@ -443,8 +444,12 @@ var Assist = function (vm) {
         obj.isExpanded(!obj.isExpanded());
       }
       else {
-        obj.isExpanded(true);
+        obj.isExpanded(false);
       }
+      self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
+    }
+    else {
+      obj.isExpanded(false);
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());

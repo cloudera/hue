@@ -310,8 +310,12 @@ var Assist = function (vm, assist) {
       if (typeof toggle == "boolean" && toggle){
         obj.isExpanded(!obj.isExpanded());
       } else {
-        obj.isExpanded(true);
+        obj.isExpanded(false);
       }
+      self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
+    }
+    else {
+      obj.isExpanded(false);
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
