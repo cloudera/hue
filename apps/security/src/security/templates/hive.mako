@@ -274,7 +274,7 @@ ${ layout.menubar(section='hive') }
       </a>
       <br/>
       ${ _('Groups') }
-      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 120px"></select>
+      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group' }" size="5" multiple="true" style="width: 120px"></select>
     </p>
   </div>
   <div class="modal-footer">

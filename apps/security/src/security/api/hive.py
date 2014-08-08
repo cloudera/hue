@@ -152,10 +152,9 @@ def save_privileges(request):
     for privilege in deleted_privileges:
       _drop_sentry_privilege(request.user, role, privilege)
     
-    # todo
+    # Todo 
 #    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
-# delete modified_privileges "names"
-#    result['privileges'] += _hive_add_privileges(request.user, role, modified_privileges)
+#    get_api(request.user).rename_sentry_privilege(oldAuthorizable, newAuthorizable)
 
     result['message'] = ''
     result['status'] = 0

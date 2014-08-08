@@ -124,12 +124,6 @@ ${ layout.menubar(section='hdfs') }
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
 
-                  <div data-bind="visible: $root.assist.changedAcls().length" class="pull-right" style="margin-right: 6px; margin-top: 4px">
-                    <button type="button" data-bind="click: $root.assist.updateAcls" class="btn disable-feedback">
-                      <i class="fa fa-save"></i> ${ _('Save') }
-                    </button>
-                  </div>
-
                   <ul class="nav nav-tabs">
                     <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
                     <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
@@ -164,6 +158,12 @@ ${ layout.menubar(section='hdfs') }
                       <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addAcl">
                         <i class="fa fa-plus"></i>
                       </div>
+                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.getAcls">
+                        <i class="fa fa-undo"></i>
+                      </div>
+                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.updateAcls">
+                        <i class="fa fa-save"></i>
+                      </div>
 
                       <h4>${ _('Default ACLs') }</h4>
                       <div data-bind="foreach: $root.assist.defaultAcls">
@@ -172,6 +172,12 @@ ${ layout.menubar(section='hdfs') }
 
                       <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addDefaultAcl">
                         <i class="fa fa-plus"></i>
+                      </div>
+                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.getAcls">
+                        <i class="fa fa-undo"></i>
+                      </div>
+                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.updateAcls">
+                        <i class="fa fa-save"></i>
                       </div>
                     </span>
                   </div>
@@ -200,7 +206,7 @@ ${ layout.menubar(section='hdfs') }
     <span data-bind="text: rwx"></span>
   </div>
   <div class="pull-right">
-    <i class="fa fa-lock" data-bind="visible: aclBit()" style="color: #338bb8"></i>
+    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #338bb8" title="${ _('Has some ACLs') }"></i>
   </div>
 </%def>
 
