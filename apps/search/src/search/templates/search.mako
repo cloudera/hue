@@ -1412,35 +1412,35 @@ $(document).ready(function () {
     }
   };
 
-  ko.bindingHandlers.slider = {
-    init: function (element, valueAccessor) {
-      var _el = $(element);
-      var _options = $.extend(valueAccessor(), {});
-      _el.slider({
-        min: _options.start() ? _options.start() : 0,
-        max: _options.end() ? _options.end() : 10,
-        step: _options.gap() ? _options.gap() : 1,
-        handle: _options.handle ? _options.handle : 'triangle',
-        start: _options.min(),
-        end: _options.max(),
-        tooltip_split: true,
-        tooltip: 'always'
-      });
-      _el.on("slide", function (e) {
-        _options.start(e.min);
-        _options.end(e.max);
-        _options.min(e.start);
-        _options.max(e.end);
-        _options.gap(e.step);
-      });
-      _el.on("slideStop", function (e) {
-        viewModel.search();
-      });
-    },
-    update: function (element, valueAccessor) {
-      var _options = $.extend(valueAccessor(), {});
-    }
+ko.bindingHandlers.slider = {
+  init: function (element, valueAccessor) {
+    var _el = $(element);
+    var _options = $.extend(valueAccessor(), {});
+    _el.slider({
+      min: !isNaN(parseFloat(_options.start())) ? parseFloat(_options.start()) : 0,
+      max: !isNaN(parseFloat(_options.end())) ? parseFloat(_options.end()) : 10,
+      step: !isNaN(parseFloat(_options.gap())) ? parseFloat(_options.gap()) : 1,
+      handle: _options.handle ? _options.handle : 'triangle',
+      start: parseFloat(_options.min()),
+      end: parseFloat(_options.max()),
+      tooltip_split: true,
+      tooltip: 'always'
+    });
+    _el.on("slide", function (e) {
+      _options.start(e.min);
+      _options.end(e.max);
+      _options.min(e.start);
+      _options.max(e.end);
+      _options.gap(e.step);
+    });
+    _el.on("slideStop", function (e) {
+      viewModel.search();
+    });
+  },
+  update: function (element, valueAccessor) {
+    var _options = $.extend(valueAccessor(), {});
   }
+}
 
   ko.bindingHandlers.daterangepicker = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
