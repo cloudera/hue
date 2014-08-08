@@ -171,7 +171,7 @@ ${ layout.menubar(section='hive') }
 
               <%def name="actions()">
                 <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-                <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+                <button class="btn toolbarBtn" data-bind="click: function(){ $('#deleteRoleModal').modal('show'); }, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
               </%def>
 
               <%def name="creation()">
@@ -258,7 +258,7 @@ ${ layout.menubar(section='hive') }
 
 
 
-<div id="createRoleModal" class="modal hide fade" role="dialog">
+<div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>${ _('Add role') }</h3>
@@ -283,6 +283,17 @@ ${ layout.menubar(section='hive') }
   </div>
 </div>
 
+
+<div id="deleteRoleModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('Do you really want to delete the selected role(s)?') }</h3>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: $root.deleteSelectedRoles">${ _('Yes') }</button>
+  </div>
+</div>
 
 <%def name="treeIcons()">
   'fa-database': isDb(),
@@ -357,6 +368,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $("#createRoleModal").modal("hide");
       });
 
+      $(document).on("deleted.role", function(){
+        $("#deleteRoleModal").modal("hide");
+      });
+
       $(document).on("changed.path", function(){
         if ($("#path").val() != viewModel.assist.path()){
           $("#path").val(viewModel.assist.path());
@@ -396,6 +411,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       };
 
       $("#createRoleModal").modal({
+        show: false
+      });
+
+      $("#deleteRoleModal").modal({
         show: false
       });
 
