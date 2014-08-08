@@ -204,3 +204,9 @@ h1.emptyMessage {
 .fa-caret {
   padding-top: 2px;
 }
+
+.select2-search-field .select2-input {
+  margin-bottom: 0;
+  min-height: 18px;
+  height: 18px;
+}

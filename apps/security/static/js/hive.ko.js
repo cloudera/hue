@@ -665,6 +665,7 @@ var HiveViewModel = function (initial) {
     ko.utils.arrayForEach(self.selectedRoles(), function (role) {
       role.remove(role);
     });
+    $(document).trigger("deleted.role");
   };
 
   self.expandSelectedRoles = function () {
