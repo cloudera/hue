@@ -130,12 +130,17 @@ var Assist = function (vm, assist) {
       return acl.isDefault();
     });
   });
-  self.changedAcls = ko.computed(function () {
-    return $.grep(self.acls(), function (acl) {
+  self.changedRegularAcls = ko.computed(function () {
+    return $.grep(self.regularAcls(), function (acl) {
       return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1;
     });
   });
-
+  self.changedDefaultAcls = ko.computed(function () {
+    return $.grep(self.defaultAcls(), function (acl) {
+      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1;
+    });
+  });
+  
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
