@@ -91,7 +91,7 @@ var Assist = function (vm, assist) {
         name: "/",
         path: "/",
         isDir: true,
-        isExpanded: true,
+        isExpanded: false,
         isChecked: false,
         aclBit: false,
         striked: false,
@@ -204,7 +204,7 @@ var Assist = function (vm, assist) {
         path: item.path,
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
-        isExpanded: true,
+        isExpanded: false,
         isChecked: false,
         rwx: item.rwx,
         isDir: item.type == "dir" || item.isDir == true,
@@ -315,7 +315,11 @@ var Assist = function (vm, assist) {
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     else {
-      obj.isExpanded(false);
+      if (typeof toggle == "boolean" && toggle){
+        obj.isExpanded(!obj.isExpanded());
+      } else {
+        obj.isExpanded(false);
+      }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
@@ -365,27 +369,34 @@ var Assist = function (vm, assist) {
         'isDiffMode': self.isDiffMode()
       },
       function (data) {
-        self.loadParents(data.breadcrumbs);
-        if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
-          $.each(data.files, function (index, item) {
-            self.convertItemToObject(item);
-          });
+        if (data.error != null){
+          if (data.error == "FILE_NOT_FOUND"){
+            self.path("/");
+          }
         }
         else {
-          self.convertItemToObject(data);
-        }
-        self.getTreeAdditionalDataForPath(_path).loaded = true;
-        if (data.page != null && data.page.number != null){
-          self.updatePathProperty(self.growingTree(), _path, "page", data.page);
-        }
-        if (typeof loadCallback != "undefined"){
-          loadCallback(data);
-        }
-        else {
-          self.loadData(self.growingTree());
-        }
-        if (typeof optionalPath == "undefined"){
-          self.getAcls();
+          self.loadParents(data.breadcrumbs);
+          if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+            $.each(data.files, function (index, item) {
+              self.convertItemToObject(item);
+            });
+          }
+          else {
+            self.convertItemToObject(data);
+          }
+          self.getTreeAdditionalDataForPath(_path).loaded = true;
+          if (data.page != null && data.page.number != null) {
+            self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+          }
+          if (typeof loadCallback != "undefined") {
+            loadCallback(data);
+          }
+          else {
+            self.loadData(self.growingTree());
+          }
+          if (typeof optionalPath == "undefined") {
+            self.getAcls();
+          }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);

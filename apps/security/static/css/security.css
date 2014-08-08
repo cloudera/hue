@@ -103,14 +103,14 @@
   margin-left: 14px;
 }
 
-.add-acl {
+.acl-actions {
   padding: 5px;
   text-align: center;
   color: #CCC;
   font-size: 20px;
 }
 
-.add-acl:hover {
+.acl-actions span:hover {
   color: #999;
 }
 
