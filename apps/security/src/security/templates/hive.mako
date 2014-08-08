@@ -33,7 +33,6 @@ ${ layout.menubar(section='hive') }
     <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
       <i class="fa fa-times" data-bind="click: remove"></i>
     </a>
-    ## todo, role name
     <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/> 
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
 
@@ -42,10 +41,10 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true);}, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
+    &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
-      <input type="text" data-bind="value: $data.server" placeholder="serverName">
+      <input type="text" data-bind="value: serverName" placeholder="serverName">
       <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </div>
 
@@ -56,9 +55,9 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-times" data-bind="click: remove"></i>
     </a>
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span data-bind="visible: roleName"> ${ _('for role') }<span data-bind="text: roleName"></span></span><br/>
     ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
-    <span data-bind="text: action"></span>
+    ${_('Action')}: <span data-bind="text: action"></span>
     <span data-bind="text: privilegeScope"></span>
     <span data-bind="text: tableName"></span>
     <span data-bind="text: URI"></span>

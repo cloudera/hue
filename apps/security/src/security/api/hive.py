@@ -209,6 +209,7 @@ def list_sentry_privileges_by_authorizable(request):
     for role in roles:
       for privilege in get_api(request.user).list_sentry_privileges_by_role(role['name']): # authorizableHierarchy not working here?
         if privilege['database'] == authorizableHierarchy['db'] and ('table' not in authorizableHierarchy or privilege['table'] == authorizableHierarchy['table']):
+          privilege['roleName'] = role['name']
           privileges.append(privilege)
 
     result['privileges'] = privileges
