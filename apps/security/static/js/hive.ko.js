@@ -29,6 +29,7 @@ function UUID() {
 var Privilege = function (vm, privilege) {
   var self = this;
 
+  self.roleName = ko.observable(typeof privilege.roleName != "undefined" && privilege.roleName != null ? privilege.roleName : "");
   self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
   self.editing = ko.observable(typeof privilege.editing != "undefined" && privilege.editing != null ? privilege.editing : false);
   self.serverName = ko.observable(typeof privilege.serverName != "undefined" && privilege.serverName != null ? privilege.serverName : "");
@@ -55,7 +56,7 @@ var Privilege = function (vm, privilege) {
       self.status('modified');
     }
   });
-  self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : "");
+  self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : 'SELECT');
   self.action.subscribe(function () {
     if (self.status() == '') {
       self.status('modified');
@@ -244,7 +245,7 @@ var Assist = function (vm) {
   self.path.subscribe(function (path) {
     vm.updatePathHash(path);
   });
-  self.server = ko.observable('');
+  self.server = ko.observable('server1');
   self.db = ko.computed(function () {
     return self.path().split(/[.]/)[0];
   });
@@ -584,7 +585,7 @@ var HiveViewModel = function (initial) {
   var self = this;
 
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
-  self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL', '']);
+  self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
 
   // Models
   self.roles = ko.observableArray();
@@ -755,7 +756,8 @@ var HiveViewModel = function (initial) {
       'tableName': privilege.table,
       'URI': privilege.URI,
       'action': privilege.action,
-      'timestamp': privilege.timestamp
+      'timestamp': privilege.timestamp,
+      'roleName': privilege.roleName,
     });
     return _privilege;
   }
