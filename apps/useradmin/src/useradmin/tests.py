@@ -548,6 +548,7 @@ def test_ensure_home_directory():
   assert_equal('40755', '%o' % dir_stat.mode)
 
 def test_list_for_autocomplete():
+  # Now the autocomplete has access to all the users and groups
   c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
   c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
   c3_other_group = make_logged_in_client('test_list_for_autocomplete3', is_superuser=False, groupname='test_list_for_autocomplete_other_group')
@@ -559,7 +560,7 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete2'], users)
+  assert_equal(['test_list_for_autocomplete2', 'test_list_for_autocomplete3'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
@@ -570,7 +571,7 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete'], users)
+  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete3'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
@@ -581,6 +582,6 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal([], users)
+  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete2'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
