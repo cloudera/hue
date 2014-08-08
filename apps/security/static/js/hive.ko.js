@@ -588,6 +588,30 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.roles = ko.observableArray();
+  self.roleFilter = ko.observable("");
+  self.filteredRoles = ko.computed(function () {
+    var _filter = self.roleFilter().toLowerCase();
+    if (!_filter) {
+      return self.roles();
+    } else {
+      return ko.utils.arrayFilter(self.roles(), function (role) {
+        var _inGroups = false;
+        role.groups().forEach(function (group) {
+          if (group.toLowerCase().indexOf(_filter) > -1) {
+            _inGroups = true;
+          }
+        });
+        var _inPrivileges = false;
+        role.privileges().forEach(function (priv) {
+          if (priv.dbName().toLowerCase().indexOf(_filter) > -1 || priv.tableName().toLowerCase().indexOf(_filter) > -1) {
+            _inPrivileges = true;
+          }
+        });
+        return role.name().toLowerCase().indexOf(_filter) > -1 || role.grantorPrincipal().toLowerCase().indexOf(_filter) > -1 || _inGroups || _inPrivileges;
+      });
+    }
+  }, self);
+
   self.availableHadoopGroups = ko.observableArray();
   self.assist = new Assist(self);
 

@@ -166,7 +166,7 @@ ${ layout.menubar(section='hive') }
           <div data-bind="visible: $root.roles().length > 0">
             <%actionbar:render>
               <%def name="search()">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
               </%def>
 
               <%def name="actions()">
@@ -189,7 +189,7 @@ ${ layout.menubar(section='hive') }
               <th width="20%">${ _('Grantor Principal') }</th>
               <th width="3%"></th>
             </thead>
-            <tbody data-bind="foreach: $root.roles">
+            <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
                   <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
@@ -401,6 +401,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $("#selectedGroup").select2("val", "");
       $("#selectedGroup").change(function() { viewModel.list_sentry_roles_by_group(); });
+
     });
 </script>
 
