@@ -251,6 +251,24 @@ var Assist = function (vm, assist) {
     return leaf;
   }
 
+  self.getCheckedItems = function (leaf, checked) {
+    if (leaf == null){
+      leaf = self.growingTree();
+    }
+    if (checked == null){
+      checked = []
+    }
+    if (leaf.isChecked){
+      checked.push(leaf);
+    }
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        self.getCheckedItems(node, checked);
+      });
+    }
+    return checked;
+  }
+
   self.collapseTree = function () {
     self.updateTreeProperty(self.growingTree(), "isExpanded", false);
     self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
