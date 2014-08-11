@@ -26,10 +26,7 @@ ko.bindingHandlers.select2 = {
       }
       if (options.type == "group") {
         if (options.update instanceof Array) {
-          console.log("WHELLA")
           options.update.forEach(function(opt){
-            console.log("mongo")
-            console.log(opt)
             if (viewModel.selectableHadoopGroups().indexOf(opt) == -1){
               viewModel.availableHadoopGroups.push({
                 name: opt

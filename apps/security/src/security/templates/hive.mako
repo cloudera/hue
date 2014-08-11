@@ -257,22 +257,27 @@ ${ layout.menubar(section='hive') }
     <h3>${ _('Add role') }</h3>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
-    <p>
-      ${ _('Name') } <input type="text" class="input-small" data-bind="value: $data.name" />
-      <br/>
-      ${ _('Privileges') }
-      <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
-      <a href="javascript: void(0)" data-bind="click: addPrivilege">
-        <i class="fa fa-plus"></i>
-      </a>
-      <br/>
-      ${ _('Groups') }
-      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group' }" size="5" multiple="true" style="width: 120px"></select>
-    </p>
+
+    <div class="row-fluid">
+      <div class="span6">
+        <h4>${ _('Name') }</h4>
+        <input type="text" class="input-xlarge" data-bind="value: $data.name" style="width: 360px" />
+      </div>
+      <div class="span6">
+        <h4>${ _('Groups') }</h4>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group' }" size="5" multiple="true" style="width: 360px"></select>
+      </div>
+    </div>
+
+    <h4>${ _('Privileges') }</h4>
+    <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
+    <div class="acl-block acl-actions">
+      <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    </div>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true" data-bind="click: $root.role.reset">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role.create">${ _('Add role') }</button>
   </div>
 </div>
 

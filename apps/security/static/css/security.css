@@ -210,3 +210,9 @@ h1.emptyMessage {
   min-height: 18px;
   height: 18px;
 }
+
+#createRoleModal {
+  width: 800px;
+  left: 50%;
+  margin-left: -400px!important;
+}
