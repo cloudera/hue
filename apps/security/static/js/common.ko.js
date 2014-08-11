@@ -26,10 +26,13 @@ ko.bindingHandlers.select2 = {
       }
       if (options.type == "group") {
         if (options.update instanceof Array) {
+          console.log("WHELLA")
           options.update.forEach(function(opt){
+            console.log("mongo")
+            console.log(opt)
             if (viewModel.selectableHadoopGroups().indexOf(opt) == -1){
               viewModel.availableHadoopGroups.push({
-                name: options.update
+                name: opt
               });
             }
           });
@@ -57,26 +60,36 @@ ko.bindingHandlers.select2 = {
         .on("select2-open", function () {
           $(".select2-input").off("keyup").data("type", options.type).on("keyup", function (e) {
             if (e.keyCode === 13) {
+              var _isArray = options.update instanceof Array;
               var _newVal = $(this).val();
               var _type = $(this).data("type");
-              if (_type == "user") {
-                viewModel.availableHadoopUsers.push({
-                  username: _newVal
-                });
+              if ($.trim(_newVal) != "") {
+                if (_type == "user") {
+                  viewModel.availableHadoopUsers.push({
+                    username: _newVal
+                  });
+                }
+                if (_type == "group") {
+                  viewModel.availableHadoopGroups.push({
+                    name: _newVal
+                  });
+                }
+                if (_type == "action") {
+                  viewModel.availableActions.push(_newVal);
+                }
+                if (_type == "scope") {
+                  viewModel.availablePrivileges.push(_newVal);
+                }
+                if (_isArray){
+                  var _vals = $(element).select2("val");
+                  _vals.push(_newVal);
+                  $(element).select2("val", _vals, true);
+                }
+                else {
+                  $(element).select2("val", _newVal, true);
+                }
+                $(element).select2("close");
               }
-              if (_type == "group") {
-                viewModel.availableHadoopGroups.push({
-                  name: _newVal
-                });
-              }
-              if (_type == "action") {
-                viewModel.availableActions.push(_newVal);
-              }
-              if (_type == "scope") {
-                viewModel.availablePrivileges.push(_newVal);
-              }
-              $(element).select2("val", _newVal, true);
-              $(element).select2("close");
             }
           });
         })

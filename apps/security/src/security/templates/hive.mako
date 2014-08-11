@@ -204,8 +204,11 @@ ${ layout.menubar(section='hive') }
                     <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
                       <span data-bind="text: $data"></span>
                     </span>
+                    <span data-bind="visible: ! showEditGroups() && ! groupsChanged() && groups().length == 0">
+                      <i class="fa fa-plus"></i> ${ _('Add a group') }
+                    </span>
                   </a>
-                  <div data-bind="visible: showEditGroups() || groups().length == 0 || groupsChanged()">
+                  <div data-bind="visible: showEditGroups() || groupsChanged()">
                     <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 400px"></select>
                     <a href="javascript: void(0)" data-bind="visible: groupsChanged, click: resetGroups">
                       <i class="fa fa-undo"></i>
@@ -228,22 +231,13 @@ ${ layout.menubar(section='hive') }
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-bind="visible: $data.showPrivileges">
                 <td colspan="2"></td>
                 <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }">
-                    <i class="fa fa-plus"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2"></td>
-                <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }">
-                    <i class="fa fa-undo"></i>
-                  </div>
-                  <div class="acl-block pointer add-acl" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }">
-                    <i class="fa fa-save"></i>                    
+                  <div class="acl-block acl-actions">
+                    <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+                    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
+                    <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>              
