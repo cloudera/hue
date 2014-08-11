@@ -29,6 +29,7 @@ function UUID() {
 var Privilege = function (vm, privilege) {
   var self = this;
 
+  self.id = ko.observable(typeof privilege.id != "undefined" && privilege.id != null ? privilege.id : "");
   self.roleName = ko.observable(typeof privilege.roleName != "undefined" && privilege.roleName != null ? privilege.roleName : "");
   self.status = ko.observable(typeof privilege.status != "undefined" && privilege.status != null ? privilege.status : "");
   self.editing = ko.observable(typeof privilege.editing != "undefined" && privilege.editing != null ? privilege.editing : false);
@@ -286,7 +287,7 @@ var Assist = function (vm) {
           _mainFound = true;
         }
       });
-      if (!_mainFound) {
+      if (! _mainFound) {
         var _item = {
           path: db,
           name: db,
@@ -610,7 +611,7 @@ var HiveViewModel = function (initial) {
   self.roleFilter = ko.observable("");
   self.filteredRoles = ko.computed(function () {
     var _filter = self.roleFilter().toLowerCase();
-    if (!_filter) {
+    if (! _filter) {
       return self.roles();
     } else {
       return ko.utils.arrayFilter(self.roles(), function (role) {
@@ -755,8 +756,10 @@ var HiveViewModel = function (initial) {
           role.originalPrivileges.removeAll();
           $.each(data.sentry_privileges, function (index, item) {
             var privilege = _create_ko_privilege(item);
+            var privilegeCopy = _create_ko_privilege(item);
+            privilegeCopy.id(privilege.id());
             role.privileges.push(privilege);
-            role.originalPrivileges.push(privilege);
+            role.originalPrivileges.push(privilegeCopy);
           });
           role.showPrivileges(true);
         }
@@ -776,6 +779,7 @@ var HiveViewModel = function (initial) {
       'action': privilege.action,
       'timestamp': privilege.timestamp,
       'roleName': privilege.roleName,
+      'id': UUID()
     });
     return _privilege;
   }
