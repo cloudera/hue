@@ -45,7 +45,7 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST['roleName']
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key= lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
+    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
@@ -202,12 +202,12 @@ def list_sentry_privileges_by_authorizable(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    groups = json.loads(request.POST['groups'])
+    groupName = request.POST['groupName'] if request.POST['groupName'] else None
     roleSet = json.loads(request.POST['roleSet'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
 
     privileges = []
-    roles = get_api(request.user).list_sentry_roles_by_group()
+    roles = get_api(request.user).list_sentry_roles_by_group(groupName=groupName)
 
     for role in roles:
       for privilege in get_api(request.user).list_sentry_privileges_by_role(role['name']): # authorizableHierarchy not working here?

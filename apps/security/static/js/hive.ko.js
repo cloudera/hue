@@ -790,7 +790,7 @@ var HiveViewModel = function (initial) {
         type: "POST",
         url: "/security/api/hive/list_sentry_privileges_by_authorizable",
         data: {
-          groups: ko.mapping.toJSON(['sambashare', 'hadoop']),
+          groupName: $('#selectedGroup').val(),
           roleSet: ko.mapping.toJSON({all: true, roles: []}),
           authorizableHierarchy: ko.mapping.toJSON({
             'server': self.assist.server(),

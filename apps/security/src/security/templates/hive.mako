@@ -261,11 +261,11 @@ ${ layout.menubar(section='hive') }
     <div class="row-fluid">
       <div class="span6">
         <h4>${ _('Name') }</h4>
-        <input type="text" class="input-xlarge" data-bind="value: $data.name" style="width: 360px" />
+        <input type="text" class="input-xlarge" data-bind="value: $data.name" placeholder="${ _('Required') }" style="width: 360px" />
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
-        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group' }" size="5" multiple="true" style="width: 360px"></select>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', placeholder: '${ _("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
       </div>
     </div>
 
@@ -277,7 +277,7 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true" data-bind="click: $root.role.reset">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role.create">${ _('Add role') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role.create">${ _('Save') }</button>
   </div>
 </div>
 
@@ -417,7 +417,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#selectedGroup").select2("val", "");
-      $("#selectedGroup").change(function() { viewModel.list_sentry_roles_by_group(); });
+      $("#selectedGroup").change(function() {
+        viewModel.list_sentry_privileges_by_authorizable();
+        viewModel.list_sentry_roles_by_group(); 
+      });
 
     });
 </script>
