@@ -125,7 +125,7 @@ ${ layout.menubar(section='hdfs') }
                     <a href="javascript: void(0)" data-bind="click: $root.assist.bulkDeleteAcls" title="${ _('Remove ACLs of checkbox selection') }">
                       <i class="fa fa-times"></i>
                     </a>
-                    <input type="checkbox"></input> ${ _('Recursive') }
+                    <label><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Recursive') }</label>
                   </div>
                   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                 </div>
