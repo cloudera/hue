@@ -34,7 +34,6 @@ ${ layout.menubar(section='hive') }
     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
-
 </script>
 
 
@@ -43,12 +42,8 @@ ${ layout.menubar(section='hive') }
 
   <!-- ko if: editing() -->
     <div class="pull-right">
-      <a href="javascript: void(0)" style="margin-right: 4px">
-        <i class="fa fa-header" data-bind="click: function() { if (editing()) { editing(false); }}"></i>
-      </a>
-      <a href="javascript: void(0)" style="margin-right: 4px">
-        <i class="fa fa-times" data-bind="click: remove"></i>
-      </a>
+      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-header" data-bind="click: function() { if (editing()) { editing(false); }}"></i></a>
+      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-times" data-bind="click: remove"></i></a>
     </div>
     <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
@@ -58,7 +53,7 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
+    &nbsp;&nbsp;<a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: serverName" placeholder="serverName">
@@ -69,12 +64,8 @@ ${ layout.menubar(section='hive') }
   
   <!-- ko ifnot: editing() -->
     <div class="pull-right">
-      <a href="javascript: void(0)" style="margin-right: 4px">
-        <i class="fa fa-pencil" data-bind="click: function() { if (! editing()) { editing(true); }}"></i>
-      </a>
-      <a href="javascript: void(0)" style="margin-right: 4px">
-        <i class="fa fa-times" data-bind="click: remove"></i>
-      </a>
+      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-pencil" data-bind="click: function() { if (! editing()) { editing(true); }}"></i></a>
+      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-times" data-bind="click: remove"></i></a>
     </div>
 
     <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>

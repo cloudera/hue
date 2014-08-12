@@ -111,6 +111,15 @@
   margin-left: 14px;
 }
 
+.span6 .acl-block input[type='text'] {
+  width: 25%;
+}
+
+.span6 .acl-block .showAdvanced {
+  display: block;
+  margin-top: 10px;
+}
+
 .acl-actions {
   padding: 5px;
   text-align: center;
