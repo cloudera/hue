@@ -65,6 +65,7 @@ def list_groups(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
+      'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
       'is_ldap_setup': is_ldap_setup
   })
 
@@ -134,32 +135,26 @@ def delete_user(request):
   return redirect(reverse(list_users))
 
 
-def delete_group(request, name):
+def delete_group(request):
   if not request.user.is_superuser:
     raise PopupException(_("You must be a superuser to delete groups."), error_code=401)
 
   if request.method == 'POST':
     try:
-      global groups_lock
-      __groups_lock.acquire()
-      try:
-        # Get the default group before getting the group, because we may be
-        # trying to delete the default group, and it may not have been created
-        # yet
-        default_group = get_default_user_group()
-        group = Group.objects.get(name=name)
-        if default_group is not None and default_group.name == name:
-          raise PopupException(_("The default user group may not be deleted."), error_code=401)
-        group.delete()
-      finally:
-        __groups_lock.release()
+      group_names = request.POST.getlist('group_names')
+      # Get the default group before getting the group, because we may be
+      # trying to delete the default group, and it may not have been created yet.
+      default_group = get_default_user_group()
+      if default_group is not None and default_group.name in group_names:
+        raise PopupException(_("The default user group may not be deleted."), error_code=401)
+      Group.objects.filter(name__in=group_names).delete()
 
-      request.info(_('The group was deleted.'))
+      request.info(_('The groups were deleted.'))
       return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:
-    return render("delete_group.mako", request, dict(path=request.path, groupname=name))
+    return render("delete_group.mako", request, {'path': request.path})
 
 
 def edit_user(request, username=None):
