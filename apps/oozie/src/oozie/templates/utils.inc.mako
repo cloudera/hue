@@ -548,6 +548,7 @@ var cron_i18n = {
 function renderCrons() {
     $(".cron-frequency").each(function(){
       var _val = $(this).find(".value");
+      $(this).data("originalValue", _val.val());
       _val.jqCron({
         texts: {
           i18n: cron_i18n // comes from utils.inc.mako
@@ -566,6 +567,10 @@ function renderCrons() {
         lang: 'i18n'
       })
       .jqCronGetInstance();
+      var _container = $(this).find(".jqCron-container");
+      if (_container.hasClass("jqCron-error")){
+        _container.parent().text($(this).data("originalValue"));
+      }
     });
 }
 </%def>
