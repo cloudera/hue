@@ -14,8 +14,9 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
 import urllib
+
+from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
 %>
@@ -74,16 +75,14 @@ ${layout.menubar(section='groups')}
           <tr class="tableRow"
               data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
           %if user.is_superuser:
-              <td data-row-selector-exclude="true">
-                <div class="hueCheckbox groupCheck fa" data-group="${group.name}"
-                     data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote(group.name))}"
-                     data-row-selector-exclude="true"></div>
-              </td>
+            <td data-row-selector-exclude="true">
+              <div class="hueCheckbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
+            </td>
           %endif
           <td>
             %if user.is_superuser:
-              <strong><a title="${_('Edit %(groupname)s') % dict(groupname=group.name)}"
-                         href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name))}"
+              <strong><a title="${ _('Edit %(groupname)s') % dict(groupname=group.name) }"
+                         href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }"
                          data-row-selector="true">${group.name}</a></strong>
             %else:
               <strong>${group.name}</strong>
@@ -107,12 +106,29 @@ ${layout.menubar(section='groups')}
   </div>
 </div>
 
-<div id="deleteGroup" class="modal hide fade groupModal"></div>
+<div id="deleteGroup" class="modal hide fade groupModal">
+  <form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+    </div>
+    <div class="hide">
+      <select name="group_names" data-bind="options: availableUsers, selectedOptions: chosenUsers" multiple="true"></select>
+    </div>
+  </form>
+</div>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
+  var viewModel;
+
   $(document).ready(function () {
-    var viewModel = {
+    viewModel = {
       availableUsers: ko.observableArray(${ groups_json | n }),
       chosenUsers: ko.observableArray([])
     };
@@ -142,21 +158,6 @@ ${layout.menubar(section='groups')}
     $(".dataTables_wrapper").css("min-height", "0");
     $(".dataTables_filter").hide();
 
-    $(".confirmationModal").click(function () {
-      var _this = $(this);
-      $.ajax({
-        url: _this.data("confirmation-url"),
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("X-Requested-With", "Hue");
-        },
-        dataType: "html",
-        success: function (data) {
-          $("#deleteGroup").html(data);
-          $("#deleteGroup").modal("show");
-        }
-      });
-    });
-
     $("#selectAll").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked");
@@ -181,7 +182,7 @@ ${layout.menubar(section='groups')}
 
     function toggleActions() {
       if ($(".groupCheck[checked='checked']").length > 0) {
-        $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck[checked='checked']").data("confirmation-url"));
+        $("#deleteGroupBtn").removeAttr("disabled");
       }
       else {
         $("#deleteGroupBtn").attr("disabled", "disabled");
@@ -192,7 +193,7 @@ ${layout.menubar(section='groups')}
       viewModel.chosenUsers.removeAll();
 
       $(".hueCheckbox[checked='checked']").each(function (index) {
-        viewModel.chosenUsers.push($(this).data("id"));
+        viewModel.chosenUsers.push($(this).data("name"));
       });
 
       $("#deleteGroup").modal("show");

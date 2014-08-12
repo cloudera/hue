@@ -36,5 +36,5 @@ urlpatterns = patterns('useradmin.views',
   url(r'^users/new$', 'edit_user', name="useradmin.new"),
   url(r'^groups/new$', 'edit_group', name="useradmin.new_group"),
   url(r'^users/delete', 'delete_user'),
-  url(r'^groups/delete/(?P<name>%s)$' % (groupname_re,), 'delete_group'),
+  url(r'^groups/delete$', 'delete_group'),
 )

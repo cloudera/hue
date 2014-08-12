@@ -280,13 +280,13 @@ def test_default_group():
 
   # Try deleting the default group
   assert_true(Group.objects.filter(name='test_default').exists())
-  response = c.post('/useradmin/groups/delete/test_default')
+  response = c.post('/useradmin/groups/delete', {'group_names': ['test_default']})
   assert_true('default user group may not be deleted' in response.content)
   assert_true(Group.objects.filter(name='test_default').exists())
 
   # Change the name of the default group, and try deleting again
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('new_default')
-  response = c.post('/useradmin/groups/delete/test_default')
+  response = c.post('/useradmin/groups/delete' , {'group_names': ['test_default']})
   assert_false(Group.objects.filter(name='test_default').exists())
   assert_true(Group.objects.filter(name='new_default').exists())
 
@@ -353,7 +353,7 @@ def test_group_admin():
   assert_true("You must be a superuser" in response.content)
 
   # Should be one group left, because we created the other group
-  response = c.post('/useradmin/groups/delete/testgroup')
+  response = c.post('/useradmin/groups/delete', {'group_names': ['testgroup']})
   assert_true(len(Group.objects.all()) == 1)
 
   group_count = len(Group.objects.all())
@@ -548,6 +548,9 @@ def test_ensure_home_directory():
   assert_equal('40755', '%o' % dir_stat.mode)
 
 def test_list_for_autocomplete():
+  reset_all_users()
+  reset_all_groups()
+
   # Now the autocomplete has access to all the users and groups
   c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
   c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
