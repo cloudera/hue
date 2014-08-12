@@ -69,7 +69,7 @@ ${ layout.menubar(section='hive') }
     </div>
 
     <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
-    ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
+    ${_('Database')}: <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
     ${_('Action')}: <span data-bind="text: action"></span>
     <span data-bind="text: privilegeScope"></span>
     <span data-bind="text: tableName"></span>
