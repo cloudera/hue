@@ -705,6 +705,16 @@ class WebHdfs(Hdfs):
     return self.do_as_user(self.superuser, fn, *args, **kwargs)
 
 
+  def do_recursively(self, fn, path, *args, **kwargs):
+    for stat in self.listdir_stats(path):
+      try:
+        if stat.isDir:
+          self.do_recursively(fn, stat.path, *args, **kwargs)
+        fn(stat.path, *args, **kwargs)
+      except Exception:
+        pass
+
+
 class File(object):
   """
   DEPRECATED!

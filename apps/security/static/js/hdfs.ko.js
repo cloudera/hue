@@ -114,6 +114,7 @@ var Assist = function (vm, assist) {
     self.fetchPath();
     window.location.hash = path;
   });
+  self.recursive = ko.observable(false);
   self.pagenum = ko.observable(1);
   self.fromLoadMore = false;
   self.fromRebuildTree = false;
@@ -494,6 +495,7 @@ var Assist = function (vm, assist) {
 	$.post("/security/api/hdfs/bulk_delete_acls", {
         'path': self.path(),
         'checkedPaths': ko.mapping.toJSON(checkedPaths),
+        'recursive': ko.mapping.toJSON(self.recursive()),
       }, function (data) {
         if (checkedPaths.indexOf(self.path()) != -1) {
           self.acls.removeAll();
@@ -516,6 +518,7 @@ var Assist = function (vm, assist) {
         'path': self.path(),
         'acls': ko.mapping.toJSON(self.acls()),
         'checkedPaths': ko.mapping.toJSON(checkedPaths),
+        'recursive': ko.mapping.toJSON(self.recursive()),
       }, function (data) {
         self.refreshTree();
         $(document).trigger("info", 'Done!');
@@ -535,6 +538,7 @@ var Assist = function (vm, assist) {
         'path': self.path(),
         'acls': ko.mapping.toJSON(self.acls()),
         'checkedPaths': ko.mapping.toJSON(checkedPaths),
+        'recursive': ko.mapping.toJSON(self.recursive()),
       }, function (data) {
         self.refreshTree();
         $(document).trigger("info", 'Done!');

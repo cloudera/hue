@@ -33,17 +33,17 @@ def _get_acl(acl):
 def _diff_list_dir(user_listing, hdfs_listing):
   user_files = [f['stats']['path'] for f in user_listing['files']]
   hdfs_files = [f['stats']['path'] for f in hdfs_listing['files']]
-  
-  # Files visible by hdfs only  
+
+  # Files visible by hdfs only
   hdfs_only = list(set(hdfs_files) - set(user_files))
   new_hdfs = filter(lambda f: f['stats']['path'] in hdfs_only, hdfs_listing['files'])
 
   for f in new_hdfs:
     f['striked'] = True
-    
+
   listing = user_listing['files'] + new_hdfs
-  
-  return sorted(listing, key=lambda f: f['path']) 
+
+  return sorted(listing, key=lambda f: f['path'])
 
 
 def list_hdfs(request, path):
@@ -72,7 +72,7 @@ def list_hdfs(request, path):
 
 
 def get_acls(request):
-  try:      
+  try:
     acls = request.fs.get_acl_status(request.GET.get('path'))
   except Exception, e:
     print e
@@ -84,8 +84,8 @@ def get_acls(request):
 def update_acls(request):
   path = request.POST.get('path')
   acls = json.loads(request.POST.get('acls'))
-  original_acls = json.loads(request.POST.get('originalAcls'))  
-  
+  original_acls = json.loads(request.POST.get('originalAcls'))
+
   try:
     renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls]) # We need to remove ACLs that have been renamed
     _remove_acl_names(request.fs, path, list(renamed_acls))
@@ -99,12 +99,15 @@ def update_acls(request):
 
 def bulk_delete_acls(request):
   path = request.POST.get('path')
-  checked_paths = json.loads(request.POST.get('checkedPaths'))  
-  
+  checked_paths = json.loads(request.POST.get('checkedPaths'))
+  recursive = json.loads(request.POST.get('recursive'))
+
   try:
-    checked_paths = [path['path'] for path in checked_paths if '+' in path['rwx']]
+    checked_paths = [path['path'] for path in checked_paths if '+' in path['rwx'] or recursive]
     for path in checked_paths:
       request.fs.remove_acl(path)
+      if recursive:
+        request.fs.do_recursively(request.fs.remove_acl, path)
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
@@ -114,12 +117,13 @@ def bulk_delete_acls(request):
 def bulk_add_acls(request):
   path = request.POST.get('path')
   acls = json.loads(request.POST.get('acls'))
-  checked_paths = json.loads(request.POST.get('checkedPaths'))  
-  
+  checked_paths = json.loads(request.POST.get('checkedPaths'))
+  recursive = json.loads(request.POST.get('recursive'))
+
   try:
     checked_paths = [path['path'] for path in checked_paths if path['path'] != path] # Don't touch current path
     for path in checked_paths:
-      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == '']) # Only saved ones
+      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == ''], recursive) # Only saved ones
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
@@ -131,9 +135,12 @@ def bulk_sync_acls(request):
   return bulk_add_acls(request)
 
 
-def _modify_acl_entries(fs, path, acls):
+def _modify_acl_entries(fs, path, acls, recursive=False):
   aclspec = ','.join([_get_acl(acl) for acl in acls])
-  return fs.modify_acl_entries(path, aclspec)
+  if recursive:
+    return fs.do_recursively(fs.modify_acl_entries, path, aclspec)
+  else:
+    return fs.modify_acl_entries(path, aclspec)
 
 
 def _remove_acl_entries(fs, path, acls):
