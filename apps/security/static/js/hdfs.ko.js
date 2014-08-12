@@ -220,7 +220,7 @@ var Assist = function (vm, assist) {
   }
 
   self.getTreeAdditionalDataForPath = function (path) {
-    if (typeof self.treeAdditionalData[path] == "undefined"){
+    if (typeof self.treeAdditionalData[path] == "undefined") {
       var _add = {
         loaded: false
       }
@@ -384,7 +384,7 @@ var Assist = function (vm, assist) {
         'pagenum': self.pagenum(),
         'format': 'json',
         'doas': vm.doAs(),
-        'isDiffMode': self.isDiffMode()
+        'isDiffMode': self.isDiffMode(),
       },
       function (data) {
         if (data.error != null){
@@ -433,9 +433,8 @@ var Assist = function (vm, assist) {
         self.isLoadingAcls(true);
       }, 1000);
         logGA('get_acls');
-
         $.getJSON('/security/api/hdfs/get_acls', {
-        'path': self.path()
+        'path': self.path(),
       }, function (data) {
       window.clearTimeout(_isLoading);
       if (data != null) {
@@ -478,11 +477,33 @@ var Assist = function (vm, assist) {
         $.each(toDelete, function (index, item) {
           self.acls.remove(item);
         });
+        self.refreshTree();
         $(document).trigger("info", 'Done!');
       }
     ).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", JSON.parse(xhr.responseText).message);
-      });
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
+  }
+  
+  self.bulkDeleteAcls = function() {
+	$(".jHueNotify").hide();
+	logGA('bulkDeleteAcls');
+
+	var checkedPaths = self.getCheckedItems();
+	
+	$.post("/security/api/hdfs/bulk_delete_acls", {
+        'path': self.path(),
+        'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      }, function (data) {
+        if (checkedPaths.indexOf(self.path()) != -1) {
+          self.acls.removeAll();
+        }
+        self.refreshTree();
+        $(document).trigger("info", 'Done!');
+      }
+    ).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 }
 
@@ -494,14 +515,14 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	  self.assist.refreshTree();
+    self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
   self.selectableHadoopUsers = ko.computed(function() {
     var _users = ko.utils.arrayMap(self.availableHadoopUsers(), function(user) {
-        return user.username;
+      return user.username;
     });
     return _users.sort();
   }, self);

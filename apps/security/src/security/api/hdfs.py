@@ -72,10 +72,10 @@ def list_hdfs(request, path):
 
 
 def get_acls(request):
-  path = request.GET.get('path')
-  try:
-    acls = request.fs.get_acl_status(path)
+  try:      
+    acls = request.fs.get_acl_status(request.GET.get('path'))
   except Exception, e:
+    print e
     acls = None
 
   return HttpResponse(json.dumps(acls is not None and acls['AclStatus'] or None), mimetype="application/json")
@@ -96,6 +96,19 @@ def update_acls(request):
 
   return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 
+
+def bulk_delete_acls(request):
+  path = request.POST.get('path')
+  checked_paths = json.loads(request.POST.get('checkedPaths'))  
+  
+  try:
+    checked_paths = [path['path'] for path in checked_paths if '+' in path['rwx']]
+    for path in checked_paths:
+      request.fs.remove_acl(path)
+  except Exception, e:
+    raise PopupException(unicode(str(e.message), "utf8"))
+
+  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 
 
 def _modify_acl_entries(fs, path, acls):

@@ -99,6 +99,12 @@ ${ layout.menubar(section='hdfs') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
+                      <i class="fa fa-compress"></i> ${_('Close others')}
+                    </a>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
+                      <i class="fa fa-refresh"></i>  ${_('Refresh')}
+                    </a>                  
                     <div class="dropdown inline-block" style="margin-right: 6px">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i><i class="fa fa-eye" data-bind="visible: ! $root.assist.isDiffMode()"></i> <span data-bind="visible: $root.assist.isDiffMode">${ _('Show non accessible files for') }</span><span data-bind="visible: ! $root.assist.isDiffMode()">${ _('Impersonate the user') }</span></a>
                       <ul class="dropdown-menu">
@@ -108,13 +114,15 @@ ${ layout.menubar(section='hdfs') }
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
+                  </div>                  
+                  <div>
+                    <i class="fa fa-save"></i>
+                    <i class="fa fa-copy"></i>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkDeleteAcls" title="${ _('Remove ACLs from selected items') }">
+                      <i class="fa fa-times"></i>
+                    </a>
+                    <input type="checkbox"></input> ${ _('Recursive') }
                   </div>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
-                    <i class="fa fa-compress"></i> ${_('Close others')}
-                  </a>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
-                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
-                  </a>
                   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                 </div>
               </div>
@@ -126,8 +134,9 @@ ${ layout.menubar(section='hdfs') }
 
                   <ul class="nav nav-tabs">
                     <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
-                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
+                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>                                       
                   </ul>
+                  
 
                   <div class="acl-panel-content">
                     <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">

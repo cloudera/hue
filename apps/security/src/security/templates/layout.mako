@@ -68,8 +68,6 @@ def is_selected(section, matcher):
               </li>
               <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive') }">${_('Hive')}</a></li>
               <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('HDFS')}</a></li>
-              <li class="${is_selected(section, 'solr')}"><a href="${ url('security:hive') }s">${_('Solr')}</a></li>
-              <li class="${is_selected(section, 'hbase')}"><a href="${ url('security:hive') }">${_('HBase')}</a></li>
             </ul>
           </div>
         </div>
