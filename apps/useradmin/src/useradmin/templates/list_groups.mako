@@ -83,7 +83,7 @@ ${layout.menubar(section='groups')}
           <td>
             %if user.is_superuser:
               <strong><a title="${_('Edit %(groupname)s') % dict(groupname=group.name)}"
-                         href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }"
+                         href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name))}"
                          data-row-selector="true">${group.name}</a></strong>
             %else:
               <strong>${group.name}</strong>
@@ -109,8 +109,16 @@ ${layout.menubar(section='groups')}
 
 <div id="deleteGroup" class="modal hide fade groupModal"></div>
 
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    var viewModel = {
+      availableUsers: ko.observableArray(${ groups_json | n }),
+      chosenUsers: ko.observableArray([])
+    };
+
+    ko.applyBindings(viewModel);
+
     $(".datatables").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
@@ -172,13 +180,23 @@ ${layout.menubar(section='groups')}
     });
 
     function toggleActions() {
-      if ($(".groupCheck[checked='checked']").length == 1) {
+      if ($(".groupCheck[checked='checked']").length > 0) {
         $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck[checked='checked']").data("confirmation-url"));
       }
       else {
         $("#deleteGroupBtn").attr("disabled", "disabled");
       }
     }
+
+    $("#deleteGroupBtn").click(function () {
+      viewModel.chosenUsers.removeAll();
+
+      $(".hueCheckbox[checked='checked']").each(function (index) {
+        viewModel.chosenUsers.push($(this).data("id"));
+      });
+
+      $("#deleteGroup").modal("show");
+    });
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });

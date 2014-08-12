@@ -16,13 +16,17 @@
 <%!
 from django.utils.translation import ugettext as _
 %>
-<form id="deleteGroupForm" action="${path}" method="POST">
-<div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 id="deleteGroupMessage">${_("Are you sure you want to delete")} ${groupname}${_("?")}</h3>
-</div>
-<div class="modal-footer">
-    <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
-    <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-</div>
+<form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
+  </div>
+  <div class="modal-footer">
+      <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+  </div>
+  <div class="hide">
+    <select name="group_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers"
+            multiple="true"></select>
+  </div>
 </form>
