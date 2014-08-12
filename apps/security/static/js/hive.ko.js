@@ -254,6 +254,7 @@ var Assist = function (vm) {
     return self.path().split(/[.]/)[1];
   });
   self.privileges = ko.observableArray();
+  self.roles = ko.observableArray();
   self.isDiffMode = ko.observable(false);
 
   self.isDiffMode = ko.observable(false);
@@ -769,6 +770,12 @@ var HiveViewModel = function (initial) {
     });
   };
 
+  function _create_ko_role(role) {
+    var _role = new Role(self, {
+
+    });
+  }
+
   function _create_ko_privilege(privilege) {
     var _privilege = new Privilege(self, {
       'privilegeScope': privilege.scope,
@@ -799,9 +806,22 @@ var HiveViewModel = function (initial) {
           })
         },
         success: function (data) {
+          self.assist.roles.removeAll();
           self.assist.privileges.removeAll();
           $.each(data.privileges, function (index, item) {
-        	self.assist.privileges.push(_create_ko_privilege(item));
+            var _role = null;
+            self.assist.roles().forEach(function(role){
+              if (role.name() == item.roleName){
+                _role = role;
+              }
+            });
+            if (_role == null){
+              var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
+              _role = self.assist.roles()[_idx - 1];
+            }
+
+            _role.privileges.push(_create_ko_privilege(item));
+        	  self.assist.privileges.push(_create_ko_privilege(item));
           });
         }
       }).fail(function (xhr, textStatus, errorThrown) {

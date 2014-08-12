@@ -26,14 +26,31 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
+<script type="text/html" id="role">
+  <div class="acl-block-title"><i class="fa fa-cubes"></i> <span data-bind="text: name"></span></div>
+  <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
+  <div class="acl-block acl-actions">
+    <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
+    <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+  </div>
+
+</script>
+
+
 <script type="text/html" id="privilege">
-<div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted', click: function() { if (! editing()) { editing(true); } }" class="acl-block acl-block-airy">
+<div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted'" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: remove"></i>
-    </a>
-    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/> 
+    <div class="pull-right">
+      <a href="javascript: void(0)" style="margin-right: 4px">
+        <i class="fa fa-header" data-bind="click: function() { if (editing()) { editing(false); }}"></i>
+      </a>
+      <a href="javascript: void(0)" style="margin-right: 4px">
+        <i class="fa fa-times" data-bind="click: remove"></i>
+      </a>
+    </div>
+    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
 
     <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
@@ -51,11 +68,16 @@ ${ layout.menubar(section='hive') }
   <!-- /ko -->
   
   <!-- ko ifnot: editing() -->
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: remove"></i>
-    </a>
+    <div class="pull-right">
+      <a href="javascript: void(0)" style="margin-right: 4px">
+        <i class="fa fa-pencil" data-bind="click: function() { if (! editing()) { editing(true); }}"></i>
+      </a>
+      <a href="javascript: void(0)" style="margin-right: 4px">
+        <i class="fa fa-times" data-bind="click: remove"></i>
+      </a>
+    </div>
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span data-bind="visible: roleName"> ${ _('for role') }<span data-bind="text: roleName"></span></span><br/>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
     ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
     ${_('Action')}: <span data-bind="text: action"></span>
     <span data-bind="text: privilegeScope"></span>
@@ -64,7 +86,6 @@ ${ layout.menubar(section='hive') }
     <span data-bind="text: grantor"></span>
     <span data-bind="text: serverName"></span>
   <!-- /ko -->
-
 </div>
 </script>
 
@@ -74,7 +95,7 @@ ${ layout.menubar(section='hive') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Privileges') }</li>
-          <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
+          <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap fa-rotate-270"></i> ${ _('Browse') }</a></li>
           <li><a href="javascript:void(0)" data-toggleSection="roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
@@ -140,9 +161,9 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span6 acl-panel">
               <div class="acl-panel-content">
-                <h4>${ _('Privileges') }</h4>
+                <h4 style="margin-top: 4px">${ _('Privileges') }</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
-                <div data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
+                  <div data-bind="template: { name: 'role', foreach: $root.assist.roles }">
                 </div>
               </div>
             </div>
