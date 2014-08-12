@@ -401,7 +401,13 @@ from django.utils.translation import ugettext as _
       </td>
       <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'fa': true, 'fa-play': $.inArray(name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, 'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered}"></i></td>
       <td data-bind="click: $root.viewFile, attr: {'title': tooltip}" rel="tooltip">
+        <!-- ko if: name == '..' -->
+        <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
+        <!-- /ko -->
+        <!-- ko if: name != '..' -->
         <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
+        <!-- /ko -->
+
       </td>
       <td data-bind="click: $root.viewFile">
         <span data-bind="visible: type=='file', text: stats.size"></span>
@@ -546,9 +552,22 @@ from django.utils.translation import ugettext as _
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
 
+      self.filesSorting = function (l, r) {
+        if (l.name == ".." && r.name == "."){
+          return -1;
+        }
+        else if (l.name == "." && r.name == ".."){
+          return 1;
+        }
+        else {
+          return l.name > r.name ? 1 : -1
+        }
+      }
+
       self.files = ko.observableArray(ko.utils.arrayMap(files, function (file) {
         return new File(file);
       }));
+      self.files.sort(self.filesSorting)
 
       self.breadcrumbs = ko.observableArray(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
         return new Breadcrumb(breadcrumb);
@@ -641,6 +660,7 @@ from django.utils.translation import ugettext as _
         self.files(ko.utils.arrayMap(files, function (file) {
           return new File(file);
         }));
+        self.files.sort(self.filesSorting)
 
         self.breadcrumbs(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
           return new Breadcrumb(breadcrumb);

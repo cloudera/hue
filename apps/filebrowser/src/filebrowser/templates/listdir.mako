@@ -27,6 +27,12 @@ from django.utils.translation import ugettext as _
 ${ commonheader(None, 'filebrowser', user) | n,unicode }
 ${ fb_components.menubar() }
 
+<style type="text/css">
+  .tooltip.left {
+    margin-left: -10px;
+  }
+</style>
+
 <div class="container-fluid">
 
   <div class="card card-small">
