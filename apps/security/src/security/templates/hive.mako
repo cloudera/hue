@@ -27,7 +27,7 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
 <script type="text/html" id="role">
-  <div class="acl-block-title"><i class="fa fa-cubes"></i> <span data-bind="text: name"></span></div>
+  <div class="acl-block-title"><i class="fa fa-cube"></i> <span data-bind="text: name"></span></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>

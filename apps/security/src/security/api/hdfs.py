@@ -111,6 +111,21 @@ def bulk_delete_acls(request):
   return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 
 
+def bulk_add_acls(request):
+  path = request.POST.get('path')
+  acls = json.loads(request.POST.get('acls'))
+  checked_paths = json.loads(request.POST.get('checkedPaths'))  
+  
+  try:
+    checked_paths = [path['path'] for path in checked_paths if path['path'] != path] # Don't touch current path
+    for path in checked_paths:
+      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == '']) # Only saved ones
+  except Exception, e:
+    raise PopupException(unicode(str(e.message), "utf8"))
+
+  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
+
+
 def _modify_acl_entries(fs, path, acls):
   aclspec = ','.join([_get_acl(acl) for acl in acls])
   return fs.modify_acl_entries(path, aclspec)
