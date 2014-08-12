@@ -126,6 +126,11 @@ def bulk_add_acls(request):
   return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
 
 
+def bulk_sync_acls(request):
+  bulk_delete_acls(request)
+  return bulk_add_acls(request)
+
+
 def _modify_acl_entries(fs, path, acls):
   aclspec = ','.join([_get_acl(acl) for acl in acls])
   return fs.modify_acl_entries(path, aclspec)
