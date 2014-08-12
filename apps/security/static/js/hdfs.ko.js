@@ -505,6 +505,25 @@ var Assist = function (vm, assist) {
       $(document).trigger("error", JSON.parse(xhr.responseText).message);
     });
   }
+
+  self.bulkAddAcls = function() {
+	$(".jHueNotify").hide();
+	logGA('bulkAddAcls');
+
+	var checkedPaths = self.getCheckedItems();
+	
+	$.post("/security/api/hdfs/bulk_add_acls", {
+        'path': self.path(),
+        'acls': ko.mapping.toJSON(self.acls()),
+        'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      }, function (data) {
+        self.refreshTree();
+        $(document).trigger("info", 'Done!');
+      }
+    ).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
+  }
 }
 
 

@@ -30,6 +30,7 @@ urlpatterns += patterns('security.api.hdfs',
   url(r'^api/hdfs/get_acls$', 'get_acls', name='get_acls'),
   url(r'^api/hdfs/update_acls', 'update_acls', name='update_acls'),
   url(r'^api/hdfs/bulk_delete_acls', 'bulk_delete_acls', name='bulk_delete_acls'),
+  url(r'^api/hdfs/bulk_add_acls', 'bulk_add_acls', name='bulk_add_acls'),
 )
 
 
