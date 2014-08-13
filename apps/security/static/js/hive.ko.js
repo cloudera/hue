@@ -635,6 +635,7 @@ var HiveViewModel = function (initial) {
 
   // Editing
   self.showCreateRole = ko.observable(false);
+  self.recursive = ko.observable(false);
   self.role = new Role(self, {});
   self.privilege = new Privilege(self, {});
 
@@ -788,6 +789,14 @@ var HiveViewModel = function (initial) {
     return _privilege;
   }
 
+  function _create_authorizable_from_ko(privilege) {
+    return {
+      'server': self.assist.server(),
+      'db': self.assist.db(),
+      'table': self.assist.table()
+    }
+  }
+  
   self.list_sentry_privileges_by_authorizable = function () {
     if (self.assist.path() != "") {
       $.ajax({
@@ -796,11 +805,7 @@ var HiveViewModel = function (initial) {
         data: {
           groupName: $('#selectedGroup').val(),
           roleSet: ko.mapping.toJSON({all: true, roles: []}),
-          authorizableHierarchy: ko.mapping.toJSON({
-            'server': self.assist.server(),
-            'db': self.assist.db(),
-            'table': self.assist.table()
-          })
+          authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko())
         },
         success: function (data) {
           self.assist.roles.removeAll();
@@ -816,9 +821,8 @@ var HiveViewModel = function (initial) {
               var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
               _role = self.assist.roles()[_idx - 1];
             }
-
             _role.privileges.push(_create_ko_privilege(item));
-        	  self.assist.privileges.push(_create_ko_privilege(item));
+        	self.assist.privileges.push(_create_ko_privilege(item));
           });
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -827,6 +831,24 @@ var HiveViewModel = function (initial) {
     }
   };
 
+  self.bulk_delete_privileges = function (role) {
+    $(".jHueNotify").hide();
+    var checkedPaths = self.assist.getCheckedItems();
+    $.post("/security/api/hive/bulk_delete_privileges", {
+      'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
+      'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      'recursive': ko.mapping.toJSON(self.recursive()),
+    }, function (data) {
+      if (data.status == 0) {
+        self.list_sentry_privileges_by_authorizable(); // Refresh
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  }  
+  
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', {
       'include_myself': true,

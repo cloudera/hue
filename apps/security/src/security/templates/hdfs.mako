@@ -116,13 +116,13 @@ ${ layout.menubar(section='hdfs') }
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>                  
                   <div>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkAddAcls" title="${ _('Add current ACL to checkbox selection') }">
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkAddAcls" title="${ _('Add current ACLs to checkbox selection') }">
                       <i class="fa fa-plus"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Sync current ACL to checkbox selection') }">
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Replace current ACLs to checkbox selection') }">
                       <i class="fa fa-copy"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="click: function(){ $('#deleteAclsModal').modal('show'); }" title="${ _('Remove ACLs of checkbox selection') }">
+                    <a href="javascript: void(0)" data-bind="click: function(){ $('#deleteAclsModal').modal('show'); }" title="${ _('Remove all ACLs of checkbox selection') }">
                       <i class="fa fa-times"></i>
                     </a>
                     <label><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Recursive') }</label>

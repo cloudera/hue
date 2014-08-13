@@ -118,6 +118,12 @@ ${ layout.menubar(section='hive') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
+                      <i class="fa fa-compress"></i> ${_('Close others')}
+                    </a>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
+                      <i class="fa fa-refresh"></i>  ${_('Refresh')}
+                    </a>                  
                     <div class="dropdown inline-block" style="margin-right: 6px">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
@@ -137,12 +143,18 @@ ${ layout.menubar(section='hive') }
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
-                    <i class="fa fa-compress"></i> ${_('Close others')}
-                  </a>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
-                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
-                  </a>
+                  <div>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkAddAcls" title="${ _('Add current current privileges to checkbox selection') }">
+                      <i class="fa fa-plus"></i>
+                    </a>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Replace checkbox selection with current privileges') }">
+                      <i class="fa fa-copy"></i>
+                    </a>
+                    <a href="javascript: void(0)" data-bind="click: $root.bulk_delete_privileges" title="${ _('Remove privileges of checkbox selection') }">
+                      <i class="fa fa-times"></i>
+                    </a>
+                    <label><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Recursive') }</label>
+                  </div>
                   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                 </div>
               </div>

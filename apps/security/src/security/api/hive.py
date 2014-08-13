@@ -225,6 +225,32 @@ def list_sentry_privileges_by_authorizable(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def bulk_delete_privileges(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    checkedPaths = json.loads(request.POST['checkedPaths'])
+    recursive = json.loads(request.POST['recursive'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    for path in [path['path'] for path in checkedPaths]:
+      if '.' in path:
+        db, table = path.split('.')
+      else:
+        db, table = path, ''
+      authorizableHierarchy.update({
+        'db': db,
+        'table': table,
+      })
+      get_api(request.user).drop_sentry_privileges(authorizableHierarchy)
+    result['message'] = _('Privileges deleted.')
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
 def rename_sentry_privilege(request):
   result = {'status': -1, 'message': 'Error'}
 
