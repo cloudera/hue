@@ -446,9 +446,6 @@ var Assist = function (vm) {
       if (typeof toggle == "boolean" && toggle) {
         obj.isExpanded(!obj.isExpanded());
       }
-      else {
-        obj.isExpanded(false);
-      }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     else {
