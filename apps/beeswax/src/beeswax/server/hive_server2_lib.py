@@ -119,8 +119,8 @@ class HiveServerTable(Table):
     # Hack because of bad delimiter escaping in LazySimpleSerDe in HS2: parameters:{serialization.format=})
     describe_text = rows[detailed_row_index]['data_type']
     try:
-      # LazySimpleSerDe case
-      return describe_text + rows[detailed_row_index + 1]['col_name']
+      # LazySimpleSerDe case, also add full next row
+      return describe_text + rows[detailed_row_index + 1]['col_name'] + rows[detailed_row_index + 1]['data_type']
     except:
       return describe_text
 
