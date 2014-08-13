@@ -316,6 +316,7 @@ var Assist = function (vm, assist) {
         }
       }
     });
+    self.getAcls();
   }
 
   self.rebuildTree = function (leaf, paths) {
@@ -441,7 +442,7 @@ var Assist = function (vm, assist) {
       }, 1000);
         logGA('get_acls');
         $.getJSON('/security/api/hdfs/get_acls', {
-        'path': self.path(),
+        'path': self.path()
       }, function (data) {
       window.clearTimeout(_isLoading);
       if (data != null) {
