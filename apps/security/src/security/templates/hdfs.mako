@@ -122,7 +122,7 @@ ${ layout.menubar(section='hdfs') }
                     <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Sync current ACL to checkbox selection') }">
                       <i class="fa fa-copy"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkDeleteAcls" title="${ _('Remove ACLs of checkbox selection') }">
+                    <a href="javascript: void(0)" data-bind="click: function(){ $('#deleteAclsModal').modal('show'); }" title="${ _('Remove ACLs of checkbox selection') }">
                       <i class="fa fa-times"></i>
                     </a>
                     <label><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Recursive') }</label>
@@ -195,6 +195,18 @@ ${ layout.menubar(section='hdfs') }
     </div>
   </div>
 </div>
+
+<div id="deleteAclsModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('Do you really want to delete the selected ACLs?') }</h3>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: $root.assist.bulkDeleteAcls">${ _('Yes') }</button>
+  </div>
+</div>
+
 
 <%def name="treeIcons()">
   'fa-folder-open-o': isDir() && nodes().length > 0 && !aclBit(),
@@ -284,6 +296,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     $(document).on("deleted.bulk.acls", function() {
       $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the selected paths.') }");
+      $("#deleteAclsModal").modal("hide");
     });
 
     $(document).on("syncd.bulk.acls", function() {
@@ -299,6 +312,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     window.onpopstate = function() {
       viewModel.assist.path(window.location.hash.substr(1));
     };
+
+    $("#deleteAclsModal").modal({
+      show: false
+    });
 
   });
 </script>
