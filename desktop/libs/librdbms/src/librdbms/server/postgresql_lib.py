@@ -88,13 +88,13 @@ class PostgreSQLClient(BaseRDMSClient):
   def get_tables(self, database, table_names=[]):
     # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
-    cursor.execute("SELECT table_schema,table_name FROM information_schema.tables")
+    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='%s'" % database)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("SHOW COLUMNS %s.%s" % (database, table))
+    cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_schema='%s' and table_name='%s'" % (database, table))
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
