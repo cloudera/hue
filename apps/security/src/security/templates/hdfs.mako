@@ -274,6 +274,22 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       }
     });
 
+    $(document).on("updated.acls", function() {
+      $(document).trigger("info", "${ _('The selected ACLs have been successfully updated.') }");
+    });
+
+    $(document).on("added.bulk.acls", function() {
+      $(document).trigger("info", "${ _('The current ACLs have been successfully added to the selected paths.') }");
+    });
+
+    $(document).on("deleted.bulk.acls", function() {
+      $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the selected paths.') }");
+    });
+
+    $(document).on("syncd.bulk.acls", function() {
+      $(document).trigger("info", "${ _('All the ACLs have been successfully updated for the selected paths.') }");
+    });
+
     var _resizeTimeout = -1;
     $(window).resize(function(){
       window.clearTimeout(_resizeTimeout);
