@@ -149,7 +149,11 @@ var Role = function (vm, role) {
   }
 
   self.addPrivilege = function () {
-    self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
+	if (vm.getSectionHash() == 'edit') {
+      self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true, 'dbName': vm.assist.db(), 'tableName': vm.assist.table()}));
+	} else {
+      self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
+	}
   }
   
   self.resetGroups = function () {
@@ -220,6 +224,7 @@ var Role = function (vm, role) {
       role: ko.mapping.toJSON(role)
     }, function (data) {
       if (data.status == 0) {
+    	vm.list_sentry_privileges_by_authorizable();
         vm.list_sentry_privileges_by_role(role); // Refresh all role privileges
       } else {
         $(document).trigger("error", data.message);
@@ -635,7 +640,6 @@ var HiveViewModel = function (initial) {
 
   // Editing
   self.showCreateRole = ko.observable(false);
-  self.recursive = ko.observable(false);
   self.role = new Role(self, {});
   self.privilege = new Privilege(self, {});
 
@@ -768,12 +772,6 @@ var HiveViewModel = function (initial) {
     });
   };
 
-  function _create_ko_role(role) {
-    var _role = new Role(self, {
-
-    });
-  }
-
   function _create_ko_privilege(privilege) {
     var _privilege = new Privilege(self, {
       'privilegeScope': privilege.scope,
@@ -837,7 +835,6 @@ var HiveViewModel = function (initial) {
     $.post("/security/api/hive/bulk_delete_privileges", {
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
-      'recursive': ko.mapping.toJSON(self.recursive()),
     }, function (data) {
       if (data.status == 0) {
         self.list_sentry_privileges_by_authorizable(); // Refresh
@@ -856,7 +853,6 @@ var HiveViewModel = function (initial) {
       'privileges': ko.mapping.toJSON(self.assist.privileges),
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
-      'recursive': ko.mapping.toJSON(self.recursive()),
     }, function (data) {
       if (data.status == 0) {
         self.list_sentry_privileges_by_authorizable(); // Refresh
