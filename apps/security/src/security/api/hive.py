@@ -251,6 +251,42 @@ def bulk_delete_privileges(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def bulk_add_privileges(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    privileges = json.loads(request.POST['privileges'])
+    checkedPaths = json.loads(request.POST['checkedPaths'])
+    recursive = json.loads(request.POST['recursive'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    privileges = [privilege for privilege in privileges if privilege['status'] == '']
+
+    for path in [path['path'] for path in checkedPaths]:
+      if '.' in path:
+        db, table = path.split('.')
+      else:
+        db, table = path, ''
+      privilegeScope = 'TABLE' if table else 'DATABASE' if db else 'SERVER'
+      authorizableHierarchy.update({
+        'db': db,
+        'table': table, 
+      })
+
+      for privilege in privileges:
+        privilege['dbName'] = db
+        privilege['tableName'] = table
+        privilege['privilegeScope'] = privilegeScope        
+        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege])      
+
+    result['message'] = _('Privileges added.')
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
 def rename_sentry_privilege(request):
   result = {'status': -1, 'message': 'Error'}
 

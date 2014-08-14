@@ -144,7 +144,7 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <div>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkAddAcls" title="${ _('Add current current privileges to checkbox selection') }">
+                    <a href="javascript: void(0)" data-bind="click: $root.bulk_add_privileges" title="${ _('Add current current privileges to checkbox selection') }">
                       <i class="fa fa-plus"></i>
                     </a>
                     <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Replace checkbox selection with current privileges') }">
