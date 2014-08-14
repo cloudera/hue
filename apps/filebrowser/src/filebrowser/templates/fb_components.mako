@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     <ul class="nav nav-pills hueBreadcrumbBar">
         % if from_listdir:
-        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" style="line-height:18px"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
             <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="fa fa-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
             <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px">
@@ -32,12 +32,12 @@ from django.utils.translation import ugettext as _
             <input id="hueBreadcrumbText" type="text" class="input-xxlarge" style="margin-top:4px;margin-right:4px;display:none" data-bind="value: currentPath" autocomplete="off" />
         </li>
         <li class="pull-right">
-          <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px" title="${_('View trash')}">
+          <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" class="trashLink" title="${_('View trash')}">
             <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
         % else:
-        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
             <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
                     % for breadcrumb_item in breadcrumbs:
