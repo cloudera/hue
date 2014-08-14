@@ -397,6 +397,7 @@ DEFAULT_USER = Config(
   help=_("This should be the user running hue webserver"),
   type=str,
   default=None)
+
 DEFAULT_HDFS_SUPERUSER = Config(
   key="default_hdfs_superuser",
   help=_("This should be the hdfs super user"),
