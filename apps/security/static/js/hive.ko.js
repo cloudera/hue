@@ -259,7 +259,7 @@ var Assist = function (vm) {
 
   self.isDiffMode = ko.observable(false);
   self.isDiffMode.subscribe(function () {
-    //self.refreshTree();
+    self.refreshTree();
   });
 
   self.isLoadingTree = ko.observable(false);
@@ -848,6 +848,25 @@ var HiveViewModel = function (initial) {
       $(document).trigger("error", xhr.responseText);
     });
   }  
+
+  self.bulk_add_privileges = function (role) {
+    $(".jHueNotify").hide();
+    var checkedPaths = self.assist.getCheckedItems();
+    $.post("/security/api/hive/bulk_add_privileges", {
+      'privileges': ko.mapping.toJSON(self.assist.privileges),
+      'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
+      'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      'recursive': ko.mapping.toJSON(self.recursive()),
+    }, function (data) {
+      if (data.status == 0) {
+        self.list_sentry_privileges_by_authorizable(); // Refresh
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  } 
   
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', {
