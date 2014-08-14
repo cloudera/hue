@@ -27,11 +27,11 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
 <script type="text/html" id="role">
-  <div class="acl-block-title"><i class="fa fa-cube"></i> <span data-bind="text: name"></span></div>
+  <div class="acl-block-title"><i class="fa fa-cube"></i> <a href="javascript: void(0)"><span data-bind="text: name"></span></a></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
-    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
+    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_authorizable, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
 </script>
@@ -42,7 +42,7 @@ ${ layout.menubar(section='hive') }
 
   <!-- ko if: editing() -->
     <div class="pull-right">
-      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-header" data-bind="click: function() { if (editing()) { editing(false); }}"></i></a>
+      <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-eye" data-bind="click: function() { if (editing()) { editing(false); }}"></i></a>
       <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-times" data-bind="click: remove"></i></a>
     </div>
     <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
@@ -68,14 +68,12 @@ ${ layout.menubar(section='hive') }
       <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-times" data-bind="click: remove"></i></a>
     </div>
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
-    ${_('Database')}: <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
-    ${_('Action')}: <span data-bind="text: action"></span>
-    <span data-bind="text: privilegeScope"></span>
-    <span data-bind="text: tableName"></span>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span data-bind="text: privilegeScope"></span><br/>
+    <span data-bind="text: serverName"></span> ${_('Database')}: <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a> <span data-bind="text: tableName"></span>
     <span data-bind="text: URI"></span>
-    <span data-bind="text: grantor"></span>
-    <span data-bind="text: serverName"></span>
+    <br/>
+    ${_('Action')}: <span data-bind="text: action"></span>
+    <span data-bind="text: grantor"></span>    
   <!-- /ko -->
 </div>
 </script>
@@ -153,7 +151,6 @@ ${ layout.menubar(section='hive') }
                     <a href="javascript: void(0)" data-bind="click: $root.bulk_delete_privileges" title="${ _('Remove privileges of checkbox selection') }">
                       <i class="fa fa-times"></i>
                     </a>
-                    <label><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Recursive') }</label>
                   </div>
                   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                 </div>
@@ -222,7 +219,10 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-2x fa-caret" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
-                <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
+                <td>
+                  <i class="fa fa-cube"></i>
+                   <span data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"/>
+                </td>
                 <td>
                   <a href="javascript: void(0)" data-bind="click: function() { showEditGroups(true); }">
                     <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
