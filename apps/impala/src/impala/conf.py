@@ -69,6 +69,14 @@ CLOSE_QUERIES = Config(
   default=True
 )
 
+QUERY_TIMEOUT_S = Config(
+  key="query_timeout_s",
+  help=_t("If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work"
+          " (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."),
+  type=int,
+  default=600
+)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
