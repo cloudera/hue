@@ -392,6 +392,17 @@ SERVER_GROUP = Config(
   type=str,
   default="hue")
 
+DEFAULT_USER = Config(
+  key="default_user",
+  help=_("This should be the user running hue webserver"),
+  type=str,
+  default=None)
+DEFAULT_HDFS_SUPERUSER = Config(
+  key="default_hdfs_superuser",
+  help=_("This should be the hdfs super user"),
+  type=str,
+  default=None)
+
 CUSTOM = ConfigSection(
   key="custom",
   help=_("Customizations to the UI."),

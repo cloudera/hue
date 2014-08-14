@@ -36,9 +36,9 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 
 import hadoop.conf
+import desktop.conf
 
-
-DEFAULT_HDFS_SUPERUSER = 'hdfs'
+DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024*1024 # 1MB
@@ -50,7 +50,7 @@ class WebHdfs(Hdfs):
   """
   WebHdfs implements the filesystem interface via the WebHDFS rest protocol.
   """
-  DEFAULT_USER = 'hue'        # This should be the user running Hue
+  DEFAULT_USER = desktop.conf.DEFAULT_USER.get()        # This should be the user running Hue
   TRASH_CURRENT = 'Current'
 
   def __init__(self, url,
