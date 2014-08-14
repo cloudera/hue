@@ -14,7 +14,7 @@ class Migration(DataMigration):
         # Need to ensure oozie is completely sync'd before jobsub.
         # This migration relies on the existence of the complete oozie model in the DB.
         # If a new oozie schema migration is added, then this will need to be updated as well.
-        ("oozie", "0021_auto__chg_field_java_args__add_field_job_is_trashed"),
+        ("oozie", "0023_auto__add_field_node_data__add_field_job_data"),
     )
 
     def forwards(self, orm):
