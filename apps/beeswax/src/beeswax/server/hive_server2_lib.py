@@ -516,6 +516,9 @@ class HiveServerClient:
 
 
   def execute_statement(self, statement, max_rows=1000, configuration={}):
+    if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
+      configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
+
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
@@ -523,6 +526,9 @@ class HiveServerClient:
 
 
   def execute_async_statement(self, statement, confOverlay):
+    if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
+      confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
+
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
     res = self.call(self._client.ExecuteStatement, req)
 
