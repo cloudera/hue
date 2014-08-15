@@ -733,6 +733,15 @@ var HiveViewModel = function (initial) {
     });
   };
 
+  self.showRole = function (role) {
+    $(document).trigger("show.role", role);
+    ko.utils.arrayForEach(self.filteredRoles(), function (r) {
+      if (r.name() == role.name()){
+        self.list_sentry_privileges_by_role(r);
+      }
+    });
+  }
+
   self.list_sentry_privileges_by_role = function (role) {
     $.ajax({
       type: "POST",
