@@ -28,7 +28,7 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="role">
-  <div class="acl-block-title"><i class="fa fa-cube"></i> <a href="javascript: void(0)"><span data-bind="text: name"></span></a></div>
+  <div class="acl-block-title"><i class="fa fa-cube"></i> <a href="javascript: void(0)" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
@@ -76,7 +76,7 @@ ${ layout.menubar(section='hive') }
     <!-- ko ifnot: URI() -->    
       <span data-bind="visible: dbName">
         ->db=
-        <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+        <a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
       <span data-bind="visible: tableName">
         ->table=
@@ -233,8 +233,9 @@ ${ layout.menubar(section='hive') }
                   </a>
                 </td>
                 <td>
-                  <i class="fa fa-cube"></i>
-                   <span data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"/>
+                  <a data-bind="attr: {'href': name}"></a>
+                  <i class="fa fa-cube muted"></i>
+                  <span data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"/>
                 </td>
                 <td>
                   <a href="javascript: void(0)" data-bind="click: function() { showEditGroups(true); }">
@@ -488,6 +489,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       showMainSection(viewModel.getSectionHash());
+
+      $(document).on("show.role", function(e, role) {
+        showMainSection("roles");
+        $("html, body").animate({
+          scrollTop: ($("a[href='" + role.name() + "']").position().top - 90)+"px"
+        });
+      });
 
       var _resizeTimeout = -1;
       $(window).resize(function(){
