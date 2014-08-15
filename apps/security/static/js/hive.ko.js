@@ -236,7 +236,7 @@ var Role = function (vm, role) {
 }
 
 
-var Assist = function (vm) {
+var Assist = function (vm, initial) {
   var self = this;
 
   self.compareNames = function (a, b) {
@@ -251,7 +251,7 @@ var Assist = function (vm) {
   self.path.subscribe(function (path) {
     vm.updatePathHash(path);
   });
-  self.server = ko.observable('server1');
+  self.server = ko.observable(initial.sentry_provider);
   self.db = ko.computed(function () {
     return self.path().split(/[.]/)[0];
   });
@@ -636,7 +636,7 @@ var HiveViewModel = function (initial) {
   }, self);
 
   self.availableHadoopGroups = ko.observableArray();
-  self.assist = new Assist(self);
+  self.assist = new Assist(self, initial);
 
   // Editing
   self.showCreateRole = ko.observable(false);
