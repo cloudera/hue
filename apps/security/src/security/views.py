@@ -17,16 +17,13 @@
 
 import json
 
-from beeswax.api import autocomplete
 from desktop.lib.django_util import render
+from libsentry.sentry_site import get_hive_sentry_provider
 
 
 def hive(request):
-  assist = autocomplete(request, database=None, table=None)
-
   return render("hive.mako", request, {
-      'assist': assist,
-      'initial': json.dumps({'user': request.user.username}),
+      'initial': json.dumps({'user': request.user.username, 'sentry_provider': get_hive_sentry_provider()}),
   })
 
 

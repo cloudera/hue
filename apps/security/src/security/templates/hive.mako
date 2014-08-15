@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
+
 <script type="text/html" id="role">
   <div class="acl-block-title"><i class="fa fa-cube"></i> <a href="javascript: void(0)"><span data-bind="text: name"></span></a></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
