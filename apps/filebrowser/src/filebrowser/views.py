@@ -636,12 +636,14 @@ def read_contents(codec_type, path, fs, offset, length):
                 offset = 0
             elif path.endswith('.avro') and detect_avro(contents):
                 codec_type = 'avro'
-            elif path.endswith('.parquet') and detect_parquet(fhandle):
+            elif detect_parquet(fhandle):
                 codec_type = 'parquet'
-            elif snappy_installed() and path.endswith('.snappy'):
+            elif path.endswith('.snappy') and snappy_installed():
                 codec_type = 'snappy'
-            elif snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get() and detect_snappy(fhandle.read()):
-                codec_type = 'snappy'
+            elif snappy_installed() and stats.size <= MAX_SNAPPY_DECOMPRESSION_SIZE.get():
+              fhandle.seek(0)
+              if detect_snappy(fhandle.read()):
+                  codec_type = 'snappy'
 
         fhandle.seek(0)
 
