@@ -234,7 +234,7 @@ ${ layout.menubar(section='hdfs') }
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
           <i class="fa fa-copy"></i><br/><br/>
-          ${ _('Replace current ACLs to checkbox selection') }
+          ${ _('Replace checkbox selection with current ACLs') }
         </div>
       </div>
       <div class="span4 center">
@@ -337,17 +337,17 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 
     $(document).on("added.bulk.acls", function() {
-      $(document).trigger("info", "${ _('The current ACLs have been successfully added to the selected paths.') }");
+      $(document).trigger("info", "${ _('The current ACLs have been successfully added to the checked paths.') }");
       $("#bulkActionsModal").modal("hide");
     });
 
     $(document).on("deleted.bulk.acls", function() {
-      $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the selected paths.') }");
+      $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the checked paths.') }");
       $("#bulkActionsModal").modal("hide");
     });
 
     $(document).on("syncd.bulk.acls", function() {
-      $(document).trigger("info", "${ _('All the ACLs have been successfully updated for the selected paths.') }");
+      $(document).trigger("info", "${ _('All the ACLs for the checked items have been replaced with the current selection.') }");
       $("#bulkActionsModal").modal("hide");
     });
 

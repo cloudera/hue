@@ -132,12 +132,6 @@ ${ layout.menubar(section='hive') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
-                      <i class="fa fa-compress"></i> ${_('Close others')}
-                    </a>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
-                      <i class="fa fa-refresh"></i>  ${_('Refresh')}
-                    </a>                  
                     <div class="dropdown inline-block" style="margin-right: 6px">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
@@ -158,17 +152,20 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <div>
-                    <a href="javascript: void(0)" data-bind="click: $root.bulk_add_privileges" title="${ _('Add current current privileges to checkbox selection') }">
-                      <i class="fa fa-plus"></i>
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
+                      <i class="fa fa-compress"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.bulkSyncAcls" title="${ _('Replace checkbox selection with current privileges') }">
-                      <i class="fa fa-copy"></i>
+                    &nbsp;
+                    <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
+                      <i class="fa fa-refresh"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="click: $root.bulk_delete_privileges" title="${ _('Remove privileges of checkbox selection') }">
-                      <i class="fa fa-times"></i>
+                    &nbsp;
+                    <a href="javascript: void(0)" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
+                      <i class="fa fa-cogs"></i>
                     </a>
                   </div>
-                  <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+
                 </div>
               </div>
 
@@ -333,6 +330,60 @@ ${ layout.menubar(section='hive') }
   </div>
 </div>
 
+<div id="bulkActionsModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('What would you like to do with the checked paths?') }</h3>
+  </div>
+  <div class="modal-body" style="overflow-x: hidden">
+
+    <div class="row-fluid">
+      <div class="span6">
+        <h4>${ _('Checked items') }</h4>
+        <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
+          <li><span class="force-word-break" data-bind="text: path()"></span></li>
+        </ul>
+      </div>
+      <div class="span6">
+
+        <h4>${ _('Selected item for privilege actions') }</h4>
+
+        <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
+        <div data-bind="template: { name: 'role', foreach: $root.assist.roles }" class="modal-panel"></div>
+
+      </div>
+    </div>
+
+    <h4>${ _('Choose your action') }</h4>
+    <div class="row-fluid">
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
+          <i class="fa fa-plus"></i><br/><br/>
+          ${ _('Add current privileges to checkbox selection') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
+          <i class="fa fa-copy"></i><br/><br/>
+          ${ _('Replace checkbox selection with current privileges') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
+          <i class="fa fa-times"></i><br/><br/>
+          ${ _('Remove privileges of checkbox selection') }
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn" data-bind="css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
+  </div>
+</div>
+
 <%def name="treeIcons()">
   'fa-database': isDb(),
   'fa-table': isTable(),
@@ -460,6 +511,25 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       $("#selectedGroup").change(function() {
         viewModel.list_sentry_privileges_by_authorizable();
         viewModel.list_sentry_roles_by_group(); 
+      });
+
+      $(document).on("added.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("deleted.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("syncd.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $("#bulkActionsModal").modal({
+        show: false
       });
 
     });
