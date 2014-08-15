@@ -69,41 +69,41 @@ var Privilege = function (vm, privilege) {
   // UI
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
-	read: function () {
-	  if (self.tableName().length > 0) {
-	    return self.dbName() + "." + self.tableName();
-	  } else {
+    read: function () {
+      if (self.tableName().length > 0) {
+        return self.dbName() + "." + self.tableName();
+      } else {
         return self.dbName();
-	  }
-	},
-	write: function (value) {
-	  var lastSpacePos = value.lastIndexOf(".");
-	    if (lastSpacePos > 0) {
-	      this.dbName(value.substring(0, lastSpacePos));
-	      this.tableName(value.substring(lastSpacePos + 1));
-	    } else {
-	      this.dbName(value);
-	      this.tableName('');
-	    }
-	  },
-	owner: self
+      }
+    },
+    write: function (value) {
+      var lastSpacePos = value.lastIndexOf(".");
+      if (lastSpacePos > 0) {
+        this.dbName(value.substring(0, lastSpacePos));
+        this.tableName(value.substring(lastSpacePos + 1));
+      } else {
+        this.dbName(value);
+        this.tableName('');
+      }
+    },
+    owner: self
   });
-  self.privilegeScope = ko.computed(function() {
+  self.privilegeScope = ko.computed(function () {
     if (self.tableName().length > 0) {
-      return 'TABLE';	
+      return 'TABLE';
     } else if (self.dbName().length > 0) {
-  	  return 'DATABASE';
+      return 'DATABASE';
     } else {
       return 'SERVER';
     }
-  });  
-  
+  });
+
   self.remove = function (privilege) {
-	if (privilege.status() == 'new') {
-	  privilege.status('alreadydeleted');
-	} else {
+    if (privilege.status() == 'new') {
+      privilege.status('alreadydeleted');
+    } else {
       privilege.status('deleted');
-	}
+    }
   }
 }
 
@@ -134,9 +134,9 @@ var Role = function (vm, role) {
   });
 
   self.groupsChanged = ko.computed(function () {
-	return ! ($(self.groups()).not(self.originalGroups()).length == 0 && $(self.originalGroups()).not(self.groups()).length == 0);
+    return !($(self.groups()).not(self.originalGroups()).length == 0 && $(self.originalGroups()).not(self.groups()).length == 0);
   });
-  
+
   self.reset = function () {
     self.name('');
     self.groups.removeAll();
@@ -149,37 +149,37 @@ var Role = function (vm, role) {
   }
 
   self.addPrivilege = function () {
-	if (vm.getSectionHash() == 'edit') {
+    if (vm.getSectionHash() == 'edit') {
       self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true, 'dbName': vm.assist.db(), 'tableName': vm.assist.table()}));
-	} else {
+    } else {
       self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
-	}
+    }
   }
-  
+
   self.resetGroups = function () {
-	self.groups.removeAll();
-	$.each(self.originalGroups(), function (index, group) {
-	  self.groups.push(group);
-	});
+    self.groups.removeAll();
+    $.each(self.originalGroups(), function (index, group) {
+      self.groups.push(group);
+    });
   }
-  
-  self.saveGroups = function() {
+
+  self.saveGroups = function () {
     $(".jHueNotify").hide();
     $.post("/security/api/hive/update_role_groups", {
-    	role: ko.mapping.toJSON(self)
+      role: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         self.showEditGroups(false);
-    	self.originalGroups.removeAll();
-    	$.each(self.groups(), function (index, group) {
-    	  self.originalGroups.push(group);
-    	});        
+        self.originalGroups.removeAll();
+        $.each(self.groups(), function (index, group) {
+          self.originalGroups.push(group);
+        });
       } else {
         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
-	});
+    });
   }
 
   self.create = function () {
@@ -224,7 +224,7 @@ var Role = function (vm, role) {
       role: ko.mapping.toJSON(role)
     }, function (data) {
       if (data.status == 0) {
-    	vm.list_sentry_privileges_by_authorizable();
+        vm.list_sentry_privileges_by_authorizable();
         vm.list_sentry_privileges_by_role(role); // Refresh all role privileges
       } else {
         $(document).trigger("error", data.message);
@@ -284,6 +284,8 @@ var Assist = function (vm, initial) {
 
   self.growingTree = ko.observable(jQuery.extend(true, {}, self.initialGrowingTree));
 
+  self.checkedItems = ko.observableArray([]);
+
   self.addDatabases = function (path, databases, skipLoading) {
     var _tree = self.growingTree();
     databases.forEach(function (db) {
@@ -293,7 +295,7 @@ var Assist = function (vm, initial) {
           _mainFound = true;
         }
       });
-      if (! _mainFound) {
+      if (!_mainFound) {
         var _item = {
           path: db,
           name: db,
@@ -307,7 +309,7 @@ var Assist = function (vm, initial) {
         _tree.nodes.push(_item);
       }
     });
-    if (typeof skipLoading == "undefined" || !skipLoading){
+    if (typeof skipLoading == "undefined" || !skipLoading) {
       self.loadData(self.growingTree());
     }
   }
@@ -342,7 +344,7 @@ var Assist = function (vm, initial) {
         _branch.nodes.push(_item);
       }
     });
-    if (typeof skipLoading == "undefined" || !skipLoading){
+    if (typeof skipLoading == "undefined" || !skipLoading) {
       self.loadData(self.growingTree());
     }
   }
@@ -383,7 +385,7 @@ var Assist = function (vm, initial) {
         _branch.nodes.push(_item);
       }
     });
-    if (typeof skipLoading == "undefined" || !skipLoading){
+    if (typeof skipLoading == "undefined" || !skipLoading) {
       self.loadData(self.growingTree());
     }
   }
@@ -420,7 +422,7 @@ var Assist = function (vm, initial) {
   self.refreshTree = function (force) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     // load root first
-    self.fetchHivePath("", function(){
+    self.fetchHivePath("", function () {
       Object.keys(self.treeAdditionalData).forEach(function (path) {
         if (path.indexOf(".") == -1 && path != "") {
           if (typeof force == "boolean" && force) {
@@ -428,10 +430,10 @@ var Assist = function (vm, initial) {
           }
           else {
             if (self.treeAdditionalData[path].loaded) {
-              self.fetchHivePath(path, function(){
+              self.fetchHivePath(path, function () {
                 Object.keys(self.treeAdditionalData).forEach(function (ipath) {
-                  if (ipath.split(".").length == 2 && ipath.split(".")[0] == path){
-                    self.fetchHivePath(ipath, function() {
+                  if (ipath.split(".").length == 2 && ipath.split(".")[0] == path) {
+                    self.fetchHivePath(ipath, function () {
                       self.updateTreeProperty(self.growingTree(), "isExpanded", true);
                       self.loadData(self.growingTree());
                     });
@@ -454,7 +456,7 @@ var Assist = function (vm, initial) {
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     else {
-      if (typeof toggle == "boolean" && toggle){
+      if (typeof toggle == "boolean" && toggle) {
         obj.isExpanded(!obj.isExpanded());
       } else {
         obj.isExpanded(false);
@@ -472,6 +474,12 @@ var Assist = function (vm, initial) {
 
   self.checkPath = function (obj) {
     obj.isChecked(!obj.isChecked());
+    if (obj.isChecked()) {
+      self.checkedItems.push(obj);
+    }
+    else {
+      self.checkedItems.remove(obj);
+    }
     self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
   }
 
@@ -507,32 +515,14 @@ var Assist = function (vm, initial) {
     return leaf;
   }
 
-  self.getCheckedItems = function (leaf, checked) {
-    if (leaf == null){
-      leaf = self.growingTree();
-    }
-    if (checked == null){
-      checked = []
-    }
-    if (leaf.isChecked){
-      checked.push(leaf);
-    }
-    if (leaf.nodes.length > 0) {
-      leaf.nodes.forEach(function (node) {
-        self.getCheckedItems(node, checked);
-      });
-    }
-    return checked;
-  }
-
   self.loadParents = function (callback) {
-    self.fetchHivePath("", function(){
+    self.fetchHivePath("", function () {
       self.updatePathProperty(self.growingTree(), "", "isExpanded", true);
       var _crumbs = self.path().split(".");
-      self.fetchHivePath(_crumbs[0], function() {
+      self.fetchHivePath(_crumbs[0], function () {
         self.updatePathProperty(self.growingTree(), _crumbs[0], "isExpanded", true);
-        if (_crumbs.length > 1){
-          self.fetchHivePath(_crumbs[0] + "." + _crumbs[1], function(){
+        if (_crumbs.length > 1) {
+          self.fetchHivePath(_crumbs[0] + "." + _crumbs[1], function () {
             self.updatePathProperty(self.growingTree(), _crumbs[0] + "." + _crumbs[1], "isExpanded", true);
             self.loadData(self.growingTree());
             if (typeof callback != "undefined") {
@@ -614,7 +604,7 @@ var HiveViewModel = function (initial) {
   self.roleFilter = ko.observable("");
   self.filteredRoles = ko.computed(function () {
     var _filter = self.roleFilter().toLowerCase();
-    if (! _filter) {
+    if (!_filter) {
       return self.roles();
     } else {
       return ko.utils.arrayFilter(self.roles(), function (role) {
@@ -663,7 +653,7 @@ var HiveViewModel = function (initial) {
     _groups.push("");
     return _groups.sort();
   }, self);
-  
+
   self.selectAllRoles = function () {
     self.allRolesSelected(!self.allRolesSelected());
     ko.utils.arrayForEach(self.roles(), function (role) {
@@ -693,7 +683,7 @@ var HiveViewModel = function (initial) {
 
   self.expandSelectedRoles = function () {
     ko.utils.arrayForEach(self.selectedRoles(), function (role) {
-      if (! role.showPrivileges()) { 
+      if (!role.showPrivileges()) {
         self.list_sentry_privileges_by_role(role);
       }
     });
@@ -730,7 +720,7 @@ var HiveViewModel = function (initial) {
       success: function (data) {
         if (typeof data.status !== "undefined" && data.status == -1) {
           $(document).trigger("error", data.message);
-        } 
+        }
         else {
           self.roles.removeAll();
           $.each(data.roles, function (index, item) {
@@ -794,7 +784,7 @@ var HiveViewModel = function (initial) {
       'table': self.assist.table()
     }
   }
-  
+
   self.list_sentry_privileges_by_authorizable = function () {
     if (self.assist.path() != "") {
       $.ajax({
@@ -810,17 +800,17 @@ var HiveViewModel = function (initial) {
           self.assist.privileges.removeAll();
           $.each(data.privileges, function (index, item) {
             var _role = null;
-            self.assist.roles().forEach(function(role){
-              if (role.name() == item.roleName){
+            self.assist.roles().forEach(function (role) {
+              if (role.name() == item.roleName) {
                 _role = role;
               }
             });
-            if (_role == null){
+            if (_role == null) {
               var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
               _role = self.assist.roles()[_idx - 1];
             }
             _role.privileges.push(_create_ko_privilege(item));
-        	self.assist.privileges.push(_create_ko_privilege(item));
+            self.assist.privileges.push(_create_ko_privilege(item));
           });
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -829,41 +819,62 @@ var HiveViewModel = function (initial) {
     }
   };
 
+  self.bulkAction = ko.observable("");
+
+  self.bulkPerfomAction = function () {
+    switch (self.bulkAction()) {
+      case "add":
+        self.bulk_add_privileges();
+        break;
+      case "sync":
+        self.assist.bulkSyncAcls();
+        break;
+      case "delete":
+        self.bulk_delete_privileges();
+        break;
+    }
+    self.bulkAction("");
+  }
+
   self.bulk_delete_privileges = function (role) {
     $(".jHueNotify").hide();
-    var checkedPaths = self.assist.getCheckedItems();
+    var checkedPaths = self.assist.checkedItems();
     $.post("/security/api/hive/bulk_delete_privileges", {
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      'recursive': false
     }, function (data) {
       if (data.status == 0) {
         self.list_sentry_privileges_by_authorizable(); // Refresh
+        $(document).trigger("deleted.bulk.privileges");
       } else {
         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  }  
+  }
 
   self.bulk_add_privileges = function (role) {
     $(".jHueNotify").hide();
-    var checkedPaths = self.assist.getCheckedItems();
+    var checkedPaths = self.assist.checkedItems();
     $.post("/security/api/hive/bulk_add_privileges", {
       'privileges': ko.mapping.toJSON(self.assist.privileges),
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
+      'recursive': false
     }, function (data) {
       if (data.status == 0) {
         self.list_sentry_privileges_by_authorizable(); // Refresh
+        $(document).trigger("added.bulk.privileges");
       } else {
         $(document).trigger("error", data.message);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-  } 
-  
+  }
+
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', {
       'include_myself': true,
@@ -877,7 +888,7 @@ var HiveViewModel = function (initial) {
 
   self.updatePathHash = function (path) {
     var _hash = window.location.hash;
-    if (_hash.indexOf("@") == -1){
+    if (_hash.indexOf("@") == -1) {
       window.location.hash = path;
     }
     else {
@@ -887,10 +898,10 @@ var HiveViewModel = function (initial) {
 
   self.updateSectionHash = function (section) {
     var _hash = window.location.hash;
-    if (_hash == ""){
+    if (_hash == "") {
       window.location.hash = "@" + section;
     }
-    if (_hash.indexOf("@") == -1){
+    if (_hash.indexOf("@") == -1) {
       window.location.hash = _hash + "@" + section;
     }
     else {
@@ -901,7 +912,7 @@ var HiveViewModel = function (initial) {
   self.getPathHash = function () {
     if (window.location.hash != "") {
       var _hash = window.location.hash.substr(1);
-      if (_hash.indexOf("@") > -1){
+      if (_hash.indexOf("@") > -1) {
         return _hash.split("@")[0];
       }
       else {
@@ -914,7 +925,7 @@ var HiveViewModel = function (initial) {
   self.getSectionHash = function () {
     if (window.location.hash != "") {
       var _hash = window.location.hash.substr(1);
-      if (_hash.indexOf("@") > -1){
+      if (_hash.indexOf("@") > -1) {
         return _hash.split("@")[1];
       }
     }
