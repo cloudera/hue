@@ -72,6 +72,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
   password1 = forms.CharField(label=_t("Password"), widget=forms.PasswordInput, required=False)
   password2 = forms.CharField(label=_t("Password confirmation"), widget=forms.PasswordInput, required=False)
+  password_old = forms.CharField(label=_t("Previous Password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),
                                             initial=True,
@@ -101,6 +102,14 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     if self.instance.id is None and password == "":
       raise forms.ValidationError(_("You must specify a password when creating a new user."))
     return self.cleaned_data.get("password1", "")
+
+  def clean_password_old(self):
+    if self.instance.id is not None:
+      password1 = self.cleaned_data.get("password1", "")
+      password_old = self.cleaned_data.get("password_old", "")
+      if password1 != '' and not self.instance.check_password(password_old):
+        raise forms.ValidationError(_("The old password does not match the current password."))
+    return self.cleaned_data.get("password_old", "")
 
   def save(self, commit=True):
     """
