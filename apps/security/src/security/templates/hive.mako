@@ -54,7 +54,7 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    &nbsp;&nbsp;<a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
+    &nbsp;&nbsp;<a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: serverName" placeholder="serverName">
@@ -69,11 +69,26 @@ ${ layout.menubar(section='hive') }
       <a href="javascript: void(0)" style="margin-right: 4px"><i class="fa fa-times" data-bind="click: remove"></i></a>
     </div>
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span data-bind="text: privilegeScope"></span><br/>
-    <span data-bind="text: serverName"></span> ${_('Database')}: <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a> <span data-bind="text: tableName"></span>
-    <span data-bind="text: URI"></span>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span><br/>
+        
+    server=<span data-bind="text: serverName"></span>
+    
+    <!-- ko ifnot: URI() -->    
+      <span data-bind="visible: dbName">
+        ->db=
+        <a data-bind="attr: { href: '/metastore/table/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+      </span>
+      <span data-bind="visible: tableName">
+        ->table=
+        <a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
+      </span>
+      ->action=<span data-bind="text: action"></span>
+    <!-- /ko -->
+    
+    <!-- ko if: URI() -->    
+      <span data-bind="text: URI"></span>
+    <!-- /ko -->
     <br/>
-    ${_('Action')}: <span data-bind="text: action"></span>
     <span data-bind="text: grantor"></span>    
   <!-- /ko -->
 </div>
