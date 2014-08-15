@@ -35,7 +35,13 @@ ${ layout.menubar(section='users') }
     <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
     <div id="properties" class="section">
       <ul class="nav nav-tabs" style="margin-bottom: 0">
-        <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
+        <li class="active">
+          <a href="#step1" class="step">${ _('Step 1: Credentials') }
+          % if not username:
+            ${ _('(required)') }
+          % endif
+          </a>
+        </li>
         <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a>
         </li>
         % if user.is_superuser:
@@ -47,8 +53,11 @@ ${ layout.menubar(section='users') }
       <div id="step1" class="stepDetails">
         ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
         % if "password1" in form.fields:
-        ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
-        ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
+          ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+          ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % if username:
+            ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % endif
         % endif
         ${layout.render_field(form["ensure_home_directory"])}
         </div>
