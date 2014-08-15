@@ -145,6 +145,8 @@ var Assist = function (vm, assist) {
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
+  self.checkedItems = ko.observableArray([]);
+
   self.afterRender = function() {
     if (! self.fromLoadMore && ! self.fromRebuildTree) {
       $(document).trigger("rendered.tree");
@@ -252,24 +254,6 @@ var Assist = function (vm, assist) {
     return leaf;
   }
 
-  self.getCheckedItems = function (leaf, checked) {
-    if (leaf == null){
-      leaf = self.growingTree();
-    }
-    if (checked == null){
-      checked = []
-    }
-    if (leaf.isChecked){
-      checked.push(leaf);
-    }
-    if (leaf.nodes.length > 0) {
-      leaf.nodes.forEach(function (node) {
-        self.getCheckedItems(node, checked);
-      });
-    }
-    return checked;
-  }
-
   self.collapseTree = function () {
     self.updateTreeProperty(self.growingTree(), "isExpanded", false);
     self.updatePathProperty(self.growingTree(), "/", "isExpanded", true);
@@ -355,6 +339,12 @@ var Assist = function (vm, assist) {
 
   self.checkPath = function (obj) {
     obj.isChecked(!obj.isChecked());
+    if (obj.isChecked()){
+      self.checkedItems.push(obj);
+    }
+    else {
+      self.checkedItems.remove(obj);
+    }
     self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
   }
 
@@ -490,12 +480,29 @@ var Assist = function (vm, assist) {
       $(document).trigger("error", JSON.parse(xhr.responseText).message);
     });
   }
+
+  self.bulkAction = ko.observable("");
+
+  self.bulkPerfomAction = function () {
+    switch (self.bulkAction()) {
+      case "add":
+        self.bulkAddAcls();
+        break;
+      case "sync":
+        self.bulkSyncAcls();
+        break;
+      case "delete":
+        self.bulkDeleteAcls();
+        break;
+    }
+    self.bulkAction("");
+  }
   
   self.bulkDeleteAcls = function() {
 	$(".jHueNotify").hide();
 	logGA('bulkDeleteAcls');
 
-	var checkedPaths = self.getCheckedItems();
+	var checkedPaths = self.checkedItems();
 	
 	$.post("/security/api/hdfs/bulk_delete_acls", {
         'path': self.path(),
@@ -517,7 +524,7 @@ var Assist = function (vm, assist) {
 	$(".jHueNotify").hide();
 	logGA('bulkAddAcls');
 
-	var checkedPaths = self.getCheckedItems();
+	var checkedPaths = self.checkedItems();
 	
 	$.post("/security/api/hdfs/bulk_add_acls", {
         'path': self.path(),
@@ -537,7 +544,7 @@ var Assist = function (vm, assist) {
 	$(".jHueNotify").hide();
 	logGA('bulkSyncAcls');
 
-	var checkedPaths = self.getCheckedItems();
+	var checkedPaths = self.checkedItems();
 	
 	$.post("/security/api/hdfs/bulk_sync_acls", {
         'path': self.path(),
