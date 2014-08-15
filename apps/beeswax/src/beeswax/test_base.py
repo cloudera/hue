@@ -143,14 +143,14 @@ def get_shared_beeswax_server():
 
       start = time.time()
       started = False
-      sleep = 0.001
+      sleep = 1
 
       make_logged_in_client()
       user = User.objects.get(username='test')
       query_server = get_query_server_config()
       db = dbms.get(user, query_server)
 
-      while not started and time.time() - start < 20.0:
+      while not started and time.time() - start <= 30:
         try:
           db.open_session(user)
           started = True
@@ -158,7 +158,6 @@ def get_shared_beeswax_server():
         except Exception, e:
           LOG.info('HiveServer2 server status not started yet after: %s' % e)
           time.sleep(sleep)
-          sleep *= 2
 
       if not started:
         raise Exception("Server took too long to come up.")
