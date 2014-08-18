@@ -36,8 +36,8 @@ ${ layout.menubar(section='hdfs') }
 
 <script type="text/html" id="aclEdit">
   <div data-bind="visible: status() != 'deleted'" class="acl-block">
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: $root.assist.removeAcl"></i>
+    <a class="pointer pull-right" style="margin-right: 4px" data-bind="click: $root.assist.removeAcl">
+      <i class="fa fa-times"></i>
     </a>
     <label class="radio inline-block">
       <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
@@ -111,15 +111,15 @@ ${ layout.menubar(section='hdfs') }
                   </div>
                   <div>
                     <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
+                    <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
                       <i class="fa fa-compress"></i>
                     </a>
                     &nbsp;
-                    <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
+                    <a class="pointer" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
                       <i class="fa fa-refresh"></i>
                     </a>
                     &nbsp;
-                    <a href="javascript: void(0)" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
+                    <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
                       <i class="fa fa-cogs"></i>
                     </a>
                   </div>
@@ -132,8 +132,8 @@ ${ layout.menubar(section='hdfs') }
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
 
                   <ul class="nav nav-tabs">
-                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
-                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>                                       
+                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
                   </ul>
                   
 
