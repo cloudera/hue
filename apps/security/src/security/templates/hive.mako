@@ -172,6 +172,7 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span6 acl-panel">
               <div class="acl-panel-content">
+                <a data-bind="visible: $root.assist.privileges().length > 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer pull-right"><i class="fa fa-plus-circle"></i> ${ _('Add role') }</a>
                 <h4 style="margin-top: 4px">${ _('Privileges') }</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')} <a class="pointer" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">${ _('Click here to add a new role.') }</a> </em></div>
                 <div data-bind="template: { name: 'role', foreach: $root.assist.roles }"></div>
