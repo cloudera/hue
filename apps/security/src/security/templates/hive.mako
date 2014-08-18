@@ -28,7 +28,7 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="role">
-  <div class="acl-block-title"><i class="fa fa-cube"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
+  <div class="acl-block-title"><i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
@@ -75,14 +75,12 @@ ${ layout.menubar(section='hive') }
     
     <!-- ko ifnot: URI() -->    
       <span data-bind="visible: dbName">
-        ->db=
-        <a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
       <span data-bind="visible: tableName">
-        ->table=
-        <a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
       </span>
-      ->action=<span data-bind="text: action"></span>
+      <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
     
     <!-- ko if: URI() -->    
