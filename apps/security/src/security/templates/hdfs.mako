@@ -202,7 +202,7 @@ ${ layout.menubar(section='hdfs') }
       <div class="span6">
         <h4>${ _('Checked paths') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path() }, text: path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
+          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
       <div class="span6">

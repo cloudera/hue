@@ -46,10 +46,10 @@ ${ layout.menubar(section='hive') }
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
-    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
+    <input value="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked="checked" />
     <input type="text" data-bind="hivechooser: $data.path" placeholder="dbName.tableName">
 
-    <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
+    <input value="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
     <input type="text" data-bind="filechooser: $data.URI" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
@@ -339,7 +339,7 @@ ${ layout.menubar(section='hive') }
       <div class="span6">
         <h4>${ _('Checked items') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><span class="force-word-break" data-bind="text: path()"></span></li>
+          <li><span class="force-word-break" data-bind="text: path"></span></li>
         </ul>
       </div>
       <div class="span6">

@@ -281,6 +281,6 @@ h1.emptyMessage {
   display: none;
 }
 
-.big-btn:hover .bulk-action-description {
+.big-btn:hover .bulk-action-description, .big-btn.selected .bulk-action-description {
   display: block;
 }

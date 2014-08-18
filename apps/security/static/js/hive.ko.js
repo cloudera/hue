@@ -475,15 +475,29 @@ var Assist = function (vm, initial) {
     self.setPath(obj, true);
   }
 
+  self.getCheckedItems = function (leaf, checked) {
+    if (leaf == null){
+      leaf = self.growingTree();
+    }
+    if (checked == null){
+      checked = []
+    }
+    if (leaf.isChecked){
+      checked.push(leaf);
+    }
+    if (leaf.nodes.length > 0) {
+      leaf.nodes.forEach(function (node) {
+        self.getCheckedItems(node, checked);
+      });
+    }
+    return checked;
+  }
+
+
   self.checkPath = function (obj) {
     obj.isChecked(!obj.isChecked());
-    if (obj.isChecked()) {
-      self.checkedItems.push(obj);
-    }
-    else {
-      self.checkedItems.remove(obj);
-    }
     self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
+    self.checkedItems(self.getCheckedItems());
   }
 
   self.getTreeAdditionalDataForPath = function (path) {
