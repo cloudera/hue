@@ -30,7 +30,7 @@ ${ layout.menubar(section='hive') }
 <script type="text/html" id="role">
   <div class="acl-block-title"><i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
   <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
-  <div class="acl-block acl-actions">
+  <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0)">
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_authorizable, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
@@ -269,7 +269,7 @@ ${ layout.menubar(section='hive') }
               <tr data-bind="visible: $data.showPrivileges">
                 <td colspan="2"></td>
                 <td colspan="4">
-                  <div class="acl-block acl-actions">
+                  <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0)">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
                     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
                     <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
@@ -306,8 +306,8 @@ ${ layout.menubar(section='hive') }
 
     <h4>${ _('Privileges') }</h4>
     <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
-    <div class="acl-block acl-actions">
-      <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    <div class="acl-block acl-actions pointer" data-bind="click: addPrivilege">
+      <span class="pointer" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     </div>
   </div>
   <div class="modal-footer">

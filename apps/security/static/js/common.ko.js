@@ -101,6 +101,7 @@ ko.bindingHandlers.select2 = {
 ko.bindingHandlers.hivechooser = {
   init: function(element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
+    self.val(valueAccessor()());
     function setPathFromAutocomplete(path){
       self.val(path);
       self.change();
