@@ -46,11 +46,11 @@ ${ layout.menubar(section='hive') }
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
-    <input value="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked="checked" />
-    <input type="text" data-bind="hivechooser: $data.path" placeholder="dbName.tableName">
+    <input value="db" data-bind="attr: { name: 'privilege-' + $index() }, checked: type" type="radio" />
+    <input type="text" data-bind="hivechooser: $data.path, enable: type() == 'db'" placeholder="dbName.tableName">
 
-    <input value="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
-    <input type="text" data-bind="filechooser: $data.URI" placeholder="URI">
+    <input value="uri" data-bind="attr: { name: 'privilege-' + $index() }, checked: type" type="radio"/>
+    <input type="text" data-bind="filechooser: $data.URI, enable: type() == 'uri'" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
