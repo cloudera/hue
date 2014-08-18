@@ -50,11 +50,11 @@ ${ layout.menubar(section='hive') }
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
 
     <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
-    <input type="text" data-bind="value: $data.URI" placeholder="URI">
+    <input type="text" data-bind="filechooser: $data.URI" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    &nbsp;&nbsp;<a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
+    <span class="showAdvancedSpace">&nbsp;&nbsp;</span><a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: serverName" placeholder="serverName">
@@ -383,6 +383,20 @@ ${ layout.menubar(section='hive') }
   </div>
 </div>
 
+<div id="chooseFile" class="modal hide fade">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+      <div id="filechooser">
+      </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
+
 <%def name="treeIcons()">
   'fa-database': isDb(),
   'fa-table': isTable(),
@@ -400,6 +414,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.hiveautocomplete.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
+
 
   <script type="text/javascript" charset="utf-8">
     var viewModel = new HiveViewModel(${ initial | n,unicode });

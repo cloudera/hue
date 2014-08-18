@@ -119,6 +119,9 @@
   display: block;
   margin-top: 4px;
 }
+.span6 .acl-block .showAdvancedSpacer {
+  display: none;
+}
 
 .acl-actions {
   padding: 5px;
@@ -267,4 +270,9 @@ h1.emptyMessage {
 .modal-panel {
   max-height: 120px;
   overflow-y: scroll;
+}
+
+.fileChooserBtn {
+  height: 31px;
+  border-left: 0;
 }

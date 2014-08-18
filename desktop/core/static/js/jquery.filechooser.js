@@ -29,6 +29,7 @@
             createFolder:true,
             uploadFile:true,
             selectFolder:false,
+            suppressErrors:false,
             labels: {
                 BACK: "Back",
                 SELECT_FOLDER: "Select this folder",
@@ -261,9 +262,11 @@
                 }, 100);
             }
         }).error(function(){
-            $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
+            if (! _parent.options.suppressErrors) {
+              $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
+              _parent.options.onError();
+            }
             _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : "/?default_to_home");
-            _parent.options.onError();
         });
     };
 
