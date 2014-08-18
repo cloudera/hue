@@ -160,7 +160,7 @@ ${ layout.menubar(section='hive') }
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
-                      <i class="fa fa-cogs"></i>
+                      <i class="fa fa-copy"></i>
                     </a>
                   </div>
 
@@ -331,7 +331,7 @@ ${ layout.menubar(section='hive') }
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('What would you like to do with the checked paths?') }</h3>
+    <h3>${ _('Apply some bulk operations') }</h3>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
@@ -357,26 +357,25 @@ ${ layout.menubar(section='hive') }
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
           <i class="fa fa-plus"></i><br/><br/>
-          ${ _('Add current privileges to checkbox selection') }
+          <span class="bulk-action-description">${ _('Add current privileges to checkbox selection') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
-          <i class="fa fa-copy"></i><br/><br/>
-          ${ _('Replace checkbox selection with current privileges') }
+          <i class="fa fa-eraser"></i><br/><br/>
+          <span class="bulk-action-description">${ _('Replace checkbox selection with current privileges') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
           <i class="fa fa-times"></i><br/><br/>
-          ${ _('Remove privileges of checkbox selection') }
+          <span class="bulk-action-description">${ _('Remove privileges of checkbox selection') }</span>
         </div>
       </div>
     </div>
 
   </div>
   <div class="modal-footer">
-    <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button class="btn" data-bind="css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
   </div>

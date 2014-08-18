@@ -120,7 +120,7 @@ ${ layout.menubar(section='hdfs') }
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
-                      <i class="fa fa-cogs"></i>
+                      <i class="fa fa-copy"></i>
                     </a>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ ${ layout.menubar(section='hdfs') }
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('What would you like to do with the checked paths?') }</h3>
+    <h3>${ _('Apply some bulk operations') }</h3>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
@@ -228,19 +228,19 @@ ${ layout.menubar(section='hdfs') }
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'add'}, click: function(){$root.assist.bulkAction('add')}">
           <i class="fa fa-plus"></i><br/><br/>
-          ${ _('Add current ACLs to checkbox selection') }
+          <span class="bulk-action-description">${ _('Add current ACLs to checkbox selection') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
-          <i class="fa fa-copy"></i><br/><br/>
-          ${ _('Replace checkbox selection with current ACLs') }
+          <i class="fa fa-eraser"></i><br/><br/>
+          <span class="bulk-action-description">${ _('Replace checkbox selection with current ACLs') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
           <i class="fa fa-times"></i><br/><br/>
-          ${ _('Remove all ACLs of checkbox selection') }
+          <span class="bulk-action-description">${ _('Remove all ACLs of checkbox selection') }</span>
         </div>
       </div>
     </div>

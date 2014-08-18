@@ -276,3 +276,11 @@ h1.emptyMessage {
   height: 31px;
   border-left: 0;
 }
+
+.bulk-action-description {
+  display: none;
+}
+
+.big-btn:hover .bulk-action-description {
+  display: block;
+}
