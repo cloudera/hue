@@ -47,7 +47,7 @@ ${ layout.menubar(section='hive') }
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
     <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
-    <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
+    <input type="text" data-bind="hivechooser: $data.path" placeholder="dbName.tableName">
 
     <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
     <input type="text" data-bind="filechooser: $data.URI" placeholder="URI">
@@ -436,6 +436,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       }
 
       $("#path").jHueHiveAutocomplete({
+        skipColumns: true,
         home: viewModel.assist.path(),
         onPathChange: function (path) {
           setPathFromAutocomplete(path);
