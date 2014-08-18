@@ -98,6 +98,25 @@ ko.bindingHandlers.select2 = {
   }
 };
 
+ko.bindingHandlers.hivechooser = {
+  init: function(element, valueAccessor, allBindingsAccessor, vm) {
+    var self = $(element);
+    function setPathFromAutocomplete(path){
+      self.val(path);
+      self.change();
+    }
+    self.jHueHiveAutocomplete({
+      skipColumns: true,
+      home: "/",
+      onPathChange: function (path) {
+        setPathFromAutocomplete(path);
+      },
+      onEnter: function (el) {
+        setPathFromAutocomplete(el.val());
+      }
+    });
+  }
+}
 
 ko.bindingHandlers.filechooser = {
   init: function(element, valueAccessor, allBindingsAccessor, vm) {

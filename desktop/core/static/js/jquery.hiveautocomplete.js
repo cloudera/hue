@@ -22,6 +22,7 @@
   var pluginName = "jHueHiveAutocomplete",
       defaults = {
         home: "/",
+        skipColumns: false,
         onEnter: function () {
         },
         onBlur: function () {
@@ -208,6 +209,7 @@
 
           var _ico = "";
           var _iterable = [];
+          var _isSkipColumns = false;
 
           if (data.databases != null){ // it's a db
             _iterable = data.databases;
@@ -218,14 +220,19 @@
             _ico = "fa-table";
           }
           else {
-            _iterable = data.columns;
-            _ico = "fa-columns";
+            if (! _this.options.skipColumns) {
+              _iterable = data.columns;
+              _ico = "fa-columns";
+            }
+            else {
+              _isSkipColumns = true;
+            }
           }
 
-
-          $(_iterable).each(function (cnt, item) {
-            _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
-          });
+          if (! _isSkipColumns){
+            $(_iterable).each(function (cnt, item) {
+              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
+            });
 
             $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
             $("#jHueHiveAutocomplete").find("ul").empty().html(_currentFiles.join(""));
@@ -237,24 +244,29 @@
 
               if ($(this).html().indexOf("database") > -1){
                 _el.val(item + ".");
-                _this.options.onPathChange(item);
+                _this.options.onPathChange(_el.val());
                 showHiveAutocomplete();
               }
 
               if ($(this).html().indexOf("table") > -1){
                 if (_el.val().indexOf(".") > -1){
                   if (_el.val().match(/\./gi).length == 1){
-                    _el.val(_el.val().substring(0, _el.val().lastIndexOf(".") + 1) + item + ".");
+                    _el.val(_el.val().substring(0, _el.val().lastIndexOf(".") + 1) + item);
                   }
                   else {
-                    _el.val(_el.val().substring(0, _el.val().indexOf(".") + 1) + item + ".");
+                    _el.val(_el.val().substring(0, _el.val().indexOf(".") + 1) + item);
                   }
                 }
                 else {
-                  _el.val(_el.val() + item + ".");
+                  _el.val(_el.val() + item);
+                }
+                if (! _this.options.skipColumns){
+                  _el.val(_el.val() + ".");
                 }
                 _this.options.onPathChange(_el.val());
-                showHiveAutocomplete();
+                if (! _this.options.skipColumns) {
+                  showHiveAutocomplete();
+                }
               }
 
               if ($(this).html().indexOf("columns") > -1){
@@ -277,6 +289,7 @@
             if ("undefined" != typeof callback) {
               callback();
             }
+          }
         }
       });
     }
