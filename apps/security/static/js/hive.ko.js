@@ -572,9 +572,10 @@ var Assist = function (vm, initial) {
             }
           } else if (data.tables && data.tables.length > 0) {
             self.addTables(_originalPath, data.tables, _hasCallback);
-          } else if (data.columns && data.columns.length > 0) {
-            self.addColumns(_originalPath, data.columns, _hasCallback);
           }
+          //else if (data.columns && data.columns.length > 0) {
+            //self.addColumns(_originalPath, data.columns, _hasCallback);
+          //}
 
           if (_hasCallback) {
             loadCallback(data);
