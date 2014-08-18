@@ -225,7 +225,8 @@ var Assist = function (vm, assist) {
   self.getTreeAdditionalDataForPath = function (path) {
     if (typeof self.treeAdditionalData[path] == "undefined") {
       var _add = {
-        loaded: false
+        loaded: false,
+        expanded: true
       }
       self.treeAdditionalData[path] = _add;
     }
@@ -288,13 +289,13 @@ var Assist = function (vm, assist) {
     Object.keys(self.treeAdditionalData).forEach(function (path) {
       if (typeof force == "boolean" && force) {
         self.fetchPath(path, function () {
-          self.updatePathProperty(self.growingTree(), path, "isExpanded", true);
+          self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
           self.loadData(self.growingTree());
         });
       } else {
         if (self.treeAdditionalData[path].loaded) {
           self.fetchPath(path, function () {
-            self.updatePathProperty(self.growingTree(), path, "isExpanded", true);
+            self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
             self.loadData(self.growingTree());
           });
         }
@@ -319,6 +320,7 @@ var Assist = function (vm, assist) {
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (!obj.isExpanded() && !self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
       if (typeof toggle == "boolean" && toggle) {
         obj.isExpanded(!obj.isExpanded());
+        self.getTreeAdditionalDataForPath(obj.path()).expanded = obj.isExpanded();
       }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
@@ -328,6 +330,7 @@ var Assist = function (vm, assist) {
       } else {
         obj.isExpanded(false);
       }
+      self.getTreeAdditionalDataForPath(obj.path()).expanded = obj.isExpanded();
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
     self.path(obj.path());
