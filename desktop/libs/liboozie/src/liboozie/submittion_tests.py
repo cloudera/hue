@@ -17,16 +17,109 @@
 
 import logging
 
-from nose.tools import assert_equal, assert_true
+from django.contrib.auth.models import User
+from nose.plugins.attrib import attr
+from nose.tools import assert_equal, assert_true, assert_not_equal
 
-from hadoop import cluster
+from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
 from liboozie.submittion import Submission
 from oozie.tests import OozieMockBase
+from desktop.lib.django_test_util import make_logged_in_client
 
 
 LOG = logging.getLogger(__name__)
+
+
+@attr('requires_hadoop')
+def test_copy_files():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client()
+    user = User.objects.get(username='test')
+
+    prefix = '/tmp/test_copy_files'
+
+    if cluster.fs.exists(prefix):
+      cluster.fs.rmtree(prefix)
+
+    # Jars in various locations
+    deployment_dir = '%s/workspace' % prefix
+    external_deployment_dir = '%s/deployment' % prefix
+    jar_1 = '%s/udf1.jar' % prefix
+    jar_2 = '%s/lib/udf2.jar' % prefix
+    jar_3 = '%s/udf3.jar' % deployment_dir
+    jar_4 = '%s/lib/udf4.jar' % deployment_dir # Never move
+
+    cluster.fs.mkdir(prefix)
+    cluster.fs.create(jar_1)
+    cluster.fs.create(jar_2)
+    cluster.fs.create(jar_3)
+    cluster.fs.create(jar_4)
+
+    class MockNode():
+      def __init__(self, jar_path):
+        self.jar_path = jar_path
+
+    class MockJob():
+      def __init__(self):
+        self.node_list = [
+            MockNode(jar_1),
+            MockNode(jar_2),
+            MockNode(jar_3),
+            MockNode(jar_4),
+        ]
+
+      def get_application_filename(self):
+        return 'workflow.xml'
+
+    submission = Submission(user, job=MockJob(), fs=cluster.fs, jt=cluster.jt)
+
+    submission._copy_files(deployment_dir, "<xml>My XML</xml>")
+    submission._copy_files(external_deployment_dir, "<xml>My XML</xml>")
+
+    # All sources still there
+    assert_true(cluster.fs.exists(jar_1))
+    assert_true(cluster.fs.exists(jar_2))
+    assert_true(cluster.fs.exists(jar_3))
+    assert_true(cluster.fs.exists(jar_4))
+
+    deployment_dir = deployment_dir + '/lib'
+    external_deployment_dir = external_deployment_dir + '/lib'
+
+    list_dir_workspace = cluster.fs.listdir(deployment_dir)
+    list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
+
+    # All destinations there
+    assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
+    assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
+    assert_true(cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace)
+    assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
+
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
+
+    stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
+    stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
+    stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
+    stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
+
+    submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>")
+
+    assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
+    assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
+    assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
+    assert_equal(stats_udf4['fileId'], cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId'])
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)
+    except:
+      pass
 
 
 class MockFs():
@@ -68,6 +161,7 @@ class TestSubmission(OozieMockBase):
         'jobTracker': 'jtname',
         'nameNode': 'fsname'
       }, submission.properties)
+
 
   def test_update_properties(self):
     finish = []
