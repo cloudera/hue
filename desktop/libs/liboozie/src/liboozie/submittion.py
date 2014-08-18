@@ -272,8 +272,12 @@ class Submission(object):
       for jar_file in files:
         LOG.debug("Updating %s" % jar_file)
         jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
+        # Refresh if needed
         if self.fs.exists(jar_lib_path):
-          self.fs.remove(jar_lib_path, skip_trash=True)
+          stat_src = self.fs.stats(jar_file)
+          stat_dest = self.fs.stats(jar_lib_path)
+          if stat_src.fileId != stat_dest.fileId:
+            self.fs.remove(jar_lib_path, skip_trash=True)
         self.fs.copyfile(jar_file, jar_lib_path)
 
   def _do_as(self, username, fn, *args, **kwargs):
