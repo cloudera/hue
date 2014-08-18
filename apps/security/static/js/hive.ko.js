@@ -567,6 +567,9 @@ var Assist = function (vm, initial) {
 
           if (data.databases) {
             self.addDatabases(_originalPath, data.databases, _hasCallback);
+            if (vm.getPathHash() == ""){
+              self.setPath(self.treeData().nodes()[0]);
+            }
           } else if (data.tables && data.tables.length > 0) {
             self.addTables(_originalPath, data.tables, _hasCallback);
           } else if (data.columns && data.columns.length > 0) {
