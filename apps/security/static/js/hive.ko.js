@@ -127,6 +127,7 @@ var Role = function (vm, role) {
   self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
   self.showEditGroups = ko.observable(false);
+  self.hasDuplicateName = ko.observable(false);
 
   self.privilegesChanged = ko.computed(function () {
     return $.grep(self.privileges(), function (privilege) {
@@ -657,6 +658,15 @@ var HiveViewModel = function (initial) {
   // Editing
   self.showCreateRole = ko.observable(false);
   self.role = new Role(self, {});
+  self.role.name.subscribe(function (value){
+    var _found = false;
+    ko.utils.arrayForEach(self.roles(), function (role) {
+      if (role.name() == value){
+        _found = true;
+      }
+    });
+    self.role.hasDuplicateName(_found);
+  });
   self.privilege = new Privilege(self, {});
 
   self.doAs = ko.observable(initial.user);
