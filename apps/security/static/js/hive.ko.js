@@ -194,6 +194,7 @@ var Role = function (vm, role) {
         $(document).trigger("created.role");
         var role = new Role(vm, data.role);
         vm.roles.unshift(role);
+        vm.assist.refreshTree();
         vm.list_sentry_privileges_by_role(role); // Show privileges        
       } else {
         $(document).trigger("error", data.message);
@@ -210,6 +211,7 @@ var Role = function (vm, role) {
     }, function (data) {
       if (data.status == 0) {
         vm.removeRole(role.name);
+        vm.assist.refreshTree();
       } else {
         $(document).trigger("error", data.message);
       }
@@ -445,7 +447,7 @@ var Assist = function (vm, initial) {
         }
       });
     });
-
+    vm.list_sentry_privileges_by_authorizable();
   }
 
   self.setPath = function (obj, toggle) {
