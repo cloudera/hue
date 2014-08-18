@@ -371,6 +371,7 @@ class HiveServerClient:
 
   def open_session(self, user):
     kwargs = {
+        'client_protocol': beeswax_conf.THRIFT_VERSION.get(),
         'username': user.username, # If SASL or LDAP, it gets the username from the authentication mechanism" since it dependents on it.
         'configuration': {},
     }
