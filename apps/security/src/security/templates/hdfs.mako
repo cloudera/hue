@@ -135,7 +135,6 @@ ${ layout.menubar(section='hdfs') }
                     <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
                     <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
                   </ul>
-                  
 
                   <div class="acl-panel-content">
                     <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
@@ -233,13 +232,13 @@ ${ layout.menubar(section='hdfs') }
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
-          <i class="fa fa-eraser"></i><br/><br/>
+          <i class="fa fa-random"></i><br/><br/>
           <span class="bulk-action-description">${ _('Replace checkbox selection with current ACLs') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
-          <i class="fa fa-times"></i><br/><br/>
+          <i class="fa fa-eraser"></i><br/><br/>
           <span class="bulk-action-description">${ _('Remove all ACLs of checkbox selection') }</span>
         </div>
       </div>

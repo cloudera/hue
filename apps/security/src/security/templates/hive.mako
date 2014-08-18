@@ -362,13 +362,13 @@ ${ layout.menubar(section='hive') }
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
-          <i class="fa fa-eraser"></i><br/><br/>
+          <i class="fa fa-random"></i><br/><br/>
           <span class="bulk-action-description">${ _('Replace checkbox selection with current privileges') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
-          <i class="fa fa-times"></i><br/><br/>
+          <i class="fa fa-eraser"></i><br/><br/>
           <span class="bulk-action-description">${ _('Remove privileges of checkbox selection') }</span>
         </div>
       </div>
