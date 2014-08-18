@@ -56,9 +56,6 @@ def is_selected(section, matcher):
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
-##			<div class="pull-right" style="padding-right:50px; padding-top:10px">
-##              <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true, 'btn-inverse': true}"><i class="fa fa-pencil"></i></button>
-##			</div>
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
@@ -68,8 +65,6 @@ def is_selected(section, matcher):
               </li>
               <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive') }">${_('Hive')}</a></li>
               <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('HDFS')}</a></li>
-              <li class="${is_selected(section, 'solr')}"><a href="${ url('security:hive') }s">${_('Solr')}</a></li>
-              <li class="${is_selected(section, 'hbase')}"><a href="${ url('security:hive') }">${_('HBase')}</a></li>
             </ul>
           </div>
         </div>

@@ -35,10 +35,19 @@ def renew_from_kt():
           CONF.HUE_PRINCIPAL.get()]
   LOG.info("Reinitting kerberos from keytab: " +
            " ".join(cmdv))
-  ret = subprocess.call(cmdv)
-  if ret != 0:
-    LOG.error("Couldn't reinit from keytab!")
-    sys.exit(ret)
+
+  subp = subprocess.Popen(cmdv,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          close_fds=True,
+                          bufsize=-1)
+  subp.wait()
+  if subp.returncode != 0:
+    LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
+              subp.returncode,
+              "\n".join(subp.stdout.readlines()),
+              "\n".join(subp.stderr.readlines())))
+    sys.exit(subp.returncode)
 
   global NEED_KRB181_WORKAROUND
   if NEED_KRB181_WORKAROUND is None:

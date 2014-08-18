@@ -77,45 +77,56 @@
      css: { selected: ${itemSelected}}
     %endif
     ">
-      %if itemChecked:
-      <i data-bind="css: {'fa': true, 'fa-fw': true, 'fa-square-o': ! ${itemChecked}(), 'fa-check-square-o': ${itemChecked}()}, click: $root.assist.checkPath, style: { color: '#999999'}"></i>
-      %endif
-      <i data-bind="
-        %if iconClick:
-          click: ${iconClick},
-        %endif
-        css: {
-            'fa': true,
-            %if iconModifier:
-            ${iconModifier()}
-            %else:
-            'fa-file-o': true
+      <table style="width: 100%">
+        <tr>
+          %if itemChecked:
+          <td style="width: 16px">
+            <i data-bind="css: {'fa': true, 'fa-fw': true, 'fa-square-o': ! ${itemChecked}(), 'fa-check-square-o': ${itemChecked}()}, click: $root.assist.checkPath, style: { color: '#999999'}"></i>
+          </td>
+          %endif
+          <td style="width: 16px">
+            <i data-bind="
+              %if iconClick:
+                click: ${iconClick},
+              %endif
+              css: {
+                  'fa fa-fw': true,
+                  %if iconModifier:
+                  ${iconModifier()}
+                  %else:
+                  'fa-file-o': true
+                  %endif
+              },
+              %if styleModifier:
+                style: { color: ${styleModifier}() ? '#338bb8': '#999999'}
+              %else:
+                style: { color: '#999999'}
+              %endif
+              "></i>
+          </td>
+          <td class="pointer" data-bind="
+          %if itemClick:
+              click: ${itemClick},
             %endif
-        },
-        %if styleModifier:
-          style: { color: ${styleModifier}() ? '#338bb8': '#999999'}
-        %else:
-          style: { color: '#999999'}
-        %endif
-        "></i>
-      %if anchorProperty:
-        <a href="#" class="anchor" data-bind="attr: {href: ${anchorProperty}}"></a>
-      %endif
-      <strong><a style="display: inline-block" data-bind="text:name,
-      %if itemClick:
-        click: ${itemClick},
-      %endif
-      %if itemDblClick:
-        event : { dblclick: ${itemDblClick} },
-      %endif
-      %if strikedProperty:
-      css:{'striked': striked},
-      %endif
-      visible: true"></a></strong>
+            %if itemDblClick:
+              event : { dblclick: ${itemDblClick} },
+            %endif
+          visible: true">
+            %if anchorProperty:
+              <a href="#" class="anchor" data-bind="attr: {href: ${anchorProperty}}"></a>
+            %endif
+            <strong><a style="display: inline-block" data-bind="text:name,
+            %if strikedProperty:
+            css:{'striked': striked},
+            %endif
+            visible: true"></a></strong>
 
-      %if styleModifierPullRight:
-      ${styleModifierPullRight()}
-      %endif
+            %if styleModifierPullRight:
+            ${styleModifierPullRight()}
+            %endif
+          </td>
+        </tr>
+      </table>
     </div>
   </script>
 

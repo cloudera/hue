@@ -77,6 +77,14 @@
   overflow-y: scroll;
 }
 
+.acl-block-title {
+  background-color: #eeeeee;
+  font-weight: bold;
+  padding: 3px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
 .acl-block {
   background-color: #f6f6f6;
   padding: 3px;
@@ -103,14 +111,23 @@
   margin-left: 14px;
 }
 
-.add-acl {
+.span6 .acl-block input[type='text'] {
+  width: 25%;
+}
+
+.span6 .acl-block .showAdvanced {
+  display: block;
+  margin-top: 4px;
+}
+
+.acl-actions {
   padding: 5px;
   text-align: center;
   color: #CCC;
   font-size: 20px;
 }
 
-.add-acl:hover {
+.acl-actions span:hover {
   color: #999;
 }
 
@@ -203,4 +220,51 @@ h1.emptyMessage {
 
 .fa-caret {
   padding-top: 2px;
+}
+
+.select2-search-field .select2-input {
+  margin-bottom: 0;
+  min-height: 18px;
+  height: 18px;
+}
+
+#createRoleModal, #bulkActionsModal {
+  width: 800px;
+  left: 50%;
+  margin-left: -400px!important;
+}
+
+
+.big-btn {
+  background-color: #F0F0F0;
+  height: 100px;
+  width: 90%;
+  text-align: center;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px;
+  padding-top: 20px;
+  cursor: pointer;
+  border: 1px solid #F0F0F0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.big-btn:hover, .big-btn.selected {
+  background-color: #DDDDDD;
+}
+
+.big-btn.selected {
+  border-color: #CCCCCC;
+}
+
+.big-btn i{
+  font-size: 40px;
+  color: #666666;
+}
+
+.modal-panel {
+  max-height: 120px;
+  overflow-y: scroll;
 }

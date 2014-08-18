@@ -581,7 +581,12 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
         if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "KILLED" && data.status != "FAILED"){
           $("#kill-btn").hide();
+        }
+
+        if (data.id && data.status != "KILLED" && data.status != "FAILED"){
           $("#rerun-btn").show();
+        } else {
+          $("#rerun-btn").hide();
         }
 
         if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){

@@ -280,13 +280,13 @@ def test_default_group():
 
   # Try deleting the default group
   assert_true(Group.objects.filter(name='test_default').exists())
-  response = c.post('/useradmin/groups/delete/test_default')
+  response = c.post('/useradmin/groups/delete', {'group_names': ['test_default']})
   assert_true('default user group may not be deleted' in response.content)
   assert_true(Group.objects.filter(name='test_default').exists())
 
   # Change the name of the default group, and try deleting again
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('new_default')
-  response = c.post('/useradmin/groups/delete/test_default')
+  response = c.post('/useradmin/groups/delete' , {'group_names': ['test_default']})
   assert_false(Group.objects.filter(name='test_default').exists())
   assert_true(Group.objects.filter(name='new_default').exists())
 
@@ -353,7 +353,7 @@ def test_group_admin():
   assert_true("You must be a superuser" in response.content)
 
   # Should be one group left, because we created the other group
-  response = c.post('/useradmin/groups/delete/testgroup')
+  response = c.post('/useradmin/groups/delete', {'group_names': ['testgroup']})
   assert_true(len(Group.objects.all()) == 1)
 
   group_count = len(Group.objects.all())
@@ -416,14 +416,17 @@ def test_user_admin():
   # Let's try changing the password
   response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
   assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors, "Should have complained about mismatched password")
+  # Old password not confirmed
   response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
+  assert_equal(["The old password does not match the current password."], response.context["form"]["password_old"].errors, "Should have complained about old password")
+  # Good now
+  response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
   assert_true(User.objects.get(username="test").is_superuser)
   assert_true(User.objects.get(username="test").check_password("foo"))
   # Change it back!
-  response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", is_active="True", is_superuser="True"))
+  response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active="True", is_superuser="True"))
   assert_true(User.objects.get(username="test").check_password("test"))
-  assert_true(make_logged_in_client(username = "test", password = "test"),
-              "Check that we can still login.")
+  assert_true(make_logged_in_client(username = "test", password = "test"), "Check that we can still login.")
 
   # Check new user form for default group
   group = get_default_user_group()
@@ -456,7 +459,7 @@ def test_user_admin():
   response = c.post('/useradmin/users/new', dict(username="group_member", password1="test", password2="test", groups=[group.pk]))
   User.objects.get(username='group_member')
   assert_true(User.objects.get(username='group_member').groups.filter(name='test-group').exists())
-  response = c.post('/useradmin/users/edit/group_member', dict(username="group_member", password1="test", password2="test", groups=[]))
+  response = c.post('/useradmin/users/edit/group_member', dict(username="group_member", groups=[]))
   assert_false(User.objects.get(username='group_member').groups.filter(name='test-group').exists())
 
   # Check permissions by logging in as the new user
@@ -540,7 +543,7 @@ def test_ensure_home_directory():
   assert_false(cluster.fs.exists('/user/test2'))
   response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
   assert_false(cluster.fs.exists('/user/test2'))
-  response = c.post('/useradmin/users/edit/%s' % "test2", dict(username="test2", password1='test', password2='test', ensure_home_directory=True))
+  response = c.post('/useradmin/users/edit/%s' % "test2", dict(username="test2", password1='test', password2='test', password_old="test", ensure_home_directory=True))
   assert_true(cluster.fs.exists('/user/test2'))
   dir_stat = cluster.fs.stats('/user/test2')
   assert_equal('test2', dir_stat.user)
@@ -548,6 +551,10 @@ def test_ensure_home_directory():
   assert_equal('40755', '%o' % dir_stat.mode)
 
 def test_list_for_autocomplete():
+  reset_all_users()
+  reset_all_groups()
+
+  # Now the autocomplete has access to all the users and groups
   c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
   c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
   c3_other_group = make_logged_in_client('test_list_for_autocomplete3', is_superuser=False, groupname='test_list_for_autocomplete_other_group')
@@ -559,7 +566,7 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete2'], users)
+  assert_equal(['test_list_for_autocomplete2', 'test_list_for_autocomplete3'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
@@ -570,7 +577,7 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete'], users)
+  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete3'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
 
@@ -581,6 +588,6 @@ def test_list_for_autocomplete():
   users = [user['username'] for user in content['users']]
   groups = [user['name'] for user in content['groups']]
 
-  assert_equal([], users)
+  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete2'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)

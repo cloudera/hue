@@ -45,7 +45,7 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST['roleName']
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key= lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
+    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
@@ -151,10 +151,13 @@ def save_privileges(request):
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
       _drop_sentry_privilege(request.user, role, privilege)
-    
-    # Todo 
-#    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
-#    get_api(request.user).rename_sentry_privilege(oldAuthorizable, newAuthorizable)
+
+    modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
+    old_privileges_ids = [privilege['id'] for privilege in modified_privileges]
+    _hive_add_privileges(request.user, role, modified_privileges)
+    for privilege in role['originalPrivileges']:
+      if privilege['id'] in old_privileges_ids:      
+        _drop_sentry_privilege(request.user, role, privilege)
 
     result['message'] = ''
     result['status'] = 0
@@ -199,21 +202,84 @@ def list_sentry_privileges_by_authorizable(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    groups = json.loads(request.POST['groups'])
+    groupName = request.POST['groupName'] if request.POST['groupName'] else None
     roleSet = json.loads(request.POST['roleSet'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
 
     privileges = []
-    roles = get_api(request.user).list_sentry_roles_by_group()
+    roles = get_api(request.user).list_sentry_roles_by_group(groupName=groupName)
 
     for role in roles:
       for privilege in get_api(request.user).list_sentry_privileges_by_role(role['name']): # authorizableHierarchy not working here?
         if privilege['database'] == authorizableHierarchy['db'] and ('table' not in authorizableHierarchy or privilege['table'] == authorizableHierarchy['table']):
+          privilege['roleName'] = role['name']
           privileges.append(privilege)
 
     result['privileges'] = privileges
 
     result['message'] = ''
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def bulk_delete_privileges(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    checkedPaths = json.loads(request.POST['checkedPaths'])
+    recursive = json.loads(request.POST['recursive'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    for path in [path['path'] for path in checkedPaths]:
+      if '.' in path:
+        db, table = path.split('.')
+      else:
+        db, table = path, ''
+      authorizableHierarchy.update({
+        'db': db,
+        'table': table,
+      })
+      get_api(request.user).drop_sentry_privileges(authorizableHierarchy)
+    result['message'] = _('Privileges deleted.')
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def bulk_add_privileges(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    privileges = json.loads(request.POST['privileges'])
+    checkedPaths = json.loads(request.POST['checkedPaths'])
+    recursive = json.loads(request.POST['recursive'])
+    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+
+    privileges = [privilege for privilege in privileges if privilege['status'] == '']
+
+    for path in [path['path'] for path in checkedPaths]:
+      if '.' in path:
+        db, table = path.split('.')
+      else:
+        db, table = path, ''
+      privilegeScope = 'TABLE' if table else 'DATABASE' if db else 'SERVER'
+      authorizableHierarchy.update({
+        'db': db,
+        'table': table, 
+      })
+
+      for privilege in privileges:
+        privilege['dbName'] = db
+        privilege['tableName'] = table
+        privilege['privilegeScope'] = privilegeScope        
+        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege])      
+
+    result['message'] = _('Privileges added.')
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")

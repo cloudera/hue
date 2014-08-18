@@ -26,15 +26,27 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hive') }
 
+
+<script type="text/html" id="role">
+  <div class="acl-block-title"><i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
+  <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
+  <div class="acl-block acl-actions">
+    <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_authorizable, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
+    <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+  </div>
+</script>
+
+
 <script type="text/html" id="privilege">
-<div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted', click: function() { if (! editing()) { editing(true); } }" class="acl-block acl-block-airy">
+<div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted'" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: remove"></i>
-    </a>
-    ## todo, role name
-    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/> 
+    <div class="pull-right">
+      <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
+      <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
+    </div>
+    <input name="db" data-bind="attr: { name: 'privilege-' + $index() }" type="radio" checked/>
     <input type="text" data-bind="value: $data.path, valueUpdate: 'afterkeydown'" placeholder="dbName.tableName">
 
     <input name="uri" data-bind="attr: { name: 'privilege-' + $index() }" type="radio"/>
@@ -42,30 +54,41 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    &nbsp;&nbsp;<a class="pointer" data-bind="click: function(){ showAdvanced(true);}, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced options') }</a>
+    &nbsp;&nbsp;<a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
-      <input type="text" data-bind="value: $data.server" placeholder="serverName">
+      <input type="text" data-bind="value: serverName" placeholder="serverName">
       <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </div>
 
   <!-- /ko -->
   
   <!-- ko ifnot: editing() -->
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: remove"></i>
-    </a>
+    <div class="pull-right">
+      <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
+      <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
+    </div>
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em><br/>
-    ${_('Database')}: <a data-bind="attr: { href: '/metastore/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a><br/>
-    <span data-bind="text: action"></span>
-    <span data-bind="text: privilegeScope"></span>
-    <span data-bind="text: tableName"></span>
-    <span data-bind="text: URI"></span>
-    <span data-bind="text: grantor"></span>
-    <span data-bind="text: serverName"></span>
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span><br/>
+        
+    server=<span data-bind="text: serverName"></span>
+    
+    <!-- ko ifnot: URI() -->    
+      <span data-bind="visible: dbName">
+        <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+      </span>
+      <span data-bind="visible: tableName">
+        <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
+      </span>
+      <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
+    <!-- /ko -->
+    
+    <!-- ko if: URI() -->    
+      <span data-bind="text: URI"></span>
+    <!-- /ko -->
+    <br/>
+    <span data-bind="text: grantor"></span>    
   <!-- /ko -->
-
 </div>
 </script>
 
@@ -75,7 +98,7 @@ ${ layout.menubar(section='hive') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Privileges') }</li>
-          <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap  fa-rotate-270"></i> ${ _('Browse') }</a></li>
+          <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap fa-rotate-270"></i> ${ _('Browse') }</a></li>
           <li><a href="javascript:void(0)" data-toggleSection="roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
@@ -126,13 +149,21 @@ ${ layout.menubar(section='hive') }
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
-                    <i class="fa fa-compress"></i> ${_('Close others')}
-                  </a>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
-                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
-                  </a>
-                  <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                  <div>
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                    <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
+                      <i class="fa fa-compress"></i>
+                    </a>
+                    &nbsp;
+                    <a class="pointer" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
+                      <i class="fa fa-refresh"></i>
+                    </a>
+                    &nbsp;
+                    <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
+                      <i class="fa fa-cogs"></i>
+                    </a>
+                  </div>
+
                 </div>
               </div>
 
@@ -141,9 +172,9 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span6 acl-panel">
               <div class="acl-panel-content">
-                <h4>${ _('Privileges') }</h4>
+                <h4 style="margin-top: 4px">${ _('Privileges') }</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
-                <div data-bind="template: { name: 'privilege', foreach: $root.assist.privileges }">
+                  <div data-bind="template: { name: 'role', foreach: $root.assist.roles }">
                 </div>
               </div>
             </div>
@@ -160,22 +191,22 @@ ${ layout.menubar(section='hive') }
         <div class="card-body">
           <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
             <i class="fa fa-plus-circle waiting"></i>
-            <h1 class="emptyMessage">${ _('There are currently no roles defined.') }<br/><a href="javascript: void(0)">${ _('Click here to add') }</a> ${ _('one.') }</h1>
+            <h1 class="emptyMessage">${ _('There are currently no roles defined.') }<br/><a class="pointer">${ _('Click here to add') }</a> ${ _('one.') }</h1>
           </div>
           <div class="clearfix" data-bind="visible: $root.roles().length == 0"></div>
           <div data-bind="visible: $root.roles().length > 0">
             <%actionbar:render>
               <%def name="search()">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
               </%def>
 
               <%def name="actions()">
                 <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-                <button class="btn toolbarBtn" data-bind="click: $root.deleteSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+                <button class="btn toolbarBtn" data-bind="click: function(){ $('#deleteRoleModal').modal('show'); }, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
               </%def>
 
               <%def name="creation()">
-                <a href="javascript: void(0)" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+                <a data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
               </%def>
             </%actionbar:render>
           </div>
@@ -189,7 +220,7 @@ ${ layout.menubar(section='hive') }
               <th width="20%">${ _('Grantor Principal') }</th>
               <th width="3%"></th>
             </thead>
-            <tbody data-bind="foreach: $root.roles">
+            <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
                   <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
@@ -199,19 +230,26 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-2x fa-caret" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
-                <td data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"></td>
                 <td>
-                  <a href="javascript: void(0)" data-bind="click: function() { showEditGroups(true); }">
+                  <a data-bind="attr: {'href': name}"></a>
+                  <i class="fa fa-cube muted"></i>
+                  <span data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"/>
+                </td>
+                <td>
+                  <a class="pointer" data-bind="click: function() { showEditGroups(true); }">
                     <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
                       <span data-bind="text: $data"></span>
                     </span>
+                    <span data-bind="visible: ! showEditGroups() && ! groupsChanged() && groups().length == 0">
+                      <i class="fa fa-plus"></i> ${ _('Add a group') }
+                    </span>
                   </a>
-                  <div data-bind="visible: showEditGroups() || groups().length == 0 || groupsChanged()">
+                  <div data-bind="visible: showEditGroups() || groupsChanged()">
                     <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group'}" size="5" multiple="true" style="width: 400px"></select>
-                    <a href="javascript: void(0)" data-bind="visible: groupsChanged, click: resetGroups">
+                    <a class="pointer" data-bind="visible: groupsChanged, click: resetGroups">
                       <i class="fa fa-undo"></i>
                     </a>
-                    <a href="javascript: void(0)" data-bind="visible: groupsChanged, click: saveGroups">
+                    <a class="pointer" data-bind="visible: groupsChanged, click: saveGroups">
                       <i class="fa fa-save"></i>
                     </a>
                   </div>
@@ -229,22 +267,13 @@ ${ layout.menubar(section='hive') }
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-bind="visible: $data.showPrivileges">
                 <td colspan="2"></td>
                 <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }">
-                    <i class="fa fa-plus"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2"></td>
-                <td colspan="4">
-                  <div class="acl-block pointer add-acl" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }">
-                    <i class="fa fa-undo"></i>
-                  </div>
-                  <div class="acl-block pointer add-acl" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }">
-                    <i class="fa fa-save"></i>                    
+                  <div class="acl-block acl-actions">
+                    <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+                    <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
+                    <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>              
@@ -258,31 +287,101 @@ ${ layout.menubar(section='hive') }
 
 
 
-<div id="createRoleModal" class="modal hide fade" role="dialog">
+<div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>${ _('Add role') }</h3>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
-    <p>
-      ${ _('Name') } <input type="text" class="input-small" data-bind="value: $data.name" />
-      <br/>
-      ${ _('Privileges') }
-      <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
-      <a href="javascript: void(0)" data-bind="click: addPrivilege">
-        <i class="fa fa-plus"></i>
-      </a>
-      <br/>
-      ${ _('Groups') }
-      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group' }" size="5" multiple="true" style="width: 120px"></select>
-    </p>
+
+    <div class="row-fluid">
+      <div class="span6">
+        <h4>${ _('Name') }</h4>
+        <input type="text" class="input-xlarge" data-bind="value: $data.name" placeholder="${ _('Required') }" style="width: 360px" />
+      </div>
+      <div class="span6">
+        <h4>${ _('Groups') }</h4>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', placeholder: '${ _("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
+      </div>
+    </div>
+
+    <h4>${ _('Privileges') }</h4>
+    <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
+    <div class="acl-block acl-actions">
+      <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    </div>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary" data-bind="click: $root.role.create">${ _('Add role') }</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true" data-bind="click: $root.role.reset">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role.create">${ _('Save') }</button>
   </div>
 </div>
 
+
+<div id="deleteRoleModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('Do you really want to delete the selected role(s)?') }</h3>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: $root.deleteSelectedRoles">${ _('Yes') }</button>
+  </div>
+</div>
+
+<div id="bulkActionsModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('What would you like to do with the checked paths?') }</h3>
+  </div>
+  <div class="modal-body" style="overflow-x: hidden">
+
+    <div class="row-fluid">
+      <div class="span6">
+        <h4>${ _('Checked items') }</h4>
+        <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
+          <li><span class="force-word-break" data-bind="text: path()"></span></li>
+        </ul>
+      </div>
+      <div class="span6">
+
+        <h4>${ _('Selected item for privilege actions') }</h4>
+
+        <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
+        <div data-bind="template: { name: 'role', foreach: $root.assist.roles }" class="modal-panel"></div>
+
+      </div>
+    </div>
+
+    <h4>${ _('Choose your action') }</h4>
+    <div class="row-fluid">
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
+          <i class="fa fa-plus"></i><br/><br/>
+          ${ _('Add current privileges to checkbox selection') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
+          <i class="fa fa-copy"></i><br/><br/>
+          ${ _('Replace checkbox selection with current privileges') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
+          <i class="fa fa-times"></i><br/><br/>
+          ${ _('Remove privileges of checkbox selection') }
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn" data-bind="css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
+  </div>
+</div>
 
 <%def name="treeIcons()">
   'fa-database': isDb(),
@@ -357,6 +456,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $("#createRoleModal").modal("hide");
       });
 
+      $(document).on("deleted.role", function(){
+        $("#deleteRoleModal").modal("hide");
+      });
+
       $(document).on("changed.path", function(){
         if ($("#path").val() != viewModel.assist.path()){
           $("#path").val(viewModel.assist.path());
@@ -385,6 +488,16 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       showMainSection(viewModel.getSectionHash());
 
+      $(document).on("show.role", function(e, role) {
+        if (typeof role != "undefined" && role.name != null){
+          $("#bulkActionsModal").modal("hide");
+          showMainSection("roles");
+          $("html, body").animate({
+            scrollTop: ($("a[href='" + role.name() + "']").position().top - 90)+"px"
+          });
+        }
+      });
+
       var _resizeTimeout = -1;
       $(window).resize(function(){
         window.clearTimeout(_resizeTimeout);
@@ -399,8 +512,35 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
+      $("#deleteRoleModal").modal({
+        show: false
+      });
+
       $("#selectedGroup").select2("val", "");
-      $("#selectedGroup").change(function() { viewModel.list_sentry_roles_by_group(); });
+      $("#selectedGroup").change(function() {
+        viewModel.list_sentry_privileges_by_authorizable();
+        viewModel.list_sentry_roles_by_group(); 
+      });
+
+      $(document).on("added.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("deleted.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("syncd.bulk.privileges", function() {
+        $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $("#bulkActionsModal").modal({
+        show: false
+      });
+
     });
 </script>
 

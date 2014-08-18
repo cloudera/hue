@@ -384,7 +384,14 @@ ul.errorlist li {
   font-style: italic;
 }
 
+.homeLink,
+.trashLink {
+  font-size: 1.25em;
+  line-height: 18px;
+}
+
 .hueBreadcrumb {
+  font-size: 1.25em;
   list-style: none outside none;
   padding: 9px 9px;
 }

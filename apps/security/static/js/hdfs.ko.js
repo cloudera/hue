@@ -53,7 +53,7 @@ function printAcl(acl) {
 var Assist = function (vm, assist) {
   var self = this;
 
-  self.compareNames = function (a,b) {
+  self.compareNames = function (a, b) {
     if (a.name.toLowerCase() < b.name.toLowerCase())
       return -1;
     if (a.name.toLowerCase() > b.name.toLowerCase())
@@ -91,7 +91,7 @@ var Assist = function (vm, assist) {
         name: "/",
         path: "/",
         isDir: true,
-        isExpanded: true,
+        isExpanded: false,
         isChecked: false,
         aclBit: false,
         striked: false,
@@ -114,6 +114,7 @@ var Assist = function (vm, assist) {
     self.fetchPath();
     window.location.hash = path;
   });
+  self.recursive = ko.observable(false);
   self.pagenum = ko.observable(1);
   self.fromLoadMore = false;
   self.fromRebuildTree = false;
@@ -122,7 +123,7 @@ var Assist = function (vm, assist) {
   self.originalAcls = ko.observableArray();
   self.regularAcls = ko.computed(function () {
     return $.grep(self.acls(), function (acl) {
-      return ! acl.isDefault();
+      return !acl.isDefault();
     });
   });
   self.defaultAcls = ko.computed(function () {
@@ -140,12 +141,14 @@ var Assist = function (vm, assist) {
       return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1;
     });
   });
-  
+
   self.owner = ko.observable('');
   self.group = ko.observable('');
 
-  self.afterRender = function() {
-    if (! self.fromLoadMore && ! self.fromRebuildTree) {
+  self.checkedItems = ko.observableArray([]);
+
+  self.afterRender = function () {
+    if (!self.fromLoadMore && !self.fromRebuildTree) {
       $(document).trigger("rendered.tree");
     }
     self.fromLoadMore = false;
@@ -204,7 +207,7 @@ var Assist = function (vm, assist) {
         path: item.path,
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
-        isExpanded: true,
+        isExpanded: false,
         isChecked: false,
         rwx: item.rwx,
         isDir: item.type == "dir" || item.isDir == true,
@@ -220,7 +223,7 @@ var Assist = function (vm, assist) {
   }
 
   self.getTreeAdditionalDataForPath = function (path) {
-    if (typeof self.treeAdditionalData[path] == "undefined"){
+    if (typeof self.treeAdditionalData[path] == "undefined") {
       var _add = {
         loaded: false
       }
@@ -284,20 +287,27 @@ var Assist = function (vm, assist) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     Object.keys(self.treeAdditionalData).forEach(function (path) {
       if (typeof force == "boolean" && force) {
-        self.fetchPath(path);
+        self.fetchPath(path, function () {
+          self.updatePathProperty(self.growingTree(), path, "isExpanded", true);
+          self.loadData(self.growingTree());
+        });
       } else {
         if (self.treeAdditionalData[path].loaded) {
-          self.fetchPath(path);
+          self.fetchPath(path, function () {
+            self.updatePathProperty(self.growingTree(), path, "isExpanded", true);
+            self.loadData(self.growingTree());
+          });
         }
       }
     });
+    self.getAcls();
   }
 
   self.rebuildTree = function (leaf, paths) {
     paths.push(leaf.path);
     if (leaf.nodes.length > 0) {
       leaf.nodes.forEach(function (node) {
-        if (node.isDir){
+        if (node.isDir) {
           self.rebuildTree(node, paths);
         }
       });
@@ -306,11 +316,17 @@ var Assist = function (vm, assist) {
   }
 
   self.setPath = function (obj, toggle) {
-    if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (! obj.isExpanded() && ! self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
-      if (typeof toggle == "boolean" && toggle){
+    if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (!obj.isExpanded() && !self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
+      if (typeof toggle == "boolean" && toggle) {
+        obj.isExpanded(!obj.isExpanded());
+      }
+      self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
+    }
+    else {
+      if (typeof toggle == "boolean" && toggle) {
         obj.isExpanded(!obj.isExpanded());
       } else {
-        obj.isExpanded(true);
+        obj.isExpanded(false);
       }
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
@@ -323,6 +339,12 @@ var Assist = function (vm, assist) {
 
   self.checkPath = function (obj) {
     obj.isChecked(!obj.isChecked());
+    if (obj.isChecked()) {
+      self.checkedItems.push(obj);
+    }
+    else {
+      self.checkedItems.remove(obj);
+    }
     self.updatePathProperty(self.growingTree(), obj.path(), "isChecked", obj.isChecked());
   }
 
@@ -354,38 +376,45 @@ var Assist = function (vm, assist) {
   self.fetchPath = function (optionalPath, loadCallback) {
     var _path = typeof optionalPath != "undefined" ? optionalPath : self.path();
     $.getJSON('/security/api/hdfs/list' + _path, {
-        'pagesize': 15,
-        'pagenum': self.pagenum(),
-        'format': 'json',
-        'doas': vm.doAs(),
-        'isDiffMode': self.isDiffMode()
-      },
-      function (data) {
-        self.loadParents(data.breadcrumbs);
-        if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
-          $.each(data.files, function (index, item) {
-            self.convertItemToObject(item);
-          });
-        }
-        else {
-          self.convertItemToObject(data);
-        }
-        self.getTreeAdditionalDataForPath(_path).loaded = true;
-        if (data.page != null && data.page.number != null){
-          self.updatePathProperty(self.growingTree(), _path, "page", data.page);
-        }
-        if (typeof loadCallback != "undefined"){
-          loadCallback(data);
-        }
-        else {
-          self.loadData(self.growingTree());
-        }
-        if (typeof optionalPath == "undefined"){
-          self.getAcls();
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
+          'pagesize': 15,
+          'pagenum': self.pagenum(),
+          'format': 'json',
+          'doas': vm.doAs(),
+          'isDiffMode': self.isDiffMode(),
+        },
+        function (data) {
+          if (data.error != null) {
+            if (data.error == "FILE_NOT_FOUND") {
+              self.path("/");
+            }
+          }
+          else {
+            self.loadParents(data.breadcrumbs);
+            if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+              $.each(data.files, function (index, item) {
+                self.convertItemToObject(item);
+              });
+            }
+            else {
+              self.convertItemToObject(data);
+            }
+            self.getTreeAdditionalDataForPath(_path).loaded = true;
+            if (data.page != null && data.page.number != null) {
+              self.updatePathProperty(self.growingTree(), _path, "page", data.page);
+            }
+            if (typeof loadCallback != "undefined") {
+              loadCallback(data);
+            }
+            else {
+              self.loadData(self.growingTree());
+            }
+            if (typeof optionalPath == "undefined") {
+              self.getAcls();
+            }
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
   };
 
   self.loadMore = function (what) {
@@ -397,13 +426,12 @@ var Assist = function (vm, assist) {
   self.getAcls = function () {
     $(".jHueNotify").hide();
     var _isLoading = window.setTimeout(function () {
-        self.isLoadingAcls(true);
-      }, 1000);
-        logGA('get_acls');
-
-        $.getJSON('/security/api/hdfs/get_acls', {
-        'path': self.path()
-      }, function (data) {
+      self.isLoadingAcls(true);
+    }, 1000);
+    logGA('get_acls');
+    $.getJSON('/security/api/hdfs/get_acls', {
+      'path': self.path()
+    }, function (data) {
       window.clearTimeout(_isLoading);
       if (data != null) {
         self.acls.removeAll();
@@ -430,26 +458,106 @@ var Assist = function (vm, assist) {
     logGA('updateAcls');
 
     $.post("/security/api/hdfs/update_acls", {
-        'path': self.path(),
-        'acls': ko.mapping.toJSON(self.acls()),
-        'originalAcls': ko.mapping.toJSON(self.originalAcls())
-      }, function (data) {
-        var toDelete = []
-        $.each(self.acls(), function (index, item) {
-          if (item.status() == 'deleted') {
-            toDelete.push(item);
-          } else {
-            item.status('');
-          }
-        });
-        $.each(toDelete, function (index, item) {
-          self.acls.remove(item);
-        });
-        $(document).trigger("info", 'Done!');
-      }
+          'path': self.path(),
+          'acls': ko.mapping.toJSON(self.acls()),
+          'originalAcls': ko.mapping.toJSON(self.originalAcls())
+        }, function (data) {
+          var toDelete = []
+          $.each(self.acls(), function (index, item) {
+            if (item.status() == 'deleted') {
+              toDelete.push(item);
+            } else {
+              item.status('');
+            }
+          });
+          $.each(toDelete, function (index, item) {
+            self.acls.remove(item);
+          });
+          self.refreshTree();
+          $(document).trigger("updated.acls");
+        }
     ).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", JSON.parse(xhr.responseText).message);
-      });
+          $(document).trigger("error", JSON.parse(xhr.responseText).message);
+        });
+  }
+
+  self.bulkAction = ko.observable("");
+
+  self.bulkPerfomAction = function () {
+    switch (self.bulkAction()) {
+      case "add":
+        self.bulkAddAcls();
+        break;
+      case "sync":
+        self.bulkSyncAcls();
+        break;
+      case "delete":
+        self.bulkDeleteAcls();
+        break;
+    }
+    self.bulkAction("");
+  }
+
+  self.bulkDeleteAcls = function () {
+    $(".jHueNotify").hide();
+    logGA('bulkDeleteAcls');
+
+    var checkedPaths = self.checkedItems();
+
+    $.post("/security/api/hdfs/bulk_delete_acls", {
+          'path': self.path(),
+          'checkedPaths': ko.mapping.toJSON(checkedPaths),
+          'recursive': ko.mapping.toJSON(self.recursive())
+        }, function (data) {
+          if (checkedPaths.indexOf(self.path()) != -1) {
+            self.acls.removeAll();
+          }
+          self.refreshTree();
+          $(document).trigger("deleted.bulk.acls");
+        }
+    ).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", JSON.parse(xhr.responseText).message);
+        });
+  }
+
+  self.bulkAddAcls = function () {
+    $(".jHueNotify").hide();
+    logGA('bulkAddAcls');
+
+    var checkedPaths = self.checkedItems();
+
+    $.post("/security/api/hdfs/bulk_add_acls", {
+          'path': self.path(),
+          'acls': ko.mapping.toJSON(self.acls()),
+          'checkedPaths': ko.mapping.toJSON(checkedPaths),
+          'recursive': ko.mapping.toJSON(self.recursive())
+        }, function (data) {
+          self.refreshTree();
+          $(document).trigger("added.bulk.acls");
+        }
+    ).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", JSON.parse(xhr.responseText).message);
+        });
+  }
+
+  self.bulkSyncAcls = function () {
+    $(".jHueNotify").hide();
+    logGA('bulkSyncAcls');
+
+    var checkedPaths = self.checkedItems();
+
+    $.post("/security/api/hdfs/bulk_sync_acls", {
+          'path': self.path(),
+          'acls': ko.mapping.toJSON(self.acls()),
+          'checkedPaths': ko.mapping.toJSON(checkedPaths),
+          'recursive': ko.mapping.toJSON(self.recursive())
+        }, function (data) {
+          self.refreshTree();
+          $(document).trigger("syncd.bulk.acls");
+        }
+    ).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", JSON.parse(xhr.responseText).message);
+        });
   }
 }
 
@@ -461,21 +569,21 @@ var HdfsViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-	  self.assist.refreshTree();
+    self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
   self.availableHadoopGroups = ko.observableArray();
 
-  self.selectableHadoopUsers = ko.computed(function() {
-    var _users = ko.utils.arrayMap(self.availableHadoopUsers(), function(user) {
-        return user.username;
+  self.selectableHadoopUsers = ko.computed(function () {
+    var _users = ko.utils.arrayMap(self.availableHadoopUsers(), function (user) {
+      return user.username;
     });
     return _users.sort();
   }, self);
 
-  self.selectableHadoopGroups = ko.computed(function() {
-    var _users = ko.utils.arrayMap(self.availableHadoopGroups(), function(group) {
-        return group.name;
+  self.selectableHadoopGroups = ko.computed(function () {
+    var _users = ko.utils.arrayMap(self.availableHadoopGroups(), function (group) {
+      return group.name;
     });
     return _users.sort();
   }, self);
@@ -484,15 +592,19 @@ var HdfsViewModel = function (initial) {
   self.init = function (path) {
     self.fetchUsers();
     self.assist.path(path);
-    $(document).one("loaded.parents", function(){
+    $(document).one("loaded.parents", function () {
       self.assist.isLoadingTree(true);
       var _paths = self.assist.rebuildTree(self.assist.growingTree().nodes[0], []);
-      _paths.forEach(function(path, cnt){
-        self.assist.fetchPath(path, function(){
-          if (cnt == _paths.length -1){
-            self.assist.fromRebuildTree = true;
-            self.assist.loadData(self.assist.growingTree());
-            self.assist.isLoadingTree(false);
+      _paths.forEach(function (ipath, cnt) {
+        self.assist.updatePathProperty(self.assist.growingTree(), ipath, "isExpanded", true);
+        self.assist.fetchPath(ipath, function () {
+          if (cnt == _paths.length - 1) {
+            self.assist.fetchPath(path, function () {
+              self.assist.updatePathProperty(self.assist.growingTree(), path, "isExpanded", true);
+              self.assist.fromRebuildTree = true;
+              self.assist.loadData(self.assist.growingTree());
+              self.assist.isLoadingTree(false);
+            });
           }
         });
       });

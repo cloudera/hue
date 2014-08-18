@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config
 
@@ -31,4 +33,10 @@ PORT=Config(
   help=_t('Port the sentry service is running on.'),
   type=int,
   default=10001,
+)
+
+SENTRY_CONF_DIR = Config(
+  key='sentry_conf_dir',
+  help=_t('Sentry configuration directory, where sentry-site.xml is located.'),
+  default=os.environ.get("SENTRY_CONF_DIR", '/etc/sentry/conf')
 )

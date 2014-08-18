@@ -29,6 +29,9 @@ urlpatterns += patterns('security.api.hdfs',
   url(r'^api/hdfs/list(?P<path>/.*)$', 'list_hdfs', name='list_hdfs'),
   url(r'^api/hdfs/get_acls$', 'get_acls', name='get_acls'),
   url(r'^api/hdfs/update_acls', 'update_acls', name='update_acls'),
+  url(r'^api/hdfs/bulk_delete_acls', 'bulk_delete_acls', name='bulk_delete_acls'),
+  url(r'^api/hdfs/bulk_add_acls', 'bulk_add_acls', name='bulk_add_acls'),
+  url(r'^api/hdfs/bulk_sync_acls', 'bulk_sync_acls', name='bulk_sync_acls'),
 )
 
 
@@ -42,5 +45,8 @@ urlpatterns += patterns('security.api.hive',
   url(r'^api/hive/drop_sentry_role', 'drop_sentry_role', name='drop_sentry_role'),
   url(r'^api/hive/create_role$', 'create_role', name='create_role'),
   url(r'^api/hive/save_privileges$', 'save_privileges', name='save_privileges'),
-  url(r'^api/hive/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),
+  url(r'^api/hive/bulk_delete_privileges', 'bulk_delete_privileges', name='bulk_delete_privileges'),
+  url(r'^api/hive/bulk_add_privileges', 'bulk_add_privileges', name='bulk_add_privileges'),
+  
+  url(r'^api/hive/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),  
 )

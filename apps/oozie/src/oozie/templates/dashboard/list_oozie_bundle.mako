@@ -461,12 +461,14 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
         if (data.id && (data.status == "KILLED" || data.status == "SUCCEEDED" ||  data.status == "DONEWITHERROR" || data.status == "FAILED")) {
           $("#kill-btn").hide();
-          if (data.status != "KILLED" ) {
-            $("#rerun-btn").show();
-          }
         } else {
           $("#kill-btn").show();
+        }
+
+        if (data.id && (data.status == "KILLED" || data.status == "FAILED" ||  data.status == "PREP" || data.status == "PREPPAUSED" || data.status == "PREPSUSPENDED")) {
           $("#rerun-btn").hide();
+        } else {
+          $("#rerun-btn").show();
         }
 
         if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){

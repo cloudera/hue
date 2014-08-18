@@ -27,17 +27,17 @@ ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
 ${ layout.menubar(section='hdfs') }
 
 
-<script type="text/html" id="acl-display">
+<script type="text/html" id="aclDisplay">
   <div data-bind="visible: status() != 'deleted'">
     <span data-bind="text: printAcl($data)"></span>
   </div>
 </script>
 
 
-<script type="text/html" id="acl-edition">
+<script type="text/html" id="aclEdit">
   <div data-bind="visible: status() != 'deleted'" class="acl-block">
-    <a href="javascript: void(0)" class="pull-right" style="margin-right: 4px">
-      <i class="fa fa-times" data-bind="click: $root.assist.removeAcl"></i>
+    <a class="pointer pull-right" style="margin-right: 4px" data-bind="click: $root.assist.removeAcl">
+      <i class="fa fa-times"></i>
     </a>
     <label class="radio inline-block">
       <input type="radio" value="group" data-bind="checked: type, attr: { name: 'aclType' + $index() + (isDefault() ? 'isDefault' : 'notDefault') }"/> ${ _('group') }
@@ -91,7 +91,7 @@ ${ layout.menubar(section='hdfs') }
             <div class="span8">
               <div class="path-container">
                 <div class="input-append span12">
-                  <input id="path" class="path" type="text" data-bind="value: $root.assist.path, valueUpdate: 'afterkeydown'" autocomplete="off" />
+                  <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
                   <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
@@ -109,13 +109,20 @@ ${ layout.menubar(section='hdfs') }
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.collapseOthers">
-                    <i class="fa fa-compress"></i> ${_('Close others')}
-                  </a>
-                  <a href="javascript: void(0)" data-bind="click: $root.assist.refreshTree">
-                    <i class="fa fa-refresh"></i>  ${_('Refresh')}
-                  </a>
-                  <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                  <div>
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
+                    <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
+                      <i class="fa fa-compress"></i>
+                    </a>
+                    &nbsp;
+                    <a class="pointer" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
+                      <i class="fa fa-refresh"></i>
+                    </a>
+                    &nbsp;
+                    <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
+                      <i class="fa fa-cogs"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
 
@@ -125,20 +132,21 @@ ${ layout.menubar(section='hdfs') }
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
 
                   <ul class="nav nav-tabs">
-                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
-                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a href="javascript: void(0)" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
+                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
                   </ul>
+                  
 
                   <div class="acl-panel-content">
                     <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
-                      # file: <span data-bind="text: $root.assist.path"></span><br/>
+                      # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
                       # owner: <span data-bind="text: $root.assist.owner"></span><br/>
                       # group: <span data-bind="text: $root.assist.group"></span><br/>
                       <div data-bind="foreach: $root.assist.regularAcls">
-                        <div data-bind="template: {name: 'acl-display'}"></div>
+                        <div data-bind="template: {name: 'aclDisplay'}"></div>
                       </div>
                       <div data-bind="foreach: $root.assist.defaultAcls">
-                        <div data-bind="template: {name: 'acl-display'}"></div>
+                        <div data-bind="template: {name: 'aclDisplay'}"></div>
                       </div>
                     </span>
 
@@ -152,32 +160,24 @@ ${ layout.menubar(section='hdfs') }
 
                       <h4>${ _('ACLs') }</h4>
                       <div data-bind="foreach: $root.assist.regularAcls">
-                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                        <div data-bind="template: {name: 'aclEdit'}"></div>
                       </div>
 
-                      <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addAcl">
-                        <i class="fa fa-plus"></i>
-                      </div>
-                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.getAcls">
-                        <i class="fa fa-undo"></i>
-                      </div>
-                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.updateAcls">
-                        <i class="fa fa-save"></i>
+                      <div class="acl-block acl-actions">
+                        <span class="pointer" data-bind="click: $root.assist.addAcl"><i class="fa fa-plus"></i></span>
+                        <span class="pointer" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.getAcls"> &nbsp; <i class="fa fa-undo"></i></span>
+                        <span class="pointer" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.updateAcls"> &nbsp; <i class="fa fa-save"></i></span>
                       </div>
 
                       <h4>${ _('Default ACLs') }</h4>
                       <div data-bind="foreach: $root.assist.defaultAcls">
-                        <div data-bind="template: {name: 'acl-edition'}"></div>
+                        <div data-bind="template: {name: 'aclEdit'}"></div>
                       </div>
 
-                      <div class="acl-block pointer add-acl" data-bind="click: $root.assist.addDefaultAcl">
-                        <i class="fa fa-plus"></i>
-                      </div>
-                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.getAcls">
-                        <i class="fa fa-undo"></i>
-                      </div>
-                      <div class="acl-block pointer add-acl" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.updateAcls">
-                        <i class="fa fa-save"></i>
+                      <div class="acl-block acl-actions">
+                        <span class="pointer" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></span>
+                        <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.getAcls"> &nbsp; <i class="fa fa-undo"></i></span>
+                        <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.updateAcls"> &nbsp; <i class="fa fa-save"></i></span>
                       </div>
                     </span>
                   </div>
@@ -190,6 +190,69 @@ ${ layout.menubar(section='hdfs') }
     </div>
   </div>
 </div>
+
+<div id="bulkActionsModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('What would you like to do with the checked paths?') }</h3>
+  </div>
+  <div class="modal-body" style="overflow-x: hidden">
+
+    <div class="row-fluid">
+      <div class="span6">
+        <h4>${ _('Checked paths') }</h4>
+        <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
+          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path() }, text: path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
+        </ul>
+      </div>
+      <div class="span6">
+
+        <h4>${ _('Selected path for ACLs actions') }</h4>
+
+        <span class="fake-pre modal-panel">
+          # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
+          # owner: <span data-bind="text: $root.assist.owner"></span><br/>
+          # group: <span data-bind="text: $root.assist.group"></span><br/>
+          <div data-bind="foreach: $root.assist.regularAcls">
+            <div data-bind="template: {name: 'aclDisplay'}"></div>
+          </div>
+          <div data-bind="foreach: $root.assist.defaultAcls">
+            <div data-bind="template: {name: 'aclDisplay'}"></div>
+          </div>
+        </span>
+      </div>
+    </div>
+
+    <h4>${ _('Choose your action') }</h4>
+    <div class="row-fluid">
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'add'}, click: function(){$root.assist.bulkAction('add')}">
+          <i class="fa fa-plus"></i><br/><br/>
+          ${ _('Add current ACLs to checkbox selection') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
+          <i class="fa fa-copy"></i><br/><br/>
+          ${ _('Replace checkbox selection with current ACLs') }
+        </div>
+      </div>
+      <div class="span4 center">
+        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
+          <i class="fa fa-times"></i><br/><br/>
+          ${ _('Remove all ACLs of checkbox selection') }
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn" data-bind="css: {'btn-primary': $root.assist.bulkAction() != 'delete', 'btn-danger': $root.assist.bulkAction() == 'delete'}, click: $root.assist.bulkPerfomAction">${ _('Confirm') }</button>
+  </div>
+</div>
+
 
 <%def name="treeIcons()">
   'fa-folder-open-o': isDir() && nodes().length > 0 && !aclBit(),
@@ -269,6 +332,25 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       }
     });
 
+    $(document).on("updated.acls", function() {
+      $(document).trigger("info", "${ _('The selected ACLs have been successfully updated.') }");
+    });
+
+    $(document).on("added.bulk.acls", function() {
+      $(document).trigger("info", "${ _('The current ACLs have been successfully added to the checked paths.') }");
+      $("#bulkActionsModal").modal("hide");
+    });
+
+    $(document).on("deleted.bulk.acls", function() {
+      $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the checked paths.') }");
+      $("#bulkActionsModal").modal("hide");
+    });
+
+    $(document).on("syncd.bulk.acls", function() {
+      $(document).trigger("info", "${ _('All the ACLs for the checked items have been replaced with the current selection.') }");
+      $("#bulkActionsModal").modal("hide");
+    });
+
     var _resizeTimeout = -1;
     $(window).resize(function(){
       window.clearTimeout(_resizeTimeout);
@@ -278,6 +360,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     window.onpopstate = function() {
       viewModel.assist.path(window.location.hash.substr(1));
     };
+
+    $("#bulkActionsModal").modal({
+      show: false
+    });
 
   });
 </script>

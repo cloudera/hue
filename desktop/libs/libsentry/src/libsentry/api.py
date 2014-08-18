@@ -128,8 +128,7 @@ class SentryApi(object):
       raise SentryException(response)
 
 
-  # Use alter_sentry_role_revoke_privilege instead?
-  def drop_sentry_privilege(self, authorizableHierarchy):
+  def drop_sentry_privileges(self, authorizableHierarchy):
     response = self.client.drop_sentry_privilege(authorizableHierarchy)
 
     if response.status.value == 0:
@@ -138,7 +137,7 @@ class SentryApi(object):
       raise SentryException(response)
 
 
-  def rename_sentry_privilege(self, oldAuthorizable, newAuthorizable):
+  def rename_sentry_privileges(self, oldAuthorizable, newAuthorizable):
     response = self.client.rename_sentry_privilege(oldAuthorizable, newAuthorizable)
 
     if response.status.value == 0:
@@ -154,7 +153,7 @@ class SentryApi(object):
         'database': privilege.dbName,
         'table': privilege.tableName,
         'URI': privilege.URI,
-        'action': privilege.action,
+        'action': privilege.action.upper(),
         'timestamp': privilege.createTime,
         'grantor': privilege.grantorPrincipal
     }
