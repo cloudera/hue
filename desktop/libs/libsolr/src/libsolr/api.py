@@ -75,7 +75,7 @@ class SolrApi(object):
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
 
     params = self._get_params() + (
-        ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']])),
+        ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')),
         ('wt', 'json'),
         ('rows', solr_query['rows']),
         ('start', solr_query['start']),
