@@ -318,6 +318,7 @@ var Assist = function (vm, initial) {
         var _item = {
           path: db,
           name: db,
+          withPrivileges: false,
           isDb: true,
           isTable: false,
           isColumn: false,
@@ -353,6 +354,7 @@ var Assist = function (vm, initial) {
         var _item = {
           path: _path,
           name: table,
+          withPrivileges: false,
           isDb: false,
           isTable: true,
           isColumn: false,
@@ -394,6 +396,7 @@ var Assist = function (vm, initial) {
         var _item = {
           path: _path,
           name: column,
+          withPrivileges: false,
           isDb: false,
           isTable: false,
           isColumn: true,
@@ -872,6 +875,9 @@ var HiveViewModel = function (initial) {
         success: function (data) {
           var _privileges = [];
           $.each(data.privileges, function (index, item) {
+            if (item.table != ""){
+              self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
+            }
             var _role = null;
             self.assist.roles().forEach(function (role) {
               if (role.name() == item.roleName) {
@@ -887,6 +893,7 @@ var HiveViewModel = function (initial) {
           });
           self.assist.privileges(_privileges);
           self.isLoadingPrivileges(false);
+          self.assist.loadData(self.assist.growingTree());
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
