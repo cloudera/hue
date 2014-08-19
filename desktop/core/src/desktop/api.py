@@ -132,6 +132,11 @@ def massaged_documents_for_json(documents, user):
   docs = {}
 
   for document in documents:
+    try:
+      url = document.content_object.get_absolute_url()
+    except:
+      # If app of document is disabled
+      url = ''
     read_perms = document.list_permissions(perm='read')
     write_perms = document.list_permissions(perm='write')
     docs[document.id] = {
@@ -139,7 +144,7 @@ def massaged_documents_for_json(documents, user):
       'contentType': document.content_type.name,
       'icon': document.icon,
       'name': document.name,
-      'url': document.content_object.get_absolute_url(),
+      'url': url,
       'description': document.description,
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in document.tags.all()],
       'perms': {
