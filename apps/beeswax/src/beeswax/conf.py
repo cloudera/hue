@@ -83,7 +83,7 @@ THRIFT_VERSION = Config(
   key="thrift_version",
   help=_t("Thrift version to use when communicating with HiveServer2"),
   type=int,
-  default=4
+  default=5
 )
 
 SSL = ConfigSection(
