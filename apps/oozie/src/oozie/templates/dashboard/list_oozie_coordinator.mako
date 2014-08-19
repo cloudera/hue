@@ -188,7 +188,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       <script id="calendarTemplate" type="text/html">
         <tr>
           <td>
-            <a data-bind="attr: {href: url}" data-row-selector="true">
+            <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
               <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
             </a>
           </td>
@@ -387,6 +387,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
   #slaTable {
     margin-top: 20px;
+  }
+
+  .disabled {
+    cursor: default;
   }
 </style>
 

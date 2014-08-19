@@ -247,7 +247,10 @@ def list_oozie_coordinator(request, job_id):
 
   oozie_bundle = None
   if request.GET.get('bundle_job_id'):
-    oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
+    try:
+      oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
+    except:
+      pass
 
   show_all_actions =request.GET.get('show_all_actions') == 'true'
 
