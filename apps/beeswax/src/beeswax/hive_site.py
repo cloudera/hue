@@ -40,6 +40,7 @@ _METASTORE_LOC_CACHE = None
 _CNF_METASTORE_SASL = 'hive.metastore.sasl.enabled'
 _CNF_METASTORE_URIS = 'hive.metastore.uris'
 _CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
+_CNF_METASTORE_WAREHOUSE_DIR = 'hive.metastore.warehouse.dir'
 
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
@@ -112,6 +113,9 @@ def get_hiveserver2_kerberos_principal(hostname_or_ip):
     return security_util.get_kerberos_principal(principal, fqdn)
   else:
     return None
+
+def get_metastore_warehouse_dir():
+  return get_conf().get(_CNF_METASTORE_WAREHOUSE_DIR, '/user/hive/warehouse')
 
 def get_hiveserver2_authentication():
   return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
