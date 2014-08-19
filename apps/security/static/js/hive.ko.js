@@ -124,6 +124,7 @@ var Role = function (vm, role) {
     self.originalGroups.push(group);
   });
   self.privileges = ko.observableArray(); // Not included in the API
+  self.privilegesForViewTo = ko.observable(49);
   self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
   self.showEditGroups = ko.observable(false);
@@ -137,6 +138,19 @@ var Role = function (vm, role) {
 
   self.groupsChanged = ko.computed(function () {
     return !($(self.groups()).not(self.originalGroups()).length == 0 && $(self.originalGroups()).not(self.groups()).length == 0);
+  });
+
+  self.privilegesForView = ko.computed(function() {
+    var _filter = vm.privilegeFilter().toLowerCase();
+    if (_filter == "") {
+      return self.privileges().slice(0, self.privilegesForViewTo());
+    }
+    else {
+      var _filtered = ko.utils.arrayFilter(self.privileges(), function (priv) {
+        return priv.dbName().toLowerCase().indexOf(_filter) > -1 || priv.tableName().toLowerCase().indexOf(_filter) > -1 || priv.action().toLowerCase().indexOf(_filter) > -1;
+      });
+      return _filtered.slice(0, self.privilegesForViewTo());
+    }
   });
 
   self.reset = function () {
@@ -473,7 +487,12 @@ var Assist = function (vm, initial) {
     }
     self.path(obj.path());
     $(document).trigger("changed.path");
-    self.fetchHivePath();
+    if (self.getTreeAdditionalDataForPath(obj.path()).loaded){
+      vm.list_sentry_privileges_by_authorizable();
+    }
+    else {
+      self.fetchHivePath();
+    }
   }
 
   self.togglePath = function (obj) {
@@ -572,6 +591,7 @@ var Assist = function (vm, initial) {
   }
 
   self.fetchHivePath = function (optionalPath, loadCallback) {
+    self.isLoadingTree(true);
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
     if (_originalPath.split(".").length < 3) {
       var _path = _originalPath.replace('.', '/');
@@ -590,9 +610,11 @@ var Assist = function (vm, initial) {
             if (vm.getPathHash() == ""){
               self.setPath(self.treeData().nodes()[0]);
             }
-          } else if (data.tables && data.tables.length > 0) {
+          }
+          else if (data.tables && data.tables.length > 0) {
             self.addTables(_originalPath, data.tables, _hasCallback);
           }
+          self.isLoadingTree(false);
           //else if (data.columns && data.columns.length > 0) {
             //self.addColumns(_originalPath, data.columns, _hasCallback);
           //}
@@ -623,8 +645,12 @@ var Assist = function (vm, initial) {
 var HiveViewModel = function (initial) {
   var self = this;
 
+  self.isLoadingPrivileges = ko.observable(false);
+
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
+
+  self.privilegeFilter = ko.observable("");
 
   // Models
   self.roles = ko.observableArray();
@@ -726,10 +752,10 @@ var HiveViewModel = function (initial) {
   };
 
   self.init = function (path) {
+    self.assist.isLoadingTree(true);
     self.fetchUsers();
     self.assist.path(path);
     self.list_sentry_roles_by_group();
-
     if (path != "") {
       self.assist.loadParents();
     } else {
@@ -831,7 +857,10 @@ var HiveViewModel = function (initial) {
   }
 
   self.list_sentry_privileges_by_authorizable = function () {
+    self.isLoadingPrivileges(true);
     if (self.assist.path() != "") {
+      self.assist.roles.removeAll();
+      self.assist.privileges.removeAll();
       $.ajax({
         type: "POST",
         url: "/security/api/hive/list_sentry_privileges_by_authorizable",
@@ -841,8 +870,7 @@ var HiveViewModel = function (initial) {
           authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko())
         },
         success: function (data) {
-          self.assist.roles.removeAll();
-          self.assist.privileges.removeAll();
+          var _privileges = [];
           $.each(data.privileges, function (index, item) {
             var _role = null;
             self.assist.roles().forEach(function (role) {
@@ -855,8 +883,10 @@ var HiveViewModel = function (initial) {
               _role = self.assist.roles()[_idx - 1];
             }
             _role.privileges.push(_create_ko_privilege(item));
-            self.assist.privileges.push(_create_ko_privilege(item));
+            _privileges.push(_create_ko_privilege(item));
           });
+          self.assist.privileges(_privileges);
+          self.isLoadingPrivileges(false);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);

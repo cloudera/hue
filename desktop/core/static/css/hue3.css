@@ -1741,3 +1741,7 @@ border-bottom-left-radius: 0px;
 .fa-1halfx {
   font-size: 1.5em;
 }
+
+input.no-margin {
+  margin-bottom: 0;
+}

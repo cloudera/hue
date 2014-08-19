@@ -110,7 +110,6 @@ ${ layout.menubar(section='hdfs') }
                     <i class="fa fa-group" title="List of groups in popover for this user?"></i>
                   </div>
                   <div>
-                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                     <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
                       <i class="fa fa-compress"></i>
                     </a>
@@ -122,6 +121,8 @@ ${ layout.menubar(section='hdfs') }
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
                       <i class="fa fa-copy"></i>
                     </a>
+                    &nbsp;
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                   </div>
                 </div>
               </div>
