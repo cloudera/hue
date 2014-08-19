@@ -17,6 +17,7 @@
 
 import os.path
 import sys
+import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
@@ -142,7 +143,7 @@ def config_validator(user):
 
   try:
     from hadoop import cluster
-    warehouse = '/user/hive/warehouse'
+    warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
     fs = cluster.get_hdfs()
     fs.stats(warehouse)
   except Exception:
