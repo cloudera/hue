@@ -165,3 +165,11 @@ function getFileBrowseButton(inputElement, selectFolder) {
     }
   });
 }
+
+ko.bindingHandlers.tooltip = {
+  update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+    var options = ko.utils.unwrapObservable(valueAccessor());
+    var self = $(element);
+    self.tooltip(options);
+  }
+};

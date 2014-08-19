@@ -28,9 +28,12 @@ ${ layout.menubar(section='hive') }
 
 
 <script type="text/html" id="role">
-  <div class="acl-block-title"><i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a></div>
-  <div data-bind="template: { name: 'privilege', foreach: privileges }"></div>
-  <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0)">
+  <div class="acl-block-title">
+    <i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a>
+  </div>
+  <div data-bind="template: { name: 'privilege', foreach: privilegesForView }"></div>
+  <div class="acl-block acl-actions">
+    <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_authorizable, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: $root.role.savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
@@ -150,7 +153,6 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <div>
-                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                     <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
                       <i class="fa fa-compress"></i>
                     </a>
@@ -162,6 +164,8 @@ ${ layout.menubar(section='hive') }
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
                       <i class="fa fa-copy"></i>
                     </a>
+                    &nbsp;
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: $root.assist.isLoadingTree()"></i>
                   </div>
 
                 </div>
@@ -172,9 +176,13 @@ ${ layout.menubar(section='hive') }
             </div>
             <div class="span6 acl-panel">
               <div class="acl-panel-content">
-                <a data-bind="visible: $root.assist.privileges().length > 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer pull-right"><i class="fa fa-plus-circle"></i> ${ _('Add role') }</a>
-                <h4 style="margin-top: 4px">${ _('Privileges') }</h4>
-                <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')} <a class="pointer" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">${ _('Click here to add a new role.') }</a> </em></div>
+                <div class="pull-right">
+                  <input class="input-medium no-margin" type="text" placeholder="${ _('Search privileges...') }" data-bind="value: privilegeFilter, valueUpdate: 'afterkeydown', visible: $root.assist.privileges().length > 1"> &nbsp;
+                  <a data-bind="visible: $root.assist.privileges().length > 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer"><i class="fa fa-plus-circle"></i> ${ _('Add role') }</a>
+                </div>
+                <h4 style="margin-top: 4px">${ _('Privileges') } &nbsp;<i class="fa fa-spinner fa-spin" data-bind="visible: $root.isLoadingPrivileges()"></i></h4>
+                <div data-bind="visible: $root.assist.privileges().length == 0 && ! $root.isLoadingPrivileges()"><em class="muted">${ _('No privileges found for the selected item.')} <a class="pointer" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">${ _('Click here to add a new role.') }</a> </em></div>
+                <div data-bind="visible: $root.assist.privileges().length == 0 && $root.isLoadingPrivileges()"><em class="muted">${ _('Loading privileges...')}</em></div>
                 <div data-bind="template: { name: 'role', foreach: $root.assist.roles }"></div>
               </div>
             </div>
@@ -418,6 +426,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
   <script type="text/javascript" charset="utf-8">
+
     var viewModel = new HiveViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
 
