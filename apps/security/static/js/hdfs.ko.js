@@ -397,13 +397,11 @@ var Assist = function (vm, assist) {
           'pagenum': self.pagenum(),
           'format': 'json',
           'doas': vm.doAs(),
-          'isDiffMode': self.isDiffMode(),
+          'isDiffMode': self.isDiffMode()
         },
         function (data) {
-          if (data.error != null) {
-            if (data.error == "FILE_NOT_FOUND") {
-              self.path("/");
-            }
+          if (data.error != null && data.error == "FILE_NOT_FOUND") {
+            self.path("/");
           }
           else {
             self.loadParents(data.breadcrumbs);
