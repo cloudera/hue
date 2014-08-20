@@ -105,11 +105,10 @@ class OozieApi(object):
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status')
 
-  def get_jobs(self, jobtype, offset=None, cnt=None, **kwargs):
+  def get_jobs(self, jobtype, offset=None, cnt=None, filters=None):
     """
     Get a list of Oozie jobs.
 
-    jobtype is 'wf', 'coord'
     Note that offset is 1-based.
     kwargs is used for filtering and may be one of VALID_FILTERS: name, user, group, status
     """
@@ -118,10 +117,12 @@ class OozieApi(object):
       params['offset'] = str(offset)
     if cnt is not None:
       params['len'] = str(cnt)
+    if filters is None:
+      filters = []
     params['jobtype'] = jobtype
 
-    filter_list = [ ]
-    for key, val in kwargs.iteritems():
+    filter_list = []
+    for key, val in filters:
       if key not in OozieApi.VALID_JOB_FILTERS:
         raise ValueError('"%s" is not a valid filter for selecting jobs' % (key,))
       filter_list.append('%s=%s' % (key, val))
@@ -130,21 +131,21 @@ class OozieApi(object):
     # Send the request
     resp = self._root.get('jobs', params)
     if jobtype == 'wf':
-      wf_list = WorkflowList(self, resp, filters=kwargs)
+      wf_list = WorkflowList(self, resp, filters=filters)
     elif jobtype == 'coord':
-      wf_list = CoordinatorList(self, resp, filters=kwargs)
+      wf_list = CoordinatorList(self, resp, filters=filters)
     else:
-      wf_list = BundleList(self, resp, filters=kwargs)
+      wf_list = BundleList(self, resp, filters=filters)
     return wf_list
 
-  def get_workflows(self, offset=None, cnt=None, **kwargs):
-    return self.get_jobs('wf', offset, cnt, **kwargs)
+  def get_workflows(self, offset=None, cnt=None, filters=None):
+    return self.get_jobs('wf', offset, cnt, filters)
 
-  def get_coordinators(self, offset=None, cnt=None, **kwargs):
-    return self.get_jobs('coord', offset, cnt, **kwargs)
+  def get_coordinators(self, offset=None, cnt=None, filters=None):
+    return self.get_jobs('coord', offset, cnt, filters)
 
-  def get_bundles(self, offset=None, cnt=None, **kwargs):
-    return self.get_jobs('bundle', offset, cnt, **kwargs)
+  def get_bundles(self, offset=None, cnt=None, filters=None):
+    return self.get_jobs('bundle', offset, cnt, filters)
 
   # TODO: make get_job accept any jobid
   def get_job(self, jobid):
