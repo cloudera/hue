@@ -67,7 +67,7 @@ var Privilege = function (vm, privilege) {
   self.grantor = ko.observable(typeof privilege.grantor != "undefined" && privilege.grantor != null ? privilege.grantor : "");
 
   // UI
-  self.type = ko.observable("db");
+  self.privilegeType = ko.observable("db");
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
