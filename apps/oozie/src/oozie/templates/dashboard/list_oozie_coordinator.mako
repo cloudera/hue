@@ -153,11 +153,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         <table class="table table-striped table-condensed">
           <thead>
           <tr>
-            <th>${ _('Day') }</th>
+            <th width="200">${ _('Day') }</th>
             <th>${ _('Comment') }</th>
           </tr>
           </thead>
-          <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions}">
+          <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions, afterRender: function(){ setupjHueRowSelector(); }}">
           </tbody>
           <tfoot>
             <tr>
@@ -186,13 +186,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       </div>
 
       <script id="calendarTemplate" type="text/html">
-        <tr>
-          <td>
+        <tr data-bind="css: { disabled: url == '' }">
+          <td data-bind="css: { disabled: url == '' }">
             <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
               <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
             </a>
           </td>
-          <td><span data-bind="text: errorMessage"></span> <span data-bind="visible:missingDependencies !='', text: '${ _('Missing')}' + missingDependencies"></span></td>
+          <td data-bind="css: { disabled: url == '' }"><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == ''">${ _('Workflow not available or instantiated yet') }</em><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url != ''">${_('-')}</em> <span data-bind="visible: errorMessage != null && errorMessage != '', text: errorMessage"></span> <span data-bind="visible:missingDependencies !='' && missingDependencies != null, text: '${ _('Missing')} ' + missingDependencies"></span></td>
         </tr>
       </script>
 
@@ -396,6 +396,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <script>
 
+  var setupjHueRowSelector = function () {
+    $("a[data-row-selector='true']").jHueRowSelector();
+  }
+
   var Action = function (action) {
     return {
       id: action.id,
@@ -573,7 +577,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     function refreshView() {
       $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "${ "&show_all_actions=true" if show_all_actions else '' | n,unicode }", function (data) {
         viewModel.isLoading(false);
-        if (data.actions){
+        if (data != null && data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
             return new Action(action);
           }));
