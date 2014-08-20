@@ -369,7 +369,7 @@ class Job(object):
     return [action for action in self.actions if not ControlFlowAction.is_control_flow(action.type)]
 
   def is_running(self):
-    return self.status in (Workflow.RUNNING_STATUSES, Coordinator.RUNNING_STATUSES, Bundle.RUNNING_STATUSES)
+    return self.status in Workflow.RUNNING_STATUSES | Coordinator.RUNNING_STATUSES | Bundle.RUNNING_STATUSES
 
   def __str__(self):
     return '%s - %s' % (self.id, self.status)
@@ -401,7 +401,7 @@ class Workflow(Job):
   ]
   ACTION = WorkflowAction
   RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED'])
-  FINISHED_STATUSES = set(['SUCCEEDED' , 'KILLED', 'FAILED'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'KILLED', 'FAILED'])
 
   def _fixup(self):
     super(Workflow, self)._fixup()
