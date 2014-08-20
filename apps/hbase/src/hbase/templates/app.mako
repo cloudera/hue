@@ -175,7 +175,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         % endif
         % if can_write:
         <span class="pull-right">
-          <a href="#new_table_modal" role="button" data-bind="click: function(){app.focusModel(app.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
+          <a href="#new_table_modal" role="button" data-bind="click: function(){prepareNewTableForm(); app.focusModel(app.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
         </span>
         % endif
       </div>
@@ -194,37 +194,51 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <!-- New Table Modal -->
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
         <h3>${_('Create New Table')}</h3>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
         <label>${_('Table Name')}:</label> <input name="tableName" placeholder="MyTable" type="text"/>
         <label>${_('Column Families')}:</label>
-        <ul>
-          <li>
-            <input type="text" name="table_columns" placeholder="family_name">
-            <select name="table_columns_propery" style="width:100px">
-			    <option data-default="3" selected>maxVersions</option>
-			    <option data-default="NONE">compression</option>
-			    <option data-default="true">inMemory</option>
-			    <option data-default="NONE">bloomFilterType</option>
-			    <option data-default="0">bloomFilterVectorSize</option>
-			    <option data-default="0">bloomFilterNbHashes</option>
-			    <option data-default="true">blockCacheEnabled</option>
-			    <option data-default="-1">timeToLive</option>
-			 </select>
-			  <input type="text" name="table_columns" placeholder="3" style="width:50px">
-			  <i class="fa fa-plus-circle"></i>
-          </li>
-        </ul>
-        <a class="btn action_addColumn"><i class="fa fa-plus-circle"></i> ${_('Additional Column Family')}</a>
+        <ul class="columns"></ul>
+        <a class="pointer action_addColumn"><i class="fa fa-plus-circle"></i> ${_('Add an additional column family')}</a>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
         <input type="submit" class="btn btn-primary" value="${_('Submit')}"/>
       </div>
     </form>
+
+    <script id="columnTemplate" type="text/html">
+      <ul class="pull-right columnProperties"></ul>
+      <div class="inline" style="width: 24px">
+        <a class="pointer action_removeColumn" title="${_('Remove Column Family')}"><i class="fa fa-times"></i></a>
+      </div>
+      <input type="text" name="table_columns" placeholder="family_name" class="no-margin">
+      <div class="clearfix"></div>
+    </script>
+
+    <script id="columnPropertyTemplate" type="text/html">
+      <select name="table_columns_property" style="width:180px" class="no-margin">
+        <option data-default="3" selected>maxVersions</option>
+        <option data-default="NONE">compression</option>
+        <option data-default="true">inMemory</option>
+        <option data-default="NONE">bloomFilterType</option>
+        <option data-default="0">bloomFilterVectorSize</option>
+        <option data-default="0">bloomFilterNbHashes</option>
+        <option data-default="true">blockCacheEnabled</option>
+        <option data-default="-1">timeToLive</option>
+      </select>
+      <input type="text" name="table_columns_property_value" placeholder="3" style="width:80px" class="no-margin">
+      <a class="pointer action_removeColumnProperty" title="${_('Remove column property')}"><i class="fa fa-minus-circle"></i></a>
+      <a class="pointer action_addColumnProperty" title="${_('Additional column property')}"><i class="fa fa-plus-circle"></i></a>
+    </script>
+    <script id="columnPropertyEmptyTemplate" type="text/html">
+      <li class="columnPropertyEmpty" style="width:310px; line-height: 29px">
+        <a class="pointer action_addColumnProperty"><i class="fa fa-plus-circle"></i> ${_('Add a column property')}</a>
+      </li>
+    </script>
   </div>
 
   <!-- Table View Page -->
@@ -309,7 +323,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </form>
     <script id="new_row_modal_template" type="text/html">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
         <h3>${_('Insert New Row')}</h3>
       </div>
       <div class="modal-body controls">
@@ -332,7 +346,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </form>
     <script id="new_column_modal_template" type="text/html">
       <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
           <h3>${_('Create New Column')}</h3>
         </div>
         <div class="modal-body controls">
@@ -357,8 +371,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: $data.content.timestamp"></span></small></h3>
+        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
+        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp($data.content.timestamp)"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -373,10 +387,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <!-- /ko -->
             </div>
             <div class="span3">
-              <ul class="nav nav-list">
+              <ul class="nav nav-list cell-history">
                 <li class="nav-header">${_('Cell History:')}</li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)"></a></li>
+                  <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><img src="/static/art/spinner.gif" /></li>
               </ul>
@@ -412,7 +426,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <div id="confirm-modal" action="createTable" method="POST" class="modal hide fade"></div>
   <script id="confirm_template" type="text/html">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
       <h3 data-bind="text: title"></h3>
     </div>
     <div class="modal-body" data-bind="text: text">

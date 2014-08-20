@@ -41,6 +41,7 @@ class HbaseApi(object):
   def query(self, action, *args):
     try:
       if hasattr(self, action):
+        print args
         return getattr(self, action)(*args)
       cluster = args[0]
       return self.queryCluster(action, cluster, *args[1:])
@@ -117,8 +118,16 @@ class HbaseApi(object):
     return client.getVerTs(tableName, smart_str(row), smart_str(column), timestamp, numVersions, attributesargs)
 
   def createTable(self, cluster, tableName, *columns):
+    print cluster
+    print tableName
+    print columns, ' ---'
+    
+    # ([{u'name': u'ff', u'properties': [{}]}, {u'properties': []}, {u'name': u'fffff', u'properties': [{}]}, {u'properties': []}],)  ---
+    # -->
+    # ([{u'name': u'ff', u'properties': [{}]}, {u'name': u'fffff', u'properties': [{}]},)  ---
+    
     client = self.connectCluster(cluster)
-    client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(name=column) for column in columns])
+    client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(name=column['name']) for column in columns])
     return "%s successfully created" % tableName
 
   def getTableList(self, cluster):
