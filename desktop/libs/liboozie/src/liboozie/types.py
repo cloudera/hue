@@ -275,18 +275,13 @@ class BundleAction(Action):
     return progress
 
 
-class Job(object):
-  RUNNING_STATUSES = set([
-     'PREP', 'RUNNING', 'SUSPENDED', # Workflow
-     'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
-    ]
-  )
+class Job(object):  
   MAX_LOG_SIZE = 3500 * 20 # 20 pages
 
   """
   Accessing log and definition will trigger Oozie API calls.
   """
-  def __init__(self, api, json_dict):
+  def __init__(self, api, json_dict):    
     for attr in self._ATTRS:
       setattr(self, attr, json_dict.get(attr))
     self._fixup()
@@ -374,7 +369,7 @@ class Job(object):
     return [action for action in self.actions if not ControlFlowAction.is_control_flow(action.type)]
 
   def is_running(self):
-    return self.status in Job.RUNNING_STATUSES
+    return self.status in (Workflow.RUNNING_STATUSES, Coordinator.RUNNING_STATUSES, Bundle.RUNNING_STATUSES)
 
   def __str__(self):
     return '%s - %s' % (self.id, self.status)
@@ -405,6 +400,8 @@ class Workflow(Job):
     'parentId'
   ]
   ACTION = WorkflowAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED'])
+  FINISHED_STATUSES = set(['SUCCEEDED' , 'KILLED', 'FAILED'])
 
   def _fixup(self):
     super(Workflow, self)._fixup()
@@ -476,6 +473,8 @@ class Coordinator(Job):
     'bundleId'
   ]
   ACTION = CoordinatorAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'DONEWITHERROR', 'KILLED', 'FAILED'])
 
   def _fixup(self):
     super(Coordinator, self)._fixup()
@@ -571,6 +570,8 @@ class Bundle(Job):
   ]
 
   ACTION = BundleAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'RUNNINGWITHERROR', 'SUSPENDED', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PAUSED', 'PAUSEDWITHERROR', 'PREPPAUSED'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'DONEWITHERROR', 'KILLED', 'FAILED'])
 
   def _fixup(self):
     self.actions = self.bundleCoordJobs
@@ -616,7 +617,7 @@ class JobList(object):
   def __init__(self, klass, jobs_key, api, json_dict, filters=None):
     """
     json_dict is the oozie json.
-    filters is (optionally) the dictionary of filters used to select this list
+    filters is (optionally) the list of filters used to select this list
     """
     self._api = api
     self.offset = int(json_dict['offset'])
