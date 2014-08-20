@@ -851,7 +851,14 @@ var HiveViewModel = function (initial) {
     return _privilege;
   }
 
-  function _create_authorizable_from_ko(privilege) {
+  function _create_authorizable_from_ko(optionalPath) {
+    if (optionalPath != null){
+      return {
+        'server': self.assist.server(),
+        'db':  optionalPath.split(/[.]/)[0],
+        'table':  optionalPath.split(/[.]/)[1]
+      }
+    }
     return {
       'server': self.assist.server(),
       'db': self.assist.db(),
@@ -859,9 +866,13 @@ var HiveViewModel = function (initial) {
     }
   }
 
-  self.list_sentry_privileges_by_authorizable = function () {
+  self.list_sentry_privileges_by_authorizable = function (optionalPath, skipList) {
+    var _path = self.assist.path();
+    if (optionalPath != null){
+      _path = optionalPath;
+    }
     self.isLoadingPrivileges(true);
-    if (self.assist.path() != "") {
+    if (_path != "") {
       self.assist.roles.removeAll();
       self.assist.privileges.removeAll();
       $.ajax({
@@ -870,7 +881,7 @@ var HiveViewModel = function (initial) {
         data: {
           groupName: $('#selectedGroup').val(),
           roleSet: ko.mapping.toJSON({all: true, roles: []}),
-          authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko())
+          authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
         },
         success: function (data) {
           var _privileges = [];
@@ -878,20 +889,24 @@ var HiveViewModel = function (initial) {
             if (item.table != ""){
               self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
             }
-            var _role = null;
-            self.assist.roles().forEach(function (role) {
-              if (role.name() == item.roleName) {
-                _role = role;
+            if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
+              var _role = null;
+              self.assist.roles().forEach(function (role) {
+                if (role.name() == item.roleName) {
+                  _role = role;
+                }
+              });
+              if (_role == null) {
+                var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
+                _role = self.assist.roles()[_idx - 1];
               }
-            });
-            if (_role == null) {
-              var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
-              _role = self.assist.roles()[_idx - 1];
+              _role.privileges.push(_create_ko_privilege(item));
+              _privileges.push(_create_ko_privilege(item));
             }
-            _role.privileges.push(_create_ko_privilege(item));
-            _privileges.push(_create_ko_privilege(item));
           });
-          self.assist.privileges(_privileges);
+          if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
+            self.assist.privileges(_privileges);
+          }
           self.isLoadingPrivileges(false);
           self.assist.loadData(self.assist.growingTree());
         }
@@ -909,7 +924,7 @@ var HiveViewModel = function (initial) {
         self.bulk_add_privileges();
         break;
       case "sync":
-        self.assist.bulkSyncAcls();
+        alert("Not supported yet");
         break;
       case "delete":
         self.bulk_delete_privileges();
@@ -927,6 +942,9 @@ var HiveViewModel = function (initial) {
       'recursive': false
     }, function (data) {
       if (data.status == 0) {
+        ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
+          self.assist.updatePathProperty(self.assist.growingTree(), item.path, "withPrivileges", false);
+        });
         self.list_sentry_privileges_by_authorizable(); // Refresh
         $(document).trigger("deleted.bulk.privileges");
       } else {
@@ -947,6 +965,9 @@ var HiveViewModel = function (initial) {
       'recursive': false
     }, function (data) {
       if (data.status == 0) {
+        ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
+          self.assist.updatePathProperty(self.assist.growingTree(), item.path, "withPrivileges", true);
+        });
         self.list_sentry_privileges_by_authorizable(); // Refresh
         $(document).trigger("added.bulk.privileges");
       } else {
@@ -956,6 +977,12 @@ var HiveViewModel = function (initial) {
       $(document).trigger("error", xhr.responseText);
     });
   }
+
+  self.bulk_refresh_privileges= function () {
+    ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
+      self.list_sentry_privileges_by_authorizable(item.path, true);
+    });
+  };
 
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', {
