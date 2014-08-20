@@ -572,6 +572,12 @@ ko.bindingHandlers.clearable = {
           valueAccessor()("");
         }
       });
+
+    if (allBindingsAccessor().valueUpdate != null && allBindingsAccessor().valueUpdate == "afterkeydown"){
+      _el.on("keyup", function () {
+        valueAccessor()(_el.val());
+      });
+    }
   },
   update: function (element, valueAccessor, allBindingsAccessor) {
     $(element).val(ko.unwrap(valueAccessor()));
