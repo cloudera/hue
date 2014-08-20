@@ -538,6 +538,7 @@ ul#hbase-breadcrumbs li a {
 }
 
 #cell_edit_modal .modal-body {
+  min-height: 400px;
   max-height: 600px;
 }
 
@@ -615,4 +616,14 @@ textarea {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#292b2d', endColorstr='#000000', GradientType=0); /* IE6-9 */
   border-color: #333;
   box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+}
+
+.cell-history {
+  border: none;
+  border-left: 1px solid #d5d5d5;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  min-height: 400px;
+  background-color: #FFFFFF;
 }

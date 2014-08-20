@@ -103,6 +103,7 @@ class HbaseApi(object):
 
   def createTable(self, cluster, tableName, *columns):
     client = self.connectCluster(cluster)
+    print columns
     client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(name=column) for column in columns])
     return "%s successfully created" % tableName
 

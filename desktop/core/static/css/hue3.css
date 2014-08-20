@@ -1742,6 +1742,6 @@ border-bottom-left-radius: 0px;
   font-size: 1.5em;
 }
 
-input.no-margin {
+input.no-margin, select.no-margin {
   margin-bottom: 0;
 }

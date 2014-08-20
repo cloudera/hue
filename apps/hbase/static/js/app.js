@@ -194,7 +194,7 @@ function bindSubmit() {
   var self = this;
   var data = [];
   var hash_cache = {};
-  $(this).find('.controls > input, .controls > textarea, .controls > ul input').not('input[type=submit]').each(function() {
+  $(this).find('.controls > input, .controls > textarea, .controls > ul input, .controls > ul select').not('input[type=submit]').each(function() {
     if($(this).hasClass('ignore'))
       return;
     var use_post = $(this).data('use-post');
@@ -249,6 +249,34 @@ $('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
   $(this).trigger('reset');
 });
 
-$('a.action_addColumn').click(function() {
-  $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family_name\"/></li>")
+var prepareNewTableForm = function () {
+  $("#new_table_modal .modal-body ul").empty();
+  addColumnToNewTableForm();
+}
+
+var addColumnToNewTableForm = function() {
+  var $li = $("<li>").css("marginBottom", "6px").html($("#columnTemplate").html());
+  $li.find("select").on("change", function(){
+    $li.find("[name='table_columns_property_value']").attr("placeholder", $(this).find("option:selected").data("default"));
+  });
+  if ($("#new_table_modal .modal-body ul li").length == 0){
+    $li.find(".action_removeColumn").hide();
+  }
+  $li.appendTo($("#new_table_modal .modal-body ul"));
+}
+
+$(document).on("click", "a.action_addColumn", function() {
+  $("a.action_addColumn").each(function(cnt, item){
+    if (cnt < $("a.action_addColumn").length){
+      $(item).hide();
+    }
+  });
+  addColumnToNewTableForm();
+});
+
+$(document).on("click", "a.action_removeColumn", function() {
+  $(this).parent().remove();
+  if ($("#new_table_modal .modal-body ul li").length == 1){
+    $("a.action_addColumn").show();
+  }
 });
