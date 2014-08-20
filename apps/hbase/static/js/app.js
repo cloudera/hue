@@ -194,42 +194,66 @@ function bindSubmit() {
   var self = this;
   var data = [];
   var hash_cache = {};
-  $(this).find('.controls > input, .controls > textarea, .controls > ul input, .controls > ul select').not('input[type=submit]').each(function() {
-    if($(this).hasClass('ignore'))
-      return;
-    var use_post = $(this).data('use-post');
-    var submitVal = null;
-    if($(this).data('subscribe')) {
-      var target = $($(this).data('subscribe'));
-      switch(target[0].tagName) {
-        case "UL":
-          var serialized = {};
-          target.find('li').each(function() {
-            serialized[$(this).find('input')[0].value] = $(this).find('input')[1].value;
-          });
-          submitVal = serialized;
-          use_post = true;
-          break;
+  if ($(this).attr("id") == "new_table_modal"){
+    var _cols = [];
+    $(this).find(".columns li").each(function(cnt, column){
+      var _props = [];
+      $(column).find(".columnProperties li").each(function(icnt, property){
+        _props.push({
+          name: $(property).find("select").val(),
+          value: $(property).find("input[name='table_columns_property_value']").val()
+        });
+      });
+      _cols.push({
+        name: $(column).find("input[name='table_columns']").val(),
+        properties: _props
+      });
+    });
+    data = {
+      cluster: $(this).find("input[name='cluster']").val(),
+      tableName: $(this).find("input[name='tableName']").val(),
+      columns: _cols
+    }
+    data = JSON.stringify(data);
+  }
+  else {
+    $(this).find('.controls > input, .controls > textarea, .controls > ul input').not('input[type=submit]').each(function() {
+      if($(this).hasClass('ignore'))
+        return;
+      var use_post = $(this).data('use-post');
+      var submitVal = null;
+      if($(this).data('subscribe')) {
+        var target = $($(this).data('subscribe'));
+        switch(target[0].tagName) {
+          case "UL":
+            var serialized = {};
+            target.find('li').each(function() {
+              serialized[$(this).find('input')[0].value] = $(this).find('input')[1].value;
+            });
+            submitVal = serialized;
+            use_post = true;
+            break;
+        }
       }
-    }
-    else if($(this).hasClass('serializeHash')) {
-      var target = $(this).attr('name');
-      if(!hash_cache[target])
-        hash_cache[target] = {};
-      hash_cache[target][$(this).data(key)] = $(this).val();
-    }
-    else {
-      submitVal = $(this).val();
-      //change reload next
-    }
-    if(submitVal) {
-      if(use_post)
-        submitVal = "hbase-post-key-" + JSON.stringify(submitVal);
-      else
-        submitVal = prepForTransport(submitVal);
-      data.push(submitVal);
-    }
-  });
+      else if($(this).hasClass('serializeHash')) {
+        var target = $(this).attr('name');
+        if(!hash_cache[target])
+          hash_cache[target] = {};
+        hash_cache[target][$(this).data(key)] = $(this).val();
+      }
+      else {
+        submitVal = $(this).val();
+        //change reload next
+      }
+      if(submitVal) {
+        if(use_post)
+          submitVal = "hbase-post-key-" + JSON.stringify(submitVal);
+        else
+          submitVal = prepForTransport(submitVal);
+        data.push(submitVal);
+      }
+    });
+  }
   $(this).find('input[type=submit]').addClass('disabled').showIndicator();
   var ui = app.focusModel();
   if(ui)
@@ -255,28 +279,38 @@ var prepareNewTableForm = function () {
 }
 
 var addColumnToNewTableForm = function() {
-  var $li = $("<li>").css("marginBottom", "6px").html($("#columnTemplate").html());
+  var $li = $("<li>").addClass("column").css("marginBottom", "10px").html($("#columnTemplate").html());
+  addColumnPropertyToColumn($li);
+  $li.appendTo($("#new_table_modal .modal-body ul.columns"));
+}
+
+var addColumnPropertyToColumn = function (col){
+  var $li = $("<li>").addClass("columnProperty").css("marginBottom", "5px").html($("#columnPropertyTemplate").html());
   $li.find("select").on("change", function(){
     $li.find("[name='table_columns_property_value']").attr("placeholder", $(this).find("option:selected").data("default"));
   });
-  if ($("#new_table_modal .modal-body ul li").length == 0){
-    $li.find(".action_removeColumn").hide();
-  }
-  $li.appendTo($("#new_table_modal .modal-body ul"));
+  $li.appendTo(col.find("ul"));
 }
 
 $(document).on("click", "a.action_addColumn", function() {
-  $("a.action_addColumn").each(function(cnt, item){
-    if (cnt < $("a.action_addColumn").length){
-      $(item).hide();
-    }
-  });
   addColumnToNewTableForm();
 });
 
+
 $(document).on("click", "a.action_removeColumn", function() {
+  $(this).parents("li").remove();
+});
+
+$(document).on("click", "a.action_addColumnProperty", function() {
+  addColumnPropertyToColumn($(this).parents(".column"));
+  $(this).parents(".column").find(".columnPropertyEmpty").remove();
+});
+
+$(document).on("click", "a.action_removeColumnProperty", function() {
+  var _col = $(this).parents(".column");
+  _col.find(".columnPropertyEmpty").remove();
   $(this).parent().remove();
-  if ($("#new_table_modal .modal-body ul li").length == 1){
-    $("a.action_addColumn").show();
+  if (_col.find("li").length == 0){
+    _col.find("ul").html($("#columnPropertyEmptyTemplate").html());
   }
 });

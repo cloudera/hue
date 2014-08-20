@@ -201,8 +201,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
         <label>${_('Table Name')}:</label> <input name="tableName" placeholder="MyTable" type="text"/>
         <label>${_('Column Families')}:</label>
-        <ul>
-        </ul>
+        <ul class="columns"></ul>
+        <a class="pointer action_addColumn"><i class="fa fa-plus-circle"></i> ${_('Add an additional column family')}</a>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
@@ -211,7 +211,15 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </form>
 
     <script id="columnTemplate" type="text/html">
+      <ul class="pull-right columnProperties"></ul>
+      <div class="inline" style="width: 24px">
+        <a class="pointer action_removeColumn" title="${_('Remove Column Family')}"><i class="fa fa-times"></i></a>
+      </div>
       <input type="text" name="table_columns" placeholder="family_name" class="no-margin">
+      <div class="clearfix"></div>
+    </script>
+
+    <script id="columnPropertyTemplate" type="text/html">
       <select name="table_columns_property" style="width:180px" class="no-margin">
         <option data-default="3" selected>maxVersions</option>
         <option data-default="NONE">compression</option>
@@ -223,8 +231,13 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <option data-default="-1">timeToLive</option>
       </select>
       <input type="text" name="table_columns_property_value" placeholder="3" style="width:80px" class="no-margin">
-      <a class="pointer action_removeColumn" title="${_('Remove Column Family')}"><i class="fa fa-minus-circle"></i></a>
-      <a class="pointer action_addColumn" title="${_('Additional Column Family')}"><i class="fa fa-plus-circle"></i></a>
+      <a class="pointer action_removeColumnProperty" title="${_('Remove column property')}"><i class="fa fa-minus-circle"></i></a>
+      <a class="pointer action_addColumnProperty" title="${_('Additional column property')}"><i class="fa fa-plus-circle"></i></a>
+    </script>
+    <script id="columnPropertyEmptyTemplate" type="text/html">
+      <li class="columnPropertyEmpty" style="width:310px; line-height: 29px">
+        <a class="pointer action_addColumnProperty"><i class="fa fa-plus-circle"></i> ${_('Add a column property')}</a>
+      </li>
     </script>
   </div>
 
