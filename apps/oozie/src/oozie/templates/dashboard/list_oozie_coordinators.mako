@@ -384,7 +384,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                       'data-message="${ _('The coordinator was killed!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
                       '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-small confirmationModal" ' +
+              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + coord.suspendUrl + '" ' +
                       'title="${ _('Suspend') } ' + coord.id + '"' +
@@ -392,7 +392,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                       'data-message="${ _('The coordinator was suspended!') }" ' +
                       'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
                       '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-small confirmationModal" ' +
+              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
                       'href="javascript:void(0)" ' +
                       'data-url="' + coord.resumeUrl + '" ' +
                       'title="${ _('Resume') } ' + coord.id + '"' +
