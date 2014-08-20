@@ -306,6 +306,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     refreshRunning();
     refreshCompleted();
+    refreshProgress();
 
     var numRunning = 0;
 
@@ -318,7 +319,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
             $(data).each(function (iWf, currentItem) {
-              if ($(node).children("td").eq(5).text() == currentItem.id) {
+              if ($(node).children("td").eq(6).text() == currentItem.id) {
                 nodeFound = true;
               }
             });
@@ -332,7 +333,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             var wf = new Workflow(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(5).text() == wf.id) {
+              if ($(node).children("td").eq(6).text() == wf.id) {
                 foundRow = node;
               }
             });
@@ -372,7 +373,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     emptyStringIfNull(wf.lastModTime),
                     '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
                     wf.appName,
-                    '<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>',
+                    '<div class="progress"></div>',
                     wf.user,
                     emptyStringIfNull(wf.lastModTime),
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
@@ -386,7 +387,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             }
             else {
               runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
-              runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 3, false);
               runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(wf.status) > -1?suspendCell:resumeCell), foundRow, 7, false);
             }
           });
@@ -400,7 +400,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         }
         numRunning = data.length;
 
-        window.setTimeout(refreshRunning, 1000);
+        window.setTimeout(refreshRunning, 5000);
       });
     }
 
@@ -424,6 +424,31 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           }
         });
         completedTable.fnDraw();
+      });
+    }
+
+    function refreshProgress() {
+      $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
+        var nNodes = runningTable.fnGetNodes();
+        $(data).each(function (iWf, item) {
+            var wf = new Workflow(item);
+            var foundRow = null;
+            $(nNodes).each(function (iNode, node) {
+              if ($(node).children("td").eq(6).text() == wf.id) {
+                foundRow = node;
+              }
+            });
+            if (foundRow != null) {
+              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
+              if (wf.progress == 0){
+                runningTable.fnUpdate('<div class="progress"></div>', foundRow, 3, false);
+              }
+              else {
+                runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 3, false);
+              }
+            }
+          });
+        window.setTimeout(refreshProgress, 30000);
       });
     }
 
