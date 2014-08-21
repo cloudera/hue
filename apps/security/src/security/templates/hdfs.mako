@@ -200,14 +200,14 @@ ${ layout.menubar(section='hdfs') }
 
     <div class="row-fluid">
       <div class="span6">
-        <h4>${ _('Checked paths') }</h4>
+        <h4>${ _('Path selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
           <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
       <div class="span6">
 
-        <h4>${ _('Selected path for ACLs actions') }</h4>
+        <h4>${ _('ACLs to apply') }</h4>
 
         <span class="fake-pre modal-panel">
           # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
@@ -228,19 +228,19 @@ ${ layout.menubar(section='hdfs') }
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'add'}, click: function(){$root.assist.bulkAction('add')}">
           <i class="fa fa-plus"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Add current ACLs to checkbox selection') }</span>
+          <span class="bulk-action-description">${ _('Add current ACLs to selection') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
           <i class="fa fa-random"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Replace checkbox selection with current ACLs') }</span>
+          <span class="bulk-action-description">${ _('Replace selection with current ACLs') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
           <i class="fa fa-eraser"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Remove all ACLs of checkbox selection') }</span>
+          <span class="bulk-action-description">${ _('Remove all ACLs of selection') }</span>
         </div>
       </div>
     </div>
@@ -249,7 +249,7 @@ ${ layout.menubar(section='hdfs') }
   <div class="modal-footer">
     <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button class="btn" data-bind="css: {'btn-primary': $root.assist.bulkAction() != 'delete', 'btn-danger': $root.assist.bulkAction() == 'delete'}, click: $root.assist.bulkPerfomAction">${ _('Confirm') }</button>
+    <button class="btn" data-bind="enable: $root.assist.bulkAction(), css: {'btn-primary': $root.assist.bulkAction() != 'delete', 'btn-danger': $root.assist.bulkAction() == 'delete'}, click: $root.assist.bulkPerfomAction">${ _('Confirm') }</button>
   </div>
 </div>
 

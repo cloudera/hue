@@ -352,14 +352,14 @@ ${ layout.menubar(section='hive') }
 
     <div class="row-fluid">
       <div class="span6">
-        <h4>${ _('Checked items') }</h4>
+        <h4>${ _('Selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
           <li><span class="force-word-break" data-bind="text: path"></span></li>
         </ul>
       </div>
       <div class="span6">
 
-        <h4>${ _('Selected item for privilege actions') }</h4>
+        <h4>${ _('Privileges to apply') }</h4>
 
         <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
         <div data-bind="template: { name: 'role', foreach: $root.assist.roles }" class="modal-panel"></div>
@@ -372,19 +372,19 @@ ${ layout.menubar(section='hive') }
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
           <i class="fa fa-plus"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Add current privileges to checkbox selection') }</span>
+          <span class="bulk-action-description">${ _('Add current privileges to selection') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
           <i class="fa fa-random"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Replace checkbox selection with current privileges') }</span>
+          <span class="bulk-action-description">${ _('Replace selection with current privileges') }</span>
         </div>
       </div>
       <div class="span4 center">
         <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
           <i class="fa fa-eraser"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Remove privileges of checkbox selection') }</span>
+          <span class="bulk-action-description">${ _('Delete all privileges of selection') }</span>
         </div>
       </div>
     </div>
@@ -392,7 +392,7 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button class="btn" data-bind="css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
+    <button class="btn" data-bind="enable: $root.bulkAction(), css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
   </div>
 </div>
 
