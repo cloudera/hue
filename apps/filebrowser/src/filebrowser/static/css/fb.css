@@ -117,3 +117,11 @@ pre a:hover {
   max-height: 200px;
   overflow-y: auto;
 }
+
+.uploadpreview span {
+  margin-right: 1em;
+}
+
+.uploadpreview span:last-child {
+  margin-right: 0;
+}
