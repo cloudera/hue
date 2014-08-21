@@ -139,7 +139,7 @@ def list_oozie_coordinators(request):
 
     json_jobs = oozie_api.get_coordinators(**kwargs).jobs
     if request.GET.get('type') == 'progress':
-      json_jobs = [oozie_api.get_job(job.id) for job in json_jobs]
+      json_jobs = [oozie_api.get_coordinator(job.id) for job in json_jobs]
 
     return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), mimetype="application/json")
 
@@ -165,7 +165,7 @@ def list_oozie_bundles(request):
 
     json_jobs = oozie_api.get_bundles(**kwargs).jobs
     if request.GET.get('type') == 'progress':
-      json_jobs = [oozie_api.get_job(job.id) for job in json_jobs]
+      json_jobs = [oozie_api.get_bundle(job.id) for job in json_jobs]
 
     return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), mimetype="application/json")
 
