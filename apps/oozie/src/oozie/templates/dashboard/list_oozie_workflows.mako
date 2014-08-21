@@ -70,7 +70,16 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
     </table>
 
@@ -91,7 +100,15 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
      </table>
    </div>
@@ -373,7 +390,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     emptyStringIfNull(wf.lastModTime),
                     '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
                     wf.appName,
-                    '<div class="progress"></div>',
+                    '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
                     emptyStringIfNull(wf.lastModTime),
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
@@ -441,7 +458,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             if (foundRow != null) {
               runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
               if (wf.progress == 0){
-                runningTable.fnUpdate('<div class="progress"></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
               }
               else {
                 runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 3, false);
