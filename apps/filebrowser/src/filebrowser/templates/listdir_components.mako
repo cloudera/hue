@@ -36,7 +36,6 @@ from django.utils.translation import ugettext as _
 <%def name="_table(files, path, current_request_path, view)">
 
   <link href="/filebrowser/static/css/fb.css" rel="stylesheet" type="text/css">
-
   <table class="table table-condensed datatables tablescroller-disable">
     <thead>
       <tr>
@@ -394,6 +393,19 @@ from django.utils.translation import ugettext as _
 
   <div id="submit-wf-modal" class="modal hide"></div>
 
+  <div id="ddUploadModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Uploads in progress')}</h3>
+      </div>
+      <div class="modal-body">
+        <div id="uploadstats" class="uploadpreview"></div>
+      </div>
+      <div class="modal-footer">
+        <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
+      </div>
+  </div>
+
   <script id="fileTemplate" type="text/html">
     <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
@@ -422,6 +434,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/js/dropzone.js" type="text/javascript" charset="utf-8"></script>
 
   <script charset="utf-8">
   (function () {
@@ -620,6 +633,9 @@ from django.utils.translation import ugettext as _
       }, self);
 
       self.currentPath = ko.observable(currentDirPath);
+      self.currentPath.subscribe(function (path) {
+        $(document).trigger('currPathLoaded', { path: path });
+      });
 
       self.inTrash = ko.computed(function() {
         return self.currentPath().match(/^\/user\/.+?\/\.Trash/);
@@ -1076,6 +1092,81 @@ from django.utils.translation import ugettext as _
     ko.applyBindings(viewModel);
 
     $(document).ready(function () {
+      // Drag and drop uploads from anywhere on filebrowser screen
+      if (window.FileReader) {
+        var showHoverMsg = function (msg) {
+          $('.hoverText').html(msg);
+          $('.hoverMsg').fadeIn();
+        };
+
+        var hideHoverMsg = function () {
+          $('.hoverMsg').fadeOut();
+        };
+
+        var _isDraggingOverText = false;
+
+        $('.card').on('dragenter', function (e) {
+          e.preventDefault();
+          showHoverMsg("${_('Drop files here to upload')}");
+        });
+
+        $('.hoverText').on('dragenter', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          _isDraggingOverText = true;
+        });
+
+        $('.hoverText').on('dragleave', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          _isDraggingOverText = false;
+        });
+
+        $('.hoverMsg').on('dragleave', function (e) {
+          if (!_isDraggingOverText) {
+            hideHoverMsg();
+          }
+        });
+
+        $(document).on('currPathLoaded', function (e, ops) {
+          var options = {
+            url: '/filebrowser/upload/file?dest=' + ops.path,
+            paramName: 'hdfs_file',
+            params: {
+              dest: ops.path
+            },
+            maxFilesize: 5000000,
+            previewsContainer: '#uploadstats',
+            previewTemplate: '<div><span data-dz-name></span> <span data-dz-size></span> <span data-dz-uploadprogress></span><a href="javascript:undefined;" data-dz-remove>${_("Cancel upload")}</a></div>',
+            drop: function (e) {
+              e.preventDefault();
+
+              hideHoverMsg();
+              $("#ddUploadModal").modal({
+                keyboard:true,
+                show:true
+              });
+            },
+            totaluploadprogress: function (progress) {
+              $('[data-dz-uploadprogress]').html(progress.toFixed() + "%");
+            },
+            queuecomplete: function (progress) {
+              $('.dz-progress').style.opacity = "1";
+            },
+            success: function () {
+              location.reload();
+            },
+            canceled: function () {
+              $('#ddUploadModal').modal('hide');
+              $.jHueNotify.info("${_('Upload has been canceled')}");
+            }
+          };
+          var dz = new Dropzone(document.body, options);
+        });
+      }
+
       $("#chownForm select[name='user']").change(function () {
         if ($(this).val() == "__other__") {
           $("input[name='user_other']").show();

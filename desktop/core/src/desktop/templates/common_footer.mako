@@ -195,5 +195,8 @@ from django.template.defaultfilters import escape, escapejs
   <%include file="tours.mako"/>
 % endif
 
+    <div class="hoverMsg">
+      <p class="hoverText"></p>
+    </div>
   </body>
 </html>
