@@ -69,7 +69,16 @@ ${layout.menubar(section='bundles', dashboard=True)}
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -88,7 +97,14 @@ ${layout.menubar(section='bundles', dashboard=True)}
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
      </table>
    </div>
