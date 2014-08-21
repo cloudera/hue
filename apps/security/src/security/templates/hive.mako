@@ -411,6 +411,7 @@ ${ layout.menubar(section='hive') }
 
 
 <%def name="treeIcons()">
+  'fa-hdd-o': isServer(),
   'fa-database': isDb(),
   'fa-table': isTable(),
   'fa-columns': isColumn()
