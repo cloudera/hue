@@ -924,7 +924,8 @@ var HiveViewModel = function (initial) {
         self.bulk_add_privileges();
         break;
       case "sync":
-        alert("Not supported yet");
+    	self.bulk_delete_privileges();
+    	self.bulk_add_privileges();
         break;
       case "delete":
         self.bulk_delete_privileges();
