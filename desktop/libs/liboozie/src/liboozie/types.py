@@ -275,13 +275,13 @@ class BundleAction(Action):
     return progress
 
 
-class Job(object):  
+class Job(object):
   MAX_LOG_SIZE = 3500 * 20 # 20 pages
 
   """
   Accessing log and definition will trigger Oozie API calls.
   """
-  def __init__(self, api, json_dict):    
+  def __init__(self, api, json_dict):
     for attr in self._ATTRS:
       setattr(self, attr, json_dict.get(attr))
     self._fixup()
