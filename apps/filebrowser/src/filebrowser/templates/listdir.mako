@@ -44,9 +44,9 @@ ${ fb_components.menubar() }
 
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-          <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="visible: !inTrash(), click: renameFile, enable: selectedFiles().length == 1"><i class="fa fa-font"></i> ${_('Rename')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0"><i class="fa fa-random"></i> ${_('Move')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="visible: !inTrash(), click: renameFile, enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-font"></i> ${_('Rename')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-random"></i> ${_('Move')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
           %if is_fs_superuser:
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
             <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
@@ -62,11 +62,11 @@ ${ fb_components.menubar() }
             <button class="btn fileToolbarBtn" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</button>
           %endif
           <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
               <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-                <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
-                <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0">
+                <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
+                <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0">
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">

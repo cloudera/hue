@@ -609,6 +609,12 @@ from django.utils.translation import ugettext as _
         });
       }, self);
 
+      self.isCurrentDirSelected = ko.computed(function () {
+        return ko.utils.arrayFilter(self.files(), function (file) {
+          return file.name == "." && file.selected();
+        });
+      }, self);
+
       self.selectedFile = ko.computed(function () {
         return self.selectedFiles()[0];
       }, self);
@@ -713,7 +719,7 @@ from django.utils.translation import ugettext as _
         self.allSelected(! self.allSelected());
 
         ko.utils.arrayForEach(self.files(), function (file) {
-          if (file.name != "..") {
+          if (file.name != "." && file.name != "..") {
             file.selected(self.allSelected());
           }
         });
