@@ -298,7 +298,18 @@ var Assist = function (vm, initial) {
     path: "__HUEROOT__",
     name: "__HUEROOT__",
     selected: false,
-    nodes: []
+    nodes: [{
+        path: "",
+        name: self.server(),
+        withPrivileges: false,
+        isServer: true,
+        isDb: false,
+        isTable: false,
+        isColumn: false,
+        isExpanded: true,
+        isChecked: false,
+        nodes: []
+    }]
   };
 
   self.growingTree = ko.observable(jQuery.extend(true, {}, self.initialGrowingTree));
@@ -306,7 +317,7 @@ var Assist = function (vm, initial) {
   self.checkedItems = ko.observableArray([]);
 
   self.addDatabases = function (path, databases, skipLoading) {
-    var _tree = self.growingTree();
+    var _tree = self.growingTree().nodes[0];
     databases.forEach(function (db) {
       var _mainFound = false;
       _tree.nodes.forEach(function (node) {
@@ -319,6 +330,7 @@ var Assist = function (vm, initial) {
           path: db,
           name: db,
           withPrivileges: false,
+          isServer: false,
           isDb: true,
           isTable: false,
           isColumn: false,
@@ -335,7 +347,7 @@ var Assist = function (vm, initial) {
   }
 
   self.addTables = function (path, tables, skipLoading) {
-    var _branch = self.growingTree();
+    var _branch = self.growingTree().nodes[0];
     _branch.nodes.forEach(function (node) {
       if (node.path == path) {
         _branch = node;
@@ -355,6 +367,7 @@ var Assist = function (vm, initial) {
           path: _path,
           name: table,
           withPrivileges: false,
+          isServer: false,
           isDb: false,
           isTable: true,
           isColumn: false,
@@ -397,6 +410,7 @@ var Assist = function (vm, initial) {
           path: _path,
           name: column,
           withPrivileges: false,
+          isServer: false,
           isDb: false,
           isTable: false,
           isColumn: true,
@@ -415,12 +429,14 @@ var Assist = function (vm, initial) {
   self.collapseTree = function () {
     self.updateTreeProperty(self.growingTree(), "isExpanded", false);
     self.updatePathProperty(self.growingTree(), "__HUEROOT__", "isExpanded", true);
+    self.updatePathProperty(self.growingTree(), "", "isExpanded", true);
     self.loadData(self.growingTree());
   }
 
   self.collapseOthers = function () {
     self.updateTreeProperty(self.growingTree(), "isExpanded", false);
     self.updatePathProperty(self.growingTree(), "__HUEROOT__", "isExpanded", true);
+    self.updatePathProperty(self.growingTree(), "", "isExpanded", true);
 
     var _path = self.path();
     var _crumb = "";
