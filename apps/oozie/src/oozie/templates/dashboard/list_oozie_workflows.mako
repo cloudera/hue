@@ -465,7 +465,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               }
             }
           });
-        window.setTimeout(refreshProgress, 30000);
+        window.setTimeout(refreshProgress, 20000);
       });
     }
 
