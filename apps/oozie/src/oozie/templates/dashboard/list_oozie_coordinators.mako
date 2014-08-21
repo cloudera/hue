@@ -75,7 +75,20 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          % if not enable_cron_scheduling:
+          <td></td>
+          % endif
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -101,7 +114,19 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         </tr>
       </thead>
       <tbody>
-
+        <tr>
+          <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          % if not enable_cron_scheduling:
+          <td></td>
+          % endif
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
      </table>
    </div>
@@ -342,6 +367,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
     refreshRunning();
     refreshCompleted();
+    refreshProgress();
 
     var numRunning = 0;
 
@@ -354,9 +380,16 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
             $(data).each(function (iCoord, currentItem) {
-              if ($(node).children("td").eq(5).text() == currentItem.id) {
-                nodeFound = true;
+              % if enable_cron_scheduling:
+              if ($(node).children("td").eq(7).text() == currentItem.id) {
+                 nodeFound = true;
               }
+              % else:
+              if ($(node).children("td").eq(8).text() == currentItem.id) {
+                 nodeFound = true;
+              }
+              % endif
+
             });
             if (!nodeFound) {
               runningTable.fnDeleteRow(node);
@@ -368,9 +401,15 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             var coord = new Coordinator(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(5).text() == coord.id) {
+              % if enable_cron_scheduling:
+              if ($(node).children("td").eq(7).text() == coord.id) {
                 foundRow = node;
               }
+              % else:
+              if ($(node).children("td").eq(8).text() == coord.id) {
+                foundRow = node;
+              }
+              % endif
             });
             var killCell = "";
             var suspendCell = "";
@@ -408,7 +447,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                     emptyStringIfNull(coord.nextMaterializedTime),
                     '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
                     coord.appName,
-                    '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>',
+                    '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     coord.user,
                     % if enable_cron_scheduling:
                     '<div class="cron-frequency"><input class="value" type="hidden" value="'+emptyStringIfNull(coord.frequency)+'"/></div>',
@@ -428,8 +467,12 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             }
             else {
               runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 1, false);
-              runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 3, false);
+              % if enable_cron_scheduling:
               runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell), foundRow, 9, false);
+              % else:
+              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell), foundRow, 10, false);
+              % endif
+
             }
           });
         }
@@ -478,6 +521,36 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         % if enable_cron_scheduling:
         renderCrons(); // utils.inc.mako
         % endif
+      });
+    }
+
+    function refreshProgress() {
+      $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
+        var nNodes = runningTable.fnGetNodes();
+          $(data).each(function (iCoord, item) {
+            var coord = new Coordinator(item);
+            var foundRow = null;
+            $(nNodes).each(function (iNode, node) {
+              % if enable_cron_scheduling:
+              if ($(node).children("td").eq(7).text() == coord.id) {
+                foundRow = node;
+              }
+              % else:
+              if ($(node).children("td").eq(8).text() == coord.id) {
+                foundRow = node;
+              }
+              % endif
+            });
+            if (foundRow != null) {
+              if (coord.progress == 0){
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
+              }
+              else {
+                runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 3, false);
+              }
+            }
+          });
+        window.setTimeout(refreshProgress, 30000);
       });
     }
   });
