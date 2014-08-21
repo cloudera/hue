@@ -307,6 +307,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
     refreshRunning();
     refreshCompleted();
+    refreshProgress();
 
     var numRunning = 0;
 
@@ -319,7 +320,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
             $(data).each(function (iBundle, currentItem) {
-              if ($(node).children("td").eq(5).text() == currentItem.id) {
+              if ($(node).children("td").eq(6).text() == currentItem.id) {
                 nodeFound = true;
               }
             });
@@ -333,7 +334,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
             var bundle = new Bundle(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(5).text() == bundle.id) {
+              if ($(node).children("td").eq(6).text() == bundle.id) {
                 foundRow = node;
               }
             });
@@ -373,7 +374,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
                     emptyStringIfNull(bundle.kickoffTime),
                     '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
                     bundle.appName,
-                    '<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>',
+                    '<div class="progress"><div class="bar bar-warning" style="width:1%"></div></div>',
                     bundle.user,
                     emptyStringIfNull(bundle.created),
                     '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>',
@@ -388,7 +389,6 @@ ${layout.menubar(section='bundles', dashboard=True)}
             }
             else {
               runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 1, false);
-              runningTable.fnUpdate('<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>', foundRow, 3, false);
               runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(bundle.status) > -1?suspendCell:resumeCell), foundRow, 7, false);
             }
           });
@@ -426,6 +426,31 @@ ${layout.menubar(section='bundles', dashboard=True)}
           }
         });
         completedTable.fnDraw();
+      });
+    }
+
+    function refreshProgress() {
+      $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
+        var nNodes = runningTable.fnGetNodes();
+        $(data).each(function (iWf, item) {
+            var bundle = new Bundle(item);
+            var foundRow = null;
+            $(nNodes).each(function (iNode, node) {
+              if ($(node).children("td").eq(6).text() == bundle.id) {
+                foundRow = node;
+              }
+            });
+            if (foundRow != null) {
+              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 1, false);
+              if (bundle.progress == 0){
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
+              }
+              else {
+                runningTable.fnUpdate('<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>', foundRow, 3, false);
+              }
+            }
+          });
+        window.setTimeout(refreshProgress, 20000);
       });
     }
 
