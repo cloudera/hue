@@ -325,11 +325,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       if (_path[_path.length-1] == "/"){
         _path = _path.substr(0, _path.length - 1);
       }
-      if ($("a.anchor[href^='"+_path+"']").length > 0){
-        $("#expandableTree").animate({
-          scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
-        });
-      }
+      window.setTimeout(function(){
+        if ($("a.anchor[href^='"+_path+"']").length > 0){
+          $("#expandableTree").animate({
+            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
+          }, 200);
+        }
+      }, 200)
     });
 
     $(document).on("updated.acls", function() {
