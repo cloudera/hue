@@ -518,6 +518,15 @@ var Assist = function (vm, initial) {
     self.setPath(obj, true);
   }
 
+  self.showHdfs = function (obj, e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    self.fetchHivePath(obj.path(), function(data){
+      location.href = "/security/hdfs#" + data.hdfs_link.substring("/filebrowser/view".length);
+    });
+  }
+
   self.getCheckedItems = function (leaf, checked) {
     if (leaf == null){
       leaf = self.growingTree();

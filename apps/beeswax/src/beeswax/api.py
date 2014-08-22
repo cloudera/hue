@@ -94,6 +94,7 @@ def autocomplete(request, database=None, table=None):
       response['tables'] = db.get_tables(database=database)
     else:
       t = db.get_table(database, table)
+      response['hdfs_link'] = t.hdfs_link
       response['columns'] = [column.name for column in t.cols]
       response['extended_columns'] = massage_columns_for_json(t.cols)
   except TTransportException, tx:
