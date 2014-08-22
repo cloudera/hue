@@ -288,15 +288,17 @@ ${ header.menubar() }
 
 $(document).ready(function(){
 
-  $.get("${ url('desktop.views.check_config') }", function(response) {
-    $("#check-config-section .spinner").css({
-      'position': 'absolute',
-      'top': '-100px'
-    });
-    $("#check-config-section .info").html(response);
-    $("#check-config-section .info").removeClass('hide');
-  })
-  .fail(function() { $(document).trigger('error', '${ _("Check config failed: ")}'); });
+  window.setTimeout(function(){
+    $.get("${ url('desktop.views.check_config') }", function(response) {
+      $("#check-config-section .spinner").css({
+        'position': 'absolute',
+        'top': '-100px'
+      });
+      $("#check-config-section .info").html(response);
+      $("#check-config-section .info").removeClass('hide');
+    })
+    .fail(function() { $(document).trigger('error', '${ _("Check config failed: ")}'); });
+  }, 100);
 
   $("[rel='popover']").popover();
 
