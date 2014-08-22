@@ -306,9 +306,6 @@ from django.utils.translation import ugettext as _
         <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="fa fa-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
         % if user.is_superuser:
           <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
-          % if 'security' in apps:
-          <li><a href="${ url('security:index') }">&nbsp;<i class="fa fa-lock"></i>&nbsp;&nbsp;${_('Hadoop Security')}</a></li>
-          % endif
         % endif
       </ul>
     </li>
@@ -413,6 +410,15 @@ from django.utils.translation import ugettext as _
              </ul>
            </li>
          % endif
+       % endif
+       % if user.is_superuser and 'security' in apps:
+         <li class="dropdown">
+           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Security')} <b class="caret"></b></a>
+           <ul role="menu" class="dropdown-menu">
+             <li><a href="${ url('security:hive') }">&nbsp;<i class="fa fa-database"></i>&nbsp;&nbsp;${_('Databases and Tables')}</a></li>
+             <li><a href="${ url('security:hdfs') }">&nbsp;<i class="fa fa-file"></i>&nbsp;&nbsp;${_('Files and Directories')}</a></li>
+           </ul>
+         </li>
        % endif
        % if other_apps:
        <li class="dropdown">
