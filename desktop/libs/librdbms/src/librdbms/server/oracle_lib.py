@@ -43,8 +43,8 @@ class OracleClient(BaseRDMSClient):
 
   def __init__(self, *args, **kwargs):
     super(OracleClient, self).__init__(*args, **kwargs)
-    if self.__conn_params:
-      self.connection = Database.connect(self._conn_string, **self.__conn_params)
+    if self._conn_params:
+      self.connection = Database.connect(self._conn_string, **self._conn_params)
     else:
       self.connection = Database.connect(self._conn_string)
 
