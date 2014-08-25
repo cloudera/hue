@@ -623,7 +623,6 @@ var Assist = function (vm, initial) {
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
     if (_originalPath.split(".").length < 3) {
       var _path = _originalPath.replace('.', '/');
-
       var request = {
         url: '/beeswax/api/autocomplete/' + _path,
         dataType: 'json',
@@ -897,48 +896,46 @@ var HiveViewModel = function (initial) {
       _path = optionalPath;
     }
     self.isLoadingPrivileges(true);
-    if (_path != "") {
-      self.assist.roles.removeAll();
-      self.assist.privileges.removeAll();
-      $.ajax({
-        type: "POST",
-        url: "/security/api/hive/list_sentry_privileges_by_authorizable",
-        data: {
-          groupName: $('#selectedGroup').val(),
-          roleSet: ko.mapping.toJSON({all: true, roles: []}),
-          authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
-        },
-        success: function (data) {
-          var _privileges = [];
-          $.each(data.privileges, function (index, item) {
-            if (item.table != ""){
-              self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
-            }
-            if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
-              var _role = null;
-              self.assist.roles().forEach(function (role) {
-                if (role.name() == item.roleName) {
-                  _role = role;
-                }
-              });
-              if (_role == null) {
-                var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
-                _role = self.assist.roles()[_idx - 1];
-              }
-              _role.privileges.push(_create_ko_privilege(item));
-              _privileges.push(_create_ko_privilege(item));
-            }
-          });
-          if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
-            self.assist.privileges(_privileges);
+    self.assist.roles.removeAll();
+    self.assist.privileges.removeAll();
+    $.ajax({
+      type: "POST",
+      url: "/security/api/hive/list_sentry_privileges_by_authorizable",
+      data: {
+        groupName: $('#selectedGroup').val(),
+        roleSet: ko.mapping.toJSON({all: true, roles: []}),
+        authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
+      },
+      success: function (data) {
+        var _privileges = [];
+        $.each(data.privileges, function (index, item) {
+          if (item.table != ""){
+            self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
           }
-          self.isLoadingPrivileges(false);
-          self.assist.loadData(self.assist.growingTree());
+          if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
+            var _role = null;
+            self.assist.roles().forEach(function (role) {
+              if (role.name() == item.roleName) {
+                _role = role;
+              }
+            });
+            if (_role == null) {
+              var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
+              _role = self.assist.roles()[_idx - 1];
+            }
+            _role.privileges.push(_create_ko_privilege(item));
+            _privileges.push(_create_ko_privilege(item));
+          }
+        });
+        if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
+          self.assist.privileges(_privileges);
         }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
+        self.isLoadingPrivileges(false);
+        self.assist.loadData(self.assist.growingTree());
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
 
   self.bulkAction = ko.observable("");
