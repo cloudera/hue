@@ -21,6 +21,8 @@ from beeswax.urls import urlpatterns as beeswax_urls
 
 
 urlpatterns = patterns('impala.views',
+  url(r'^dashboard$', 'dashboard', name='dashboard'),
+  url(r'^query', 'query', name='query'),
 )
 
 urlpatterns += beeswax_urls
