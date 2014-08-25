@@ -25,6 +25,9 @@ from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPri
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
     TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest
 
+from libsentry.sentry_site import get_sentry_server_authentication,\
+  get_sentry_server_principal
+
 
 LOG = logging.getLogger(__name__)
 
@@ -50,19 +53,41 @@ struct TSentryAuthorizable {
 """
 
 class SentryClient(object):
+  SENTRY_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NOSASL': 'NOSASL'}
 
   def __init__(self, host, port, username):
     self.username = username
-
-    self.client = thrift_util.get_client( # TODO: kerberos
+    self.security = self._get_security()
+    
+    self.client = thrift_util.get_client(
         SentryPolicyService.Client,
         host,
         port,
         service_name="SentryPolicyService",
         username=self.username,
         timeout_seconds=30,
-        multiple=True
+        multiple=True,
+        kerberos_principal=self.security['kerberos_principal_short_name'],
+        use_sasl=self.security['use_sasl'],
+        mechanism=self.security['mechanism']
     )
+
+
+  def _get_security(self):
+    principal = get_sentry_server_principal()
+    if principal:
+      kerberos_principal_short_name = principal.split('/', 1)[0]
+    else:
+      kerberos_principal_short_name = None
+    use_sasl = get_sentry_server_authentication() == 'KERBEROS'
+    mechanism = SentryClient.SENTRY_MECHANISMS[get_sentry_server_authentication()]
+    
+    return {
+        'kerberos_principal_short_name': kerberos_principal_short_name,
+        'use_sasl': use_sasl,
+        'mechanism': mechanism
+    }
+
 
   def create_sentry_role(self, roleName):
     request = TCreateSentryRoleRequest(requestorUserName=self.username, roleName=roleName)
