@@ -303,15 +303,16 @@ ${ layout.menubar(section='hive') }
 <div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Add role') }</h3>
+    <h3 data-bind="visible: ! $root.role().isEditing()">${ _('Add role') }</h3>
+    <h3 data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h3>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
 
     <div class="row-fluid">
       <div class="span6">
         <h4>${ _('Name') }</h4>
-        <input type="text" class="input-xlarge" data-bind="value: $data.name, valueUpdate: 'afterkeydown', style: {'border-color': $root.role.hasDuplicateName() ? '#b94a48':''}" placeholder="${ _('Required') }" style="width: 360px" />
-        <div style="color: #b94a48;" data-bind="visible: $root.role.hasDuplicateName"><em>${ _('The specified role name already exists.') }</em></div>
+        <input id="createRoleName" type="text" class="input-xlarge" data-bind="value: $data.name, valueUpdate: 'afterkeydown', visible: ! $data.isEditing()" placeholder="${ _('Required') }" style="width: 360px" />
+        <strong data-bind="text: $data.name, visible: $data.isEditing()"></strong>
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
@@ -326,8 +327,9 @@ ${ layout.menubar(section='hive') }
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true" data-bind="click: $root.role.reset">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role.create, enable: ! $root.role.hasDuplicateName()">${ _('Save') }</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().create, visible: ! $root.role().isEditing()">${ _('Save') }</button>
+    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().update, visible: $root.role().isEditing()">${ _('Update') }</button>
   </div>
 </div>
 
@@ -552,6 +554,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
+      $("#createRoleModal").on("hidden", function () {
+        viewModel.resetCreateRole();
+      });
+
       $("#deleteRoleModal").modal({
         show: false
       });
@@ -581,7 +587,30 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
+      $(document).on("create.typeahead", function(){
+        $("#createRoleName").typeahead({
+            source: function (query) {
+              var _options = [];
+              viewModel.selectableRoles().forEach(function(item){
+                if (item.toLowerCase().indexOf(query.toLowerCase()) > -1){
+                  _options.push(item);
+                }
+              });
+              return _options;
+            },
+            'updater': function(item) {
+                return item;
+             }
+        });
+      });
+      $(document).on("destroy.typeahead", function(){
+        $('.typeahead').unbind();
+        $("ul.typeahead").hide();
+      });
+
+      $(document).trigger("create.typeahead");
     });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }
