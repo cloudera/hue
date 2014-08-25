@@ -115,12 +115,23 @@
   width: 25%;
 }
 
+.modal .showAdvanced {
+  display: block;
+  margin-top: 4px;
+  margin-left: 6px;
+}
+
 .span6 .acl-block .showAdvanced {
   display: block;
   margin-top: 4px;
+  margin-left: 6px;
 }
 .span6 .acl-block .showAdvancedSpacer {
   display: none;
+}
+
+.span6 .acl-block input[type='text'] {
+  width: 21%;
 }
 
 .acl-actions {

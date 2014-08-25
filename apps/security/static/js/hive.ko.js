@@ -112,6 +112,21 @@ var Role = function (vm, role) {
   var self = this;
 
   self.name = ko.observable(typeof role.name != "undefined" && role.name != null ? role.name : "");
+  self.name.subscribe(function (value){
+    var _found = false;
+    vm.role().isEditing(false);
+    ko.utils.arrayForEach(vm.roles(), function (role) {
+      if (role.name() == value){
+        vm.role(role);
+        _found = true;
+      }
+    });
+    if (_found) {
+      vm.role().isEditing(true);
+      vm.list_sentry_privileges_by_role(vm.role());
+      $(document).trigger("destroy.typeahead");
+    }
+  });
   self.selected = ko.observable(false);
   self.handleSelect = function (row, e) {
     self.selected(!self.selected());
@@ -128,7 +143,7 @@ var Role = function (vm, role) {
   self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
   self.showEditGroups = ko.observable(false);
-  self.hasDuplicateName = ko.observable(false);
+  self.isEditing = ko.observable(false);
 
   self.privilegesChanged = ko.computed(function () {
     return $.grep(self.privileges(), function (privilege) {
@@ -158,6 +173,7 @@ var Role = function (vm, role) {
     self.groups.removeAll();
     self.privileges.removeAll();
     self.originalPrivileges.removeAll();
+    self.isEditing(false);
   }
 
   self.addGroup = function () {
@@ -212,6 +228,26 @@ var Role = function (vm, role) {
         vm.roles.unshift(role);
         vm.assist.refreshTree();
         vm.list_sentry_privileges_by_role(role); // Show privileges        
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  }
+
+  self.update = function () {
+    $(".jHueNotify").hide();
+    $.post("/security/api/hive/update_role", {
+      role: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        $(document).trigger("info", data.message);
+        vm.showCreateRole(false);
+        self.reset();
+        $(document).trigger("updated.role");
+        vm.assist.refreshTree();
+        vm.list_sentry_privileges_by_role(role); // Show privileges
       } else {
         $(document).trigger("error", data.message);
       }
@@ -681,6 +717,7 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.roles = ko.observableArray();
+  self.originalRoles = ko.observableArray();
   self.roleFilter = ko.observable("");
   self.filteredRoles = ko.computed(function () {
     var _filter = self.roleFilter().toLowerCase();
@@ -705,21 +742,26 @@ var HiveViewModel = function (initial) {
     }
   }, self);
 
+  self.selectableRoles = ko.computed(function () {
+    var _roles = ko.utils.arrayMap(self.roles(), function (role) {
+      return role.name();
+    });
+    return _roles.sort();
+  }, self);
+
   self.availableHadoopGroups = ko.observableArray();
   self.assist = new Assist(self, initial);
 
   // Editing
   self.showCreateRole = ko.observable(false);
-  self.role = new Role(self, {});
-  self.role.name.subscribe(function (value){
-    var _found = false;
-    ko.utils.arrayForEach(self.roles(), function (role) {
-      if (role.name() == value){
-        _found = true;
-      }
-    });
-    self.role.hasDuplicateName(_found);
-  });
+  self.role = ko.observable(new Role(self, {}));
+
+  self.resetCreateRole = function() {
+    self.roles(self.originalRoles());
+    self.role(new Role(self, {}));
+    $(document).trigger("create.typeahead");
+  };
+
   self.privilege = new Privilege(self, {});
 
   self.doAs = ko.observable(initial.user);
@@ -814,6 +856,7 @@ var HiveViewModel = function (initial) {
           self.roles.removeAll();
           $.each(data.roles, function (index, item) {
             self.roles.push(new Role(self, item));
+            self.originalRoles.push(new Role(self, item));
           });
         }
       }
