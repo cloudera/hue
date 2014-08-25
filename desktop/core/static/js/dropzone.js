@@ -974,16 +974,16 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
       var string;
       if (size >= 1024 * 1024 * 1024 * 1024 / 10) {
         size = size / (1024 * 1024 * 1024 * 1024 / 10);
-        string = "TiB";
+        string = "TB";
       } else if (size >= 1024 * 1024 * 1024 / 10) {
         size = size / (1024 * 1024 * 1024 / 10);
-        string = "GiB";
+        string = "GB";
       } else if (size >= 1024 * 1024 / 10) {
         size = size / (1024 * 1024 / 10);
-        string = "MiB";
+        string = "MB";
       } else if (size >= 1024 / 10) {
         size = size / (1024 / 10);
-        string = "KiB";
+        string = "KB";
       } else {
         size = size * 10;
         string = "b";

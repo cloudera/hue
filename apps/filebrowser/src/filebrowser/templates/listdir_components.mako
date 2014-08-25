@@ -393,18 +393,10 @@ from django.utils.translation import ugettext as _
 
   <div id="submit-wf-modal" class="modal hide"></div>
 
-  <div id="ddUploadModal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Uploads in progress')}</h3>
-      </div>
-      <div class="modal-body">
-        <div id="uploadstats" class="uploadpreview"></div>
-      </div>
-      <div class="modal-footer">
-        <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
-      </div>
-  </div>
+  <div id="progressStatus" class="uploadstatus alert alert-info hide">
+    <div class="updateStatus"> </div>
+  <div>
+</div>
 
   <script id="fileTemplate" type="text/html">
     <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
@@ -1096,11 +1088,11 @@ from django.utils.translation import ugettext as _
       if (window.FileReader) {
         var showHoverMsg = function (msg) {
           $('.hoverText').html(msg);
-          $('.hoverMsg').fadeIn();
+          $('.hoverMsg').removeClass('hide');
         };
 
         var hideHoverMsg = function () {
-          $('.hoverMsg').fadeOut();
+          $('.hoverMsg').addClass('hide');
         };
 
         var _isDraggingOverText = false;
@@ -1143,33 +1135,37 @@ from django.utils.translation import ugettext as _
             params: {
               dest: ops.path
             },
+            autoDiscover: false,
             maxFilesize: 5000000,
-            previewsContainer: '#uploadstats',
-            previewTemplate: '<div><span data-dz-name></span> <span data-dz-size></span> <span data-dz-uploadprogress></span><a href="javascript:undefined;" data-dz-remove>${_("Cancel upload")}</a></div>',
+            previewsContainer: '#progressStatus',
+            previewTemplate: '<div class="row">\n <span class="offset4 span3 break-word"><strong data-dz-name></strong></span>\n <span class="span2">File size: <strong data-dz-size></strong></span>\n <span class="span3">Percent complete: <strong data-dz-uploadprogress></strong></span>\n <span class="span1"><a href="javascript:undefined;" title="Cancel upload" data-dz-remove><i class="fa fa-times"></i></a></span>\n </div>',
             drop: function (e) {
-              e.preventDefault();
-
-              hideHoverMsg();
-              $("#ddUploadModal").modal({
-                keyboard:true,
-                show:true
+              $('.hoverMsg').addClass('hide');
+              $('#progressStatus').removeClass('hide');
+            },
+            uploadprogress: function (file, progress) {
+              $("[data-dz-name]").each(function (cnt, item) {
+                if ($(item).text() === file.name) {
+                  $(item).parents(".row").find("[data-dz-uploadprogress]").html(progress.toFixed() + "%");
+                  if (progress.toFixed() === "100"){
+                    $(item).parents(".row").find("[data-dz-remove]").hide();
+                  }
+                }
               });
             },
-            totaluploadprogress: function (progress) {
-              $('[data-dz-uploadprogress]').html(progress.toFixed() + "%");
-            },
-            queuecomplete: function (progress) {
-              $('.dz-progress').style.opacity = "1";
-            },
-            success: function () {
-              location.reload();
-            },
             canceled: function () {
-              $('#ddUploadModal').modal('hide');
               $.jHueNotify.info("${_('Upload has been canceled')}");
             }
           };
           _dropzone = new Dropzone(document.body, options);
+
+          _dropzone.on('queuecomplete', function () {
+              setTimeout(function () {
+                $('#progressStatus').addClass('hide');
+                location.reload();
+                },
+              2500);
+          });
         });
       }
 

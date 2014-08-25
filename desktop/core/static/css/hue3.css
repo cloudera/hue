@@ -1827,8 +1827,9 @@ input.no-margin {
 
 .hoverMsg {
   background: #000;
-  display: none;
+  /*display: none;*/
   height: 100%;
+  left: 0;
   opacity: .5;
   position: fixed;
   width: 100%;
@@ -1850,4 +1851,8 @@ input.no-margin {
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+}
+
+.break-word {
+  word-wrap: break-word
 }
