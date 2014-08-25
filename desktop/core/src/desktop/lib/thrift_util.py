@@ -75,7 +75,7 @@ class ConnectionConfig(object):
                kerberos_principal="thrift",
                mechanism='GSSAPI',
                username='hue',
-	       password='hue',
+	             password='hue',
                ca_certs=None,
                keyfile=None,
                certfile=None,
