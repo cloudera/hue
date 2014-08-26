@@ -1082,7 +1082,6 @@ $(document).ready(function () {
       getDatabases(function(){
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
-        renderNavigator();
       });
     }
   }
@@ -1095,6 +1094,8 @@ $(document).ready(function () {
       $("#navigatorLoader").html("${_('No databases or tables found.')}");
     } else {
       hac_getTables(viewModel.database(), function (data) {  //preload tables for the default db
+        $("#navigatorTables").empty();
+        $("#navigatorLoader").show();
         $(data.split(" ")).each(function (cnt, table) {
           if ($.trim(table) != "") {
             var _table = $("<li>");
@@ -1222,7 +1223,21 @@ $(document).ready(function () {
     if ($(e.target).attr("href") == "#results" || $(e.target).attr("href") == "#recentTab") {
       reinitializeTableExtenders();
     }
+    if ($(e.target).attr("href") != "#results"){
+      $($(e.target).attr("href")).css('height', 'auto');
+      if ($(e.target).attr("href") == "#chart") {
+        logGA('results/chart');
+        predictGraph();
+      }
+      if ($(e.target).attr("href") == "#resultTab") {
+        reinitializeTable();
+      }
+    } else {
+      reinitializeTable();
+    }
+    return e;
   });
+
 });
 
 
@@ -1617,23 +1632,6 @@ $(document).ready(function () {
     resizeLogs();
   });
 
-  $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
-    if ($(e.target).attr("href") != "#results"){
-      $($(e.target).attr("href")).css('height', 'auto');
-      if ($(e.target).attr("href") == "#chart") {
-        logGA('results/chart');
-        predictGraph();
-      }
-      if ($(e.target).attr("href") == "#resultTab") {
-        reinitializeTable();
-      }
-    } else {
-      reinitializeTable();
-    }
-    return e;
-  });
-
-
   function getMapBounds(lats, lngs) {
     lats = lats.sort();
     lngs = lngs.sort();
@@ -1865,6 +1863,9 @@ function addResults(viewModel, dataTable, index, pageSize) {
     viewModel.fetchResults();
   } else {
     dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
+  }
+  if (index == 0){
+    window.setTimeout(reinitializeTable, 500);
   }
 }
 
