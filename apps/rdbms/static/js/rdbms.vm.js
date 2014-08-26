@@ -97,7 +97,14 @@ function RdbmsViewModel() {
     var last = $.totalStorage('hueRdbmsLastServer') || ((newServers[0].length > 0) ? newServers[0].name() : null);
     if (last) {
       self.server(last);
+      $.each(self.servers(), function(index, server) {
+        if (server.name() == last) {
+          self.chosenServer(server);
+        }
+      });
     }
+
+    $(document).trigger("update.chosen");
   };
 
   self.updateDatabases = function(databases) {
@@ -107,7 +114,10 @@ function RdbmsViewModel() {
     var last = $.totalStorage(key) || ((databases.length > 0) ? databases[0] : null);
     if (last) {
       self.database(last);
+      self.chosenDatabase(last);
     }
+
+    $(document).trigger("update.chosen");
   };
 
   self.updateQuery = function(design) {
@@ -119,21 +129,25 @@ function RdbmsViewModel() {
     self.server(design.server);
   };
 
-  self.chooseServer = function(value, e) {
+  self.chosenServer = ko.observable();
+
+  self.initialChoose = true;
+  self.chosenServer.subscribe(function(value){
     $.each(self.servers(), function(index, server) {
       if (server.name() == value.name()) {
         self.selectedServer(index);
       }
     });
-    $.totalStorage('hueRdbmsLastServer', self.server().name());
+    if (self.initialChoose){
+      self.initialChoose = false;
+    }
+    else {
+      $.totalStorage('hueRdbmsLastServer', self.server().name());
+    }
     self.fetchDatabases();
-  };
+  });
 
-  self.chooseDatabase = function(value, e) {
-    var key = 'hueRdbmsLastDatabase-' + self.server().name();
-    self.selectedDatabase(self.databases.indexOf(value));
-    $.totalStorage(key, value);
-  };
+  self.chosenDatabase = ko.observable();
 
   var error_fn = function(jqXHR, status, errorThrown) {
     self.isExecuting(false);
