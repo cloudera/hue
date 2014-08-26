@@ -46,7 +46,7 @@ def dashboard(request):
          ],
         'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'pie', 
                     'properties': {'limit': 10}}],
-        'properties': {'database': 'default', 'table': 'sample_07'}
+        'properties': [{'database': 'default', 'table': 'sample_07'}]
         }), 
                                             # type: MAX, / ORDER BY, LIMIT 100
   })
@@ -77,7 +77,9 @@ def query(request):
   handle = db.execute_and_wait(query, timeout_sec=5.0)
 
   if handle:
-    result['data'] = list(db.fetch(handle, rows=100).rows())
+    data = db.fetch(handle, rows=100)
+    result['data'] = list(data.rows())
+    result['cols'] = list(data.cols())
     result['status'] = 0
     db.close(handle)
     

@@ -99,9 +99,9 @@ var Dashboard = function (vm, dashboard) {
   var self = this;
   
   self.facets = ko.observable(dashboard.facets);
+  self.properties = ko.observable(dashboard.properties);
   
   self.addFacet = function(data) {
-    
   }
   
   self.getFacetById = function (facet_id) {
@@ -118,7 +118,8 @@ var Dashboard = function (vm, dashboard) {
 
 var TestViewModel = function (query_json, dashboard_json) {
     var self = this;
-    self.isEditing = ko.observable(false);
+
+    self.isEditing = ko.observable(true);
     self.toggleEditing = function () {
       self.isEditing(! self.isEditing());
     };
@@ -129,19 +130,25 @@ var TestViewModel = function (query_json, dashboard_json) {
 
     self.query = new Query(self, query_json);
     self.dashboard = new Dashboard(self, dashboard_json);
+
     self.results = ko.observableArray([]);
     self.results_facet = ko.observableArray([]);
+    self.results_cols = ko.observableArray([]);
 
+    self.init = function() {
+      self.search();
+    }
+    
     self.search = function (callback) {
       self.results.removeAll();
     	
       var multiQs = $.map(self.dashboard.facets(), function(facet) {
-            return $.post("/impala/query", {
-                "query": ko.mapping.toJSON(self.query),
-                "dashboard": ko.mapping.toJSON(self.dashboard),
-                "layout": ko.mapping.toJSON(self.columns),
-                "facet": ko.mapping.toJSON(facet),
-              }, function (data) {return data});
+        return $.post("/impala/query", {
+           "query": ko.mapping.toJSON(self.query),
+           "dashboard": ko.mapping.toJSON(self.dashboard),
+           "layout": ko.mapping.toJSON(self.columns),
+           "facet": ko.mapping.toJSON(facet),
+        }, function (data) {return data});
       });    	
     	
       $.when.apply($, [
@@ -151,6 +158,7 @@ var TestViewModel = function (query_json, dashboard_json) {
             "layout": ko.mapping.toJSON(self.columns),
             }, function (data) {
               if (data.status == 0) {
+            	self.results_cols(data.cols)
             	$.each(data.data, function (index, row) {
             	  self.results.push(row);
             	});
@@ -167,7 +175,7 @@ var TestViewModel = function (query_json, dashboard_json) {
               removeFrom(self.results_facet, facet.id);
               self.results_facet.push(ko.mapping.fromJS(facet));
             }
-          }
+          }          
         })
       .fail(function (xhr, textStatus, errorThrown) {
     	  $(document).trigger("error", data.message);

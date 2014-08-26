@@ -95,7 +95,8 @@ ${ commonheader(None, "impala", user) | n,unicode }
 
   <form class="form-search" style="margin: 0" data-bind="submit: search">
     <strong>${_("Search")}</strong>
-    <div class="input-append">
+    <span data-bind="text: $root.dashboard.properties()[0].database"></span>.<span data-bind="text: $root.dashboard.properties()[0].table"></span>
+      <div class="input-append">
 
       <span data-bind="foreach: query.qs">
         <input data-bind="clearable: q" maxlength="4096" type="text" class="search-query input-xlarge">
@@ -107,7 +108,7 @@ ${ commonheader(None, "impala", user) | n,unicode }
   ##    <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
 
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px"><i class="fa fa-search"></i></button>
-    </div>
+      </div>
   </form>
 </div>
 
@@ -119,6 +120,12 @@ ${ dashboard.layout_skeleton() }
 <div id="result-main" style="overflow-x: auto">
   <table id="result-container" style="margin-top: 0; width: 100%">
     <thead>
+      <tr>
+        <th style="width: 18px">&nbsp;</th>
+        <!-- ko foreach: $root.results_cols -->
+          <th data-bind="text: $data"></th>       
+        <!-- /ko -->
+      </tr>
     </thead>
     <tbody data-bind="foreach: { data: $root.results, as: 'row'}" class="result-tbody">
       <tr class="result-row">
@@ -140,6 +147,8 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: properties.limit" />
+      <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
     </div>
   
@@ -186,6 +195,8 @@ ${ dashboard.import_charts() }
 
   var viewModel = new TestViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
   ko.applyBindings(viewModel);
+  
+  viewModel.init();
 </script>
 
 ${ commonfooter(messages) | n,unicode }
