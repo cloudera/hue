@@ -35,7 +35,7 @@ from django.utils.translation import ugettext as _
 
 <%def name="_table(files, path, current_request_path, view)">
 
-  <link href="/filebrowser/static/css/fb.css" rel="stylesheet" type="text/css">
+  <link href="/filebrowser/static/css/listdir_components.css" rel="stylesheet" type="text/css">
   <table class="table table-condensed datatables tablescroller-disable">
     <thead>
       <tr>
@@ -66,22 +66,34 @@ from django.utils.translation import ugettext as _
     </tfoot>
   </table>
 
-  <div class="pagination" data-bind="visible: !isLoading()">
-    <ul class="pull-right">
-      <!-- ko if: page().number > 1 -->
-      <li class="prev"><a href="#" data-bind="click: firstPage" title="${_('Beginning of List')}">&larr; ${_('Beginning of List')}</a></li>
-      <li><a href="#" data-bind="click: previousPage" title="${_('Previous Page')}">${_('Previous Page')}</a></li>
-      <!-- /ko -->
-      <!-- ko if: page().number < page().num_pages -->
-      <li><a href="#" data-bind="click: nextPage" title="${_('Next page')}">${_('Next Page')}</a></li>
-      <li class="next"><a href="#" data-bind="click: lastPage" title="${_('End of List')}">${_('End of List')} &rarr;</a></li>
-      <!-- /ko -->
-    </ul>
+  <div class="pagination">
+    <div class="pull-right flush-right">
+        <div class="form-inline pagination-input-form inline">
+          <span>${_('Page')}</span>
+          <input type="text" data-bind="value: page().number, valueUpdate: 'afterkeydown', event: { change: skipTo }" class="pagination-input" />
+          <input type="hidden" id="current_page" data-bind="value: page().number" />
+          of <span data-bind="text: page().num_pages"></span>
+        </div>
+
+        <ul class="inline">
+          <li class="first-page prev" data-bind="css: { 'disabled': page().number === page().start_index }">
+            <a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a>
+          </li>
+          <li class="previous-page" data-bind="css: { 'disabled': page().number === page().start_index }">
+            <a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a>
+          </li>
+          <li class="next-page" data-bind="css: { 'disabled': page().number === page().num_pages }">
+            <a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a>
+          </li>
+          <li class="last-page next" data-bind="css: { 'disabled': page().number === page().num_pages }">
+            <a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a>
+          </li>
+        </ul>
+    </div>
+
     <p>${_('Show')}
       <select class="input-mini" data-bind="options: recordsPerPageChoices, value: recordsPerPage"></select>
-      ${_('items per page')}.
-      ${_('Showing')} <span data-bind="text: page().start_index"></span> ${_('to')} <span data-bind="text: page().end_index"></span> ${_('of')} <span data-bind="text: page().total_count"></span> ${_('items, page')}
-      <span data-bind="text: page().number"></span> ${_('of')} <span data-bind="text: page().num_pages"></span>.
+      ${_('of')} <span data-bind="text: page().total_count"></span> ${_('items')}.
     </p>
   </div>
 
@@ -552,7 +564,7 @@ from django.utils.translation import ugettext as _
       }
 
       self.page = ko.observable(new Page(page));
-      self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200"],
+      self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200", "1000"],
       self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path}");
@@ -700,6 +712,18 @@ from django.utils.translation import ugettext as _
         $.cookie("hueFilebrowserRecordsPerPage", newValue);
         self.retrieveData();
       });
+
+      self.skipTo = function () {
+        var doc = document,
+          old_page = doc.querySelector('#current_page').value,
+          page = doc.querySelector('.pagination-input');
+
+        if (! isNaN(page.value) && (page.value > 0 && page.value <= self.page().num_pages)) {
+          self.goToPage(page.value);
+        } else {
+          page.value = old_page;
+        }
+      };
 
       self.goToPage = function (pageNumber) {
         self.targetPageNum(pageNumber);

@@ -31,8 +31,7 @@
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 ${ fb_components.menubar() }
 
-<link rel="stylesheet" type="text/css" href="/filebrowser/static/css/fb.css">
-
+<link href="/filebrowser/static/css/display.css" rel="stylesheet" />
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -41,12 +40,12 @@ ${ fb_components.menubar() }
     <div class="span10">
       <div class="card card-small" style="margin-bottom: 5px">
         % if not view['compression'] or view['compression'] in ("none", "avro"):
-          <div class="pull-right">
-            <div class="form-inline inline">
+          <div class="pull-right" style="margin-right: 20px; margin-top: 14px;">
+            <div class="form-inline pagination-input-form inline">
               <span>${_('Page')}</span>
-              <input type="text" data-bind="value: page, valueUpdate: 'afterkeydown', event: { change: pageChanged }" style="width: 40px; text-align: center"/>
+              <input type="text" data-bind="value: page, valueUpdate: 'afterkeydown', event: { change: pageChanged }" class="pagination-input" />
               <span data-bind="visible: totalPages() > MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == 'binary'">
-              to <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" style="width: 40px; text-align: center"/></span>
+              to <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" class="pagination-input"/></span>
               of <span data-bind="text: totalPages"></span>
             </div>
             <div class="pagination inline">
