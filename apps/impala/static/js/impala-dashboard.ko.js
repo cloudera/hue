@@ -98,10 +98,34 @@ var Query = function (vm, query) {
 var Dashboard = function (vm, dashboard) { 
   var self = this;
   
-  self.facets = ko.observable(dashboard.facets);
+  self.facets = ko.mapping.fromJS(dashboard.facets);
   self.properties = ko.observable(dashboard.properties);
   
-  self.addFacet = function(data) {
+  self.fields = ko.mapping.fromJS([{'name': 'code', 'name': 'description', 'name': 'total_emp', 'name': 'salary'}]);
+  self.fieldNames = ko.computed(function () {
+	return $.map(self.fields(), function (field) { return field.name()});
+  });
+  
+  self.addFacet = function(facet_json) {
+   $.post("/impala/dashboard/new_facet", {
+       "dashboard": ko.mapping.toJSON(self),
+       "facet_json": ko.mapping.toJSON(facet_json),
+       //"id": facet_json.widget_id,
+       //"label": facet_json.name,
+       //"field": facet_json.name,
+       //"widget_type": facet_json.widgetType
+     }, function (data) {
+       if (data.status == 0) {
+         var facet = ko.mapping.fromJS(data.facet);
+         facet.properties.limit.subscribe(function () {
+           vm.search();
+         });
+         self.facets.push(facet);
+         vm.search();
+       } else {
+         $(document).trigger("error", data.message);
+       }
+    }).fail(function (xhr, textStatus, errorThrown) {});
   }
   
   self.getFacetById = function (facet_id) {
@@ -126,7 +150,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     self.isRetrievingResults = ko.observable(false);
     self.previewColumns = ko.observable("");
     self.columns = ko.observable([]);
-
+    
     loadLayout(self, dashboard_json.layout);
 
     self.query = new Query(self, query_json);
@@ -145,7 +169,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
       self.results.removeAll();
     	
       var multiQs = $.map(self.dashboard.facets(), function(facet) {
-        return $.post("/impala/query", {
+        return $.post("/impala/dashboard/query", {
            "query": ko.mapping.toJSON(self.query),
            "dashboard": ko.mapping.toJSON(self.dashboard),
            "layout": ko.mapping.toJSON(self.columns),
@@ -154,7 +178,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
       });    	
     	
       $.when.apply($, [
-          $.post("/impala/query", {
+          $.post("/impala/dashboard/query", {
             "query": ko.mapping.toJSON(self.query),
             "dashboard": ko.mapping.toJSON(self.dashboard),
             "layout": ko.mapping.toJSON(self.columns),
@@ -181,7 +205,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
           }          
         })
       .fail(function (xhr, textStatus, errorThrown) {
-    	  $(document).trigger("error", data.message);
+    	  $(document).trigger("error", textStatus);
        });
     };
 
