@@ -1,0 +1,296 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.dropdown-menu li {
+  font-size: 14px;
+}
+
+.dropdown a.dropdown-toggle {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.search-bar {
+  background-color: #F5F5F5;
+  border-bottom: 1px solid #e3e3e3;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  margin: 0;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+  width: 100%;
+  position: fixed;
+  top: 28px;
+  z-index: 1000;
+}
+
+.search-bar input {
+  margin-left: 10px;
+  padding-right: 20px;
+}
+
+.search-bar input.deletable {
+  background-image: url("../art/remove.png");
+  background-repeat: no-repeat;
+  background-position: 99% 50%;
+}
+
+.search-bar ul li {
+  text-align: right;
+}
+
+.sort-by {
+  font-size: 11px;
+  height: 24px;
+  width: 120px;
+  margin-top: -2px;
+}
+
+.nav-header {
+  padding-left: 0 !important;
+  padding-top: 8px;
+}
+
+.facet-list {
+  list-style: none outside none;
+  padding: 0;
+  margin: 0;
+}
+
+.facet-list li {
+  padding-left: 8px;
+  padding-right: 3px;
+}
+
+.facet-list li a {
+  word-wrap: break-word;
+}
+
+.counter {
+  color: #999999;
+  font-size: 13px;
+}
+
+.pagination {
+  border-radius: 4px 4px 4px 4px;
+  list-style: none outside none;
+  margin: 0 0 20px;
+  padding: 8px 15px;
+}
+
+.results.container {
+  width: 1180px;
+}
+
+.results.span2 {
+  width: 180px;
+}
+
+.results.span10 {
+  width: 980px;
+}
+
+.results.span12 {
+  width: 1180px;
+}
+
+.errorlist {
+  display: none;
+}
+
+.breadcrumb {
+  background-color: #FFFFFF;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+#result-container {
+  margin-top: 20px;
+}
+
+.facetItem {
+  display: none;
+}
+
+.selectMask {
+  background-color: #F9F9F9;
+  background-image: linear-gradient(to bottom, #FFFFFF, #F1F1F1);
+  background-repeat: repeat-x;
+  border: 1px solid #C0C0C0;
+  border-right-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: none;
+  color: #444444;
+  display: inline-block;
+  font-size: 13px;
+  height: 29px;
+  line-height: 29px;
+  margin: 0;
+  margin-left: 5px;
+  min-height: 29px;
+  min-width: 120px;
+  padding: 0 8px;
+  text-shadow: none;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-query {
+  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  margin-left: 0 !important;
+  border-left: 0 !important;
+}
+
+.download-btn-group {
+  min-width: auto;
+}
+
+.download-btn-group > ul > li {
+  text-align: left;
+}
+
+em {
+  font-weight: bold;
+  background-color: yellow;
+}
+
+.fields-chooser li {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.fields-chooser li .badge {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.badge-left {
+  border-radius: 9px 0px 0px 9px;
+  padding-right: 5px;
+}
+
+.badge-right {
+  border-radius: 0px 9px 9px 0px;
+  padding-left: 5px;
+}
+
+.trash-filter {
+  cursor: pointer;
+}
+
+.editable-click {
+  cursor: pointer;
+}
+
+.CodeMirror {
+  border: 1px dotted #DDDDDD;
+}
+
+[contenteditable=true] {
+  border: 1px dotted #DDDDDD;
+  outline: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  min-height: 150px;
+}
+
+[contenteditable=true] [class*="span"], .tmpl [class*="span"] {
+  background-color: #eee;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  min-height: 40px;
+  line-height: 40px;
+  background-color: #F3F3F3;
+  border: 2px dashed #DDD;
+}
+
+.tmpl {
+  margin: 10px;
+  height: 60px;
+}
+
+.tmpl [class*="span"] {
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.editor-title {
+  font-weight: bold;
+  color: #262626;
+  border-bottom: 1px solid #338bb8;
+}
+
+.document-details {
+  background-color: #F6F6F6;
+  padding: 10px;
+  border: 1px solid #e5e5e5;
+}
+
+.result-row:nth-child(even) {
+  background-color: #F6F6F6;
+}
+
+.result-row td {
+  white-space: nowrap;
+  padding: 3px;
+}
+
+#result-container thead tr {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.demi-modal {
+  min-height: 80px;
+}
+
+.filter-box {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background-color: #F6F6F6;
+  padding: 5px;
+  border: 1px solid #d8d8d8;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.field-selector {
+  display: inline-block;
+  margin-left: 3px;
+  min-height: 20px;
+  line-height: 20px
+}
+
+.field-selector.hoverable {
+  cursor: pointer;
+}
+
+.field-selector.hoverable:hover {
+  background-color: #DDD;
+}

@@ -114,15 +114,27 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<link rel="stylesheet" href="/impala/static/css/impala.css">
+<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
+<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-langs.min.js" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout() }
+
+<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/mustache.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
 ${ dashboard.import_bindings() }
+
+<script src="/impala/static/js/impala.ko.js" type="text/javascript" charset="utf-8"></script>
+
 ${ dashboard.import_charts() }
 
-<script src="/impala/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
   function columnDropAdditionalHandler(widget){
