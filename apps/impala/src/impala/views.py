@@ -44,8 +44,9 @@ def dashboard(request):
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
          ],
-        'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'aa', 'field': 'salary', 'widget_type': 'pie'}],
-        'properties': [{'database': 'default', 'table': 'sample_07'}]
+        'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'pie', 
+                    'properties': {'limit': 10}}],
+        'properties': {'database': 'default', 'table': 'sample_07'}
         }), 
                                             # type: MAX, / ORDER BY, LIMIT 100
   })
@@ -58,10 +59,11 @@ def query(request):
   }
     
   if 'facet' in request.POST: 
+    facet = json.loads(request.POST['facet'])
     database = 'default'
-    table = 'sample_07'    
-    hql = "SELECT salary FROM %s.%s WHERE salary IS NOT NULL ORDER BY salary DESC LIMIT 10" % (database, table,)
-    result['id'] = json.loads(request.POST['facet'])['id']
+    table = 'sample_07'  
+    hql = "SELECT salary FROM %s.%s WHERE salary IS NOT NULL ORDER BY salary DESC LIMIT %s" % (database, table, facet['properties']['limit'])
+    result['id'] = facet['id']
   else:
     database = 'default'
     table = 'sample_07'    

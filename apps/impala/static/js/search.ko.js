@@ -65,6 +65,17 @@ var Dashboard = function (vm, dashboard) {
   self.addFacet = function(data) {
     
   }
+  
+  self.getFacetById = function (facet_id) {
+    var _facet = null;
+    $.each(self.facets(), function (index, facet) {
+      if (facet.id == facet_id) {
+        _facet = facet;
+        return false;
+      }
+    });
+    return _facet;
+  }   
 }
 
 var TestViewModel = function (query_json, dashboard_json) {
@@ -84,18 +95,18 @@ var TestViewModel = function (query_json, dashboard_json) {
     self.results_facet = ko.observableArray([]);
 
     self.search = function (callback) {
-    	self.results.removeAll();
+      self.results.removeAll();
     	
-    	var multiQs = $.map(self.dashboard.facets(), function(facet) {
+      var multiQs = $.map(self.dashboard.facets(), function(facet) {
             return $.post("/impala/query", {
                 "query": ko.mapping.toJSON(self.query),
                 "dashboard": ko.mapping.toJSON(self.dashboard),
                 "layout": ko.mapping.toJSON(self.columns),
                 "facet": ko.mapping.toJSON(facet),
               }, function (data) {return data});
-          });    	
+      });    	
     	
-    	$.when.apply($, [
+      $.when.apply($, [
           $.post("/impala/query", {
             "query": ko.mapping.toJSON(self.query),
             "dashboard": ko.mapping.toJSON(self.dashboard),
@@ -110,8 +121,8 @@ var TestViewModel = function (query_json, dashboard_json) {
               }
             })
           ].concat(multiQs)
-        )
-        .done(function() {
+      )
+      .done(function() {
           if (arguments.length > 1) { // If multi queries
             for (var i = 1; i < arguments.length; i++) {
               var facet = arguments[i][0];
@@ -120,13 +131,15 @@ var TestViewModel = function (query_json, dashboard_json) {
             }
           }
         })
-        .fail(function (xhr, textStatus, errorThrown) {});
+      .fail(function (xhr, textStatus, errorThrown) {
+    	  $(document).trigger("error", data.message);
+       });
     };
 
     function removeFrom(collection, item_id) {
       $.each(collection(), function (index, item) {
         if (item.id() == item_id) {
-          self.collection.remove(item);
+          collection.remove(item);
           return false;
         }
       });
