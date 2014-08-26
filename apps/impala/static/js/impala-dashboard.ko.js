@@ -116,13 +116,14 @@ var Dashboard = function (vm, dashboard) {
   }   
 }
 
-var TestViewModel = function (query_json, dashboard_json) {
+var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     var self = this;
 
     self.isEditing = ko.observable(true);
     self.toggleEditing = function () {
       self.isEditing(! self.isEditing());
     };
+    self.isRetrievingResults = ko.observable(false);
     self.previewColumns = ko.observable("");
     self.columns = ko.observable([]);
 
@@ -140,6 +141,7 @@ var TestViewModel = function (query_json, dashboard_json) {
     }
     
     self.search = function (callback) {
+      self.isRetrievingResults(true);
       self.results.removeAll();
     	
       var multiQs = $.map(self.dashboard.facets(), function(facet) {
@@ -157,6 +159,7 @@ var TestViewModel = function (query_json, dashboard_json) {
             "dashboard": ko.mapping.toJSON(self.dashboard),
             "layout": ko.mapping.toJSON(self.columns),
             }, function (data) {
+              self.isRetrievingResults(false);
               if (data.status == 0) {
             	self.results_cols(data.cols)
             	$.each(data.data, function (index, row) {

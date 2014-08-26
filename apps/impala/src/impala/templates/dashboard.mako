@@ -117,29 +117,42 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="resultset-widget">
 
-<div id="result-main" style="overflow-x: auto">
-  <table id="result-container" style="margin-top: 0; width: 100%">
-    <thead>
-      <tr>
-        <th style="width: 18px">&nbsp;</th>
-        <!-- ko foreach: $root.results_cols -->
-          <th data-bind="text: $data"></th>       
-        <!-- /ko -->
-      </tr>
-    </thead>
-    <tbody data-bind="foreach: { data: $root.results, as: 'row'}" class="result-tbody">
-      <tr class="result-row">
-        <td>
-          <a href="javascript:void(0)">
-            <i class="fa" data-bind="css: {'fa-caret-right' : true }"></i>
-          </a>
-        </td>
-        <!-- ko foreach: row -->
-          <td data-bind="html: $data"></td>
-        <!-- /ko -->
-      </tr>
-    </tbody>
-  </table>
+
+<div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+</div>
+
+<div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+  </br>
+  ${ _('Your search did not match any documents.') }
+</div>
+
+<div data-bind="visible: !$root.isRetrievingResults() && $root.results().length > 0">
+  <div id="result-main" style="overflow-x: auto">
+    <table id="result-container" style="margin-top: 0; width: 100%">
+      <thead>
+        <tr>
+          <th style="width: 18px">&nbsp;</th>
+          <!-- ko foreach: $root.results_cols -->
+            <th data-bind="text: $data"></th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: { data: $root.results, as: 'row'}" class="result-tbody">
+        <tr class="result-row">
+          <td>
+            <a href="javascript:void(0)">
+              <i class="fa" data-bind="css: {'fa-caret-right' : true }"></i>
+            </a>
+          </td>
+          <!-- ko foreach: row -->
+            <td data-bind="html: $data"></td>
+          <!-- /ko -->
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </script>
 
@@ -193,10 +206,15 @@ ${ dashboard.import_charts() }
     console.log("boom")
   }
 
-  var viewModel = new TestViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
+  var viewModel = new ImpalaDashboardViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
   ko.applyBindings(viewModel);
-  
-  viewModel.init();
+
+  $(document).ready(function(){
+    window.setTimeout(function(){
+      viewModel.init();
+    }, 50);
+  });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }
