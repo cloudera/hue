@@ -1,0 +1,51 @@
+#fileArea {
+  overflow: auto;
+  background-color: #F5F5F5;
+  position: relative;
+}
+
+#fileArea.loading {
+  opacity: .7;
+}
+
+#loader {
+  position: fixed;
+  margin-top: 40px;
+  font-size: 50px;
+  text-align: center;
+  width: 140px;
+  height: 140px;
+  line-height: 140px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+
+.binary {
+  font-family: "Courier New", Courier, monospace;
+}
+
+pre {
+  border: none;
+}
+
+pre a {
+  color: #444;
+  cursor: default;
+}
+
+pre a:hover {
+  color: #444;
+  text-decoration: none;
+}
+
+.pagination-input-form {
+  position: relative;
+  right: 1em;
+  top: -10px;
+}
+
+.pagination-input {
+  text-align: center;
+  width: 40px;
+}
