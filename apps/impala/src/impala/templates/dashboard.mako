@@ -100,6 +100,10 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="pie-widget">
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById ($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: properties.limit"></input>
+    </div>
+  
     <span data-bind="foreach: data()">
       <span data-bind="text: $data"></span>
     </span>
