@@ -396,6 +396,9 @@ from django.utils.translation import ugettext as _
   <div id="progressStatus" class="uploadstatus alert alert-info hide">
     <div class="updateStatus"> </div>
   <div>
+  <div id="progressStatusBar" class="uploadstatusbar hide">
+    <div></div>
+  </div>
 </div>
 
   <script id="fileTemplate" type="text/html">
@@ -1145,6 +1148,8 @@ from django.utils.translation import ugettext as _
               // Ensure dropped item was a file
               if (e.dataTransfer.files.length > 0) {
                 $('#progressStatus').removeClass('hide');
+                $('#progressStatusBar').removeClass('hide');
+                $('#progressStatusBar div').css("width", "0");
               }
             },
             uploadprogress: function (file, progress) {
@@ -1157,6 +1162,11 @@ from django.utils.translation import ugettext as _
                 }
               });
             },
+            totaluploadprogress: function (progress) {
+              $('#progressStatusBar div').animate({
+                "width": progress.toFixed() + "%"
+              }, 100);
+            },
             canceled: function () {
               $.jHueNotify.info("${_('Upload has been canceled')}");
             }
@@ -1166,6 +1176,8 @@ from django.utils.translation import ugettext as _
           _dropzone.on('queuecomplete', function () {
               setTimeout(function () {
                 $('#progressStatus').addClass('hide');
+                $('#progressStatusBar').addClass('hide');
+                $('#progressStatusBar div').css("width", "0");
                 location.reload();
                 },
               2500);
