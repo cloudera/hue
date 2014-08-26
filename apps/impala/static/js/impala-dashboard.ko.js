@@ -203,6 +203,13 @@ var TestViewModel = function (query_json, dashboard_json) {
       });
     }
 
+    self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget"));
     self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget"));
+    self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget"));
+    self.draggableBar = ko.observable(bareWidgetBuilder("Bar Chart", "bar-widget"));
+    self.draggableMap = ko.observable(bareWidgetBuilder("Map", "map-widget"));
+    self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget"));
     self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
+    self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
+  
 };
