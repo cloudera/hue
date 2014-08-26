@@ -156,11 +156,11 @@ ${ dashboard.layout_skeleton() }
 </div>
 </script>
 
-<script type="text/html" id="pie-widget">
+
+<script type="text/html" id="facet-widget">
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: properties.limit" />
       <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
     </div>
@@ -172,6 +172,35 @@ ${ dashboard.layout_skeleton() }
     </span>
   </div>
   <!-- /ko -->
+  <!-- ko ifnot: $root.getFacetFromResult(id()) -->
+    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">
+      <i class="fa fa-plus"></i>
+    </a>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="pie-widget">
+  <!-- ko if: $root.getFacetFromResult(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    PIE widget
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: field" />
+      <input type="text" data-bind="value: properties.limit" />
+    </div>
+  
+    <span data-bind="foreach: data()">
+      <a href="javascript: void(0)">
+        <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+      </a>
+    </span>
+  </div>
+  <!-- /ko -->
+  <!-- ko ifnot: $root.getFacetFromResult(id()) -->
+    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">
+      <i class="fa fa-plus"></i>
+    </a>
+  <!-- /ko -->  
 </script>
 
 

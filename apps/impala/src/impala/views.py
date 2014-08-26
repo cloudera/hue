@@ -37,14 +37,14 @@ def dashboard(request):
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
     'dashboard_json': json.dumps({'layout': [
-              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Pie Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"pie-widget",
+              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Pie Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
          ],
-        'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'pie', 
+        'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'facet-widget', 
                     'properties': {'limit': 10}}],
         'properties': [{'database': 'default', 'table': 'sample_07'}]
         }), 
@@ -63,7 +63,10 @@ def query(request):
     facet = json.loads(request.POST['facet'])
     database = 'default'
     table = 'sample_07'  
-    hql = "SELECT salary FROM %s.%s WHERE salary IS NOT NULL ORDER BY salary DESC LIMIT %s" % (database, table, facet['properties']['limit'])
+    hql = "SELECT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL ORDER BY %(field)s DESC LIMIT %(limit)s" % {
+        'database': database, 'table': table, 'limit': facet['properties']['limit'],
+        'field': facet['field']
+    }
     result['id'] = facet['id']
     result['field'] = facet['field']
   else:
@@ -84,3 +87,56 @@ def query(request):
     db.close(handle)
     
   return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def new_facet(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    dashboard = json.loads(request.POST.get('dashboard', '{}')) # Perms
+    facet_json = json.loads(request.POST.get('facet_json', '{}'))
+    
+
+#    facet_id = request.POST['id']
+#    facet_label = request.POST['label']
+#    facet_field = request.POST['field']
+#    widget_type = request.POST['widget_type']
+
+    result['message'] = ''
+    result['facet'] =  {
+        'id': facet_json['id'], 'label': 'Top salaries', 'field': 'total_emp', 'widget_type': facet_json['widgetType'], 
+        'properties': {'limit': 10}
+    }
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
+  properties = {
+    'sort': 'desc',
+    'canRange': False,
+    'stacked': False,
+    'limit': 10,
+    'mincount': 0,
+    'isDate': False,
+    'andUp': False,  # Not used yet
+  }
+
+  facet_type = 'field'
+
+  if widget_type == 'map-widget':
+    properties['scope'] = 'world'
+    properties['mincount'] = 1
+    properties['limit'] = 100
+
+  return {
+    'id': facet_id,
+    'label': facet_label,
+    'field': facet_field,
+    'type': facet_type,
+    'widgetType': widget_type,
+    'properties': properties
+  }
