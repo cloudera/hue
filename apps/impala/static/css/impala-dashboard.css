@@ -47,12 +47,6 @@
   padding-right: 20px;
 }
 
-.search-bar input.deletable {
-  background-image: url("../art/remove.png");
-  background-repeat: no-repeat;
-  background-position: 99% 50%;
-}
-
 .search-bar ul li {
   text-align: right;
 }
@@ -154,13 +148,6 @@
   vertical-align: middle;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.search-query {
-  border-bottom-left-radius: 0 !important;
-  border-top-left-radius: 0 !important;
-  margin-left: 0 !important;
-  border-left: 0 !important;
 }
 
 .download-btn-group {
@@ -293,4 +280,8 @@ em {
 
 .field-selector.hoverable:hover {
   background-color: #DDD;
+}
+
+.draggable-icon {
+  cursor: move;
 }

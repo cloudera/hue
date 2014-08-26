@@ -29,19 +29,58 @@ ${ commonheader(None, "impala", user) | n,unicode }
               options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                         'stop': function(event, ui){$('.card-body').slideDown('fast'); }}}"
          title="${_('Grid Results')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-            <i class="fa fa-table"></i>
-         </a>
+         <a class="draggable-icon"><i class="fa fa-table"></i></a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true},
-          draggable: {data: draggablePie(), isEnabled: true,
-              options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                        'stop': function(event, ui){$('.card-body').slideDown('fast'); }}}"
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableFacet(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Text Facet')}" rel="tooltip" data-placement="top">
+         <a  class="draggable-icon"><i class="fa fa-sort-amount-asc"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggablePie(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-            <i class="hcha hcha-pie-chart"></i>
-         </a>
-    </div>    
+         <a class="draggable-icon"><i class="hcha hcha-pie-chart"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableBar(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="hcha hcha-bar-chart"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableLine(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Line Chart')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="hcha hcha-line-chart"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableHistogram(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Timeline')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="hcha hcha-timeline-chart"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableFilter(),
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-filter"></i></a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableMap(),
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Map')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="hcha hcha-map-chart"></i></a>
+    </div>
 </%def>
 </%dashboard:layout_toolbar>
 
@@ -101,7 +140,7 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: properties.limit"></input>
+      <input type="text" data-bind="value: properties.limit" />
     </div>
   
     <span data-bind="foreach: data()">
@@ -114,7 +153,7 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
-<link rel="stylesheet" href="/impala/static/css/impala.css">
+<link rel="stylesheet" href="/impala/static/css/impala-dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
@@ -131,7 +170,7 @@ ${ dashboard.import_layout() }
 
 ${ dashboard.import_bindings() }
 
-<script src="/impala/static/js/impala.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/impala/static/js/impala-dashboard.ko.js" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_charts() }
 
