@@ -1141,7 +1141,11 @@ from django.utils.translation import ugettext as _
             previewTemplate: '<div class="row">\n <span class="offset4 span3 break-word"><strong data-dz-name></strong></span>\n <span class="span2">File size: <strong data-dz-size></strong></span>\n <span class="span3">Percent complete: <strong data-dz-uploadprogress></strong></span>\n <span class="span1"><a href="javascript:undefined;" title="Cancel upload" data-dz-remove><i class="fa fa-times"></i></a></span>\n </div>',
             drop: function (e) {
               $('.hoverMsg').addClass('hide');
-              $('#progressStatus').removeClass('hide');
+
+              // Ensure dropped item was a file
+              if (e.dataTransfer.files.length > 0) {
+                $('#progressStatus').removeClass('hide');
+              }
             },
             uploadprogress: function (file, progress) {
               $("[data-dz-name]").each(function (cnt, item) {
