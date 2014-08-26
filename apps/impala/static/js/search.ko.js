@@ -51,13 +51,51 @@ function loadLayout(viewModel, json_layout) {
 
 var Query = function (vm, query) {
   var self = this;
-  // current select
+
   self.qs = ko.mapping.fromJS([{'q': ''}]);
-  self.fqs = ko.mapping.fromJS([{'q': ''}]);
+  self.fqs = ko.mapping.fromJS([]);
+  
+  self.toggleFacet = function (data) {
+    var fq = self.getFacetFilter(data.widget.id());
+
+    if (fq == null) {
+      self.fqs.push(ko.mapping.fromJS({
+        'id': data.widget.id(),
+        'field': data.widget.field(),
+        'filter': [data.facet[0]],
+        'type': 'field'
+      }));
+    } else {
+      $.each(self.fqs(), function (index, fq) {
+        if (fq.id() == data.widget.id()) {
+          if (fq.filter.indexOf(data.facet[0]) > -1) {
+            fq.filter.remove(data.facet[0]);
+            if (fq.filter().length == 0) {
+              self.fqs.remove(fq);
+            }
+          } else {
+            fq.filter.push(data.facet[0]);
+          }
+        }
+      });
+    }
+
+    vm.search();
+  }  
+  
+  self.getFacetFilter = function (facet_id) {
+    var _facet = null;
+    $.each(self.fqs(), function (index, facet) {
+      if (facet.id() == facet_id) {
+        _facet = facet;
+        return false;
+      }
+    });
+    return _facet;	  
+  }
 }
 
 var Dashboard = function (vm, dashboard) { 
-  // id from DB
   var self = this;
   
   self.facets = ko.observable(dashboard.facets);

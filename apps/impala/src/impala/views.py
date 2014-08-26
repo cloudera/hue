@@ -57,13 +57,15 @@ def query(request):
     'status': -1,
     'data': {}
   }
-    
+  print request.POST
+  
   if 'facet' in request.POST: 
     facet = json.loads(request.POST['facet'])
     database = 'default'
     table = 'sample_07'  
     hql = "SELECT salary FROM %s.%s WHERE salary IS NOT NULL ORDER BY salary DESC LIMIT %s" % (database, table, facet['properties']['limit'])
     result['id'] = facet['id']
+    result['field'] = facet['field']
   else:
     database = 'default'
     table = 'sample_07'    
@@ -80,5 +82,3 @@ def query(request):
     db.close(handle)
     
   return HttpResponse(json.dumps(result), mimetype="application/json")
-
-  
