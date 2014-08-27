@@ -117,10 +117,13 @@ var Dashboard = function (vm, dashboard) {
   };
 
   self.fields = ko.computed(function () {
-	return self.properties()[0].fields();
+    if (self.properties() != null && self.properties().length > 0 && self.properties()[0].fields != null){
+	    return self.properties()[0].fields();
+    }
+    return [];
   });
   self.fieldNames = ko.computed(function () {
-	return $.map(self.fields(), function (field) { return field.name()});
+	  return $.map(self.fields(), function (field) { return field.name()});
   });
 
   self.resultsetShowFieldList = ko.observable(true);
@@ -177,7 +180,7 @@ var Dashboard = function (vm, dashboard) {
 var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     var self = this;
 
-    self.isEditing = ko.observable(true);
+    self.isEditing = ko.observable(false);
     self.toggleEditing = function () {
       self.isEditing(! self.isEditing());
     };
@@ -194,8 +197,12 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     self.results_facet = ko.observableArray([]);
     self.results_cols = ko.observableArray([]);
 
+    self.inited = ko.observable(self.dashboard.facets().length > 0);
+
     self.init = function(callback) {
-      self.search();
+      if (self.inited()){
+        self.search();
+      }
       callback();
     }
     

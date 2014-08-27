@@ -94,28 +94,27 @@ ${ commonheader(None, "impala", user) | n,unicode }
     % endif
   </div>
 
-
-  <form class="form-search" style="margin: 0" data-bind="submit: search">
-    <strong>${_("Search")}</strong>
-    <span data-bind="text: $root.dashboard.properties()[0].database"></span>.<span data-bind="text: $root.dashboard.properties()[0].table"></span>
-
+  <form class="form-search" style="margin: 0" data-bind="visible: $root.isEditing() && columns().length == 0">
+    ${ _('Select a database and a table') }
+    <!-- ko if: columns().length == 0 -->
     <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium chosen-select chosen-server hide" data-placeholder="${_('Choose a database...')}"></select>
     <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium chosen-select chosen-table hide" data-placeholder="${_('Choose a table...')}"></select>
 
     <a title="${_('Manually refresh the dropdowns')}" rel="tooltip" data-placement="bottom" class="pointer" data-bind="click: resetDropdownsCache"><i class="fa fa-refresh"></i></a>
+    <!-- /ko -->
+  </form>
 
-      <div class="input-append">
+  <form class="form-search" style="margin: 0" data-bind="submit: search, visible: columns().length != 0">
+    <strong>${_("Search")}</strong>
+    <!-- ko if: $root.dashboard.properties().length > 0 -->
+    <span data-bind="text: $root.dashboard.properties()[0].database"></span>.<span data-bind="text: $root.dashboard.properties()[0].table"></span>
+    <!-- /ko -->
+    <div class="input-append">
       <span data-bind="foreach: query.qs">
         <input data-bind="clearable: q" maxlength="4096" type="text" class="search-query input-xlarge">
-  ##      <!-- ko if: $index() >= 1 -->
-  ##      <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
-  ##      <!-- /ko -->
+        <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
       </span>
-
-  ##    <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
-
-      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px"><i class="fa fa-search"></i></button>
-      </div>
+    </div>
   </form>
 </div>
 
@@ -324,7 +323,7 @@ ${ dashboard.import_charts() }
           width: "130px",
           no_results_text: "${_('Oops, no table found!')}"
           }).change(function () {
-
+            viewModel.dashboard.properties([{'database': viewModel.dashboard.selectedDropdownDb(), 'table': viewModel.dashboard.selectedDropdownTable()}]);
           });
         $(".chosen-select").trigger("chosen:updated");
       }, 200);

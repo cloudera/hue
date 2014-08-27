@@ -289,3 +289,7 @@ em {
 .chosen-container .chosen-results li {
   text-align: left;
 }
+
+#emptyDashboard {
+  right: 70px!important;
+}
