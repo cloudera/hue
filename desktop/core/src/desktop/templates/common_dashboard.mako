@@ -114,7 +114,7 @@
     </div>
     <div data-bind="template: { name: 'row-template', foreach: rows}">
     </div>
-    <div class="container-fluid" data-bind="visible: $root.isEditing">
+    <div class="container-fluid" data-bind="visible: $root.isEditing && rows().length > 0">
       <div data-bind="click: function(){$data.addEmptyRow()}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
   </div>
