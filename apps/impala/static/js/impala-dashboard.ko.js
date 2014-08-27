@@ -101,19 +101,17 @@ var Dashboard = function (vm, dashboard) {
   self.facets = ko.mapping.fromJS(dashboard.facets);
   self.properties = ko.observable(dashboard.properties);
   
-  self.fields = ko.mapping.fromJS([{'name': 'code', 'name': 'description', 'name': 'total_emp', 'name': 'salary'}]);
+  self.fields = ko.mapping.fromJS([{'name': 'code'}, {'name': 'description'}, {'name': 'total_emp'}, {'name': 'salary'}]);
   self.fieldNames = ko.computed(function () {
 	return $.map(self.fields(), function (field) { return field.name()});
   });
+  self.selectedNewFacetField = ko.observable();
   
   self.addFacet = function(facet_json) {
    $.post("/impala/dashboard/new_facet", {
        "dashboard": ko.mapping.toJSON(self),
        "facet_json": ko.mapping.toJSON(facet_json),
-       //"id": facet_json.widget_id,
-       //"label": facet_json.name,
-       //"field": facet_json.name,
-       //"widget_type": facet_json.widgetType
+       "field": self.selectedNewFacetField(),
      }, function (data) {
        if (data.status == 0) {
          var facet = ko.mapping.fromJS(data.facet);
