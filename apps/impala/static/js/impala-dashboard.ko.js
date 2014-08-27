@@ -99,12 +99,14 @@ var Dashboard = function (vm, dashboard) {
   var self = this;
   
   self.facets = ko.mapping.fromJS(dashboard.facets);
-  self.properties = ko.observable(dashboard.properties);
+  self.properties = ko.mapping.fromJS(dashboard.properties);
 
 
-  self.fields = ko.mapping.fromJS([{'name': 'code'}, {'name': 'description'}, {'name': 'total_emp'}, {'name': 'salary'}]);
+  self.fields = ko.computed(function () {
+	return self.properties()[0].fields();
+  });
   self.fieldNames = ko.computed(function () {
-	  return $.map(self.fields(), function (field) { return field.name()});
+	return $.map(self.fields(), function (field) { return field.name()});
   });
 
   self.resultsetShowFieldList = ko.observable(true);
