@@ -98,8 +98,13 @@ ${ commonheader(None, "impala", user) | n,unicode }
   <form class="form-search" style="margin: 0" data-bind="submit: search">
     <strong>${_("Search")}</strong>
     <span data-bind="text: $root.dashboard.properties()[0].database"></span>.<span data-bind="text: $root.dashboard.properties()[0].table"></span>
-      <div class="input-append">
 
+    <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium chosen-select chosen-server hide" data-placeholder="${_('Choose a database...')}"></select>
+    <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium chosen-select chosen-table hide" data-placeholder="${_('Choose a table...')}"></select>
+
+    <a title="${_('Manually refresh the dropdowns')}" rel="tooltip" data-placement="bottom" class="pointer" data-bind="click: resetDropdownsCache"><i class="fa fa-refresh"></i></a>
+
+      <div class="input-append">
       <span data-bind="foreach: query.qs">
         <input data-bind="clearable: q" maxlength="4096" type="text" class="search-query input-xlarge">
   ##      <!-- ko if: $index() >= 1 -->
@@ -265,6 +270,7 @@ ${ dashboard.import_layout() }
 
 ${ dashboard.import_bindings() }
 
+<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/impala/static/js/impala-dashboard.ko.js" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_charts() }
@@ -274,9 +280,67 @@ ${ dashboard.import_charts() }
   var viewModel = new ImpalaDashboardViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
   ko.applyBindings(viewModel);
 
+  var HIVE_AUTOCOMPLETE_BASE_URL = "/impala/api/autocomplete/";
+  var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
+  var HIVE_AUTOCOMPLETE_USER = "${ user }";
+
+  function resetDropdownsCache(){
+    $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
+    getDatabases(function(){
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + viewModel.dashboard.selectedDropdownDb(), null);
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + viewModel.dashboard.selectedDropdownDb(), null);
+    });
+  }
+
+  function getDatabases(callback){
+    $(document).one('fetched.databases', function() {
+      window.setTimeout(function(){
+        $(".chosen-server").chosen({
+          disable_search_threshold: 5,
+          width: "130px",
+          no_results_text: "${_('Oops, no database found!')}"
+        }).change(function () {
+          getTables();
+        });
+        $(".chosen-select").trigger("chosen:updated");
+      }, 200)
+    });
+    hac_getDatabases(function (dbs) {
+      viewModel.dashboard.updateDropdownDatabases(dbs);
+
+      if (typeof callback != "undefined"){
+        callback(dbs);
+      }
+      $(document).trigger('fetched.databases', [dbs]);
+    });
+  }
+
+  function getTables(callback) {
+    hac_getTables(viewModel.dashboard.selectedDropdownDb(), function (data) {
+      viewModel.dashboard.dropdownTables(data.split(" "));
+      window.setTimeout(function(){
+        $(".chosen-table").chosen({
+          disable_search_threshold: 5,
+          width: "130px",
+          no_results_text: "${_('Oops, no table found!')}"
+          }).change(function () {
+
+          });
+        $(".chosen-select").trigger("chosen:updated");
+      }, 200);
+      if (typeof callback != "undefined"){
+        callback(data);
+      }
+    });
+  }
+
   $(document).ready(function(){
     window.setTimeout(function(){
-      viewModel.init();
+      viewModel.init(function(){
+        getDatabases(function(){
+          getTables();
+        });
+      });
     }, 50);
   });
 

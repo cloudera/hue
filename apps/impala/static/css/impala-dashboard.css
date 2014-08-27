@@ -285,3 +285,7 @@ em {
 .draggable-icon {
   cursor: move;
 }
+
+.chosen-container .chosen-results li {
+  text-align: left;
+}
