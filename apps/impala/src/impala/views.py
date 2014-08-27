@@ -111,6 +111,24 @@ def new_facet(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def new_search(request):
+
+  return render('dashboard.mako', request, {
+    'query_json': json.dumps({}),
+    'dashboard_json': json.dumps({'layout': [
+              {"size":2,"rows":[],"drops":["temp"],"klass":"card card-home card-column span2"},
+              {"size":10,"rows":[{"widgets":[
+                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+              "drops":["temp"],"klass":"card card-home card-column span10"}
+         ],
+        'facets': [],
+        'properties': [{'database': 'default', 'table': 'sample_07'}]
+        }), 
+  })
+
+
+
 def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
   properties = {
     'sort': 'desc',
