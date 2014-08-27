@@ -55,6 +55,7 @@ def query(request):
   database = dashboard['properties'][0]['database']
   table = dashboard['properties'][0]['table']
   
+  
   if fqs:
     filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
   else:
@@ -74,7 +75,12 @@ def query(request):
     fields = [fq['field'] for fq in fqs]
     result['selected'] = facet['field'] in fields
   else:
-    hql = "SELECT * FROM %s.%s" % (database, table,)
+    fields = ', '.join(dashboard['resultsetSelectedFields'])
+    hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
+        'database': database, 
+        'table': table,
+        'fields': fields
+    }
     if filters:
       hql += ' WHERE ' + filters
 
