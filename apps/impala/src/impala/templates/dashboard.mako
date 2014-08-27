@@ -207,15 +207,18 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="facet-widget">
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())">
       <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
     </div>
   
     <span data-bind="foreach: data()">
-      <a href="javascript: void(0)">
-        <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
-      </a>
+      <div>
+        <a href="javascript: void(0)">
+          <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+          <i class="fa fa-times" data-bind="visible: $parent.data().length == 1"></i>
+        </a>
+      </div>
     </span>
   </div>
   <!-- /ko -->

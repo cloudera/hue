@@ -37,7 +37,7 @@ def dashboard(request):
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
     'dashboard_json': json.dumps({'layout': [
-              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Pie Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
+              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Top salaries","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
@@ -56,22 +56,33 @@ def query(request):
     'status': -1,
     'data': {}
   }
-  print request.POST
-  
+    
+  fqs = json.loads(request.POST['query'])['fqs']
+
+  if fqs:
+    filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
+  else:
+    filters = ''
+
   if 'facet' in request.POST: 
     facet = json.loads(request.POST['facet'])
     database = 'default'
     table = 'sample_07'  
-    hql = "SELECT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL ORDER BY %(field)s DESC LIMIT %(limit)s" % {
+    hql = "SELECT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s" % {
         'database': database, 'table': table, 'limit': facet['properties']['limit'],
-        'field': facet['field']
+        'field': facet['field'],
+        'filters': (' AND ' + filters) if filters else ''
     }
     result['id'] = facet['id']
     result['field'] = facet['field']
+    fields = [fq['field'] for fq in fqs]
+    result['selected'] = facet['field'] in fields
   else:
     database = 'default'
     table = 'sample_07'    
     hql = "SELECT * FROM %s.%s" % (database, table,)
+    if filters:
+      hql += ' WHERE ' + filters
 
   query_server = get_query_server_config(name='impala')
   query = hql_query(hql)
