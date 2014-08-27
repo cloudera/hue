@@ -48,7 +48,6 @@ def dashboard(request):
                     'properties': {'limit': 10}}],
         'properties': [{'database': 'default', 'table': 'sample_07'}]
         }), 
-                                            # type: MAX, / ORDER BY, LIMIT 100
   })
 
 
@@ -95,16 +94,14 @@ def new_facet(request):
   try:
     dashboard = json.loads(request.POST.get('dashboard', '{}')) # Perms
     facet_json = json.loads(request.POST.get('facet_json', '{}'))
-    
-
-#    facet_id = request.POST['id']
-#    facet_label = request.POST['label']
-#    facet_field = request.POST['field']
-#    widget_type = request.POST['widget_type']
+    facet_field = request.POST['field']
 
     result['message'] = ''
     result['facet'] =  {
-        'id': facet_json['id'], 'label': 'Top salaries', 'field': 'total_emp', 'widget_type': facet_json['widgetType'], 
+        'id': facet_json['id'],
+        'label': facet_field,
+        'field': facet_field,
+        'widget_type': facet_json['widgetType'], 
         'properties': {'limit': 10}
     }
     result['status'] = 0

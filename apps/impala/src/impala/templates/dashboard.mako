@@ -157,6 +157,16 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="select-field">
+  <!-- ko ifnot: $root.getFacetFromResult(id()) -->
+    <select data-bind="options: $root.dashboard.fieldNames, value: $root.dashboard.selectedNewFacetField"></select>
+    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">      
+      <i class="fa fa-plus"></i>
+    </a>
+  <!-- /ko -->  
+</script>
+
+
 <script type="text/html" id="facet-widget">
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
@@ -172,11 +182,8 @@ ${ dashboard.layout_skeleton() }
     </span>
   </div>
   <!-- /ko -->
-  <!-- ko ifnot: $root.getFacetFromResult(id()) -->
-    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">
-      <i class="fa fa-plus"></i>
-    </a>
-  <!-- /ko -->
+  
+  <span data-bind="template: { name: 'select-field' }"></span>
 </script>
 
 
