@@ -28,26 +28,18 @@ from desktop.lib.django_util import render
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
+from impala.models import Dashboard
 
 
 LOG = logging.getLogger(__name__)
 
 
 def dashboard(request):
+  dashboard = Dashboard()
+
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
-    'dashboard_json': json.dumps({'layout': [
-              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Top salaries","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-              {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-              "drops":["temp"],"klass":"card card-home card-column span10"}
-         ],
-        'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'facet-widget', 
-                    'properties': {'limit': 10}}],
-        'properties': [{'database': 'default', 'table': 'sample_07'}]
-        }), 
+    'dashboard_json': dashboard.get_json(request.user), 
   })
 
 
@@ -56,9 +48,13 @@ def query(request):
     'status': -1,
     'data': {}
   }
-    
+  
+  dashboard = json.loads(request.POST['dashboard'])  
   fqs = json.loads(request.POST['query'])['fqs']
 
+  database = dashboard['properties'][0]['database']
+  table = dashboard['properties'][0]['table']
+  
   if fqs:
     filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
   else:
@@ -66,10 +62,10 @@ def query(request):
 
   if 'facet' in request.POST: 
     facet = json.loads(request.POST['facet'])
-    database = 'default'
-    table = 'sample_07'  
     hql = "SELECT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s" % {
-        'database': database, 'table': table, 'limit': facet['properties']['limit'],
+        'database': database,
+        'table': table,
+        'limit': facet['properties']['limit'],
         'field': facet['field'],
         'filters': (' AND ' + filters) if filters else ''
     }
@@ -78,15 +74,14 @@ def query(request):
     fields = [fq['field'] for fq in fqs]
     result['selected'] = facet['field'] in fields
   else:
-    database = 'default'
-    table = 'sample_07'    
     hql = "SELECT * FROM %s.%s" % (database, table,)
     if filters:
       hql += ' WHERE ' + filters
 
   query_server = get_query_server_config(name='impala')
-  query = hql_query(hql)
   db = dbms.get(request.user, query_server=query_server)
+  
+  query = hql_query(hql)
   handle = db.execute_and_wait(query, timeout_sec=5.0)
 
   if handle:
