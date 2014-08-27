@@ -113,6 +113,9 @@ var Dashboard = function (vm, dashboard) {
   self.resultsetFieldsFilter = ko.observable(""); // For UI
 
   self.resultsetSelectedFields = ko.observableArray(self.fieldNames());
+  self.resultsetSelectedFields.subscribe(function(value) {
+    vm.search();
+  });
 
   self.resultsetFilteredFields = ko.computed(function() {
     var _fields = [];
