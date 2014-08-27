@@ -101,6 +101,20 @@ var Dashboard = function (vm, dashboard) {
   self.facets = ko.mapping.fromJS(dashboard.facets);
   self.properties = ko.mapping.fromJS(dashboard.properties);
 
+  self.dropdownDbs = ko.observableArray([]);
+  self.selectedDropdownDb = ko.observable("");
+  self.dropdownTables = ko.observableArray([]);
+  self.selectedDropdownTable = ko.observable("");
+
+  self.updateDropdownDatabases = function(databases) {
+    if (databases) {
+      var i = databases.indexOf("_impala_builtins"); // Blacklist of system databases
+      if (i != -1) {
+        databases.splice(i, 1);
+      }
+      self.dropdownDbs(databases);
+    }
+  };
 
   self.fields = ko.computed(function () {
 	return self.properties()[0].fields();
@@ -180,8 +194,9 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     self.results_facet = ko.observableArray([]);
     self.results_cols = ko.observableArray([]);
 
-    self.init = function() {
+    self.init = function(callback) {
       self.search();
+      callback();
     }
     
     self.search = function (callback) {

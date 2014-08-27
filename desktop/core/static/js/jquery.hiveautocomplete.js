@@ -21,6 +21,7 @@
 (function ($, window, document, undefined) {
   var pluginName = "jHueHiveAutocomplete",
       defaults = {
+        serverType: "HIVE",
         home: "/",
         skipColumns: false,
         onEnter: function () {
@@ -187,6 +188,9 @@
     });
 
     var BASE_PATH = "/beeswax/api/autocomplete/";
+    if (_this.options.serverType == "IMPALA"){
+      BASE_PATH = "/impala/api/autocomplete/";
+    }
     var _currentFiles = [];
 
     function showHiveAutocomplete(callback) {
