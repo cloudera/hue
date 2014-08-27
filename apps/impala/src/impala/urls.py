@@ -25,6 +25,7 @@ urlpatterns = patterns('impala.views',
   url(r'^dashboard/query', 'query', name='query'),
   
   url(r'^dashboard/new_facet$', 'new_facet', name='new_facet'),
+  url(r'^dashboard/new_search$', 'new_search', name='new_search'),
 )
 
 urlpatterns += beeswax_urls

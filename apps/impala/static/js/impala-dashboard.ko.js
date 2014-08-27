@@ -194,7 +194,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
           ].concat(multiQs)
       )
       .done(function() {
-          if (arguments.length > 1) { // If multi queries
+          if (multiQs.length > 0) {
             for (var i = 1; i < arguments.length; i++) {
               var facet = arguments[i][0];
               removeFrom(self.results_facet, facet.id);

@@ -89,6 +89,8 @@ ${ commonheader(None, "impala", user) | n,unicode }
   <div class="pull-right" style="padding-right:50px">
     % if user.is_superuser:
       <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
+      &nbsp;&nbsp;&nbsp;
+      <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>      
     % endif
   </div>
 
@@ -203,11 +205,8 @@ ${ dashboard.layout_skeleton() }
     </span>
   </div>
   <!-- /ko -->
-  <!-- ko ifnot: $root.getFacetFromResult(id()) -->
-    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">
-      <i class="fa fa-plus"></i>
-    </a>
-  <!-- /ko -->  
+
+  <span data-bind="template: { name: 'select-field' }"></span> 
 </script>
 
 
