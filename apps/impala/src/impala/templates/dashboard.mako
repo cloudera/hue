@@ -118,42 +118,77 @@ ${ commonheader(None, "impala", user) | n,unicode }
 ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="resultset-widget">
-
-
-<div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
-  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+<div style="float:left; margin-right: 10px">
+  <div data-bind="visible: ! $root.dashboard.resultsetShowFieldList()" style="padding-top: 5px; display: inline-block">
+    <a href="javascript: void(0)"  data-bind="click: function(){ $root.dashboard.resultsetShowFieldList(true) }">
+      <i class="fa fa-chevron-right"></i>
+    </a>
+  </div>
+</div>
+<div data-bind="visible: $root.dashboard.resultsetShowFieldList()" style="float:left; margin-right: 10px; background-color: #F6F6F6; padding: 5px">
+  <span data-bind="visible: $root.dashboard.resultsetShowFieldList()">
+    <div>
+      <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.dashboard.resultsetShowFieldList(false) }">
+        <i class="fa fa-chevron-left"></i>
+      </a>
+      <input type="text" data-bind="clearable: $root.dashboard.resultsetFieldsFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
+    </div>
+    <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
+      <a href="javascript: void(0)" class="btn btn-mini"
+        data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.dashboard.resultsetSelectedFields().length == $root.dashboard.fields().length }"
+        style="margin-right: 2px;">
+        <i class="fa fa-square-o"></i>
+      </a>
+      <strong>${_('Field Name')}</strong>
+    </div>
+    <div class="fields-list" data-bind="foreach: $root.dashboard.resultsetFilteredFields" style="max-height: 230px; overflow-y: auto; padding-left: 4px">
+      <div style="margin-bottom: 3px">
+        <input type="checkbox" data-bind="checkedValue: name, checked: $root.dashboard.resultsetSelectedFields" style="margin: 0" />
+        <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.dashboard.resultsetSelectedFields.indexOf(name()) > -1}, click: highlightColumn"></div>
+      </div>
+    </div>
+    <div data-bind="visible: $root.dashboard.resultsetFilteredFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
+      <i class="fa fa-frown-o"></i>
+    </div>
+  </span>
 </div>
 
-<div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
-  </br>
-  ${ _('Your search did not match any documents.') }
-</div>
+<div>
+  <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 
-<div data-bind="visible: !$root.isRetrievingResults() && $root.results().length > 0">
-  <div id="result-main" style="overflow-x: auto">
-    <table id="result-container" style="margin-top: 0; width: 100%">
-      <thead>
-        <tr>
-          <th style="width: 18px">&nbsp;</th>
-          <!-- ko foreach: $root.results_cols -->
-            <th data-bind="text: $data"></th>
-          <!-- /ko -->
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: { data: $root.results, as: 'row'}" class="result-tbody">
-        <tr class="result-row">
-          <td>
-            <a href="javascript:void(0)">
-              <i class="fa" data-bind="css: {'fa-caret-right' : true }"></i>
-            </a>
-          </td>
-          <!-- ko foreach: row -->
-            <td data-bind="html: $data"></td>
-          <!-- /ko -->
-        </tr>
-      </tbody>
-    </table>
+  <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+    </br>
+    ${ _('Your search did not match any documents.') }
+  </div>
+
+  <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length > 0">
+    <div id="result-main" style="overflow-x: auto">
+      <table id="result-container" style="margin-top: 0; width: 100%">
+        <thead>
+          <tr>
+            <th style="width: 18px">&nbsp;</th>
+            <!-- ko foreach: $root.results_cols -->
+              <th data-bind="text: $data"></th>
+            <!-- /ko -->
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: { data: $root.results, as: 'row'}" class="result-tbody">
+          <tr class="result-row">
+            <td>
+              <a href="javascript:void(0)">
+                <i class="fa" data-bind="css: {'fa-caret-right' : true }"></i>
+              </a>
+            </td>
+            <!-- ko foreach: row -->
+              <td data-bind="html: $data"></td>
+            <!-- /ko -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </script>
@@ -233,14 +268,6 @@ ${ dashboard.import_charts() }
 
 
 <script type="text/javascript">
-  function columnDropAdditionalHandler(widget){
-    console.log("column drop")
-  }
-
-  function widgetDraggedAdditionalHandler(widget){
-    console.log("boom")
-  }
-
   var viewModel = new ImpalaDashboardViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
   ko.applyBindings(viewModel);
 
@@ -249,6 +276,47 @@ ${ dashboard.import_charts() }
       viewModel.init();
     }, 50);
   });
+
+  function toggleGridFieldsSelection() {
+    if (viewModel.dashboard.resultsetSelectedFields().length > 0) {
+      viewModel.dashboard.resultsetSelectedFields([]);
+    }
+    else {
+      selectAllCollectionFields();
+    }
+  }
+
+  function selectAllCollectionFields() {
+    viewModel.dashboard.resultsetSelectedFields(viewModel.dashboard.fieldNames());
+  }
+
+  function highlightColumn(column) {
+    var _colName = $.trim(column.name());
+    if (viewModel.dashboard.resultsetSelectedFields.indexOf(_colName) > -1) {
+      var _t = $("#result-container");
+      var _col = _t.find("th").filter(function () {
+        return $.trim($(this).text()) == _colName;
+      });
+      if (_t.find("tr td:nth-child(" + (_col.index() + 1) + ").columnSelected").length == 0) {
+        _t.find(".columnSelected").removeClass("columnSelected");
+        _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+        _t.parent().animate({
+          scrollLeft: _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+        }, 300);
+      }
+      else {
+        _t.find(".columnSelected").removeClass("columnSelected");
+      }
+    }
+  }
+
+  function columnDropAdditionalHandler(widget){
+    console.log("column drop")
+  }
+
+  function widgetDraggedAdditionalHandler(widget){
+    console.log("boom")
+  }
 
 </script>
 

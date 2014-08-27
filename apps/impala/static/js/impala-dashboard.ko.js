@@ -100,11 +100,28 @@ var Dashboard = function (vm, dashboard) {
   
   self.facets = ko.mapping.fromJS(dashboard.facets);
   self.properties = ko.observable(dashboard.properties);
-  
+
+
   self.fields = ko.mapping.fromJS([{'name': 'code'}, {'name': 'description'}, {'name': 'total_emp'}, {'name': 'salary'}]);
   self.fieldNames = ko.computed(function () {
-	return $.map(self.fields(), function (field) { return field.name()});
+	  return $.map(self.fields(), function (field) { return field.name()});
   });
+
+  self.resultsetShowFieldList = ko.observable(true);
+  self.resultsetFieldsFilter = ko.observable(""); // For UI
+
+  self.resultsetSelectedFields = ko.observableArray(self.fieldNames());
+
+  self.resultsetFilteredFields = ko.computed(function() {
+    var _fields = [];
+    $.each(self.fields(), function (index, field) {
+      if (self.resultsetFieldsFilter() == "" || field.name().toLowerCase().indexOf(self.resultsetFieldsFilter().toLowerCase()) > -1){
+        _fields.push(field);
+      }
+    });
+    return _fields;
+  });
+
   self.selectedNewFacetField = ko.observable();
   
   self.addFacet = function(facet_json) {
