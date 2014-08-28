@@ -73,6 +73,9 @@ function BeeswaxViewModel(server) {
 
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
+  self.chartType = ko.observable("bars");
+  self.chartData = ko.observableArray();
+
   self.server = ko.observable(server);
   self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);

@@ -23,6 +23,7 @@
 
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
+<%namespace name="dashboard" file="common_dashboard.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
@@ -403,17 +404,19 @@ ${layout.menubar(section='query')}
         </div>
 
         <div class="tab-pane" id="chart">
-          <pre data-bind="visible: $root.design.results.columns().length == 0">${_('There is currently no data to build a chart on.')}</pre>
+          <pre data-bind="visible: $root.design.results.empty() || $root.design.results.expired()">${_('There is currently no data to build a chart on.')}</pre>
           <div class="alert hide">
             <strong>${_('Warning:')}</strong> ${_('the results on the chart have been limited to 1000 rows.')}
           </div>
-          <div data-bind="visible: $root.design.results.columns().length > 0" style="text-align: center">
+
+          <div data-bind="visible: ! $root.design.results.empty() && ! $root.design.results.expired()" style="text-align: center">
           <form class="form-inline">
             ${_('Chart type')}&nbsp;
             <div class="btn-group" data-toggle="buttons-radio">
-              <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="fa fa-bar-chart-o"></i></a>
-              <a rel="tooltip" data-placement="top" title="${_('Lines')}" id="blueprintLines" href="javascript:void(0)" class="btn"><i class="fa fa-signal"></i></a>
-              <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="fa fa-map-marker"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="hcha hcha-bar-chart"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Lines')}" id="blueprintLines" href="javascript:void(0)" class="btn"><i class="hcha hcha-line-chart"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Pie')}" id="blueprintPie" href="javascript:void(0)" class="btn"><i class="hcha hcha-pie-chart"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="hcha hcha-map-chart"></i></a>
             </div>&nbsp;&nbsp;
             <span id="blueprintAxis" class="hide">
               <label>${_('X-Axis')}
@@ -436,7 +439,23 @@ ${layout.menubar(section='query')}
             </span>
           </form>
           </div>
-          <div  data-bind="visible: $root.design.results.columns().length > 0" id="blueprint" class="empty">${_("Please select a chart type.")}</div>
+          <div data-bind="visible: ! $root.design.results.empty() && ! $root.design.results.expired()" id="blueprint" class="empty center">${_("Please select a chart type.")}</div>
+          <div style="margin: 10px" data-bind="visible: ! $root.design.results.empty() && ! $root.design.results.expired()">
+            <div id="pieChart" data-bind="pieChart: {data: {counts: $root.chartData}, fqs: ko.observableArray([]),
+              transformer: pieChartDataTransformer,
+              maxWidth: 350 }, visible: $root.chartType() == 'pie'"></div>
+
+            <div id="barChart" data-bind="barChart: {datum: {counts: $root.chartData}, fqs: ko.observableArray([]),
+                  transformer: barChartDataTransformer}, visible: $root.chartType() == 'bars'"></div>
+
+            <div id="lineChart" data-bind="lineChart: {datum: {counts: $root.chartData},
+                  transformer: lineChartDataTransformer,
+                  showControls: false }, visible: $root.chartType() == 'lines'"></div>
+
+            <div id="leafletMapChart" data-bind="leafletMapChart: {datum: {counts: $root.chartData},
+                  transformer: leafletMapChartDataTransformer,
+                  showControls: false }, visible: $root.chartType() == 'map'"></div>
+          </div>
         </div>
         <!-- /ko -->
       </div>
@@ -659,7 +678,7 @@ ${layout.menubar(section='query')}
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     % if has_metastore:
     <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
-      <iclass="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
+      <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
     </a>
     % endif
 
@@ -676,6 +695,7 @@ ${layout.menubar(section='query')}
     <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
   </div>
 </div>
+
 
 <script src="/static/js/hue.json.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
@@ -695,12 +715,6 @@ ${layout.menubar(section='query')}
 
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
-
-<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
-
 
 <style type="text/css">
   h1 {
@@ -923,14 +937,17 @@ ${layout.menubar(section='query')}
 
 </style>
 
-<link href="/static/ext/css/leaflet.css" rel="stylesheet">
-<link href="/static/ext/css/hue-filetypes.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
+<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+${ dashboard.import_charts() }
+
 
 <script type="text/javascript" charset="utf-8">
 var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent;
@@ -1620,6 +1637,135 @@ function isStringColumn(type) {
 
 var map;
 var graphHasBeenPredicted = false;
+function getMapBounds(lats, lngs) {
+  lats = lats.sort();
+  lngs = lngs.sort();
+  return [
+    [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
+    [lats[0], lngs[0]] // south-west
+  ]
+}
+
+function generateGraph(graphType) {
+  $("#chart").height(Math.max($(window).height() - $("#blueprint").offset().top + 30, 500));
+  $("#chart .alert").addClass("hide");
+  if (graphType != "") {
+    $("#blueprint").attr("class", "").attr("style", "").empty();
+    if (graphType == ko.HUE_CHARTS.TYPES.MAP) {
+      if ($("#blueprintLat").val() != "-1" && $("#blueprintLng").val() != "-1") {
+        var _latCol = $("#blueprintLat").val() * 1;
+        var _lngCol = $("#blueprintLng").val() * 1;
+        var _descCol = $("#blueprintDesc").val() * 1;
+        var _lats = [];
+        var _lngs = [];
+        $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+          _lats.push($.trim($(this).text()) * 1);
+        });
+        $("#resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
+          _lngs.push($.trim($(this).text()) * 1);
+        });
+
+        var _koData = [];
+
+        try {
+          $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+            if (cnt < 1000) {
+              if (_descCol != "-1") {
+                _koData.push({ lat: $.trim($(this).text()) * 1, lng: $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1, label: $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text())});
+              }
+              else {
+                _koData.push({ lat: $.trim($(this).text()) * 1, lng: $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1});
+              }
+            }
+          });
+          viewModel.chartData(_koData);
+        }
+        catch (err) {
+          if (typeof console != "undefined") {
+            console.error(err);
+          }
+        }
+        if ($("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
+          $("#chart .alert").removeClass("hide");
+        }
+      }
+      else {
+        $("#blueprint").addClass("empty").css("text-align", "center").text("${_("Please select the latitude and longitude columns.")}");
+      }
+    }
+    else {
+      if ($("#blueprintX").val() != "-1" && $("#blueprintY").val() != "-1") {
+        var _x = $("#blueprintX").val() * 1;
+        var _y = $("#blueprintY").val() * 1;
+        var _koData = [];
+        $("#resultTable>tbody>tr>td:nth-child(" + _x + ")").each(function (cnt) {
+          if (cnt < 1000) {
+            _koData.push({ value: $.trim($(this).text()), count: $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1});
+          }
+        });
+
+        viewModel.chartData(_koData);
+
+        if ($("#resultTable>tbody>tr>td:nth-child(" + _x + ")").length > 1000){
+          $("#chart .alert").removeClass("hide");
+        }
+      }
+      else {
+        $("#blueprint").addClass("empty").css("text-align", "center").text("${_("Please select the columns you would like to see in this chart.")}");
+      }
+    }
+  }
+}
+
+function getGraphType() {
+  var _type = "";
+  if ($("#blueprintBars").hasClass("active")) {
+    _type = ko.HUE_CHARTS.TYPES.BARCHART;
+  }
+  if ($("#blueprintLines").hasClass("active")) {
+    _type = ko.HUE_CHARTS.TYPES.LINECHART;
+  }
+  if ($("#blueprintMap").hasClass("active")) {
+    _type = ko.HUE_CHARTS.TYPES.MAP;
+  }
+  if ($("#blueprintPie").hasClass("active")) {
+    _type = ko.HUE_CHARTS.TYPES.PIECHART;
+  }
+  viewModel.chartType(_type);
+  return _type;
+}
+
+
+function predictGraph() {
+  if (!graphHasBeenPredicted) {
+    graphHasBeenPredicted = true;
+    var _firstAllString, _firstAllNumeric;
+    var _cols = viewModel.design.results.columns();
+    $(_cols).each(function (cnt, col) {
+      if (cnt > 0){
+        if (_firstAllString == null && !isNumericColumn(col.type)) {
+          _firstAllString = cnt + 1;
+        }
+        if (_firstAllNumeric == null && isNumericColumn(col.type)) {
+          _firstAllNumeric = cnt + 1;
+        }
+      }
+    });
+
+    if (_firstAllString != null && _firstAllNumeric != null) {
+      $("#blueprintBars").addClass("active");
+      $("#blueprintLines").removeClass("active");
+      $("#blueprintPie").removeClass("active");
+      $("#blueprintMap").removeClass("active");
+      $("#blueprintAxis").removeClass("hide");
+      $("#blueprintLatLng").addClass("hide");
+      $("#blueprintX").val(_firstAllString);
+      $("#blueprintY").val(_firstAllNumeric);
+    }
+  }
+  generateGraph(getGraphType());
+}
+
 // Logs
 var logsAtEnd = true;
 $(document).ready(function () {
@@ -1636,153 +1782,6 @@ $(document).ready(function () {
     resizeLogs();
   });
 
-  function getMapBounds(lats, lngs) {
-    lats = lats.sort();
-    lngs = lngs.sort();
-    return [
-      [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
-      [lats[0], lngs[0]] // south-west
-    ]
-  }
-
-  function generateGraph(graphType) {
-    $("#chart").height(Math.max($(window).height() - $("#blueprint").offset().top + 30, 500));
-    $("#chart .alert").addClass("hide");
-    if (graphType != "") {
-      if (map != null){
-        try {
-          map.remove();
-        }
-        catch (err) {
-          if (typeof console != "undefined") {
-            console.error(err);
-          }
-        }
-      }
-      $("#blueprint").attr("class", "").attr("style", "").empty();
-      $("#blueprint").data("plugin_jHueBlueprint", null);
-      if (graphType == $.jHueBlueprint.TYPES.MAP) {
-        L.DomUtil.get("blueprint")._leaflet = false;
-        if ($("#blueprintLat").val() != "-1" && $("#blueprintLng").val() != "-1") {
-          var _latCol = $("#blueprintLat").val() * 1;
-          var _lngCol = $("#blueprintLng").val() * 1;
-          var _descCol = $("#blueprintDesc").val() * 1;
-          var _lats = [];
-          var _lngs = [];
-          $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
-            _lats.push($.trim($(this).text()) * 1);
-          });
-          $("#resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
-            _lngs.push($.trim($(this).text()) * 1);
-          });
-          $("#blueprint").height($("#blueprint").parent().height() - 100);
-          try {
-            map = L.map("blueprint").fitBounds(getMapBounds(_lats, _lngs));
-
-            L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
-              if (cnt < 1000) {
-                if (_descCol != "-1") {
-                  L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
-                }
-                else {
-                  L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
-                }
-              }
-            });
-          }
-          catch (err) {
-            if (typeof console != "undefined") {
-              console.error(err);
-            }
-          }
-          if ($("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
-            $("#chart .alert").removeClass("hide");
-          }
-        }
-        else {
-          $("#blueprint").addClass("empty").css("text-align", "center").text("${_("Please select the latitude and longitude columns.")}");
-        }
-      }
-      else {
-        if ($("#blueprintX").val() != "-1" && $("#blueprintY").val() != "-1") {
-          var _x = $("#blueprintX").val() * 1;
-          var _y = $("#blueprintY").val() * 1;
-          var _data = [];
-          $("#resultTable>tbody>tr>td:nth-child(" + _x + ")").each(function (cnt) {
-            if (cnt < 1000) {
-              _data.push([$.trim($(this).text()), $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1]);
-            }
-          });
-          if ($("#resultTable>tbody>tr>td:nth-child(" + _x + ")").length > 1000){
-            $("#chart .alert").removeClass("hide");
-          }
-          $("#blueprint").jHueBlueprint({
-            data: _data,
-            label: $("#resultTable>thead>tr>th:nth-child(" + _y + ")").text(),
-            type: graphType,
-            color: $.jHueBlueprint.COLORS.BLUE,
-            isCategories: true,
-            fill: true,
-            enableSelection: false,
-            height: $("#blueprint").parent().height() - 100
-          });
-          if (_data.length > 30){
-            $(".flot-x-axis .flot-tick-label").hide();
-          }
-        }
-        else {
-          $("#blueprint").addClass("empty").text("${_("Please select the columns you would like to see in this chart.")}");
-        }
-      }
-    }
-  }
-
-  function getGraphType() {
-    var _type = "";
-    if ($("#blueprintBars").hasClass("active")) {
-      _type = $.jHueBlueprint.TYPES.BARCHART;
-    }
-    if ($("#blueprintLines").hasClass("active")) {
-      _type = $.jHueBlueprint.TYPES.LINECHART;
-    }
-    if ($("#blueprintMap").hasClass("active")) {
-      _type = $.jHueBlueprint.TYPES.MAP;
-    }
-    return _type;
-  }
-
-
-  function predictGraph() {
-    if (!graphHasBeenPredicted) {
-      graphHasBeenPredicted = true;
-      var _firstAllString, _firstAllNumeric;
-      var _cols = viewModel.design.results.columns();
-      $(_cols).each(function (cnt, col) {
-        if (cnt > 0){
-          if (_firstAllString == null && !isNumericColumn(col.type)) {
-            _firstAllString = cnt + 1;
-          }
-          if (_firstAllNumeric == null && isNumericColumn(col.type)) {
-            _firstAllNumeric = cnt + 1;
-          }
-        }
-      });
-
-      if (_firstAllString != null && _firstAllNumeric != null) {
-        $("#blueprintBars").addClass("active");
-        $("#blueprintAxis").removeClass("hide");
-        $("#blueprintLatLng").addClass("hide");
-        $("#blueprintX").val(_firstAllString);
-        $("#blueprintY").val(_firstAllNumeric);
-      }
-    }
-    generateGraph(getGraphType());
-  }
-
   $(".blueprintSelect").on("change", function () {
     generateGraph(getGraphType())
   });
@@ -1790,17 +1789,26 @@ $(document).ready(function () {
   $("#blueprintBars").on("click", function () {
     $("#blueprintAxis").removeClass("hide");
     $("#blueprintLatLng").addClass("hide");
-    generateGraph($.jHueBlueprint.TYPES.BARCHART)
+    viewModel.chartType(ko.HUE_CHARTS.TYPES.BARCHART);
+    generateGraph(ko.HUE_CHARTS.TYPES.BARCHART)
   });
   $("#blueprintLines").on("click", function () {
     $("#blueprintAxis").removeClass("hide");
     $("#blueprintLatLng").addClass("hide");
-    generateGraph($.jHueBlueprint.TYPES.LINECHART)
+    viewModel.chartType(ko.HUE_CHARTS.TYPES.LINECHART);
+    generateGraph(ko.HUE_CHARTS.TYPES.LINECHART)
+  });
+  $("#blueprintPie").on("click", function () {
+    $("#blueprintAxis").removeClass("hide");
+    $("#blueprintLatLng").addClass("hide");
+    viewModel.chartType(ko.HUE_CHARTS.TYPES.PIECHART);
+    generateGraph(ko.HUE_CHARTS.TYPES.PIECHART)
   });
   $("#blueprintMap").on("click", function () {
     $("#blueprintAxis").addClass("hide");
     $("#blueprintLatLng").removeClass("hide");
-    generateGraph($.jHueBlueprint.TYPES.MAP)
+    viewModel.chartType(ko.HUE_CHARTS.TYPES.MAP);
+    generateGraph(ko.HUE_CHARTS.TYPES.MAP)
   });
 
   $("#log pre:eq(1)").scroll(function () {
@@ -2613,6 +2621,86 @@ ko.applyBindings(viewModel);
 % else:
   $(document).ready(queryEvents);
 % endif
+
+
+// chart related stuff
+
+
+function pieChartDataTransformer(data) {
+  var _data = [];
+  $(data.counts()).each(function (cnt, item) {
+    _data.push({
+      label: item.value,
+      value: item.count,
+      obj: item
+    });
+  });
+  return _data;
+}
+
+function leafletMapChartDataTransformer(data) {
+  if (data != null && data.counts != null) return data.counts();
+}
+
+function barChartDataTransformer(rawDatum) {
+  var _datum = [];
+  var _data = [];
+
+  $(rawDatum.counts()).each(function (cnt, item) {
+    if (typeof item.from != "undefined") {
+      _data.push({
+        series: 0,
+        x: item.from,
+        x_end: item.to,
+        y: item.value,
+        obj: item
+      });
+    }
+    else {
+      _data.push({
+        series: 0,
+        x: item.value,
+        y: item.count,
+        obj: item
+      });
+    }
+  });
+  _datum.push({
+    key: $("#blueprintY option:selected").text(),
+    values: _data
+  });
+  return _datum;
+}
+
+function lineChartDataTransformer(rawDatum) {
+  var _datum = [];
+  var _data = [];
+    $(rawDatum.counts()).each(function (cnt, item) {
+      if (typeof item.from != "undefined") {
+        _data.push({
+          series: 0,
+          x: item.from,
+          x_end: item.to,
+          y: item.value,
+          obj: item
+        });
+      }
+      else {
+        _data.push({
+          series: 0,
+          x: item.value,
+          y: item.count,
+          obj: item
+        });
+      }
+    });
+    _datum.push({
+      key: $("#blueprintY option:selected").text(),
+      values: _data
+    });
+  return _datum;
+}
+
 
 </script>
 
