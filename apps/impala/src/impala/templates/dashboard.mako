@@ -223,7 +223,8 @@ ${ dashboard.layout_skeleton() }
     <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }} ">
       <div>
         <a href="javascript: void(0)">
-          <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+          <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+          (<span data-bind="text: $data.count, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>)
           <i class="fa fa-times" data-bind="visible: $parent.data().length == 1"></i>
         </a>
       </div>
@@ -450,8 +451,8 @@ ${ dashboard.import_charts() }
     $(data.counts()).each(function (cnt, item) {
       var _item = {
         widget_id: data.widget_id,
-        count: parseInt(Math.random()*1000),
-        value: item[0]
+        count: item.count(),
+        value: item.value()
       }
       item.widget_id = data.widget_id;
       _data.push({
@@ -470,8 +471,8 @@ ${ dashboard.import_charts() }
     $(rawDatum.counts()).each(function (cnt, item) {
       var _item = {
         widget_id: rawDatum.widget_id,
-        count: parseInt(Math.random()*1000),
-        value: item[0]
+        count: item.count(),
+        value: item.value()
       }
       item.widget_id = rawDatum.widget_id;
       _data.push({

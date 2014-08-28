@@ -64,12 +64,13 @@ def query(request):
     filters = ''
 
   if 'facet' in request.POST:
-    if request.POST.get('facet') == 'count':
-      template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY %(field)s DESC LIMIT %(limit)s"
-    else:      
-      # select count(*) as top, salary FROM sample_07 group by salary order by top desc limit 10
-      # select count(*) as top, salary/100 FROM sample_07 group by salary/100 order by top desc limit 10      
+    if request.POST.get('facet') == 'count' or True:
+      template = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s"
+    elif request.POST.get('facet') == 'range':
+      template = "SELECT cast(%(field)s / 10000 AS int), COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY cast(%(field)s / 10000 AS int) ORDER BY top DESC LIMIT %(limit)s"    
+    else:            
       template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s"
+    
     facet = json.loads(request.POST['facet'])
     hql = template % {
           'database': database,
@@ -101,7 +102,10 @@ def query(request):
 
   if handle:
     data = db.fetch(handle, rows=100)
-    result['data'] = list(data.rows())
+    if 'facet' in request.POST:
+      result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
+    else:
+      result['data'] = list(data.rows())
     result['cols'] = list(data.cols())
     result['status'] = 0
     db.close(handle)
