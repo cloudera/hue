@@ -41,7 +41,7 @@ def dashboard(request):
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
     'dashboard_json': dashboard.get_json(request.user), 
-    'initial_json': ''
+    'initial_json': json.dumps('')
   })
 
 
@@ -63,28 +63,35 @@ def query(request):
   else:
     filters = ''
 
-  if 'facet' in request.POST: 
+  if 'facet' in request.POST:
+    if request.POST.get('facet') == 'count':
+      template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY %(field)s DESC LIMIT %(limit)s"
+    else:      
+      # select count(*) as top, salary FROM sample_07 group by salary order by top desc limit 10
+      # select count(*) as top, salary/100 FROM sample_07 group by salary/100 order by top desc limit 10      
+      template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s"
     facet = json.loads(request.POST['facet'])
-    hql = "SELECT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s" % {
-        'database': database,
-        'table': table,
-        'limit': facet['properties']['limit'],
-        'field': facet['field'],
-        'filters': (' AND ' + filters) if filters else ''
-    }
+    hql = template % {
+          'database': database,
+          'table': table,
+          'limit': facet['properties']['limit'],
+          'field': facet['field'],
+          'filters': (' AND ' + filters) if filters else ''
+      }
     result['id'] = facet['id']
     result['field'] = facet['field']
     fields = [fq['field'] for fq in fqs]
     result['selected'] = facet['field'] in fields
   else:
     fields = ', '.join(dashboard['resultsetSelectedFields']) if dashboard['resultsetSelectedFields'] else '*'
-    hql = "SELECT %(fields)s FROM %(database)s.%(table)s LIMIT 100" % {
+    hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
         'database': database, 
         'table': table,
         'fields': fields
     }
     if filters:
       hql += ' WHERE ' + filters
+    hql += ' LIMIT 100'
 
   query_server = get_query_server_config(name='impala')
   db = dbms.get(request.user, query_server=query_server)
