@@ -321,6 +321,98 @@ ${ dashboard.layout_skeleton() }
   <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
 </script>
 
+<script type="text/html" id="histogram-widget">
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromResult(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: field" />
+      <input type="text" data-bind="value: properties.limit" />
+    </div>
+
+    <div data-bind="timelineChart: {datum: {counts: data, extraSeries: extraSeries, widget_id: id()}, stacked: $root.collection.getFacetById(id()).properties.stacked(), field: field, transformer: timelineChartDataTransformer,
+      fqs: $root.query.fqs,
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onStateChange: function(state){ $root.collection.getFacetById(id()).properties.stacked(state.stacked); },
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) }}" />
+
+    </div>
+  <!-- /ko -->
+
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
+</script>
+
+<script type="text/html" id="filter-widget">
+  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
+  <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
+    <!-- ko if: $data.type() == 'field' -->
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
+      <strong>${_('value')}</strong>:
+      <span data-bind="text: $data.filter"></span>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: $data.type() == 'range' -->
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
+      <span data-bind="foreach: $data.properties" style="font-weight: normal">
+        <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
+        <br/>
+        <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
+      </span>
+    </div>
+    <!-- /ko -->
+  </div>
+  <div class="clearfix"></div>
+  <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+</script>
+
+
+<script type="text/html" id="map-widget">
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromResult(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: field" />
+      <input type="text" data-bind="value: properties.limit" />
+    </div>
+
+    <div data-bind="mapChart: {data: {counts: data, scope: $root.collection.getFacetById(id()).properties.scope()},
+        transformer: mapChartDataTransformer,
+        maxWidth: 750,
+        isScale: true,
+        onClick: function(d){ viewModel.query.toggleFacet({facet: d, widget_id: $parent.id}) },
+        onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) {widget.isLoading(false)};} }" />
+
+    </div>
+  <!-- /ko -->
+
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
+
+</script>
+
+
+
 
 <link rel="stylesheet" href="/impala/static/css/impala-dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
@@ -418,6 +510,61 @@ ${ dashboard.import_charts() }
       values: _data
     });
     return _datum;
+  }
+
+  function timelineChartDataTransformer(rawDatum) {
+    var _datum = [];
+    var _data = [];
+
+    $(rawDatum.counts).each(function (cnt, item) {
+      _data.push({
+        series: 0,
+        x: new Date(moment(item.from).valueOf()),
+        y: item.value,
+        obj: item
+      });
+    });
+
+    _datum.push({
+      key: rawDatum.label,
+      values: _data
+    });
+
+
+    // If multi query
+    $(rawDatum.extraSeries).each(function (cnt, item) {
+      if (cnt == 0) {
+        _datum = [];
+      }
+      var _data = [];
+      $(item.counts).each(function (cnt, item) {
+        _data.push({
+          series: cnt + 1,
+          x: new Date(moment(item.from).valueOf()),
+          y: item.value,
+          obj: item
+        });
+      });
+
+      _datum.push({
+        key: item.label,
+        values: _data
+      });
+    });
+
+    return _datum;
+  }
+
+  function mapChartDataTransformer(data) {
+    var _data = [];
+    $(data.counts).each(function (cnt, item) {
+      _data.push({
+        label: item.value,
+        value: item.count,
+        obj: item
+      });
+    });
+    return _data;
   }
 
 
