@@ -209,6 +209,10 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="facet-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())">
@@ -216,7 +220,7 @@ ${ dashboard.layout_skeleton() }
       <input type="text" data-bind="value: properties.limit" />
     </div>
   
-    <span data-bind="foreach: data()">
+    <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }} ">
       <div>
         <a href="javascript: void(0)">
           <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
@@ -227,7 +231,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
   
-  <span data-bind="template: { name: 'select-field' }"></span>
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
 </script>
 
 
@@ -336,9 +340,11 @@ ${ dashboard.import_charts() }
   $(document).ready(function(){
     window.setTimeout(function(){
       viewModel.init(function(){
-        getDatabases(function(){
-          getTables();
-        });
+        if (! viewModel.inited()){
+          getDatabases(function(){
+            getTables();
+          });
+        }
       });
     }, 50);
   });

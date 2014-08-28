@@ -197,7 +197,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     self.results_facet = ko.observableArray([]);
     self.results_cols = ko.observableArray([]);
 
-    self.inited = ko.observable(self.dashboard.facets().length > 0);
+    self.inited = ko.observable(self.columns().length > 0);
 
     self.init = function(callback) {
       if (self.inited()){
@@ -269,7 +269,21 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
         }
       });
       return _facet;
-    }   
+    }
+
+    self.getWidgetById = function (widget_id) {
+      var _widget = null;
+      $.each(self.columns(), function (i, col) {
+        $.each(col.rows(), function (j, row) {
+          $.each(row.widgets(), function (z, widget) {
+            if (widget.id() == widget_id){
+              _widget = widget;
+            }
+          });
+        });
+      });
+      return _widget;
+    }
     
     function bareWidgetBuilder(name, type){
       return new Widget({
