@@ -889,6 +889,7 @@ nv.dev = false;
 var lastWindowScrollPosition = 0;
 
 function pieChartDataTransformer(data) {
+  console.log(ko.toJSON(data, null, 2));
   var _data = [];
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;

@@ -201,7 +201,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="select-field">
   <!-- ko ifnot: $root.getFacetFromResult(id()) -->
     <select data-bind="options: $root.dashboard.fieldNames, value: $root.dashboard.selectedNewFacetField"></select>
-    <a href="javascript:void(0)" data-bind="click: $root.dashboard.addFacet">      
+    <a href="javascript:void(0)" data-bind="click: function(){ $root.getWidgetById(id()).isLoading(true); $root.dashboard.addFacet($data);}">
       <i class="fa fa-plus"></i>
     </a>
   <!-- /ko -->  
@@ -236,23 +236,34 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="pie-widget">
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
-    PIE widget
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
       <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
     </div>
   
-    <span data-bind="foreach: data()">
-      <a href="javascript: void(0)">
-        <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
-      </a>
-    </span>
-  </div>
+##    <span data-bind="foreach: data()">
+##      <a href="javascript: void(0)">
+##        <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+##      </a>
+##    </span>
+
+    <div data-bind="pieChart: {data: {counts: data, widget_id: id()}, field: field, fqs: $root.query.fqs,
+        transformer: pieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
+        onComplete: function(){viewModel.getWidgetById(id()).isLoading(false)}}" />
+    </div>
   <!-- /ko -->
 
-  <span data-bind="template: { name: 'select-field' }"></span> 
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
 </script>
 
 
@@ -286,6 +297,25 @@ ${ dashboard.import_charts() }
   var HIVE_AUTOCOMPLETE_BASE_URL = "/impala/api/autocomplete/";
   var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
   var HIVE_AUTOCOMPLETE_USER = "${ user }";
+
+  function pieChartDataTransformer(data) {
+    var _data = [];
+    $(data.counts()).each(function (cnt, item) {
+      var _item = {
+        widget_id: data.widget_id,
+        count: parseInt(Math.random()*1000),
+        value: item[0]
+      }
+      item.widget_id = data.widget_id;
+      _data.push({
+        label: _item.value,
+        value: _item.count,
+        obj: _item
+      });
+    });
+    return _data;
+  }
+
 
   function resetDropdownsCache(){
     $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
