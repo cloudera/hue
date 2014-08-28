@@ -88,7 +88,7 @@ ${ commonheader(None, "impala", user) | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     % if user.is_superuser:
-      <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
+      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></a>
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>      
     % endif
@@ -249,17 +249,45 @@ ${ dashboard.layout_skeleton() }
       <input type="text" data-bind="value: properties.limit" />
     </div>
   
-##    <span data-bind="foreach: data()">
-##      <a href="javascript: void(0)">
-##        <span data-bind="text: $data, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
-##      </a>
-##    </span>
-
     <div data-bind="pieChart: {data: {counts: data, widget_id: id()}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
         onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
         onComplete: function(){viewModel.getWidgetById(id()).isLoading(false)}}" />
+    </div>
+  <!-- /ko -->
+
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
+</script>
+
+<script type="text/html" id="bar-widget">
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromResult(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: field" />
+      <input type="text" data-bind="value: properties.limit" />
+    </div>
+
+    <div data-bind="barChart: {datum: {counts: data, widget_id: id()}, stacked: false, field: field,
+      fqs: $root.query.fqs,
+      transformer: barChartDataTransformer,
+      onStateChange: function(state){ console.log(state); },
+      onClick: function(d) {
+        if (d.obj.field != undefined) {
+          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+        } else {
+          viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+        }
+      },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
+      onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+    />
     </div>
   <!-- /ko -->
 
@@ -315,6 +343,32 @@ ${ dashboard.import_charts() }
     });
     return _data;
   }
+
+  function barChartDataTransformer(rawDatum) {
+  var _datum = [];
+  var _data = [];
+
+  $(rawDatum.counts()).each(function (cnt, item) {
+    var _item = {
+      widget_id: rawDatum.widget_id,
+      count: parseInt(Math.random()*1000),
+      value: item[0]
+    }
+    item.widget_id = rawDatum.widget_id;
+    _data.push({
+      series: 0,
+      x: _item.value,
+      y: _item.count,
+      obj: _item
+    });
+  });
+  _datum.push({
+    key: "LABEL",
+    values: _data
+  });
+  return _datum;
+}
+
 
 
   function resetDropdownsCache(){
