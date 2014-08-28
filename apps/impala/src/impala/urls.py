@@ -21,7 +21,7 @@ from beeswax.urls import urlpatterns as beeswax_urls
 
 
 urlpatterns = patterns('impala.views',
-  url(r'^dashboard$', 'dashboard', name='dashboard'),
+  url(r'^dashboard/$', 'dashboard', name='dashboard'),
   url(r'^dashboard/query', 'query', name='query'),
   
   url(r'^dashboard/new_facet$', 'new_facet', name='new_facet'),

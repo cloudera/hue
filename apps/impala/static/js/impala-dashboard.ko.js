@@ -209,7 +209,7 @@ var Dashboard = function (vm, dashboard) {
 var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_json) {
     var self = this;
 
-    self.isEditing = ko.observable(false);
+    self.isEditing = ko.observable(true);
     self.toggleEditing = function () {
       self.isEditing(! self.isEditing());
     };
@@ -277,7 +277,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_jso
           }          
         })
       .fail(function (xhr, textStatus, errorThrown) {
-    	  $(document).trigger("error", textStatus);
+    	  $(document).trigger("error", errorThrown);
        });
     };
 
