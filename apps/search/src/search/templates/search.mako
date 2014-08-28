@@ -948,6 +948,7 @@ function barChartDataTransformer(rawDatum) {
 }
 
 function lineChartDataTransformer(rawDatum) {
+  console.log(ko.toJSON(rawDatum, null, 2));
   var _datum = [];
   var _data = [];
   $(rawDatum.counts).each(function (cnt, item) {
