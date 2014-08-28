@@ -294,6 +294,33 @@ ${ dashboard.layout_skeleton() }
   <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
 </script>
 
+<script type="text/html" id="line-widget">
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromResult(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: field" />
+      <input type="text" data-bind="value: properties.limit" />
+    </div>
+
+    <div data-bind="lineChart: {datum: {counts: data, widget_id: id()}, field: field,
+      transformer: lineChartDataTransformer,
+      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+    />
+
+    </div>
+  <!-- /ko -->
+
+  <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
+</script>
+
 
 <link rel="stylesheet" href="/impala/static/css/impala-dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
@@ -345,29 +372,53 @@ ${ dashboard.import_charts() }
   }
 
   function barChartDataTransformer(rawDatum) {
-  var _datum = [];
-  var _data = [];
+    var _datum = [];
+    var _data = [];
 
-  $(rawDatum.counts()).each(function (cnt, item) {
-    var _item = {
-      widget_id: rawDatum.widget_id,
-      count: parseInt(Math.random()*1000),
-      value: item[0]
-    }
-    item.widget_id = rawDatum.widget_id;
-    _data.push({
-      series: 0,
-      x: _item.value,
-      y: _item.count,
-      obj: _item
+    $(rawDatum.counts()).each(function (cnt, item) {
+      var _item = {
+        widget_id: rawDatum.widget_id,
+        count: parseInt(Math.random()*1000),
+        value: item[0]
+      }
+      item.widget_id = rawDatum.widget_id;
+      _data.push({
+        series: 0,
+        x: _item.value,
+        y: _item.count,
+        obj: _item
+      });
     });
-  });
-  _datum.push({
-    key: "LABEL",
-    values: _data
-  });
-  return _datum;
-}
+    _datum.push({
+      key: "LABEL",
+      values: _data
+    });
+    return _datum;
+  }
+
+  function lineChartDataTransformer(rawDatum) {
+    var _datum = [];
+    var _data = [];
+    $(rawDatum.counts()).each(function (cnt, item) {
+      var _item = {
+        widget_id: rawDatum.widget_id,
+        count: parseInt(Math.random()*1000),
+        value: item[0]
+      }
+      item.widget_id = rawDatum.widget_id;
+      _data.push({
+        series: 0,
+        x: _item.value,
+        y: _item.count,
+        obj: _item
+      });
+    });
+    _datum.push({
+      key: "LABEL",
+      values: _data
+    });
+    return _datum;
+  }
 
 
 
