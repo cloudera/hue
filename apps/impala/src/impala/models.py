@@ -39,12 +39,8 @@ class Dashboard():
 
   def get_json(self, user):
     _data = self.get_data()
-    
-    query_server = get_query_server_config(name='impala')
-    db = dbms.get(user, query_server=query_server)
-    
-    _table = db.get_table(_data['properties'][0]['database'], _data['properties'][0]['table'])
-    _data['properties'][0]['fields'] = [dict([('name', col.name), ('type', col.type), ('comment', col.comment)]) for col in _table.cols]
+
+    _data['properties'][0]['fields'] = Controller(user).get_fields(_data['properties'][0]['database'], _data['properties'][0]['table'])
     
     return json.dumps(_data)
  
@@ -52,4 +48,16 @@ class Dashboard():
     return json.loads(self.data)
 
     
+class Controller():
+  
+  def __init__(self, user):
+    query_server = get_query_server_config(name='impala')
+    self.db = dbms.get(user, query_server=query_server)      
+      
+  def get_fields(self, database, table):
+        
+    _table = self.db.get_table(database, table)
+    return [dict([('name', col.name), ('type', col.type), ('comment', col.comment)]) for col in _table.cols]    
+        
+        
         

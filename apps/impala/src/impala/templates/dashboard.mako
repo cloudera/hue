@@ -280,7 +280,7 @@ ${ dashboard.import_charts() }
 
 
 <script type="text/javascript">
-  var viewModel = new ImpalaDashboardViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  });
+  var viewModel = new ImpalaDashboardViewModel(${ query_json | n,unicode }, ${ dashboard_json | n,unicode  },  ${ initial_json | n,unicode  });
   ko.applyBindings(viewModel);
 
   var HIVE_AUTOCOMPLETE_BASE_URL = "/impala/api/autocomplete/";
@@ -308,9 +308,9 @@ ${ dashboard.import_charts() }
         $(".chosen-select").trigger("chosen:updated");
       }, 200)
     });
+    
     hac_getDatabases(function (dbs) {
       viewModel.dashboard.updateDropdownDatabases(dbs);
-
       if (typeof callback != "undefined"){
         callback(dbs);
       }
@@ -326,9 +326,7 @@ ${ dashboard.import_charts() }
           disable_search_threshold: 5,
           width: "130px",
           no_results_text: "${_('Oops, no table found!')}"
-          }).change(function () {
-            viewModel.dashboard.properties([{'database': viewModel.dashboard.selectedDropdownDb(), 'table': viewModel.dashboard.selectedDropdownTable()}]);
-          });
+        });
         $(".chosen-select").trigger("chosen:updated");
       }, 200);
       if (typeof callback != "undefined"){

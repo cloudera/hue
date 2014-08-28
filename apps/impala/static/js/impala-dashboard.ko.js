@@ -103,9 +103,22 @@ var Dashboard = function (vm, dashboard) {
 
   self.dropdownDbs = ko.observableArray([]);
   self.selectedDropdownDb = ko.observable("");
+  self.selectedDropdownDb.subscribe(function(value) {
+	self.properties()[0].database(self.selectedDropdownDb());
+	if (self.selectedDropdownDb() && self.selectedDropdownTable()) {
+	  self.updateFields(); 
+	}
+  });  
+
   self.dropdownTables = ko.observableArray([]);
   self.selectedDropdownTable = ko.observable("");
-
+  self.selectedDropdownTable.subscribe(function(value) {
+	self.properties()[0].table(self.selectedDropdownTable());
+	if (self.selectedDropdownDb() && self.selectedDropdownTable()) {
+	  self.updateFields(); 
+	}
+  });
+  
   self.updateDropdownDatabases = function(databases) {
     if (databases) {
       var i = databases.indexOf("_impala_builtins"); // Blacklist of system databases
@@ -118,12 +131,12 @@ var Dashboard = function (vm, dashboard) {
 
   self.fields = ko.computed(function () {
     if (self.properties() != null && self.properties().length > 0 && self.properties()[0].fields != null){
-	    return self.properties()[0].fields();
+	  return self.properties()[0].fields();
     }
     return [];
   });
   self.fieldNames = ko.computed(function () {
-	  return $.map(self.fields(), function (field) { return field.name()});
+	return $.map(self.fields(), function (field) { return field.name() });
   });
 
   self.resultsetShowFieldList = ko.observable(true);
@@ -175,9 +188,25 @@ var Dashboard = function (vm, dashboard) {
     });
     return _facet;
   }   
+  
+  self.updateFields = function(database, table) {
+    $.post("/impala/dashboard/get_fields", {
+    	"database": self.properties()[0].database(),
+    	"table": self.properties()[0].table()
+    }, function (data) {
+      if (data.status == 0) {
+        self.properties()[0].fields.removeAll();
+        self.resultsetSelectedFields.removeAll();
+    	$.each(data.fields, function (index, field) {
+    	  self.properties()[0].fields.push(ko.mapping.fromJS(field));
+    	  self.resultsetSelectedFields.push(field.name);
+      	});        
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {});
+  }  
 }
 
-var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
+var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_json) {
     var self = this;
 
     self.isEditing = ko.observable(false);
@@ -192,6 +221,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
 
     self.query = new Query(self, query_json);
     self.dashboard = new Dashboard(self, dashboard_json);
+    self.initial = initial_json;
 
     self.results = ko.observableArray([]);
     self.results_facet = ko.observableArray([]);
@@ -302,5 +332,4 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json) {
     self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget"));
     self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
     self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
-  
 };

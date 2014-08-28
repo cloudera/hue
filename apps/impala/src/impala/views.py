@@ -28,7 +28,8 @@ from desktop.lib.django_util import render
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
-from impala.models import Dashboard
+
+from impala.models import Dashboard, Controller
 
 
 LOG = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ def dashboard(request):
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
     'dashboard_json': dashboard.get_json(request.user), 
+    'initial_json': ''
   })
 
 
@@ -75,8 +77,8 @@ def query(request):
     fields = [fq['field'] for fq in fqs]
     result['selected'] = facet['field'] in fields
   else:
-    fields = ', '.join(dashboard['resultsetSelectedFields'])
-    hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
+    fields = ', '.join(dashboard['resultsetSelectedFields']) if dashboard['resultsetSelectedFields'] else '*'
+    hql = "SELECT %(fields)s FROM %(database)s.%(table)s LIMIT 100" % {
         'database': database, 
         'table': table,
         'fields': fields
@@ -127,18 +129,37 @@ def new_search(request):
 
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
-    'dashboard_json': json.dumps({'layout': [
-              {"size":2,"rows":[],"drops":["temp"],"klass":"card card-home card-column span2"},
-              {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-              "drops":["temp"],"klass":"card card-home card-column span10"}
-         ],
-        'facets': [],
-        'properties': [{'database': 'default', 'table': 'sample_07'}]
-        }),
+    'dashboard_json': json.dumps({
+      'layout': [],
+      'facets': [],
+      'properties': [{'database': '', 'table': '', 'fields': []}]
+      }),
+     'initial_json': json.dumps({
+        'layout': [
+           {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+           {"size":10,"rows":[{"widgets":[
+               {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+               "drops":["temp"],"klass":"card card-home card-column span10"}
+         ]
+     })
   })
 
+
+def get_fields(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    database = request.POST.get('database')
+    table = request.POST.get('table')
+
+    result['message'] = ''
+    result['fields'] = Controller(request.user).get_fields(database, table)
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json") 
 
 
 def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
