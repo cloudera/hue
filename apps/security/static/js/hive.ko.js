@@ -972,7 +972,13 @@ var HiveViewModel = function (initial) {
               var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
               _role = self.assist.roles()[_idx - 1];
             }
-            _role.privileges.push(_create_ko_privilege(item));
+            //_role.privileges.push(_create_ko_privilege(item));
+            var privilege = _create_ko_privilege(item);
+            var privilegeCopy = _create_ko_privilege(item);
+            privilegeCopy.id(privilege.id());
+            _role.privileges.push(privilege);
+            _role.originalPrivileges.push(privilegeCopy);            
+            
             _privileges.push(_create_ko_privilege(item));
           }
         });
