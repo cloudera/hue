@@ -51,10 +51,16 @@ class SolrApi(object):
       self._client.set_kerberos_auth()
     self._root = resource.Resource(self._client)
 
+
   def _get_params(self):
     if self.security_enabled:
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
+
+
+  def _get_q(self, query):
+    q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
+    return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
 
   def query(self, collection, query):
@@ -72,10 +78,8 @@ class SolrApi(object):
     solr_query['rows'] = min(solr_query['rows'], 1000)
     solr_query['start'] = min(solr_query['start'], 10000)
 
-    q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
-
     params = self._get_params() + (
-        ('q', 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')),
+        ('q', self._get_q(query)),
         ('wt', 'json'),
         ('rows', solr_query['rows']),
         ('start', solr_query['start']),
@@ -335,16 +339,35 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def stats(self, core, fields):
+  def stats(self, core, fields, query=None, facet=''):
     try:
       params = self._get_params() + (
-          ('q', EMPTY_QUERY.get()),
+          ('q', self._get_q(query) if query is not None else EMPTY_QUERY.get()),
           ('wt', 'json'),
           ('rows', 0),
           ('stats', 'true'),
       )
+      if facet:
+        params += (('stats.facet', facet),)
+
       params += tuple([('stats.field', field) for field in fields])
       response = self._root.get('%(core)s/select' % {'core': core}, params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def terms(self, core, field, properties=None):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('rows', 0),
+          ('terms.fl', field),
+      )
+      if properties:
+        for key, val in properties.iteritems():
+          params += ((key, val),)
+
+      response = self._root.get('%(core)s/terms' % {'core': core}, params=params)
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))

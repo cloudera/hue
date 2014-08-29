@@ -37,7 +37,8 @@ from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
 from search.management.commands import search_setup
-from search.models import Collection, augment_solr_response, augment_solr_exception
+from search.models import Collection, augment_solr_response, augment_solr_exception,\
+  pairwise2
 from search.search_controller import SearchController
 
 
@@ -315,6 +316,60 @@ def get_document(request):
 
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def get_stats(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    query = json.loads(request.POST.get('query', '{}'))
+    analysis = json.loads(request.POST.get('analysis', '{}'))
+
+    field = analysis['name']
+    facet = analysis['stats']['facet']
+
+    result['stats'] = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [field], query, facet)
+    result['status'] = 0
+    result['message'] = ''
+
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+    if 'not currently supported' in result['message']:
+      result['status'] = 1
+      result['message'] = _('This field does not support stats')
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def get_terms(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    analysis = json.loads(request.POST.get('analysis', '{}'))
+
+    field = analysis['name']
+    properties = {
+      'terms.prefix': analysis['terms']['prefix']
+      # lower
+      # limit
+      # mincount
+      # maxcount
+    }
+
+    result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
+    result['terms'] = pairwise2(field, [], result['terms']['terms'][field])
+    result['status'] = 0
+    result['message'] = ''
+
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+    if 'not currently supported' in result['message']:
+      result['status'] = 1
+      result['message'] = _('This field does not support stats')
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
