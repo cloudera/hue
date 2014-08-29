@@ -385,7 +385,8 @@ ul.errorlist li {
 }
 
 .homeLink,
-.trashLink {
+.trashLink,
+.historyLink {
   font-size: 1.25em;
   line-height: 18px;
 }
