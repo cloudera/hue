@@ -32,7 +32,7 @@ PORT=Config(
   key='port',
   help=_t('Port the sentry service is running on.'),
   type=int,
-  default=10001,
+  default=8038,
 )
 
 SENTRY_CONF_DIR = Config(

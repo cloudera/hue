@@ -53,7 +53,7 @@ ${ layout.menubar(section='hive') }
     <div class="inline-block" style="vertical-align: middle">
       <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); }"><i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i></a>
     </div>
-    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName">
+    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
 
     <div class="inline-block" style="vertical-align: middle">
       <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); }"><i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}"></i></a>
