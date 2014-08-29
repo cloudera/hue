@@ -104,7 +104,7 @@ var Query = function (vm, query) {
   };
 
   self.selectedMultiq.subscribe(function () { // To keep below the computed objects!
-	  vm.search();
+    vm.search();
   });
 
   self.toggleFacet = function (data) {
@@ -195,6 +195,86 @@ var Query = function (vm, query) {
     vm.search();
   };
 };
+
+
+var FieldAnalysis = function (vm, field_name) {
+  var self = this;
+
+  self.name = ko.observable(field_name);
+
+  self.section = ko.observable('terms');
+  self.section.subscribe(function () {
+    self.update();
+  });
+  self.terms = ko.mapping.fromJS({'prefix': '', 'data': []});
+  self.terms.prefix.subscribe(function () {
+  self.getTerms();
+  });
+  self.terms.prefix.extend({rateLimit: {timeout: 2000, method: "notifyWhenChangesStop"}});
+  self.stats = ko.mapping.fromJS({'facet': '', 'data': []});
+  self.stats.facet.subscribe(function () {
+    self.getStats();
+  });
+
+  self.update = function() {
+    if (self.section() == 'stats') {
+      if (self.stats.data().length == 0) {
+        self.getStats();
+      }
+    } else {
+      if (self.terms.data().length == 0) {
+         self.getTerms();
+      }
+    }
+  }
+
+  self.getTerms = function () {
+    self.terms.data.removeAll();
+
+    $.post("/search/get_terms", {
+      collection: ko.mapping.toJSON(vm.collection),
+      analysis: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {  
+        $.each(data.terms, function(key, val) {
+          self.terms.data.push({'key': key, 'val': val});
+        });
+      }
+      else if (data.status == 1) {
+        self.terms.data.push({'key': 'Error', 'val': data.message});
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
+  self.getStats = function () {
+    self.stats.data.removeAll();
+
+    $.post("/search/get_stats", {
+      collection: ko.mapping.toJSON(vm.collection),
+      query: ko.mapping.toJSON(vm.query),
+      analysis: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {  
+        $.each(data.stats.stats.stats_fields[self.name()], function(key, val) {
+          self.stats.data.push({'key': key, 'val': val});
+        });
+      }
+      else if (data.status == 1) {
+        self.stats.data.push({'key': 'Error', 'val': data.message});
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+}
 
 
 var Collection = function (vm, collection) {
@@ -354,13 +434,14 @@ var Collection = function (vm, collection) {
   self.template.fieldsModalFilter = ko.observable(""); // For UI
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
+
   self.template.filteredModalFields = ko.observableArray();
   self.template.filteredAttributeFieldsAll = ko.observable(true);
   self.template.filteredAttributeFields = ko.computed(function() {
     var _fields = [];
 
     var _iterable = self.template.fieldsAttributes();
-    if (!self.template.filteredAttributeFieldsAll()){
+    if (! self.template.filteredAttributeFieldsAll()){
       _iterable = self.template.fields();
     }
 
@@ -448,7 +529,7 @@ var Collection = function (vm, collection) {
     self.template.fieldsSelected.removeAll(_toDelete);
     var bulk = $.grep(currentObservable(), function(field) {
       return (_toDelete.indexOf(field.name()) != -1)
-    });     	
+    });  
     currentObservable.removeAll(bulk);
 
     // New fields
@@ -492,6 +573,7 @@ var Collection = function (vm, collection) {
     } else {
       template_field.sort.direction(null);
     }
+
     $(document).trigger("setResultsHeight");
     vm.search();
   };
@@ -520,7 +602,7 @@ var Collection = function (vm, collection) {
     vm.search();
   };
 
-  self.selectTimelineFacet = function (data) { // alert(ko.mapping.toJSON(data));
+  self.selectTimelineFacet = function (data) {
     var facet = self.getFacetById(data.widget_id);
 
     facet.properties.start(data.from);
@@ -697,6 +779,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.disableGridlayoutResultChevron = function() {
     self.toggledGridlayoutResultChevron(false);
   };
+  self.fieldAnalyses = ko.observableArray([]);
+  self.fieldAnalysesName = ko.observableArray("");
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable([]);
@@ -704,7 +788,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
-    self.isEditing(!self.isEditing());
+    self.isEditing(! self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
 
@@ -898,7 +982,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   }
 
-
   self.getDocument = function (doc) {
     $.post("/search/get_document", {
       collection: ko.mapping.toJSON(self.collection),
@@ -927,6 +1010,32 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
+  self.showFieldAnalysis = function() {
+    if (self.fieldAnalysesName()) {
+      var analyse = self.getFieldAnalysis();
+
+      if (analyse == null) {
+        analyse = new FieldAnalysis(self, self.fieldAnalysesName());
+        self.fieldAnalyses.push(analyse);
+      }
+
+      analyse.update();
+    }
+  }
+
+  self.getFieldAnalysis = function() {
+    var field_name = self.fieldAnalysesName();
+    var _analyse = null;
+
+    $.each(self.fieldAnalyses(), function (index, analyse) {
+      if (analyse.name() == field_name) {
+        _analyse = analyse;
+        return false;
+      }
+    });
+
+    return _analyse;
+  }
 
   self.save = function () {
     $.post("/search/save", {

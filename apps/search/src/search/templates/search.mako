@@ -343,6 +343,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn"></div>
+            <i class="fa fa-question-circle pull-right" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
@@ -563,7 +564,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="resultset-pagination">
 <div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
-    <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+    <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-left" data-bind="
         visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
@@ -587,7 +588,7 @@ ${ dashboard.layout_skeleton() }
   </span>
 
   <a href="javascript: void(0)" title="${ _('Next') }">
-    <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout"></span>
+    <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-arrow-right" data-bind="
         visible: ($root.collection.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
@@ -801,6 +802,31 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 </script>
+
+<script type="text/html" id="analysis-window">
+  <!-- ko if: $root.fieldAnalysesName() -->
+  <div data-bind="with: $root.getFieldAnalysis()">
+    <span data-bind="text: name"></span>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
+      <li><a href="#analysis-stats" role="tab" data-toggle="tab" data-bind="click: function() { section('stats'); }">${ _('Stats') }</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="analysis-terms" data-bind="with: terms">
+        <input type="text" data-bind="value: prefix, valueUpdate:'afterkeydown'" />
+        <span data-bind="text: ko.mapping.toJSON($data)"></span>
+      </div>
+      <div class="tab-pane" id="analysis-stats" data-bind="with: stats">
+        <input type="text" data-bind="value: facet" />
+        <span data-bind="text: ko.mapping.toJSON($data)"></span>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+<div data-bind="template: { name: 'analysis-window' }"></div>
+
 
 <div id="shareModal" class="modal hide" data-backdrop="true">
   <div class="modal-header">

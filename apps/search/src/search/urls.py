@@ -37,6 +37,8 @@ urlpatterns = patterns('search.views',
   url(r'^get_timeline$', 'get_timeline', name='get_timeline'),
   url(r'^get_collection$', 'get_collection', name='get_collection'),
   url(r'^get_collections$', 'get_collections', name='get_collections'),
+  url(r'^get_stats$', 'get_stats', name='get_stats'),
+  url(r'^get_terms$', 'get_terms', name='get_terms'),
 
   # Admin
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
