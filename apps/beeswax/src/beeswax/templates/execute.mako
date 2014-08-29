@@ -1079,6 +1079,10 @@ $(document).ready(function () {
     var _db = viewModel.database();
     if (_db != null) {
       $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
+      // clear all the table fields too
+      $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db).split(" ").forEach(function(item){
+        $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + _db + '_' + item, null);
+      });
       getDatabases(function(){
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
