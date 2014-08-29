@@ -126,4 +126,9 @@ ${ fb_components.menubar() }
   </div>
 </div>
 
+<div class="hoverMsg hide">
+  <p class="hoverText"></p>
+</div>
+
+
 ${ commonfooter(messages) | n,unicode }
