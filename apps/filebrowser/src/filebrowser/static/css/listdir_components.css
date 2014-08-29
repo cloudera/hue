@@ -146,3 +146,30 @@
   height: 4px;
   width: 30%;
 }
+
+.hoverMsg {
+  background: #000;
+  height: 100%;
+  left: 0;
+  opacity: .5;
+  position: fixed;
+  width: 100%;
+  top:0;
+  z-index: 10000;
+}
+
+.hoverText {
+  color: #fff;
+  font-size: 5em;
+  position: relative;
+  text-align: center;
+  top: 45%;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+  -webkit-animation-name: bounceInDown;
+  animation-name: bounceInDown;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
