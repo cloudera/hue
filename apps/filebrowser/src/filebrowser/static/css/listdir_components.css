@@ -147,6 +147,33 @@
   width: 30%;
 }
 
+.history {
+  padding: 0 10px 8px 0;
+  top: 10px;
+}
+
+.history:hover {
+  border-bottom: 2px solid #338bb8;
+}
+
+.history a {
+  color: #737373;
+  text-decoration: none;
+}
+
+.history.no-history:hover {
+  border-bottom: 2px solid transparent;
+}
+
+.history.no-history a {
+  color: #ccc;
+  cursor: default;
+}
+
+.dropdown-menu {
+  left: inherit;
+  right: 0;
+}
 .hoverMsg {
   background: #000;
   height: 100%;

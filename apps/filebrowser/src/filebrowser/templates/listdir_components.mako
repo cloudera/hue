@@ -445,6 +445,34 @@ from django.utils.translation import ugettext as _
 
   <script charset="utf-8">
   (function () {
+    // track hash changes for quick lookup
+    var history = $.totalStorage('history') || [];
+
+    var showHistory = function (num) {
+      //keep last 10 items
+      var num = num || -10,
+        history = $.totalStorage('history').slice(num),
+        frag = $('<ul/>', {
+                  'id': 'hashHistory',
+                  'class': 'dropdown-menu',
+                  'role': 'menu',
+                  'aria-labelledby': 'historyDropdown'
+                });
+
+      $('#hashHistory').remove();
+
+      history.forEach(function (item) {
+        var url = '/filebrowser/#' + item,
+          list = $('<li><a href="' + url + '">' + item + '</a></li>');
+
+        $(list).appendTo(frag);
+      });
+
+      $(frag).appendTo('.history');
+
+      return this;
+    };
+
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {
       $.ajax({
@@ -1124,6 +1152,19 @@ from django.utils.translation import ugettext as _
 
         var _isDraggingOverText = false;
 
+        if (! $.totalStorage('history')) {
+          $('.history').addClass('no-history');
+        }
+
+        $('.historyLink').on('click', function (e) {
+          if($.totalStorage('history')) {
+            showHistory();
+          } else {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+
         $('.card').on('dragenter', function (e) {
           e.preventDefault();
           showHoverMsg("${_('Drop files here to upload')}");
@@ -1488,7 +1529,18 @@ from django.utils.translation import ugettext as _
       $(window).bind("hashchange", function () {
         var targetPath = "";
         var hash = window.location.hash.substring(1);
+
         if (hash != null && hash != "") {
+          // ensure no duplicates are pushed to $.totalStorage()
+          if (history.indexOf(hash) === -1) {
+            history.unshift(hash);
+            $('.history').removeClass('no-history');
+          } else {
+            history.unshift(history.splice(history.indexOf(hash), 1)[0]);
+          }
+
+          $.totalStorage('history', history);
+
           targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}";
           if (hash.indexOf("!!") != 0) {
             targetPath += stripHashes(hash.substring(1));

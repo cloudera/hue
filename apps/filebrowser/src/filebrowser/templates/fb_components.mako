@@ -36,6 +36,13 @@ from django.utils.translation import ugettext as _
             <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
+        <li class="pull-right">
+          <div class="dropdown history">
+            <a href="javascript:void(0)" class="historyLink dropdown-toggle" title="${_('View History')}" data-toggle="dropdown" id="historyDropdown">
+              <i class="fa fa-caret-down"></i> ${_('History')}
+            </a>
+          </div>
+        </li>
         % else:
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
