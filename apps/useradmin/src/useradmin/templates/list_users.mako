@@ -118,6 +118,7 @@ ${layout.menubar(section='users')}
 
   <div id="deleteUser" class="modal hide fade">
     <form id="dropTableForm" action="${ url('useradmin.views.delete_user') }" method="POST">
+      ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
 

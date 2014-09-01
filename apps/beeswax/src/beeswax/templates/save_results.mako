@@ -38,6 +38,7 @@ ${layout.menubar(section='query')}
     <div class="card-body">
       <p>
         <form id="saveForm" action="${action}" method="POST" class="form form-inline">
+          ${ csrf_token(request) | n,unicode }
           <fieldset>
             <div class="control-group">
               <div class="controls">

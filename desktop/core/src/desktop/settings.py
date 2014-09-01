@@ -129,8 +129,9 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'desktop.middleware.AppSpecificMiddleware',
-    'django.middleware.transaction.TransactionMiddleware'
+    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
+    'django.middleware.csrf.CsrfViewMiddleware'
 ]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):

@@ -82,6 +82,7 @@ ${ components.menubar() }
 
 <div id="dropDatabase" class="modal hide fade">
   <form id="dropDatabaseForm" action="${ url('metastore:drop_database') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="dropDatabaseMessage">${_('Confirm action')}</h3>

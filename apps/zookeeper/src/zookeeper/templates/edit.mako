@@ -40,6 +40,7 @@ ${ shared.menubar() }
 ${ shared.header(_breadcrumbs,clusters) }
 
 <form action="" method="POST">
+  ${ csrf_token(request) | n,unicode }
   ${form.as_table()|n}
   <br/>
   <input type="submit" class="btn btn-primary" value="${ _('Save') }">

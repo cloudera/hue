@@ -191,7 +191,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
       <div id="logo"></div>
 
       <form method="POST" action="${action}" class="well">
-
+        ${ csrf_token(request) | n,unicode }
         %if first_login_ever:
           <h3>${_('Create your Hue account')}</h3>
         %else:

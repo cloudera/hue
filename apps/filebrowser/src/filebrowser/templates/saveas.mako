@@ -30,6 +30,7 @@
     % endif
     <div class="saveAsPrompt_popup">
       <form method="post" action="${url('filebrowser.views.save_file')}">
+          ${ csrf_token(request) | n,unicode }
           ${ _('Enter the location where you would like to save the file.') }
           ${edit.render_field(form["path"], notitle=True)}
           <div>${edit.render_field(form["contents"], hidden=True)}</div>

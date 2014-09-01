@@ -73,6 +73,7 @@ ${ layout.metastore_menubar() }
                 <li class="active"><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
                 <form action="${action}" method="POST" class="form-stacked">
+                ${ csrf_token(request) | n,unicode }
                 <div class="hide">
                     ${util.render_form(file_form)}
                     ${util.render_form(delim_form)}

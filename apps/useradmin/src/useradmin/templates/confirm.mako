@@ -21,7 +21,8 @@ ${ commonheader(title, "useradmin", user) | n,unicode }
 <div class="container-fluid">
 	<h1>${_('Confirm')}</h1>
 	<form action="${path}" method="POST">
-		${title}
+	    ${ csrf_token(request) | n,unicode }
+	    ${title}
 		<input type="submit" value="${_('Yes')}">
 	</form>
 </div>

@@ -108,6 +108,7 @@ ${layout.menubar(section='groups')}
 
 <div id="deleteGroup" class="modal hide fade groupModal">
   <form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>

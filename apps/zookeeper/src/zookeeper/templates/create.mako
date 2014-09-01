@@ -39,6 +39,7 @@ ${ shared.menubar() }
 ${ shared.header(_breadcrumbs, clusters) }
 
 <form class="createZnodeForm" action="" method="POST">
+  ${ csrf_token(request) | n,unicode }
   ${form.as_table()|n}
   <br/>
   <br/>

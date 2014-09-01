@@ -691,6 +691,7 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $data.response.numFound > 0 -->
   <span class="pull-right">
     <form method="POST" action="${ url('search:download') }">
+      ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
       <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
       <input type="hidden" name="download">

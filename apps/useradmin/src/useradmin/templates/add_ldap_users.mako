@@ -32,6 +32,7 @@ ${ layout.menubar(section='users') }
     <br/>
 
   <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
+    ${ csrf_token(request) | n,unicode }
     <fieldset>
           % for field in form.fields:
                   % if form[field].is_hidden:

@@ -91,6 +91,7 @@ def is_selected(section, matcher):
 <%def name="uploadAppModal()">
 <div id="uploadAppModal" class="modal hide fade">
   <form class="form-horizontal" id="uploadAppForm" action="${ url('spark:upload_app') }" method="POST" enctype="multipart/form-data">
+  ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3>${_('Upload application')}</h3>

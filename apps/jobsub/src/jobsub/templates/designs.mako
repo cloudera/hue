@@ -210,6 +210,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div id="trashWf" class="modal hide fade">
   <form id="trashWfForm" action="#" method="POST" style="margin:0">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
@@ -223,6 +224,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div id="destroyWf" class="modal hide fade">
   <form id="destroyWfForm" action="#" method="POST" style="margin:0">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="destroyWfMessage">${_('Delete selected designs?')}</h3>
@@ -236,6 +238,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div id="purgeWf" class="modal hide fade">
   <form id="purgeWfForm" action="#" method="POST" style="margin:0">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
@@ -249,6 +252,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div id="restoreWf" class="modal hide fade">
   <form id="restoreWfForm" action="#" method="POST" style="margin:0">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="restoreWfMessage">${_('Restore selected designs?')}</h3>

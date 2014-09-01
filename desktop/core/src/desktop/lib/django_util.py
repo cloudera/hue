@@ -25,6 +25,7 @@ import datetime
 
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ungettext, ugettext
+from django.core.context_processors import csrf
 from django.core import urlresolvers, serializers
 from django.conf import settings
 from django.utils.http import urlencode # this version is unicode-friendly
@@ -135,10 +136,10 @@ def _get_template_lib(template, kwargs):
   return template_lib
 
 
-def _render_to_response(template, *args, **kwargs):
+def _render_to_response(template, request, *args, **kwargs):
   template_lib = _get_template_lib(template, kwargs)
-
   if template_lib == DJANGO:
+    kwargs.update(csrf(request))
     return django_render_to_response(template, *args, **kwargs)
   elif template_lib == MAKO:
     return django_mako.render_to_response(template, *args, **kwargs)
@@ -216,6 +217,7 @@ def render(template, request, data, json=None, template_lib=None, force_template
       return render_json(data, request.GET.get("callback"), status=status)
   else:
     return _render_to_response(template,
+                               request,
                                RequestContext(request=request, dict_=data),
                                template_lib=template_lib,
                                status=status,

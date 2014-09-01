@@ -77,6 +77,7 @@ ${ layout.metastore_menubar() }
         </ul>
 
         <form action="#" method="POST" id="mainForm" class="form-horizontal">
+      ${ csrf_token(request) | n,unicode }
       <div class="steps">
 
         <div id="step1" class="stepDetails">
