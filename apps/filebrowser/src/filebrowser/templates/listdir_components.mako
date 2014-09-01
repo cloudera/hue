@@ -76,10 +76,10 @@ from django.utils.translation import ugettext as _
         </div>
 
         <ul class="inline">
-          <li class="first-page prev" data-bind="css: { 'disabled': page().number === page().start_index }">
+          <li class="first-page prev" data-bind="css: { 'disabled': (page().number === page().start_index || page().num_pages <= 1) }">
             <a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a>
           </li>
-          <li class="previous-page" data-bind="css: { 'disabled': page().number === page().start_index }">
+          <li class="previous-page" data-bind="css: { 'disabled': (page().number === page().start_index || page().num_pages <= 1) }">
             <a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a>
           </li>
           <li class="next-page" data-bind="css: { 'disabled': page().number === page().num_pages }">
