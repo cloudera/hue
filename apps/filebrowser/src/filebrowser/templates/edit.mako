@@ -46,6 +46,7 @@ ${ fb_components.menubar() }
         <div class="card-body">
           <p>
             <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+              ${ csrf_token(request) | n,unicode }
               % if form.errors:
               <div class="alert-message">
                 % for field in form:
@@ -72,6 +73,7 @@ ${ fb_components.menubar() }
 
 <div id="saveAsModal" class="modal hide fade">
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Save as')}</h3>

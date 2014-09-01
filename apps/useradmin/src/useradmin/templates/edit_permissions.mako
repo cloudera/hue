@@ -45,6 +45,7 @@ ${layout.menubar(section='permissions')}
     <br/>
 
     <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
+      ${ csrf_token(request) | n,unicode }
       <fieldset>
           % for field in form:
           ${render_field(field)}

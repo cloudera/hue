@@ -23,13 +23,17 @@ import os
 import tempfile
 from mako.lookup import TemplateLookup, TemplateCollection
 import django.template
+from django import template
+
+register = template.Library()
 
 ENCODING_ERRORS = 'replace'
 
 # Things to automatically import into all template namespaces
 IMPORTS=[
   "from desktop.lib.django_mako import url",
-  "from django.utils.html import escape"
+  "from django.utils.html import escape",
+  "from desktop.lib.django_mako import csrf_token"
 ]
 
 class DesktopLookup(TemplateCollection):
@@ -81,7 +85,6 @@ class DesktopLookup(TemplateCollection):
 
 lookup = DesktopLookup()
 
-
 def render_to_string_test(template_name, django_context):
   """
   In tests, send a template rendered signal.  This puts
@@ -121,3 +124,13 @@ def url(view_name, *args, **view_args):
   """URL tag for use in templates - like {% url ... %} in django"""
   from django.core.urlresolvers import reverse
   return reverse(view_name, args=args, kwargs=view_args)
+
+
+from django.core.context_processors import csrf
+
+def csrf_token(request):
+  """
+  Returns the rendered common footer
+  """
+  csrf_token = csrf(request)["csrf_token"]
+  return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />",csrf_token)

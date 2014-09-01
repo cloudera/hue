@@ -73,6 +73,7 @@ ${ layout.metastore_menubar() }
                 <li><a id="step3" href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
                 <form id="delimiterForm" action="${action}" method="POST" class="form-horizontal">
+                ${ csrf_token(request) | n,unicode }
                 <div class="hide">
                     ${util.render_form(file_form)}
                     ${comps.field(delim_form['file_type'])}

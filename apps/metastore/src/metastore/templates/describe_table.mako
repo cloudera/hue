@@ -176,6 +176,7 @@ ${ components.menubar() }
 
 <div id="dropTable" class="modal hide fade">
   <form id="dropTableForm" method="POST" action="${ url('metastore:drop_table', database=database) }">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
 

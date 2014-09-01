@@ -47,6 +47,7 @@ ${layout.metastore_menubar()}
       </ul>
 
       <form action="${ url(app_name + ':create_database')}" method="POST" id="mainForm" class="form-horizontal">
+        ${ csrf_token(request) | n,unicode }
         <div class="steps">
           <div id="step1" class="stepDetails">
               <fieldset>

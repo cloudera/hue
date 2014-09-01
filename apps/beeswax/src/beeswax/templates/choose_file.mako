@@ -72,6 +72,7 @@ ${ layout.metastore_menubar() }
                 <li><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
                 <form action="${action}" method="POST" class="form-horizontal">
+                ${ csrf_token(request) | n,unicode }
                 <fieldset>
                     <div class="alert alert-info"><h3>${_('Name Your Table and Choose A File')}</h3></div>
                     <div class="control-group">

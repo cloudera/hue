@@ -193,6 +193,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
     <!-- New Table Modal -->
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
         <h3>${_('Create New Table')}</h3>

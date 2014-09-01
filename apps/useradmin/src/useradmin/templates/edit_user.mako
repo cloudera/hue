@@ -33,6 +33,7 @@ ${ layout.menubar(section='users') }
 
     <br/>
     <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
+    ${ csrf_token(request) | n,unicode }
     <div id="properties" class="section">
       <ul class="nav nav-tabs" style="margin-bottom: 0">
         <li class="active">

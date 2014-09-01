@@ -76,6 +76,7 @@ ${ common.navbar('contexts') }
 
 <div id="deleteContext" class="modal hide fade">
   <form id="deleteContextForm" action="${ url('spark:delete_contexts') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>

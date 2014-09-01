@@ -67,6 +67,7 @@ ${layout.menubar(section='query')}
         <div class="card-body">
           <div id="advanced-settings">
           <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
+              ${ csrf_token(request) | n,unicode }
               <ul class="nav nav-list" style="border: none; padding: 0;">
                 <li class="nav-header">${_('settings')}</li>
                 <li class="white paramContainer">
@@ -479,6 +480,7 @@ ${layout.menubar(section='query')}
       <div class="card-body">
         <p>
         <form method="POST" action="" class="form-horizontal">
+          ${ csrf_token(request) | n,unicode }
           <fieldset>
             <!-- ko foreach: $root.design.parameters -->
             <div class="control-group">
@@ -510,6 +512,7 @@ ${layout.menubar(section='query')}
         <p>
 
         <form method="POST" action="" class="form-horizontal">
+          ${ csrf_token(request) | n,unicode }
           <fieldset>
             <!-- ko foreach: $root.design.parameters -->
             <div class="control-group">
@@ -624,6 +627,7 @@ ${layout.menubar(section='query')}
       <h4 data-bind="text: $root.design.results.save.targetDirectoryError()"></h4>
     <!-- /ko -->
     <form id="saveResultsForm" method="POST" class="form form-inline">
+      ${ csrf_token(request) | n,unicode }
       <fieldset>
         <div data-bind="css: {'error': $root.design.results.save.targetFileError()}" class="control-group">
           <div class="controls">

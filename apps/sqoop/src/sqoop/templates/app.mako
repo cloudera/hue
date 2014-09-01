@@ -122,6 +122,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
       <div class="sidebar-nav span2" data-bind="visible: $root.job().persisted">
         <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
+          ${ csrf_token(request) | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
@@ -193,6 +194,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
           </ul>
 
           <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
+            ${ csrf_token(request) | n,unicode }
             <div class="alert alert-info"><h3 data-bind="text: description"></h3></div>
             <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
             </div>
@@ -240,6 +242,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     <div id="connection-editor" class="row-fluid section hide" data-bind="with: editConnection">
       <div id="connection-forms" class="span12">
         <form method="POST" class="form form-horizontal noPadding">
+          ${ csrf_token(request) | n,unicode }
           <div class="control-group">
             <label class="control-label">${ _('Name') }</label>
             <div class="controls">

@@ -30,6 +30,7 @@ ${ commonheader(_('File Operation'), 'filebrowser', user) | n,unicode }
 <div class="container-fluid">
 <div class="well">
 <form action="" method="POST" enctype="multipart/form-data" class="form-stacked">
+${ csrf_token(request) | n,unicode }
 <h1>${form.op}</h1>
 % if isinstance(form, forms.Form):
 	${form.as_p()|n}

@@ -23,6 +23,7 @@
 
 
 <form action="${ action }" method="POST">
+  ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3>${ _('Select coordinators to rerun') }</h3>

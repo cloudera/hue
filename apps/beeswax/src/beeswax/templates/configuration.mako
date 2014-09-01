@@ -30,6 +30,7 @@ ${layout.menubar(section='configuration')}
     <div class="card-body">
       <p>
         <form class="form-search" method="POST">
+          ${ csrf_token(request) | n,unicode }
           <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc.')}">
           <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
         </form>
