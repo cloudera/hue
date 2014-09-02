@@ -85,13 +85,13 @@ SSL_CIPHER_LIST = Config(
 
 LDAP_PASSWORD = Config(
   key="ldap_password",
-  help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2."),
+  help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default=None)
 
 LDAP_USERNAME = Config(
   key="ldap_username",
-  help=_("LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2."),
+  help=_("LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default="hue")
 
