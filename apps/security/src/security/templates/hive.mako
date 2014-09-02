@@ -312,7 +312,7 @@ ${ layout.menubar(section='hive') }
     <div class="row-fluid">
       <div class="span6">
         <h4>${ _('Name') }</h4>
-        <input id="createRoleName" type="text" class="input-xlarge" data-bind="value: $data.name, valueUpdate: 'afterkeydown', visible: ! $data.isEditing()" placeholder="${ _('Required') }" style="width: 360px" />
+        <input id="createRoleName" type="text" class="input-xlarge" data-bind="value: $data.name, visible: ! $data.isEditing()" placeholder="${ _('Required') }" style="width: 360px" />
         <strong data-bind="text: $data.name, visible: $data.isEditing()"></strong>
       </div>
       <div class="span6">
