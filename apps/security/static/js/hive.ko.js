@@ -227,7 +227,7 @@ var Role = function (vm, role) {
         var role = new Role(vm, data.role);
         vm.roles.unshift(role);
         vm.assist.refreshTree();
-        vm.list_sentry_privileges_by_role(role); // Show privileges        
+        vm.list_sentry_privileges_by_role(role); // Show privileges
       } else {
         $(document).trigger("error", data.message);
       }
