@@ -1516,14 +1516,14 @@ from django.utils.translation import ugettext as _
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 
-      $(".actionbarGhost").height($(".actionbar").outerHeight() + 20);
+      $(".actionbarGhost").height($(".actionbar").outerHeight());
 
       resetActionbar();
 
       $(window).scroll(function () {
-        if ($(window).scrollTop() > 95) {
+        if ($(window).scrollTop() > 20) {
           $(".actionbar").width($(".actionbar").data("originalWidth"));
-          $(".actionbar").css("position", "fixed").css("top", "73px");
+          $(".actionbar").css("position", "fixed").css("top", "73px").css("zIndex", "1001");
           $(".actionbarGhost").removeClass("hide");
         } else {
           resetActionbar();
