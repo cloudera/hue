@@ -225,7 +225,7 @@ var Role = function (vm, role) {
         self.reset();
         $(document).trigger("created.role");
         var role = new Role(vm, data.role);
-        vm.roles.unshift(role);
+        vm.originalRoles.unshift(role);
         vm.assist.refreshTree();
         vm.list_sentry_privileges_by_role(role); // Show privileges
       } else {
@@ -262,7 +262,7 @@ var Role = function (vm, role) {
       roleName: role.name
     }, function (data) {
       if (data.status == 0) {
-        vm.removeRole(role.name);
+        vm.removeRole(role.name());
         vm.assist.refreshTree();
       } else {
         $(document).trigger("error", data.message);
@@ -834,8 +834,14 @@ var HiveViewModel = function (initial) {
 
   self.removeRole = function (roleName) {
     $.each(self.roles(), function (index, role) {
-      if (role.name == roleName) {
+      if (role.name() == roleName) {
         self.roles.remove(role);
+        return false;
+      }
+    });
+    $.each(self.originalRoles(), function (index, role) {
+      if (role.name() == roleName) {
+        self.originalRoles.remove(role);
         return false;
       }
     });
