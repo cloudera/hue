@@ -359,9 +359,9 @@ def listdir_paged(request, path):
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
     do_as = None
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security"):
       do_as = request.GET.get('doas', request.user.username)
-    if request.user.is_superuser and hasattr(request, 'doas'):
+    if hasattr(request, 'doas'):
       do_as = request.doas
 
     home_dir_path = request.user.get_home_directory()

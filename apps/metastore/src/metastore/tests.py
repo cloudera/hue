@@ -28,8 +28,7 @@ from django.core.urlresolvers import reverse
 import hadoop
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
-from useradmin.models import HuePermission, GroupPermission,\
-  group_has_permission
+from useradmin.models import HuePermission, GroupPermission, group_has_permission
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.views import collapse_whitespace

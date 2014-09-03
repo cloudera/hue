@@ -138,6 +138,7 @@ ${ layout.menubar(section='hive') }
                 <div class="clearfix"></div>
                 <div class="tree-toolbar">
                   <div class="pull-right">
+                    % if has_impersonation_perm:
                     <div class="dropdown inline-block" style="margin-right: 6px">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-eye-slash" data-bind="visible: $root.assist.isDiffMode"></i>
@@ -155,6 +156,7 @@ ${ layout.menubar(section='hive') }
                       </ul>
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    % endif
                     <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <div>
