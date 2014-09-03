@@ -214,7 +214,7 @@ def list_sentry_privileges_by_authorizable(request):
         privilege['roleName'] = role['name']
         privileges.append(privilege)
 
-    result['privileges'] = sorted(roles, key= lambda privileges: privileges['roleName'])
+    result['privileges'] = sorted(privileges, key=lambda privilege: privilege['roleName'])
 
     result['message'] = ''
     result['status'] = 0

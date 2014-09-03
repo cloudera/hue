@@ -23,6 +23,6 @@ MENU_INDEX = 61
 IS_URL_NAMESPACED = True
 
 
-#PERMISSION_ACTIONS = (
-#  ("access_view:security:edit_user", "Access to profile page on User Admin"),
-#)
+PERMISSION_ACTIONS = (
+  ("impersonate", "Let a user impersonate another user when listing objects like files or tables."),
+)

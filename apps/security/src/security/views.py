@@ -18,12 +18,15 @@
 import json
 
 from desktop.lib.django_util import render
+
 from libsentry.sentry_site import get_hive_sentry_provider
 
 
 def hive(request):
+
   return render("hive.mako", request, {
       'initial': json.dumps({'user': request.user.username, 'sentry_provider': get_hive_sentry_provider()}),
+      'has_impersonation_perm': _has_impersonation_perm(request.user)
   })
 
 
@@ -31,4 +34,9 @@ def hdfs(request):
 
   return render("hdfs.mako", request, {      
       'initial': json.dumps({'user': request.user.username}),
+      'has_impersonation_perm': _has_impersonation_perm(request.user)
   })
+
+
+def _has_impersonation_perm(user):
+  return user.is_superuser or user.has_hue_permission(action="impersonate", app="security")

@@ -411,7 +411,7 @@ from django.utils.translation import ugettext as _
            </li>
          % endif
        % endif
-       % if user.is_superuser and 'security' in apps:
+       % if 'security' in apps:
          <li class="dropdown">
            <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Security')} <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">

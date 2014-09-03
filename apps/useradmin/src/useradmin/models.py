@@ -264,7 +264,8 @@ def update_app_permissions(**kwargs):
       for new_dp in added:
         if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
-           not (new_dp.app == 'hbase' and new_dp.action == 'write'):
+           not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
+           not (new_dp.app == 'security' and new_dp.action == 'impersonate'):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()

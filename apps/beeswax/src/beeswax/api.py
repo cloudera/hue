@@ -82,7 +82,7 @@ def autocomplete(request, database=None, table=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   do_as = request.user
-  if request.user.is_superuser and 'doas' in request.GET:
+  if (request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
     do_as = User.object.get(username=request.GET.get('doas'))
   db = dbms.get(do_as, query_server)
   response = {}
