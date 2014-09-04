@@ -796,6 +796,41 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="filter-widget">
+  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
+  <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
+    <!-- ko if: $data.type() == 'field' -->
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
+      <strong>${_('value')}</strong>:
+      <span data-bind="text: $data.filter"></span>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: $data.type() == 'range' -->
+    <div class="filter-box">
+      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <strong>${_('field')}</strong>:
+      <span data-bind="text: $data.field"></span>
+      <br/>
+      <span data-bind="foreach: $data.properties" style="font-weight: normal">
+        <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
+        <br/>
+        <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
+      </span>
+    </div>
+    <!-- /ko -->
+  </div>
+  <div class="clearfix"></div>
+  <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+</script>
+
+
 <script type="text/html" id="map-widget">
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
@@ -996,7 +1031,6 @@ function barChartDataTransformer(rawDatum) {
 }
 
 function lineChartDataTransformer(rawDatum) {
-  console.log(ko.toJSON(rawDatum, null, 2));
   var _datum = [];
   var _data = [];
   $(rawDatum.counts).each(function (cnt, item) {
@@ -1246,7 +1280,6 @@ $(document).ready(function () {
 
   function widgetDraggedAdditionalHandler(widget) {
     showAddFacetDemiModal(widget);
-    viewModel.search();
   }
 
   var selectedWidget = null;
