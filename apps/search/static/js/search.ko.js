@@ -173,6 +173,7 @@ var Query = function (vm, query) {
   };
 
   self.removeFilter = function (data) {
+	var found = false;
     $.each(self.fqs(), function (index, fq) {
       if (fq.id() == data.id()) {
         self.fqs.remove(fq);
@@ -181,9 +182,11 @@ var Query = function (vm, query) {
         if (rangeWidget != null && RANGE_SELECTABLE_WIDGETS.indexOf(rangeWidget.widgetType()) != -1 && fq.type() == 'range') {
           vm.collection.timeLineZoom({'id': rangeWidget.id()});
         }
+        found = true;
         return false;
       }
     });
+    return found;
   };
 
   self.paginate = function (direction) {
@@ -376,16 +379,16 @@ var Collection = function (vm, collection) {
 
   self.addPivotFacetValue = function(facet) {
     var pivot;
-  
+
     if (typeof facet.properties.facets_form.field == 'string') { // Hackish but we load back properties as simple objects
       pivot = ko.mapping.fromJS({
           'field': facet.properties.facets_form.field,
           'limit': facet.properties.facets_form.limit,
           'mincount': facet.properties.facets_form.mincount,
-      });  
+      });
       facet.properties.facets_form.field = null;
       facet.properties.facets_form.limit = 10;
-      facet.properties.facets_form.mincount = 1;  
+      facet.properties.facets_form.mincount = 1;
     } else {
       pivot = ko.mapping.fromJS({
           'field': facet.properties.facets_form.field(),
@@ -394,7 +397,7 @@ var Collection = function (vm, collection) {
       });
       facet.properties.facets_form.field(null);
       facet.properties.facets_form.limit(10);
-      facet.properties.facets_form.mincount(1);    
+      facet.properties.facets_form.mincount(1);
     }
 
     facet.properties.facets.push(pivot);
@@ -986,8 +989,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id);
-    self.query.removeFilter(widget_json);
+    var refresh = self.query.removeFilter(widget_json);
     self.removeWidgetById(widget_json.id());
+
+    if (refresh) {
+      self.search();
+    }
   }
 
   self.getWidgetById = function (widget_id) {
