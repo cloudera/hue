@@ -163,7 +163,7 @@
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
-        <a href="javascript:void(0)" data-bind="click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
+        <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
     <div class="card-body" style="padding: 5px;">

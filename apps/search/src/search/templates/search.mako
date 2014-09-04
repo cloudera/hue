@@ -1224,7 +1224,6 @@ $(document).ready(function () {
       addFacetDemiModalFieldCancel();
     }
   });
-
 });
 
   function showShareModal() {
