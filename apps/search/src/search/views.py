@@ -432,7 +432,7 @@ def new_facet(request):
     widget_type = request.POST['widget_type']
 
     result['message'] = ''
-    result['facet'] =  _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
+    result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
@@ -451,21 +451,29 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'andUp': False,  # Not used yet
   }
 
-  solr_api = SolrApi(SOLR_URL.get(), user)
-  range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
-
-  if range_properties:
-    facet_type = 'range'
-    properties.update(range_properties)
-  elif widget_type == 'hit-widget':
-    facet_type = 'query'
+  if widget_type == 'tree-widget':
+    facet_type = 'pivot'
   else:
-    facet_type = 'field'
+    solr_api = SolrApi(SOLR_URL.get(), user)
+    range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
+
+    if range_properties:
+      facet_type = 'range'
+      properties.update(range_properties)
+    elif widget_type == 'hit-widget':
+      facet_type = 'query'
+    else:
+      facet_type = 'field'
 
   if widget_type == 'map-widget':
     properties['scope'] = 'world'
     properties['mincount'] = 1
     properties['limit'] = 100
+  elif widget_type == 'tree-widget':
+    properties['mincount'] = 1
+    properties['facets'] = []
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10}
+    properties['graph'] = False
 
   return {
     'id': facet_id,

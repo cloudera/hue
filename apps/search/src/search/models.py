@@ -487,7 +487,20 @@ def augment_solr_response(response, collection, query):
             'count': value,
           }
           normalized_facets.append(facet)
-      # pivot_facet
+      elif category == 'pivot':
+        name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
+        if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
+          count = response['facet_counts']['facet_pivot'][name]
+        else:
+          count = []
+        facet = {
+          'id': facet['id'],
+          'query': name,
+          'type': category,
+          'label': name,
+          'count': count,
+        }
+        normalized_facets.append(facet)
 
   # HTML escaping
   for doc in response['response']['docs']:

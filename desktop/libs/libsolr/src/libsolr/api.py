@@ -91,6 +91,7 @@ class SolrApi(object):
         ('facet.mincount', 0),
         ('facet.limit', 10),
       )
+
       for facet in collection['facets']:
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
@@ -108,7 +109,17 @@ class SolrApi(object):
               ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
               ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
           )
-
+        elif facet['type'] == 'pivot':  
+          if facet['properties']['facets']:
+            fields = facet['field']
+            for f in facet['properties']['facets']:
+              params += (('f.%s.facet.limit' % f['field'], f['limit']),)
+              fields += ',' + f['field']
+            params += (
+                ('facet.pivot', '{!ex=%s}%s' % (fields, fields)),
+                ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
+                ('facet.pivot.mincount', int(facet['properties']['mincount'])),
+            )
     for fq in query['fqs']:
       if fq['type'] == 'field':
         # This does not work if spaces in Solr:
