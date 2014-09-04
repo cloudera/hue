@@ -37,7 +37,7 @@ var Column = function (size, rows) {
   };
   self.addRow = function (row, atBeginning) {
     if (typeof row == "undefined" || row == null) {
-      row = new Row([]);
+      row = new Row([], viewModel); // Hacky but needed when a new row is deleted
     }
     if (typeof atBeginning == "undefined" || atBeginning == null) {
       self.rows.push(row);
