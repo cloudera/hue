@@ -93,7 +93,7 @@ from django.utils.translation import ugettext as _
 
     <p>${_('Show')}
       <select class="input-mini" data-bind="options: recordsPerPageChoices, value: recordsPerPage"></select>
-      ${_('of')} <span data-bind="text: page().total_count"></span> ${_('items')}.
+      ${_('of')} <span data-bind="text: page().total_count"></span> ${_('items')}
     </p>
   </div>
 
@@ -445,13 +445,14 @@ from django.utils.translation import ugettext as _
 
   <script charset="utf-8">
   (function () {
-    // track hash changes for quick lookup
-    var history = $.totalStorage('history') || [];
+    var getHistory = function () {
+      return $.totalStorage('hue_fb_history') || [];
+    };
 
     var showHistory = function (num) {
       //keep last 10 items
       var num = num || -10,
-        history = $.totalStorage('history').slice(num),
+        history = getHistory().slice(num),
         frag = $('<ul/>', {
                   'id': 'hashHistory',
                   'class': 'dropdown-menu',
@@ -468,9 +469,41 @@ from django.utils.translation import ugettext as _
         $(list).appendTo(frag);
       });
 
+      $('<li>', {
+        'class': 'divider'
+      }).appendTo(frag);
+
+      $('<li><a href="javascript:void(0)">${ _("Clear history...") }</a></li>')
+          .appendTo(frag)
+          .on('click', function(){
+            $.totalStorage('hue_fb_history', null);
+            $('.history').addClass('no-history');
+          });
+
       $(frag).appendTo('.history');
 
       return this;
+    };
+
+    var addPathToHistory = function (path) {
+      $('.history').removeClass('no-history');
+      var history = getHistory();
+      if (path != '/filebrowser/') {
+        var _basePath = '${url('filebrowser.views.view', path=urlencode('/'))}';
+        if (path.indexOf(_basePath) > -1) {
+          path = path.substr(_basePath.length - 1);
+        }
+
+        // ensure no duplicates are pushed to $.totalStorage()
+        if (history.indexOf(path) === -1) {
+          history.unshift(path);
+          $('.history').removeClass('no-history');
+        } else {
+          history.unshift(history.splice(history.indexOf(path), 1)[0]);
+        }
+
+        $.totalStorage('hue_fb_history', history);
+      }
     };
 
     // ajax modal windows
@@ -1152,12 +1185,12 @@ from django.utils.translation import ugettext as _
 
         var _isDraggingOverText = false;
 
-        if (! $.totalStorage('history')) {
+        if (getHistory().length == 0) {
           $('.history').addClass('no-history');
         }
 
         $('.historyLink').on('click', function (e) {
-          if($.totalStorage('history')) {
+          if(getHistory().length > 0) {
             showHistory();
           } else {
             e.preventDefault();
@@ -1483,6 +1516,8 @@ from django.utils.translation import ugettext as _
         }
       }
 
+      addPathToHistory(viewModel.targetPath())
+
       viewModel.retrieveData();
 
       $(".search-query").jHueDelayedInput(function(){
@@ -1531,15 +1566,7 @@ from django.utils.translation import ugettext as _
         var hash = window.location.hash.substring(1);
 
         if (hash != null && hash != "") {
-          // ensure no duplicates are pushed to $.totalStorage()
-          if (history.indexOf(hash) === -1) {
-            history.unshift(hash);
-            $('.history').removeClass('no-history');
-          } else {
-            history.unshift(history.splice(history.indexOf(hash), 1)[0]);
-          }
-
-          $.totalStorage('history', history);
+          addPathToHistory(hash);
 
           targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}";
           if (hash.indexOf("!!") != 0) {
