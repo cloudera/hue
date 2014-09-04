@@ -235,7 +235,7 @@ var FieldAnalysis = function (vm, field_name) {
       collection: ko.mapping.toJSON(vm.collection),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
-      if (data.status == 0) {  
+      if (data.status == 0) {
         $.each(data.terms, function(key, val) {
           self.terms.data.push({'key': key, 'val': val});
         });
@@ -259,7 +259,7 @@ var FieldAnalysis = function (vm, field_name) {
       query: ko.mapping.toJSON(vm.query),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
-      if (data.status == 0) {  
+      if (data.status == 0) {
         $.each(data.stats.stats.stats_fields[self.name()], function(key, val) {
           self.stats.data.push({'key': key, 'val': val});
         });
@@ -373,6 +373,39 @@ var Collection = function (vm, collection) {
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
+
+  self.addPivotFacetValue = function(facet) {
+    var pivot;
+  
+    if (typeof facet.properties.facets_form.field == 'string') { // Hackish but we load back properties as simple objects
+      pivot = ko.mapping.fromJS({
+          'field': facet.properties.facets_form.field,
+          'limit': facet.properties.facets_form.limit,
+          'mincount': facet.properties.facets_form.mincount,
+      });  
+      facet.properties.facets_form.field = null;
+      facet.properties.facets_form.limit = 10;
+      facet.properties.facets_form.mincount = 1;  
+    } else {
+      pivot = ko.mapping.fromJS({
+          'field': facet.properties.facets_form.field(),
+          'limit': facet.properties.facets_form.limit(),
+          'mincount': facet.properties.facets_form.mincount(),
+      });
+      facet.properties.facets_form.field(null);
+      facet.properties.facets_form.limit(10);
+      facet.properties.facets_form.mincount(1);    
+    }
+
+    facet.properties.facets.push(pivot);
+    vm.search();
+  }
+
+  self.removePivotFacetValue = function(facet) {
+    facet['pivot_facet'].properties.facets.remove(facet['value']);
+
+    vm.search();
+  }
 
   self.removeFacet = function (widget_id) {
     $.each(self.facets(), function (index, facet) {
@@ -529,7 +562,7 @@ var Collection = function (vm, collection) {
     self.template.fieldsSelected.removeAll(_toDelete);
     var bulk = $.grep(currentObservable(), function(field) {
       return (_toDelete.indexOf(field.name()) != -1)
-    });  
+    });
     currentObservable.removeAll(bulk);
 
     // New fields
@@ -786,7 +819,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.columns = ko.observable([]);
   loadLayout(self, collection_json.layout);
 
-  self.isEditing = ko.observable(false);
+  self.isEditing = ko.observable(true);
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
   };
@@ -811,6 +844,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget"));
   self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
   self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
+  self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });

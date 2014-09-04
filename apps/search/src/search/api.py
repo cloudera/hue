@@ -53,7 +53,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         if widget_type == 'line-widget':
           start, _ = _round_thousand_range(stats_min)
         else:
-          start, _ =  _round_number_range(stats_min)
+          start, _ = _round_number_range(stats_min)
       else:
         start = int(start)
       if end is None:

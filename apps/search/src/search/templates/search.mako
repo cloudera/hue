@@ -162,6 +162,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+                    draggable: {data: draggableTree(), isEnabled: availableDraggableChart,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Tree')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-sitemap fa-rotate-270"></i>
+         </a>
+   </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -212,6 +221,20 @@ ${ dashboard.layout_skeleton() }
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
       </a>
     </div>
+
+    <!-- ko if: type() == 'pivot' -->
+      <select data-bind="options: $root.collection.template.availableWidgetFieldsNames, value: properties.facets_form.field, optionsCaption: ' '"></select>
+      <input type="text" class="input-medium" data-bind="value: properties.facets_form.limit"/>
+      <input type="text" class="input-medium" data-bind="value: properties.facets_form.mincount"/>
+
+      <a href="javascript: void(0)" data-bind="click: $root.collection.addPivotFacetValue">
+        <i class="fa fa-plus"></i>
+      </a>
+
+      ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: properties.limit"/>
+      ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: properties.mincount"/>
+      ${ _('Plot') } <input type="checkbox" data-bind="checked: properties.graph"></span>
+    <!-- /ko -->
 
     <!-- ko if: type() == 'range' -->
       <!-- ko ifnot: properties.isDate() -->
@@ -741,39 +764,37 @@ ${ dashboard.layout_skeleton() }
   </div>
 </script>
 
-<script type="text/html" id="filter-widget">
-  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
-  <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
-    <!-- ko if: $data.type() == 'field' -->
-    <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-      <strong>${_('field')}</strong>:
-      <span data-bind="text: $data.field"></span>
-      <br/>
-      <strong>${_('value')}</strong>:
-      <span data-bind="text: $data.filter"></span>
-    </div>
-    <!-- /ko -->
-    <!-- ko if: $data.type() == 'range' -->
-    <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-      <strong>${_('field')}</strong>:
-      <span data-bind="text: $data.field"></span>
-      <br/>
-      <span data-bind="foreach: $data.properties" style="font-weight: normal">
-        <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
-        <br/>
-        <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
+
+<script type="text/html" id="tree-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
       </span>
     </div>
-    <!-- /ko -->
+
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      ${ _('Cross with') }
+      <div data-bind="foreach: $data.properties.facets">
+        <span data-bind="text: field"></span>
+        ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: limit"/>
+        ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: mincount"/>
+        <a href="javascript: void(0)" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </div>
+    </div>
+
+    <span data-bind="text: ko.mapping.toJSON(count)"></span>
+
   </div>
-  <div class="clearfix"></div>
-  <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
+  <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 </script>
+
 
 <script type="text/html" id="map-widget">
   <!-- ko if: $root.getFacetFromQuery(id()) -->
@@ -802,6 +823,7 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
 </script>
+
 
 <script type="text/html" id="analysis-window">
   <!-- ko if: $root.fieldAnalysesName() -->
