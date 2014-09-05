@@ -223,7 +223,6 @@ class Job(models.Model):
       raise e
 
   def is_editable(self, user):
-    """Only owners or admins can modify a job."""
     return user.is_superuser or self.owner == user or self.doc.get().can_write(user)
 
   @property
