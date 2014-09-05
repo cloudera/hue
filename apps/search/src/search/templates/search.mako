@@ -179,6 +179,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+                    draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableChart,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Marker Map')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-map-marker"></i>
+         </a>
+   </div>
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -688,7 +697,7 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       fqs: $root.query.fqs,
       transformer: barChartDataTransformer,
-      onStateChange: function(state){ console.log(state); },
+      onStateChange: function(state){ },
       onClick: function(d) {
         if (d.obj.field != undefined) {
           viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
@@ -859,7 +868,6 @@ ${ dashboard.layout_skeleton() }
   </div>
 </script>
 
-
 <script type="text/html" id="analysis-window">
   <!-- ko if: $root.fieldAnalysesName() -->
   <div data-bind="with: $root.getFieldAnalysis()">
@@ -943,6 +951,24 @@ ${ dashboard.layout_skeleton() }
       </tr>
     </tbody>
   </table>
+</script>
+
+<script type="text/html" id="leafletmap-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById(id)" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
+    </div>
+    <div data-bind="leafletMapChart: {datum: {counts: counts},
+      transformer: leafletMapChartDataTransformer,
+      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }" />
+  </div>
+  <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
 </script>
 
 <div id="shareModal" class="modal hide" data-backdrop="true">
@@ -1184,6 +1210,22 @@ function mapChartDataTransformer(data) {
   });
   return _data;
 }
+
+function leafletMapChartDataTransformer(data) {
+  var _data = [];
+  _data.push({lat: 33.305606842041016, lng: -111.978759765625});
+  _data.push({lat: 33.4143447876, lng: -111.913032532});
+  _data.push({lat: 33.5229454041, lng: -111.90788269});
+  _data.push({lat: 33.3910255432, lng: -111.68447876});
+  _data.push({lat: 33.3907928467, lng: -112.012504578});
+  _data.push({lat: 33.4691314697, lng: -112.04750824});
+  _data.push({lat: 33.4347496033, lng: -112.006439209});
+  _data.push({lat: 33.5096054077, lng: -112.025741577});
+  _data.push({lat: 33.4495391846, lng: -112.065666199});
+  _data.push({lat: 33.4248809814, lng: -111.940200806});
+  return _data;
+}
+
 
 function toggleDocDetails(doc) {
   doc.showDetails(! doc.showDetails());
