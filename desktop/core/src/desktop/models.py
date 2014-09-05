@@ -397,7 +397,8 @@ class Document(models.Model):
     return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
   def can_write(self, user):
-    return user.is_superuser or self.owner == user or user in self.list_permissions('write').users.all()
+    perm = self.list_permissions('write')
+    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
