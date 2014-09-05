@@ -406,6 +406,7 @@ def execute_query(request, design_id=None, query_history_id=None):
     'query': query_history, # Backward
     'query_history': query_history,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
+    'autocomplete_base_url_hive': reverse('beeswax:api_autocomplete_databases', kwargs={}),
     'can_edit_name': design and design.id and not design.is_auto,
     'can_edit': design and design.id and design.doc.get().can_write(request.user),
     'action': action,

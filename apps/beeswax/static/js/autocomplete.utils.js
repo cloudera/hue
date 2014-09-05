@@ -15,16 +15,17 @@
 // limitations under the License.
 
 function hac_jsoncalls(options) {
-  if (typeof HIVE_AUTOCOMPLETE_BASE_URL != "undefined") {
+  if (typeof HIVE_AUTOCOMPLETE_BASE_URL != "undefined" || typeof options.autocompleteBaseURL != "undefined") {
+    var _baseURL = typeof options.autocompleteBaseURL != "undefined" ? options.autocompleteBaseURL : HIVE_AUTOCOMPLETE_BASE_URL;
     if (options.database == null) {
-      $.getJSON(HIVE_AUTOCOMPLETE_BASE_URL, options.onDataReceived);
+      $.getJSON(_baseURL, options.onDataReceived);
     }
     if (options.database != null) {
       if (options.table != null) {
-        $.getJSON(HIVE_AUTOCOMPLETE_BASE_URL + options.database + "/" + options.table, options.onDataReceived);
+        $.getJSON(_baseURL + options.database + "/" + options.table, options.onDataReceived);
       }
       else {
-        $.getJSON(HIVE_AUTOCOMPLETE_BASE_URL + options.database + "/", options.onDataReceived);
+        $.getJSON(_baseURL + options.database + "/", options.onDataReceived);
       }
     }
   }
