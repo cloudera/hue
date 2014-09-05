@@ -153,7 +153,12 @@ ko.bindingHandlers.leafletMapChart = {
       }
     });
 
-    $(element).height($(element).parents(".tab-pane").height() - 100);
+    if ($(element).parents(".tab-pane").length > 0){
+      $(element).height($(element).parents(".tab-pane").height() - 100);
+    }
+    else {
+      $(element).height(300);
+    }
 
     var _map = null;
     if (element._map != null) {
@@ -164,7 +169,7 @@ ko.bindingHandlers.leafletMapChart = {
     if (_lats.length > 0 && _lngs.length > 0) {
       try {
         if (_map == null) {
-          _map = L.map($(element).attr("id"));
+          _map = L.map(element);
           L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributorss'
           }).addTo(_map);
@@ -180,6 +185,9 @@ ko.bindingHandlers.leafletMapChart = {
             }
           }
         });
+        if (_options.onComplete != null) {
+          _options.onComplete();
+        }
       }
       catch (err) {
         $.jHueNotify.error(err.message);
