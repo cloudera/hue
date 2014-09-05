@@ -62,6 +62,12 @@ if (!('filter' in Array.prototype)) {
   };
 }
 
+Array.prototype.diff = function (a) {
+  return this.filter(function (i) {
+    return a.indexOf(i) < 0;
+  });
+};
+
 /*
  * Add utility methods to the HUE object
 */
