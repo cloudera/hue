@@ -37,7 +37,9 @@ _log_client_lock = threading.Lock()
 def get_log_client(log_link):
   global _log_client_queue
   global MAX_HEAP_SIZE
+
   _log_client_lock.acquire()
+
   try:
     components = urlparse.urlsplit(log_link)
     base_url = '%(scheme)s://%(netloc)s' % {
@@ -49,7 +51,7 @@ def get_log_client(log_link):
     # Least Recently Used algorithm.
     client_tuple = next((tup for tup in _log_client_heap if tup[1].base_url == base_url), None)
     if client_tuple is None:
-      client = HttpClient(base_url, LOG)
+      client = HttpClient(base_url, logger=LOG)
       yarn_cluster = cluster.get_cluster_conf_for_job_submission()
       if yarn_cluster.SECURITY_ENABLED.get():
         client.set_kerberos_auth()
