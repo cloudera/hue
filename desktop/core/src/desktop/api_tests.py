@@ -197,6 +197,11 @@ class TestDocModelPermissions():
     response = self.client_not_me.get('/home')
     assert_false(doc_id in json.loads(response.context['json_documents']))
 
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
     # Share by user
     response = self.client.post("/desktop/api/doc/update_permissions", {
       'doc_id': doc.id,
@@ -216,6 +221,11 @@ class TestDocModelPermissions():
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
@@ -240,6 +250,11 @@ class TestDocModelPermissions():
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
@@ -269,6 +284,11 @@ class TestDocModelPermissions():
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
     response = self.client_not_me.get('/home')
@@ -292,6 +312,11 @@ class TestDocModelPermissions():
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
@@ -319,6 +344,11 @@ class TestDocModelPermissions():
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_true(doc.can_write(self.user_not_me))
+
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
     response = self.client_not_me.get('/home')
@@ -342,6 +372,11 @@ class TestDocModelPermissions():
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
@@ -369,6 +404,11 @@ class TestDocModelPermissions():
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_true(doc.can_write(self.user_not_me))
+
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
     response = self.client_not_me.get('/home')
@@ -392,6 +432,11 @@ class TestDocModelPermissions():
     })
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/home')
     assert_true(doc_id in json.loads(response.context['json_documents']))
