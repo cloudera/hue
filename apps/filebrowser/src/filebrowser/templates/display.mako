@@ -436,6 +436,12 @@ ${ fb_components.menubar() }
     if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING && viewModel.mode() == "text") { // enable scrolling
       _fileAreaScrollTimeout = -1;
       $("#fileArea").on("scroll", function () {
+        if (viewModel.compression() === 'gzip') {
+          $("#fileArea").off("scroll");
+          $(document).trigger('warn', "${_('Offsets are not supported with Gzip compression.')}");
+          return false;
+        }
+
         if ($("#fileArea").scrollTop() < 30) {
           viewModel.page(1);
           viewModel.upperPage(viewModel.page());
