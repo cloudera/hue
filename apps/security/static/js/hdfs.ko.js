@@ -92,6 +92,7 @@ var Assist = function (vm, assist) {
         path: "/",
         isDir: true,
         isExpanded: false,
+        isLoaded: false,
         isChecked: false,
         aclBit: false,
         striked: false,
@@ -208,6 +209,7 @@ var Assist = function (vm, assist) {
         aclBit: item.rwx.indexOf('+') != -1,
         striked: item.striked != null,
         isExpanded: false,
+        isLoaded: false,
         isChecked: false,
         rwx: item.rwx,
         isDir: item.type == "dir" || item.isDir == true,
@@ -414,6 +416,7 @@ var Assist = function (vm, assist) {
               self.convertItemToObject(data);
             }
             self.getTreeAdditionalDataForPath(_path).loaded = true;
+            self.updatePathProperty(self.growingTree(), _path, "isLoaded", true);
             if (data.page != null && data.page.number != null) {
               self.updatePathProperty(self.growingTree(), _path, "page", data.page);
             }

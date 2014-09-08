@@ -267,8 +267,8 @@ ${ layout.menubar(section='hdfs') }
 
 
 <%def name="treeIcons()">
-  'fa-folder-open-o': isDir() && nodes().length > 0 && !aclBit(),
-  'fa-folder-open': isDir() && nodes().length > 0 && aclBit(),
+  'fa-folder-open-o': isDir() && (nodes().length > 0 || isLoaded()) && !aclBit(),
+  'fa-folder-open': isDir() && (nodes().length > 0 || isLoaded()) && aclBit(),
   'fa-folder-o': isDir() && nodes().length == 0 && !aclBit(),
   'fa-folder': isDir() && nodes().length == 0 && aclBit(),
   'fa-file-o': !isDir() && !aclBit(),
