@@ -238,11 +238,11 @@ var Role = function (vm, role) {
         $(document).trigger("info", data.message);
         vm.showCreateRole(false);
         self.reset();
-        $(document).trigger("created.role");
         var role = new Role(vm, data.role);
         vm.originalRoles.unshift(role);
         vm.assist.refreshTree();
         vm.refreshExpandedRoles();
+        $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
       }
@@ -260,9 +260,9 @@ var Role = function (vm, role) {
         $(document).trigger("info", data.message);
         vm.showCreateRole(false);
         self.reset();
-        $(document).trigger("updated.role");
         vm.assist.refreshTree();
         vm.refreshExpandedRoles();
+        $(document).trigger("updated.role");
       } else {
         $(document).trigger("error", data.message);
       }
@@ -279,6 +279,7 @@ var Role = function (vm, role) {
       if (data.status == 0) {
         vm.removeRole(role.name());
         vm.assist.refreshTree();
+        $(document).trigger("removed.role");
       } else {
         $(document).trigger("error", data.message);
       }
