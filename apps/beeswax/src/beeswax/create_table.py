@@ -428,7 +428,7 @@ class GzipFileReader(object):
     except IOError:
       return None
     try:
-      return unicode(data, encoding, errors='replace').split('\n')[:IMPORT_PEEK_NLINES]
+      return unicode(data, encoding, errors='replace').splitlines()[:IMPORT_PEEK_NLINES]
     except UnicodeError:
       return None
 
@@ -444,7 +444,7 @@ class TextFileReader(object):
     """readlines(fileobj, encoding) -> list of lines"""
     try:
       data = fileobj.read(IMPORT_PEEK_SIZE)
-      return unicode(data, encoding, errors='replace').split('\n')[:IMPORT_PEEK_NLINES]
+      return unicode(data, encoding, errors='replace').splitlines()[:IMPORT_PEEK_NLINES]
     except UnicodeError:
       return None
 
