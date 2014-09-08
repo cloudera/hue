@@ -724,6 +724,7 @@ var HiveViewModel = function (initial) {
   var self = this;
 
   self.isLoadingPrivileges = ko.observable(false);
+  self.isApplyingBulk = ko.observable(false);
 
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
