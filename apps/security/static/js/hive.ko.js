@@ -142,6 +142,21 @@ var Role = function (vm, role) {
   self.privilegesForViewTo = ko.observable(49);
   self.originalPrivileges = ko.observableArray();
   self.showPrivileges = ko.observable(false);
+  self.showPrivileges.subscribe(function (value) {
+    var _expanded = vm.expandedRoles();
+    if (value) {
+      if (_expanded.indexOf(self.name()) == -1) {
+        _expanded.push(self.name());
+      }
+    }
+    else {
+      if (_expanded.indexOf(self.name()) > -1) {
+        _expanded.splice(_expanded.indexOf(self.name()), 1);
+      }
+    }
+    vm.expandedRoles(_expanded);
+  });
+
   self.showEditGroups = ko.observable(false);
   self.isEditing = ko.observable(false);
 
@@ -227,7 +242,7 @@ var Role = function (vm, role) {
         var role = new Role(vm, data.role);
         vm.originalRoles.unshift(role);
         vm.assist.refreshTree();
-        vm.list_sentry_privileges_by_role(role); // Show privileges
+        vm.refreshExpandedRoles();
       } else {
         $(document).trigger("error", data.message);
       }
@@ -247,7 +262,7 @@ var Role = function (vm, role) {
         self.reset();
         $(document).trigger("updated.role");
         vm.assist.refreshTree();
-        vm.list_sentry_privileges_by_role(role); // Show privileges
+        vm.refreshExpandedRoles();
       } else {
         $(document).trigger("error", data.message);
       }
@@ -278,9 +293,8 @@ var Role = function (vm, role) {
       role: ko.mapping.toJSON(role)
     }, function (data) {
       if (data.status == 0) {
-        vm.list_sentry_roles_by_group();
         vm.list_sentry_privileges_by_authorizable();
-        vm.list_sentry_privileges_by_role(role); // Refresh all role privileges
+        vm.refreshExpandedRoles();
       } else {
         $(document).trigger("error", data.message);
       }
@@ -820,6 +834,8 @@ var HiveViewModel = function (initial) {
     });
   };
 
+  self.expandedRoles = ko.observableArray([]);
+
   self.init = function (path) {
     self.assist.isLoadingTree(true);
     self.fetchUsers();
@@ -870,6 +886,14 @@ var HiveViewModel = function (initial) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+
+  self.refreshExpandedRoles = function () {
+    ko.utils.arrayForEach(self.filteredRoles(), function (r) {
+      if (self.expandedRoles().indexOf(r.name()) > -1){
+        self.list_sentry_privileges_by_role(r);
+      }
+    });
+  }
 
   self.showRole = function (role) {
     $(document).trigger("show.role", role);

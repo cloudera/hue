@@ -104,10 +104,16 @@ ko.bindingHandlers.hivechooser = {
     self.val(valueAccessor()());
     function setPathFromAutocomplete(path){
       self.val(path);
-      self.change();
+      self.blur();
     }
+
+    self.on("blur", function(){
+      valueAccessor()(self.val());
+    });
+
     self.jHueHiveAutocomplete({
       skipColumns: true,
+      showOnFocus: true,
       home: "/",
       onPathChange: function (path) {
         setPathFromAutocomplete(path);
