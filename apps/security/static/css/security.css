@@ -295,3 +295,11 @@ h1.emptyMessage {
 .big-btn:hover .bulk-action-description, .big-btn.selected .bulk-action-description {
   display: block;
 }
+
+.fa-database-open:before {
+  content:"\f1c0"
+}
+
+.fa-database-open {
+  color: #666!important;
+}
