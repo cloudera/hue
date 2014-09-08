@@ -130,6 +130,11 @@ ${ layout.menubar(section='hive') }
         </h1>
 
         <div class="card-body">
+          <div class="row-fluid" data-bind="visible: $root.doAs() != '${ user.username }' && ! $root.assist.isDiffMode()">
+            <div class="span12">
+              <div class="alert"><i class="fa fa-warning"></i> ${ _('You are currently impersonating the user') } <strong data-bind="text: $root.doAs"></strong></div>
+            </div>
+          </div>
           <div class="row-fluid">
             <div class="span6">
               <div class="path-container">
