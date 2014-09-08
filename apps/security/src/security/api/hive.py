@@ -62,7 +62,8 @@ def _to_sentry_privilege(privilege):
       'tableName': privilege['tableName'],
       'URI': privilege['URI'],
       'action': privilege['action'],
-      'createTime': privilege['timestamp']
+      'createTime': privilege['timestamp'],
+      'grantOption': 1 if privilege['grantOption'] else 0,
   }  
 
 
@@ -83,7 +84,8 @@ def _hive_add_privileges(user, role, privileges):
             'scope': privilege.get('privilegeScope'),
             'table': privilege.get('tableName'),
             'URI': privilege.get('URI'),            
-            'server': privilege.get('serverName')
+            'server': privilege.get('serverName'),
+            'grantOption': privilege.get('grantOption') == 1
         })
 
     return _privileges

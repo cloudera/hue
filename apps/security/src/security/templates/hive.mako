@@ -63,7 +63,11 @@ ${ layout.menubar(section='hive') }
     <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
-
+    
+    <div class="inline-block" style="vertical-align: middle">
+      <input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }
+    </div>
+    
     <span class="showAdvancedSpace">&nbsp;&nbsp;</span><a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
@@ -95,11 +99,15 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
     
-    <!-- ko if: URI() -->    
+    <!-- ko if: grantOption() -->
+      <i class="fa fa-link" title="${ _('With grant option') }"></i>
+    <!-- /ko -->
+    
+    <!-- ko if: URI() -->
       <span data-bind="text: URI"></span>
     <!-- /ko -->
     <br/>
-    <span data-bind="text: grantor"></span>    
+    <span data-bind="text: grantor"></span>
   <!-- /ko -->
 </div>
 </script>
