@@ -18,6 +18,23 @@ except:
   fastbinary = None
 
 
+class TSentryGrantOption(object):
+  TRUE = 1
+  FALSE = 0
+  UNSET = -1
+
+  _VALUES_TO_NAMES = {
+    1: "TRUE",
+    0: "FALSE",
+    -1: "UNSET",
+  }
+
+  _NAMES_TO_VALUES = {
+    "TRUE": 1,
+    "FALSE": 0,
+    "UNSET": -1,
+  }
+
 
 class TSentryPrivilege(object):
   """
@@ -30,6 +47,7 @@ class TSentryPrivilege(object):
    - action
    - createTime
    - grantorPrincipal
+   - grantOption
   """
 
   thrift_spec = (
@@ -43,9 +61,10 @@ class TSentryPrivilege(object):
     (7, TType.STRING, 'action', None, "", ), # 7
     (8, TType.I64, 'createTime', None, None, ), # 8
     (9, TType.STRING, 'grantorPrincipal', None, None, ), # 9
+    (10, TType.I32, 'grantOption', None,     0, ), # 10
   )
 
-  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantorPrincipal=None,):
+  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantorPrincipal=None, grantOption=thrift_spec[10][4],):
     self.privilegeScope = privilegeScope
     self.serverName = serverName
     self.dbName = dbName
@@ -54,6 +73,7 @@ class TSentryPrivilege(object):
     self.action = action
     self.createTime = createTime
     self.grantorPrincipal = grantorPrincipal
+    self.grantOption = grantOption
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -104,6 +124,11 @@ class TSentryPrivilege(object):
           self.grantorPrincipal = iprot.readString();
         else:
           iprot.skip(ftype)
+      elif fid == 10:
+        if ftype == TType.I32:
+          self.grantOption = iprot.readI32();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -145,6 +170,10 @@ class TSentryPrivilege(object):
     if self.grantorPrincipal is not None:
       oprot.writeFieldBegin('grantorPrincipal', TType.STRING, 9)
       oprot.writeString(self.grantorPrincipal)
+      oprot.writeFieldEnd()
+    if self.grantOption is not None:
+      oprot.writeFieldBegin('grantOption', TType.I32, 10)
+      oprot.writeI32(self.grantOption)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

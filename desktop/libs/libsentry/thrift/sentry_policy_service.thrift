@@ -22,13 +22,22 @@
 # Thrift Service that the MetaStore is built on
 #
 
-# include "share/fb303/if/fb303.thrift"
+#include "share/fb303/if/fb303.thrift"
 include "sentry_common_service.thrift"
 
 namespace java org.apache.sentry.provider.db.service.thrift
 namespace php sentry.provider.db.service.thrift
 namespace cpp Apache.Sentry.Provider.Db.Service.Thrift
 
+enum TSentryGrantOption {
+  TRUE = 1,
+  FALSE = 0,
+  # UNSET is used for revoke privilege, the component like 'hive'
+  # didn't support getting grant option, so use UNSET is stand
+  # for revoke both privileges with grant option and without grant
+  # option.
+  UNSET = -1
+}
 
 # Represents a Privilege in transport from the client to the server
 struct TSentryPrivilege {
@@ -39,7 +48,8 @@ struct TSentryPrivilege {
 6: optional string URI = "",
 7: required string action = "",
 8: optional i64 createTime, # Set on server side
-9: optional string grantorPrincipal # Set on server side
+9: optional string grantorPrincipal, # Set on server side
+10: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
 }
 
 # TODO can this be deleted? it's not adding value to TAlterSentryRoleAddGroupsRequest
