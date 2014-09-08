@@ -500,6 +500,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $(document).on("created.role", function(){
         $("#createRoleModal").modal("hide");
+        window.setTimeout(function(){
+          viewModel.refreshExpandedRoles();
+        }, 500);
       });
 
       $(document).on("deleted.role", function(){
