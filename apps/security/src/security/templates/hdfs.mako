@@ -206,13 +206,38 @@ ${ layout.menubar(section='hdfs') }
   <div class="modal-body" style="overflow-x: hidden">
 
     <div class="row-fluid">
-      <div class="span6">
+      <div class="span4">
         <h4>${ _('Path selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
           <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
-      <div class="span6">
+      <div class="span8">
+        <div class="row-fluid">
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'add'}, click: function(){$root.assist.bulkAction('add')}">
+              <i class="fa fa-plus"></i><br/><br/>
+              <span>${ _('Add current ACLs to selection') }</span>
+            </div>
+          </div>
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
+              <i class="fa fa-random"></i><br/><br/>
+              <span>${ _('Replace selection with current ACLs') }</span>
+            </div>
+          </div>
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
+              <i class="fa fa-eraser"></i><br/><br/>
+              <span>${ _('Remove all ACLs of selection') }</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-fluid" data-bind="visible: $root.assist.bulkAction() != '' && $root.assist.bulkAction() != 'delete'">
+      <div class="span12">
 
         <h4>${ _('ACLs to apply') }</h4>
 
@@ -230,27 +255,7 @@ ${ layout.menubar(section='hdfs') }
       </div>
     </div>
 
-    <h4>${ _('Choose your action') }</h4>
-    <div class="row-fluid">
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'add'}, click: function(){$root.assist.bulkAction('add')}">
-          <i class="fa fa-plus"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Add current ACLs to selection') }</span>
-        </div>
-      </div>
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
-          <i class="fa fa-random"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Replace selection with current ACLs') }</span>
-        </div>
-      </div>
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'delete'}, click: function(){$root.assist.bulkAction('delete')}">
-          <i class="fa fa-eraser"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Remove all ACLs of selection') }</span>
-        </div>
-      </div>
-    </div>
+
 
   </div>
   <div class="modal-footer">
