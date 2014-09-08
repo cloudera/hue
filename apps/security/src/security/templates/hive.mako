@@ -432,7 +432,7 @@ ${ layout.menubar(section='hive') }
 
 <%def name="treeIcons()">
   'fa-hdd-o': isServer(),
-  'fa-database-open': isDb() && nodes().length > 0,
+  'fa-database-open': isDb() && (nodes().length > 0 || isLoaded()),
   'fa-database': isDb() && nodes().length == 0,
   'fa-table': isTable(),
   'fa-columns': isColumn()

@@ -358,6 +358,7 @@ var Assist = function (vm, initial) {
         isTable: false,
         isColumn: false,
         isExpanded: true,
+        isLoaded: true,
         isChecked: false,
         nodes: []
     }]
@@ -386,6 +387,7 @@ var Assist = function (vm, initial) {
           isTable: false,
           isColumn: false,
           isExpanded: false,
+          isLoaded: false,
           isChecked: false,
           nodes: []
         };
@@ -423,6 +425,7 @@ var Assist = function (vm, initial) {
           isTable: true,
           isColumn: false,
           isExpanded: false,
+          isLoaded: false,
           isChecked: false,
           nodes: []
         };
@@ -466,6 +469,7 @@ var Assist = function (vm, initial) {
           isTable: false,
           isColumn: true,
           isExpanded: false,
+          isLoaded: false,
           isChecked: false,
           nodes: []
         };
@@ -682,6 +686,7 @@ var Assist = function (vm, initial) {
           var _hasCallback = typeof loadCallback != "undefined";
 
           self.getTreeAdditionalDataForPath(_originalPath).loaded = true;
+          self.updatePathProperty(self.growingTree(), _originalPath, "isLoaded", true);
 
           if (data.databases) {
             self.addDatabases(_originalPath, data.databases, _hasCallback);
