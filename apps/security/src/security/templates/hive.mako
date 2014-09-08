@@ -32,12 +32,14 @@ ${ layout.menubar(section='hive') }
     <i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a>
   </div>
   <div data-bind="template: { name: 'privilege', foreach: privilegesForView }"></div>
+  <!-- ko ifnot: $root.isApplyingBulk() -->
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: $root.role().savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
+  <!-- /ko -->
 </script>
 
 
@@ -72,10 +74,12 @@ ${ layout.menubar(section='hive') }
   <!-- /ko -->
 
   <!-- ko ifnot: editing() -->
+    <!-- ko ifnot: $root.isApplyingBulk() -->
     <div class="pull-right">
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
+    <!-- /ko -->
 
     <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span><br/>
         
@@ -168,7 +172,7 @@ ${ layout.menubar(section='hive') }
                       <i class="fa fa-refresh"></i>
                     </a>
                     &nbsp;
-                    <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
+                    <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $root.isApplyingBulk(true); $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
                       <i class="fa fa-copy"></i>
                     </a>
                     &nbsp;
@@ -356,13 +360,39 @@ ${ layout.menubar(section='hive') }
   <div class="modal-body" style="overflow-x: hidden">
 
     <div class="row-fluid">
-      <div class="span6">
+      <div class="span4">
         <h4>${ _('Selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><span class="force-word-break" data-bind="text: path"></span></li>
+          <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span> <i class="fa fa-long-arrow-right muted"></i> <i class="fa fa-table muted"></i> <span data-bind="text: path.split('.')[1]"></span></li>
+          <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span></li>
         </ul>
       </div>
-      <div class="span6">
+      <div class="span8">
+        <div class="row-fluid">
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
+              <i class="fa fa-plus"></i><br/><br/>
+              <span>${ _('Add current privileges to selection') }</span>
+            </div>
+          </div>
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
+              <i class="fa fa-random"></i><br/><br/>
+              <span>${ _('Replace selection with current privileges') }</span>
+            </div>
+          </div>
+          <div class="span4 center">
+            <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
+              <i class="fa fa-eraser"></i><br/><br/>
+              <span>${ _('Delete all privileges of selection') }</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br/>
+    <div class="row-fluid" data-bind="visible: $root.bulkAction() != '' && $root.bulkAction() != 'delete'">
+      <div class="span12">
 
         <h4>${ _('Privileges to apply') }</h4>
 
@@ -370,29 +400,9 @@ ${ layout.menubar(section='hive') }
         <div data-bind="template: { name: 'role', foreach: $root.assist.roles }" class="modal-panel"></div>
 
       </div>
+
     </div>
 
-    <h4>${ _('Choose your action') }</h4>
-    <div class="row-fluid">
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'add'}, click: function(){$root.bulkAction('add')}">
-          <i class="fa fa-plus"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Add current privileges to selection') }</span>
-        </div>
-      </div>
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
-          <i class="fa fa-random"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Replace selection with current privileges') }</span>
-        </div>
-      </div>
-      <div class="span4 center">
-        <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'delete'}, click: function(){$root.bulkAction('delete')}">
-          <i class="fa fa-eraser"></i><br/><br/>
-          <span class="bulk-action-description">${ _('Delete all privileges of selection') }</span>
-        </div>
-      </div>
-    </div>
 
   </div>
   <div class="modal-footer">
@@ -591,6 +601,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $("#bulkActionsModal").modal({
         show: false
+      });
+
+      $("#bulkActionsModal").on("hidden", function(){
+        viewModel.isApplyingBulk(false);
       });
 
       $(document).on("create.typeahead", function(){
