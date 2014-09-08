@@ -390,7 +390,7 @@ from django.utils.translation import ugettext as _
        </li>
        % endif
        % if 'search' in apps:
-         <%! from search.search_controller import SearchController %>
+         <% from search.search_controller import SearchController %>
          <% collections = SearchController(user).get_search_collections() %>
          % if not collections:
            <li>
