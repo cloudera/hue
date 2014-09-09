@@ -125,8 +125,9 @@ class CollectionManagerController(object):
       shutil.rmtree(tmp_path)
 
       if status != 0:
-        LOG.error("Cloud not create instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
-        raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
+        LOG.error("Could not create instance directory.\nOutput: %s\nError: %s" % process.communicate())
+        raise PopupException(_('Could not create instance directory. '
+                               'Check if [indexer] solr_zk_ensemble is correct in Hue config and look at the Solr error logs for more info.'))
 
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
