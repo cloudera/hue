@@ -204,14 +204,14 @@ ${ layout.menubar(section='hive') }
                   <input class="input-medium no-margin" type="text" placeholder="${ _('Search privileges...') }" data-bind="value: privilegeFilter, valueUpdate: 'afterkeydown', visible: $root.assist.privileges().length > 1"> &nbsp;
                   <a data-bind="visible: $root.assist.privileges().length > 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer"><i class="fa fa-plus-circle"></i> ${ _('Add role') }</a>
                 </div>
-                <h4 style="margin-top: 4px">${ _('Privileges') } &nbsp;<i class="fa fa-spinner fa-spin" data-bind="visible: $root.isLoadingPrivileges()"></i></h4>
+                <div data-bind="visible: $root.assist.privileges().length == 0 && $root.isLoadingPrivileges()"><i class="fa fa-spinner fa-spin" data-bind="visible: $root.isLoadingPrivileges()"></i> <em class="muted">${ _('Loading privileges...')}</em></div>
+                <h4 style="margin-top: 4px" data-bind="visible: $root.assist.privileges().length > 0 && ! $root.isLoadingPrivileges()">${ _('Privileges') } &nbsp;</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0 && ! $root.isLoadingPrivileges()">
                   <div class="span10 offset1 center" style="cursor: pointer" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
                     <i class="fa fa-plus-circle waiting"></i>
                     <h1 class="emptyMessage">${ _('No privileges found for the selected item') }<br/><a class="pointer">${ _('Click here to add a new role') }</a></h1>
                   </div>
                 </div>
-                <div data-bind="visible: $root.assist.privileges().length == 0 && $root.isLoadingPrivileges()"><em class="muted">${ _('Loading privileges...')}</em></div>
                 <div data-bind="template: { name: 'role', foreach: $root.assist.roles }"></div>
               </div>
             </div>
@@ -226,12 +226,13 @@ ${ layout.menubar(section='hive') }
         </h1>
 
         <div class="card-body">
-          <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
+          <h1 class="muted" data-bind="visible: $root.isLoadingRoles()"><i class="fa fa-spinner fa-spin"></i></h1>
+          <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles(), click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
             <i class="fa fa-plus-circle waiting"></i>
             <h1 class="emptyMessage">${ _('There are currently no roles defined') }<br/><a class="pointer">${ _('Click here to add') }</a> ${ _('one') }</h1>
           </div>
-          <div class="clearfix" data-bind="visible: $root.roles().length == 0"></div>
-          <div data-bind="visible: $root.roles().length > 0">
+          <div class="clearfix" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles()"></div>
+          <div data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <%actionbar:render>
               <%def name="search()">
                 <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
@@ -248,7 +249,7 @@ ${ layout.menubar(section='hive') }
             </%actionbar:render>
           </div>
 
-          <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0">
+          <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <thead>
               <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
               <th width="2%"></th>

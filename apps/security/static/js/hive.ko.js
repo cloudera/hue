@@ -729,6 +729,7 @@ var Assist = function (vm, initial) {
 var HiveViewModel = function (initial) {
   var self = this;
 
+  self.isLoadingRoles = ko.observable(false);
   self.isLoadingPrivileges = ko.observable(false);
   self.isApplyingBulk = ko.observable(false);
 
@@ -846,14 +847,17 @@ var HiveViewModel = function (initial) {
 
   self.init = function (path) {
     self.assist.isLoadingTree(true);
-    self.fetchUsers();
+    self.isLoadingRoles(true);
     self.assist.path(path);
-    self.list_sentry_roles_by_group();
-    if (path != "") {
-      self.assist.loadParents();
-    } else {
-      self.assist.fetchHivePath();
-    }
+    window.setTimeout(function(){
+      self.fetchUsers();
+      self.list_sentry_roles_by_group();
+      if (path != "") {
+        self.assist.loadParents();
+      } else {
+        self.assist.fetchHivePath();
+      }
+    }, 100);
   };
 
   self.removeRole = function (roleName) {
@@ -872,6 +876,7 @@ var HiveViewModel = function (initial) {
   };
 
   self.list_sentry_roles_by_group = function () {
+    self.isLoadingRoles(true);
     $.ajax({
       type: "POST",
       url: "/security/api/hive/list_sentry_roles_by_group",
@@ -884,10 +889,15 @@ var HiveViewModel = function (initial) {
         }
         else {
           self.roles.removeAll();
+          var _roles = [];
+          var _originalRoles = [];
           $.each(data.roles, function (index, item) {
-            self.roles.push(new Role(self, item));
-            self.originalRoles.push(new Role(self, item));
+            _roles.push(new Role(self, item));
+            _originalRoles.push(new Role(self, item));
           });
+          self.roles(_roles);
+          self.originalRoles(_originalRoles);
+          self.isLoadingRoles(false);
         }
       }
     }).fail(function (xhr, textStatus, errorThrown) {

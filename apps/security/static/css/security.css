@@ -232,6 +232,15 @@ h1.emptyMessage {
   line-height: 60px;
 }
 
+.acl-panel .waiting {
+  font-size: 130px;
+}
+
+.acl-panel h1.emptyMessage {
+  margin-top: 0;
+  line-height: 54px;
+}
+
 .fa-caret {
   padding-top: 2px;
 }
@@ -302,4 +311,9 @@ h1.emptyMessage {
 
 .fa-database-open {
   color: #666!important;
+}
+
+.actionbar-main {
+  padding: 0!important;
+  padding-bottom: 10px!important;
 }
