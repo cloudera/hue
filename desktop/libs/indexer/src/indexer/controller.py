@@ -140,7 +140,7 @@ class CollectionManagerController(object):
                                      'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                    })
         if process.wait() != 0:
-          LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
+          LOG.error("Cloud not delete collection.\nOutput: %s\nError: %s" % process.communicate())
         raise PopupException(_('Could not create collection. Check error logs for more info.'))
     else:
       # Non-solrcloud mode

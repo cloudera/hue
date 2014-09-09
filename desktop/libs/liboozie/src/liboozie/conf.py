@@ -24,7 +24,7 @@ from desktop.lib.conf import Config, coerce_bool, validate_path
 
 OOZIE_URL = Config(
   key='oozie_url',
-  help=_t('URL of Oozie server. This is required for job submission.'),
+  help=_t('URL of Oozie server. This is required for job submission. Empty value disables the config check.'),
   default='http://localhost:11000/oozie',
   type=str)
 
@@ -53,6 +53,7 @@ def get_oozie_status(user):
 
   return status
 
+
 def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
@@ -63,17 +64,18 @@ def config_validator(user):
 
   res = []
 
-  status = get_oozie_status(user)
-  if 'NORMAL' not in status:
-    res.append((status, _('The Oozie server is not available')))
+  if OOZIE_URL.get():
+    status = get_oozie_status(user)
+    if 'NORMAL' not in status:
+      res.append((status, _('The Oozie server is not available')))
 
-  class ConfigMock:
-    def __init__(self, value): self.value = value
-    def get(self): return self.value
-    def get_fully_qualifying_key(self): return self.value
+    class ConfigMock:
+      def __init__(self, value): self.value = value
+      def get(self): return self.value
+      def get_fully_qualifying_key(self): return self.value
 
-  for cluster in get_all_hdfs().values():
-    res.extend(validate_path(ConfigMock('/user/oozie/share/lib'), is_dir=True, fs=cluster,
-                             message=_('Oozie Share Lib not installed in default location.')))
+    for cluster in get_all_hdfs().values():
+      res.extend(validate_path(ConfigMock('/user/oozie/share/lib'), is_dir=True, fs=cluster,
+                               message=_('Oozie Share Lib not installed in default location.')))
 
   return res
