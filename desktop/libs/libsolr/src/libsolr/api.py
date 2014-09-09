@@ -63,6 +63,25 @@ class SolrApi(object):
     return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
 
+  def _get_fq(self, query):
+    params = ()
+
+    for fq in query['fqs']:
+      if fq['type'] == 'field':
+        # This does not work if spaces in Solr:
+        # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
+        f = []
+        for _filter in fq['filter']:
+          if _filter is not None and ' ' in _filter:
+            f.append('%s:"%s"' % (fq['field'], _filter))
+          else:
+            f.append('{!field f=%s}%s' % (fq['field'], _filter))
+        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}' % fq['field'] + ' '.join(f)))),)
+      elif fq['type'] == 'range':
+        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
+
+    return params
+
   def query(self, collection, query):
     solr_query = {}
 
@@ -109,7 +128,7 @@ class SolrApi(object):
               ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
               ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
           )
-        elif facet['type'] == 'pivot':  
+        elif facet['type'] == 'pivot':
           if facet['properties']['facets']:
             fields = facet['field']
             for f in facet['properties']['facets']:
@@ -120,19 +139,8 @@ class SolrApi(object):
                 ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
                 ('facet.pivot.mincount', int(facet['properties']['mincount'])),
             )
-    for fq in query['fqs']:
-      if fq['type'] == 'field':
-        # This does not work if spaces in Solr:
-        # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
-        f = []
-        for _filter in fq['filter']:
-          if _filter is not None and ' ' in _filter:
-            f.append('%s:"%s"' % (fq['field'], _filter))
-          else:
-            f.append('{!field f=%s}%s' % (fq['field'], _filter))
-        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}' % fq['field'] + ' '.join(f)))),)
-      elif fq['type'] == 'range':
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
+
+    params += self._get_fq(query)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []
@@ -358,6 +366,9 @@ class SolrApi(object):
           ('rows', 0),
           ('stats', 'true'),
       )
+
+      params += self._get_fq(query)
+
       if facet:
         params += (('stats.facet', facet),)
 

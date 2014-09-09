@@ -826,7 +826,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.columns = ko.observable([]);
   loadLayout(self, collection_json.layout);
 
-  self.isEditing = ko.observable(true);
+  self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
   };
@@ -920,6 +920,13 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             multiQ: multiQ
           }, function (data) {return data});
       });
+    }
+
+    $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
+      analyse.stats.data.removeAll();
+    });
+    if (self.getFieldAnalysis()) {
+      self.getFieldAnalysis().update();
     }
 
     $.when.apply($, [
