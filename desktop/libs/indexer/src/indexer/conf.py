@@ -21,7 +21,7 @@ from urlparse import urlparse
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config
 
 
 def solrctl():
@@ -60,7 +60,6 @@ CORE_INSTANCE_DIR = Config(
 CONFIG_TEMPLATE_PATH = Config(
   key="config_template_path",
   help=_t("Default template used at collection creation."),
-  private=True,
   type=str,
   default=os.path.join(os.path.dirname(__file__), '..', 'data', 'solrconfigs'))
 

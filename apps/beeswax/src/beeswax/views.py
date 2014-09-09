@@ -305,7 +305,7 @@ def list_query_history(request):
                           Default to "-date".
     auto_query=<bool>   - Show auto generated actions (drop table, read data, etc). Default True
   """
-  DEFAULT_PAGE_SIZE = 30
+  DEFAULT_PAGE_SIZE = 100
   prefix = 'q-'
 
   share_queries = request.user.is_superuser
