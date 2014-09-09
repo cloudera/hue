@@ -571,16 +571,14 @@ class HiveServerClient:
 
 
   def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
-    if operation_handle.hasResultSet:
+    try:
       fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
       res = self.call(self._client.FetchResults, fetch_req)
-    else:
-      res = TFetchResultsResp(results=TRowSet(startRowOffset=0, rows=[], columns=[]))
-
-    if operation_handle.hasResultSet:
       meta_req = TGetResultSetMetadataReq(operationHandle=operation_handle)
       schema = self.call(self._client.GetResultSetMetadata, meta_req)
-    else:
+    except Exception, e:
+      LOG.info('No resultset: %s' % e)
+      res = TFetchResultsResp(results=TRowSet(startRowOffset=0, rows=[], columns=[]))
       schema = None
 
     return res, schema
