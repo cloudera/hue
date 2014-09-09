@@ -205,13 +205,15 @@ var FieldAnalysis = function (vm, field_name) {
 
   self.name = ko.observable(field_name);
 
+  self.isLoading = ko.observable(true);
+
   self.section = ko.observable('terms');
   self.section.subscribe(function () {
     self.update();
   });
   self.terms = ko.mapping.fromJS({'prefix': '', 'data': []});
   self.terms.prefix.subscribe(function () {
-  self.getTerms();
+    self.getTerms();
   });
   self.terms.prefix.extend({rateLimit: {timeout: 2000, method: "notifyWhenChangesStop"}});
   self.stats = ko.mapping.fromJS({'facet': '', 'data': []});
@@ -232,8 +234,8 @@ var FieldAnalysis = function (vm, field_name) {
   }
 
   self.getTerms = function () {
+    self.isLoading(true);
     self.terms.data.removeAll();
-
     $.post("/search/get_terms", {
       collection: ko.mapping.toJSON(vm.collection),
       analysis: ko.mapping.toJSON(self)
@@ -249,6 +251,7 @@ var FieldAnalysis = function (vm, field_name) {
       else {
         $(document).trigger("error", data.message);
       }
+      self.isLoading(false);
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
@@ -256,7 +259,7 @@ var FieldAnalysis = function (vm, field_name) {
 
   self.getStats = function () {
     self.stats.data.removeAll();
-
+    self.isLoading(true);
     $.post("/search/get_stats", {
       collection: ko.mapping.toJSON(vm.collection),
       query: ko.mapping.toJSON(vm.query),
@@ -273,6 +276,7 @@ var FieldAnalysis = function (vm, field_name) {
       else {
         $(document).trigger("error", data.message);
       }
+      self.isLoading(false);
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
@@ -1061,6 +1065,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
 
       analyse.update();
+      $(document).trigger("shown.fieldAnalysis")
     }
   }
 

@@ -366,7 +366,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn"></div>
-            <i class="fa fa-question-circle pull-right" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
+            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
@@ -863,27 +863,83 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="analysis-window">
   <!-- ko if: $root.fieldAnalysesName() -->
   <div data-bind="with: $root.getFieldAnalysis()">
-    <span data-bind="text: name"></span>
+    <div class="pull-right">
+        <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" />
+        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet" />
+    </div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
       <li><a href="#analysis-stats" role="tab" data-toggle="tab" data-bind="click: function() { section('stats'); }">${ _('Stats') }</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="analysis-terms" data-bind="with: terms">
-        <input type="text" data-bind="value: prefix, valueUpdate:'afterkeydown'" />
-        <span data-bind="text: ko.mapping.toJSON($data)"></span>
+        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
+          <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+          <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+        </div>
+        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table-striped">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td data-bind="text: val.value"></td>
+            <td style="width: 40px">
+              <div class="progress"><div class="bar-label" data-bind="text:val.count"></div><div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count)*100) + '%'}"></div></div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
       <div class="tab-pane" id="analysis-stats" data-bind="with: stats">
-        <input type="text" data-bind="value: facet" />
-        <span data-bind="text: ko.mapping.toJSON($data)"></span>
+        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
+          <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+          <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+        </div>
+        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table-striped">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
+            <!-- ko if: key == 'facets' -->
+            <td>
+              <!-- ko if: val[Object.keys(val)[0]] != null -->
+              <table style="width: 100%">
+                <tbody data-bind="foreach: Object.keys(val[Object.keys(val)[0]])">
+                  <tr>
+                    <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
+                    <td data-bind="template: 'stats-facets'"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- ko ifnot: val[Object.keys(val)[0]] != null -->
+              ${ _('Not available') }
+              <!-- /ko -->
+            </td>
+            <!-- /ko -->
+            <!-- ko ifnot: key == 'facets' -->
+            <td data-bind="text: val"></td>
+            <!-- /ko -->
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
   <!-- /ko -->
 </script>
 
-<div data-bind="template: { name: 'analysis-window' }"></div>
-
+<script type="text/html" id="stats-facets">
+  <table style="width: 100%">
+    <tbody data-bind="foreach: Object.keys($parent.val[Object.keys($parent.val)[0]][$data])">
+      <tr>
+        <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
+        <!-- ko ifnot: $data == 'facets' -->
+        <td style="vertical-align: top" data-bind="text: $parents[1].val[Object.keys($parents[1].val)[0]][$parent][$data]"></td>
+        <!-- /ko -->
+      </tr>
+    </tbody>
+  </table>
+</script>
 
 <div id="shareModal" class="modal hide" data-backdrop="true">
   <div class="modal-header">
@@ -936,6 +992,13 @@ ${ dashboard.layout_skeleton() }
     </label>
   </div>
 </div>
+
+<div id="fieldAnalysis" class="popover mega-popover right">
+  <div class="arrow"></div>
+  <h3 class="popover-title" style="text-align: left"><a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysis').hide(); }">&times;</a> ${ _('Micro analysis for') } <strong data-bind="text: $root.fieldAnalysesName"></strong></h3>
+  <div class="popover-content" data-bind="template: { name: 'analysis-window' }" style="text-align: left"></div>
+</div>
+
 
 
 ## Extra code for style and custom JS
@@ -1224,6 +1287,12 @@ $(document).ready(function () {
       addFacetDemiModalFieldCancel();
     }
   });
+
+  $(document).on("shown.fieldAnalysis", function(){
+
+    var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName();}).parent();
+    $("#fieldAnalysis").show().css("top", _fieldElement.position().top - $("#fieldAnalysis").outerHeight()/2 + _fieldElement.outerHeight()/2).css("left", _fieldElement.position().left + _fieldElement.outerWidth());
+  });
 });
 
   function showShareModal() {
@@ -1350,6 +1419,5 @@ $(document).ready(function () {
     }
   }
 </script>
-
 
 ${ commonfooter(messages) | n,unicode }

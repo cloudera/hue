@@ -294,3 +294,36 @@ em {
 .field-selector.hoverable:hover {
   background-color: #DDD;
 }
+
+.mega-popover {
+  max-width: 1200px;
+}
+
+.mega-popover .popover-content {
+  width: 440px;
+  height: 300px;
+}
+
+.mega-popover .tab-pane {
+  height: 240px;
+  overflow-y: scroll;
+}
+
+.mega-popover input[type='text'] {
+  margin: 0;
+  width: 130px;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  min-height: 26px;
+  padding-left: 12px;
+}
+
+.fa.analysis {
+  margin-top: 3px;
+  margin-right: 3px;
+}
+
+.fa.analysis:hover {
+  color: #333;
+}
