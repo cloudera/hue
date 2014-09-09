@@ -18,7 +18,7 @@
 %>
 
 <%def name="render()">
-    <div style="padding: 10px;">
+    <div class="actionbar-main" style="padding: 10px;">
         <div class="pull-right actionbar-creation">
             %if hasattr(caller, "creation"):
                 ${caller.creation()}
