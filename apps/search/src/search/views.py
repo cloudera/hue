@@ -353,6 +353,7 @@ def get_terms(request):
 
     field = analysis['name']
     properties = {
+      'terms.limit': 25,
       'terms.prefix': analysis['terms']['prefix']
       # lower
       # limit

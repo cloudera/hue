@@ -366,7 +366,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn"></div>
-            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
+            <i class="fa fa-question-circle pull-right muted pointer analysis" title="${ _('Click to analyse field') }" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
@@ -864,8 +864,8 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.fieldAnalysesName() -->
   <div data-bind="with: $root.getFieldAnalysis()">
     <div class="pull-right">
-        <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" />
-        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet" />
+        <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
+        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet" placeholder="${ _('Field name...') }"/>
     </div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
@@ -883,7 +883,10 @@ ${ dashboard.layout_skeleton() }
           <tr>
             <td data-bind="text: val.value"></td>
             <td style="width: 40px">
-              <div class="progress"><div class="bar-label" data-bind="text:val.count"></div><div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count)*100) + '%'}"></div></div>
+              <div class="progress">
+                <div class="bar-label" data-bind="text:val.count"></div>
+                <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
+              </div>
             </td>
           </tr>
           </tbody>
@@ -995,7 +998,10 @@ ${ dashboard.layout_skeleton() }
 
 <div id="fieldAnalysis" class="popover mega-popover right">
   <div class="arrow"></div>
-  <h3 class="popover-title" style="text-align: left"><a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysis').hide(); }">&times;</a> ${ _('Micro analysis for') } <strong data-bind="text: $root.fieldAnalysesName"></strong></h3>
+  <h3 class="popover-title" style="text-align: left">
+    <a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysis').hide(); $root.fieldAnalysesName(''); }"><i class="fa fa-times"></i></a>
+    <strong data-bind="text: $root.fieldAnalysesName"></strong> ${ _(' field analysis') }
+  </h3>
   <div class="popover-content" data-bind="template: { name: 'analysis-window' }" style="text-align: left"></div>
 </div>
 
