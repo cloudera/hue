@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from functools import wraps
-
 import itertools
 import json
 import logging
@@ -36,22 +34,6 @@ from utils import fields_from_log, field_values_from_separated_file, get_type_fr
 LOG = logging.getLogger(__name__)
 
 
-def admin_only():
-  """
-  Ensure only admins are allowed.
-  """
-  def decorator(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-      if request.user.is_superuser:
-        return view_func(request, *args, **kwargs)
-      else:
-        raise PopupException(_("Must be a superuser to access this module."))
-    return _wrapped_view
-  return decorator
-
-
-@admin_only()
 def parse_fields(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -106,7 +88,6 @@ def parse_fields(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-@admin_only()
 def collections(request):
   searcher = CollectionManagerController(request.user)
   solr_collections = searcher.get_collections()
@@ -124,7 +105,6 @@ def collections(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@admin_only()
 def collections_create(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -173,7 +153,6 @@ def collections_create(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@admin_only()
 def collections_import(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -202,7 +181,6 @@ def collections_import(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@admin_only()
 def collections_remove(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -229,7 +207,6 @@ def collections_remove(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@admin_only()
 def collections_fields(request, collection):
   if request.method != 'GET':
     raise PopupException(_('GET request required.'))
@@ -246,7 +223,6 @@ def collections_fields(request, collection):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@admin_only()
 def collections_update(request, collection):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -267,7 +243,7 @@ def collections_update(request, collection):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-@admin_only()
+
 def collections_data(request, collection):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
