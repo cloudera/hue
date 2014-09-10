@@ -15,29 +15,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
+from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, validate_thrift_transport
+
 
 HBASE_CLUSTERS = Config(
   key="hbase_clusters",
   default="(Cluster|localhost:9090)",
-  help="Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.",
+  help=_t("Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security."),
   type=str)
 
 TRUNCATE_LIMIT = Config(
   key="truncate_limit",
   default="500",
-  help="Hard limit of rows or columns per row fetched before truncating.",
+  help=_t("Hard limit of rows or columns per row fetched before truncating."),
   type=int)
 
 THRIFT_TRANSPORT = Config(
   key="thrift_transport",
   default="buffered",
-  help="'buffered' is the default of the HBase Thrift Server. " +
+  help=_t("'buffered' is the default of the HBase Thrift Server and supports security. " +
        "'framed' can be used to chunk up responses, " +
-       "which is useful when used in conjunction with the nonblocking server in Thrift.",
+       "which is useful when used in conjunction with the nonblocking server in Thrift."),
   type=str
 )
+
+HBASE_CONF_DIR = Config(
+  key='hbase_conf_dir',
+  help=_t('HBase configuration directory, where hbase-site.xml is located.'),
+  default=os.environ.get("HBASE_CONF_DIR", '/etc/hbase/conf')
+)
+
 
 
 def config_validator(user):

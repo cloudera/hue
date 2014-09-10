@@ -30,6 +30,7 @@ from desktop.lib.exceptions_renderable import PopupException
 
 from hbase.server.hbase_lib import get_thrift_type, get_client_type
 from hbase import conf
+from hbase.hbase_site import get_server_principal, get_server_authentication
 
 LOG = logging.getLogger(__name__)
 
@@ -83,15 +84,29 @@ class HbaseApi(object):
     raise PopupException(_("Cluster by the name of %s does not exist in configuration.") % name)
 
   def connectCluster(self, name):
+    _security = self._get_security()
     target = self.getCluster(name)
     return thrift_util.get_client(get_client_type(),
                                   target['host'],
                                   target['port'],
                                   service_name="Hue HBase Thrift Client for %s" % name,
-                                  kerberos_principal=None,
-                                  use_sasl=False,
+                                  kerberos_principal=_security['kerberos_principal_short_name'],
+                                  use_sasl=_security['use_sasl'],
                                   timeout_seconds=None,
                                   transport=conf.THRIFT_TRANSPORT.get())
+  @classmethod
+  def _get_security(cls):
+    principal = get_server_principal()
+    if principal:
+      kerberos_principal_short_name = principal.split('/', 1)[0]
+    else:
+      kerberos_principal_short_name = None
+    use_sasl = get_server_authentication() == 'KERBEROS'
+
+    return {
+        'kerberos_principal_short_name': kerberos_principal_short_name,
+        'use_sasl': use_sasl,
+    }
 
   def get(self, cluster, tableName, row, column, attributes):
     client = self.connectCluster(cluster)
