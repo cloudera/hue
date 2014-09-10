@@ -403,7 +403,7 @@ from django.utils.translation import ugettext as _
                % for collection in collections:
                <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ collection.icon }" class="app-icon"/> ${ collection.label }</a></li>
                % endfor
-               % if user.is_superuser:
+               % if 'indexer' in apps:
                  <li class="divider"></li>
                  <li><a href="${ url('indexer:collections') }"><i class="fa fa-database"></i> ${ _('Indexes') }</a></li>
                % endif
