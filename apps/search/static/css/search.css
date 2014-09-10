@@ -300,12 +300,12 @@ em {
 }
 
 .mega-popover .popover-content {
-  width: 440px;
-  height: 300px;
+  min-width: 440px;
+  min-height: 360px;
 }
 
 .mega-popover .tab-pane {
-  height: 240px;
+  height: 300px;
   overflow-y: scroll;
 }
 
@@ -326,4 +326,8 @@ em {
 
 .fa.analysis:hover {
   color: #333;
+}
+
+.typeahead {
+  z-index: 10000;
 }

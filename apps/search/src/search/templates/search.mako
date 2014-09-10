@@ -865,7 +865,7 @@ ${ dashboard.layout_skeleton() }
   <div data-bind="with: $root.getFieldAnalysis()">
     <div class="pull-right">
         <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
-        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet" placeholder="${ _('Field name...') }"/>
+        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet, typeahead: { target: stats.facet, source: $root.fieldsAnalysisAttributesNames, triggerOnFocus: true }" placeholder="${ _('Field name...') }"/>
     </div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
@@ -898,6 +898,7 @@ ${ dashboard.layout_skeleton() }
           <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
         </div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
+        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
         <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table-striped">
           <tbody data-bind="foreach: $data.data">
           <tr>
@@ -905,7 +906,7 @@ ${ dashboard.layout_skeleton() }
             <!-- ko if: key == 'facets' -->
             <td>
               <!-- ko if: val[Object.keys(val)[0]] != null -->
-              <table style="width: 100%">
+              <table style="width: 400px">
                 <tbody data-bind="foreach: Object.keys(val[Object.keys(val)[0]])">
                   <tr>
                     <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>

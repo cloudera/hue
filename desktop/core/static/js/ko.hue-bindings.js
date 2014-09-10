@@ -681,3 +681,41 @@ ko.bindingHandlers.tooltip = {
     });
   }
 };
+
+ko.bindingHandlers.typeahead = {
+  init: function (element, valueAccessor) {
+    var binding = this;
+    var elem = $(element);
+    var value = valueAccessor();
+
+    var _options = {
+      source: function () {
+        return ko.utils.unwrapObservable(value.source);
+      },
+      onselect: function (val) {
+        value.target(val);
+      }
+    }
+
+    if (value.triggerOnFocus){
+      _options.minLength =  0;
+    }
+
+    elem.typeahead(_options);
+
+    if (value.triggerOnFocus){
+      elem.on('focus', function(){
+        elem.trigger("keyup");
+      });
+    }
+
+    elem.blur(function () {
+      value.target(elem.val());
+    });
+  },
+  update: function (element, valueAccessor) {
+    var elem = $(element);
+    var value = valueAccessor();
+    elem.val(value.target());
+  }
+};

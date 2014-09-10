@@ -156,6 +156,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/js/jquery.datatables.sorting.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
+  <script src="/static/ext/js/bootstrap-better-typeahead.min.js"></script>
   <script src="/static/ext/js/fileuploader.js"></script>
   <script src="/static/js/popover-extra-placements.js"></script>
 
