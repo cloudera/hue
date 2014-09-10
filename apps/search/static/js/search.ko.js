@@ -217,8 +217,12 @@ var FieldAnalysis = function (vm, field_name) {
   });
   self.terms.prefix.extend({rateLimit: {timeout: 2000, method: "notifyWhenChangesStop"}});
   self.stats = ko.mapping.fromJS({'facet': '', 'data': []});
+
+  var _statsUpdateTimeout = -1;
   self.stats.facet.subscribe(function () {
-    self.getStats();
+    // this is to avoid false positives from typeahead blur
+    window.clearTimeout(_statsUpdateTimeout);
+    _statsUpdateTimeout = window.setTimeout(function(){self.getStats()}, 200);
   });
 
   self.update = function() {
@@ -241,9 +245,11 @@ var FieldAnalysis = function (vm, field_name) {
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
-        $.each(data.terms, function(key, val) {
-          self.terms.data.push({'key': key, 'val': val});
-        });
+        if (data.terms != null) {
+          $.each(data.terms, function (key, val) {
+            self.terms.data.push({'key': key, 'val': val});
+          });
+        }
       }
       else if (data.status == 1) {
         self.terms.data.push({'key': 'Error', 'val': data.message});
@@ -266,9 +272,11 @@ var FieldAnalysis = function (vm, field_name) {
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
-        $.each(data.stats.stats.stats_fields[self.name()], function(key, val) {
-          self.stats.data.push({'key': key, 'val': val});
-        });
+        if (data.stats.stats.stats_fields[self.name()] != null) {
+          $.each(data.stats.stats.stats_fields[self.name()], function (key, val) {
+            self.stats.data.push({'key': key, 'val': val});
+          });
+        }
       }
       else if (data.status == 1) {
         self.stats.data.push({'key': 'Error', 'val': data.message});
@@ -821,6 +829,15 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
   self.fieldAnalyses = ko.observableArray([]);
   self.fieldAnalysesName = ko.observableArray("");
+  self.fieldsAnalysisAttributesNames = ko.computed(function () {
+    var _fields = [];
+    $.each(self.collection.template.fieldsAttributes(), function (index, field) {
+      if (field.name() != self.fieldAnalysesName()){
+        _fields.push(field.name())
+      }
+    });
+    return _fields;
+  });
 
   self.previewColumns = ko.observable("");
   self.columns = ko.observable([]);
