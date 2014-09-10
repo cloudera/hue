@@ -15,14 +15,80 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import json
-import time
-
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+import os
+import shutil
+import tempfile
 
 from nose.tools import assert_true, assert_equal
 
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from hbase.api import HbaseApi
+from hbase.conf import HBASE_CONF_DIR
+from hbase.hbase_site import get_server_authentication, get_server_principal, reset
+
+
+def test_security_plain():
+  tmpdir = tempfile.mkdtemp()
+  finish = HBASE_CONF_DIR.set_for_testing(tmpdir)
+
+  try:
+    xml = hbase_site_xml()
+    file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    reset()
+
+    assert_equal('NOSASL', get_server_authentication())
+    assert_equal('test', get_server_principal())
+
+    security = HbaseApi._get_security()
+
+    assert_equal('test', security['kerberos_principal_short_name'])
+    assert_equal(False, security['use_sasl'])
+  finally:
+    reset()
+    finish()
+    shutil.rmtree(tmpdir)
+
+
+def test_security_kerberos():
+  tmpdir = tempfile.mkdtemp()
+  finish = HBASE_CONF_DIR.set_for_testing(tmpdir)
+
+  try:
+    xml = hbase_site_xml(authentication='kerberos')
+    file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    reset()
+
+    assert_equal('KERBEROS', get_server_authentication())
+    assert_equal('test', get_server_principal())
+
+    security = HbaseApi._get_security()
+
+    assert_equal('test', security['kerberos_principal_short_name'])
+    assert_equal(True, security['use_sasl'])
+  finally:
+    reset()
+    finish()
+    shutil.rmtree(tmpdir)
+
+
+def hbase_site_xml(
+    kerberos_principal='test/test.com@TEST.COM',
+    authentication='NOSASL'):
+
+  return """
+    <configuration>
+
+      <property>
+        <name>hbase.thrift.kerberos.principal</name>
+        <value>%(kerberos_principal)s</value>
+      </property>
+
+      <property>
+        <name>hbase.security.authentication</name>
+        <value>%(authentication)s</value>
+      </property>
+
+    </configuration>
+  """ % {
+    'kerberos_principal': kerberos_principal,
+    'authentication': authentication,
+  }
