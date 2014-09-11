@@ -28,9 +28,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
+    % if 'indexer' in app:
     <a class="btn importBtn" href="${ url('indexer:collections') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
+    % endif
   </div>
   <h4><i class="fa fa-tags"></i> ${_('Dashboards')}</h4>
 </div>
