@@ -376,7 +376,21 @@ def file_search_dirs():
     return [d for d in dirs if os.path.isdir(d)]
 
 def install_setuptools(py_executable, unzip=False):
-    _install_req(py_executable, unzip)
+    try:
+        _install_req(py_executable, unzip)
+    except OSError, e:
+        print """
+        -----------------------------------------------------------------------------------------------------------------
+        If on Ubuntu 14.04 Trusty, you might be hitting https://bugs.launchpad.net/ubuntu/+source/python2.7/+bug/1115466.
+
+        Recommended workaround:
+        sudo ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py /usr/lib/python2.7/
+
+        More information:
+        http://gethue.com/how-to-build-hue-on-ubuntu-14-04-trusty/
+        -----------------------------------------------------------------------------------------------------------------
+        """
+        raise e
 
 def install_distribute(py_executable, unzip=False):
     _install_req(py_executable, unzip, distribute=True)
