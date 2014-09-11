@@ -1128,22 +1128,27 @@ $(document).ready(function () {
 
             _table.data("table", table).attr("id", "navigatorTables_" + table);
             _table.find("a:eq(2)").on("click", function () {
-              _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
-              hac_getTableColumns(viewModel.database(), table, "", function (plain_columns, extended_columns) {
-                _table.find("a:eq(1)").removeClass("hide");
+              if (_table.find("li").length > 0){
                 _table.find("ul").empty();
-                _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
-                $(extended_columns).each(function (iCnt, col) {
-                  var _column = $("<li>");
-                  _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
-                  _column.appendTo(_table.find("ul"));
-                  _column.on("dblclick", function () {
-                    codeMirror.replaceSelection($.trim(col.name) + ', ');
-                    codeMirror.setSelection(codeMirror.getCursor());
-                    codeMirror.focus();
+              }
+              else {
+                _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
+                hac_getTableColumns(viewModel.database(), table, "", function (plain_columns, extended_columns) {
+                  _table.find("a:eq(1)").removeClass("hide");
+                  _table.find("ul").empty();
+                  _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
+                  $(extended_columns).each(function (iCnt, col) {
+                    var _column = $("<li>");
+                    _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
+                    _column.appendTo(_table.find("ul"));
+                    _column.on("dblclick", function () {
+                      codeMirror.replaceSelection($.trim(col.name) + ', ');
+                      codeMirror.setSelection(codeMirror.getCursor());
+                      codeMirror.focus();
+                    });
                   });
                 });
-              });
+              }
             });
             _table.find("a:eq(2)").on("dblclick", function () {
               codeMirror.replaceSelection($.trim(table) + ' ');
