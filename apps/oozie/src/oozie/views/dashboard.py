@@ -668,11 +668,11 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
   actions = []
 
   related_job_ids = []
+  related_job_ids.append('coordinator_job_id=%s' % coordinator_id)
   if oozie_bundle is not None:
     related_job_ids.append('bundle_job_id=%s' %oozie_bundle.id)
 
   for action in coordinator_actions:
-    related_job_ids.append('coordinator_job_id=%s' % coordinator_id)
     massaged_action = {
       'id': action.id,
       'url': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId}) + '?%s' % '&'.join(related_job_ids) or '',
