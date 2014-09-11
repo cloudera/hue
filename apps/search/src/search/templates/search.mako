@@ -82,7 +82,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <%dashboard:layout_toolbar>
       <%def name="widgets()">
-        <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); }}}"
@@ -179,15 +179,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableChart,
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
+                    draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Marker Map')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-map-marker"></i>
+         <a data-bind="style: { cursor: 'move' }">
+             <i class="fa fa-map-marker"></i>
          </a>
    </div>
+
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -869,22 +870,28 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 <script type="text/html" id="leafletmap-widget">
-  SHABA
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById(id)" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
+
+  <div class="row-fluid">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      ${_('Latitude')}
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      &nbsp;&nbsp;
+      ${_('Longitude')}
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      &nbsp;&nbsp;
+      ${_('Label')}
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
-    <div data-bind="leafletMapChart: {datum: {counts: counts},
+    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults(), datum: {counts: $root.results()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }" />
   </div>
-  <!-- /ko -->
-  <div class="widget-spinner" data-bind="visible: isLoading()">
+
+  <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
+
 </script>
 
 
@@ -1215,16 +1222,11 @@ function mapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformer(data) {
   var _data = [];
-  _data.push({lat: 33.305606842041016, lng: -111.978759765625});
-  _data.push({lat: 33.4143447876, lng: -111.913032532});
-  _data.push({lat: 33.5229454041, lng: -111.90788269});
-  _data.push({lat: 33.3910255432, lng: -111.68447876});
-  _data.push({lat: 33.3907928467, lng: -112.012504578});
-  _data.push({lat: 33.4691314697, lng: -112.04750824});
-  _data.push({lat: 33.4347496033, lng: -112.006439209});
-  _data.push({lat: 33.5096054077, lng: -112.025741577});
-  _data.push({lat: 33.4495391846, lng: -112.065666199});
-  _data.push({lat: 33.4248809814, lng: -111.940200806});
+  if (data.counts != null){
+    data.counts.forEach(function(obj){
+      _data.push({lat: obj.row[0], lng: obj.row[1], label: obj.row[2]});
+    });
+  }
   return _data;
 }
 
@@ -1402,7 +1404,7 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   function showAddFacetDemiModal(widget) {
-    if (["resultset-widget", "html-resultset-widget", "filter-widget"].indexOf(widget.widgetType()) == -1) {
+    if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       viewModel.collection.template.fieldsModalType(widget.widgetType());
       viewModel.collection.template.fieldsModalFilter.valueHasMutated();

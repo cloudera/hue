@@ -119,7 +119,6 @@ ko.bindingHandlers.leafletMapChart = {
     var _options = valueAccessor();
     var _data = _options.transformer(valueAccessor().datum);
 
-
     function getMapBounds(lats, lngs) {
       lats = lats.sort();
       lngs = lngs.sort();
@@ -142,13 +141,13 @@ ko.bindingHandlers.leafletMapChart = {
 
     var _lats = [];
     _data.forEach(function (item) {
-      if (item.lat != null) {
+      if (item.lat != null && $.isNumeric(item.lat)) {
         _lats.push(item.lat);
       }
     });
     var _lngs = [];
     _data.forEach(function (item) {
-      if (item.lng != null) {
+      if (item.lng != null && $.isNumeric(item.lng)) {
         _lngs.push(item.lng);
       }
     });
@@ -158,6 +157,18 @@ ko.bindingHandlers.leafletMapChart = {
     }
     else {
       $(element).height(300);
+    }
+
+    if (_data.length == 0){
+      $(element).hide();
+    }
+    else {
+      if ((_options.visible != null && _options.visible) || _options.visible == null) {
+        $(element).show();
+      }
+      else {
+        $(element).hide();
+      }
     }
 
     var _map = null;
@@ -179,9 +190,21 @@ ko.bindingHandlers.leafletMapChart = {
 
         _data.forEach(function (item) {
           if (item.lng != null && item.lat != null) {
-            var _marker = L.marker([item.lat, item.lng]).addTo(_map);
-            if (item.label != null) {
-              _marker.bindPopup(item.label);
+            var _addMarker = false;
+            try {
+              var _latLngObj = L.latLng(item.lat, item.lng);
+              _addMarker = true;
+             }
+            catch (e){
+              if (typeof console != "undefined") {
+                console.error(e);
+              }
+            }
+            if (_addMarker){
+              var _marker = L.marker([item.lat, item.lng]).addTo(_map);
+              if (item.label != null) {
+                _marker.bindPopup(item.label);
+              }
             }
           }
         });

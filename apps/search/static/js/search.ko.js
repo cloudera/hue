@@ -885,6 +885,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableDraggableResultset = ko.computed(function() {
     return getWidgets(function(widget) { return ['resultset-widget', 'html-resultset-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
   });
+  self.availableDraggableLeaflet = ko.computed(function() {
+    return getWidgets(function(widget) { return ['leafletmap-widget'].indexOf(widget.widgetType()) != -1; }).length == 0;
+  });
   self.availableDraggableFilter = ko.computed(function() {
     return getWidgets(function(widget) { return widget.widgetType() == 'filter-widget'; }).length == 0;
   });
@@ -964,6 +967,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         else {
           if (self.collection.template.isGridLayout()) {
             // Table view
+            var _docs = [];
             $.each(data.response.docs, function (index, item) {
               var row = [];
               var fields = self.collection.template.fieldsSelected();
@@ -981,17 +985,20 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 'showDetails': ko.observable(item.showDetails),
                 'details': ko.observableArray(item.details),
               };
-              self.results.push(doc);
+              _docs.push(doc);
             });
+            self.results(_docs);
           }
           else {
             // Template view
+            var _docs = [];
             var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
             $.each(data.response.docs, function (index, item) {
               // fix the fields that contain dots in the name
               addTemplateFunctions(item);
-              self.results.push(Mustache.render(_mustacheTmpl, item));
+              _docs.push(Mustache.render(_mustacheTmpl, item));
             });
+            self.results(_docs);
           }
           self.isRetrievingResults(false);
         }
