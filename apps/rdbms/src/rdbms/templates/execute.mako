@@ -718,23 +718,28 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             codeMirror.focus();
           });
           _table.find("a").on("click", function () {
-            _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
-            rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), table, "", function (columns) {
+            if (_table.find("li").length > 0){
               _table.find("ul").empty();
-              _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
-              $(columns.split(" ")).each(function (iCnt, col) {
-                if ($.trim(col) != "" && $.trim(col) != "*") {
-                  var _column = $("<li>");
-                  _column.html("<a href='#' style='padding-left:10px'><i class='fa fa-columns'></i> " + col + "</a>");
-                  _column.appendTo(_table.find("ul"));
-                  _column.on("dblclick", function () {
-                    codeMirror.replaceSelection($.trim(col) + ', ');
-                    codeMirror.setSelection(codeMirror.getCursor());
-                    codeMirror.focus();
-                  });
-                }
+            }
+            else {
+              _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
+              rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), table, "", function (columns) {
+                _table.find("ul").empty();
+                _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
+                $(columns.split(" ")).each(function (iCnt, col) {
+                  if ($.trim(col) != "" && $.trim(col) != "*") {
+                    var _column = $("<li>");
+                    _column.html("<a href='#' style='padding-left:10px'><i class='fa fa-columns'></i> " + col + "</a>");
+                    _column.appendTo(_table.find("ul"));
+                    _column.on("dblclick", function () {
+                      codeMirror.replaceSelection($.trim(col) + ', ');
+                      codeMirror.setSelection(codeMirror.getCursor());
+                      codeMirror.focus();
+                    });
+                  }
+                });
               });
-            });
+            }
           });
           _table.find("a:eq(2)").on("dblclick", function () {
             codeMirror.replaceSelection($.trim(table) + ' ');
