@@ -432,7 +432,7 @@ ${ dashboard.layout_skeleton() }
                       <table>
                         <tbody data-bind="foreach: details">
                           <tr>
-                             <th style="text-align: left; white-space: nobreak; vertical-align:top; padding-right:20px", data-bind="text: key"></th>
+                             <th style="text-align: left; white-space: nowrap; vertical-align:top; padding-right:20px" data-bind="text: key"></th>
                              <td width="100%" data-bind="text: value"></td>
                           </tr>
                         </tbody>
@@ -868,6 +868,26 @@ ${ dashboard.layout_skeleton() }
   </div>
 </script>
 
+<script type="text/html" id="leafletmap-widget">
+  SHABA
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById(id)" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
+    </div>
+    <div data-bind="leafletMapChart: {datum: {counts: counts},
+      transformer: leafletMapChartDataTransformer,
+      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }" />
+  </div>
+  <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+</script>
+
+
 <script type="text/html" id="analysis-window">
   <!-- ko if: $root.fieldAnalysesName() -->
   <div data-bind="with: $root.getFieldAnalysis()">
@@ -951,24 +971,6 @@ ${ dashboard.layout_skeleton() }
       </tr>
     </tbody>
   </table>
-</script>
-
-<script type="text/html" id="leafletmap-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById(id)" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
-    </div>
-    <div data-bind="leafletMapChart: {datum: {counts: counts},
-      transformer: leafletMapChartDataTransformer,
-      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }" />
-  </div>
-  <!-- /ko -->
-  <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
-  </div>
 </script>
 
 <div id="shareModal" class="modal hide" data-backdrop="true">
@@ -1337,8 +1339,7 @@ $(document).ready(function () {
     }
   });
 
-  $(document).on("shown.fieldAnalysis", function(){
-
+  $(document).on("shownAnalysis", function(){
     var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName();}).parent();
     $("#fieldAnalysis").show().css("top", _fieldElement.position().top - $("#fieldAnalysis").outerHeight()/2 + _fieldElement.outerHeight()/2).css("left", _fieldElement.position().left + _fieldElement.outerWidth());
   });
