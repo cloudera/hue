@@ -1090,7 +1090,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
 
       analyse.update();
-      $(document).trigger("shown.fieldAnalysis")
+      $(document).trigger("shownAnalysis")
     }
   }
 
