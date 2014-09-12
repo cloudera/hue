@@ -316,15 +316,15 @@ var Collection = function (vm, collection) {
   });
 
   self.template.leafletmapOn = ko.computed(function() {
-    return self.template.leafletmap.latitudeField() && self.template.leafletmap.longitudeField();
+    return self.template.leafletmap.latitudeField() != null && self.template.leafletmap.longitudeField() != null;
   });
   self.template.leafletmap.latitudeField.subscribe(function (newValue) {
-    if (self.template.leafletmapOn()) {
+    if (self.template.leafletmap.longitudeField() != null && newValue != null) {
       vm.search();
     }
   });
   self.template.leafletmap.longitudeField.subscribe(function (newValue) {
-    if (self.template.leafletmapOn()) {
+    if (self.template.leafletmap.latitudeField() != null && newValue != null) {
       vm.search();
     }
   });
