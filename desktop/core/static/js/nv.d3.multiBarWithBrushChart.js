@@ -658,6 +658,7 @@ nv.models.multiBarWithBrushChart = function() {
 
   chart.hideSelection = function() {
     selectionHidden = true;
+    selectionEnabled = false;
     return chart;
   }
 

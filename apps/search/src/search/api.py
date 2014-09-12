@@ -68,7 +68,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         gap = int((end - start) / SLOTS)
       if gap < 1:
         gap = 1
-    elif 'T' in stat_facet['min']:
+    elif re.match('\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ', stat_facet['min']):
       is_date = True
       stats_min = stat_facet['min']
       stats_max = stat_facet['max']

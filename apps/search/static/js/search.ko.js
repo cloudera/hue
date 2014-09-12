@@ -314,6 +314,15 @@ var Collection = function (vm, collection) {
     vm.results.removeAll();
     vm.search();
   });
+  if (self.template.leafletmap.latitudeField == undefined) {
+    self.template.leafletmap.latitudeField = ko.observable();
+  }
+  if (self.template.leafletmap.longitudeField == undefined) {
+    self.template.leafletmap.longitudeField = ko.observable();
+  }
+  if (self.template.leafletmap.labelField == undefined) {
+    self.template.leafletmap.labelField = ko.observable();
+  }
 
   self.template.leafletmapOn = ko.computed(function() {
     return self.template.leafletmap.latitudeField() != null && self.template.leafletmap.longitudeField() != null;

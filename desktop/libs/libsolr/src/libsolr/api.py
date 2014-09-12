@@ -374,7 +374,8 @@ class SolrApi(object):
           ('stats', 'true'),
       )
 
-      params += self._get_fq(query)
+      if query is not None:
+        params += self._get_fq(query)
 
       if facet:
         params += (('stats.facet', facet),)
