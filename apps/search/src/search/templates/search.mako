@@ -1299,7 +1299,14 @@ function leafletMapChartDataTransformer(data) {
 
   data.counts.forEach(function(record){
     if (record.leafletmap) {
-      _data.push({lat: record.leafletmap.latitude, lng: record.leafletmap.longitude, label: record.leafletmap.label});
+      var _obj = {
+        lat: record.leafletmap.latitude,
+        lng: record.leafletmap.longitude
+      }
+      if (record.leafletmap.label != null && record.leafletmap.label != ""){
+        _obj.label = record.leafletmap.label;
+      }
+      _data.push(_obj);
     }
   });
 

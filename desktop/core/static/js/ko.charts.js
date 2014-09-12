@@ -159,16 +159,11 @@ ko.bindingHandlers.leafletMapChart = {
       $(element).height(300);
     }
 
-    if (_data.length == 0){
-      $(element).hide();
+    if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
+      $(element).show();
     }
     else {
-      if ((_options.visible != null && _options.visible) || _options.visible == null) {
-        $(element).show();
-      }
-      else {
-        $(element).hide();
-      }
+      $(element).hide();
     }
 
     var _map = null;
