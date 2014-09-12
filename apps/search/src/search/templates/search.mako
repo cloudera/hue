@@ -174,8 +174,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableTree(), isEnabled: availableDraggableChart,
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
+                    draggable: {data: draggableTree(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
@@ -241,8 +241,7 @@ ${ dashboard.layout_skeleton() }
       ${ _('Plot') }
       <select data-bind="selectedOptions: properties.scope" class="input-small">
         <option value="tree">${ _("Tree") }</option>
-        <option value="stack">${ _("Stacked Bars") }</option>
-        <option value="heat">${ _("Heat Map") }</option>
+        <option value="stack">${ _("Bars") }</option>
       </select>
 
       </br>
@@ -301,6 +300,7 @@ ${ dashboard.layout_skeleton() }
                 <!-- ko if: ! $data.selected -->
                   <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                   <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                  <i class="fa fa-minus" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }"></i>
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
                   <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
@@ -335,10 +335,9 @@ ${ dashboard.layout_skeleton() }
           <div>
             <a href="javascript: void(0)">
               <!-- ko if: ! selected -->
-                <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
-                  <span data-bind="text: $data.from + ' - ' + $data.to"></span>
-                  <span class="counter" data-bind="text: ' (' + $data.value + ')'"></span>
-                </span>
+                <span data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+                <span class="counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+                <i class="fa fa-minus" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }"></i>
               <!-- /ko -->
               <!-- ko if: selected -->
                 <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
@@ -856,7 +855,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="text: $data.field"></span>
       <br/>
       <strong>${_('value')}</strong>:
-      <span data-bind="text: $data.filter"></span>
+      <span data-bind="text: ko.mapping.toJSON($data.filter)"></span>
     </div>
     <!-- /ko -->
     <!-- ko if: $data.type() == 'range' -->
@@ -865,6 +864,7 @@ ${ dashboard.layout_skeleton() }
       <strong>${_('field')}</strong>:
       <span data-bind="text: $data.field"></span>
       <br/>
+      <span data-bind="text: ko.mapping.toJSON($data.filter)"></span>
       <span data-bind="foreach: $data.properties" style="font-weight: normal">
         <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
         <br/>
@@ -957,6 +957,12 @@ ${ dashboard.layout_skeleton() }
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td data-bind="text: val.value"></td>
+            <td data-bind="click: $root.query.addSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-plus" title="${ _('Select this value') }"></i></a>
+            </td>
+            <td data-bind="click: $root.query.removeSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-minus" title="${ _('Exclude this value') }"></i></a>
+            </td>
             <td style="width: 40px">
               <div class="progress">
                 <div class="bar-label" data-bind="text:val.count"></div>

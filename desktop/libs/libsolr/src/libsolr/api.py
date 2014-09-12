@@ -72,13 +72,20 @@ class SolrApi(object):
         # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
         f = []
         for _filter in fq['filter']:
-          if _filter is not None and ' ' in _filter:
-            f.append('%s:"%s"' % (fq['field'], _filter))
+          value = _filter['value']
+          exclude = '-' if _filter['exclude'] else ''
+          if value is not None and ' ' in value:
+            f.append('%s%s:"%s"' % (exclude, fq['field'], value))
           else:
-            f.append('{!field f=%s}%s' % (fq['field'], _filter))
-        params += (('fq', urllib.unquote(utf_quoter('{!tag=%s}' % fq['field'] + ' '.join(f)))),)
+            f.append('%s{!field f=%s}%s' % (exclude, fq['field'], value))
+        if fq['id'].startswith('***single'): # Do not tag Single term fq
+          _params = ' '.join(f)
+        else:
+          _params ='{!tag=%s}' % fq['field'] + ' '.join(f)
+        params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(utf_quoter('%s:[%s TO %s}' % (fq['field'], f['from'], f['to']))) for f in fq['properties']])),)
+        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
+                    utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
 
     return params
 
