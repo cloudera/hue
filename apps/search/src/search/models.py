@@ -267,11 +267,13 @@ class Collection(models.Model):
     if self.enabled is not None:
       props['collection']['enabled'] = self.enabled
 
-    # tmp for dev
+    # For backward compatibility
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
     if 'enabled' not in props['collection']:
       props['collection']['enabled'] = True
+    if 'leafletmap' not in props['collection']['template']:
+      props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
 
     return json.dumps(props)
 
@@ -296,6 +298,7 @@ class Collection(models.Model):
       "showFieldList": True,
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
+      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
       "rows": 10,
     }
 
