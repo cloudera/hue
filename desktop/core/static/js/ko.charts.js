@@ -428,6 +428,8 @@ function barChartBuilder(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
 
+  var _isPivot = options.isPivot != null ? options.isPivot : false;
+
   if ($(element).find('svg').length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
     $(element).find('svg').empty();
   }
@@ -487,7 +489,7 @@ function barChartBuilder(element, options, isTimeline) {
             }
           }
         }
-        if (_isDiscrete) {
+        if (_isDiscrete && ! _isPivot) {
           if ($(element).find('svg').length > 0 && $(element).find('.nv-multiBarWithLegend').length > 0) {
             $(element).find('svg').empty();
           }
@@ -508,7 +510,13 @@ function barChartBuilder(element, options, isTimeline) {
           if (_datum.length > 0 && _datum[0].values.length > 10) {
             _chart.enableSelection();
           }
-          _chart.xAxis.showMaxMin(false).tickFormat(d3.format(',0f'));
+
+          if (_isPivot){
+            _chart.hideSelection();
+          }
+          else {
+            _chart.xAxis.showMaxMin(false).tickFormat(d3.format(',0f'));
+          }
           _chart.multibar.hideable(true);
           _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
           _chart.onStateChange(options.onStateChange);

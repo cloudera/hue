@@ -803,6 +803,22 @@ ${ dashboard.layout_skeleton() }
 
     <span data-bind="text: ko.mapping.toJSON(count)"></span>
 
+    <div data-bind="barChart: {datum: {counts: count, widget_id: $parent.id(), label: label}, stacked: true,
+      isPivot: true,
+      fqs: $root.query.fqs,
+      transformer: pivotChartDataTransformer,
+      onStateChange: function(state){ },
+      onClick: function(d) {
+        if (d.obj.field != undefined) {
+          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+        } else {
+          viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+        }
+      },
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
+      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
+    />
+
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -1139,6 +1155,44 @@ function barChartDataTransformer(rawDatum) {
     values: _data
   });
   return _datum;
+}
+
+function pivotChartDataTransformer(rawDatum) {
+
+  rawDatum = {"counts": [{"count": 904, "value": "Firefox", "cat": "US"}, {"count": 96, "selected": false, "value": "Explorer", "cat": "US"}, {"count": 116, "selected": false, "value": "Chrome", "cat": "US"}, {"count": 94, "value": "Firefox", "cat": "CUR"}, {"count": 6, "selected": false, "value": "Explorer", "cat": "CUR"}, {"count": 16, "selected": false, "value": "Chrome", "cat": "CUR"}]};
+
+  var _datum = [];
+  var _data = [];
+
+  var _cats = [];
+
+  $(rawDatum.counts).each(function (cnt, item) {
+    item.widget_id = rawDatum.widget_id;
+
+    var _cat = null;
+    _cats.forEach(function(cat){
+      if (cat.key == item.value){
+        _cat = cat;
+      }
+    });
+
+    if (_cat == null){
+     _cat = {
+        key: item.value,
+        values: []
+      };
+     _cats.push(_cat);
+    }
+
+    _cat.values.push({
+      series: 0,
+      x: item.cat,
+      y: item.count,
+      obj: item
+    });
+  });
+
+  return _cats;
 }
 
 function lineChartDataTransformer(rawDatum) {
