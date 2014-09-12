@@ -65,7 +65,7 @@ ko.bindingHandlers.pieChart = {
         if (_options.fqs) {
           $.each(_options.fqs(), function (cnt, item) {
             if (item.field() == _options.field()) {
-              _chart.selectSlices(item.filter());
+              _chart.selectSlices($.map(item.filter(), function(it) {return it.value();}));
             }
           });
         }
@@ -540,7 +540,7 @@ function barChartBuilder(element, options, isTimeline) {
 
       $.each(options.fqs(), function (cnt, item) {
         if (item.field() == options.field) {
-          _chart.selectBars(item.filter());
+          _chart.selectBars($.map(item.filter(), function(it) {return it.value();}));
         }
       });
 

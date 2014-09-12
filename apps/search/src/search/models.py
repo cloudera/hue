@@ -440,7 +440,7 @@ def augment_solr_response(response, collection, query):
 
   normalized_facets = []
 
-  selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
+  selected_values = dict([((fq['id'], fq['field'], fq['type']), [f['value'] for f in fq['filter']]) for fq in query['fqs']])
 
   if response and response.get('facet_counts'):
     # e.g. [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}

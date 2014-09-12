@@ -114,25 +114,44 @@ var Query = function (vm, query) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget_id,
         'field': data.facet.cat,
-        'filter': [data.facet.value],
+        'filter': [{'exclude': data.exclude ? true : false, 'value': data.facet.value}],
         'type': 'field'
       }));
     } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget_id) {
-          if (fq.filter.indexOf(data.facet.value) > -1) {
-            fq.filter.remove(data.facet.value);
+          var f = $.grep(fq.filter(), function(f) { return f.value() == data.facet.value; }); 
+          if (f.length > 0) {
+            fq.filter.remove(f[0]);
             if (fq.filter().length == 0) {
               self.fqs.remove(fq);
             }
           } else {
-            fq.filter.push(data.facet.value);
+            fq.filter.push(ko.mapping.fromJS({'exclude': data.exclude ? true : false, 'value': data.facet.value}));
           }
         }
       });
     }
 
     vm.search();
+  }
+
+  function _toggleSingleTermFacet(data, exclude) {
+    var fq = getFilterByField(data.val.cat);
+    var id;
+    if (fq) {
+      id = fq.id();
+    } else {
+      id = '***single' + UUID(); // Tag single terms like this
+    }
+    self.toggleFacet({'widget_id': id, 'facet': {'cat': data.val.cat, 'value': data.val.value}, 'exclude': exclude});
+    vm.search();
+  }  
+  self.addSingleTermFacet = function(data) {
+    _toggleSingleTermFacet(data, false);
+  }
+  self.removeSingleTermFacet = function(data) {
+	  _toggleSingleTermFacet(data, true);
   }
 
   self.selectRangeFacet = function (data) {
@@ -146,13 +165,14 @@ var Query = function (vm, query) {
       self.fqs.push(ko.mapping.fromJS({
           'id': data.widget_id,
           'field': data.cat,
-          'filter': [data.from],
+          'filter': [{'exclude': data.exclude ? true : false, 'value': data.from}],
           'properties': [{'from': data.from, 'to': data.to}],
           'type': 'range'
       }));
     } else {
-      if (fq.filter().indexOf(data.from) > -1) { // Unselect
-        fq.filter.remove(data.from);
+      var f = $.grep(fq.filter(), function(f) { return f.value() == data.from; });
+      if (f.length > 0) { // Unselect
+        fq.filter.remove(f[0]);
         $.each(fq.properties(), function (index, prop) {
           if (prop && prop.from() == data.from) {
             fq.properties.remove(prop);
@@ -162,7 +182,7 @@ var Query = function (vm, query) {
           self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
         }
       } else {
-       fq.filter.push(data.from);
+       fq.filter.push(ko.mapping.fromJS({'exclude': data.exclude ? true : false, 'value': data.from}));
        fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
       }
     }
@@ -170,6 +190,17 @@ var Query = function (vm, query) {
     if (data.no_refresh == undefined) {
       vm.search();
     }
+  };
+  
+  function getFilterByField(field) {
+    var _fq = null;
+    $.each(self.fqs(), function (index, fq) {
+      if (fq.field() == field && fq.id().indexOf('***') == 0) {
+        _fq= fq;
+        return false;
+      }
+    });
+    return _fq;
   };
 
   self.removeFilter = function (data) {
@@ -549,6 +580,9 @@ var Collection = function (vm, collection) {
     else if (self.template.fieldsModalType() == 'line-widget') {
       return vm.availableNumberFields();
     }
+    else if (self.template.fieldsModalType() == 'tree-widget') {
+      return vm.availablePivotFields();
+    }
     else {
       return self.availableFacetFields();
     }
@@ -918,6 +952,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableNumberFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return NUMBER_TYPES.indexOf(field.type()) != -1; });
   });
+  self.availablePivotFields = ko.computed(function() {
+    return self.collection.fields();
+  });
 
   function getWidgets(equalsTo) {
     return $.map(self.columns(), function (col){return $.map(col.rows(), function(row){ return $.grep(row.widgets(), function(widget){ return equalsTo(widget); });}) ;})
@@ -941,6 +978,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;
   });
+
 
   self.init = function (callback) {
     self.initial.init();
