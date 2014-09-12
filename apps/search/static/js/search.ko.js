@@ -353,6 +353,10 @@ var Collection = function (vm, collection) {
   });
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
+  self.template.leafletmap.latitudeField = ko.observable();
+  self.template.leafletmap.longitudeField = ko.observable();
+  self.template.leafletmap.labelField = ko.observable();
+
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.availableFacetFields = ko.computed(function() {

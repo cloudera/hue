@@ -56,6 +56,12 @@
       </div>
     </a>
   </div>
+  %if hasattr(caller, "results"):
+  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
+    <div class="toolbar-label">${_('RESULTS')}</div>
+    ${caller.results()}
+  </div>
+  %endif
   %if hasattr(caller, "widgets"):
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div class="toolbar-label">${_('WIDGETS')}</div>

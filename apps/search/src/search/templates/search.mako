@@ -81,7 +81,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </div>
 
 <%dashboard:layout_toolbar>
-      <%def name="widgets()">
+  <%def name="results()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -107,6 +107,28 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="fa fa-code"></i>
          </a>
     </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
+                    draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
+                       <i class="fa fa-filter"></i>
+         </a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
+                    draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Map Results')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: 'move' }">
+             <i class="fa fa-map-marker"></i>
+         </a>
+   </div>
+
+      </%def>
+      <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -152,15 +174,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
-                    draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
-                       <i class="fa fa-filter"></i>
-         </a>
-    </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableTree(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -179,16 +192,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
-                    draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Marker Map')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: 'move' }">
-             <i class="fa fa-map-marker"></i>
-         </a>
-   </div>
-
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -874,7 +877,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="leafletmap-widget">
   <div class="row-fluid">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+    <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px; text-align: center">
       ${_('Latitude')}
       <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
@@ -885,12 +888,12 @@ ${ dashboard.layout_skeleton() }
       <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
-    <!-- ko if: $root.collection.template.leafletmap.latitudeField() && $root.collection.template.leafletmap.longitudeField() -->
-    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults(), datum: {counts: $root.results()},
+##    <!-- ko if: $root.collection.template.leafletmap.latitudeField && $root.collection.template.leafletmap.longitudeField -->
+    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmap.latitudeField() != null && $root.collection.template.leafletmap.longitudeField() != null, datum: {counts: $root.results()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }">
     </div>
-    <!-- /ko -->
+##    <!-- /ko -->
   </div>
 
   <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
@@ -1229,7 +1232,7 @@ function leafletMapChartDataTransformer(data) {
   var _data = [];
 
   data.counts.forEach(function(record){
-    _data.push({lat: record.leafletmap.latitude, lng: record.leafletmap.longitude, label: record.leafletmap.label});
+    _data.push({lat: record.leafletmap.latitude(), lng: record.leafletmap.longitude(), label: record.leafletmap.label()});
   });
 
   return _data;
