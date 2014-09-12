@@ -238,8 +238,16 @@ ${ dashboard.layout_skeleton() }
     <!-- ko if: type() == 'pivot' -->
       ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: properties.limit"/>
       ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: properties.mincount"/>
-      ${ _('Plot') } <input type="checkbox" data-bind="checked: properties.graph"></span>
+      ${ _('Plot') }
+      <select data-bind="selectedOptions: properties.scope" class="input-small">
+        <option value="tree">${ _("Tree") }</option>
+        <option value="stack">${ _("Stacked Bars") }</option>
+        <option value="heat">${ _("Heat Map") }</option>
+      </select>
 
+      </br>
+
+      ${ _('Add a dimension') }
       <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: ' '"></select>
       <input type="text" class="input-medium" data-bind="value: properties.facets_form.limit"/>
       <input type="text" class="input-medium" data-bind="value: properties.facets_form.mincount"/>
@@ -790,7 +798,6 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      ${ _('Cross with') }
       <div data-bind="foreach: $data.properties.facets">
         <span data-bind="text: field"></span>
         ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: limit"/>
@@ -799,28 +806,39 @@ ${ dashboard.layout_skeleton() }
           <i class="fa fa-minus"></i>
         </a>
       </div>
-    </div>
 
-    <span data-bind="text: ko.mapping.toJSON(count)"></span>
+      <!-- ko if: properties.scope() == 'tree' -->
+        TREE
+        <span data-bind="text: ko.mapping.toJSON($parent.count)"></span>
+      <!-- /ko -->
 
-    <div data-bind="barChart: {datum: {counts: count, widget_id: $parent.id(), label: label}, stacked: true,
-      isPivot: true,
-      fqs: $root.query.fqs,
-      transformer: pivotChartDataTransformer,
-      onStateChange: function(state){ },
-      onClick: function(d) {
-        if (d.obj.field != undefined) {
-          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
-        } else {
-          viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
-        }
-      },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
-      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
-    />
+      <!-- ko if: properties.scope() == 'stack' -->
+        STACK
+        <div data-bind="barChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label}, stacked: true,
+          isPivot: true,
+          fqs: $root.query.fqs,
+          transformer: pivotChartDataTransformer,
+          onStateChange: function(state){ },
+          onClick: function(d) {
+            if (d.obj.field != undefined) {
+              viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+            } else {
+              viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+            }
+          },
+          onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
+          onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+        />
+      <!-- /ko -->
 
+      <!-- ko if: properties.scope() == 'heat' -->
+        HOT
+        <span data-bind="text: ko.mapping.toJSON($parent.count)"></span>
+      <!-- /ko -->
+    </div>    
   </div>
   <!-- /ko -->
+
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
@@ -1158,9 +1176,6 @@ function barChartDataTransformer(rawDatum) {
 }
 
 function pivotChartDataTransformer(rawDatum) {
-
-  rawDatum = {"counts": [{"count": 904, "value": "Firefox", "cat": "US"}, {"count": 96, "selected": false, "value": "Explorer", "cat": "US"}, {"count": 116, "selected": false, "value": "Chrome", "cat": "US"}, {"count": 94, "value": "Firefox", "cat": "CUR"}, {"count": 6, "selected": false, "value": "Explorer", "cat": "CUR"}, {"count": 16, "selected": false, "value": "Chrome", "cat": "CUR"}]};
-
   var _datum = [];
   var _data = [];
 

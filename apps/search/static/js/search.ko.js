@@ -418,7 +418,7 @@ var Collection = function (vm, collection) {
           'mincount': facet.properties.facets_form.mincount,
       });
       facet.properties.facets_form.field = null;
-      facet.properties.facets_form.limit = 10;
+      facet.properties.facets_form.limit = 5;
       facet.properties.facets_form.mincount = 1;
     } else {
       pivot = ko.mapping.fromJS({
@@ -427,7 +427,7 @@ var Collection = function (vm, collection) {
           'mincount': facet.properties.facets_form.mincount(),
       });
       facet.properties.facets_form.field(null);
-      facet.properties.facets_form.limit(10);
+      facet.properties.facets_form.limit(5);
       facet.properties.facets_form.mincount(1);
     }
 

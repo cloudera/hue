@@ -473,8 +473,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   elif widget_type == 'tree-widget':
     properties['mincount'] = 1
     properties['facets'] = []
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10}
-    properties['graph'] = False
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+    properties['scope'] = 'tree'
 
   return {
     'id': facet_id,

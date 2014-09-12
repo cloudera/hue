@@ -493,7 +493,7 @@ def augment_solr_response(response, collection, query):
       elif category == 'pivot':
         name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
-          count = response['facet_counts']['facet_pivot'][name]
+          count = _augment_pivot_2d(response['facet_counts']['facet_pivot'][name])
         else:
           count = []
         facet = {
@@ -532,6 +532,32 @@ def augment_solr_response(response, collection, query):
     augmented['normalized_facets'].extend(normalized_facets)
 
   return augmented
+
+
+def _augment_pivot_2d(counts):
+  values = set()
+  
+  for dimension in counts:
+    for pivot in dimension['pivot']:
+      values.add(pivot['value'])
+  
+  values = sorted(list(values))
+  
+  augmented = []
+  
+  for dimension in counts:
+    count = {}
+    for pivot in dimension['pivot']:
+      count[pivot['value']] = pivot['count']
+    for val in values:
+      if val in count:      
+        c = {"count": count[pivot['value']], "value": val, "cat": dimension['value']}
+      else:
+        c = {"count": 0, "value": val, "cat": dimension['value']}
+      augmented.append(c)
+      
+  return augmented
+    
 
 def augment_solr_exception(response, collection):
   response.update(

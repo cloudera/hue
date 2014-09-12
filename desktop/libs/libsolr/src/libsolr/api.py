@@ -136,7 +136,7 @@ class SolrApi(object):
               fields += ',' + f['field']
             params += (
                 ('facet.pivot', '{!ex=%s}%s' % (fields, fields)),
-                ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
+                ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10))),
                 ('facet.pivot.mincount', int(facet['properties']['mincount'])),
             )
 
