@@ -86,7 +86,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); }}}"
-         title="${_('Grid Results')}" rel="tooltip" data-placement="top">
+         title="${_('Grid')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
          </a>
@@ -102,7 +102,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                                }
                              }
                     }"
-         title="${_('HTML Results')}" rel="tooltip" data-placement="top">
+         title="${_('HTML')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
          </a>
@@ -121,7 +121,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Map Results')}" rel="tooltip" data-placement="top">
+         title="${_('Marker Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: 'move' }">
              <i class="fa fa-map-marker"></i>
          </a>
@@ -187,7 +187,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableMap(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Map')}" rel="tooltip" data-placement="top">
+         title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
@@ -236,17 +236,17 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <!-- ko if: type() == 'pivot' -->
-      <select data-bind="options: $root.collection.template.availableWidgetFieldsNames, value: properties.facets_form.field, optionsCaption: ' '"></select>
+      ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: properties.limit"/>
+      ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: properties.mincount"/>
+      ${ _('Plot') } <input type="checkbox" data-bind="checked: properties.graph"></span>
+
+      <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: ' '"></select>
       <input type="text" class="input-medium" data-bind="value: properties.facets_form.limit"/>
       <input type="text" class="input-medium" data-bind="value: properties.facets_form.mincount"/>
 
       <a href="javascript: void(0)" data-bind="click: $root.collection.addPivotFacetValue">
         <i class="fa fa-plus"></i>
       </a>
-
-      ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: properties.limit"/>
-      ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: properties.mincount"/>
-      ${ _('Plot') } <input type="checkbox" data-bind="checked: properties.graph"></span>
     <!-- /ko -->
 
     <!-- ko if: type() == 'range' -->
@@ -879,21 +879,19 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px; text-align: center">
       ${_('Latitude')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       ${_('Longitude')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       ${_('Label')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
-##    <!-- ko if: $root.collection.template.leafletmap.latitudeField && $root.collection.template.leafletmap.longitudeField -->
-    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmap.latitudeField() != null && $root.collection.template.leafletmap.longitudeField() != null, datum: {counts: $root.results()},
+    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.results()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }">
     </div>
-##    <!-- /ko -->
   </div>
 
   <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
@@ -1191,7 +1189,6 @@ function timelineChartDataTransformer(rawDatum) {
     values: _data
   });
 
-
   // If multi query
   $(rawDatum.extraSeries).each(function (cnt, item) {
     if (cnt == 0) {
@@ -1232,7 +1229,9 @@ function leafletMapChartDataTransformer(data) {
   var _data = [];
 
   data.counts.forEach(function(record){
-    _data.push({lat: record.leafletmap.latitude(), lng: record.leafletmap.longitude(), label: record.leafletmap.label()});
+    if (record.leafletmap) {
+      _data.push({lat: record.leafletmap.latitude, lng: record.leafletmap.longitude, label: record.leafletmap.label});
+    }
   });
 
   return _data;

@@ -173,7 +173,7 @@ var Query = function (vm, query) {
   };
 
   self.removeFilter = function (data) {
-	var found = false;
+    var found = false;
     $.each(self.fqs(), function (index, fq) {
       if (fq.id() == data.id()) {
         self.fqs.remove(fq);
@@ -315,6 +315,25 @@ var Collection = function (vm, collection) {
     vm.search();
   });
 
+  self.template.leafletmapOn = ko.computed(function() {
+    return self.template.leafletmap.latitudeField() && self.template.leafletmap.longitudeField();
+  });
+  self.template.leafletmap.latitudeField.subscribe(function (newValue) {
+    if (self.template.leafletmapOn()) {
+      vm.search();
+    }
+  });
+  self.template.leafletmap.longitudeField.subscribe(function (newValue) {
+    if (self.template.leafletmapOn()) {
+      vm.search();
+    }
+  });
+  self.template.leafletmap.labelField.subscribe(function (newValue) {
+    if (self.template.leafletmapOn()) {
+      vm.search();
+    }
+  });
+
   self.template.selectedVisualField = ko.observable();
   self.template.selectedVisualFunction = ko.observable();
   self.template.selectedVisualFunction.subscribe(function (newValue) {
@@ -352,10 +371,6 @@ var Collection = function (vm, collection) {
     vm.search();
   });
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
-
-  self.template.leafletmap.latitudeField = ko.observable();
-  self.template.leafletmap.longitudeField = ko.observable();
-  self.template.leafletmap.labelField = ko.observable();
 
   self.fields = ko.mapping.fromJS(collection.fields);
 
@@ -435,6 +450,14 @@ var Collection = function (vm, collection) {
     });
   }
 
+  self.removeLeaflet = function (widget_json) {
+    if (widget_json.widgetType() == "leafletmap-widget") {
+      self.template.leafletmap.latitudeField(null);
+      self.template.leafletmap.longitudeField(null);
+      self.template.leafletmap.labelField(null);
+    }
+  }
+
   self.getFacetById = function (facet_id) {
     var _facet = null;
     $.each(self.facets(), function (index, facet) {
@@ -470,6 +493,11 @@ var Collection = function (vm, collection) {
       }
     });
     return _fields;
+  });
+  self.template.fieldsNames = ko.computed(function () {
+    return $.map(self.template.fieldsAttributes(), function(field) {
+      return field.name();
+    });
   });
 
   self.getTemplateField = function (name) {
@@ -972,6 +1000,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           if (self.collection.template.isGridLayout()) {
             // Table view
             var _docs = [];
+            var leafletmap = {};
             $.each(data.response.docs, function (index, item) {
               var row = [];
               var fields = self.collection.template.fieldsSelected();
@@ -983,12 +1012,19 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               } else {
                 row.push(ko.mapping.toJSON(item));
               }
+              if (self.collection.template.leafletmapOn()) {
+                leafletmap = {
+                  'latitude': item[self.collection.template.leafletmap.latitudeField()],
+                  'longitude': item[self.collection.template.leafletmap.longitudeField()],
+                  'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+                }
+              }
               var doc = {
                 'id': item[self.collection.idField()],
                 'row': row,
                 'showDetails': ko.observable(item.showDetails),
                 'details': ko.observableArray(item.details),
-                'leafletmap': ko.mapping.fromJS({'latitude': 33.3907928467, 'longitude': -112.012504578, 'label': 'Curacao'}), // TODO pull with fields
+                'leafletmap': leafletmap,
               };
               _docs.push(doc);
             });
@@ -1030,6 +1066,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.removeWidget = function (widget_json) {
     self.collection.removeFacet(widget_json.id);
+    self.collection.removeLeaflet(widget_json);
     var refresh = self.query.removeFilter(widget_json);
     self.removeWidgetById(widget_json.id());
 
