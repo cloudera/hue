@@ -143,8 +143,15 @@ class SolrApi(object):
     params += self._get_fq(query)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
-      fields = collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else []
-      params += (('fl', urllib.unquote(utf_quoter(','.join(fields)))),)
+      fields = set(collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else [])
+      # Add field if needed
+      if collection['template']['leafletmap'].get('latitudeField'):
+        fields.add(collection['template']['leafletmap']['latitudeField'])
+      if collection['template']['leafletmap'].get('longitudeField'):
+        fields.add(collection['template']['leafletmap']['longitudeField'])
+      if collection['template']['leafletmap'].get('labelField'):
+        fields.add(collection['template']['leafletmap']['labelField'])
+      params += (('fl', urllib.unquote(utf_quoter(','.join(list(fields))))),)
     else:
       params += (('fl', '*'),)
 
