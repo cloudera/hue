@@ -58,11 +58,12 @@ nv.models.multiBarWithBrushChart = function() {
     , defaultState = null
     , noData = "No Data Available."
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
-    , controlWidth = function() { return showControls ? 300 : 0 }
+    , controlWidth = function() { return showControls ? (selectionHidden ? 240 : 300) : 0 }
     , transitionDuration = 250
     , extent
     , brushExtent = null
     , selectionEnabled = false
+    , selectionHidden = false
     , onSelectRange = null
     , onStateChange = null
     , onChartUpdate = null
@@ -230,9 +231,12 @@ nv.models.multiBarWithBrushChart = function() {
       if (showControls) {
         var controlsData = [
           { key: LABELS.GROUPED, disabled: multibar.stacked() },
-          { key: LABELS.STACKED, disabled: !multibar.stacked() },
-          { key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true }
+          { key: LABELS.STACKED, disabled: !multibar.stacked() }
         ];
+
+        if (! selectionHidden) {
+          controlsData.push({ key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true });
+        }
 
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
         g.select('.nv-controlsWrap')
@@ -651,6 +655,11 @@ nv.models.multiBarWithBrushChart = function() {
     selectionEnabled = true;
     return chart;
   };
+
+  chart.hideSelection = function() {
+    selectionHidden = true;
+    return chart;
+  }
 
   chart.onSelectRange = function(_) {
     if (!arguments.length) return onSelectRange;
