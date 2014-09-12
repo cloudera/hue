@@ -643,6 +643,7 @@ ${ dashboard.layout_skeleton() }
 </div>
 </script>
 
+
 <script type="text/html" id="histogram-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -672,6 +673,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="bar-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -712,6 +714,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="line-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -870,28 +873,30 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 <script type="text/html" id="leafletmap-widget">
-
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       ${_('Latitude')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       ${_('Longitude')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       ${_('Label')}
-      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', selectedOptions: properties.labelField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: viewModel.collection.fields, optionsText: 'name', value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
+
+    <!-- ko if: $root.collection.template.leafletmap.latitudeField() && $root.collection.template.leafletmap.longitudeField() -->
     <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults(), datum: {counts: $root.results()},
       transformer: leafletMapChartDataTransformer,
-      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }" />
+      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }">
+    </div>
+    <!-- /ko -->
   </div>
 
   <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
   </div>
-
 </script>
 
 
@@ -1222,11 +1227,11 @@ function mapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformer(data) {
   var _data = [];
-  if (data.counts != null){
-    data.counts.forEach(function(obj){
-      _data.push({lat: obj.row[0], lng: obj.row[1], label: obj.row[2]});
-    });
-  }
+
+  data.counts.forEach(function(record){
+    _data.push({lat: record.leafletmap.latitude, lng: record.leafletmap.longitude, label: record.leafletmap.label});
+  });
+
   return _data;
 }
 

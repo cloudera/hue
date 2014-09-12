@@ -984,6 +984,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 'row': row,
                 'showDetails': ko.observable(item.showDetails),
                 'details': ko.observableArray(item.details),
+                'leafletmap': ko.mapping.fromJS({'latitude': 33.3907928467, 'longitude': -112.012504578, 'label': 'Curacao'}), // TODO pull with fields
               };
               _docs.push(doc);
             });
