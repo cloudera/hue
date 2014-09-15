@@ -299,7 +299,7 @@ ${ dashboard.layout_skeleton() }
                 <!-- ko if: ! $data.selected -->
                   <a class="pointer" data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></a>
                   <span class="pointer counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                  <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-sign-out red"></i></a>
+                  <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
                   <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
@@ -333,7 +333,7 @@ ${ dashboard.layout_skeleton() }
               <!-- ko if: ! selected -->
                 <a class="pointer" data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
                 <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
-                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-sign-out red"></i></a>
+                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
               <!-- /ko -->
               <!-- ko if: selected -->
                 <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
@@ -848,7 +848,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
       <div class="title excluded">
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-        <i class="fa fa-sign-out"></i> ${ _('excluded') }
+        ${ _('excluded') }&nbsp;&nbsp;
       </div>
       <!-- /ko -->
       <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
@@ -873,7 +873,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
       <div class="title excluded">
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-        <i class="fa fa-sign-out"></i> ${ _('excluded') }
+        ${ _('excluded') }&nbsp;&nbsp;
       </div>
       <!-- /ko -->
       <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
@@ -979,11 +979,11 @@ ${ dashboard.layout_skeleton() }
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td data-bind="text: val.value"></td>
-            <td style="width: 26px" data-bind="click: $root.query.addSingleTermFacet">
-              <a href="javascript: void(0)"><i class="fa fa-sign-in" title="${ _('Select this value') }"></i></a>
+            <td style="width: 22px" data-bind="click: $root.query.addSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-plus" title="${ _('Select this value') }"></i></a>
             </td>
-            <td style="width: 26px" data-bind="click: $root.query.removeSingleTermFacet">
-              <a href="javascript: void(0)"><i class="fa fa-sign-out red" title="${ _('Exclude this value') }"></i></a>
+            <td style="width: 22px" data-bind="click: $root.query.removeSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-minus" title="${ _('Exclude this value') }"></i></a>
             </td>
             <td style="width: 40px">
               <div class="progress">
