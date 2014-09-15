@@ -294,58 +294,53 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() != 'range' -->
         <div data-bind="foreach: $parent.counts">
-          <div>
-            <a href="javascript: void(0)">
+          <div class="trigger-exclude">
               <!-- ko if: $index() < $parent.properties.limit() -->
                 <!-- ko if: ! $data.selected -->
-                  <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                  <span class="counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                  <i class="fa fa-minus" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }"></i>
+                  <a class="pointer" data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></a>
+                  <span class="pointer counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                  <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-sign-out red"></i></a>
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
-                  <span data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
-                    <span data-bind="text: $data.value"></span>
-                    <i class="fa fa-times"></i>
+                  <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
+                    <strong data-bind="text: $data.value"></strong>
+                    <a class="pointer"><i class="fa fa-times"></i></a>
                   </span>
                 <!-- /ko -->
               <!-- /ko -->
               <!-- ko if: $index() == $parent.properties.limit() -->
                 <!-- ko if: $parent.properties.prevLimit == undefined || $parent.properties.prevLimit == $parent.properties.limit() -->
-                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
                     ${ _('Show more...') }
-                  </span>
+                  </a>
                 <!-- /ko -->
                 <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
-                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
                     ${ _('Show more') }
-                  </span>
+                  </a>
                   /
-                  <span data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
                     ${ _('less...') }
-                  </span>
-                </span>
+                  </a>
                 <!-- /ko -->
               <!-- /ko -->
-            </a>
           </div>
         </div>
       <!-- /ko -->
       <!-- ko if: type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
-          <div>
-            <a href="javascript: void(0)">
+          <div class="trigger-exclude">
               <!-- ko if: ! selected -->
-                <span data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
-                <span class="counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
-                <i class="fa fa-minus" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }"></i>
+                <a class="pointer" data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+                <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-sign-out red"></i></a>
               <!-- /ko -->
               <!-- ko if: selected -->
-                <span data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
-                  <span data-bind="text: $data.from + ' - ' + $data.to"></span>
-                  <i class="fa fa-times"></i>
+                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+                  <strong data-bind="text: $data.from + ' - ' + $data.to"></strong>
+                  <a class="pointer"><i class="fa fa-times"></i></a>
                 </span>
               <!-- /ko -->
-            </a>
           </div>
         </div>
       <!-- /ko -->
@@ -850,26 +845,53 @@ ${ dashboard.layout_skeleton() }
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <!-- ko if: $data.type() == 'field' -->
     <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-      <strong>${_('field')}</strong>:
-      <span data-bind="text: $data.field"></span>
-      <br/>
-      <strong>${_('value')}</strong>:
-      <span data-bind="text: ko.mapping.toJSON($data.filter)"></span>
+      <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
+      <div class="title excluded">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+        <i class="fa fa-sign-out"></i> ${ _('excluded') }
+      </div>
+      <!-- /ko -->
+      <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
+      <div class="title">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+        &nbsp;
+      </div>
+      <!-- /ko -->
+      <div class="content">
+        <strong>${_('field')}</strong>:
+        <span data-bind="text: $data.field"></span>
+        <!-- ko if: $data.filter().length > 0  -->
+        <br/>
+        <strong>${_('value')}</strong>:
+        <span data-bind="text: $data.filter()[0].value"></span>
+        <!-- /ko -->
+      </div>
     </div>
     <!-- /ko -->
     <!-- ko if: $data.type() == 'range' -->
     <div class="filter-box">
-      <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-      <strong>${_('field')}</strong>:
-      <span data-bind="text: $data.field"></span>
-      <br/>
-      <span data-bind="text: ko.mapping.toJSON($data.filter)"></span>
-      <span data-bind="foreach: $data.properties" style="font-weight: normal">
-        <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
+      <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
+      <div class="title excluded">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+        <i class="fa fa-sign-out"></i> ${ _('excluded') }
+      </div>
+      <!-- /ko -->
+      <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
+      <div class="title">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+        &nbsp;
+      </div>
+      <!-- /ko -->
+      <div class="content">
+        <strong>${_('field')}</strong>:
+        <span data-bind="text: $data.field"></span>
         <br/>
-        <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
-      </span>
+        <span data-bind="foreach: $data.properties" style="font-weight: normal">
+          <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
+          <br/>
+          <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
+        </span>
+      </div>
     </div>
     <!-- /ko -->
   </div>
@@ -957,11 +979,11 @@ ${ dashboard.layout_skeleton() }
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td data-bind="text: val.value"></td>
-            <td data-bind="click: $root.query.addSingleTermFacet">
-              <a href="javascript: void(0)"><i class="fa fa-plus" title="${ _('Select this value') }"></i></a>
+            <td style="width: 26px" data-bind="click: $root.query.addSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-sign-in" title="${ _('Select this value') }"></i></a>
             </td>
-            <td data-bind="click: $root.query.removeSingleTermFacet">
-              <a href="javascript: void(0)"><i class="fa fa-minus" title="${ _('Exclude this value') }"></i></a>
+            <td style="width: 26px" data-bind="click: $root.query.removeSingleTermFacet">
+              <a href="javascript: void(0)"><i class="fa fa-sign-out red" title="${ _('Exclude this value') }"></i></a>
             </td>
             <td style="width: 40px">
               <div class="progress">
@@ -1403,7 +1425,6 @@ $(document).ready(function () {
 
   viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, _query, ${ initial | n,unicode });
   ko.applyBindings(viewModel);
-
 
   viewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");
