@@ -449,30 +449,34 @@ var Collection = function (vm, collection) {
   };
 
   self.addPivotFacetValue = function(facet) {
-    var pivot;
+    var pivot = null;
 
     if (typeof facet.properties.facets_form.field == 'string') { // Hackish but we load back properties as simple objects
       pivot = ko.mapping.fromJS({
-          'field': facet.properties.facets_form.field,
-          'limit': facet.properties.facets_form.limit,
-          'mincount': facet.properties.facets_form.mincount,
+        'field': facet.properties.facets_form.field,
+        'limit': facet.properties.facets_form.limit,
+        'mincount': facet.properties.facets_form.mincount
       });
       facet.properties.facets_form.field = null;
       facet.properties.facets_form.limit = 5;
       facet.properties.facets_form.mincount = 1;
     } else {
-      pivot = ko.mapping.fromJS({
+      if (typeof facet.properties.facets_form.field != 'undefined') {
+        pivot = ko.mapping.fromJS({
           'field': facet.properties.facets_form.field(),
           'limit': facet.properties.facets_form.limit(),
-          'mincount': facet.properties.facets_form.mincount(),
-      });
-      facet.properties.facets_form.field(null);
-      facet.properties.facets_form.limit(5);
-      facet.properties.facets_form.mincount(1);
+          'mincount': facet.properties.facets_form.mincount()
+        });
+        facet.properties.facets_form.field(null);
+        facet.properties.facets_form.limit(5);
+        facet.properties.facets_form.mincount(1);
+      }
     }
 
-    facet.properties.facets.push(pivot);
-    vm.search();
+    if (pivot != null) {
+      facet.properties.facets.push(pivot);
+      vm.search();
+    }
   }
 
   self.removePivotFacetValue = function(facet) {

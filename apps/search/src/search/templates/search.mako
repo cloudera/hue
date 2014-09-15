@@ -20,6 +20,7 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
+<%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
@@ -236,24 +237,74 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <!-- ko if: type() == 'pivot' -->
-      ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: properties.limit"/>
-      ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: properties.mincount"/>
-      ${ _('Plot') }
-      <select data-bind="selectedOptions: properties.scope" class="input-small">
-        <option value="tree">${ _("Tree") }</option>
-        <option value="stack">${ _("Bars") }</option>
-      </select>
 
-      </br>
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Limit') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
+        </span>
+      </div>
 
-      ${ _('Add a dimension') }
-      <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: ' '"></select>
-      <input type="text" class="input-medium" data-bind="value: properties.facets_form.limit"/>
-      <input type="text" class="input-medium" data-bind="value: properties.facets_form.mincount"/>
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Min Count') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+        </span>
+      </div>
 
-      <a href="javascript: void(0)" data-bind="click: $root.collection.addPivotFacetValue">
-        <i class="fa fa-plus"></i>
-      </a>
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Plot') }
+          </span>
+          <select data-bind="selectedOptions: properties.scope" class="input-small">
+            <option value="tree">${ _("Tree") }</option>
+            <option value="stack">${ _("Bars") }</option>
+          </select>
+        </span>
+      </div>
+
+      <br/>
+
+      <div class="facet-field-tile">
+        <div class="facet-field-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">${ _('Add a dimension') }</span>
+        </div>
+
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">
+              ${ _('Field') }
+            </span>
+            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Choose...') }'"></select>
+          </span>
+        </div>
+
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">
+              ${ _('Limit') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
+          </span>
+        </div>
+
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">
+              ${ _('Min Count') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
+            <a href="javascript: void(0)" data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue">
+              <i class="fa fa-plus"></i>
+            </a>
+          </span>
+        </div>
+      </div>
     <!-- /ko -->
 
     <!-- ko if: type() == 'range' -->
@@ -792,22 +843,41 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="foreach: $data.properties.facets">
-        <span data-bind="text: field"></span>
-        ${ _('Limit') } <input type="text" class="input-medium" data-bind="value: limit"/>
-        ${ _('Mincount') } <input type="text" class="input-medium" data-bind="value: mincount"/>
-        <a href="javascript: void(0)" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }">
-          <i class="fa fa-minus"></i>
-        </a>
+      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
+        <div class="facet-field-tile">
+          <div class="facet-field-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title" data-bind="text: field"></span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label facet-field-label-fixed-width">
+                ${ _('Limit') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label facet-field-label-fixed-width">
+                ${ _('Min Count') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              <a href="javascript: void(0)" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </span>
+          </div>
+        </div>
       </div>
+      <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'tree' -->
-        TREE
-        <span data-bind="text: ko.mapping.toJSON($parent.count)"></span>
+        ${ tree.render(id='expandableTree', data='treeDataTransformer($parent.count)', afterRender='treeAfterRender') }
       <!-- /ko -->
 
       <!-- ko if: properties.scope() == 'stack' -->
-        STACK
         <div data-bind="barChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label}, stacked: true,
           isPivot: true,
           fqs: $root.query.fqs,
@@ -826,7 +896,6 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
 
       <!-- ko if: properties.scope() == 'heat' -->
-        HOT
         <span data-bind="text: ko.mapping.toJSON($parent.count)"></span>
       <!-- /ko -->
     </div>    
@@ -1137,6 +1206,8 @@ ${ dashboard.import_layout() }
 ${ dashboard.import_bindings() }
 ${ dashboard.import_charts() }
 
+${ tree.import_templates(itemClick='toggleTreeNode', iconClick='toggleTreeNode') }
+
 <script type="text/javascript" charset="utf-8">
 var viewModel;
 
@@ -1203,10 +1274,62 @@ function barChartDataTransformer(rawDatum) {
   return _datum;
 }
 
-function pivotChartDataTransformer(rawDatum) {
-  var _datum = [];
-  var _data = [];
 
+function toggleTreeNode (obj) {
+  obj.isExpanded(!obj.isExpanded());
+}
+
+function treeDataTransformer(rawDatum) {
+
+  var _initialGrowingTree = {
+    path: "__HUEROOT__",
+    name: "__HUEROOT__",
+    selected: false,
+    nodes: [
+    ]
+  };
+
+
+  $(rawDatum).each(function (cnt, item) {
+    item.widget_id = rawDatum.widget_id;
+
+    var _cat = null;
+    _initialGrowingTree.nodes.forEach(function(cat){
+      if (cat.name == item.value){
+        _cat = cat;
+      }
+    });
+
+    if (_cat == null){
+      _cat = {
+        path: item.value,
+        name: item.value,
+        isExpanded: true,
+        selected: false,
+        nodes: []
+      }
+     _initialGrowingTree.nodes.push(_cat);
+    }
+
+    _cat.nodes.push({
+      path: item.cat,
+      name: item.cat + ' (' + item.count + ')',
+      isExpanded: true,
+      selected: false,
+      nodes: []
+    });
+  });
+
+  var _growingTree = jQuery.extend(true, {}, _initialGrowingTree);
+
+  return new TreeNodeModel(_growingTree);
+}
+
+function treeAfterRender() {
+
+}
+
+function pivotChartDataTransformer(rawDatum) {
   var _cats = [];
 
   $(rawDatum.counts).each(function (cnt, item) {

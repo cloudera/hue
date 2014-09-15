@@ -373,3 +373,18 @@ em {
 .fa-sign-out.red {
   color: #d84a38;
 }
+
+.hue-tree {
+  width: 100%;
+  overflow-y: scroll;
+  min-height: 100px;
+}
+
+.hue-tree ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.tree {
+  margin: 20px;
+}
