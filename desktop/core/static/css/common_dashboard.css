@@ -308,6 +308,16 @@ body.modal-open {
   display: inline-block;
 }
 
+.facet-field-label-fixed-width-double {
+  width: 180px;
+}
+
+.facet-field-label-title {
+  text-align: left;
+  font-weight: bold;
+  padding-left: 110px;
+}
+
 .simpledaterangepicker .left-margin {
   margin-left: 6px;
 }
@@ -340,4 +350,9 @@ body.modal-open {
 
 .card-widget .input-append, .card-widget .input-prepend, .card-widget select, .card-widget input {
   margin-bottom: 0;
+}
+
+
+.facet-field-tile {
+  float: left;
 }
