@@ -12,6 +12,7 @@ Checked-in third party dependencies
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
+|Y|cx_Oracle|5.1.2|Python|http://downloads.sourceforge.net/project/cx-oracle/5.1.2/cx_Oracle-5.1.2.tar.gz|
 |Y|Django|1.2.3|BSD|http://www.djangoproject.com/download/1.2.3/tarball/|
 |Y|django-auth-ldap|1.0.7|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
 |Y|Django_cpserver|19739bea057d824d9cd6c10c4caec622e8e1c0b9|BSD|http://github.com/lincolnloop/django-cpserver/|
