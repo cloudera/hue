@@ -1829,3 +1829,11 @@ input.no-margin {
 .break-word {
   word-wrap: break-word
 }
+
+.jHueHdfsTree .content {
+  margin-left: 14px;
+}
+
+.jHueHdfsTree a.selected {
+  font-weight: bold;
+}

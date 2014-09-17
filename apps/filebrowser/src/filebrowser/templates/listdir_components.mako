@@ -277,19 +277,15 @@ from django.utils.translation import ugettext as _
     <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move:')}</h3>
+        <h3>${_('Move to:')}</h3>
       </div>
       <div class="modal-body">
-        <div style="padding-left: 15px;">
-          <label for="moveDestination">${_('Destination')}</label>
-          <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="moveDestination" /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
-        </div>
-        <br/>
-        <div class="fileChooserModal" class="hide"></div>
+        <div id="moveHdfsTree" style="padding-left: 15px;"></div>
       </div>
       <div class="modal-footer">
-        <div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-          <span class="label label-important">${_('Name is required.')}</span>
+        <div style="position: absolute; left: 10;">
+          <input type="text" class="input-xlarge" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
+          <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
@@ -302,19 +298,18 @@ from django.utils.translation import ugettext as _
     <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Copy:')}</h3>
+        <h3>${_('Copy to:')}</h3>
       </div>
       <div class="modal-body">
-        <div style="padding-left: 15px;">
-          <label for="copyDestination">${_('Destination')}</label>
-          <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="copyDestination" /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
-        </div>
-        <br/>
-        <div class="fileChooserModal" class="hide"></div>
+        <div id="copyHdfsTree"></div>
       </div>
       <div class="modal-footer">
         <div id="copyNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-          <span class="label label-important">${_('Name is required.')}</span>
+          <span class="label label-important">${_('Please select a folder.')}</span>
+        </div>
+        <div style="position: absolute; left: 10;">
+          <input type="text" class="input-xlarge" value="" name="dest_path" id="copyDestination" placeholder="${_('Select a folder or paste a path...')}" />
+          <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
@@ -439,12 +434,13 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/js/jquery.hdfstree.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/js/dropzone.js" type="text/javascript" charset="utf-8"></script>
 
+
   <script charset="utf-8">
-  (function () {
     var getHistory = function () {
       return $.totalStorage('hue_fb_history') || [];
     };
@@ -880,6 +876,18 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
+
+        $("#moveModal").on("shown", function(){
+          $("#moveHdfsTree").remove();
+          $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
+          $("#moveHdfsTree").jHueHdfsTree({
+            home: viewModel.currentPath(),
+            onPathChange: function(path){
+              $("#moveDestination").val(path);
+              $("#moveNameRequiredAlert").hide();
+            }
+          });
+        });
       };
 
       self.copy = function () {
@@ -897,6 +905,19 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
+
+        $("#copyModal").on("shown", function(){
+          $("#copyHdfsTree").remove();
+          $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
+          $("#copyHdfsTree").jHueHdfsTree({
+            home: viewModel.currentPath(),
+            onPathChange: function(path){
+              $("#copyDestination").val(path);
+              $("#copyNameRequiredAlert").hide();
+            }
+          });
+        });
+
       };
 
       self.changeOwner = function () {
@@ -1172,6 +1193,7 @@ from django.utils.translation import ugettext as _
     ko.applyBindings(viewModel);
 
     $(document).ready(function () {
+
       // Drag and drop uploads from anywhere on filebrowser screen
       if (window.FileReader) {
         var showHoverMsg = function (msg) {
@@ -1379,7 +1401,7 @@ from django.utils.translation import ugettext as _
       });
 
       $("#moveForm").on("submit", function () {
-        if ($.trim($("#moveForm").find("input.pathChooser").val()) == "") {
+        if ($.trim($("#moveDestination").val()) == "") {
           $("#moveNameRequiredAlert").show();
           $("#moveForm").find("input[name='*dest_path']").addClass("fieldError");
           resetPrimaryButtonsStatus(); //globally available
@@ -1394,7 +1416,7 @@ from django.utils.translation import ugettext as _
       });
 
       $("#copyForm").on("submit", function () {
-        if ($.trim($("#copyForm").find("input.pathChooser").val()) == "") {
+        if ($.trim($("#copyDestination").val()) == "") {
           $("#copyNameRequiredAlert").show();
           $("#copyForm").find("input[name='*dest_path']").addClass("fieldError");
           resetPrimaryButtonsStatus(); //globally available
@@ -1609,6 +1631,5 @@ from django.utils.translation import ugettext as _
         }
       });
     });
-  }());
   </script>
 </%def>
