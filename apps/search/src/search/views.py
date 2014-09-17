@@ -474,7 +474,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     properties['mincount'] = 1
     properties['facets'] = []
     properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
-    properties['scope'] = 'tree'
+    properties['scope'] = 'stack'
 
   return {
     'id': facet_id,
