@@ -151,7 +151,7 @@ var Query = function (vm, query) {
     _toggleSingleTermFacet(data, false);
   }
   self.removeSingleTermFacet = function(data) {
-	  _toggleSingleTermFacet(data, true);
+	_toggleSingleTermFacet(data, true);
   }
 
   self.selectRangeFacet = function (data) {

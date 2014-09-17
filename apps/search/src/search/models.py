@@ -450,6 +450,7 @@ def augment_solr_response(response, collection, query):
       if category == 'field' and response['facet_counts']['facet_fields']:
         name = facet['field']
         collection_facet = get_facet_field(category, name, collection['facets'])
+        print selected_values.get((facet['id'], name, category))
         counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
@@ -550,11 +551,7 @@ def _augment_pivot_2d(counts):
     for pivot in dimension['pivot']:
       count[pivot['value']] = pivot['count']
     for val in values:
-      if val in count:
-        c = {"count": count[val], "value": val, "cat": dimension['value']}
-      else:
-        c = {"count": 0, "value": val, "cat": dimension['value']}
-      augmented.append(c)
+      augmented.append({"count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': False})
 
   return augmented
 
