@@ -354,7 +354,7 @@ ${ dashboard.layout_skeleton() }
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
                   <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
-                    <strong data-bind="text: $data.value"></strong>
+                    <strong data-bind="text: ko.mapping.toJSON($data)"></strong>
                     <a class="pointer"><i class="fa fa-times"></i></a>
                   </span>
                 <!-- /ko -->
@@ -908,54 +908,48 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="filter-widget">
   <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
-    <!-- ko if: $data.type() == 'field' -->
-    <div class="filter-box">
-      <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
-      <div class="title excluded">
-        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-        ${ _('excluded') }&nbsp;&nbsp;
-      </div>
-      <!-- /ko -->
-      <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
+    <!-- ko if: $data.type() == 'field' -->    
+    <div class="filter-box">      
       <div class="title">
-        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-        &nbsp;
-      </div>
-      <!-- /ko -->
-      <div class="content">
-        <strong>${_('field')}</strong>:
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function() { chartsUpdatingState(); $root.query.removeFilter($data); $root.search(); }">
+          <i class="fa fa-times"></i>
+        </a>
         <span data-bind="text: $data.field"></span>
-        <!-- ko if: $data.filter().length > 0  -->
+        &nbsp;
+      </div>      
+      <div class="content">
+        <strong>${_('value')}</strong>
+        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return ! f.exclude(); }), function(f) { return f.value(); }).join(', '); "></span>
         <br/>
         <strong>${_('value')}</strong>:
-        <span data-bind="text: $data.filter()[0].value"></span>
-        <!-- /ko -->
+        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return f.exclude(); }), function(f) { return f.value(); }).join(', ');"></span>        
       </div>
-    </div>
+    </div>        
     <!-- /ko -->
+
     <!-- ko if: $data.type() == 'range' -->
     <div class="filter-box">
-      <!-- ko if: $data.filter().length > 0 && $data.filter()[0].exclude -->
-      <div class="title excluded">
-        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
-        ${ _('excluded') }&nbsp;&nbsp;
-      </div>
-      <!-- /ko -->
-      <!-- ko ifnot: $data.filter().length > 0 && $data.filter()[0].exclude -->
-      <div class="title">
-        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); viewModel.query.removeFilter($data); viewModel.search() }"><i class="fa fa-times"></i></a>
+      <div class="title">        
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); $root.query.removeFilter($data); $root.search() }">
+          <i class="fa fa-times"></i>
+        </a>
+        <span data-bind="text: $data.field"></span>
         &nbsp;
       </div>
-      <!-- /ko -->
       <div class="content">
-        <strong>${_('field')}</strong>:
-        <span data-bind="text: $data.field"></span>
-        <br/>
         <span data-bind="foreach: $data.properties" style="font-weight: normal">
-          <strong>${_('from')}</strong>: <span data-bind="text: $data.from"></span>
-          <br/>
-          <strong>${_('to')}</strong>: <span data-bind="text: $data.to"></span>
-        </span>
+          <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && ! f.exclude() }).length > 0 -->
+            <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
+            <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+          <!-- /ko -->
+        </span>        
+        <br/>
+        <span data-bind="foreach: $data.properties" style="font-weight: normal"  class="excluded">
+          <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && f.exclude() }).length > 0 -->
+            <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
+            <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+          <!-- /ko -->
+        </span>        
       </div>
     </div>
     <!-- /ko -->
