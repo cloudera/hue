@@ -536,28 +536,28 @@ def augment_solr_response(response, collection, query):
 
 def _augment_pivot_2d(counts):
   values = set()
-  
+
   for dimension in counts:
     for pivot in dimension['pivot']:
       values.add(pivot['value'])
-  
+
   values = sorted(list(values))
-  
+
   augmented = []
-  
+
   for dimension in counts:
     count = {}
     for pivot in dimension['pivot']:
       count[pivot['value']] = pivot['count']
     for val in values:
-      if val in count:      
-        c = {"count": count[pivot['value']], "value": val, "cat": dimension['value']}
+      if val in count:
+        c = {"count": count[val], "value": val, "cat": dimension['value']}
       else:
         c = {"count": 0, "value": val, "cat": dimension['value']}
       augmented.append(c)
-      
+
   return augmented
-    
+
 
 def augment_solr_exception(response, collection):
   response.update(

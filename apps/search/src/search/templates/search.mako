@@ -262,8 +262,8 @@ ${ dashboard.layout_skeleton() }
             ${ _('Plot') }
           </span>
           <select data-bind="selectedOptions: properties.scope" class="input-small">
-            <option value="tree">${ _("Tree") }</option>
             <option value="stack">${ _("Bars") }</option>
+            <option value="tree">${ _("Tree") }</option>
           </select>
         </span>
       </div>
@@ -299,7 +299,7 @@ ${ dashboard.layout_skeleton() }
               ${ _('Min Count') }
             </span>
             <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
-            <a href="javascript: void(0)" data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue">
+            <a class="pull-right" href="javascript: void(0)" data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue">
               <i class="fa fa-plus"></i>
             </a>
           </span>
@@ -894,11 +894,7 @@ ${ dashboard.layout_skeleton() }
           onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
         />
       <!-- /ko -->
-
-      <!-- ko if: properties.scope() == 'heat' -->
-        <span data-bind="text: ko.mapping.toJSON($parent.count)"></span>
-      <!-- /ko -->
-    </div>    
+    </div>
   </div>
   <!-- /ko -->
 
