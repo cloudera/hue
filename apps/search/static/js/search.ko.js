@@ -1012,7 +1012,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         queries = self.query.qs();
       } else {
         facet = self.query.getFacetFilter(self.query.selectedMultiq());
-        queries = facet.filter();
+        queries = $.map(facet.filter(), function(f) { return f.value(); });
       }
 
       multiQs = $.map(queries, function(qdata) {
