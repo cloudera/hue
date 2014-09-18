@@ -18,11 +18,51 @@
 Configuration options for the "user admin" application
 """
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, ConfigSection, coerce_bool
+from django.utils.translation import ugettext_lazy as _
+
 
 DEFAULT_USER_GROUP = Config(
     key="default_user_group",
-    help="The name of a default group for users at creation time, or at first login "
-         "if the server is configured to authenticate against an external source.",
+    help=_("The name of a default group for users at creation time, or at first login "
+           "if the server is configured to authenticate against an external source."),
     type=str,
     default='default')
+
+PASSWORD_POLICY = ConfigSection(
+  key="password_policy",
+  help=_("Configuration options for user password policy"),
+  members=dict(
+    IS_ENABLED = Config(
+      key="is_enabled",
+      help=_("Enable user password policy."),
+      type=coerce_bool,
+      default=False),
+
+    PWD_RULE = Config(
+      key="pwd_regex",
+      help=_("The regular expression of password rule. The default rule requires that "
+             "a password  must be at least 8 characters long, and must contain both "
+             "uppercase and lowercase letters, at least one number, and at least one "
+             "special character."),
+      type=str,
+      default="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"),
+
+    PWD_HINT = Config(
+      key="pwd_hint",
+      help=_("Message about the password rule defined in pwd_regex"),
+      type=str,
+      default="The password must be at least 8 characters long, and must contain both " + \
+              "uppercase and lowercase letters, at least one number, and at least " + \
+              "one special character."),
+
+    PWD_ERROR_MESSAGE = Config(
+      key="pwd_error_message",
+      help=_("The error message displayed if the provided password does not "
+             "meet the enhanced password rule"),
+      type=str,
+      default="The password must be at least 8 characters long, and must contain both " + \
+               "uppercase and lowercase letters, at least one number, and at least " + \
+               "one special character.")
+    )
+  )

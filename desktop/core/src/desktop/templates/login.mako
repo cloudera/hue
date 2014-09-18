@@ -18,6 +18,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
   from desktop.views import commonheader, commonfooter
+  from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
 ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
@@ -201,7 +202,10 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         %if first_login_ever:
           <div class="alert alert-block">
             ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
-            <strong>${_('they will become your Hue superuser credentials.')}</strong>.
+            <strong>${_('they will become your Hue superuser credentials.')}</strong>
+            % if is_password_policy_enabled():
+	      <p>${get_password_hint()}</p>
+            % endif
           </div>
         %endif
 

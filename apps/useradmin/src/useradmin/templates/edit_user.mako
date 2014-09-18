@@ -16,6 +16,7 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -55,6 +56,11 @@ ${ layout.menubar(section='users') }
         ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
         % if "password1" in form.fields:
           ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % if is_password_policy_enabled():
+            <div class="password_rule" style="margin-left:180px; width:500px;">
+              <p>${get_password_hint()}</p>
+            </div>
+          % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
           % if username:
             ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
