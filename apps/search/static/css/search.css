@@ -276,10 +276,10 @@ em {
 
 .filter-box .title {
   font-weight: bold;
-  color: #FFF;
-  padding-left: 5px;
+  color: #333;
+  padding: 5px;
   border: 1px solid #d8d8d8;
-  background-color: #999;
+  background-color: #F6F6F6;
   border-bottom: none;
   -webkit-border-radius: 3px 3px 0 0;
   -moz-border-radius: 3px 3px 0 0;
@@ -287,8 +287,7 @@ em {
 }
 
 .filter-box .title a {
-  color: #FFF;
-  margin-right: 5px;
+  color: #333;
 }
 
 .filter-box .title.excluded {
@@ -296,8 +295,8 @@ em {
 }
 
 .filter-box .content {
-  padding: 5px;
-  background-color: #F6F6F6;
+  padding: 8px;
+  background-color: #FFFFFF;
   border: 1px solid #d8d8d8;
   border-top: none;
   -webkit-border-radius: 0 0 3px 3px;
