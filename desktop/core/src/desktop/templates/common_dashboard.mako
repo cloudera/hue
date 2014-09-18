@@ -225,7 +225,7 @@
   <script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
 
   <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/nv.d3.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/ext/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>

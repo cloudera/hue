@@ -886,11 +886,8 @@ ${ dashboard.layout_skeleton() }
           transformer: pivotChartDataTransformer,
           onStateChange: function(state){ },
           onClick: function(d) {
-            if (d.obj.field != undefined) {
-              viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
-            } else {
-              viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
-            }
+            console.log('X:', d.obj.cat, 'Val:', d.obj.value, 'Count:', d.obj.count);
+            $(document).find('svg').css('opacity', '1');
           },
           onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
           onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
@@ -921,10 +918,14 @@ ${ dashboard.layout_skeleton() }
       </div>
       <div class="content">
         <strong>${_('selected')}</strong>
-        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return ! f.exclude(); }), function(f) { return f.value(); }).join(', '); "></span>
+        <span data-bind="foreach: $data.filter">
+          <span class="label label-info" style="margin-left: 4px" data-bind="visible: ! $data.exclude(), text: $data.value()"></span>
+        </span>
         <br/>
-        <strong>${_('excluded')}</strong>:
-        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return f.exclude(); }), function(f) { return f.value(); }).join(', ');"></span>
+        <strong>${_('excluded')}</strong>
+        <span data-bind="foreach: $data.filter">
+          <span class="label label-important" style="margin-left: 4px" data-bind="visible: $data.exclude(), text: $data.value()"></span>
+        </span>
       </div>
     </div>
     <!-- /ko -->
