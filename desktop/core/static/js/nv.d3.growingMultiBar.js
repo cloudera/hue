@@ -169,7 +169,7 @@ nv.models.growingMultiBar = function() {
         .append('rect');
       wrap.select('#nv-edge-clip-' + id + ' rect')
           .attr('width', availableWidth)
-          .attr('height', availableHeight);
+          .attr('height', nv.utils.NaNtoZero(availableHeight) >= 0 ? nv.utils.NaNtoZero(availableHeight) : 0);
 
       g   .attr('clip-path', clipEdge ? 'url(#nv-edge-clip-' + id + ')' : '');
 

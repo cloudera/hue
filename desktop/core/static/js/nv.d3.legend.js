@@ -186,7 +186,7 @@ nv.models.legend = function() {
 
         //position legend as far right as possible within the total width
         if (rightAlign) {
-           g.attr('transform', 'translate(' + (width - margin.right - legendWidth) + ',' + margin.top + ')');
+           g.attr('transform', 'translate(' + nv.utils.NaNtoZero(width - margin.right - legendWidth) + ',' + margin.top + ')');
         }
         else {
            g.attr('transform', 'translate(0' + ',' + margin.top + ')');
