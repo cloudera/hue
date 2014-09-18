@@ -947,6 +947,15 @@
   # The name of the default user group that users will be a member of
   ## default_user_group=default
 
+  [[password_policy]]
+    # Set password policy to all users. The default policy requires password to be at least 8 characters long,
+    # and contain both uppercase and lowercase letters, numbers, and special characters.
+
+    ## is_enabled=false
+    ## pwd_regex="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"
+    ## pwd_hint="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
+    ## pwd_error_message="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
+
 
 ###########################################################################
 # Settings for the Sentry lib

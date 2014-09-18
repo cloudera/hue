@@ -29,6 +29,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
+from useradmin.password_policy import get_password_validators
 
 
 
@@ -70,8 +71,16 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       regex='^%s$' % (get_username_re_rule(),),
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
-  password1 = forms.CharField(label=_t("Password"), widget=forms.PasswordInput, required=False)
-  password2 = forms.CharField(label=_t("Password confirmation"), widget=forms.PasswordInput, required=False)
+
+  password1 = forms.CharField(label=_t("Password"),
+                              widget=forms.
+                              PasswordInput,
+                              required=False,
+                              validators=get_password_validators())
+  password2 = forms.CharField(label=_t("Password confirmation"),
+                              widget=forms.PasswordInput,
+                              required=False,
+                              validators=get_password_validators())
   password_old = forms.CharField(label=_t("Previous Password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),
@@ -123,6 +132,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       # groups must be saved after the user
       self.save_m2m()
     return user
+
 
 class SuperUserChangeForm(UserChangeForm):
   class Meta(UserChangeForm.Meta):
