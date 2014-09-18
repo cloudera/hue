@@ -70,20 +70,22 @@ class SolrApi(object):
       if fq['type'] == 'field':
         # This does not work if spaces in Solr:
         # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
-        f = []
-        for _filter in fq['filter']:
-          value = _filter['value']
-          exclude = '-' if _filter['exclude'] else ''
-          if value is not None and ' ' in value:
-            f.append('%s%s:"%s"' % (exclude, fq['field'], value))
-          else:
-            f.append('%s{!field f=%s}%s' % (exclude, fq['field'], value))
-        _params ='{!tag=%s}' % fq['field'] + ' '.join(f)
-        params += (('fq', urllib.unquote(utf_quoter(_params))),)
+        fields = fq['field'].split(':') # 2D facets support
+        for field in fields:
+          f = []
+          for _filter in fq['filter']:
+            values = _filter['value'].split(':')
+            value = values[fields.index(field)]
+            exclude = '-' if _filter['exclude'] else ''
+            if value is not None and ' ' in value:
+              f.append('%s%s:"%s"' % (exclude, field, value))
+            else:
+              f.append('%s{!field f=%s}%s' % (exclude, field, value))
+          _params ='{!tag=%s}' % field + ' '.join(f)
+          params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
-
     return params
 
   def query(self, collection, query):

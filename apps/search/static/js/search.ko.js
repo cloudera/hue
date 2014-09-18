@@ -136,6 +136,12 @@ var Query = function (vm, query) {
     vm.search();
   }
   
+  self.togglePivotFacet = function (data) {
+    data.facet.cat = data.facet.fq_fields; 
+    data.facet.value = data.facet.fq_values;
+    self.toggleFacet(data);
+  }
+  
   function _toggleSingleTermFacet(data, exclude) {
     var fq = getFilterByField(data.val.cat);
     var id;

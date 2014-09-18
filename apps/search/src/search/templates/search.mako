@@ -886,10 +886,9 @@ ${ dashboard.layout_skeleton() }
           transformer: pivotChartDataTransformer,
           onStateChange: function(state){ },
           onClick: function(d) {
-            console.log('X:', d.obj.cat, 'Val:', d.obj.value, 'Count:', d.obj.count);
+            $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
             $(document).find('svg').css('opacity', '1');
           },
-          onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
           onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
         />
       <!-- /ko -->
