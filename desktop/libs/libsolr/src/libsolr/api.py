@@ -78,9 +78,6 @@ class SolrApi(object):
             f.append('%s%s:"%s"' % (exclude, fq['field'], value))
           else:
             f.append('%s{!field f=%s}%s' % (exclude, fq['field'], value))
-        #if fq['id'].startswith('***single'): # Do not tag Single term fq
-        #  _params = ' '.join(f)
-        #else:
         _params ='{!tag=%s}' % fq['field'] + ' '.join(f)
         params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
