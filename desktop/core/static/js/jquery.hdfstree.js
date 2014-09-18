@@ -30,19 +30,45 @@
       defaults = {
         home: "/",
         onPathChange: function () {
+        },
+        createFolder: true,
+        labels: {
+          CREATE_FOLDER: "Create folder",
+          FOLDER_NAME: "Folder name",
+          CANCEL: "Cancel"
         }
-      };
+      },
+      STORAGE_PREFIX = "hueFileBrowserLastPathForUser_";
 
   function Plugin(element, options) {
     this.element = element;
-    this.options = $.extend({}, defaults, options);
+    if (typeof jHueHdfsTreeGlobals != 'undefined') {
+      var extendedDefaults = $.extend({}, defaults, jHueHdfsTreeGlobals);
+      extendedDefaults.labels = $.extend({}, defaults.labels, jHueHdfsTreeGlobals.labels);
+      this.options = $.extend({}, extendedDefaults, options);
+      if (options != null) {
+        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
+      }
+    }
+    else {
+      this.options = $.extend({}, defaults, options);
+      if (options != null) {
+        this.options.labels = $.extend({}, defaults.labels, options.labels);
+      }
+    }
     this._defaults = defaults;
     this._name = pluginName;
+    this.lastPath = "";
+    this.previousPath = "";
     this.init();
   }
 
-  Plugin.prototype.init = function () {
+  Plugin.prototype.init = function (optionalPath) {
     var _this = this;
+
+    if (typeof optionalPath != "undefined") {
+      _this.options.home = optionalPath;
+    }
     var _el = $(_this.element);
     _el.empty();
     _el.addClass("jHueHdfsTree");
@@ -62,19 +88,21 @@
     var _currentFiles = [];
 
     function showHdfsLeaf(options) {
-      var autocompleteUrl = BASE_PATH;
-      if (options.paths != null) {
-        autocompleteUrl += options.paths.shift();
+      var autocompleteUrl = BASE_PATH,
+          currentPath = "";
+
+      if (options.paths != null && options.paths.length > 0) {
+        currentPath = options.paths.shift();
       }
       else {
-        autocompleteUrl += (options.leaf != null ? options.leaf : "");
+        currentPath = (options.leaf != null ? options.leaf : "");
       }
+      autocompleteUrl += currentPath;
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {
-          if (options.leaf != null) {
-            _el.find("[data-path='" + options.leaf + "']").attr("data-loaded", true);
-          }
+          _el.find("[data-path='" + currentPath + "']").attr("data-loaded", true);
+          _el.find("[data-path='" + currentPath + "']").siblings("a").find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
           $(data.files).each(function (cnt, item) {
             if (item.name != "." && item.name != ".." && item.type == "dir") {
               var _path = item.path;
@@ -83,10 +111,10 @@
               _li.appendTo(_el.find("[data-path='" + _destination + "']"));
               _li.find("a").on("click", function () {
                 _this.options.onPathChange(_path);
+                _this.lastPath = _path;
                 _tree.find("a").removeClass("selected");
                 _li.find("a:eq(0)").addClass("selected");
                 if (_li.find(".content").attr("data-loaded") == "false") {
-                  _li.find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
                   showHdfsLeaf({
                     leaf: _path
                   });
@@ -102,7 +130,49 @@
               });
             }
           });
-          if (options.paths.length > 0) {
+          if (_this.options.createFolder) {
+            var _createFolderLi = $("<li>").html('<a class="pointer"><i class="fa fa-plus-square-o"></i> ' + _this.options.labels.CREATE_FOLDER + '</a>');
+            _createFolderLi.appendTo(_el.find("[data-path='" + currentPath + "']"));
+
+            var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("form-inline");
+            _createFolderDetails.hide();
+            var _folderName = $("<input>").attr("type", "text").attr("placeholder", _this.options.labels.FOLDER_NAME).appendTo(_createFolderDetails);
+            $("<span> </span>").appendTo(_createFolderDetails);
+            var _folderBtn = $("<input>").attr("type", "button").attr("value", _this.options.labels.CREATE_FOLDER).addClass("btn primary").appendTo(_createFolderDetails);
+            $("<span> </span>").appendTo(_createFolderDetails);
+            var _folderCancel = $("<input>").attr("type", "button").attr("value", _this.options.labels.CANCEL).addClass("btn").appendTo(_createFolderDetails);
+            _folderCancel.click(function () {
+              _createFolderDetails.slideUp();
+            });
+            _folderBtn.click(function () {
+              $.ajax({
+                type: "POST",
+                url: "/filebrowser/mkdir",
+                data: {
+                  name: _folderName.val(),
+                  path: currentPath
+                },
+                beforeSend: function (xhr) {
+                  xhr.setRequestHeader("X-Requested-With", "Hue"); // need to override the default one because otherwise Django returns HTTP 500
+                },
+                success: function (xhr, status) {
+                  if (status == "success") {
+                    _createFolderDetails.slideUp();
+                    var _newFolder = currentPath + "/" + _folderName.val();
+                    _this.init(_newFolder);
+                    _this.options.onPathChange(_newFolder);
+                  }
+                }
+              });
+
+            });
+            _createFolderDetails.appendTo(_el.find("[data-path='" + currentPath + "']"));
+
+            _createFolderLi.find("a").on("click", function () {
+              _createFolderDetails.slideDown();
+            });
+          }
+          if (options.paths != null && options.paths.length > 0) {
             showHdfsLeaf({
               paths: options.paths
             });
@@ -118,12 +188,11 @@
         _paths.push(_this.options.home.substr(0, match.index));
       }
       _paths.push(_this.options.home);
-      console.log(_paths)
     }
+
     showHdfsLeaf({
       paths: _paths
     });
-
 
   };
 

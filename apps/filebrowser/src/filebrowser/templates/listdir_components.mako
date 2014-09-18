@@ -161,10 +161,10 @@ from django.utils.translation import ugettext as _
         <label>${_('New name')} <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
       </div>
       <div class="modal-footer">
-        <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+        <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Name is required.')}</span>
         </div>
-        <div id="renameNameExistsAlert" class="hide" style="position: absolute; left: 10;">
+        <div id="renameNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
         <input id="renameSrcPath" type="hidden" name="src_path" type="text">
@@ -199,7 +199,7 @@ from django.utils.translation import ugettext as _
       </div>
 
       <div class="modal-footer" style="padding-top: 10px;">
-        <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
+        <div id="chownRequired" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Name is required.')}</span>
         </div>
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
@@ -277,18 +277,18 @@ from django.utils.translation import ugettext as _
     <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move to:')}</h3>
+        <h3>${_('Move to')}</h3>
       </div>
       <div class="modal-body">
         <div id="moveHdfsTree" style="padding-left: 15px;"></div>
       </div>
       <div class="modal-footer">
-        <div style="position: absolute; left: 10;">
-          <input type="text" class="input-xlarge" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
+        <div>
+          <input type="text" class="input-xlarge disable-autsofocus" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
+        <input class="btn btn-primary disable-enter" type="submit" value="${_('Move')}"/>
       </div>
     </form>
   </div>
@@ -298,21 +298,18 @@ from django.utils.translation import ugettext as _
     <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Copy to:')}</h3>
+        <h3>${_('Copy to')}</h3>
       </div>
       <div class="modal-body">
         <div id="copyHdfsTree"></div>
       </div>
       <div class="modal-footer">
-        <div id="copyNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-          <span class="label label-important">${_('Please select a folder.')}</span>
-        </div>
-        <div style="position: absolute; left: 10;">
-          <input type="text" class="input-xlarge" value="" name="dest_path" id="copyDestination" placeholder="${_('Select a folder or paste a path...')}" />
+        <div>
+          <input type="text" class="input-xlarge disable-autofocus" value="" name="dest_path" id="copyDestination" placeholder="${_('Select a folder or paste a path...')}" />
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
+        <input class="btn btn-primary disable-enter" type="submit" value="${_('Copy')}"/>
       </div>
     </form>
   </div>
@@ -362,10 +359,10 @@ from django.utils.translation import ugettext as _
         <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
       </div>
       <div class="modal-footer">
-        <div id="directoryNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+        <div id="directoryNameRequiredAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Directory name is required.')}</span>
         </div>
-        <div id="directoryNameExistsAlert" class="hide" style="position: absolute; left: 10;">
+        <div id="directoryNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
@@ -386,10 +383,10 @@ from django.utils.translation import ugettext as _
         <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
       </div>
       <div class="modal-footer">
-         <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
+         <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('File name is required.')}</span>
         </div>
-        <div id="fileNameExistsAlert" class="hide" style="position: absolute; left: 10;">
+        <div id="fileNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
@@ -878,6 +875,7 @@ from django.utils.translation import ugettext as _
         });
 
         $("#moveModal").on("shown", function(){
+          $("#moveModal .modal-footer div").show();
           $("#moveHdfsTree").remove();
           $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
           $("#moveHdfsTree").jHueHdfsTree({
@@ -907,6 +905,7 @@ from django.utils.translation import ugettext as _
         });
 
         $("#copyModal").on("shown", function(){
+          $("#copyModal .modal-footer div").show();
           $("#copyHdfsTree").remove();
           $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
           $("#copyHdfsTree").jHueHdfsTree({
@@ -917,6 +916,7 @@ from django.utils.translation import ugettext as _
             }
           });
         });
+
 
       };
 
@@ -1410,9 +1410,14 @@ from django.utils.translation import ugettext as _
         return true;
       });
 
-      $("#moveForm").on("focus", "input[name='dest_path']", function () {
-        $("#moveNameRequiredAlert").hide();
-        $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
+      $("#moveForm").bind("keypress", function(e) {
+        if (e.keyCode == 13) {
+           return false;
+        }
+       });
+
+      $("#moveDestination").jHueHdfsAutocomplete({
+        showOnFocus: true
       });
 
       $("#copyForm").on("submit", function () {
@@ -1425,9 +1430,15 @@ from django.utils.translation import ugettext as _
         return true;
       });
 
-      $("#copyForm").find("input[name='dest_path']").on("focus", function () {
-        $("#copyNameRequiredAlert").hide();
-        $("#copyForm").find("input[name='dest_path']").removeClass("fieldError");
+      $("#copyForm").bind("keypress", function(e) {
+        if (e.keyCode == 13) {
+           return false;
+        }
+       });
+
+
+      $("#copyDestination").jHueHdfsAutocomplete({
+        showOnFocus: true
       });
 
       $(".create-directory-link").click(function () {

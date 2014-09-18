@@ -103,6 +103,14 @@ from django.utils.translation import ugettext as _
       user: "${ user.username }"
     };
 
+    jHueHdfsTreeGlobals = {
+      labels: {
+        CREATE_FOLDER: "${_('Create folder')}",
+        FOLDER_NAME: "${_('Folder name')}",
+        CANCEL: "${_('Cancel')}"
+      }
+    };
+
     jHueTableExtenderGlobals = {
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",

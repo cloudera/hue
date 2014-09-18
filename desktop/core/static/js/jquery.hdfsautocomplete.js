@@ -29,7 +29,8 @@
         onPathChange: function () {
         },
         smartTooltip: "",
-        smartTooltipThreshold: 10 // needs 10 up/down or click actions and no tab to activate the smart tooltip
+        smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
+        showOnFocus: false
       };
 
   function Plugin(element, options) {
@@ -41,8 +42,10 @@
   }
 
   Plugin.prototype.init = function () {
+
     var _this = this;
     var _el = $(_this.element);
+    _el.attr("autocomplete", "off"); // prevents default browser behavior
 
     // creates autocomplete popover
     if ($("#jHueHdfsAutocomplete").length == 0) {
@@ -172,6 +175,12 @@
         _hdfsAutocompleteSelectedIndex = -1;
       }
     });
+
+    if (_this.options.showOnFocus){
+      _el.on("focus", function(){
+        showHdfsAutocomplete();
+      });
+    }
 
     var _pauseBlur = false;
 

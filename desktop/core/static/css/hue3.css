@@ -1837,3 +1837,8 @@ input.no-margin {
 .jHueHdfsTree a.selected {
   font-weight: bold;
 }
+
+form .modal-header .close {
+  top: 0px;
+  right: -11px;
+}

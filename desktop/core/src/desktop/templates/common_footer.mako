@@ -117,17 +117,6 @@ from django.template.defaultfilters import escape, escapejs
           return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
     %endif
-
-
-##    if (window.devicePixelRatio > 1) {
-##        $('img').each(function(i) {
-##            var lowres = $(this).attr('src');
-##            var highres = lowres.replace(".", "@2x.");
-##            $(this).attr('src', highres).attr("width", "24").attr("height", "24");
-##        });
-##    }
-
-
   });
 
   function resetPrimaryButtonsStatus() {
@@ -139,7 +128,7 @@ from django.template.defaultfilters import escape, escapejs
   $(".modal").on("shown", function () {
     _catchEnterKeyOnModals = true;
     // safe ux enhancement: focus on the first editable input
-    $(".modal:visible").find("input:visible:first").focus();
+    $(".modal:visible").find("input:not(.disable-autofocus):visible:first").focus();
   });
 
   $(".modal").on("hidden", function () {
