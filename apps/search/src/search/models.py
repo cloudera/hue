@@ -501,8 +501,7 @@ def augment_solr_response(response, collection, query):
       elif category == 'pivot':
         name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
-          _selected_values = selected_values.get((facet['id'], name, category), [])
-          count = _augment_pivot_2d(response['facet_counts']['facet_pivot'][name], _selected_values)
+          count = _augment_pivot_2d(facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
         else:
           count = []
         facet = {
@@ -543,9 +542,8 @@ def augment_solr_response(response, collection, query):
   return augmented
 
 
-def _augment_pivot_2d(counts, fq_filter):
+def _augment_pivot_2d(facet_id, counts, selected_values):
   values = set()
-  selected_values = [f['value'] for f in fq_filter]
 
   for dimension in counts:
     for pivot in dimension['pivot']:
@@ -557,12 +555,22 @@ def _augment_pivot_2d(counts, fq_filter):
 
   for dimension in counts:
     count = {}
+    pivot_field = ''
     for pivot in dimension['pivot']:
       count[pivot['value']] = pivot['count']
+      pivot_field = pivot['field']
     for val in values:
+      fq_values = '%s:%s' % (dimension['value'], val)
+      fq_fields = '%s:%s' % (dimension['field'], pivot_field)
+
+      fq_filter = selected_values.get((facet_id, fq_fields, 'field'), [])
+      _selected_values = [f['value'] for f in fq_filter]
+
       augmented.append({
-          "count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': val in selected_values,
-          'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val])
+          "count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': fq_values in _selected_values,
+          'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
+          'fq_fields': fq_fields,
+          'fq_values': fq_values,
       })
 
   return augmented
