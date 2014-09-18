@@ -179,9 +179,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableTree(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Tree')}" rel="tooltip" data-placement="top">
+         title="${_('Pivot')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-sitemap fa-rotate-270"></i>
+                       <i class="fa fa-sitemap"></i>
          </a>
    </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
@@ -354,8 +354,9 @@ ${ dashboard.layout_skeleton() }
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
                   <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
-                    <strong data-bind="text: ko.mapping.toJSON($data)"></strong>
-                    <a class="pointer"><i class="fa fa-times"></i></a>
+                    <strong data-bind="text: $data.value"></strong>
+                    <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                    <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                   </span>
                 <!-- /ko -->
               <!-- /ko -->
@@ -389,7 +390,8 @@ ${ dashboard.layout_skeleton() }
               <!-- ko if: selected -->
                 <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
                   <strong data-bind="text: $data.from + ' - ' + $data.to"></strong>
-                  <a class="pointer"><i class="fa fa-times"></i></a>
+                  <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                  <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                 </span>
               <!-- /ko -->
           </div>
@@ -908,28 +910,28 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="filter-widget">
   <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
-    <!-- ko if: $data.type() == 'field' -->    
-    <div class="filter-box">      
+    <!-- ko if: $data.type() == 'field' -->
+    <div class="filter-box">
       <div class="title">
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function() { chartsUpdatingState(); $root.query.removeFilter($data); $root.search(); }">
           <i class="fa fa-times"></i>
         </a>
         <span data-bind="text: $data.field"></span>
         &nbsp;
-      </div>      
+      </div>
       <div class="content">
-        <strong>${_('value')}</strong>
+        <strong>${_('selected')}</strong>
         <span data-bind="text: $.map($.grep($data.filter(), function(f) { return ! f.exclude(); }), function(f) { return f.value(); }).join(', '); "></span>
         <br/>
-        <strong>${_('value')}</strong>:
-        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return f.exclude(); }), function(f) { return f.value(); }).join(', ');"></span>        
+        <strong>${_('excluded')}</strong>:
+        <span data-bind="text: $.map($.grep($data.filter(), function(f) { return f.exclude(); }), function(f) { return f.value(); }).join(', ');"></span>
       </div>
-    </div>        
+    </div>
     <!-- /ko -->
 
     <!-- ko if: $data.type() == 'range' -->
     <div class="filter-box">
-      <div class="title">        
+      <div class="title">
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); $root.query.removeFilter($data); $root.search() }">
           <i class="fa fa-times"></i>
         </a>
@@ -942,14 +944,14 @@ ${ dashboard.layout_skeleton() }
             <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
             <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
           <!-- /ko -->
-        </span>        
+        </span>
         <br/>
         <span data-bind="foreach: $data.properties" style="font-weight: normal"  class="excluded">
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && f.exclude() }).length > 0 -->
             <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
             <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
           <!-- /ko -->
-        </span>        
+        </span>
       </div>
     </div>
     <!-- /ko -->

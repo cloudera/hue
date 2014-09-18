@@ -415,22 +415,30 @@ def get_facet_field(category, field, facets):
   else:
     return None
 
-def pairwise2(cat, selected_values, iterable):
+def pairwise2(cat, fq_filter, iterable):
   pairs = []
+  selected_values = [f['value'] for f in fq_filter]
   a, b = itertools.tee(iterable)
   for element in a:
-    pairs.append({'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values})
+    pairs.append({
+        'cat': cat, 'value': element, 'count': next(a), 'selected': element in selected_values,
+        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element])
+    })
   return pairs
 
-def range_pair(cat, selected_values, iterable, end):
+def range_pair(cat, fq_filter, iterable, end):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
+  selected_values = [f['value'] for f in fq_filter]
   a, to = itertools.tee(iterable)
   next(to, None)
   for element in a:
     next(to, None)
     to_value = next(to, end)
-    pairs.append({'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values})
+    pairs.append({
+        'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values,
+        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element])
+    })
   return pairs
 
 
@@ -440,7 +448,7 @@ def augment_solr_response(response, collection, query):
 
   normalized_facets = []
 
-  selected_values = dict([((fq['id'], fq['field'], fq['type']), [f['value'] for f in fq['filter']]) for fq in query['fqs']])
+  selected_values = dict([((fq['id'], fq['field'], fq['type']), fq['filter']) for fq in query['fqs']])
 
   if response and response.get('facet_counts'):
     # e.g. [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
@@ -450,7 +458,6 @@ def augment_solr_response(response, collection, query):
       if category == 'field' and response['facet_counts']['facet_fields']:
         name = facet['field']
         collection_facet = get_facet_field(category, name, collection['facets'])
-        print selected_values.get((facet['id'], name, category))
         counts = pairwise2(name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
@@ -494,7 +501,8 @@ def augment_solr_response(response, collection, query):
       elif category == 'pivot':
         name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
-          count = _augment_pivot_2d(response['facet_counts']['facet_pivot'][name])
+          _selected_values = selected_values.get((facet['id'], name, category), [])
+          count = _augment_pivot_2d(response['facet_counts']['facet_pivot'][name], _selected_values)
         else:
           count = []
         facet = {
@@ -535,8 +543,9 @@ def augment_solr_response(response, collection, query):
   return augmented
 
 
-def _augment_pivot_2d(counts):
+def _augment_pivot_2d(counts, fq_filter):
   values = set()
+  selected_values = [f['value'] for f in fq_filter]
 
   for dimension in counts:
     for pivot in dimension['pivot']:
@@ -551,7 +560,10 @@ def _augment_pivot_2d(counts):
     for pivot in dimension['pivot']:
       count[pivot['value']] = pivot['count']
     for val in values:
-      augmented.append({"count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': False})
+      augmented.append({
+          "count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': val in selected_values,
+          'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val])
+      })
 
   return augmented
 

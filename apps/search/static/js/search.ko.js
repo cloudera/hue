@@ -135,14 +135,14 @@ var Query = function (vm, query) {
 
     vm.search();
   }
-
+  
   function _toggleSingleTermFacet(data, exclude) {
     var fq = getFilterByField(data.val.cat);
     var id;
     if (fq) {
       id = fq.id();
     } else {
-      id = '***single' + UUID(); // Tag single terms like this
+      id = UUID();
     }
     self.toggleFacet({'widget_id': id, 'facet': {'cat': data.val.cat, 'value': data.val.value}, 'exclude': exclude});
     vm.search();
