@@ -402,7 +402,7 @@ def get_timeline(request):
       # Only care about our current field:value filter
       for fq in query['fqs']:
         if fq['id'] == facet_id:
-          fq['filter'] = [qdata]
+          fq['filter'] = [{'value': qdata, 'exclude': False}]
 
     # Remove other facets from collection for speed
     collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
