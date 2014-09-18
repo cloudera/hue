@@ -887,7 +887,6 @@ ${ dashboard.layout_skeleton() }
           onStateChange: function(state){ },
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
-            $(document).find('svg').css('opacity', '1');
           },
           onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
         />

@@ -1102,7 +1102,7 @@ nv.utils.optionsFunc = function(args) {
           axisLabel
               .attr('text-anchor', 'middle')
               .attr('y', 0)
-              .attr('x', w/2);
+              .attr('x', nv.utils.NaNtoZero(w)/2);
           if (showMaxMin) {
             var axisMaxMin = wrap.selectAll('g.nv-axisMaxMin')
                            .data(scale.domain());
@@ -1149,7 +1149,7 @@ nv.utils.optionsFunc = function(args) {
           axisLabel
               .attr('text-anchor', 'middle')
               .attr('y', xLabelMargin)
-              .attr('x', w/2);
+              .attr('x', nv.utils.NaNtoZero(w)/2);
           if (showMaxMin) {
           //if (showMaxMin && !isOrdinal) {
             var axisMaxMin = wrap.selectAll('g.nv-axisMaxMin')

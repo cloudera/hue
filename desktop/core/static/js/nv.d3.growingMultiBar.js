@@ -206,16 +206,29 @@ nv.models.growingMultiBar = function() {
       bars.exit().remove();
 
       selectBars = function(selected) {
+        var _pivotField = null;
+        if (!Array.isArray(selected)){
+          _pivotField = selected.field;
+          selected = selected.selected;
+        }
+
         $(selected).each(function(cnt, item){
           bars.each(function(d, i) {
-            if (d.x instanceof Date){
-              if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
+            if (_pivotField != null){
+              if (d.obj.fq_fields == _pivotField && d.obj.fq_values == item){
                 d3.select(this).classed('selected', true);
               }
             }
             else {
-              if (d.x == item) {
-                d3.select(this).classed('selected', true);
+              if (d.x instanceof Date){
+                if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
+                  d3.select(this).classed('selected', true);
+                }
+              }
+              else {
+                if (d.x == item) {
+                  d3.select(this).classed('selected', true);
+                }
               }
             }
           });

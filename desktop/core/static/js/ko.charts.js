@@ -542,6 +542,12 @@ function barChartBuilder(element, options, isTimeline) {
         if (item.field() == options.field) {
           _chart.selectBars($.map(item.filter(), function(it) {return it.value();}));
         }
+        if (item.field().indexOf(":") > -1){
+          _chart.selectBars({
+            field: item.field(),
+            selected: $.map(item.filter(), function(it) {return it.value();})
+          });
+        }
       });
 
       nv.utils.windowResize(_chart.update);
