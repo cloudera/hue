@@ -50,7 +50,7 @@ def get_conf(name='sentry'):
 
 
 def get_hive_sentry_provider():
-  return get_conf(name='hive').get(_CONF_HIVE_PROVIDER, 'default')
+  return get_conf(name='hive').get(_CONF_HIVE_PROVIDER, 'server1')
 
 
 def get_sentry_server_principal():
@@ -64,6 +64,9 @@ def get_sentry_server_principal():
 
 def get_sentry_server_authentication():
   return get_conf().get(_CONF_SENTRY_SERVER_SECURITY_MODE, 'NOSASL').upper()
+
+def get_sentry_server_admin_groups():
+  return get_conf().get(_CONF_SENTRY_SERVER_ADMIN_GROUP, '').split(',')
 
 
 def _parse_sites():
@@ -81,9 +84,7 @@ def _parse_sites():
     LOG.error('Cannot read Hive sentry site: %s' % e)
 
   for name, path in paths:
-    print path
     _SITE_DICT[name] = _parse_site(path)
-    print _SITE_DICT[name]
 
 def _parse_site(site_path):
   try:

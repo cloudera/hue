@@ -22,15 +22,20 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from libsentry.api import get_api
+from libsentry.sentry_site import get_sentry_server_admin_groups
 
 
 def list_sentry_roles_by_group(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    groupName = request.POST['groupName'] if request.POST['groupName'] else None
+    if request.POST['groupName']:
+      groupName = request.POST['groupName']
+    else:
+      # Admins can see everything, other only the groups they belong too
+      groupName = None if request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists() else '*'
     roles = get_api(request.user).list_sentry_roles_by_group(groupName)
-    result['roles'] = sorted(roles, key= lambda role: role['name'])
+    result['roles'] = sorted(roles, key=lambda role: role['name'])
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
