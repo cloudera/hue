@@ -28,30 +28,32 @@ from libsentry.conf import SENTRY_CONF_DIR, HOSTNAME
 LOG = logging.getLogger(__name__)
 
 
-_SENTRY_SITE_PATH = None
-_SENTRY_SITE_DICT = None
+_SITE_DICT = None
 
-_CONF_HIVE_PROVIDER = 'hive.sentry.provider'
+_CONF_HIVE_PROVIDER = 'hive.sentry.server'
+
 _CONF_SENTRY_SERVER_PRINCIPAL = 'sentry.service.server.principal'
 _CONF_SENTRY_SERVER_SECURITY_MODE = 'sentry.service.security.mode'
+_CONF_SENTRY_SERVER_ADMIN_GROUP = 'sentry.service.admin.group'
 
 
 def reset():
-  global _SENTRY_SITE_DICT
-  _SENTRY_SITE_DICT = None
+  global _SITE_DICT
+  _SITE_DICT = None
 
 
-def get_conf():
-  if _SENTRY_SITE_DICT is None:
-    _parse_site()
-  return _SENTRY_SITE_DICT
+def get_conf(name='sentry'):
+  if _SITE_DICT is None:
+    _parse_sites()
+  return _SITE_DICT[name]
 
 
 
 def get_hive_sentry_provider():
-  return get_conf().get(_CONF_HIVE_PROVIDER, 'default')
+  return get_conf(name='hive').get(_CONF_HIVE_PROVIDER, 'default')
 
-def get_sentry_server_principal():  
+
+def get_sentry_server_principal():
   # Get kerberos principal and replace host pattern
   principal = get_conf().get(_CONF_SENTRY_SERVER_PRINCIPAL, None)
   if principal:
@@ -64,17 +66,32 @@ def get_sentry_server_authentication():
   return get_conf().get(_CONF_SENTRY_SERVER_SECURITY_MODE, 'NOSASL').upper()
 
 
-def _parse_site():
-  global _SENTRY_SITE_DICT
-  global _SENTRY_SITE_PATH
+def _parse_sites():
+  global _SITE_DICT
+  _SITE_DICT ={}
 
-  _SENTRY_SITE_PATH = os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')
+  paths = [
+    ('sentry', os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')),
+  ]
+
   try:
-    data = file(_SENTRY_SITE_PATH, 'r').read()
+    from beeswax.conf import HIVE_CONF_DIR
+    paths.append(('hive', os.path.join(HIVE_CONF_DIR.get(), 'sentry-site.xml')))
+  except Exception, e:
+    LOG.error('Cannot read Hive sentry site: %s' % e)
+
+  for name, path in paths:
+    print path
+    _SITE_DICT[name] = _parse_site(path)
+    print _SITE_DICT[name]
+
+def _parse_site(site_path):
+  try:
+    data = file(site_path, 'r').read()
   except IOError, err:
     if err.errno != errno.ENOENT:
-      LOG.error('Cannot read from "%s": %s' % (_SENTRY_SITE_PATH, err))
+      LOG.error('Cannot read from "%s": %s' % (site_path, err))
       return
     data = ""
 
-  _SENTRY_SITE_DICT = confparse.ConfParse(data)
+  return confparse.ConfParse(data)
