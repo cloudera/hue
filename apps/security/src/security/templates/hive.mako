@@ -591,6 +591,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#createRoleModal").on("hidden", function () {
+        $('#jHueHiveAutocomplete').hide();
         viewModel.resetCreateRole();
       });
 
