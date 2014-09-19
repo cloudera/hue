@@ -23,7 +23,8 @@ from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 
 from libsentry import sentry_site
 from libsentry.conf import SENTRY_CONF_DIR
-from libsentry.sentry_site import get_sentry_server_principal
+from libsentry.sentry_site import get_sentry_server_principal,\
+  get_sentry_server_admin_groups
 from libsentry.client import SentryClient
 
 
@@ -37,6 +38,7 @@ def test_security_plain():
     sentry_site.reset()
 
     assert_equal('test/test.com@TEST.COM', get_sentry_server_principal())
+    assert_equal(['hive', 'impala', 'hue'], get_sentry_server_admin_groups())
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
@@ -89,6 +91,11 @@ def sentry_site_xml(
       <property>
         <name>sentry.service.security.mode</name>
         <value>%(authentication)s</value>
+      </property>
+
+      <property>
+        <name>sentry.service.admin.group</name>
+        <value>hive,impala,hue</value>
       </property>
 
     </configuration>
