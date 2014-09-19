@@ -154,4 +154,5 @@ class SentryApi(object):
         'URI': privilege.URI,
         'action': privilege.action.upper(),
         'timestamp': privilege.createTime,
+        'grantOption': privilege.grantOption == 1,
     }
