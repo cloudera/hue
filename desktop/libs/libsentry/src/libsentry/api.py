@@ -102,7 +102,6 @@ class SentryApi(object):
       for role in response.roles:
         roles.append({
           'name': role.roleName,
-          'grantorPrincipal': role.grantorPrincipal,
           'groups': [group.groupName for group in role.groups]
         })
       return roles
@@ -155,5 +154,4 @@ class SentryApi(object):
         'URI': privilege.URI,
         'action': privilege.action.upper(),
         'timestamp': privilege.createTime,
-        'grantor': privilege.grantorPrincipal
     }

@@ -69,7 +69,7 @@ def _to_sentry_privilege(privilege):
       'action': privilege['action'],
       'createTime': privilege['timestamp'],
       'grantOption': 1 if privilege['grantOption'] else 0,
-  }  
+  }
 
 
 def _hive_add_privileges(user, role, privileges):
@@ -83,12 +83,11 @@ def _hive_add_privileges(user, role, privileges):
         # Mocked until Sentry API returns the info. Not used currently as we refresh the whole role.
         _privileges.append({
             'timestamp': int(time.time()),
-            'grantor': user.username,
             'database': privilege.get('dbName'),
             'action': privilege.get('action'),
             'scope': privilege.get('privilegeScope'),
             'table': privilege.get('tableName'),
-            'URI': privilege.get('URI'),            
+            'URI': privilege.get('URI'),
             'server': privilege.get('serverName'),
             'grantOption': privilege.get('grantOption') == 1
         })
@@ -112,7 +111,7 @@ def create_role(request):
     result['privileges'] = _hive_add_privileges(request.user, role, role['privileges'])
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
 
-    result['role'] = {"name": role['name'], "groups": role['groups'], "grantorPrincipal": request.user.username}
+    result['role'] = {"name": role['name'], "groups": role['groups']}
 
     result['message'] = _('Role created!')
     result['status'] = 0
@@ -127,12 +126,12 @@ def update_role_groups(request):
 
   try:
     role = json.loads(request.POST['role'])
-    
+
     new_groups = set(role['groups']) - set(role['originalGroups'])
     deleted_groups = set(role['originalGroups']) - set(role['groups'])
 
     api = get_api(request.user)
-    
+
     if new_groups:
       api.alter_sentry_role_add_groups(role['name'], new_groups)
     if deleted_groups:
@@ -154,7 +153,7 @@ def save_privileges(request):
 
     new_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'new']
     result['privileges'] = _hive_add_privileges(request.user, role, new_privileges)
-    
+
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
       _drop_sentry_privilege(request.user, role, privilege)
@@ -163,7 +162,7 @@ def save_privileges(request):
     old_privileges_ids = [privilege['id'] for privilege in modified_privileges]
     _hive_add_privileges(request.user, role, modified_privileges)
     for privilege in role['originalPrivileges']:
-      if privilege['id'] in old_privileges_ids:      
+      if privilege['id'] in old_privileges_ids:
         _drop_sentry_privilege(request.user, role, privilege)
 
     result['message'] = ''
@@ -274,14 +273,14 @@ def bulk_add_privileges(request):
       privilegeScope = 'TABLE' if table else 'DATABASE' if db else 'SERVER'
       authorizableHierarchy.update({
         'db': db,
-        'table': table, 
+        'table': table,
       })
 
       for privilege in privileges:
         privilege['dbName'] = db
         privilege['tableName'] = table
-        privilege['privilegeScope'] = privilegeScope        
-        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege])      
+        privilege['privilegeScope'] = privilegeScope
+        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege])
 
     result['message'] = _('Privileges added.')
     result['status'] = 0

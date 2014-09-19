@@ -64,7 +64,6 @@ var Privilege = function (vm, privilege) {
     }
   });
   self.timestamp = ko.observable(typeof privilege.timestamp != "undefined" && privilege.timestamp != null ? privilege.timestamp : 0);
-  self.grantor = ko.observable(typeof privilege.grantor != "undefined" && privilege.grantor != null ? privilege.grantor : "");
   self.grantOption = ko.observable(typeof privilege.grantOption != "undefined" && privilege.grantOption != null ? privilege.grantOption : false);
 
   // UI
@@ -132,7 +131,6 @@ var Role = function (vm, role) {
   self.handleSelect = function (row, e) {
     self.selected(!self.selected());
   }
-  self.grantorPrincipal = ko.observable(typeof role.grantorPrincipal != "undefined" && role.grantorPrincipal != null ? role.grantorPrincipal : "");
   self.groups = ko.observableArray();
   self.originalGroups = ko.observableArray();
   $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function (index, group) {
@@ -760,7 +758,7 @@ var HiveViewModel = function (initial) {
             _inPrivileges = true;
           }
         });
-        return role.name().toLowerCase().indexOf(_filter) > -1 || role.grantorPrincipal().toLowerCase().indexOf(_filter) > -1 || _inGroups || _inPrivileges;
+        return role.name().toLowerCase().indexOf(_filter) > -1 || _inGroups || _inPrivileges;
       });
     }
   }, self);

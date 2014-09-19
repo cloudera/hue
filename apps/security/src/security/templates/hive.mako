@@ -63,11 +63,11 @@ ${ layout.menubar(section='hive') }
     <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
-    
+
     <div class="inline-block" style="vertical-align: middle">
       <input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }
     </div>
-    
+
     <span class="showAdvancedSpace">&nbsp;&nbsp;</span><a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
@@ -86,10 +86,10 @@ ${ layout.menubar(section='hive') }
     <!-- /ko -->
 
     <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span><br/>
-        
+
     server=<span data-bind="text: serverName"></span>
-    
-    <!-- ko ifnot: URI() -->    
+
+    <!-- ko ifnot: URI() -->
       <span data-bind="visible: dbName">
         <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
@@ -98,16 +98,14 @@ ${ layout.menubar(section='hive') }
       </span>
       <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
-    
+
     <!-- ko if: grantOption() -->
       <i class="fa fa-link" title="${ _('With grant option') }"></i>
     <!-- /ko -->
-    
+
     <!-- ko if: URI() -->
       <span data-bind="text: URI"></span>
     <!-- /ko -->
-    <br/>
-    <span data-bind="text: grantor"></span>
   <!-- /ko -->
 </div>
 </script>
@@ -254,8 +252,7 @@ ${ layout.menubar(section='hive') }
               <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
               <th width="2%"></th>
               <th width="20%">${ _('Name') }</th>
-              <th width="54%">${ _('Groups') }</th>
-              <th width="20%">${ _('Grantor Principal') }</th>
+              <th width="74%">${ _('Groups') }</th>
               <th width="3%"></th>
             </thead>
             <tbody data-bind="foreach: $root.filteredRoles">
@@ -294,9 +291,6 @@ ${ layout.menubar(section='hive') }
                   </div>
                 </td>
                 <td>
-                  <a href=""><span data-bind="text: grantorPrincipal"></span></a>
-                </td>
-                <td>
                 </td>
               </tr>
               <tr>
@@ -315,7 +309,7 @@ ${ layout.menubar(section='hive') }
                     <span class="pointer" data-bind="click: $root.role().savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
-              </tr>              
+              </tr>
             </tbody>
           </table>
         </div>
@@ -602,7 +596,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       $("#selectedGroup").select2("val", "");
       $("#selectedGroup").change(function() {
         viewModel.list_sentry_privileges_by_authorizable();
-        viewModel.list_sentry_roles_by_group(); 
+        viewModel.list_sentry_roles_by_group();
       });
 
       $(document).on("added.bulk.privileges", function() {
