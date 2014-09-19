@@ -48,8 +48,7 @@ struct TSentryPrivilege {
 6: optional string URI = "",
 7: required string action = "",
 8: optional i64 createTime, # Set on server side
-9: optional string grantorPrincipal, # Set on server side
-10: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
+9: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
 }
 
 # TODO can this be deleted? it's not adding value to TAlterSentryRoleAddGroupsRequest
@@ -109,6 +108,7 @@ struct TAlterSentryRoleGrantPrivilegeRequest {
 }
 struct TAlterSentryRoleGrantPrivilegeResponse {
 1: required sentry_common_service.TSentryResponseStatus status
+2: optional TSentryPrivilege privilege
 }
 
 # REVOKE ... ON ... FROM ROLE ...
@@ -132,7 +132,7 @@ struct TListSentryRolesRequest {
 struct TSentryRole {
 1: required string roleName,
 2: required set<TSentryGroup> groups,
-3: required string grantorPrincipal
+3: required string grantorPrincipal #Deprecated
 }
 struct TListSentryRolesResponse {
 1: required sentry_common_service.TSentryResponseStatus status
@@ -199,6 +199,22 @@ struct TListSentryPrivilegesForProviderResponse {
 2: required set<string> privileges
 }
 
+# List role:set<privileges> for the given authorizable
+# Optionally use the set of groups to filter the roles
+struct TSentryPrivilegeMap {
+1: required map<string, set<TSentryPrivilege>> privilegeMap
+}
+struct TListSentryPrivilegesByAuthRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+2: required set<TSentryAuthorizable> authorizableSet,
+3: optional set<string> groups,
+4: optional TSentryActiveRoleSet roleSet
+}
+struct TListSentryPrivilegesByAuthResponse {
+1: required sentry_common_service.TSentryResponseStatus status,
+2: required map<TSentryAuthorizable, TSentryPrivilegeMap> privilegesMapByAuth
+}
+
 service SentryPolicyService
 {
   TCreateSentryRoleResponse create_sentry_role(1:TCreateSentryRoleRequest request)
@@ -220,4 +236,6 @@ service SentryPolicyService
  TDropPrivilegesResponse drop_sentry_privilege(1:TDropPrivilegesRequest request);
 
  TRenamePrivilegesResponse rename_sentry_privilege(1:TRenamePrivilegesRequest request);
+
+ TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(1:TListSentryPrivilegesByAuthRequest request);
 }

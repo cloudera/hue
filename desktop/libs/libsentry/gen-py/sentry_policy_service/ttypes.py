@@ -46,7 +46,6 @@ class TSentryPrivilege(object):
    - URI
    - action
    - createTime
-   - grantorPrincipal
    - grantOption
   """
 
@@ -60,11 +59,10 @@ class TSentryPrivilege(object):
     (6, TType.STRING, 'URI', None, "", ), # 6
     (7, TType.STRING, 'action', None, "", ), # 7
     (8, TType.I64, 'createTime', None, None, ), # 8
-    (9, TType.STRING, 'grantorPrincipal', None, None, ), # 9
-    (10, TType.I32, 'grantOption', None,     0, ), # 10
+    (9, TType.I32, 'grantOption', None,     0, ), # 9
   )
 
-  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantorPrincipal=None, grantOption=thrift_spec[10][4],):
+  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantOption=thrift_spec[9][4],):
     self.privilegeScope = privilegeScope
     self.serverName = serverName
     self.dbName = dbName
@@ -72,7 +70,6 @@ class TSentryPrivilege(object):
     self.URI = URI
     self.action = action
     self.createTime = createTime
-    self.grantorPrincipal = grantorPrincipal
     self.grantOption = grantOption
 
   def read(self, iprot):
@@ -120,11 +117,6 @@ class TSentryPrivilege(object):
         else:
           iprot.skip(ftype)
       elif fid == 9:
-        if ftype == TType.STRING:
-          self.grantorPrincipal = iprot.readString();
-        else:
-          iprot.skip(ftype)
-      elif fid == 10:
         if ftype == TType.I32:
           self.grantOption = iprot.readI32();
         else:
@@ -167,12 +159,8 @@ class TSentryPrivilege(object):
       oprot.writeFieldBegin('createTime', TType.I64, 8)
       oprot.writeI64(self.createTime)
       oprot.writeFieldEnd()
-    if self.grantorPrincipal is not None:
-      oprot.writeFieldBegin('grantorPrincipal', TType.STRING, 9)
-      oprot.writeString(self.grantorPrincipal)
-      oprot.writeFieldEnd()
     if self.grantOption is not None:
-      oprot.writeFieldBegin('grantOption', TType.I32, 10)
+      oprot.writeFieldBegin('grantOption', TType.I32, 9)
       oprot.writeI32(self.grantOption)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -1031,15 +1019,18 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
   """
   Attributes:
    - status
+   - privilege
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
+    (2, TType.STRUCT, 'privilege', (TSentryPrivilege, TSentryPrivilege.thrift_spec), None, ), # 2
   )
 
-  def __init__(self, status=None,):
+  def __init__(self, status=None, privilege=None,):
     self.status = status
+    self.privilege = privilege
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1056,6 +1047,12 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
           self.status.read(iprot)
         else:
           iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRUCT:
+          self.privilege = TSentryPrivilege()
+          self.privilege.read(iprot)
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -1069,6 +1066,10 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
     if self.status is not None:
       oprot.writeFieldBegin('status', TType.STRUCT, 1)
       self.status.write(oprot)
+      oprot.writeFieldEnd()
+    if self.privilege is not None:
+      oprot.writeFieldBegin('privilege', TType.STRUCT, 2)
+      self.privilege.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2406,6 +2407,294 @@ class TListSentryPrivilegesForProviderResponse(object):
       raise TProtocol.TProtocolException(message='Required field status is unset!')
     if self.privileges is None:
       raise TProtocol.TProtocolException(message='Required field privileges is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TSentryPrivilegeMap(object):
+  """
+  Attributes:
+   - privilegeMap
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.MAP, 'privilegeMap', (TType.STRING,None,TType.SET,(TType.STRUCT,(TSentryPrivilege, TSentryPrivilege.thrift_spec))), None, ), # 1
+  )
+
+  def __init__(self, privilegeMap=None,):
+    self.privilegeMap = privilegeMap
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.MAP:
+          self.privilegeMap = {}
+          (_ktype57, _vtype58, _size56 ) = iprot.readMapBegin() 
+          for _i60 in xrange(_size56):
+            _key61 = iprot.readString();
+            _val62 = set()
+            (_etype66, _size63) = iprot.readSetBegin()
+            for _i67 in xrange(_size63):
+              _elem68 = TSentryPrivilege()
+              _elem68.read(iprot)
+              _val62.add(_elem68)
+            iprot.readSetEnd()
+            self.privilegeMap[_key61] = _val62
+          iprot.readMapEnd()
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TSentryPrivilegeMap')
+    if self.privilegeMap is not None:
+      oprot.writeFieldBegin('privilegeMap', TType.MAP, 1)
+      oprot.writeMapBegin(TType.STRING, TType.SET, len(self.privilegeMap))
+      for kiter69,viter70 in self.privilegeMap.items():
+        oprot.writeString(kiter69)
+        oprot.writeSetBegin(TType.STRUCT, len(viter70))
+        for iter71 in viter70:
+          iter71.write(oprot)
+        oprot.writeSetEnd()
+      oprot.writeMapEnd()
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.privilegeMap is None:
+      raise TProtocol.TProtocolException(message='Required field privilegeMap is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TListSentryPrivilegesByAuthRequest(object):
+  """
+  Attributes:
+   - protocol_version
+   - authorizableSet
+   - groups
+   - roleSet
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (2, TType.SET, 'authorizableSet', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec)), None, ), # 2
+    (3, TType.SET, 'groups', (TType.STRING,None), None, ), # 3
+    (4, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 4
+  )
+
+  def __init__(self, protocol_version=thrift_spec[1][4], authorizableSet=None, groups=None, roleSet=None,):
+    self.protocol_version = protocol_version
+    self.authorizableSet = authorizableSet
+    self.groups = groups
+    self.roleSet = roleSet
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.I32:
+          self.protocol_version = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.SET:
+          self.authorizableSet = set()
+          (_etype75, _size72) = iprot.readSetBegin()
+          for _i76 in xrange(_size72):
+            _elem77 = TSentryAuthorizable()
+            _elem77.read(iprot)
+            self.authorizableSet.add(_elem77)
+          iprot.readSetEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.SET:
+          self.groups = set()
+          (_etype81, _size78) = iprot.readSetBegin()
+          for _i82 in xrange(_size78):
+            _elem83 = iprot.readString();
+            self.groups.add(_elem83)
+          iprot.readSetEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRUCT:
+          self.roleSet = TSentryActiveRoleSet()
+          self.roleSet.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TListSentryPrivilegesByAuthRequest')
+    if self.protocol_version is not None:
+      oprot.writeFieldBegin('protocol_version', TType.I32, 1)
+      oprot.writeI32(self.protocol_version)
+      oprot.writeFieldEnd()
+    if self.authorizableSet is not None:
+      oprot.writeFieldBegin('authorizableSet', TType.SET, 2)
+      oprot.writeSetBegin(TType.STRUCT, len(self.authorizableSet))
+      for iter84 in self.authorizableSet:
+        iter84.write(oprot)
+      oprot.writeSetEnd()
+      oprot.writeFieldEnd()
+    if self.groups is not None:
+      oprot.writeFieldBegin('groups', TType.SET, 3)
+      oprot.writeSetBegin(TType.STRING, len(self.groups))
+      for iter85 in self.groups:
+        oprot.writeString(iter85)
+      oprot.writeSetEnd()
+      oprot.writeFieldEnd()
+    if self.roleSet is not None:
+      oprot.writeFieldBegin('roleSet', TType.STRUCT, 4)
+      self.roleSet.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.protocol_version is None:
+      raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
+    if self.authorizableSet is None:
+      raise TProtocol.TProtocolException(message='Required field authorizableSet is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TListSentryPrivilegesByAuthResponse(object):
+  """
+  Attributes:
+   - status
+   - privilegesMapByAuth
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
+    (2, TType.MAP, 'privilegesMapByAuth', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec),TType.STRUCT,(TSentryPrivilegeMap, TSentryPrivilegeMap.thrift_spec)), None, ), # 2
+  )
+
+  def __init__(self, status=None, privilegesMapByAuth=None,):
+    self.status = status
+    self.privilegesMapByAuth = privilegesMapByAuth
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.status = sentry_common_service.ttypes.TSentryResponseStatus()
+          self.status.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.MAP:
+          self.privilegesMapByAuth = {}
+          (_ktype87, _vtype88, _size86 ) = iprot.readMapBegin() 
+          for _i90 in xrange(_size86):
+            _key91 = TSentryAuthorizable()
+            _key91.read(iprot)
+            _val92 = TSentryPrivilegeMap()
+            _val92.read(iprot)
+            self.privilegesMapByAuth[_key91] = _val92
+          iprot.readMapEnd()
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TListSentryPrivilegesByAuthResponse')
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.STRUCT, 1)
+      self.status.write(oprot)
+      oprot.writeFieldEnd()
+    if self.privilegesMapByAuth is not None:
+      oprot.writeFieldBegin('privilegesMapByAuth', TType.MAP, 2)
+      oprot.writeMapBegin(TType.STRUCT, TType.STRUCT, len(self.privilegesMapByAuth))
+      for kiter93,viter94 in self.privilegesMapByAuth.items():
+        kiter93.write(oprot)
+        viter94.write(oprot)
+      oprot.writeMapEnd()
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.status is None:
+      raise TProtocol.TProtocolException(message='Required field status is unset!')
+    if self.privilegesMapByAuth is None:
+      raise TProtocol.TProtocolException(message='Required field privilegesMapByAuth is unset!')
     return
 
 
