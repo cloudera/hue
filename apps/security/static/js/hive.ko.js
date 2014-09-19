@@ -65,7 +65,12 @@ var Privilege = function (vm, privilege) {
   });
   self.timestamp = ko.observable(typeof privilege.timestamp != "undefined" && privilege.timestamp != null ? privilege.timestamp : 0);
   self.grantOption = ko.observable(typeof privilege.grantOption != "undefined" && privilege.grantOption != null ? privilege.grantOption : false);
-
+  self.grantOption.subscribe(function () {
+    if (self.status() == '') {
+      self.status('modified');
+    }
+  });
+  
   // UI
   self.privilegeType = ko.observable("db");
   self.showAdvanced = ko.observable(false);
@@ -728,7 +733,7 @@ var HiveViewModel = function (initial) {
   var self = this;
 
   self.isLoadingRoles = ko.observable(false);
-  self.isLoadingPrivileges = ko.observable(false);
+  self.isLoadingPrivileges = ko.observable(true);
   self.isApplyingBulk = ko.observable(false);
 
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
@@ -960,6 +965,7 @@ var HiveViewModel = function (initial) {
       'action': privilege.action,
       'timestamp': privilege.timestamp,
       'roleName': privilege.roleName,
+      'grantOption': privilege.grantOption,
       'id': UUID()
     });
     return _privilege;

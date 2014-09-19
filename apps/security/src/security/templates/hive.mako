@@ -65,7 +65,7 @@ ${ layout.menubar(section='hive') }
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
     <div class="inline-block" style="vertical-align: middle">
-      <input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }
+      <label>&nbsp;&nbsp;<input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
     </div>
 
     <span class="showAdvancedSpace">&nbsp;&nbsp;</span><a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
@@ -74,7 +74,6 @@ ${ layout.menubar(section='hive') }
       <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 29px">
       <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </div>
-
   <!-- /ko -->
 
   <!-- ko ifnot: editing() -->
@@ -85,11 +84,14 @@ ${ layout.menubar(section='hive') }
     </div>
     <!-- /ko -->
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span><br/>
-
+    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span>
+    <!-- ko if: grantOption -->
+      <i class="fa fa-unlock-alt muted" title="${ _('With grant option') }"></i>
+    <!-- /ko -->
+    <br/>
     server=<span data-bind="text: serverName"></span>
 
-    <!-- ko ifnot: URI() -->
+    <!-- ko ifnot: URI -->
       <span data-bind="visible: dbName">
         <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
@@ -99,11 +101,7 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
 
-    <!-- ko if: grantOption() -->
-      <i class="fa fa-link" title="${ _('With grant option') }"></i>
-    <!-- /ko -->
-
-    <!-- ko if: URI() -->
+    <!-- ko if: URI -->
       <span data-bind="text: URI"></span>
     <!-- /ko -->
   <!-- /ko -->
@@ -172,7 +170,6 @@ ${ layout.menubar(section='hive') }
                     </div>
                     <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     % endif
-                    <i class="fa fa-group" title="${ _('List of groups in popover for this user?') }"></i>
                   </div>
                   <div>
                     <a class="pointer" data-bind="click: $root.assist.collapseOthers" rel="tooltip" data-placement="right" title="${_('Close other nodes')}">
@@ -265,10 +262,10 @@ ${ layout.menubar(section='hive') }
                     <i class="fa fa-2x fa-caret" data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }, css: {'fa-caret-right' : ! showPrivileges(), 'fa-caret-down': showPrivileges() }"></i>
                   </a>
                 </td>
-                <td>
+                <td data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer">
                   <a data-bind="attr: {'href': name}"></a>
                   <i class="fa fa-cube muted"></i>
-                  <span data-bind="text: name, click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer"/>
+                  <span data-bind="text: name"/>
                 </td>
                 <td>
                   <a class="pointer" data-bind="click: function() { showEditGroups(true); }">
@@ -411,11 +408,8 @@ ${ layout.menubar(section='hive') }
 
         <div data-bind="visible: $root.assist.privileges().length == 0"><em class="muted">${ _('No privileges found for the selected item.')}</em></div>
         <div data-bind="template: { name: 'role', foreach: $root.assist.roles }" class="modal-panel"></div>
-
       </div>
-
     </div>
-
 
   </div>
   <div class="modal-footer">
@@ -474,7 +468,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     ko.applyBindings(viewModel);
 
     $(document).ready(function () {
-
       var _initialPath = viewModel.getPathHash();
       viewModel.init(_initialPath);
       $("#path").val(_initialPath);
