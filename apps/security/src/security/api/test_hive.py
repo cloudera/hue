@@ -29,6 +29,9 @@ from django.core.urlresolvers import reverse
 from libsentry import api
 
 
+def mocked_get_api(user):
+  return MockHiveApi(user)
+
 class MockHiveApi(object):
 
   def __init__(self, user):
@@ -38,34 +41,35 @@ class MockHiveApi(object):
     return [{'name': groupName}]
 
 
-class TestMockedApi():
+class TestMockedApi(object):
 
   def setUp(self):
     if not hasattr(api, 'OriginalSentryApi'):
       api.OriginalSentryApi = api.get_api
-      api.get_api = MockHiveApi
+    api.get_api = mocked_get_api
 
     self.client = make_logged_in_client(username='sentry_test', groupname='test', is_superuser=False)
     self.client_admin = make_logged_in_client(username='sentry_hue', groupname='hue', is_superuser=False)
+
     grant_access("sentry_test", "test", "security")
     grant_access("sentry_hue", "hue", "security")
     add_to_group("sentry_test")
     add_to_group("sentry_hue")
 
   def tearDown(self):
-    api.OozieApi = api.OriginalSentryApi
+    api.get_api = api.OriginalSentryApi
 
 
   def test_list_sentry_roles_by_group(self):
     response = self.client.post(reverse("security:list_sentry_roles_by_group"), {'groupName': ''})
-    assert_equal('*', json.loads(response.content)['roles'][0]['name'], response.content)
+    assert_equal('*', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
 
     response = self.client.post(reverse("security:list_sentry_roles_by_group"), {'groupName': 'test'})
-    assert_equal('test', json.loads(response.content)['roles'][0]['name'], response.content)
+    assert_equal('test', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
 
 
     response = self.client_admin.post(reverse("security:list_sentry_roles_by_group"), {'groupName': ''})
-    assert_equal(None, json.loads(response.content)['roles'][0]['name'], response.content)
+    assert_equal(None, json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
 
     response = self.client_admin.post(reverse("security:list_sentry_roles_by_group"), {'groupName': 'test'})
-    assert_equal('test', json.loads(response.content)['roles'][0]['name'], response.content)
+    assert_equal('test', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)

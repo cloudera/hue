@@ -251,8 +251,8 @@ ${ layout.menubar(section='hive') }
             <thead>
               <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
               <th width="2%"></th>
-              <th width="20%">${ _('Name') }</th>
-              <th width="74%">${ _('Groups') }</th>
+              <th width="20%" style="text-align:left">${ _('Name') }</th>
+              <th width="74%" style="text-align:left">${ _('Groups') }</th>
               <th width="3%"></th>
             </thead>
             <tbody data-bind="foreach: $root.filteredRoles">
@@ -469,8 +469,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/static/js/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
 
 
-  <script type="text/javascript" charset="utf-8">
-
+<script type="text/javascript" charset="utf-8">
     var viewModel = new HiveViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
 
@@ -645,7 +644,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $(document).trigger("create.typeahead");
     });
-
 </script>
 
 ${ commonfooter(messages) | n,unicode }

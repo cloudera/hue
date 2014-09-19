@@ -770,6 +770,7 @@ var HiveViewModel = function (initial) {
     return _roles.sort();
   }, self);
 
+  self.is_sentry_admin = initial.is_sentry_admin;
   self.availableHadoopGroups = ko.observableArray();
   self.assist = new Assist(self, initial);
 
@@ -1105,7 +1106,8 @@ var HiveViewModel = function (initial) {
   self.fetchUsers = function () {
     $.getJSON('/desktop/api/users/autocomplete', {
       'include_myself': true,
-      'extend_user': true
+      'extend_user': true,
+      'only_mygroups': ! self.is_sentry_admin,
     }, function (data) {
       self.availableHadoopUsers(data.users);
       self.availableHadoopGroups(data.groups);
