@@ -23,10 +23,8 @@ from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 
 from libsentry import sentry_site
 from libsentry.conf import SENTRY_CONF_DIR
-from libsentry.sentry_site import get_hive_sentry_provider,\
-  get_sentry_server_principal
+from libsentry.sentry_site import get_sentry_server_principal
 from libsentry.client import SentryClient
-
 
 
 def test_security_plain():
@@ -38,7 +36,6 @@ def test_security_plain():
     file(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
-    assert_equal('default', get_hive_sentry_provider())
     assert_equal('test/test.com@TEST.COM', get_sentry_server_principal())
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
