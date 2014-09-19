@@ -77,9 +77,18 @@ def list_permissions(request):
 def list_for_autocomplete(request):
   if request.ajax:
     extended_user_object = request.GET.get('extend_user') == 'true'
+
+    users = User.objects.all()
+    if not request.GET.get('include_myself'):
+      users = users.exclude(pk=request.user.pk)
+
+    groups = Group.objects.all()
+    if request.GET.get('only_mygroups'):
+      groups = request.user.groups.all()
+
     response = {
-      'users': request.GET.get('include_myself') and massage_users_for_json(User.objects.all(), extended_user_object) or massage_users_for_json(User.objects.exclude(pk=request.user.pk), extended_user_object),
-      'groups': massage_groups_for_json(Group.objects.all())
+      'users': massage_users_for_json(users, extended_user_object),
+      'groups': massage_groups_for_json(groups)
     }
     return HttpResponse(json.dumps(response), mimetype="application/json")
 

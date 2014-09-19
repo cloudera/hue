@@ -19,20 +19,23 @@ import json
 
 from desktop.lib.django_util import render
 
-from libsentry.sentry_site import get_hive_sentry_provider
+from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups
 
 
 def hive(request):
 
   return render("hive.mako", request, {
-      'initial': json.dumps({'user': request.user.username, 'sentry_provider': get_hive_sentry_provider()}),
-      'has_impersonation_perm': _has_impersonation_perm(request.user)
+      'initial': json.dumps({
+          'user': request.user.username, 'sentry_provider': get_hive_sentry_provider(),
+          'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
+      }),
+      'has_impersonation_perm': _has_impersonation_perm(request.user),
   })
 
 
 def hdfs(request):
 
-  return render("hdfs.mako", request, {      
+  return render("hdfs.mako", request, {
       'initial': json.dumps({'user': request.user.username}),
       'has_impersonation_perm': _has_impersonation_perm(request.user)
   })
