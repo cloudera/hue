@@ -42,8 +42,12 @@ ${layout.menubar(section='query')}
     <div class="tab-pane active" id="navigatorTab">
       <div class="card card-small card-tab">
         <div class="card-body" style="margin-top: 0">
-          <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px"><i class="fa fa-question-circle"></i></a>
-          <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px"><i class="fa fa-refresh"></i></a>
+          <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
+            <i class="fa fa-question-circle"></i>
+          </a>
+          <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
+            <i class="fa fa-refresh"></i>
+          </a>
           <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
             <li class="nav-header">${_('database')}</li>
           </ul>
@@ -1198,33 +1202,6 @@ $(document).ready(function () {
     }
   }
 
-  % if app_name == 'impala':
-    syncWithHive = function () {
-      // sync tables with Hive
-      hac_jsoncalls({
-        autocompleteBaseURL: "${ autocomplete_base_url_hive | n,unicode }",
-        database: viewModel.database(),
-        onDataReceived: function (data) {
-          if (data.tables) {
-            var _hiveTables = data.tables;
-            hac_getTables(viewModel.database(), function (data) {  //preload tables for the default db
-              var _impalaTables = data.split(" ");
-              var _diff = {
-                added: _hiveTables.diff(_impalaTables),
-                removed: _impalaTables.diff(_hiveTables)
-              }
-              console.log("Tables diff")
-              console.log(_diff);
-            });
-          }
-        }
-      });
-    }
-    if (viewModel.database()) {
-      syncWithHive();
-    }
-  % endif
-
   $("#expandResults").on("click", function(){
     if ($(this).find("i").hasClass("fa-expand")){
       $(this).find("i").removeClass("fa-expand").addClass("fa-compress");
@@ -1238,6 +1215,42 @@ $(document).ready(function () {
   });
 
   $("#refreshNavigator").on("click", function () {
+    % if app_name == 'impala':
+      syncWithHive = function () {
+        // Diff Hive / Impala metastore and invalidate out of sync tables
+        hac_jsoncalls({
+          autocompleteBaseURL: "${ autocomplete_base_url_hive | n,unicode }",
+          database: viewModel.database(),
+          sync: true,
+          onDataReceived: function (data) {
+            if (data.tables) {
+              var _hiveTables = data.tables;
+              hac_getTables(viewModel.database(), function (data) {
+                var _impalaTables = data.split(" ");
+                $.ajax({
+                  type: "POST",
+                  url: "${ url('impala:refresh_tables') }",
+                  data: {
+                    database: ko.mapping.toJSON(viewModel.database()),
+                    added: ko.mapping.toJSON(_hiveTables.diff(_impalaTables)),
+                    removed: ko.mapping.toJSON(_impalaTables.diff(_hiveTables)),
+                  },
+                  success: function (data) {
+                    if (data.status != 0) {
+                      $(document).trigger("error", data.message);
+                    }
+                  }
+                });
+              });
+            }
+          }
+        });
+      }
+    
+      syncWithHive();
+
+    % endif
+   
     resetNavigator();
   });
 

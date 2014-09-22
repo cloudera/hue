@@ -15,27 +15,21 @@
 // limitations under the License.
 
 function hac_jsoncalls(options) {
-  if (typeof HIVE_AUTOCOMPLETE_BASE_URL != "undefined" || typeof options.autocompleteBaseURL != "undefined") {
-    var _baseURL = typeof options.autocompleteBaseURL != "undefined" ? options.autocompleteBaseURL : HIVE_AUTOCOMPLETE_BASE_URL;
-    if (options.database == null) {
-      $.getJSON(_baseURL, options.onDataReceived);
-    }
-    if (options.database != null) {
-      if (options.table != null) {
-        $.getJSON(_baseURL + options.database + "/" + options.table, options.onDataReceived);
-      }
-      else {
-        $.getJSON(_baseURL + options.database + "/", options.onDataReceived);
-      }
-    }
+  var _url = typeof options.autocompleteBaseURL != "undefined" ? options.autocompleteBaseURL : HIVE_AUTOCOMPLETE_BASE_URL;
+    
+  if (options.database != null) {
+    _url += options.database
   }
-  else {
-    try {
-      console.error("You need to specify a HIVE_AUTOCOMPLETE_BASE_URL to use the autocomplete")
-    }
-    catch (e) {
-    }
+  if (options.table != null) {
+    _url += "/" + options.table
   }
+  
+  $.ajax({
+    type: "GET",
+    url: _url,
+    success: options.onDataReceived,
+    async: options.sync == "undefined"
+  });
 }
 
 function hac_hasExpired(timestamp){
