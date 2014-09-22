@@ -20,7 +20,6 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
-<%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
@@ -876,7 +875,15 @@ ${ dashboard.layout_skeleton() }
       <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'tree' -->
-        ${ tree.render(id='expandableTree', data='treeDataTransformer($parent.count)', afterRender='treeAfterRender') }
+        <div data-bind="partitionChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label},
+          fqs: $root.query.fqs,
+          transformer: partitionChartDataTransformer,
+          onStateChange: function(state){ },
+          onClick: function(d) {
+            $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
+          },
+          onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+        />
       <!-- /ko -->
 
       <!-- ko if: properties.scope() == 'stack' -->
@@ -1197,8 +1204,6 @@ ${ dashboard.import_layout() }
 ${ dashboard.import_bindings() }
 ${ dashboard.import_charts() }
 
-${ tree.import_templates(itemClick='toggleTreeNode', iconClick='toggleTreeNode') }
-
 <script type="text/javascript" charset="utf-8">
 var viewModel;
 
@@ -1265,83 +1270,65 @@ function barChartDataTransformer(rawDatum) {
   return _datum;
 }
 
-
-function toggleTreeNode (obj) {
-  obj.isExpanded(!obj.isExpanded());
-}
-
-function treeDataTransformer(rawDatum) {
-
-  var _initialGrowingTree = {
-    path: "__HUEROOT__",
-    name: "__HUEROOT__",
-    selected: false,
-    nodes: [
-    ]
-  };
-
-
-  $(rawDatum).each(function (cnt, item) {
+function partitionChartDataTransformer(rawDatum) {
+  var _partitionData = {
+    name: "${ _('Total') }",
+    children: []
+  }
+  var _categories = [];
+  $(rawDatum.counts).each(function (cnt, item) {
     item.widget_id = rawDatum.widget_id;
 
-    var _cat = null;
-    _initialGrowingTree.nodes.forEach(function(cat){
-      if (cat.name == item.value){
-        _cat = cat;
+    var _category = null;
+    _categories.forEach(function (category) {
+      if (category.name == item.value) {
+        _category = category;
       }
     });
 
-    if (_cat == null){
-      _cat = {
-        path: item.value,
+    if (_category == null) {
+      _category = {
         name: item.value,
-        isExpanded: true,
-        selected: false,
-        nodes: []
+        children: []
       }
-     _initialGrowingTree.nodes.push(_cat);
+      _categories.push(_category);
     }
 
-    _cat.nodes.push({
-      path: item.cat,
-      name: item.cat + ' (' + item.count + ')',
-      isExpanded: true,
-      selected: false,
-      nodes: []
+    _category.children.push({
+      name: item.cat,
+      size: item.count,
+      obj: item,
+      children: []
     });
   });
 
-  var _growingTree = jQuery.extend(true, {}, _initialGrowingTree);
+  _partitionData.children = _categories;
 
-  return new TreeNodeModel(_growingTree);
-}
-
-function treeAfterRender() {
-
+  return _partitionData;
 }
 
 function pivotChartDataTransformer(rawDatum) {
-  var _cats = [];
+  var _categories = [];
 
   $(rawDatum.counts).each(function (cnt, item) {
     item.widget_id = rawDatum.widget_id;
 
-    var _cat = null;
-    _cats.forEach(function(cat){
-      if (cat.key == item.value){
-        _cat = cat;
+    var _category = null;
+    _categories.forEach(function (category) {
+      if (category.key == item.value) {
+        _category = category;
       }
     });
 
-    if (_cat == null){
-     _cat = {
+    if (_category == null) {
+      _category = {
         key: item.value,
         values: []
       };
-     _cats.push(_cat);
+      _categories.push(_category);
     }
 
-    _cat.values.push({
+    _category.values.push({
       series: 0,
       x: item.cat,
       y: item.count,
@@ -1349,7 +1336,7 @@ function pivotChartDataTransformer(rawDatum) {
     });
   });
 
-  return _cats;
+  return _categories;
 }
 
 function lineChartDataTransformer(rawDatum) {
