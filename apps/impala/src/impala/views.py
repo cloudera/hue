@@ -24,7 +24,9 @@ import json
 
 from django.http import HttpResponse
 
+from desktop.context_processors import get_app_name
 from desktop.lib.django_util import render
+
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
@@ -33,6 +35,31 @@ from impala.models import Dashboard, Controller
 
 
 LOG = logging.getLogger(__name__)
+
+
+def refresh_tables(request):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)  
+  db = dbms.get(request.user, query_server=query_server)
+  
+  response = {'status': -1, 'message': ''}
+  
+  if request.method == "POST":
+    try:
+      database = json.loads(request.POST['database'])
+      added = json.loads(request.POST['added'])
+      removed = json.loads(request.POST['removed'])
+      
+      db.invalidate_tables(database, added + removed)
+      
+      response['status'] = 0
+    except Exception, e:
+      response['message'] = str(e)    
+  
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+# Dashboard below
 
 
 def dashboard(request):
@@ -51,7 +78,7 @@ def query(request):
     'data': {}
   }
   
-  dashboard = json.loads(request.POST['dashboard'])  
+  dashboard = json.loads(request.POST['dashboard'])
   fqs = json.loads(request.POST['query'])['fqs']
 
   database = dashboard['properties'][0]['database']

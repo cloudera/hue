@@ -27,11 +27,10 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT,\
   BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
-from beeswax.models import QueryHistory, HIVE_SERVER2, BEESWAX, QUERY_TYPES
+from beeswax.models import QueryHistory, QUERY_TYPES
 
 from filebrowser.views import location_to_url
 from desktop.lib.django_util import format_preserving_redirect
-from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -236,6 +235,17 @@ class HiveServer2Dbms(object):
     design.save()
 
     return self.execute_query(query, design)
+
+
+  def invalidate_tables(self, database, tables):
+    for table in tables:
+      hql = "INVALIDATE METADATA %s.%s" % (database, table,)        
+      query = hql_query(hql, database, query_type=QUERY_TYPES[1])
+
+      handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+      if handle:
+        self.close(handle)
 
 
   def drop_database(self, database):
