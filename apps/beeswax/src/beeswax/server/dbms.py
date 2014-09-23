@@ -242,7 +242,7 @@ class HiveServer2Dbms(object):
       hql = "INVALIDATE METADATA %s.%s" % (database, table,)        
       query = hql_query(hql, database, query_type=QUERY_TYPES[1])
 
-      handle = self.execute_and_wait(query, timeout_sec=5.0)
+      handle = self.execute_and_wait(query, timeout_sec=10.0)
 
       if handle:
         self.close(handle)

@@ -55,8 +55,8 @@ ${layout.menubar(section='query')}
           <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div id="navigatorNoTables">${_('The selected database has no tables.')}</div>
           <ul id="navigatorTables" class="unstyled"></ul>
-          <div id="navigatorLoader">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+          <div id="navigatorLoader" class="center">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
             <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
           </div>
         </div>
@@ -1101,9 +1101,11 @@ $(document).ready(function () {
     if (_db != null) {
       $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
       // clear all the table fields too
-      $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db).split(" ").forEach(function(item){
-        $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + _db + '_' + item, null);
-      });
+      if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db) != null) {
+        $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db).split(" ").forEach(function (item) {
+          $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + _db + '_' + item, null);
+        });
+      }
       getDatabases(function(){
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
@@ -1215,6 +1217,9 @@ $(document).ready(function () {
   });
 
   $("#refreshNavigator").on("click", function () {
+    $("#navigatorTables").empty();
+    $("#navigatorLoader").show();
+
     % if app_name == 'impala':
       syncWithHive = function () {
         // Diff Hive / Impala metastore and invalidate out of sync tables
@@ -1246,12 +1251,12 @@ $(document).ready(function () {
           }
         });
       }
-    
-      syncWithHive();
+
+      window.setTimeout(syncWithHive, 100);
 
     % endif
-   
-    resetNavigator();
+
+    window.setTimeout(resetNavigator, 100);
   });
 
   resizeNavigator();
