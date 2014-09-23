@@ -134,7 +134,8 @@ var Assist = function (vm, assist) {
   });
   self.changedRegularAcls = ko.computed(function () {
     return $.grep(self.regularAcls(), function (acl) {
-      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1;
+      return ['new', 'deleted', 'modified'].indexOf(acl.status()) != -1 &&
+        ! (['new', 'modified'].indexOf(acl.status()) != -1 && acl.name() == ''); // Empty groups/users
     });
   });
   self.changedDefaultAcls = ko.computed(function () {
@@ -429,10 +430,10 @@ var Assist = function (vm, assist) {
             if (typeof optionalPath == "undefined") {
               self.getAcls();
             }
-          }
-        }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
-        });
+        }
+     }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+     });
   };
 
   self.loadMore = function (what) {
@@ -495,8 +496,8 @@ var Assist = function (vm, assist) {
           $(document).trigger("updated.acls");
         }
     ).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", JSON.parse(xhr.responseText).message);
-        });
+       $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 
   self.bulkAction = ko.observable("");
@@ -534,8 +535,8 @@ var Assist = function (vm, assist) {
           $(document).trigger("deleted.bulk.acls");
         }
     ).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", JSON.parse(xhr.responseText).message);
-        });
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 
   self.bulkAddAcls = function () {
@@ -554,8 +555,8 @@ var Assist = function (vm, assist) {
           $(document).trigger("added.bulk.acls");
         }
     ).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", JSON.parse(xhr.responseText).message);
-        });
+      $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 
   self.bulkSyncAcls = function () {
@@ -574,8 +575,8 @@ var Assist = function (vm, assist) {
           $(document).trigger("syncd.bulk.acls");
         }
     ).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", JSON.parse(xhr.responseText).message);
-        });
+       $(document).trigger("error", JSON.parse(xhr.responseText).message);
+    });
   }
 }
 

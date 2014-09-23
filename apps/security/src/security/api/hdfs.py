@@ -87,10 +87,13 @@ def update_acls(request):
   original_acls = json.loads(request.POST.get('originalAcls'))
 
   try:
-    renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls]) # We need to remove ACLs that have been renamed
-    _remove_acl_names(request.fs, path, list(renamed_acls))
-    _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
-    _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
+    if all([acl['status'] == 'deleted' for acl in acls]):
+      request.fs.remove_acl(path)
+    else:
+      renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls]) # We need to remove ACLs that have been renamed
+      _remove_acl_names(request.fs, path, list(renamed_acls))
+      _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
+      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
