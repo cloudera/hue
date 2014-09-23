@@ -209,12 +209,11 @@ function bindSubmit() {
         properties: _props
       });
     });
-    data = {
-      cluster: $(this).find("input[name='cluster']").val(),
-      tableName: $(this).find("input[name='tableName']").val(),
-      columns: _cols
-    }
-    data = JSON.stringify(data);
+    data = [
+      $(this).find("input[name='cluster']").val(),
+      $(this).find("input[name='tableName']").val(),
+      JSON.stringify(_cols)
+    ]
   }
   else {
     $(this).find('.controls > input, .controls > textarea, .controls > ul input').not('input[type=submit]').each(function() {
@@ -246,18 +245,21 @@ function bindSubmit() {
         //change reload next
       }
       if(submitVal) {
-        if(use_post)
+        if(use_post) {
           submitVal = "hbase-post-key-" + JSON.stringify(submitVal);
-        else
+        } else {
           submitVal = prepForTransport(submitVal);
+        }
         data.push(submitVal);
       }
     });
   }
+
   $(this).find('input[type=submit]').addClass('disabled').showIndicator();
   var ui = app.focusModel();
   if(ui)
     ui.isLoading(true);
+
   API.queryArray($(this).attr('action'), data).complete(function() {
     $(self).find('input[type=submit]').removeClass('disabled').hideIndicator();
     if(ui)
@@ -267,6 +269,7 @@ function bindSubmit() {
     if(ui)
       app.focusModel().reload();
   });
+
   return false;
 }
 $('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
