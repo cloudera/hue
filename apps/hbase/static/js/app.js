@@ -196,13 +196,15 @@ function bindSubmit() {
   var hash_cache = {};
   if ($(this).attr("id") == "new_table_modal"){
     var _cols = [];
-    $(this).find(".columns li").each(function(cnt, column){
+    $(this).find(".columns li.column").each(function(cnt, column){
       var _props = [];
       $(column).find(".columnProperties li").each(function(icnt, property){
-        _props.push({
-          name: $(property).find("select").val(),
-          value: $(property).find("input[name='table_columns_property_value']").val()
-        });
+        if (! $(property).hasClass("columnPropertyEmpty")) {
+          _props.push({
+            name: $(property).find("select").val(),
+            value: $(property).find("input[name='table_columns_property_value']").val()
+          });
+        }
       });
       _cols.push({
         name: $(column).find("input[name='table_columns']").val(),
@@ -283,7 +285,7 @@ var prepareNewTableForm = function () {
 
 var addColumnToNewTableForm = function() {
   var $li = $("<li>").addClass("column").css("marginBottom", "10px").html($("#columnTemplate").html());
-  addColumnPropertyToColumn($li);
+  $li.find("ul").html($("#columnPropertyEmptyTemplate").html());
   $li.appendTo($("#new_table_modal .modal-body ul.columns"));
 }
 
