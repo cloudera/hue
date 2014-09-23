@@ -501,7 +501,10 @@ def augment_solr_response(response, collection, query):
       elif category == 'pivot':
         name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
-          count = _augment_pivot_2d(facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
+          if facet['properties']['scope'] == 'stack':
+            count = _augment_pivot_2d(facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
+          else:
+            count = response['facet_counts']['facet_pivot'][name]
         else:
           count = []
         facet = {
