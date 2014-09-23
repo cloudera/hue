@@ -174,7 +174,7 @@ class SentryApi(object):
         'database': privilege.dbName,
         'table': privilege.tableName,
         'URI': privilege.URI,
-        'action': privilege.action.upper(),
+        'action': 'ALL' if privilege.action == '*' else privilege.action.upper(),
         'timestamp': privilege.createTime,
         'grantOption': privilege.grantOption == 1,
     }
