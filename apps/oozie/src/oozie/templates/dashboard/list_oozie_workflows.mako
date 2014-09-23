@@ -35,6 +35,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
+    <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+      <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+      <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i> ${ _('Resume') }</button>
+      <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i> ${ _('Suspend') }</button>
+      <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i> ${ _('Kill') }</button>
+    </div>
+
     <span class="pull-right">
       <span style="padding-right:10px;float:left;margin-top:3px">
       ${ _('Show only') }
@@ -59,14 +66,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="15%">${ _('Submission') }</th>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th width="14%">${ _('Submission') }</th>
           <th width="5%">${ _('Status') }</th>
           <th width="21%">${ _('Name') }</th>
           <th width="7%">${ _('Progress') }</th>
           <th width="7%">${ _('Submitter') }</th>
           <th width="15%">${ _('Last Modified') }</th>
           <th width="20%">${ _('Id') }</th>
-          <th width="10%">${ _('Action') }</th>
         </tr>
       </thead>
       <tbody>
@@ -128,6 +135,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   </div>
 </div>
 
+
 <script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
@@ -155,6 +163,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
   }
 
+  var refreshRunning;
+
   $(document).ready(function () {
     var runningTable = $("#running-table").dataTable({
       "sPaginationType":"bootstrap",
@@ -162,14 +172,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
+        { "bSortable":false },
         { "sType":"date" },
         null,
         null,
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
-        null,
-        { "bSortable":false }
+        null
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -321,13 +331,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       });
     });
 
-    refreshRunning();
-    refreshCompleted();
-    refreshProgress();
-
     var numRunning = 0;
 
-    function refreshRunning() {
+    refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
         if (data) {
           var nNodes = runningTable.fnGetNodes();
@@ -336,7 +342,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
             $(data).each(function (iWf, currentItem) {
-              if ($(node).children("td").eq(6).text() == currentItem.id) {
+              if ($(node).children("td").eq(7).text() == currentItem.id) {
                 nodeFound = true;
               }
             });
@@ -350,51 +356,22 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             var wf = new Workflow(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(6).text() == wf.id) {
+              if ($(node).children("td").eq(7).text() == wf.id) {
                 foundRow = node;
               }
             });
-            var killCell = "";
-            var suspendCell = "";
-            var resumeCell = "";
-            if (wf.canEdit) {
-              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + wf.killUrl + '" ' +
-                      'title="${ _('Kill') } ' + wf.id + '"' +
-                      'alt="${ _('Are you sure you want to kill workflow ')}' + wf.id + '?" ' +
-                      'data-message="${ _('The workflow was killed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
-                      '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + wf.suspendUrl + '" ' +
-                      'title="${ _('Suspend') } ' + wf.id + '"' +
-                      'alt="${ _('Are you sure you want to suspend workflow ')}' + wf.id + '?" ' +
-                      'data-message="${ _('The workflow was suspended!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
-                      '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + wf.resumeUrl + '" ' +
-                      'title="${ _('Resume') } ' + wf.id + '"' +
-                      'alt="${ _('Are you sure you want to resume workflow ')}' + wf.id + '?" ' +
-                      'data-message="${ _('The workflow was resumed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"' +
-                      '>${ _('Resume') }</a>';
-            }
             if (foundRow == null) {
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(wf.status) > -1) {
                 try {
                   runningTable.fnAddData([
+                    wf.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>':'',
                     emptyStringIfNull(wf.lastModTime),
                     '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
                     wf.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
                     emptyStringIfNull(wf.lastModTime),
-                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(wf.status) > -1 ? suspendCell : resumeCell)
+                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
                   ]);
                 }
                 catch (error) {
@@ -403,8 +380,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               }
             }
             else {
-              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
-              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(wf.status) > -1?suspendCell:resumeCell), foundRow, 7, false);
+              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -451,17 +427,17 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             var wf = new Workflow(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(6).text() == wf.id) {
+              if ($(node).children("td").eq(7).text() == wf.id) {
                 foundRow = node;
               }
             });
             if (foundRow != null) {
-              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
+              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 2, false);
               if (wf.progress == 0){
-                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }
               else {
-                runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 4, false);
               }
             }
           });
@@ -469,8 +445,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       });
     }
 
+    refreshRunning();
+    refreshCompleted();
+    refreshProgress();
+
   });
 
 </script>
+${ utils.bulk_dashboard_functions() }
 
 ${ commonfooter(messages) | n,unicode }
