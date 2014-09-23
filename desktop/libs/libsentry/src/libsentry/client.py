@@ -23,7 +23,8 @@ from sentry_policy_service import SentryPolicyService
 from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
-    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest
+    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest, \
+    TListSentryPrivilegesByAuthRequest
 
 from libsentry.sentry_site import get_sentry_server_authentication,\
   get_sentry_server_principal
@@ -166,3 +167,14 @@ class SentryClient(object):
       authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
     request = TListSentryPrivilegesForProviderRequest(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
     return self.client.list_sentry_privileges_for_provider(request)
+
+
+  def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
+    authorizableSet = [TSentryAuthorizable(**authorizable) for authorizable in authorizableSet]
+    if roleSet is not None:
+      roleSet = TSentryActiveRoleSet(**roleSet)    
+
+    # Missing requestorUserName=self.username
+    request = TListSentryPrivilegesByAuthRequest(authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
+    return self.client.list_sentry_privileges_by_authorizable(request)
+

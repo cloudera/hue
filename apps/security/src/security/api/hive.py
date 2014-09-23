@@ -203,24 +203,22 @@ def drop_sentry_role(request):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-# Mocked until Sentry API returns the info!
 def list_sentry_privileges_by_authorizable(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    groupName = request.POST['groupName'] if request.POST['groupName'] else None
-    roleSet = json.loads(request.POST['roleSet'])
-    authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+    groups = [request.POST['groupName']] if request.POST['groupName'] else None
+    authorizableSet = [json.loads(request.POST['authorizableHierarchy'])]
 
-    privileges = []
-    roles = get_api(request.user).list_sentry_roles_by_group(groupName=groupName)
+    _privileges = []
 
-    for role in roles:
-      for privilege in get_api(request.user).list_sentry_privileges_by_role(role['name'], authorizableHierarchy=authorizableHierarchy):
-        privilege['roleName'] = role['name']
-        privileges.append(privilege)
+    for authorizable, roles in get_api(request.user).list_sentry_privileges_by_authorizable(authorizableSet=authorizableSet, groups=groups):
+      for role, privileges in roles.iteritems():
+        for privilege in privileges:
+          privilege['roleName'] = role
+        _privileges.append(privilege)
 
-    result['privileges'] = sorted(privileges, key=lambda privilege: privilege['roleName'])
+    result['privileges'] = sorted(_privileges, key=lambda privilege: privilege['roleName'])
 
     result['message'] = ''
     result['status'] = 0
