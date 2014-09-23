@@ -365,18 +365,11 @@ ${ layout.menubar(section='hive') }
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Apply some bulk operations') }</h3>
+    <h3>${ _('Select one operation') }</h3>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
     <div class="row-fluid">
-      <div class="span4">
-        <h4>${ _('Selection') }</h4>
-        <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span> <i class="fa fa-long-arrow-right muted"></i> <i class="fa fa-table muted"></i> <span data-bind="text: path.split('.')[1]"></span></li>
-          <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span></li>
-        </ul>
-      </div>
       <div class="span8">
         <div class="row-fluid">
           <div class="span4 center">
@@ -399,6 +392,13 @@ ${ layout.menubar(section='hive') }
           </div>
         </div>
       </div>
+      <div class="span4">
+        <h4>${ _('to apply to the selection') }</h4>
+        <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
+          <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span> <i class="fa fa-long-arrow-right muted"></i> <i class="fa fa-table muted"></i> <span data-bind="text: path.split('.')[1]"></span></li>
+          <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span></li>
+        </ul>
+      </div>      
     </div>
     <br/>
     <div class="row-fluid" data-bind="visible: $root.bulkAction() != '' && $root.bulkAction() != 'delete'">
