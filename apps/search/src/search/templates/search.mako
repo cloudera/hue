@@ -180,7 +180,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pivot')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-sitemap"></i>
+                       <i class="fa fa-sitemap fa-rotate-270"></i>
          </a>
    </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
@@ -1270,16 +1270,13 @@ function barChartDataTransformer(rawDatum) {
   return _datum;
 }
 
-function partitionChartDataTransformer(rawDatum) {
-  var _partitionData = {
-    name: "${ _('Total') }",
-    children: []
-  }
-  var _categories = [];
-  $(rawDatum.counts).each(function (cnt, item) {
-    item.widget_id = rawDatum.widget_id;
 
+function _partitionChartDataTransformer(counts) {
+  var _categories = [];
+
+  $(counts).each(function (cnt, item) {
     var _category = null;
+
     _categories.forEach(function (category) {
       if (category.name == item.value) {
         _category = category;
@@ -1289,23 +1286,36 @@ function partitionChartDataTransformer(rawDatum) {
     if (_category == null) {
       _category = {
         name: item.value,
+        size: item.count,
         children: []
       }
       _categories.push(_category);
     }
 
-    _category.children.push({
-      name: item.cat,
-      size: item.count,
-      obj: item,
-      children: []
-    });
+    if (item.pivot != undefined) {
+      var children = []
+      $(item.pivot).each(function (cnt, child) {
+        children = children.concat(_partitionChartDataTransformer(child));
+      });
+     _category.children = children;
+    }
   });
 
-  _partitionData.children = _categories;
+  return _categories;
+}
+
+function partitionChartDataTransformer(rawDatum) {
+  var _partitionData = {
+    name: "${ _('Total') }",
+    children: []
+  }
+
+  _partitionData.children = _partitionChartDataTransformer(rawDatum.counts);
 
   return _partitionData;
 }
+
+
 
 function pivotChartDataTransformer(rawDatum) {
   var _categories = [];
