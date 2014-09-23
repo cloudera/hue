@@ -70,7 +70,7 @@ var Privilege = function (vm, privilege) {
       self.status('modified');
     }
   });
-  
+
   // UI
   self.privilegeType = ko.observable("db");
   self.showAdvanced = ko.observable(false);
@@ -1003,37 +1003,41 @@ var HiveViewModel = function (initial) {
         authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
       },
       success: function (data) {
-        var _privileges = [];
-        $.each(data.privileges, function (index, item) {
-          if (item.table != ""){
-            self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
-          }
-          if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
-            var _role = null;
-            self.assist.roles().forEach(function (role) {
-              if (role.name() == item.roleName) {
-                _role = role;
-              }
-            });
-            if (_role == null) {
-              var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
-              _role = self.assist.roles()[_idx - 1];
+    	if (data.status == 0) {
+          var _privileges = [];
+          $.each(data.privileges, function (index, item) {
+            if (item.table != ""){
+              self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
             }
+            if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
+              var _role = null;
+              self.assist.roles().forEach(function (role) {
+                if (role.name() == item.roleName) {
+                  _role = role;
+                }
+              });
+              if (_role == null) {
+                var _idx = self.assist.roles.push(new Role(self, { name: item.roleName }));
+                _role = self.assist.roles()[_idx - 1];
+              }
 
-            var privilege = _create_ko_privilege(item);
-            var privilegeCopy = _create_ko_privilege(item);
-            privilegeCopy.id(privilege.id());
-            _role.privileges.push(privilege);
-            _role.originalPrivileges.push(privilegeCopy);            
-            
-            _privileges.push(privilege);
+              var privilege = _create_ko_privilege(item);
+              var privilegeCopy = _create_ko_privilege(item);
+              privilegeCopy.id(privilege.id());
+              _role.privileges.push(privilege);
+              _role.originalPrivileges.push(privilegeCopy);
+
+              _privileges.push(privilege);
+            }
+          });
+          if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
+            self.assist.privileges(_privileges);
           }
-        });
-        if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
-          self.assist.privileges(_privileges);
-        }
-        self.isLoadingPrivileges(false);
-        self.assist.loadData(self.assist.growingTree());
+          self.isLoadingPrivileges(false);
+          self.assist.loadData(self.assist.growingTree());
+    	} else {
+    	  $(document).trigger("error", data.message);
+    	}
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
