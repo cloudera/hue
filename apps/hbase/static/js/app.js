@@ -197,17 +197,15 @@ function bindSubmit() {
   if ($(this).attr("id") == "new_table_modal"){
     var _cols = [];
     $(this).find(".columns li.column").each(function(cnt, column){
-      var _props = [];
+      var _props = {
+        name: $(column).find("input[name='table_columns']").val()
+      };
       $(column).find(".columnProperties li").each(function(icnt, property){
         if (! $(property).hasClass("columnPropertyEmpty")) {
-          _props.push({
-            name: $(property).find("select").val(),
-            value: $(property).find("input[name='table_columns_property_value']").val()
-          });
+          _props[$(property).find("select").val()] = $(property).find("input[name='table_columns_property_value']").val();
         }
       });
       _cols.push({
-        name: $(column).find("input[name='table_columns']").val(),
         properties: _props
       });
     });
