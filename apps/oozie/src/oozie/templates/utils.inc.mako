@@ -575,3 +575,133 @@ function renderCrons() {
 }
 </%def>
 
+<%def name="bulk_dashboard_functions()">
+
+<div id="bulkConfirmation" class="modal hide">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('Do you really want to kill the selected jobs?') }</h3>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $(".bulkToolbarBtn").on("click", function(){
+      $(".btn-toolbar").find(".loader").removeClass("hide");
+      $(".bulkToolbarBtn").hide();
+      if ($(this).data("operation") == "kill"){
+        bulkOperationConfirmation($(this).data("operation"));
+      }
+      else {
+        bulkOperation($(this).data("operation"));
+      }
+    });
+
+    function toggleBulkButtons() {
+      if ($(".hueCheckbox.fa-check:not(.select-all)").length > 0){
+        var _allResume = true;
+        var _allSuspended = true;
+        $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+          if (['RUNNING', 'PREP', 'WAITING'].indexOf($(this).parents("tr").find(".label").text()) > -1){
+            _allResume = false;
+          }
+          else {
+            _allSuspended = false;
+          }
+        });
+        if (! _allResume) {
+          $(".bulk-suspend").removeAttr("disabled");
+        }
+        if (! _allSuspended) {
+          $(".bulk-resume").removeAttr("disabled");
+        }
+        $(".bulk-kill").removeAttr("disabled");
+      }
+      else {
+        $(".bulkToolbarBtn").attr("disabled", "disabled");
+      }
+    }
+
+    $("#bulkConfirmation").modal({
+      show: false
+    }).on("hidden", function(){
+      $(".btn-toolbar").find(".loader").addClass("hide");
+      $(".bulkToolbarBtn").show();
+    });
+
+
+    function bulkOperationConfirmation(what){
+      $("#bulkConfirmation").modal("show");
+      $("#bulkConfirmation a.btn-danger").on("click", function(){
+        bulkOperation(what);
+        $("#bulkConfirmation").modal("hide");
+      });
+    }
+
+    function bulkOperation(what) {
+      var _ids = [];
+      $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+        _ids.push($(this).parents("tr").find("a[data-row-selector='true']").text());
+      });
+
+      $.post("${ url('oozie:bulk_manage_oozie_jobs') }",
+        {
+          "job_ids": _ids.join(" "),
+          "action": what
+        },
+        function (response) {
+          ## we get this from each dashboard page
+          refreshRunning();
+          var _messages = {
+            suspend: "${ _('The selected jobs have been suspended correctly.') }",
+            suspendErrors: "${ _('Some of the selected jobs may not have been suspended correctly:') }",
+            resume: "${ _('The selected jobs have been resumed correctly.') }",
+            resumeErrors: "${ _('Some of the selected jobs may not have been resumed correctly:') }",
+            kill: "${ _('The selected jobs have been killed correctly.') }",
+            killErrors: "${ _('Some of the selected jobs may not have been killed correctly:') }"
+          }
+          if (response.totalErrors > 0){
+            $.jHueNotify.warn(_messages[what + "Errors"] + " " + response.messages);
+          }
+          else {
+            $.jHueNotify.info(_messages[what]);
+          }
+          $(".hueCheckbox").removeClass("fa-check");
+          toggleBulkButtons();
+          $(".btn-toolbar").find(".loader").addClass("hide");
+          $(".bulkToolbarBtn").show();
+      });
+    }
+
+    $(document).on("click", ".hueCheckbox", function(){
+      var _check = $(this);
+      if (_check.hasClass("select-all")){
+        if (_check.hasClass("fa-check")){
+          $(".hueCheckbox").removeClass("fa-check");
+        }
+        else {
+          $(".hueCheckbox").addClass("fa-check");
+        }
+      }
+      else {
+        if (_check.hasClass("fa-check")){
+          _check.removeClass("fa-check");
+        }
+        else {
+          _check.addClass("fa-check");
+        }
+      }
+      toggleBulkButtons();
+    });
+
+    toggleBulkButtons();
+  });
+
+</script>
+</%def>
+

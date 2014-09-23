@@ -82,6 +82,27 @@ def manage_oozie_jobs(request, job_id, action):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+def bulk_manage_oozie_jobs(request):
+  if request.method != 'POST':
+    raise PopupException(_('Use a POST request to manage the Oozie jobs.'))
+
+  response = {'status': -1, 'data': ''}
+
+  if 'job_ids' in request.POST and 'action' in request.POST:
+    jobs = request.POST.get('job_ids').split()
+    response = {'totalRequests': len(jobs), 'totalErrors': 0, 'messages': ''}
+
+    for job_id in jobs:
+      job = check_job_access_permission(request, job_id)
+      check_job_edition_permission(job, request.user)
+      try:
+        get_oozie(request.user).job_control(job_id, request.POST.get('action'))
+      except RestException, ex:
+        response['totalErrors'] = response['totalErrors'] + 1
+        response['messages'] += str(ex)
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 def show_oozie_error(view_func):
   def decorate(request, *args, **kwargs):

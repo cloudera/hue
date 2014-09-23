@@ -34,6 +34,13 @@ ${layout.menubar(section='bundles', dashboard=True)}
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
+    <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+      <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+      <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i> ${ _('Resume') }</button>
+      <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i> ${ _('Suspend') }</button>
+      <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i> ${ _('Kill') }</button>
+    </div>
+
     <span class="pull-right">
       <span style="padding-right:10px;float:left;margin-top:3px">
       ${ _('Show only') }
@@ -58,14 +65,14 @@ ${layout.menubar(section='bundles', dashboard=True)}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="15%">${ _('Kickoff Time') }</th>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th width="14%">${ _('Kickoff Time') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
           <th width="10%">${ _('Progress') }</th>
           <th width="10%">${ _('Submitter') }</th>
           <th width="10%">${ _('Created Time') }</th>
           <th width="15%">${ _('Id') }</th>
-          <th width="10%">${ _('Action') }</th>
         </tr>
       </thead>
       <tbody>
@@ -151,6 +158,8 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
   }
 
+  var refreshRunning;
+
   $(document).ready(function () {
     var runningTable = $("#running-table").dataTable({
       "sPaginationType":"bootstrap",
@@ -158,14 +167,14 @@ ${layout.menubar(section='bundles', dashboard=True)}
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
+        { "bSortable":false },
         { "sType":"date" },
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
-        null,
-        { "bSortable":false }
+        null
       ],
       "aaSorting":[
         [ 5, "desc" ]
@@ -321,13 +330,10 @@ ${layout.menubar(section='bundles', dashboard=True)}
       });
     });
 
-    refreshRunning();
-    refreshCompleted();
-    refreshProgress();
 
     var numRunning = 0;
 
-    function refreshRunning() {
+    refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
         if (data) {
           var nNodes = runningTable.fnGetNodes();
@@ -336,7 +342,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
             $(data).each(function (iBundle, currentItem) {
-              if ($(node).children("td").eq(6).text() == currentItem.id) {
+              if ($(node).children("td").eq(7).text() == currentItem.id) {
                 nodeFound = true;
               }
             });
@@ -350,51 +356,23 @@ ${layout.menubar(section='bundles', dashboard=True)}
             var bundle = new Bundle(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(6).text() == bundle.id) {
+              if ($(node).children("td").eq(7).text() == bundle.id) {
                 foundRow = node;
               }
             });
-            var killCell = "";
-            var suspendCell = "";
-            var resumeCell = "";
-            if (bundle.canEdit) {
-              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + bundle.killUrl + '" ' +
-                      'title="${ _('Kill') } ' + bundle.id + '"' +
-                      'alt="${ _('Are you sure you want to kill bundle ')}' + bundle.id + '?" ' +
-                      'data-message="${ _('The bundle was killed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
-                      '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + bundle.suspendUrl + '" ' +
-                      'title="${ _('Suspend') } ' + bundle.id + '"' +
-                      'alt="${ _('Are you sure you want to suspend bundle ')}' + bundle.id + '?" ' +
-                      'data-message="${ _('The bundle was suspended!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
-                      '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + bundle.resumeUrl + '" ' +
-                      'title="${ _('Resume') } ' + bundle.id + '"' +
-                      'alt="${ _('Are you sure you want to resume bundle ')}' + bundle.id + '?" ' +
-                      'data-message="${ _('The bundle was resumed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"' +
-                      '>${ _('Resume') }</a>';
-            }
+
             if (foundRow == null) {
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(bundle.status) > -1) {
                 try {
                   runningTable.fnAddData([
+                    bundle.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
                     emptyStringIfNull(bundle.kickoffTime),
                     '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
                     bundle.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width:1%"></div></div>',
                     bundle.user,
                     emptyStringIfNull(bundle.created),
-                    '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>',
-                    killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(bundle.status) > -1?suspendCell:resumeCell)
+                    '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>'
                   ]);
                 }
                 catch (error) {
@@ -404,8 +382,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
             }
             else {
-              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 1, false);
-              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(bundle.status) > -1?suspendCell:resumeCell), foundRow, 7, false);
+              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -452,17 +429,17 @@ ${layout.menubar(section='bundles', dashboard=True)}
             var bundle = new Bundle(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(6).text() == bundle.id) {
+              if ($(node).children("td").eq(7).text() == bundle.id) {
                 foundRow = node;
               }
             });
             if (foundRow != null) {
-              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 1, false);
+              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 2, false);
               if (bundle.progress == 0){
-                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }
               else {
-                runningTable.fnUpdate('<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>', foundRow, 4, false);
               }
             }
           });
@@ -470,7 +447,13 @@ ${layout.menubar(section='bundles', dashboard=True)}
       });
     }
 
+    refreshRunning();
+    refreshCompleted();
+    refreshProgress();
+
   });
 </script>
+
+${ utils.bulk_dashboard_functions() }
 
 ${ commonfooter(messages) | n,unicode }

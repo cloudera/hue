@@ -34,6 +34,13 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
+    <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+      <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+      <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i> ${ _('Resume') }</button>
+      <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i> ${ _('Suspend') }</button>
+      <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i> ${ _('Kill') }</button>
+    </div>
+
     <span class="pull-right">
       <span style="padding-right:10px;float:left;margin-top:3px">
       ${ _('Show only') }
@@ -58,7 +65,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="12%">${ _('Next Submission') }</th>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th width="11%">${ _('Next Submission') }</th>
           <th width="5%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
           <th width="5%">${ _('Progress') }</th>
@@ -71,7 +79,6 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           % endif
           <th width="12%">${ _('Start Time') }</th>
           <th width="15%">${ _('Id') }</th>
-          <th width="10%">${ _('Action') }</th>
         </tr>
       </thead>
       <tbody>
@@ -80,10 +87,10 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           <td></td>
           <td></td>
           <td></td>
+          <td></td>
           % if not enable_cron_scheduling:
           <td></td>
           % endif
-          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -181,6 +188,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     }
   }
 
+  var refreshRunning;
+
   $(document).ready(function () {
     var runningTable = $("#running-table").dataTable({
       "sPaginationType":"bootstrap",
@@ -188,6 +197,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
+        { "bSortable":false },
         { "sType":"date" },
         null,
         null,
@@ -198,8 +208,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         % if not enable_cron_scheduling:
         null,
         % endif
-        null,
-        { "bSortable":false }
+        null
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -365,13 +374,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     % endif
 
 
-    refreshRunning();
-    refreshCompleted();
-    refreshProgress();
-
     var numRunning = 0;
 
-    function refreshRunning() {
+    refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
         if (data) {
           var nNodes = runningTable.fnGetNodes();
@@ -381,11 +386,11 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             var nodeFound = false;
             $(data).each(function (iCoord, currentItem) {
               % if enable_cron_scheduling:
-              if ($(node).children("td").eq(7).text() == currentItem.id) {
+              if ($(node).children("td").eq(8).text() == currentItem.id) {
                  nodeFound = true;
               }
               % else:
-              if ($(node).children("td").eq(8).text() == currentItem.id) {
+              if ($(node).children("td").eq(9).text() == currentItem.id) {
                  nodeFound = true;
               }
               % endif
@@ -402,48 +407,20 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
               % if enable_cron_scheduling:
-              if ($(node).children("td").eq(7).text() == coord.id) {
+              if ($(node).children("td").eq(8).text() == coord.id) {
                 foundRow = node;
               }
               % else:
-              if ($(node).children("td").eq(8).text() == coord.id) {
+              if ($(node).children("td").eq(9).text() == coord.id) {
                 foundRow = node;
               }
               % endif
             });
-            var killCell = "";
-            var suspendCell = "";
-            var resumeCell = "";
-            if (coord.canEdit) {
-              killCell = '<a class="btn btn-mini btn-danger disable-feedback confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + coord.killUrl + '" ' +
-                      'title="${ _('Kill') } ' + coord.id + '"' +
-                      'alt="${ _('Are you sure you want to kill coordinator ')}' + coord.id + '?" ' +
-                      'data-message="${ _('The coordinator was killed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
-                      '>${ _('Kill') }</a>';
-              suspendCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + coord.suspendUrl + '" ' +
-                      'title="${ _('Suspend') } ' + coord.id + '"' +
-                      'alt="${ _('Are you sure you want to suspend coordinator ')}' + coord.id + '?" ' +
-                      'data-message="${ _('The coordinator was suspended!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
-                      '>${ _('Suspend') }</a>';
-              resumeCell = '<a class="btn btn-mini confirmationModal" ' +
-                      'href="javascript:void(0)" ' +
-                      'data-url="' + coord.resumeUrl + '" ' +
-                      'title="${ _('Resume') } ' + coord.id + '"' +
-                      'alt="${ _('Are you sure you want to resume coordinator ')}' + coord.id + '?" ' +
-                      'data-message="${ _('The coordinator was resumed!') }" ' +
-                      'data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"' +
-                      '>${ _('Resume') }</a>';
-            }
             if (foundRow == null) {
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(coord.status) > -1) {
                 try {
                   runningTable.fnAddData([
+                    coord.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
                     emptyStringIfNull(coord.nextMaterializedTime),
                     '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
                     coord.appName,
@@ -456,8 +433,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                     emptyStringIfNull(coord.timeUnit),
                     % endif
                     emptyStringIfNull(coord.startTime),
-                    '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
-                    killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell)
+                    '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'
                   ]);
                 }
                 catch (error) {
@@ -466,13 +442,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               }
             }
             else {
-              runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 1, false);
-              % if enable_cron_scheduling:
-              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell), foundRow, 9, false);
-              % else:
-              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell), foundRow, 10, false);
-              % endif
-
+              runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -532,28 +502,33 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
               % if enable_cron_scheduling:
-              if ($(node).children("td").eq(7).text() == coord.id) {
+              if ($(node).children("td").eq(8).text() == coord.id) {
                 foundRow = node;
               }
               % else:
-              if ($(node).children("td").eq(8).text() == coord.id) {
+              if ($(node).children("td").eq(9).text() == coord.id) {
                 foundRow = node;
               }
               % endif
             });
             if (foundRow != null) {
               if (coord.progress == 0){
-                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }
               else {
-                runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 3, false);
+                runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 4, false);
               }
             }
           });
         window.setTimeout(refreshProgress, 30000);
       });
     }
+
+    refreshRunning();
+    refreshCompleted();
+    refreshProgress();
   });
 </script>
+${ utils.bulk_dashboard_functions() }
 
 ${ commonfooter(messages) | n,unicode }
