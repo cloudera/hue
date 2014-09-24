@@ -848,6 +848,7 @@ var NewTemplate = function (vm, initial) {
 
   self.syncCollections = function () {
     $.post("/search/get_collections", {
+        collection: ko.mapping.toJSON(vm.collection),
       }, function (data) {
         if (data.status == 0) {
           // Sync new and old names
