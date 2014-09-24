@@ -80,7 +80,11 @@ class Job(object):
     self.api = api
     self.is_mr2 = True
     for attr in attrs.keys():
-      setattr(self, attr, attrs[attr])
+      if attr == 'acls':
+        # 'acls' are actually not available in the API
+        LOGGER.warn('Not using attribute: %s' % attrs[attr])
+      else:
+        setattr(self, attr, attrs[attr])
 
     self._fixup()
 

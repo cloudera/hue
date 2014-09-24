@@ -526,9 +526,15 @@ class MockMapreduce2Api(object):
         "path" : "hdfs://host.domain.com:9000/user/user1/.staging/job_1326232085508_0004/job.xml",
         "property" : [
            {
+              "name" : "dfs.datanode.data.dir",
               "value" : "/home/hadoop/hdfs/data",
-              "name" : "dfs.datanode.data.dir"
-           },
+           }, {
+              "name" : "mapreduce.job.acl-modify-job",
+              "value" : "test",
+           }, {
+              "name" : "mapreduce.job.acl-view-job",
+              "value" : "test",
+           }
          ]
       }
     }
@@ -622,6 +628,7 @@ class MockMapreduceApi(MockMapreduce2Api):
               u'user': u'test', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
               u'name': u'select avg(salary) from sample_07(Stage-1)', u'reducesRunning': 0, u'newMapAttempts': 0, u'diagnostics': u'', u'mapProgress': 0.0,
               u'runningMapAttempts': 1, u'newReduceAttempts': 1,
+              # Does not seems to exist in API, we actually skip it in case.
               "acls" : [{
                   "value" : "test",
                   "name" : "mapreduce.job.acl-modify-job"
