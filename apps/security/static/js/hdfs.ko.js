@@ -115,6 +115,7 @@ var Assist = function (vm, assist) {
     self.fetchPath();
     window.location.hash = path;
   });
+  self.pathType = ko.observable('');
   self.recursive = ko.observable(false);
   self.pagenum = ko.observable(1);
   self.fromLoadMore = false;
@@ -405,15 +406,18 @@ var Assist = function (vm, assist) {
         function (data) {
           if (data.error != null && data.error == "FILE_NOT_FOUND") {
             self.path("/");
+            self.pathType("dir");
           }
           else {
             self.loadParents(data.breadcrumbs);
             if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+              self.pathType("dir");
               $.each(data.files, function (index, item) {
                 self.convertItemToObject(item);
               });
             }
             else {
+              self.pathType("file");
               self.convertItemToObject(data);
             }
             self.getTreeAdditionalDataForPath(_path).loaded = true;

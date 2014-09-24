@@ -175,15 +175,16 @@ ${ layout.menubar(section='hdfs') }
                         <span class="pointer" data-bind="visible: $root.assist.changedRegularAcls().length, click: $root.assist.updateAcls"> &nbsp; <i class="fa fa-save"></i></span>
                       </div>
 
-                      <h4>${ _('Default ACLs') }</h4>
-                      <div data-bind="foreach: $root.assist.defaultAcls">
-                        <div data-bind="template: {name: 'aclEdit'}"></div>
-                      </div>
-
-                      <div class="acl-block acl-actions">
-                        <span class="pointer" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></span>
-                        <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.getAcls"> &nbsp; <i class="fa fa-undo"></i></span>
-                        <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.updateAcls"> &nbsp; <i class="fa fa-save"></i></span>
+                      <div data-bind="visible: $root.assist.pathType() == 'dir'">
+                        <h4>${ _('Default ACLs') }</h4>
+                        <div data-bind="foreach: $root.assist.defaultAcls">
+                          <div data-bind="template: {name: 'aclEdit'}"></div>
+                        </div>
+                        <div class="acl-block acl-actions">
+                          <span class="pointer" data-bind="click: $root.assist.addDefaultAcl"><i class="fa fa-plus"></i></span>
+                          <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.getAcls"> &nbsp; <i class="fa fa-undo"></i></span>
+                          <span class="pointer" data-bind="visible: $root.assist.defaultAcls().length, click: $root.assist.updateAcls"> &nbsp; <i class="fa fa-save"></i></span>
+                        </div>
                       </div>
                     </span>
                   </div>
