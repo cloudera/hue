@@ -94,7 +94,6 @@ def new_search(request):
   })
 
 
-@allow_admin_only
 def browse(request, name):
   collections = SearchController(request.user).get_all_indexes()
   if not collections:
