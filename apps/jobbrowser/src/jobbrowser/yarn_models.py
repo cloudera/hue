@@ -71,6 +71,8 @@ class Application:
     setattr(self, 'desiredReduces', None)
     setattr(self, 'durationFormatted', format_duration_in_millis(self.durationInMillis))
 
+    if not hasattr(self, 'acls'):
+      setattr(self, 'acls', {})
 
 class Job(object):
 
@@ -102,9 +104,6 @@ class Job(object):
     setattr(self, 'finishedReduces', self.reducesCompleted)
     setattr(self, 'desiredReduces', None)
 
-    if not hasattr(self, 'acls'):
-      setattr(self, 'acls', {})
-
   def kill(self):
     return self.api.kill(self.id)
 
@@ -115,6 +114,12 @@ class Job(object):
       return counters['jobCounters']
     else:
       return None
+
+  @property
+  def acls(self):
+    if not hasattr(self, '_acls'):
+      self._acls = dict([(name, self.conf_keys[name]) for name in self.conf_keys if 'acl' in name])
+    return self._acls
 
   @property
   def full_job_conf(self):

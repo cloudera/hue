@@ -48,7 +48,7 @@ def can_modify_job(username, job):
 
 def get_acls(job):
   if job.is_mr2:
-    return dict([(acl['name'], acl['value']) for acl in job.acls])
+    return job.acls
   else:
     return job.full_job_conf
 
