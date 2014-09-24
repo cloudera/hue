@@ -18,16 +18,19 @@
 
 import json
 
+from django.core.urlresolvers import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
+
+from hadoop import cluster
+
+from hadoop.conf import HDFS_CLUSTERS
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 
-from django.core.urlresolvers import reverse
-
-
 from libsentry import api
+from security.api.hive import _massage_uri
 
 
 def mocked_get_api(user):
@@ -56,7 +59,7 @@ class TestMockedApi(object):
     grant_access("sentry_hue", "hue", "security")
     add_to_group("sentry_test")
     add_to_group("sentry_hue")
-    
+
     raise SkipTest
 
   def tearDown(self):
@@ -76,3 +79,45 @@ class TestMockedApi(object):
 
     response = self.client_admin.post(reverse("security:list_sentry_roles_by_group"), {'groupName': 'test'})
     assert_equal('test', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
+
+
+class TestUtils(object):
+
+  def test_massage_uri(self):
+
+    finish = HDFS_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('namenode')
+    cluster.clear_caches()
+
+    try:
+      assert_equal('', _massage_uri(''))
+
+      assert_equal('namenode/data', _massage_uri('hdfs:///data'))
+
+      assert_equal('hdfs://nn:11/data', _massage_uri('hdfs://nn:11/data'))
+
+      assert_equal('hdfs://logical/data', _massage_uri('hdfs://logical/data'))
+
+      assert_equal('namenode/data', _massage_uri('/data'))
+
+      assert_equal('file:///data', _massage_uri('file:///data'))
+    finally:
+      finish()
+
+
+    finish = HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('hdfs://fs_defaultfs:8021')
+    cluster.clear_caches()
+
+    try:
+      assert_equal('', _massage_uri(''))
+
+      assert_equal('hdfs://fs_defaultfs:8021/data', _massage_uri('hdfs:///data'))
+
+      assert_equal('hdfs://nn:11/data', _massage_uri('hdfs://nn:11/data'))
+
+      assert_equal('hdfs://logical/data', _massage_uri('hdfs://logical/data'))
+
+      assert_equal('hdfs://fs_defaultfs:8021/data', _massage_uri('/data'))
+
+      assert_equal('file:///data', _massage_uri('file:///data'))
+    finally:
+      finish()

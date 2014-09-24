@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 
 from libsentry.api import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
+from hadoop.cluster import get_defaultfs
 
 
 def list_sentry_roles_by_group(request):
@@ -65,7 +66,7 @@ def _to_sentry_privilege(privilege):
       'serverName': privilege['serverName'],
       'dbName': privilege['dbName'],
       'tableName': privilege['tableName'],
-      'URI': privilege['URI'],
+      'URI': _massage_uri(privilege['URI']),
       'action': privilege['action'],
       'createTime': privilege['timestamp'],
       'grantOption': 1 if privilege['grantOption'] else 0,
@@ -93,6 +94,16 @@ def _hive_add_privileges(user, role, privileges):
         })
 
     return _privileges
+
+
+def _massage_uri(uri):
+  if uri:
+    if uri.startswith('hdfs:///'):
+      uri = uri.replace('hdfs://', get_defaultfs())
+    elif uri.startswith('/'):
+      uri = get_defaultfs() + uri
+
+  return uri
 
 
 def _drop_sentry_privilege(user, role, authorizable):
