@@ -534,7 +534,11 @@ def get_collections(request):
     result['status'] = 0
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    if 'does not have privileges' in str(e):
+      result['status'] = 0
+      result['collection'] = [json.loads(request.POST.get('collection'))['name']]
+    else:
+      result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
