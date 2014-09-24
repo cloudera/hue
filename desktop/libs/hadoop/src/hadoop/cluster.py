@@ -56,6 +56,13 @@ def get_hdfs(identifier="default"):
   get_all_hdfs()
   return FS_CACHE[identifier]
 
+def get_defaultfs():
+  fs = get_hdfs()
+
+  if fs.logical_name:
+    return fs.logical_name
+  else:
+    return fs.fs_defaultfs
 
 def get_all_hdfs():
   global FS_CACHE
