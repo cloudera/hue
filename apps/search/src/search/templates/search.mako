@@ -165,6 +165,24 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
+                    draggable: {data: draggableTree(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Tree')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-sitemap fa-rotate-270"></i>
+         </a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
+                    draggable: {data: draggableHeatmap(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Heatmap')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-th"></i>
+         </a>
+    </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -174,15 +192,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
-                    draggable: {data: draggableTree(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Pivot')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-sitemap fa-rotate-270"></i>
-         </a>
-   </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -255,21 +264,9 @@ ${ dashboard.layout_skeleton() }
         </span>
       </div>
 
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label facet-field-label-fixed-width">
-            ${ _('Plot') }
-          </span>
-          <select data-bind="selectedOptions: properties.scope" class="input-small">
-            <option value="stack">${ _("Bars") }</option>
-            <option value="tree">${ _("Tree") }</option>
-          </select>
-        </span>
-      </div>
-
       <br/>
 
-      <div class="facet-field-tile">
+      <div class="facet-field-tile" data-bind="visible: properties.scope() == 'tree' || properties.facets().length == 0">
         <div class="facet-field-cnt">
           <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">${ _('Add a dimension') }</span>
         </div>
@@ -885,6 +882,56 @@ ${ dashboard.layout_skeleton() }
           onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
         />
       <!-- /ko -->
+
+    </div>
+  </div>
+  <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+  </div>
+</script>
+
+
+<script type="text/html" id="heatmap-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+      </span>
+    </div>
+
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
+        <div class="facet-field-tile">
+          <div class="facet-field-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title" data-bind="text: field"></span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label facet-field-label-fixed-width">
+                ${ _('Limit') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label facet-field-label-fixed-width">
+                ${ _('Min Count') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              <a href="javascript: void(0)" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'stack' -->
         <div data-bind="barChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label}, stacked: true,

@@ -120,7 +120,7 @@ var Query = function (vm, query) {
     } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget_id) {
-          var f = $.grep(fq.filter(), function(f) { return f.value() == data.facet.value; }); 
+          var f = $.grep(fq.filter(), function(f) { return f.value() == data.facet.value; });
           if (f.length > 0) {
             fq.filter.remove(f[0]);
             if (fq.filter().length == 0) {
@@ -135,13 +135,13 @@ var Query = function (vm, query) {
 
     vm.search();
   }
-  
-  self.togglePivotFacet = function (data) {
-    data.facet.cat = data.facet.fq_fields; 
+
+  self.togglePivotFacet = function (data) { alert(ko.mapping.toJSON(data));
+    data.facet.cat = data.facet.fq_fields;
     data.facet.value = data.facet.fq_values;
     self.toggleFacet(data);
   }
-  
+
   function _toggleSingleTermFacet(data, exclude) {
     var fq = getFilterByField(data.val.cat);
     var id;
@@ -152,7 +152,7 @@ var Query = function (vm, query) {
     }
     self.toggleFacet({'widget_id': id, 'facet': {'cat': data.val.cat, 'value': data.val.value}, 'exclude': exclude});
     vm.search();
-  }  
+  }
   self.addSingleTermFacet = function(data) {
     _toggleSingleTermFacet(data, false);
   }
@@ -197,7 +197,7 @@ var Query = function (vm, query) {
       vm.search();
     }
   };
-  
+
   function getFilterByField(field) {
     var _fq = null;
     $.each(self.fqs(), function (index, fq) {
@@ -590,7 +590,7 @@ var Collection = function (vm, collection) {
     else if (self.template.fieldsModalType() == 'line-widget') {
       return vm.availableNumberFields();
     }
-    else if (self.template.fieldsModalType() == 'tree-widget') {
+    else if (self.template.fieldsModalType() == 'tree-widget' || self.template.fieldsModalType() == 'heatmap-widget') {
       return vm.availablePivotFields();
     }
     else {
@@ -956,6 +956,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
   self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
   self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget"));
+  self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
