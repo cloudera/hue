@@ -136,7 +136,7 @@ var Query = function (vm, query) {
     vm.search();
   }
 
-  self.togglePivotFacet = function (data) { alert(ko.mapping.toJSON(data));
+  self.togglePivotFacet = function (data) {
     data.facet.cat = data.facet.fq_fields;
     data.facet.value = data.facet.fq_values;
     self.toggleFacet(data);
