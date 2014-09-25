@@ -400,10 +400,18 @@ ${ layout.menubar(section='hive') }
       <div class="span4">
         <h4>${ _('to apply to the selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span> <i class="fa fa-long-arrow-right muted"></i> <i class="fa fa-table muted"></i> <span data-bind="text: path.split('.')[1]"></span></li>
-          <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break"><i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span></li>
+          <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break">
+            <i class="fa fa-database muted"></i>
+            <span data-bind="text: path.split('.')[0]"></span>
+            <i class="fa fa-long-arrow-right muted"></i>
+            <i class="fa fa-table muted"></i>
+            <span data-bind="text: path.split('.')[1]"></span>
+          </li>
+          <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break">
+            <i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span>
+          </li>
         </ul>
-      </div>      
+      </div>
     </div>
     <br/>
     <div class="row-fluid" data-bind="visible: $root.bulkAction() != '' && $root.bulkAction() != 'delete'">
@@ -632,7 +640,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
             },
             'updater': function(item) {
                 return item;
-             }
+            }
         });
       });
       $(document).on("destroy.typeahead", function(){

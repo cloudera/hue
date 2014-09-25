@@ -176,7 +176,7 @@ def save_privileges(request):
       if privilege['id'] in old_privileges_ids:
         _drop_sentry_privilege(request.user, role, privilege)
 
-    result['message'] = ''
+    result['message'] = _('Privileges updated')
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
