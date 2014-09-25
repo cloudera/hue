@@ -2506,6 +2506,7 @@ class TListSentryPrivilegesByAuthRequest(object):
   """
   Attributes:
    - protocol_version
+   - requestorUserName
    - authorizableSet
    - groups
    - roleSet
@@ -2514,13 +2515,15 @@ class TListSentryPrivilegesByAuthRequest(object):
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'protocol_version', None, 1, ), # 1
-    (2, TType.SET, 'authorizableSet', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec)), None, ), # 2
-    (3, TType.SET, 'groups', (TType.STRING,None), None, ), # 3
-    (4, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 4
+    (2, TType.STRING, 'requestorUserName', None, None, ), # 2
+    (3, TType.SET, 'authorizableSet', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec)), None, ), # 3
+    (4, TType.SET, 'groups', (TType.STRING,None), None, ), # 4
+    (5, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 5
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], authorizableSet=None, groups=None, roleSet=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, authorizableSet=None, groups=None, roleSet=None,):
     self.protocol_version = protocol_version
+    self.requestorUserName = requestorUserName
     self.authorizableSet = authorizableSet
     self.groups = groups
     self.roleSet = roleSet
@@ -2540,6 +2543,11 @@ class TListSentryPrivilegesByAuthRequest(object):
         else:
           iprot.skip(ftype)
       elif fid == 2:
+        if ftype == TType.STRING:
+          self.requestorUserName = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
         if ftype == TType.SET:
           self.authorizableSet = set()
           (_etype75, _size72) = iprot.readSetBegin()
@@ -2550,7 +2558,7 @@ class TListSentryPrivilegesByAuthRequest(object):
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
-      elif fid == 3:
+      elif fid == 4:
         if ftype == TType.SET:
           self.groups = set()
           (_etype81, _size78) = iprot.readSetBegin()
@@ -2560,7 +2568,7 @@ class TListSentryPrivilegesByAuthRequest(object):
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
-      elif fid == 4:
+      elif fid == 5:
         if ftype == TType.STRUCT:
           self.roleSet = TSentryActiveRoleSet()
           self.roleSet.read(iprot)
@@ -2580,22 +2588,26 @@ class TListSentryPrivilegesByAuthRequest(object):
       oprot.writeFieldBegin('protocol_version', TType.I32, 1)
       oprot.writeI32(self.protocol_version)
       oprot.writeFieldEnd()
+    if self.requestorUserName is not None:
+      oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
+      oprot.writeString(self.requestorUserName)
+      oprot.writeFieldEnd()
     if self.authorizableSet is not None:
-      oprot.writeFieldBegin('authorizableSet', TType.SET, 2)
+      oprot.writeFieldBegin('authorizableSet', TType.SET, 3)
       oprot.writeSetBegin(TType.STRUCT, len(self.authorizableSet))
       for iter84 in self.authorizableSet:
         iter84.write(oprot)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     if self.groups is not None:
-      oprot.writeFieldBegin('groups', TType.SET, 3)
+      oprot.writeFieldBegin('groups', TType.SET, 4)
       oprot.writeSetBegin(TType.STRING, len(self.groups))
       for iter85 in self.groups:
         oprot.writeString(iter85)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     if self.roleSet is not None:
-      oprot.writeFieldBegin('roleSet', TType.STRUCT, 4)
+      oprot.writeFieldBegin('roleSet', TType.STRUCT, 5)
       self.roleSet.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -2604,6 +2616,8 @@ class TListSentryPrivilegesByAuthRequest(object):
   def validate(self):
     if self.protocol_version is None:
       raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
+    if self.requestorUserName is None:
+      raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.authorizableSet is None:
       raise TProtocol.TProtocolException(message='Required field authorizableSet is unset!')
     return
@@ -2693,8 +2707,6 @@ class TListSentryPrivilegesByAuthResponse(object):
   def validate(self):
     if self.status is None:
       raise TProtocol.TProtocolException(message='Required field status is unset!')
-    if self.privilegesMapByAuth is None:
-      raise TProtocol.TProtocolException(message='Required field privilegesMapByAuth is unset!')
     return
 
 

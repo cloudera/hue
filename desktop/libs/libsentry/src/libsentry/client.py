@@ -174,7 +174,6 @@ class SentryClient(object):
     if roleSet is not None:
       roleSet = TSentryActiveRoleSet(**roleSet)    
 
-    # Missing requestorUserName=self.username
-    request = TListSentryPrivilegesByAuthRequest(authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
+    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)
 

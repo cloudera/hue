@@ -91,7 +91,7 @@ ${ layout.menubar(section='hive') }
 
     <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span>
     <!-- ko if: grantOption -->
-      <i class="fa fa-unlock-alt muted" title="${ _('With grant option') }"></i>
+      <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <br/>
     server=<span data-bind="text: serverName"></span>
