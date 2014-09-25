@@ -396,12 +396,20 @@ def get_oozie_job_log(request, job_id):
 def list_oozie_info(request):
   api = get_oozie(request.user)
 
-  instrumentation = api.get_instrumentation()
   configuration = api.get_configuration()
   oozie_status = api.get_oozie_status()
+  instrumentation = {}
+  metrics = {}
+
+  if 'org.apache.oozie.service.MetricsInstrumentationService' in [c.strip() for c in configuration.get('oozie.services.ext', '').split(',')]:
+    api2 = get_oozie(request.user, api_version="v2")
+    metrics = api2.get_metrics()
+  else:
+    instrumentation = api.get_instrumentation()
 
   return render('dashboard/list_oozie_info.mako', request, {
     'instrumentation': instrumentation,
+    'metrics': metrics,
     'configuration': configuration,
     'oozie_status': oozie_status,
   })

@@ -433,6 +433,7 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     self.removeFacet(function(){return facet_json.widget_id});
+    logGA('add_facet/' + facet_json.widgetType);
 
     $.post("/search/template/new_facet", {
       "collection": ko.mapping.toJSON(self),
