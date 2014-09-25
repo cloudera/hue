@@ -206,13 +206,14 @@ struct TSentryPrivilegeMap {
 }
 struct TListSentryPrivilegesByAuthRequest {
 1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
-2: required set<TSentryAuthorizable> authorizableSet,
-3: optional set<string> groups,
-4: optional TSentryActiveRoleSet roleSet
+2: required string requestorUserName, # user on whose behalf the request is issued
+3: required set<TSentryAuthorizable> authorizableSet,
+4: optional set<string> groups,
+5: optional TSentryActiveRoleSet roleSet
 }
 struct TListSentryPrivilegesByAuthResponse {
 1: required sentry_common_service.TSentryResponseStatus status,
-2: required map<TSentryAuthorizable, TSentryPrivilegeMap> privilegesMapByAuth
+2: optional map<TSentryAuthorizable, TSentryPrivilegeMap> privilegesMapByAuth # will not be set in case of an error
 }
 
 service SentryPolicyService
