@@ -102,14 +102,11 @@ ko.bindingHandlers.hivechooser = {
   init: function(element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
     self.val(valueAccessor()());
+
     function setPathFromAutocomplete(path){
       self.val(path);
       self.blur();
     }
-
-    self.on("blur", function(){
-      valueAccessor()(self.val());
-    });
 
     self.jHueHiveAutocomplete({
       skipColumns: true,
@@ -120,6 +117,12 @@ ko.bindingHandlers.hivechooser = {
       },
       onEnter: function (el) {
         setPathFromAutocomplete(el.val());
+      },
+      onBlur: function () {
+        if (self.val().lastIndexOf(".") == self.val().length - 1){
+          self.val(self.val().substr(0, self.val().length - 1));
+        }
+        valueAccessor()(self.val());
       }
     });
   }

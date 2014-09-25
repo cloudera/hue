@@ -78,6 +78,7 @@
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
       });
       setHueBreadcrumbCaretAtEnd(_this.element);
+      _pauseBlur = false;
     });
 
     _el.keydown(function (e) {
@@ -167,6 +168,7 @@
         showHiveAutocomplete();
       }
       if (e.keyCode == 13) {
+        _pauseBlur = true;
         if (_hiveAutocompleteSelectedIndex > -1) {
           $("#jHueHiveAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).click();
         }
