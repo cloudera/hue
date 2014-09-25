@@ -1334,6 +1334,7 @@ function _partitionChartDataTransformer(counts) {
       _category = {
         name: item.value,
         size: item.count,
+        obj: item,
         children: []
       }
       _categories.push(_category);

@@ -75,12 +75,13 @@ class SolrApi(object):
           f = []
           for _filter in fq['filter']:
             values = _filter['value'].split(':')
-            value = values[fields.index(field)]
-            exclude = '-' if _filter['exclude'] else ''
-            if value is not None and ' ' in value:
-              f.append('%s%s:"%s"' % (exclude, field, value))
-            else:
-              f.append('%s{!field f=%s}%s' % (exclude, field, value))
+            if fields.index(field) < len(values): # Lowest common field denominator
+              value = values[fields.index(field)]
+              exclude = '-' if _filter['exclude'] else ''
+              if value is not None and ' ' in value:
+                f.append('%s%s:"%s"' % (exclude, field, value))
+              else:
+                f.append('%s{!field f=%s}%s' % (exclude, field, value))
           _params ='{!tag=%s}' % field + ' '.join(f)
           params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':

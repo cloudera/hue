@@ -505,6 +505,7 @@ def augment_solr_response(response, collection, query):
             count = _augment_pivot_2d(facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
           else:
             count = response['facet_counts']['facet_pivot'][name]
+            _augment_pivot_nd(facet['id'], count, selected_values)
         else:
           count = []
         facet = {
@@ -577,6 +578,22 @@ def _augment_pivot_2d(facet_id, counts, selected_values):
       })
 
   return augmented
+
+
+def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
+
+  for c in counts:
+    fq_fields = (fields + ':' if fields else '') + c['field']
+    fq_values = (values + ':' if values else '') + c['value']
+    if 'pivot' in c:
+      _augment_pivot_nd(facet_id, c['pivot'], selected_values, fq_fields, fq_values)
+
+    fq_filter = selected_values.get((facet_id, fq_fields, 'field'), [])
+    _selected_values = [f['value'] for f in fq_filter]
+    c['selected'] = fq_values in _selected_values
+    c['exclude'] = False
+    c['fq_fields'] = fq_fields
+    c['fq_values'] = fq_values
 
 
 def augment_solr_exception(response, collection):
