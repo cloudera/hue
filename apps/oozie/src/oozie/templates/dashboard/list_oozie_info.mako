@@ -40,11 +40,17 @@ ${ layout.menubar(section='oozie', dashboard=True) }
   </h1>
 
   <ul class="nav nav-tabs">
+    % if instrumentation:
     <li class="active"><a href="#instrumentation" data-toggle="tab">${ _('Instrumentation') }</a></li>
+    % else:
+    <li class="active"><a href="#metrics" data-toggle="tab">${ _('Metrics') }</a></li>
+    % endif
     <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
   </ul>
 
   <div class="tab-content" style="padding-bottom:200px">
+
+    % if instrumentation:
     <div class="tab-pane active" id="instrumentation">
       <form class="form-search">
         <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
@@ -107,8 +113,17 @@ ${ layout.menubar(section='oozie', dashboard=True) }
             % endfor
         </div>
       </div>
-
     </div>
+    % endif
+
+    % if metrics:
+    <div class="tab-pane active" id="metrics">
+      <form class="form-search">
+        <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
+      </form>
+      ${ metrics }
+    </div>
+    % endif
 
     <div class="tab-pane" id="configuration">
       <form class="form-search">
@@ -134,20 +149,20 @@ ${ layout.menubar(section='oozie', dashboard=True) }
 
     $("*[rel=tooltip]").tooltip();
 
-        var _metadataTable = $("#configurationTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
+    var _metadataTable = $("#configurationTable").dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bInfo": false,
+        "bAutoWidth": false,
+        "aoColumns": [
+            { "sWidth": "30%" },
+            { "sWidth": "70%" }
+        ],
+        "oLanguage": {
+           "sEmptyTable": "${_('No data available')}",
+           "sZeroRecords": "${_('No matching records')}",
+        }
+   });
 
    var instrumentationTables = [];
 

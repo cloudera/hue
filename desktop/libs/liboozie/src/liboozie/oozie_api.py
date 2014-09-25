@@ -275,6 +275,11 @@ class OozieApi(object):
     resp = self._root.get('admin/instrumentation', params)
     return resp
 
+  def get_metrics(self):
+    params = self._get_params()
+    resp = self._root.get('admin/metrics', params)
+    return resp
+
   def get_configuration(self):
     """
     get_configuration() -> Oozie config (dictionary)
