@@ -242,7 +242,7 @@ from django.utils.translation import ugettext as _
           $(".navigator li.open").removeClass("open");
           $(".navigator ul.dropdown-menu").hide();
           $("[rel='navigator-tooltip']").tooltip("hide");
-          _this.find("ul.dropdown-menu").show();
+          _this.find("ul.dropdown-menu:eq(0)").show();
         }, _timeout);
       }
 
@@ -261,6 +261,12 @@ from django.utils.translation import ugettext as _
           $(".navigator li a:focus").blur();
           $(".navigator").find("ul.dropdown-menu").hide();
         }, 1000);
+      });
+      $(".navigator ul.nav li.dropdown-submenu").hover(function () {
+        $(this).find(".dropdown-menu").show();
+      },
+      function () {
+        $(this).find(".dropdown-menu").hide();
       });
 
       var _skew = -1;
@@ -393,8 +399,22 @@ from django.utils.translation import ugettext as _
        <li class="dropdown">
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
-           <li><a href="${ url('oozie:index') }"><img src="/oozie/static/art/icon_oozie_dashboard_48.png" class="app-icon" /> ${_('Dashboard')}</a></li>
-           <li><a href="${ url('oozie:list_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" /> ${_('Editor')}</a></li>
+           <li class="dropdown-submenu">
+             <a href="${ url('oozie:index') }"><img src="/oozie/static/art/icon_oozie_dashboard_48.png" class="app-icon" /> ${_('Dashboards')}</a>
+             <ul class="dropdown-menu">
+               <li><a href="${url('oozie:list_oozie_workflows')}"><img src="/oozie/static/art/icon_oozie_workflow_48.png" class="app-icon"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_oozie_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_oozie_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
+             </ul>
+           </li>
+           <li class="dropdown-submenu">
+             <a href="${ url('oozie:list_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" /> ${_('Editors')}</a>
+             <ul class="dropdown-menu">
+               <li><a href="${url('oozie:list_workflows')}"><img src="/oozie/static/art/icon_oozie_workflow_48.png" class="app-icon"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
+             </ul>
+           </li>
          </ul>
        </li>
        % endif
