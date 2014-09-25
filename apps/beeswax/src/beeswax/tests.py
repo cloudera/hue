@@ -56,7 +56,7 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
   HIVE_SERVER_TEST_PORT, fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
 from beeswax.data_export import upload, download
-from beeswax.models import SavedQuery, QueryHistory, HQL
+from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
@@ -1975,6 +1975,34 @@ class TestWithMockedServer(object):
     assert_equal('test_save_design', saved_design.doc.get().name)
     assert_equal('test_save_design desc', saved_design.doc.get().description)
     assert_false(saved_design.doc.get().is_historic())
+
+  def test_get_history_xss(self):
+    sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
+    sql_escaped = 'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+
+    response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
+    content = json.loads(response.content)
+    design_id = content['design_id']
+    design = SavedQuery.objects.get(id=design_id)
+
+    query_history = QueryHistory.build(
+        owner=self.user,
+        query=sql,
+        server_host='server_host',
+        server_port=1,
+        server_name='server_name',
+        server_type=HIVE_SERVER2,
+        last_state=QueryHistory.STATE.submitted.index,
+        design=design,
+        notify=False,
+        query_type=HQL,
+        statement_number=0
+    )
+    query_history.save()
+
+    resp = self.client.get('/beeswax/query_history?format=json')
+    assert_true(sql_escaped in resp.content, resp.content)
+    assert_false(sql in resp.content, resp.content)
 
 
 class TestDesign():
