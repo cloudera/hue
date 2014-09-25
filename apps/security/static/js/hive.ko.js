@@ -258,16 +258,15 @@ var Role = function (vm, role) {
 
   self.update = function () {
     $(".jHueNotify").hide();
-    $.post("/security/api/hive/update_role", {
+    $.post("/security/api/hive/save_privileges", {
       role: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         $(document).trigger("info", data.message);
         vm.showCreateRole(false);
-        self.reset();
         vm.assist.refreshTree();
         vm.refreshExpandedRoles();
-        $(document).trigger("updated.role");
+        $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
       }

@@ -133,8 +133,6 @@ class SentryApi(object):
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
     response = self.client.list_sentry_privileges_by_authorizable(authorizableSet, groups, roleSet)
 
-    print response
-
     _privileges = []
 
     for authorizable, roles in response.privilegesMapByAuth.iteritems():
