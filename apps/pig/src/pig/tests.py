@@ -336,9 +336,9 @@ OOZIE_LOGS ="""  Log Type: stdout
   ------------------------
   /var/lib/hadoop-yarn/cache/yarn/nm-local-dir/usercache/romain/appcache/application_1381360805876_0001/container_1381360805876_0001_01_000002
   /etc/hadoop/conf
-  /usr/lib/hadoop/hadoop-nfs-2.1.0-cdh5.2.0-SNAPSHOT.jar
-  /usr/lib/hadoop/hadoop-common-2.1.0-cdh5.2.0-SNAPSHOT.jar
-  /usr/lib/hadoop/hadoop-auth-2.1.0-cdh5.2.0-SNAPSHOT.jar
+  /usr/lib/hadoop/hadoop-nfs-2.1.0-cdh5.3.0-SNAPSHOT.jar
+  /usr/lib/hadoop/hadoop-common-2.1.0-cdh5.3.0-SNAPSHOT.jar
+  /usr/lib/hadoop/hadoop-auth-2.1.0-cdh5.3.0-SNAPSHOT.jar
   /usr/lib/hadoop/hadoop-common.jar
   /var/lib/hadoop-yarn/cache/yarn/nm-local-dir/usercache/romain/appcache/application_1381360805876_0001/container_1381360805876_0001_01_000002/jyson-1.0.2.jar
   ------------------------
