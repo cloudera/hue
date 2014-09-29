@@ -24,6 +24,8 @@ from collections import defaultdict
 
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+
+from django.utils import html
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
@@ -94,7 +96,7 @@ def massaged_tags_for_json(docs, user):
 def massaged_tags(tag, tag_doc_mapping):
   return {
     'id': tag.id,
-    'name': tag.tag,
+    'name': html.conditional_escape(tag.tag),
     'owner': tag.owner.username,
     'docs': [doc.id for doc in tag_doc_mapping[tag]] # Could get with one request groupy
   }
@@ -141,16 +143,18 @@ def massaged_documents_for_json(documents, user):
     write_perms = document.list_permissions(perm='write')
     docs[document.id] = {
       'id': document.id,
-      'contentType': document.content_type.name,
+      'contentType': html.conditional_escape(document.content_type.name),
       'icon': document.icon,
-      'name': document.name,
-      'url': url,
-      'description': document.description,
-      'tags': [{'id': tag.id, 'name': tag.tag} for tag in document.tags.all()],
+      'name': html.conditional_escape(document.name),
+      'url': html.conditional_escape(url),
+      'description': html.conditional_escape(document.description),
+      'tags': [{'id': tag.id, 'name': html.conditional_escape(tag.tag)} \
+               for tag in document.tags.all()],
       'perms': {
         'read': {
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in read_perms.groups.all()]
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+                     for perm_group in read_perms.groups.all()]
         },
         'write': {
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in write_perms.users.all()],
@@ -173,10 +177,11 @@ def massage_doc_for_json(doc, user):
       'id': doc.id,
       'contentType': doc.content_type.name,
       'icon': doc.icon,
-      'name': doc.name,
-      'url': doc.content_object.get_absolute_url(),
-      'description': doc.description,
-      'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
+      'name': html.conditional_escape(doc.name),
+      'url': html.conditional_escape(doc.content_object.get_absolute_url()),
+      'description': html.conditional_escape(doc.description),
+      'tags': [{'id': tag.id, 'name': html.conditional_escape(tag.tag)} \
+               for tag in doc.tags.all()],
       'perms': {
         'read': {
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
