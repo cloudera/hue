@@ -587,14 +587,14 @@ ${layout.menubar(section='query')}
       <label class="control-label">${_('Name')}</label>
 
       <div class="controls">
-        <input data-bind="value: $root.design.name" type="text" class="input-xlarge">
+        <input data-bind="value: $root.design.name, html" type="text" class="input-xlarge">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">${_('Description')}</label>
 
       <div class="controls">
-        <input data-bind="value: $root.design.description" type="text" class="input-xlarge">
+        <input data-bind="value: $root.design.description, html" type="text" class="input-xlarge">
       </div>
     </div>
   </form>
@@ -1053,7 +1053,7 @@ $(document).ready(function () {
         $(data.queries).each(function(cnt, item){
           _rows.push([
             '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
-            '<code style="cursor:pointer">' + item.query + '</code>',
+            '<code style="cursor:pointer">' + hue.htmlEncode(item.query) + '</code>',
             (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
             (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')
           ]);

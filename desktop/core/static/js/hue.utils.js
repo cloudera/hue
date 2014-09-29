@@ -104,6 +104,16 @@ Array.prototype.diff = function (a) {
     }
     return this;
   };
+
+  /*
+   * Create a in-memory div, set it's inner text(which jQuery automatically encodes)
+   * then grab the encoded contents back out.
+  */
+
+  hue.htmlEncode = function (value){
+    return $('<div/>').text(value).html();
+  };
+
 }(hue = window.hue || {}));
 
 

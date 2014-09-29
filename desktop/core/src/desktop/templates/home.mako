@@ -229,7 +229,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script type="text/html" id="tag-template">
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
     <a href="javascript:void(0)" style="padding-right: 4px">
-      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="text: name"></span>
+      <i data-bind="css: {'fa': true, 'fa-trash-o':name() == 'trash', 'fa-clock-o': name() == 'history', 'fa-tag': name() != 'trash' && name() != 'history'}"></i> <span data-bind="html: name"></span>
       <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
@@ -242,7 +242,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   <!-- ko foreach: projects-->
   <li data-bind="click: $root.filterDocs, css: {'active': $root.selectedTag().id == id}">
     <a href="javascript:void(0)" style="padding-right: 4px">
-      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="text: name"></span> <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
+      &nbsp;&nbsp;&nbsp;<i class="fa fa-tag"></i> <span data-bind="html: name"></span> <span class="badge pull-right tag-counter" data-bind="text: docs().length"></span>
     </a>
   </li>
   <!-- /ko -->
@@ -251,14 +251,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script type="text/html" id="document-template">
   <tr>
     <td style="width: 26px"><img data-bind="attr: { src: icon }" class="app-icon"></td>
-    <td><a data-bind="attr: { href: url }, text: name"></a></td>
-    <td data-bind="text: description"></td>
+    <td><a data-bind="attr: { href: url }, html: name"></a></td>
+    <td data-bind="html: description"></td>
     <td data-bind="text: lastModified"></td>
     <td style="text-align: center; white-space: nowrap">
       <a href="javascript:void(0)" rel="tooltip" data-placement="left" data-bind="click: moveDoc, attr: {'data-original-title': '${ _("Change project for") } '+name}" style="padding-left:8px; padding-right: 8px">
         <span data-bind="foreach: tags">
           <!-- ko if: name != 'trash'-->
-          <span class="badge" data-bind="text: name"></span>
+          <span class="badge" data-bind="html: name"></span>
           <!-- /ko -->
         </span>
       </a>
@@ -516,6 +516,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {
+        data.name = hue.htmlEncode(data.name);
         viewModel.createTag(data);
         $("#tagsNew").val("");
         $(document).trigger("info", "${_('Project created')}");
