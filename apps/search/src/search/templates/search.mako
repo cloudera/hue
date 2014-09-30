@@ -875,6 +875,7 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="partitionChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label},
           fqs: $root.query.fqs,
           transformer: partitionChartDataTransformer,
+          zoomable: false,
           onStateChange: function(state){ },
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});

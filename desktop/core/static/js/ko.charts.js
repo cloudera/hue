@@ -615,13 +615,6 @@ ko.bindingHandlers.partitionChart = {
         .attr("transform", function (d) {
           return "translate(" + _x(d.y) + "," + _y(d.x) + ")";
         })
-        .on("click", click)
-        .on("dblclick", function (d, i) {
-          if (typeof _options.onClick != "undefined") {
-            chartsUpdatingState();
-            _options.onClick(d);
-          }
-        })
         .on("mouseover", function (d, i) {
           if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP) {
             _tip.attr("class", "d3-tip").show(d);
@@ -637,6 +630,24 @@ ko.bindingHandlers.partitionChart = {
           }
           d3.select(this).select("rect").classed("mouseover", false)
         });
+
+    if (typeof _options.zoomable == "undefined" || _options.zoomable) {
+      g.on("click", click)
+       .on("dblclick", function (d, i) {
+          if (typeof _options.onClick != "undefined") {
+            chartsUpdatingState();
+            _options.onClick(d);
+          }
+        });
+    }
+    else {
+      g.on("click", function (d, i) {
+        if (typeof _options.onClick != "undefined") {
+          chartsUpdatingState();
+          _options.onClick(d);
+        }
+      });
+    }
 
     var _kx = _w / _data.dx,
         _ky = _h / 1;
