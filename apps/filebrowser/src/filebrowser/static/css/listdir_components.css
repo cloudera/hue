@@ -212,3 +212,13 @@
   text-align: left;
   display: none;
 }
+
+.row-selected {
+  background: #e5e5e5;
+}
+
+.context-menu {
+  display: none;
+  position: absolute;
+  width: 250px;
+}
