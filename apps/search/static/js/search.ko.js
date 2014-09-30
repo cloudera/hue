@@ -1237,9 +1237,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
-  function logGA(page) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA('search/' + page);
-    }
-  }
 };
+
+function logGA(page) {
+  if (typeof trackOnGA == 'function') {
+    trackOnGA('search/' + page);
+  }
+}
