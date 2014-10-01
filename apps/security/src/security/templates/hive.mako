@@ -102,7 +102,7 @@ ${ layout.menubar(section='hive') }
       </span>
       <span data-bind="visible: tableName">
         <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
-      </span>      
+      </span>
     <!-- /ko -->
 
     <!-- ko if: URI -->
@@ -245,7 +245,7 @@ ${ layout.menubar(section='hive') }
           <div data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <%actionbar:render>
               <%def name="search()">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search roles by name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
               </%def>
 
               <%def name="actions()">
@@ -536,7 +536,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
         if ($("a.anchor[href^='"+_path+"']").length > 0){
           $("#expandableTree").animate({
-            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
+            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4) + "px"
           });
         }
       });
@@ -584,7 +584,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           $("#bulkActionsModal").modal("hide");
           showMainSection("roles");
           $("html, body").animate({
-            scrollTop: ($("a[href='" + role.name() + "']").position().top - 90)+"px"
+            scrollTop: ($("a[href='" + role.name() + "']").position().top - 90) + "px"
           });
         }
       });

@@ -759,7 +759,10 @@ var HiveViewModel = function (initial) {
         });
         var _inPrivileges = false;
         role.privileges().forEach(function (priv) {
-          if (priv.dbName().toLowerCase().indexOf(_filter) > -1 || priv.tableName().toLowerCase().indexOf(_filter) > -1) {
+          if (priv.dbName().toLowerCase().indexOf(_filter) > -1 || priv.tableName().toLowerCase().indexOf(_filter) > -1
+              || priv.URI().toLowerCase().indexOf(_filter) > -1
+              || priv.action().toLowerCase().indexOf(_filter) > -1
+              || priv.serverName().toLowerCase().indexOf(_filter) > -1) {
             _inPrivileges = true;
           }
         });
