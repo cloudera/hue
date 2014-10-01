@@ -289,8 +289,11 @@ var Assist = function (vm, assist) {
   }
 
   self.refreshTree = function (force) {
+    $.ajaxSetup({
+      async: false
+    });
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
-    Object.keys(self.treeAdditionalData).forEach(function (path) {
+    Object.keys(self.treeAdditionalData).sort().forEach(function (path) {
       if (typeof force == "boolean" && force) {
         self.fetchPath(path, function () {
           self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
@@ -304,6 +307,9 @@ var Assist = function (vm, assist) {
           });
         }
       }
+    });
+    $.ajaxSetup({
+      async: true
     });
     self.getAcls();
   }
