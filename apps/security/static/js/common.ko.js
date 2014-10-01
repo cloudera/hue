@@ -105,6 +105,7 @@ ko.bindingHandlers.hivechooser = {
 
     function setPathFromAutocomplete(path){
       self.val(path);
+      valueAccessor()(path);
       self.blur();
     }
 
