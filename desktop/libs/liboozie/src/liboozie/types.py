@@ -545,6 +545,11 @@ class Coordinator(Job):
 
     return result
 
+  @property
+  def human_frequency(self):
+    from oozie.models import Coordinator
+    return Coordinator.CRON_MAPPING.get(self.frequency, self.frequency)
+
 
 class Bundle(Job):
   _ATTRS = [

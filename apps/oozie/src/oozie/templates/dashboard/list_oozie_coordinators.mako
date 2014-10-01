@@ -157,10 +157,6 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 <script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
-% if enable_cron_scheduling:
-<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
-<script src="/static/js/jqCron.js" type="text/javascript"></script>
-% endif
 
 <script type="text/javascript" charset="utf-8">
 
@@ -369,11 +365,6 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       });
     });
 
-    % if enable_cron_scheduling:
-    ${ utils.cron_js() }
-    % endif
-
-
     var numRunning = 0;
 
     refreshRunning = function () {
@@ -454,9 +445,6 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           refreshCompleted();
         }
         numRunning = data.length;
-        % if enable_cron_scheduling:
-        renderCrons(); // utils.inc.mako
-        % endif
         window.setTimeout(refreshRunning, 20000);
       });
     }
@@ -474,10 +462,10 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               emptyStringIfNull(coord.duration),
               coord.user,
               % if enable_cron_scheduling:
-              '<div class="cron-frequency"><input class="value" type="hidden" value="'+emptyStringIfNull(coord.frequency)+'"/></div>',
+                emptyStringIfNull(coord.frequency),
               % else:
-              emptyStringIfNull(coord.frequency),
-              emptyStringIfNull(coord.timeUnit),
+                emptyStringIfNull(coord.frequency),
+                emptyStringIfNull(coord.timeUnit),
               % endif
               emptyStringIfNull(coord.startTime),
               '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'
@@ -488,9 +476,6 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           }
         });
         completedTable.fnDraw();
-        % if enable_cron_scheduling:
-        renderCrons(); // utils.inc.mako
-        % endif
       });
     }
 

@@ -1417,6 +1417,15 @@ class Coordinator(Job):
   HUE_ID = 'hue-id-c'
   ICON = '/oozie/static/art/icon_oozie_coordinator_48.png'
   METADATA_FORMAT_VERSION = "0.0.1"
+  CRON_MAPPING = {
+    '0,15,30,45 * * * *': _('Every 15 minutes'),
+    '0,30 * * * *': _('Every 30 minutes'),
+    '0 * * * *': _('Every hour'),
+    '0 0 * * *': _('Every day at midnight'),
+    '0 0 * * 0': _('Every week'),
+    '0 0 1 * *': _('Every month'),
+    '0 0 1 1 *': _('Every year'),
+  }
 
   def get_type(self):
     return 'coordinator'
@@ -1600,6 +1609,10 @@ class Coordinator(Job):
           freq = '0 0 * * *'
       return {'frequency': freq, 'isAdvancedCron': False}
 
+  @property
+  def cron_frequency_human(self):
+    frequency = self.cron_frequency['frequency']
+    return Coordinator.CRON_MAPPING.get(frequency, frequency)
 
   @cron_frequency.setter
   def cron_frequency(self, cron_frequency):
