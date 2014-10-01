@@ -37,7 +37,7 @@ ${ layout.menubar(section='hive') }
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
     <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-    <span class="pointer" data-bind="click: $root.role().savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
   <!-- /ko -->
 </script>
@@ -328,7 +328,7 @@ ${ layout.menubar(section='hive') }
                   <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0)">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
                     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-                    <span class="pointer" data-bind="click: $root.role().savePrivileges, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+                    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>
@@ -409,6 +409,22 @@ ${ layout.menubar(section='hive') }
     <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: $root.deleteSelectedRoles">${ _('Yes') }</button>
   </div>
 </div>
+
+
+<div id="deletePrivilegeModal" class="modal hide fade in" role="dialog">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${ _('Confirm the deletion?') }</h3>
+  </div>
+  <div class="modal-body">
+    ${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: function() { $root.role().savePrivileges($root.roleToUpdate()); }">${ _('Yes delete') }</button>
+  </div>
+</div>
+
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
@@ -520,6 +536,19 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
 <script type="text/javascript" charset="utf-8">
+
+    function deletePrivilegeModal(role) {
+      var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
+          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE'); }
+      );
+      if (cascadeDeletes.length > 0 ) {
+        viewModel.roleToUpdate(role);
+        $('#deletePrivilegeModal').modal('show');
+      } else {
+        viewModel.role().savePrivileges(role);
+      }
+    }
+
     var viewModel = new HiveViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
 
@@ -573,6 +602,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       $(document).on("created.role", function(){
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
+        $("#deletePrivilegeModal").modal("hide");
         window.setTimeout(function(){
           viewModel.refreshExpandedRoles();
         }, 500);
@@ -697,6 +727,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $(document).trigger("create.typeahead");
+
+      $("#deletePrivilegeModal").modal({
+        show: false
+      });
     });
 </script>
 

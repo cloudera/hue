@@ -136,6 +136,7 @@ var Role = function (vm, role) {
   self.handleSelect = function (row, e) {
     self.selected(!self.selected());
   }
+
   self.groups = ko.observableArray();
   self.originalGroups = ko.observableArray();
   $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function (index, group) {
@@ -297,7 +298,7 @@ var Role = function (vm, role) {
     }, function (data) {
       if (data.status == 0) {
         vm.list_sentry_privileges_by_authorizable();
-        vm.refreshExpandedRoles();
+        $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
       }
@@ -783,6 +784,7 @@ var HiveViewModel = function (initial) {
   // Editing
   self.showCreateRole = ko.observable(false);
   self.role = ko.observable(new Role(self, {}));
+  self.roleToUpdate = ko.observable();
 
   self.grantToPrivilege = ko.observable();
   self.grantToPrivilegeRole = ko.observable();
