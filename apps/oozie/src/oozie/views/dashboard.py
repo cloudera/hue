@@ -812,7 +812,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
         'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
         'run': hasattr(job, 'run') and job.run or 0,
-        'frequency': hasattr(job, 'frequency') and job.frequency or None,
+        'frequency': hasattr(job, 'frequency') and Coordinator.CRON_MAPPING.get(job.frequency, job.frequency) or None,
         'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
       }
       jobs.append(massaged_job)

@@ -107,9 +107,9 @@ ${ layout.menubar(section='coordinators') }
             % endif
           </td>
           % if enable_cron_scheduling:
-          <td class="cron-frequency"><input class="value" type="hidden" value="${ coordinator.cron_frequency["frequency"] }"/></td>
+            <td class="cron-frequency">${ coordinator.cron_frequency_human }</td>
           % else:
-          <td>${ coordinator.text_frequency }</td>
+            <td>${ coordinator.text_frequency }</td>
           % endif
           <td>
             <span class="label label-info">${ coordinator.status }</span>
@@ -168,11 +168,6 @@ ${ layout.menubar(section='coordinators') }
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-
-% if enable_cron_scheduling:
-<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
-<script src="/static/js/jqCron.js" type="text/javascript"></script>
-% endif
 
 
 <script type="text/javascript" charset="utf-8">
@@ -323,12 +318,6 @@ ${ layout.menubar(section='coordinators') }
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
-
-    % if enable_cron_scheduling:
-    ${ utils.cron_js() }
-    renderCrons(); // from utils.inc.mako
-    % endif
-
   });
 </script>
 
