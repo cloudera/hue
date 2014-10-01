@@ -94,7 +94,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                    href="javascript:void(0)"
                    data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
                    data-message="${ _('The workflow was killed.') }"
-                   data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+                   data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
                 ${_('Kill')}
                 </button>
                 <button title="${ _('Suspend the workflow after finishing the current running actions') }" id="suspend-btn"
@@ -104,7 +104,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                    % if not oozie_workflow.is_running():
                      hide
                    % endif
-                   " rel="tooltip" data-placement="right">
+                   " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
                   ${ _('Suspend') }
                 </button>
                 <button title="${ _('Resume the workflow') }" id="resume-btn"
@@ -114,7 +114,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                    % if oozie_workflow.is_running():
                      hide
                    % endif
-                   ">
+                   " style="margin-bottom: 5px">
                   ${ _('Resume') }
                 </button>
                 <button title="${ _('Rerun the same workflow') }" id="rerun-btn"
@@ -123,7 +123,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                    % if oozie_workflow.is_running():
                      hide
                    % endif
-                   ">
+                   " style="margin-bottom: 5px">
                   ${ _('Rerun') }
                 </button>
                 <div id="rerun-wf-modal" class="modal hide"></div>
