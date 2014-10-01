@@ -1055,8 +1055,8 @@ var HiveViewModel = function (initial) {
         self.bulk_add_privileges();
         break;
       case "sync":
-    	self.bulk_delete_privileges();
-    	self.bulk_add_privileges();
+        self.bulk_delete_privileges({norefresh: true});
+        self.bulk_add_privileges();
         break;
       case "delete":
         self.bulk_delete_privileges();
@@ -1065,7 +1065,7 @@ var HiveViewModel = function (initial) {
     self.bulkAction("");
   }
 
-  self.bulk_delete_privileges = function (role) {
+  self.bulk_delete_privileges = function (norefresh) {
     $(".jHueNotify").hide();
     var checkedPaths = self.assist.checkedItems();
     $.post("/security/api/hive/bulk_delete_privileges", {
@@ -1077,8 +1077,10 @@ var HiveViewModel = function (initial) {
         ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
           self.assist.updatePathProperty(self.assist.growingTree(), item.path, "withPrivileges", false);
         });
-        self.list_sentry_privileges_by_authorizable(); // Refresh
-        $(document).trigger("deleted.bulk.privileges");
+        if (norefresh == undefined) {
+          self.list_sentry_privileges_by_authorizable(); // Refresh
+          $(document).trigger("deleted.bulk.privileges");
+        }
       } else {
         $(document).trigger("error", data.message);
       }
