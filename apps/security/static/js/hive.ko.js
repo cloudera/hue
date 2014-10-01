@@ -243,6 +243,7 @@ var Role = function (vm, role) {
         vm.showCreateRole(false);
         self.reset();
         var role = new Role(vm, data.role);
+        role.showPrivileges(true);
         vm.originalRoles.unshift(role);
         vm.assist.refreshTree();
         vm.refreshExpandedRoles();
