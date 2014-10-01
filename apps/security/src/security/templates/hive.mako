@@ -202,14 +202,19 @@ ${ layout.menubar(section='hive') }
               <div class="acl-panel-content">
                 <div class="pull-right">
                   <input class="input-medium no-margin" type="text" placeholder="${ _('Search privileges...') }" data-bind="value: privilegeFilter, valueUpdate: 'afterkeydown', visible: $root.assist.privileges().length > 1"> &nbsp;
-                  <a data-bind="visible: $root.assist.privileges().length > 0, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer"><i class="fa fa-plus-circle"></i> ${ _('Add role') }</a>
+                  <a data-bind="visible: $root.assist.privileges().length > 0 && $root.is_sentry_admin, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer">
+                    <i class="fa fa-plus-circle"></i> ${ _('Add role') }
+                  </a>
                 </div>
                 <div data-bind="visible: $root.assist.privileges().length == 0 && $root.isLoadingPrivileges()"><i class="fa fa-spinner fa-spin" data-bind="visible: $root.isLoadingPrivileges()"></i> <em class="muted">${ _('Loading privileges...')}</em></div>
                 <h4 style="margin-top: 4px" data-bind="visible: $root.assist.privileges().length > 0 && ! $root.isLoadingPrivileges()">${ _('Privileges') } &nbsp;</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0 && ! $root.isLoadingPrivileges()">
                   <div class="span10 offset1 center" style="cursor: pointer" data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
                     <i class="fa fa-plus-circle waiting"></i>
-                    <h1 class="emptyMessage">${ _('No privileges found for the selected item') }<br/><a class="pointer">${ _('Click here to add a new role') }</a></h1>
+                    <h1 class="emptyMessage">
+                      ${ _('No privileges found for the selected item') }<br/>
+                      <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add a new role') }</a>
+                    </h1>
                   </div>
                 </div>
                 <div data-bind="template: { name: 'role', foreach: $root.assist.roles }"></div>
@@ -229,7 +234,10 @@ ${ layout.menubar(section='hive') }
           <h1 class="muted" data-bind="visible: $root.isLoadingRoles()"><i class="fa fa-spinner fa-spin"></i></h1>
           <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles(), click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }">
             <i class="fa fa-plus-circle waiting"></i>
-            <h1 class="emptyMessage">${ _('There are currently no roles defined') }<br/><a class="pointer">${ _('Click here to add') }</a> ${ _('one') }</h1>
+            <h1 class="emptyMessage">
+              ${ _('There are currently no roles defined') }<br/>
+              <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add one') }</a>
+            </h1>
           </div>
           <div class="clearfix" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles()"></div>
           <div data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
@@ -240,11 +248,15 @@ ${ layout.menubar(section='hive') }
 
               <%def name="actions()">
                 <button class="btn toolbarBtn" data-bind="click: $root.expandSelectedRoles, enable: $root.selectedRoles().length > 0"><i class="fa fa-expand"></i> ${ _('Expand') }</button>
-                <button class="btn toolbarBtn" data-bind="click: function(){ $('#deleteRoleModal').modal('show'); }, enable: $root.selectedRoles().length > 0"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+                <button class="btn toolbarBtn" data-bind="visible: $root.is_sentry_admin, click: function(){ $('#deleteRoleModal').modal('show'); }, enable: $root.selectedRoles().length > 0">
+                  <i class="fa fa-times"></i> ${ _('Delete') }
+                </button>
               </%def>
 
               <%def name="creation()">
-                <a data-bind="click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer"><i class="fa fa-plus-circle"></i> ${ _('Add') }</a>
+                <a data-bind="visible: $root.is_sentry_admin, click: function(){ $root.showCreateRole(true); $('#createRoleModal').modal('show'); }" class="btn pointer">
+                  <i class="fa fa-plus-circle"></i> ${ _('Add') }
+                </a>
               </%def>
             </%actionbar:render>
           </div>
