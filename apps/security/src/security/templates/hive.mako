@@ -102,13 +102,15 @@ ${ layout.menubar(section='hive') }
       </span>
       <span data-bind="visible: tableName">
         <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
-      </span>
-      <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
+      </span>      
     <!-- /ko -->
 
     <!-- ko if: URI -->
-      <span data-bind="text: URI"></span>
+      <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
+
+    <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
+
   <!-- /ko -->
 </div>
 </script>
