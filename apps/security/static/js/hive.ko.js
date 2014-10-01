@@ -246,7 +246,6 @@ var Role = function (vm, role) {
         role.showPrivileges(true);
         vm.originalRoles.unshift(role);
         vm.assist.refreshTree();
-        vm.refreshExpandedRoles();
         $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
@@ -265,7 +264,6 @@ var Role = function (vm, role) {
         $(document).trigger("info", data.message);
         vm.showCreateRole(false);
         vm.assist.refreshTree();
-        vm.refreshExpandedRoles();
         $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
@@ -786,6 +784,9 @@ var HiveViewModel = function (initial) {
   self.showCreateRole = ko.observable(false);
   self.role = ko.observable(new Role(self, {}));
 
+  self.grantToPrivilege = ko.observable();
+  self.grantToPrivilegeRole = ko.observable();
+
   self.resetCreateRole = function() {
     self.roles(self.originalRoles());
     self.role(new Role(self, {}));
@@ -816,7 +817,7 @@ var HiveViewModel = function (initial) {
   }, self);
 
   self.selectAllRoles = function () {
-    self.allRolesSelected(!self.allRolesSelected());
+    self.allRolesSelected(! self.allRolesSelected());
     ko.utils.arrayForEach(self.roles(), function (role) {
       role.selected(self.allRolesSelected());
     });
@@ -987,6 +988,29 @@ var HiveViewModel = function (initial) {
       'db': self.assist.db(),
       'table': self.assist.table()
     }
+  }
+
+  self.grant_privilege = function () {
+    $(".jHueNotify").hide();
+    $.ajax({
+      type: "POST",
+      url: "/security/api/hive/grant_privilege",
+      data: {
+        'privilege': ko.mapping.toJSON(self.grantToPrivilege()),
+        'roleName': ko.mapping.toJSON(self.grantToPrivilegeRole())
+      },
+      success: function (data) {
+        if (data.status == 0) {
+          $(document).trigger("info", data.message);
+          self.assist.refreshTree();
+          $(document).trigger("created.role");
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   }
 
   self.list_sentry_privileges_by_authorizable = function (optionalPath, skipList) {
