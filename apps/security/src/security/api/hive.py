@@ -119,7 +119,9 @@ def create_role(request):
     api = get_api(request.user)
 
     api.create_sentry_role(role['name'])
-    result['privileges'] = _hive_add_privileges(request.user, role, role['privileges'])
+
+    privileges = [privilege for privilege in role['privileges'] if privilege['status'] != 'deleted']
+    result['privileges'] = _hive_add_privileges(request.user, role, privileges)
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
 
     result['role'] = {"name": role['name'], "groups": role['groups']}
@@ -177,6 +179,23 @@ def save_privileges(request):
         _drop_sentry_privilege(request.user, role, privilege)
 
     result['message'] = _('Privileges updated')
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def grant_privilege(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    roleName = json.loads(request.POST['roleName'])
+    privilege = json.loads(request.POST['privilege'])
+
+    result['privileges'] = _hive_add_privileges(request.user, {'name': roleName}, [privilege])
+
+    result['message'] = _('Privilege granted successfully to %s.') % roleName
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
