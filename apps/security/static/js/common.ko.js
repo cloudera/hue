@@ -132,6 +132,7 @@ ko.bindingHandlers.hivechooser = {
 ko.bindingHandlers.filechooser = {
   init: function(element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
+    self.val(valueAccessor()());
     self.after(getFileBrowseButton(self, true, valueAccessor));
   }
 };

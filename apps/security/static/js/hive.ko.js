@@ -72,7 +72,7 @@ var Privilege = function (vm, privilege) {
   });
 
   // UI
-  self.privilegeType = ko.observable("db");
+  self.privilegeType = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null && privilege.URI != "" ? "uri" : "db");
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
@@ -1118,7 +1118,7 @@ var HiveViewModel = function (initial) {
     $.getJSON('/desktop/api/users/autocomplete', {
       'include_myself': true,
       'extend_user': true,
-      'only_mygroups': ! self.is_sentry_admin,
+      'only_mygroups': ! self.is_sentry_admin
     }, function (data) {
       self.availableHadoopUsers(data.users);
       self.availableHadoopGroups(data.groups);
