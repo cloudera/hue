@@ -87,7 +87,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
               href="javascript:void(0)"
               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_bundle.id, action='kill') }"
               data-message="${ _('The bundle was killed!') }"
-              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
                 ${_('Kill')}
             </button>
             <button class="btn btn-small
@@ -97,7 +97,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
             "
               id="rerun-btn"
               data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=oozie_bundle.bundleJobPath) }"
-            >
+            style="margin-bottom: 5px">
               ${ _('Rerun') }
             </button>
             <div id="rerun-coord-modal" class="modal hide"></div>
@@ -108,7 +108,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
                % if not oozie_bundle.is_running():
                  hide
                % endif
-               " rel="tooltip" data-placement="right">
+               " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
               ${ _('Suspend') }
             </button>
             <button title="${ _('Resume the bundle') }" id="resume-btn"
@@ -118,7 +118,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
                % if oozie_bundle.is_running():
                  hide
                % endif
-               ">
+               " style="margin-bottom: 5px">
               ${ _('Resume') }
             </button>
           </li>

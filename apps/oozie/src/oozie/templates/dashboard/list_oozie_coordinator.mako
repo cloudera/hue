@@ -73,6 +73,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
           % for dataset in coordinator.dataset_set.all():
             <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="fa fa-eye"></i> <span class="dataset">${ dataset.name }</span></li>
           % endfor
+          % if not coordinator.dataset_set.all():
+            <li class="white">${ _('No available datasets') }</li>
+          % endif
         % endif
 
         % if has_job_edition_permission(oozie_coordinator, user):
@@ -89,7 +92,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               href="javascript:void(0)"
               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
               data-message="${ _('The coordinator was killed!') }"
-              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
                 ${_('Kill')}
             </button>
             <button class="btn btn-small
@@ -99,7 +102,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             "
               id="rerun-btn"
               data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }"
-            >
+            style="margin-bottom: 5px">
               ${ _('Rerun') }
             </button>
             <div id="rerun-coord-modal" class="modal hide"></div>
@@ -110,7 +113,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                % if not oozie_coordinator.is_running():
                  hide
                % endif
-               " rel="tooltip" data-placement="right">
+               " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
               ${ _('Suspend') }
             </button>
             <button title="${ _('Resume the coordinator') }" id="resume-btn"
@@ -120,7 +123,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                % if oozie_coordinator.is_running():
                  hide
                % endif
-               ">
+               " style="margin-bottom: 5px">
               ${ _('Resume') }
             </button>
           </li>
