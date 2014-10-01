@@ -51,7 +51,7 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST['roleName']
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s' % (privilege['database'], privilege['table']))
+    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
     result['message'] = ''
     result['status'] = 0
   except Exception, e:

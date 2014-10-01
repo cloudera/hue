@@ -1174,6 +1174,6 @@ var HiveViewModel = function (initial) {
 
 function logGA(page) {
   if (typeof trackOnGA == 'function') {
-    trackOnGA('security/' + page);
+    trackOnGA('sentry/' + page);
   }
 }
