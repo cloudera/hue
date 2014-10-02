@@ -2595,12 +2595,7 @@ function loadDesign(design_id) {
 
   $(document).one('fetched.design', saveLastUsedDatabase);
 
-  var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
-    viewModel.queryEditorBlank(true);
-    codeMirror.setValue(value);
-    codeMirrorSubscription.dispose();
-  });
-
+  setupCodeMirrorSubscription();
   loadEditor();
 }
 
@@ -2612,13 +2607,22 @@ function loadQueryHistory(query_history_id) {
 
   $(document).one('fetched.query', saveLastUsedDatabase);
 
-  var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
-    viewModel.queryEditorBlank(true);
-    codeMirror.setValue(value);
-    codeMirrorSubscription.dispose();
-  });
-
+  setupCodeMirrorSubscription();
   loadEditor();
+}
+
+function setupCodeMirrorSubscription() {
+  var codeMirrorSubscription = viewModel.design.query.value.subscribe(function (value) {
+    viewModel.queryEditorBlank(true);
+    var _waitForCodemirrorInit = -1;
+    _waitForCodemirrorInit = window.setInterval(function () {
+      if (typeof codeMirror != "undefined") {
+        codeMirror.setValue(value);
+        codeMirrorSubscription.dispose();
+        window.clearInterval(_waitForCodemirrorInit);
+      }
+    }, 100);
+  });
 }
 
 // Knockout
