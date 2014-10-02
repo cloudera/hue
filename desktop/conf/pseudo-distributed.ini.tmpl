@@ -711,9 +711,9 @@
 
 [beeswax]
 
-  # Host where Hive server Thrift daemon is running.
+  # Host where HiveServer2 is running.
   # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
-  ## hive_server_host=<FQDN of Hive Server>
+  ## hive_server_host=localhost
 
   # Port where HiveServer2 Thrift server runs on.
   ## hive_server_port=10000
@@ -723,9 +723,6 @@
 
   # Timeout in seconds for thrift calls to Hive service
   ## server_conn_timeout=120
-
-  # Path to HiveServer2 start script
-  ## hive_server_bin=/usr/lib/hive/bin/hiveserver2
 
   # Set a LIMIT clause when browsing a partitioned table.
   # A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.
