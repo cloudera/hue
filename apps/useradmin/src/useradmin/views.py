@@ -79,11 +79,11 @@ def list_for_autocomplete(request):
     extended_user_object = request.GET.get('extend_user') == 'true'
 
     users = User.objects.all()
-    if request.GET.get('include_myself') != 'true':
+    if not request.GET.get('include_myself'):
       users = users.exclude(pk=request.user.pk)
 
     groups = Group.objects.all()
-    if request.GET.get('only_mygroups') != 'false':
+    if request.GET.get('only_mygroups'):
       groups = request.user.groups.all()
 
     response = {

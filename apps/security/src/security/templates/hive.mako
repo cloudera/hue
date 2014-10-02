@@ -47,8 +47,8 @@ ${ layout.menubar(section='hive') }
 <div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted'" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
-    <div class="pull-right privilege-actions">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
+    <div class="pull-right privilege-actions" data-bind="visible: grantOption() || $root.is_sentry_admin">
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
@@ -84,8 +84,8 @@ ${ layout.menubar(section='hive') }
 
   <!-- ko ifnot: editing() -->
     <!-- ko ifnot: $root.isApplyingBulk() -->
-    <div class="pull-right privilege-actions">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
+    <div class="pull-right privilege-actions" data-bind="visible: grantOption() || $root.is_sentry_admin">
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
       <a title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
       <a title="${ _('Delete this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
@@ -217,7 +217,7 @@ ${ layout.menubar(section='hive') }
                     <i data-bind="visible: $root.is_sentry_admin" class="fa fa-plus-circle waiting"></i>
                     <h1 class="emptyMessage">
                       ${ _('No privileges found for the selected item') }<br/>
-                      <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add a new role') }</a>
+                      <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add some') }</a>
                     </h1>
                   </div>
                 </div>
@@ -342,7 +342,7 @@ ${ layout.menubar(section='hive') }
 <div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 data-bind="visible: ! $root.role().isEditing()">${ _('Add role') }</h3>
+    <h3 data-bind="visible: ! $root.role().isEditing()">${ _('Add or select a role') }</h3>
     <h3 data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h3>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
@@ -350,7 +350,7 @@ ${ layout.menubar(section='hive') }
     <div class="row-fluid">
       <div class="span6">
         <h4>${ _('Name') }</h4>
-        <input id="createRoleName" type="text" class="input-xlarge" data-bind="value: $data.name, visible: ! $data.isEditing()" placeholder="${ _('Required') }" style="width: 360px" />
+        <input id="createRoleName" type="text" class="input-xlarge" data-bind="value: $data.name, visible: ! $data.isEditing()" placeholder="${ _('New or existing role name') }" style="width: 360px" />
         <strong data-bind="text: $data.name, visible: $data.isEditing()"></strong>
       </div>
       <div class="span6">
@@ -419,7 +419,7 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: function() { $root.role().savePrivileges($root.roleToUpdate()); }">${ _('Yes delete') }</button>
+    <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: function() { $root.role().savePrivileges($root.roleToUpdate()); }">${ _('Yes, delete') }</button>
   </div>
 </div>
 
