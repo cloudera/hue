@@ -385,9 +385,10 @@ ${ layout.menubar(section='hive') }
       <div data-bind="template: { name: 'privilege', data: $root.grantToPrivilege() }"></div>
     <!-- /ko -->
 
-    <h4>${ _('To') }</h4>
-    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { update: $root.grantToPrivilegeRole, placeholder: '${ _("Select a role") }' }" style="width: 360px"></select>
-    </br>
+    <br/>
+    <span>${ _('To role') }&nbsp;&nbsp;</span>
+    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { update: $root.grantToPrivilegeRole, placeholder: '${ _("Select a role") }', type: 'role' }" style="width: 360px"></select>
+    <br/>
 
   </div>
   <div class="modal-footer">
