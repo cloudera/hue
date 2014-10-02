@@ -553,7 +553,7 @@ var Assist = function (vm, initial) {
     vm.list_sentry_privileges_by_authorizable();
   }
 
-  self.setPath = function (obj, toggle) {
+  self.setPath = function (obj, toggle, skipListAuthorizable) {
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded || (!obj.isExpanded() && !self.getTreeAdditionalDataForPath(obj.path()).loaded)) {
       if (typeof toggle == "boolean" && toggle) {
         obj.isExpanded(!obj.isExpanded());
@@ -575,7 +575,9 @@ var Assist = function (vm, initial) {
     $(document).trigger("changed.path");
 
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded){
-      vm.list_sentry_privileges_by_authorizable();
+      if (typeof skipListAuthorizable == "undefined" || !skipListAuthorizable) {
+        vm.list_sentry_privileges_by_authorizable();
+      }
     }
     else {
       self.fetchHivePath();
@@ -704,7 +706,7 @@ var Assist = function (vm, initial) {
           if (data.databases) {
             self.addDatabases(_originalPath, data.databases, _hasCallback);
             if (vm.getPathHash() == ""){
-              self.setPath(self.treeData().nodes()[0]);
+              self.setPath(self.treeData().nodes()[0], false, true);
             }
           }
           else if (data.tables && data.tables.length > 0) {

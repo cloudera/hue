@@ -601,7 +601,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
         $("#deletePrivilegeModal").modal("hide");
-        viewModel.clear_temp_roles();
+        viewModel.clearTempRoles();
         window.setTimeout(function(){
           viewModel.refreshExpandedRoles();
         }, 500);
