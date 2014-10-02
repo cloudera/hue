@@ -1160,11 +1160,15 @@ var HiveViewModel = function (initial) {
   };
 
   self.fetchUsers = function () {
-    $.getJSON('/desktop/api/users/autocomplete', {
+    var data = {
       'include_myself': true,
-      'extend_user': true,
-      'only_mygroups': ! self.is_sentry_admin
-    }, function (data) {
+      'extend_user': true
+    };
+    if (! self.is_sentry_admin) {
+      data['only_mygroups'] = true;
+    }
+
+    $.getJSON('/desktop/api/users/autocomplete', data, function (data) {
       self.availableHadoopUsers(data.users);
       self.availableHadoopGroups(data.groups);
       $(document).trigger("loaded.users");
