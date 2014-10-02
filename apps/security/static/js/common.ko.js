@@ -78,7 +78,9 @@ ko.bindingHandlers.select2 = {
                   viewModel.availablePrivileges.push(_newVal);
                 }
                 if (_type == "role") {
-                  viewModel.roles.push(new Role(viewModel, { name: _newVal }));
+                  var _r = new Role(viewModel, { name: _newVal });
+                  viewModel.tempRoles.push(_r);
+                  viewModel.roles.push(_r);
                 }
                 if (_isArray){
                   var _vals = $(element).select2("val");
