@@ -246,7 +246,7 @@ var Role = function (vm, role) {
         var role = new Role(vm, data.role);
         role.showPrivileges(true);
         vm.originalRoles.unshift(role);
-        vm.assist.refreshTree();
+        vm.list_sentry_privileges_by_authorizable();
         $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
@@ -264,7 +264,7 @@ var Role = function (vm, role) {
       if (data.status == 0) {
         $(document).trigger("info", data.message);
         vm.showCreateRole(false);
-        vm.assist.refreshTree();
+        vm.list_sentry_privileges_by_authorizable();
         $(document).trigger("created.role");
       } else {
         $(document).trigger("error", data.message);
@@ -281,7 +281,7 @@ var Role = function (vm, role) {
     }, function (data) {
       if (data.status == 0) {
         vm.removeRole(role.name());
-        vm.assist.refreshTree();
+        vm.list_sentry_privileges_by_authorizable();
         $(document).trigger("removed.role");
       } else {
         $(document).trigger("error", data.message);
@@ -528,14 +528,19 @@ var Assist = function (vm, initial) {
             if (self.treeAdditionalData[path].loaded) {
               self.fetchHivePath(path, function () {
                 self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
+                var _withTable = false;
                 Object.keys(self.treeAdditionalData).forEach(function (ipath) {
                   if (ipath.split(".").length == 2 && ipath.split(".")[0] == path) {
                     self.fetchHivePath(ipath, function () {
+                      _withTable = true;
                       self.updatePathProperty(self.growingTree(), ipath, "isExpanded", self.treeAdditionalData[ipath].expanded);
                       self.loadData(self.growingTree());
                     });
                   }
                 });
+                if (! _withTable){
+                  self.loadData(self.growingTree());
+                }
               });
             }
           }
@@ -1035,9 +1040,6 @@ var HiveViewModel = function (initial) {
     	if (data.status == 0) {
           var _privileges = [];
           $.each(data.privileges, function (index, item) {
-            if (item.table != ""){
-              self.assist.updatePathProperty(self.assist.growingTree(), item.database + "." + item.table, "withPrivileges", true);
-            }
             if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)){
               var _role = null;
               self.assist.roles().forEach(function (role) {
@@ -1100,9 +1102,6 @@ var HiveViewModel = function (initial) {
       'recursive': false
     }, function (data) {
       if (data.status == 0) {
-        ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
-          self.assist.updatePathProperty(self.assist.growingTree(), item.path, "withPrivileges", false);
-        });
         if (norefresh == undefined) {
           self.list_sentry_privileges_by_authorizable(); // Refresh
           $(document).trigger("deleted.bulk.privileges");
@@ -1125,9 +1124,6 @@ var HiveViewModel = function (initial) {
       'recursive': false
     }, function (data) {
       if (data.status == 0) {
-        ko.utils.arrayForEach(self.assist.checkedItems(), function (item) {
-          self.assist.updatePathProperty(self.assist.growingTree(), item.path, "withPrivileges", true);
-        });
         self.list_sentry_privileges_by_authorizable(); // Refresh
         $(document).trigger("added.bulk.privileges");
       } else {

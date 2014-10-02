@@ -216,7 +216,7 @@ ${ layout.menubar(section='hive') }
                 <h4 style="margin-top: 4px" data-bind="visible: $root.assist.privileges().length > 0 && ! $root.isLoadingPrivileges()">${ _('Privileges') } &nbsp;</h4>
                 <div data-bind="visible: $root.assist.privileges().length == 0 && ! $root.isLoadingPrivileges()">
                   <div class="span10 offset1 center" style="cursor: pointer" data-bind="click: function(){ if ($root.is_sentry_admin) { $root.showCreateRole(true); $('#createRoleModal').modal('show'); } }">
-                    <i class="fa fa-plus-circle waiting"></i>
+                    <i data-bind="visible: $root.is_sentry_admin" class="fa fa-plus-circle waiting"></i>
                     <h1 class="emptyMessage">
                       ${ _('No privileges found for the selected item') }<br/>
                       <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add a new role') }</a>
@@ -239,7 +239,7 @@ ${ layout.menubar(section='hive') }
         <div class="card-body">
           <h1 class="muted" data-bind="visible: $root.isLoadingRoles()"><i class="fa fa-spinner fa-spin"></i></h1>
           <div class="span10 offset1 center" style="cursor: pointer" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles(), click: function(){ if ($root.is_sentry_admin) { $root.showCreateRole(true); $('#createRoleModal').modal('show'); } }">
-            <i class="fa fa-plus-circle waiting"></i>
+            <i data-bind="visible: $root.is_sentry_admin" class="fa fa-plus-circle waiting"></i>
             <h1 class="emptyMessage">
               ${ _('There are currently no roles defined') }<br/>
               <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add one') }</a>
