@@ -246,7 +246,7 @@ def list_sentry_privileges_by_authorizable(request):
       for role, privileges in roles.iteritems():
         for privilege in privileges:
           privilege['roleName'] = role
-        _privileges.append(privilege)
+          _privileges.append(privilege)
 
     result['privileges'] = sorted(_privileges, key=lambda privilege: privilege['roleName'])
 
