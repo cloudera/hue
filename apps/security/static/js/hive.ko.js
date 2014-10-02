@@ -326,10 +326,12 @@ var Assist = function (vm, initial) {
   });
   self.server = ko.observable(initial.sentry_provider);
   self.db = ko.computed(function () {
-    return self.path().split(/[.]/)[0];
+    var db = self.path().split(/[.]/)[0];
+    return db ? db : null;
   });
   self.table = ko.computed(function () {
-    return self.path().split(/[.]/)[1];
+    var table = self.path().split(/[.]/)[1];
+    return table ? table : null;
   });
   self.privileges = ko.observableArray();
   self.roles = ko.observableArray();
@@ -547,6 +549,7 @@ var Assist = function (vm, initial) {
         }
       });
     });
+
     vm.list_sentry_privileges_by_authorizable();
   }
 
@@ -567,8 +570,10 @@ var Assist = function (vm, initial) {
       self.getTreeAdditionalDataForPath(obj.path()).expanded = obj.isExpanded();
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
+
     self.path(obj.path());
     $(document).trigger("changed.path");
+
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded){
       vm.list_sentry_privileges_by_authorizable();
     }
@@ -985,16 +990,18 @@ var HiveViewModel = function (initial) {
 
   function _create_authorizable_from_ko(optionalPath) {
     if (optionalPath != null){
+      var paths = optionalPath.split(/[.]/);
       return {
         'server': self.assist.server(),
-        'db':  optionalPath.split(/[.]/)[0],
-        'table':  optionalPath.split(/[.]/)[1]
+        'db': paths[0] ? paths[0] : null,
+        'table': paths[1] ? paths[1] : null
       }
-    }
-    return {
-      'server': self.assist.server(),
-      'db': self.assist.db(),
-      'table': self.assist.table()
+    } else {
+      return {
+        'server': self.assist.server(),
+        'db': self.assist.db(),
+        'table': self.assist.table()
+      }
     }
   }
 
