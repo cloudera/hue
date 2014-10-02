@@ -293,7 +293,7 @@ ${ layout.menubar(section='hive') }
                   <span data-bind="text: name"/>
                 </td>
                 <td>
-                  <a class="pointer" data-bind="click: function() { showEditGroups(true); }">
+                  <a class="pointer" data-bind="click: function() { if ($root.is_sentry_admin) { showEditGroups(true); } }">
                     <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
                       <span data-bind="text: $data"></span>
                     </span>
