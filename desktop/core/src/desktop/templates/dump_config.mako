@@ -43,7 +43,7 @@ ${ layout.menubar(section='dump_config') }
 
     <div class="container-fluid">
       <div class="row-fluid">
-        <div class="well">
+        <div class="well" style="border-top-width:1px">
         ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
         </div>
 
