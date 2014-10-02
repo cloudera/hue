@@ -47,10 +47,8 @@ ${ layout.menubar(section='hive') }
 <div data-bind="visible: status() != 'deleted' && status() != 'alreadydeleted'" class="acl-block acl-block-airy">
 
   <!-- ko if: editing() -->
-    <div class="pull-right">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }">
-        <i class="fa fa-send"></i>
-      </a>
+    <div class="pull-right privilege-actions">
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
@@ -71,12 +69,14 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    <div class="inline-block" style="vertical-align: middle">
-      <label>&nbsp;&nbsp;<input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
+    <div class="inline-block with-grant-checkbox">
+      <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
     </div>
 
     <span class="showAdvancedSpace">&nbsp;&nbsp;</span>
     <a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Advanced') }</a>
+
+    <div class="clearfix"></div>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced">
       <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 29px">
@@ -86,10 +86,8 @@ ${ layout.menubar(section='hive') }
 
   <!-- ko ifnot: editing() -->
     <!-- ko ifnot: $root.isApplyingBulk() -->
-    <div class="pull-right">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }">
-        <i class="fa fa-send"></i>
-      </a>
+    <div class="pull-right privilege-actions">
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: grantOption() || $root.is_sentry_admin, click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
       <a title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
       <a title="${ _('Delete this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>

@@ -116,13 +116,13 @@
 }
 
 .modal .showAdvanced {
-  display: block;
+  float:left;
   margin-top: 4px;
   margin-left: 6px;
 }
 
 .span6 .acl-block .showAdvanced {
-  display: block;
+  float:left;
   margin-top: 4px;
   margin-left: 6px;
 }
@@ -251,7 +251,7 @@ h1.emptyMessage {
   height: 18px;
 }
 
-#createRoleModal, #bulkActionsModal {
+#createRoleModal, #bulkActionsModal, #grantPrivilegeModal {
   width: 800px;
   left: 50%;
   margin-left: -400px!important;
@@ -316,4 +316,27 @@ h1.emptyMessage {
 .actionbar-main {
   padding: 0!important;
   padding-bottom: 10px!important;
+}
+
+#grantPrivilegeModal .privilege-actions {
+  display: none;
+}
+
+.with-grant-checkbox {
+  vertical-align: middle;
+}
+
+.with-grant-checkbox label {
+  line-height: 22px;
+}
+
+.span6 .acl-block .with-grant-checkbox {
+  float: left;
+  margin-right: 6px;
+  margin-top: 2px;
+  clear: both;
+}
+
+table .showAdvanced {
+  float: none;
 }
