@@ -109,6 +109,10 @@ ko.bindingHandlers.hivechooser = {
       self.blur();
     }
 
+    self.on("blur", function () {
+      valueAccessor()(self.val());
+    });
+
     self.jHueHiveAutocomplete({
       skipColumns: true,
       showOnFocus: true,
@@ -133,6 +137,11 @@ ko.bindingHandlers.filechooser = {
   init: function(element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
     self.val(valueAccessor()());
+
+    self.on("blur", function () {
+      valueAccessor()(self.val());
+    });
+
     self.after(getFileBrowseButton(self, true, valueAccessor));
   }
 };
