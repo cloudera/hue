@@ -69,17 +69,15 @@ ${ layout.menubar(section='hive') }
 
     <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
 
-    <div class="inline-block with-grant-checkbox">
+    <div class="new-line-if-small">
       <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
+      <a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Show advanced') }</a>
+      <a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(false); }, visible: showAdvanced()"><i class="fa fa-cog"></i> ${ _('Hide advanced') }</a>
+      <div class="clearfix"></div>
     </div>
 
-    <span class="showAdvancedSpace">&nbsp;&nbsp;</span>
-    <a class="pointer showAdvanced" data-bind="click: function(){ showAdvanced(true); }, visible: ! showAdvanced()"><i class="fa fa-cog"></i> ${ _('Advanced') }</a>
-
-    <div class="clearfix"></div>
-
-    <div class="acl-block-section" data-bind="visible: showAdvanced">
-      <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 29px">
+    <div class="acl-block-section" data-bind="visible: showAdvanced" style="margin-top: 0">
+      <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 6px">
       <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
     </div>
   <!-- /ko -->
