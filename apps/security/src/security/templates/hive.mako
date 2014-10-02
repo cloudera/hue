@@ -243,6 +243,7 @@ ${ layout.menubar(section='hive') }
             <h1 class="emptyMessage">
               ${ _('There are currently no roles defined') }<br/>
               <a class="pointer" data-bind="visible: $root.is_sentry_admin">${ _('Click here to add one') }</a>
+              <br/>
             </h1>
           </div>
           <div class="clearfix" data-bind="visible: $root.roles().length == 0 && ! $root.isLoadingRoles()"></div>
@@ -602,6 +603,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
         $("#deletePrivilegeModal").modal("hide");
+        viewModel.clear_temp_roles();
         window.setTimeout(function(){
           viewModel.refreshExpandedRoles();
         }, 500);
@@ -670,6 +672,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $('#jHueHiveAutocomplete').hide();
         viewModel.resetCreateRole();
       });
+
+      $("#grantPrivilegeModal").on("hidden", function () {
+        viewModel.clearTempRoles();
+      });
+
 
       $("#deleteRoleModal").modal({
         show: false

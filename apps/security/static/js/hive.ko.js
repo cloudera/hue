@@ -747,6 +747,7 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.roles = ko.observableArray();
+  self.tempRoles = ko.observableArray();
   self.originalRoles = ko.observableArray();
   self.roleFilter = ko.observable("");
   self.filteredRoles = ko.computed(function () {
@@ -1010,6 +1011,7 @@ var HiveViewModel = function (initial) {
         if (data.status == 0) {
           $(document).trigger("info", data.message);
           self.assist.refreshTree();
+          self.clearTempRoles();
           $(document).trigger("created.role");
         } else {
           $(document).trigger("error", data.message);
@@ -1018,6 +1020,23 @@ var HiveViewModel = function (initial) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
+  }
+
+  self.clearTempRoles = function () {
+    var _roles = [];
+    self.roles().forEach(function(role){
+      var _found = false;
+      self.tempRoles().forEach(function(tempRole){
+        if (role.name() == tempRole.name()){
+          _found = true;
+        }
+      });
+      if (! _found){
+        _roles.push(role);
+      }
+    });
+    self.roles(_roles);
+    self.tempRoles([]);
   }
 
   self.list_sentry_privileges_by_authorizable = function (optionalPath, skipList) {
