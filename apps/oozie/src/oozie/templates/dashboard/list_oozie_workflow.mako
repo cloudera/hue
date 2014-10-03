@@ -182,7 +182,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               <th>${ _('Start Time') }</th>
               <th>${ _('End Time') }</th>
 
-              <th>${ _('Retries') }</th>
               <th>${ _('Error Code') }</th>
               <th>${ _('Error Message') }</th>
               <th>${ _('Transition') }</th>
@@ -224,7 +223,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             <td data-bind="text: startTime"></td>
             <td data-bind="text: endTime"></td>
 
-            <td data-bind="text: retries"></td>
             <td data-bind="text: errorCode"></td>
             <td data-bind="text: errorMessage"></td>
             <td data-bind="text: transition"></td>
@@ -402,7 +400,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       externalId: action.externalId,
       startTime: action.startTime,
       endTime: action.endTime,
-      retries: action.retries,
       errorMessage: action.errorMessage,
       errorCode: action.errorCode,
       transition: action.transition,

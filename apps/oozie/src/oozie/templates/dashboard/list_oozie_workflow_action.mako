@@ -123,10 +123,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                 </tr>
               % endif
               <tr>
-                <td>${ _('Retries') }</td>
-                <td>${ action.retries }</td>
-              </tr>
-              <tr>
                 <td>${ _('TrackerURI') }</td>
                 <td>${ action.trackerUri }</td>
               </tr>
