@@ -36,6 +36,8 @@ urlpatterns += patterns('security.api.hdfs',
 
 
 urlpatterns += patterns('security.api.hive',
+  url(r'^api/hive/fetch_hive_path', 'fetch_hive_path', name='fetch_hive_path'),
+
   url(r'^api/hive/list_sentry_roles_by_group', 'list_sentry_roles_by_group', name='list_sentry_roles_by_group'),
   url(r'^api/hive/list_sentry_privileges_by_role', 'list_sentry_privileges_by_role', name='list_sentry_privileges_by_role'),
   url(r'^api/hive/list_sentry_privileges_for_provider$', 'list_sentry_privileges_for_provider', name='list_sentry_privileges_for_provider'),
@@ -49,5 +51,6 @@ urlpatterns += patterns('security.api.hive',
   url(r'^api/hive/bulk_add_privileges', 'bulk_add_privileges', name='bulk_add_privileges'),
   url(r'^api/hive/grant_privilege', 'grant_privilege', name='grant_privilege'),
 
+  # Unused: API is for blind bulk operations
   url(r'^api/hive/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),
 )

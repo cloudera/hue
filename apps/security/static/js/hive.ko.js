@@ -694,7 +694,12 @@ var Assist = function (vm, initial) {
     if (_originalPath.split(".").length < 3) {
       var _path = _originalPath.replace('.', '/');
       var request = {
-        url: '/beeswax/api/autocomplete/' + _path,
+        url: '/security/api/hive/fetch_hive_path',
+        data: {
+          'path': _path,
+          'doas': vm.doAs(),
+          'isDiffMode': self.isDiffMode()
+        },
         dataType: 'json',
         type: 'GET',
         success: function (data) {
@@ -812,7 +817,7 @@ var HiveViewModel = function (initial) {
 
   self.doAs = ko.observable(initial.user);
   self.doAs.subscribe(function () {
-    self.assist.fetchHivePath();
+    self.assist.refreshTree();
   });
   self.availableHadoopUsers = ko.observableArray();
 

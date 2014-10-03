@@ -25,6 +25,29 @@ from libsentry.api import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
 from hadoop.cluster import get_defaultfs
 
+from beeswax.api import autocomplete
+
+
+def fetch_hive_path(request):
+  path = request.GET['path']
+
+  database = None
+  table = None
+  if path:
+    database = path
+  if '/' in path:
+    database, table = path.split('/')
+
+  resp = autocomplete(request, database, table)
+
+  if database and request.GET['doas'] != request.user.username:
+    request.GET = request.GET.copy()
+    request.GET['doas'] = request.GET['doas']
+
+    resp = autocomplete(request, database, table)
+
+  return resp
+
 
 def list_sentry_roles_by_group(request):
   result = {'status': -1, 'message': 'Error'}
