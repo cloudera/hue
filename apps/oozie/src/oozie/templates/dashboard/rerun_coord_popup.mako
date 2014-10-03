@@ -25,6 +25,11 @@
 <form action="${ action }" method="POST">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <span class="btn-group pull-right" style="margin-right: 20px">
+      <a class="btn btn-status btn-success" data-value="success">${ _('Succeeded') }</a>
+      <a class="btn btn-status btn-warning" data-value="warning">${ _('Running') }</a>
+      <a class="btn btn-status btn-danger disable-feedback" data-value="important">${ _('Failed') }</a>
+    </span>
     <h3>${ _('Select actions to rerun') }</h3>
   </div>
 
@@ -86,21 +91,39 @@
   $(document).ready(function(){
     var ViewModel = function() {
       var self = this;
+      self.isLoading = ko.observable(false);
+      self.actions = ko.observableArray([]);
     };
 
     window.viewModel = new ViewModel();
 
     $("#id_actions").jHueSelector({
-      selectAllLabel: "${_('Select all')}",
+      showSelectAll: false,
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No successful actions found.')}",
-      width:524,
+      width:558,
       height:200
     });
 
     // Update status color of each date
     $(".jHueSelectorBody ul li label").each(function(index) {
       $(this).addClass($("#date-" + index).attr('class'));
+    });
+
+    $(".btn-status").on("click", function () {
+      $(this).toggleClass("active");
+      $(".btn-status.active").each(function (cnt, item) {
+        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").prop("checked", true);
+        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").each(function(icnt, option){
+          $(option).data("opt").prop("selected", true);
+        });
+      });
+      $(".btn-status:not(.active)").each(function (cnt, item) {
+        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").prop("checked", false);
+        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").each(function(icnt, option){
+          $(option).data("opt").prop("selected", false);
+        });
+      });
     });
   });
 </script>
