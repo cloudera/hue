@@ -3,7 +3,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.1" exclude-result-prefixes="workflow">
 
 <xsl:import href="fields/archives.xslt"/>
-<xsl:import href="fields/arguments.xslt"/>
+<xsl:import href="fields/params.xslt"/>
 <xsl:import href="fields/files.xslt"/>
 <xsl:import href="fields/job_properties.xslt"/>
 <xsl:import href="fields/job_xml.xslt"/>
@@ -15,7 +15,7 @@
   <object model="oozie.pig" pk="0">
 
     <xsl:call-template name="archives"/>
-    <xsl:call-template name="arguments"/>
+    <xsl:call-template name="params"/>
     <xsl:call-template name="files"/>
     <xsl:call-template name="job_properties"/>
     <xsl:call-template name="job_xml"/>

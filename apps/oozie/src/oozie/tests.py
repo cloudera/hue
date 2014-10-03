@@ -2220,7 +2220,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('aggregate.pig', node.script_path)
-    assert_equal('[{"type":"argument","value":"-param"},{"type":"argument","value":"INPUT=/user/hue/oozie/workspaces/data"},{"type":"argument","value":"-param"},{"type":"argument","value":"OUTPUT=${output}"}]', node.params)
+    assert_equal('[{"type":"param","value":"KEY=VALUE"},{"type":"argument","value":"-param"},{"type":"argument","value":"INPUT=/user/hue/oozie/workspaces/data"},{"type":"argument","value":"-param"},{"type":"argument","value":"OUTPUT=${output}"}]', node.params)
     workflow.delete(skip_trash=True)
 
 

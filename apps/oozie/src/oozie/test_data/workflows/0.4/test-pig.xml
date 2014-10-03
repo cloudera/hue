@@ -5,6 +5,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <script>aggregate.pig</script>
+              <param>KEY=VALUE</param>
               <argument>-param</argument>
               <argument>INPUT=/user/hue/oozie/workspaces/data</argument>
               <argument>-param</argument>
