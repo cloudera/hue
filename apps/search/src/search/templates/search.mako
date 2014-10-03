@@ -874,8 +874,8 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: properties.scope() == 'tree' -->
         <div data-bind="partitionChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label},
           fqs: $root.query.fqs,
+          tooltip: '${ _('Click to zoom, double click to select') }',
           transformer: partitionChartDataTransformer,
-          zoomable: false,
           onStateChange: function(state){ },
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});

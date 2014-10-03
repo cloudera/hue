@@ -56,4 +56,5 @@ var HueColors = {
   PURPLE: "#C0B1E9",
   GRAY: "#666666",
   WHITE: "#FFFFFF",
+  ORANGE: "#FF7F0E"
 };
