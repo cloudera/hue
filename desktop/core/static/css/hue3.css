@@ -1837,7 +1837,7 @@ input.no-margin, select.no-margin {
   font-weight: bold;
 }
 
-form .modal-header .close {
+form.form-inline .modal-header .close {
   top: 0px;
   right: -11px;
 }

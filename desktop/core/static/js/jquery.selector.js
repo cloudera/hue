@@ -23,6 +23,7 @@
   var pluginName = "jHueSelector",
       defaults = {
         selectAllLabel: "Select all",
+        showSelectAll: true,
         searchPlaceholder: "Search",
         noChoicesFound: "No choices found for this element",
         width: 300,
@@ -104,24 +105,29 @@
       var header = $("<div>").addClass("jHueSelectorHeader");
       header.prependTo(selectorContainer);
 
-      var selectAll = $("<label>").text(this.options.selectAllLabel);
-      $("<input>").attr("type", "checkbox").change(function () {
-        var isChecked = $(this).is(":checked");
-        selectorContainer.find("input.selector:visible").each(function () {
-          if (isChecked) {
-            $(this).attr("checked", "checked");
-            $(this).data("opt").attr("selected", "selected");
-          }
-          else {
+      var selectAll = $("<label>").html("&nbsp;");
+
+      if (this.options.showSelectAll) {
+        selectAll.text(this.options.selectAllLabel);
+        $("<input>").attr("type", "checkbox").change(function () {
+          var isChecked = $(this).is(":checked");
+          selectorContainer.find("input.selector:visible").each(function () {
+            if (isChecked) {
+              $(this).attr("checked", "checked");
+              $(this).data("opt").attr("selected", "selected");
+            }
+            else {
+              $(this).removeAttr("checked");
+              $(this).data("opt").removeAttr("selected");
+            }
+          });
+          if (searchBox.val() != "") {
             $(this).removeAttr("checked");
-            $(this).data("opt").removeAttr("selected");
           }
-        });
-        if (searchBox.val() != "") {
-          $(this).removeAttr("checked");
-        }
-        _this.options.onChange();
-      }).prependTo(selectAll);
+          _this.options.onChange();
+        }).prependTo(selectAll);
+      }
+
       selectAll.appendTo(header);
 
       var searchBox = $("<input>").attr("type", "text").attr("placeholder", this.options.searchPlaceholder).keyup(function () {
