@@ -322,7 +322,10 @@ nv.models.multiBarWithBrushChart = function() {
       }
 
       function disableBrush() {
-        g.selectAll('.nv-brush').attr('display', 'none');
+        try {
+          g.selectAll('.nv-brush').attr('display', 'none');
+        }
+        catch (e){}
       }
 
 

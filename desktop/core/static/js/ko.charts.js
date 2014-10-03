@@ -65,7 +65,9 @@ ko.bindingHandlers.pieChart = {
         if (_options.fqs) {
           $.each(_options.fqs(), function (cnt, item) {
             if (item.field() == _options.field()) {
-              _chart.selectSlices($.map(item.filter(), function(it) {return it.value();}));
+              _chart.selectSlices($.map(item.filter(), function (it) {
+                return it.value();
+              }));
             }
           });
         }
@@ -152,7 +154,7 @@ ko.bindingHandlers.leafletMapChart = {
       }
     });
 
-    if ($(element).parents(".tab-pane").length > 0){
+    if ($(element).parents(".tab-pane").length > 0) {
       $(element).height($(element).parents(".tab-pane").height() - 100);
     }
     else {
@@ -189,13 +191,13 @@ ko.bindingHandlers.leafletMapChart = {
             try {
               var _latLngObj = L.latLng(item.lat, item.lng);
               _addMarker = true;
-             }
-            catch (e){
+            }
+            catch (e) {
               if (typeof console != "undefined") {
                 console.error(e);
               }
             }
-            if (_addMarker){
+            if (_addMarker) {
               var _marker = L.marker([item.lat, item.lng]).addTo(_map);
               if (item.label != null) {
                 _marker.bindPopup(item.label);
@@ -484,7 +486,7 @@ function barChartBuilder(element, options, isTimeline) {
             }
           }
         }
-        if (_isDiscrete && ! _isPivot) {
+        if (_isDiscrete && !_isPivot) {
           if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
             $(element).find("svg").empty();
           }
@@ -506,7 +508,7 @@ function barChartBuilder(element, options, isTimeline) {
             _chart.enableSelection();
           }
 
-          if (_isPivot){
+          if (_isPivot) {
             _chart.hideSelection();
           }
           else {
@@ -540,12 +542,16 @@ function barChartBuilder(element, options, isTimeline) {
 
       $.each(options.fqs(), function (cnt, item) {
         if (item.field() == options.field) {
-          _chart.selectBars($.map(item.filter(), function(it) {return it.value();}));
+          _chart.selectBars($.map(item.filter(), function (it) {
+            return it.value();
+          }));
         }
-        if (item.field().indexOf(":") > -1){
+        if (item.field().indexOf(":") > -1) {
           _chart.selectBars({
             field: item.field(),
-            selected: $.map(item.filter(), function(it) {return it.value();})
+            selected: $.map(item.filter(), function (it) {
+              return it.value();
+            })
           });
         }
       });
@@ -582,7 +588,10 @@ ko.bindingHandlers.partitionChart = {
     var _tip = d3.tip()
         .attr("class", "d3-tip")
         .html(function (d) {
-          if (d.depth < 2) {
+          if (d.depth == 0) {
+            return _options.tooltip || "";
+          }
+          else if (d.depth > 0 && d.depth < 2) {
             return d.name + " (" + d.value + ")";
           }
           else {
@@ -616,7 +625,7 @@ ko.bindingHandlers.partitionChart = {
           return "translate(" + _x(d.y) + "," + _y(d.x) + ")";
         })
         .on("mouseover", function (d, i) {
-          if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP) {
+          if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP || d.depth == 0) {
             _tip.attr("class", "d3-tip").show(d);
           }
 
@@ -624,7 +633,7 @@ ko.bindingHandlers.partitionChart = {
           d3.select(this).select("rect").classed("mouseover", true)
         })
         .on("mouseout", function (d, i) {
-          if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP) {
+          if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP || d.depth == 0) {
             _tip.attr("class", "d3-tip").show(d);
             _tip.hide();
           }
@@ -633,16 +642,16 @@ ko.bindingHandlers.partitionChart = {
 
     if (typeof _options.zoomable == "undefined" || _options.zoomable) {
       g.on("click", click)
-       .on("dblclick", function (d, i) {
-          if (typeof _options.onClick != "undefined") {
-            chartsUpdatingState();
-            _options.onClick(d);
-          }
-        });
+          .on("dblclick", function (d, i) {
+            if (typeof _options.onClick != "undefined" && d.depth > 0) {
+              chartsUpdatingState();
+              _options.onClick(d);
+            }
+          });
     }
     else {
       g.on("click", function (d, i) {
-        if (typeof _options.onClick != "undefined") {
+        if (typeof _options.onClick != "undefined" && d.depth > 0) {
           chartsUpdatingState();
           _options.onClick(d);
         }
@@ -662,11 +671,22 @@ ko.bindingHandlers.partitionChart = {
         .attr("class", function (d) {
           return d.children ? "parent" : "child";
         })
-        .attr("stroke", HueColors.DARK_BLUE)
+        .attr("stroke", function (d) {
+          return HueColors.DARK_BLUE;
+        })
         .attr("fill", function (d, i) {
-          return _colors[d.depth];
+          var _fill = _colors[d.depth] || _colors[_colors.length - 1];
+          if (d.obj && _options.fqs) {
+            $.each(_options.fqs(), function (cnt, item) {
+              $.each(item.filter(), function (icnt, filter) {
+                if (filter.value() == d.obj.fq_values) {
+                  _fill = HueColors.ORANGE;
+                }
+              });
+            });
+          }
+          return _fill;
         });
-
 
     g.append("svg:text")
         .attr("transform", transform)
