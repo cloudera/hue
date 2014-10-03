@@ -469,7 +469,9 @@ class MockResourceManagerApi:
         u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
         u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
         u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
-        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'test'
+        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'test',
+        # For when the job is KILLED
+        'startTime': 1356961057226, 'finishTime': 1356961057226
     },
     'application_1356251510842_0009': {
         u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
@@ -648,7 +650,19 @@ class HistoryServerApi(MockMapreduce2Api):
   def __init__(self, oozie_url=None): pass
 
   def job(self, user, job_id):
-    if '1356251510842_0054' not in job_id:
+    if '1356251510842_0054' == job_id:
+      return {
+          u'job': {
+              u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': job_id,
+              u'successfulReduceAttempts': 1, u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1,
+              u'state': u'KILLED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
+              u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'test',
+              u'startTime': 1357151916268, u'avgReduceTime': 137,
+              u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+              u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0
+          }
+      }
+    else:      
       return {
           u'job': {
               u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009',

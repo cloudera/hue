@@ -97,10 +97,8 @@ class Job(object):
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
-    if self.state in ('FINISHED', 'FAILED', 'KILLED'):
-      setattr(self, 'finishTime', self.finishedTime)
-      setattr(self, 'startTime', self.startedTime)
     setattr(self, 'duration', self.finishTime - self.startTime)
+    setattr(self, 'durationFormatted', format_duration_in_millis(self.duration))
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'finishedMaps', self.mapsCompleted)
@@ -157,6 +155,11 @@ class KilledJob(Job):
     self._fixup()
 
     super(KilledJob, self).__init__(api, attrs)
+    if not hasattr(self, 'finishTime'):
+      setattr(self, 'finishTime', self.finishedTime)
+    if not hasattr(self, 'startTime'):
+      setattr(self, 'startTime', self.startedTime)
+
     super(KilledJob, self)._fixup()
 
     setattr(self, 'jobId_short', self.jobId.replace('application_', ''))
@@ -166,7 +169,6 @@ class KilledJob(Job):
       setattr(self, 'mapsCompleted', 1)
     if not hasattr(self, 'reducesCompleted'):
       setattr(self, 'reducesCompleted', 1)
-
 
   @property
   def counters(self):

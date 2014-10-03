@@ -115,12 +115,12 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Logs')}</li>
           <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
           % if not job.is_retired:
-          <li class="nav-header">${_('Maps:')}</li>
+          <li class="nav-header">${_('Maps')}</li>
           <li class="white" id="jobMaps">&nbsp;</li>
-          <li class="nav-header">${_('Reduces:')}</li>
+          <li class="nav-header">${_('Reduces')}</li>
           <li class="white" id="jobReduces">&nbsp;</li>
           % endif
-          <li class="nav-header">${_('Duration:')}</li>
+          <li class="nav-header">${_('Duration')}</li>
           <li class="white" id="jobDuration">&nbsp;</li>
           <%
               output_dir = job.conf_keys.get('mapredOutputDir', "")
