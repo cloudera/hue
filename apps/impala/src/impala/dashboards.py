@@ -19,6 +19,8 @@
 import logging
 import json
 
+from math import log
+
 from django.http import HttpResponse
 
 from desktop.context_processors import get_app_name
@@ -63,21 +65,28 @@ def query(request):
     filters = ''
 
   if 'facet' in request.POST:
-    if request.POST.get('facet') == 'count' or True:
+    facet = json.loads(request.POST.get('facet'))
+    slot = None
+
+    if facet['type'] == 'field':
       template = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s"
-    elif request.POST.get('facet') == 'range':
-      template = "SELECT cast(%(field)s / 10000 AS int), COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY cast(%(field)s / 10000 AS int) ORDER BY top DESC LIMIT %(limit)s"    
+    elif facet['type'] == 'range':
+      slot = (facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit']
+      template = """select cast(%(field)s / %(slot)s AS int) * %(slot)s, count(*) AS top, cast(%(field)s / %(slot)s as int) as s 
+       FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL GROUP BY s ORDER BY s DESC LIMIT %(limit)s"""    
     else:            
+      # Simple Top
       template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s"
     
     facet = json.loads(request.POST['facet'])
     hql = template % {
-          'database': database,
-          'table': table,
-          'limit': facet['properties']['limit'],
-          'field': facet['field'],
-          'filters': (' AND ' + filters) if filters else ''
-      }
+        'database': database,
+        'table': table,
+        'limit': facet['properties']['limit'],
+        'field': facet['field'],
+        'filters': (' AND ' + filters) if filters else '',
+        'slot': slot
+    }
     result['id'] = facet['id']
     result['field'] = facet['field']
     fields = [fq['field'] for fq in fqs]
@@ -97,18 +106,23 @@ def query(request):
   db = dbms.get(request.user, query_server=query_server)
   
   query = hql_query(hql)
-  handle = db.execute_and_wait(query, timeout_sec=5.0)
+  print hql
+  handle = db.execute_and_wait(query, timeout_sec=35.0)
 
   if handle:
     data = db.fetch(handle, rows=100)
     if 'facet' in request.POST:
-      result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
+      facet = json.loads(request.POST.get('facet'))
+      if facet['type'] == 'top':
+        result['data'] = [{"value": row[0], "count": None, "selected": False, "cat": facet['field']} for row in data.rows()]
+      else:
+        result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
     else:
       result['data'] = list(data.rows())
     result['cols'] = list(data.cols())
     result['status'] = 0
     db.close(handle)
-    
+
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
@@ -121,13 +135,8 @@ def new_facet(request):
     facet_field = request.POST['field']
 
     result['message'] = ''
-    result['facet'] =  {
-        'id': facet_json['id'],
-        'label': facet_field,
-        'field': facet_field,
-        'widget_type': facet_json['widgetType'], 
-        'properties': {'limit': 10}
-    }
+    result['facet'] = _create_facet(dashboard, request.user, facet_json, facet_field)
+
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
@@ -172,7 +181,51 @@ def get_fields(request):
   return HttpResponse(json.dumps(result), mimetype="application/json") 
 
 
-def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
+def _round_number_range(n):
+  if n <= 10:
+    return n, n + 1
+  else:
+    i = int(log(n, 10))
+    end = round(n, -i)
+    start = end - 10 ** i
+    return start, end
+  
+
+def _guess_range(user, dashboard, field):
+    
+    hql = "SELECT MIN(%(field)s), MAX(%(field)s) FROM %(database)s.%(table)s" % {
+      'field': field['name'],
+      'database': dashboard['properties'][0]['database'],
+      'table': dashboard['properties'][0]['table']      
+    }
+    
+    query_server = get_query_server_config(name='impala')
+    db = dbms.get(user, query_server=query_server)
+    
+    query = hql_query(hql)
+    handle = db.execute_and_wait(query, timeout_sec=35.0)    
+
+    data = db.fetch(handle, rows=1)
+    stats_min, stats_max = list(data.rows())[0]
+    db.close(handle)
+    
+    _min, _m = _round_number_range(stats_min)
+    _m, _max = _round_number_range(stats_max)    
+
+    properties = {
+      'min': stats_min,
+      'max': stats_max,
+      'start': _min,
+      'end': _max,
+      #'gap': gap,
+      'canRange': True,
+      'isDate': False,
+    }
+    
+    return properties
+
+
+def _create_facet(dashboard, user, facet_json, facet_field):
   properties = {
     'sort': 'desc',
     'canRange': False,
@@ -180,21 +233,30 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'limit': 10,
     'mincount': 0,
     'isDate': False,
-    'andUp': False,  # Not used yet
   }
 
-  facet_type = 'field'
+  field = [field for field in dashboard['fields'] if field['name'] == facet_field][0]
 
-  if widget_type == 'map-widget':
+  if field['type'] == 'int':
+    facet_type = 'range'
+    _props = _guess_range(user, dashboard, field)
+    properties.update(_props)
+  else:
+    facet_type = 'field'
+  
+  # facet_type = 'top'
+  
+
+  if facet_json['widgetType'] == 'map-widget':
     properties['scope'] = 'world'
     properties['mincount'] = 1
     properties['limit'] = 100
 
   return {
-    'id': facet_id,
-    'label': facet_label,
+    'id': facet_json['id'],
+    'label': facet_field,
     'field': facet_field,
     'type': facet_type,
-    'widgetType': widget_type,
+    'widgetType': facet_json['widgetType'],
     'properties': properties
   }

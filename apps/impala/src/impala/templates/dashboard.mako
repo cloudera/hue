@@ -218,6 +218,7 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="visible: $root.isEditing, with: $root.dashboard.getFacetById($parent.id())">
       <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
+      <input type="text" data-bind="value: $data.type" />
     </div>
   
     <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }} ">
