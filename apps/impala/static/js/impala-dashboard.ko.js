@@ -62,19 +62,19 @@ var Query = function (vm, query) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget.id(),
         'field': data.widget.field(),
-        'filter': [data.facet['value']],
+        'filter': [data.facet.value()],
         'type': 'field'
       }));
     } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget.id()) {
-          if (fq.filter.indexOf(data.facet['value']) > -1) {
-            fq.filter.remove(data.facet['value']);
+          if (fq.filter.indexOf(data.facet.value()) > -1) {
+            fq.filter.remove(data.facet.value());
             if (fq.filter().length == 0) {
               self.fqs.remove(fq);
             }
           } else {
-            fq.filter.push(data.facet['value']);
+            fq.filter.push(data.facet.value());
           }
         }
       });
