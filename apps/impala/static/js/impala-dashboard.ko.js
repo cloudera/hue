@@ -62,19 +62,19 @@ var Query = function (vm, query) {
       self.fqs.push(ko.mapping.fromJS({
         'id': data.widget.id(),
         'field': data.widget.field(),
-        'filter': [data.facet[0]],
+        'filter': [data.facet['value']],
         'type': 'field'
       }));
     } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget.id()) {
-          if (fq.filter.indexOf(data.facet[0]) > -1) {
-            fq.filter.remove(data.facet[0]);
+          if (fq.filter.indexOf(data.facet['value']) > -1) {
+            fq.filter.remove(data.facet['value']);
             if (fq.filter().length == 0) {
               self.fqs.remove(fq);
             }
           } else {
-            fq.filter.push(data.facet[0]);
+            fq.filter.push(data.facet['value']);
           }
         }
       });
@@ -181,7 +181,7 @@ var Dashboard = function (vm, dashboard) {
   self.getFacetById = function (facet_id) {
     var _facet = null;
     $.each(self.facets(), function (index, facet) {
-      if (facet.id == facet_id) {
+      if (facet.id() == facet_id) {
         _facet = facet;
         return false;
       }

@@ -25,14 +25,14 @@ class Dashboard():
   
   data = json.dumps(
       {'layout': [
-              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Top salaries","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
+              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Total Employees","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
          ],
-      'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Top salaries', 'field': 'salary', 'widget_type': 'facet-widget', 
+      'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Total Employees', 'type': 'field', 'field': 'total_emp', 'widget_type': 'facet-widget', 
                     'properties': {'limit': 10}}],
       'properties': [{'database': 'default', 'table': 'sample_07', 'fields': []}]
   })
