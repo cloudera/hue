@@ -90,6 +90,7 @@ ${ commonheader(None, "impala", user) | n,unicode }
     % if user.is_superuser:
       <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></a>
       &nbsp;&nbsp;&nbsp;
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>      
     % endif
   </div>
@@ -221,15 +222,37 @@ ${ dashboard.layout_skeleton() }
       <input type="text" data-bind="value: $data.type" />
     </div>
   
-    <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }} ">
-      <div>
-        <a href="javascript: void(0)">
-          <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
-          (<span data-bind="text: $data.count, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>)
-          <i class="fa fa-times" data-bind="visible: $parent.data().length == 1"></i>
-        </a>
+    <!-- ko if: type() == 'field' -->
+      <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }}">
+        <div>
+          <a href="javascript: void(0)">
+            <span data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>
+            (<span data-bind="text: $data.count, click: function(){ $root.query.toggleFacet({facet: $data, widget: $parent}) }"></span>)
+            <i class="fa fa-times" data-bind="visible: $parent.data().length == 1"></i>
+          </a>
+        </div>
+      </span>
+    <!-- /ko --> 
+    
+    <!-- ko if: type() == 'range' -->
+      <div data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }}">
+        <div class="trigger-exclude">
+          <!-- ko if: ! selected -->
+            <a class="pointer" data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+            <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+            <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+          <!-- /ko -->
+          <!-- ko if: selected -->
+            <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+              <strong data-bind="text: $data.from + ' - ' + $data.to"></strong>
+              <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+              <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+            </span>
+          <!-- /ko -->
+        </div>
       </div>
-    </span>
+    <!-- /ko -->    
+    
   </div>
   <!-- /ko -->
   

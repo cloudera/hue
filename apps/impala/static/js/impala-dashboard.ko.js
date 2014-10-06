@@ -83,6 +83,36 @@ var Query = function (vm, query) {
     vm.search();
   }  
   
+  self.selectRangeFacet = function (data) {
+    var fq = self.getFacetFilter(data.widget_id);
+
+    if (fq == null) {
+      self.fqs.push(ko.mapping.fromJS({
+          'id': data.widget_id,
+          'field': data.cat,
+          'filter': [{'value': data.from, 'exclude': false}],
+          'properties': [{'from': data.from, 'to': data.to}],
+          'type': 'range'
+      }));
+    } else {
+      var f = $.grep(fq.filter(), function(f) { return f.value() == data.from; });
+      if (f.length > 0) { // Unselect
+        fq.filter.remove(f[0]);
+        $.each(fq.properties(), function (index, prop) {
+          if (prop && prop.from() == data.from) {
+            fq.properties.remove(prop);
+          }
+        });
+        if (fq.filter().length == 0) {
+          self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
+        }
+      } else {
+       fq.filter.push(ko.mapping.fromJS({'exclude': data.exclude ? true : false, 'value': data.from}));
+       fq.properties.push(ko.mapping.fromJS({'from': data.from, 'to': data.to}));
+      }
+    }
+  };  
+  
   self.getFacetFilter = function (facet_id) {
     var _facet = null;
     $.each(self.fqs(), function (index, facet) {
@@ -314,6 +344,26 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_jso
       });
       return _widget;
     }
+    
+    self.save = function () {
+      $.post("/impala/dashboard/save", {
+          "dashboard": ko.mapping.toJSON(self.dashboard),
+          "layout": ko.mapping.toJSON(self.columns)
+      }, function (data) {
+        if (data.status == 0) {
+          self.collection.id = data.id;
+          $(document).trigger("info", data.message);
+          if (window.location.search.indexOf("dashboard") == -1) {
+            window.location.hash = '#dashboard=' + data.id;
+          }
+        }
+        else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
     
     function bareWidgetBuilder(name, type){
       return new Widget({

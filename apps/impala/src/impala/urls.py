@@ -30,6 +30,7 @@ urlpatterns += patterns('impala.dashboards',
   
   url(r'^dashboard/new_facet$', 'new_facet', name='new_facet'),
   url(r'^dashboard/new_search$', 'new_search', name='new_search'),
+  url(r'^dashboard/save$', 'save', name='save'),
   url(r'^dashboard/get_fields', 'get_fields', name='get_fields'),
 )
 

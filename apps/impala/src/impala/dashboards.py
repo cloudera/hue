@@ -105,20 +105,22 @@ def query(request):
   query_server = get_query_server_config(name='impala')
   db = dbms.get(request.user, query_server=query_server)
   
-  query = hql_query(hql)
   print hql
+  query = hql_query(hql)  
   handle = db.execute_and_wait(query, timeout_sec=35.0)
 
   if handle:
     data = db.fetch(handle, rows=100)
     if 'facet' in request.POST:
       facet = json.loads(request.POST.get('facet'))
+      result['type'] = facet['type']
       if facet['type'] == 'top':
         result['data'] = [{"value": row[0], "count": None, "selected": False, "cat": facet['field']} for row in data.rows()]
       else:
         result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
     else:
       result['data'] = list(data.rows())
+
     result['cols'] = list(data.cols())
     result['status'] = 0
     db.close(handle)
@@ -163,6 +165,34 @@ def new_search(request):
          ]
      })
   })
+
+
+def save(request):
+  response = {'status': -1}
+
+  dashboard = json.loads(request.POST.get('dashboard', '{}')) # TODO perms
+  layout = json.loads(request.POST.get('layout', '{}'))
+
+  collection['template']['extracode'] = escape(collection['template']['extracode'])
+
+  if collection:
+    if collection['id']:
+      hue_collection = Collection.objects.get(id=collection['id'])
+    else:
+      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'])
+    hue_collection.update_properties({'collection': collection})
+    hue_collection.update_properties({'layout': layout})
+    hue_collection.name = collection['name']
+    hue_collection.label = collection['label']
+    hue_collection.enabled = collection['enabled']
+    hue_collection.save()
+    response['status'] = 0
+    response['id'] = hue_collection.id
+    response['message'] = _('Page saved !')
+  else:
+    response['message'] = _('There is no collection to search.')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def get_fields(request):
