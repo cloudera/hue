@@ -1837,7 +1837,13 @@ input.no-margin, select.no-margin {
   font-weight: bold;
 }
 
-form.form-inline .modal-header .close {
-  top: 0px;
-  right: -11px;
+.modal-header .close {
+  position: inherit;
+  margin-top: -10px;
 }
+
+form.form-inline .modal-header .close {
+  margin-top: 0;
+  margin-right: -10px;
+}
+
