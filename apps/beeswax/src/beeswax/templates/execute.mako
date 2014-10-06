@@ -961,7 +961,7 @@ var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/view
 var HIVE_AUTOCOMPLETE_USER = "${ user }";
 
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
-  if (data != null && data.error) {
+  if (data != null && data.error && typeof resetNavigator != "undefined") {
     resetNavigator();
   }
 };
