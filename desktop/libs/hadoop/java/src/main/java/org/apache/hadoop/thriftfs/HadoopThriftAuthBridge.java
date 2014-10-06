@@ -40,7 +40,13 @@ import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
-
+import java.net.InetAddress;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import org.apache.hadoop.conf.Configurable;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.SaslRpcServer;
+import java.util.TreeMap;
 
 /**
  * Functions that bridge Thrift's SASL transports to Hadoop's
@@ -64,6 +70,47 @@ import org.apache.thrift.transport.TTransportFactory;
  */
 class HadoopThriftAuthBridge {
   static final Log LOG = LogFactory.getLog(HadoopThriftAuthBridge.class);
+  private static Field SASL_PROPS_FIELD;
+  private static Map<String, String> SASL_PROPS;
+  private static Class<?> SASL_PROPERTIES_RESOLVER_CLASS;
+  private static Method RES_GET_INSTANCE_METHOD;
+  private static Method GET_PROP_METHOD;
+  static {
+    //this is based on hive's HadoopThriftAuthBridge23.java
+    SASL_PROPERTIES_RESOLVER_CLASS = null;
+    SASL_PROPS_FIELD = null;
+    final String SASL_PROP_RES_CLASSNAME = "org.apache.hadoop.security.SaslPropertiesResolver";
+    try {
+      SASL_PROPERTIES_RESOLVER_CLASS = Class.forName(SASL_PROP_RES_CLASSNAME);
+
+    } catch (ClassNotFoundException e) {
+    }
+
+    if (SASL_PROPERTIES_RESOLVER_CLASS != null) {
+      // found the class, so this would be hadoop version 2.4 or newer (See
+      // HADOOP-10221, HADOOP-10451)
+      try {
+        RES_GET_INSTANCE_METHOD = SASL_PROPERTIES_RESOLVER_CLASS.getMethod("getInstance",
+            Configuration.class);
+        GET_PROP_METHOD = SASL_PROPERTIES_RESOLVER_CLASS.getMethod("getServerProperties",
+            InetAddress.class);
+      } catch (Exception e) {
+      }
+    }
+
+    if (SASL_PROPERTIES_RESOLVER_CLASS == null) {
+      // this must be a 2.3.x version or earlier
+      // Resorting to the earlier method of getting the properties, which uses SASL_PROPS field
+      try {
+        SASL_PROPS_FIELD = SaslRpcServer.class.getField("SASL_PROPS");
+        //SASL_PROPS = (Map<String, String>) SASL_PROPS_FIELD.get();
+      } catch (NoSuchFieldException e) {
+        // Older version of hadoop should have had this field
+        throw new IllegalStateException("Error finding hadoop SASL_PROPS field in "
+            + SaslRpcServer.class.getSimpleName(), e);
+      }
+    }
+  }
 
   public static class Client {
     /**
@@ -77,7 +124,7 @@ class HadoopThriftAuthBridge {
     public TTransport createClientTransport(
       String principalConfig, String host,
       String methodStr, TTransport underlyingTransport)
-      throws IOException {
+      throws IOException, IllegalAccessException {
       AuthMethod method = AuthMethod.valueOf(AuthMethod.class, methodStr);
 
       switch (method) {
@@ -90,12 +137,15 @@ class HadoopThriftAuthBridge {
               + serverPrincipal);
           }
           try {
+          	Map<String, String> reflectedProps = new TreeMap<String, String>();
+          	reflectedProps = (java.util.Map)SASL_PROPS_FIELD.get("");        	
             TTransport saslTransport = new TSaslClientTransport(
               method.getMechanismName(),
               null,
               names[0], names[1],
-              SaslRpcServer.SASL_PROPS, null,
+              reflectedProps, null,
               underlyingTransport);
+
             return new TUGIAssumingTransport(saslTransport, UserGroupInformation.getCurrentUser());
           } catch (SaslException se) {
             throw new IOException("Could not instantiate SASL transport", se);
@@ -128,7 +178,7 @@ class HadoopThriftAuthBridge {
      * instantiating a TThreadPoolServer, for example.
      *
      */
-    public TTransportFactory createTransportFactory() throws TTransportException
+    public TTransportFactory createTransportFactory(Configuration conf) throws TTransportException, IllegalAccessException
     {
       // Parse out the kerberos principal, host, realm.
       String kerberosName = realUgi.getUserName();
@@ -138,12 +188,33 @@ class HadoopThriftAuthBridge {
       }
 
       TSaslServerTransport.Factory transFactory = new TSaslServerTransport.Factory();
-      transFactory.addServerDefinition(
-        AuthMethod.KERBEROS.getMechanismName(),
-        names[0], names[1],  // two parts of kerberos principal
-        SaslRpcServer.SASL_PROPS,
-        new SaslRpcServer.SaslGssCallbackHandler());
-
+      if (SASL_PROPS_FIELD != null) {
+        // hadoop 2.3.x and earlier way of finding the sasl property settings
+      	Map<String, String> reflectedProps = new TreeMap<String, String>();
+      	reflectedProps = (java.util.Map)SASL_PROPS_FIELD.get("");
+      	transFactory.addServerDefinition(
+            AuthMethod.KERBEROS.getMechanismName(),
+            names[0], names[1],  // two parts of kerberos principal
+            reflectedProps,
+            new SaslRpcServer.SaslGssCallbackHandler());
+      }
+      else {
+        // 2.4 and later way of finding SASL_PROPS property due to change from HADOOP-10221,HADOOP-10451
+      	Map<String, String> saslProps = new TreeMap<String, String>();
+        try {
+          Configurable saslPropertiesResolver = (Configurable) RES_GET_INSTANCE_METHOD.invoke(null,
+              conf);
+          saslPropertiesResolver.setConf(conf);
+          saslProps = (Map<String, String>) GET_PROP_METHOD.invoke(saslPropertiesResolver, InetAddress.getLocalHost());
+          transFactory.addServerDefinition(
+              AuthMethod.KERBEROS.getMechanismName(),
+              names[0], names[1],  // two parts of kerberos principal
+              saslProps,
+              new SaslRpcServer.SaslGssCallbackHandler());
+        } catch (Exception e) {
+          throw new IllegalStateException("Error finding hadoop SASL properties", e);
+        }
+      }
       return new TUGIAssumingTransportFactory(transFactory, realUgi);
     }
 

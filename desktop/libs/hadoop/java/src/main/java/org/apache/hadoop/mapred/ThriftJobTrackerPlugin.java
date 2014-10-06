@@ -682,7 +682,7 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         try {
           InetSocketAddress address = NetUtils.createSocketAddr(
             conf.get(THRIFT_ADDRESS_PROPERTY, DEFAULT_THRIFT_ADDRESS));
-          this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory());
+          this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory(), conf);
           thriftServer.setConf(conf);
           thriftServer.start();
           // The port may have been 0, so we update it.
