@@ -23,10 +23,10 @@ function hac_jsoncalls(options) {
   if (options.table != null) {
     _url += "/" + options.table
   }
-  
+
   $.ajax({
     type: "GET",
-    url: _url,
+    url: _url + "?" + Math.random(),
     success: options.onDataReceived,
     async: options.sync == "undefined"
   });
