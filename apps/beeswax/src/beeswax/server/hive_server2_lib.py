@@ -81,11 +81,15 @@ class HiveServerTable(Table):
 
   @property
   def path_location(self):
-    describe = self.extended_describe
-    match = re.search('location:([^,]+)', describe)
-    if match is not None:
-      match = match.group(1)
-    return match
+    try:
+      describe = self.extended_describe
+      match = re.search('location:([^,]+)', describe)
+      if match is not None:
+        match = match.group(1)
+      return match
+    except:
+      # Impala does not have extended_describe
+      return None
 
   @property
   def parameters(self):
