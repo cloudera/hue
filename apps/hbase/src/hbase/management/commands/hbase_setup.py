@@ -49,7 +49,7 @@ class Command(NoArgsCommand):
 
   def create_analytics_table(self, api, cluster_name):
     try:
-      api.createTable(cluster_name, 'analytics_demo', 'hour', 'day', 'total')
+      api.createTable(cluster_name, 'analytics_demo', [{'properties': {'name': 'hour'}}, {'properties': {'name': 'day'}}, {'properties': {'name': 'total'}}])
     except AlreadyExists:
       pass
 
@@ -59,7 +59,7 @@ class Command(NoArgsCommand):
 
   def create_binary_table(self, api, cluster_name):
     try:
-      api.createTable(cluster_name, 'document_demo', 'doc')
+      api.createTable(cluster_name, 'document_demo', [{'properties': {'name': 'doc'}}])
     except AlreadyExists:
       pass
 
