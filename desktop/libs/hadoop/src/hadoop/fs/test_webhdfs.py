@@ -135,6 +135,25 @@ class WebhdfsTests(unittest.TestCase):
     assert_raises(WebHdfsException, f.read)
     assert_raises(IOError, fs.open, "/test/doesnotexist.txt")
 
+  
+  def test_umask(self):
+    fs = self.cluster.fs
+    try:
+      clear = UMASK.set_for_testing("0077")
+      test_dir = '/umask_test_dir'
+      fs.mkdir(test_dir)
+      test_file = '/umask_test.txt'
+      f.open(test_file, "w")
+      f.write("foo")
+      f.close()
+
+      # Check currrent permissions are not 777 (666 for file)
+      assert_equals(1700, fs.stats(test_dir).mode)
+      assert_equals(1700, fs.stats(test_file).mode)
+    finally:
+      clear()
+
+
   def test_copy_remote_dir(self):
     fs = self.cluster.fs
 
@@ -265,6 +284,7 @@ class WebhdfsTests(unittest.TestCase):
     subdir1 = dir1 + '/test1'
     file1 = subdir1 + '/test1.txt'
     fs = self.cluster.fs
+
     try:
       fs.mkdir(subdir1)
       f = fs.open(file1, "w")

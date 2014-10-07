@@ -40,6 +40,14 @@ def find_file_recursive(desired_glob, root):
   return f
 
 
+def coerce_umask(umask):
+  if len(umask) < 4:
+    umask = "1" + umask
+    return int(umask)
+  else:
+    return int(umask)
+
+
 UPLOAD_CHUNK_SIZE = Config(
   key="upload_chunk_size",
   help="Size, in bytes, of the 'chunks' Django should store into memory and feed into the handler. Default is 64MB.",
@@ -69,6 +77,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                               default=False, type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
+      UMASK=Config("umask", help="Umask for creating files/directories in hdfs",
+                      default='1022', type=coerce_umask),
     )
   )
 )
