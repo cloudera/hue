@@ -43,9 +43,8 @@ def find_file_recursive(desired_glob, root):
 def coerce_umask(umask):
   if len(umask) < 4:
     umask = "1" + umask
-    return int(umask)
-  else:
-    return int(umask)
+
+  return int(umask, 8)
 
 
 UPLOAD_CHUNK_SIZE = Config(
@@ -69,16 +68,16 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                          help="The URL to WebHDFS/HttpFS service. Defaults to " +
                          "the WebHDFS URL on the NameNode.",
                          type=str, default="http://localhost:50070/webhdfs/v1"),
-      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
+      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode", # Unused
                                    default="hdfs", type=str),
-      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
+      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode", # Unused
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
-      UMASK=Config("umask", help="Umask for creating files/directories in hdfs",
-                      default='1022', type=coerce_umask),
+      UMASK=Config("umask", help="Default umask for file and directory creation, specified in an octal value",
+                   default='022', type=coerce_umask),
     )
   )
 )
