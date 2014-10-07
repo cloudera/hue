@@ -135,23 +135,85 @@ class WebhdfsTests(unittest.TestCase):
     assert_raises(WebHdfsException, f.read)
     assert_raises(IOError, fs.open, "/test/doesnotexist.txt")
 
-  
+
   def test_umask(self):
     fs = self.cluster.fs
+
+    prefix = '/tmp/test_umask'
+    fs_umask = fs._umask
+    fs._umask = 01022
+
     try:
-      clear = UMASK.set_for_testing("0077")
-      test_dir = '/umask_test_dir'
+      test_dir = prefix + '/umask_test_dir'
       fs.mkdir(test_dir)
-      test_file = '/umask_test.txt'
-      f.open(test_file, "w")
+
+      test_file = prefix + '/umask_test.txt'
+      f = fs.open(test_file, "w")
       f.write("foo")
       f.close()
 
-      # Check currrent permissions are not 777 (666 for file)
-      assert_equals(1700, fs.stats(test_dir).mode)
-      assert_equals(1700, fs.stats(test_file).mode)
+      # Check currrent permissions are 777 (666 for file)
+      assert_equals('40755', '%o' % fs.stats(test_dir).mode)
+      assert_equals('100644', '%o' % fs.stats(test_file).mode)
     finally:
-      clear()
+      fs._umask = fs_umask
+
+    fs_umask = fs._umask
+    fs._umask = 0077
+    prefix += '/2'
+
+    try:
+      test_dir = prefix + '/umask_test_dir'
+      fs.mkdir(test_dir)
+
+      test_file = prefix + '/umask_test.txt'
+      fs.create(test_file)
+
+      # Check currrent permissions are not 777 (666 for file)
+      assert_equals('41700', '%o' % fs.stats(test_dir).mode)
+      assert_equals('100600', '%o' % fs.stats(test_file).mode)
+    finally:
+      fs._umask = fs_umask
+
+
+  def test_umask_overriden(self):
+    fs = self.cluster.fs
+
+    prefix = '/tmp/test_umask_overriden'
+    fs_umask = fs._umask
+    fs._umask = 01022
+
+    try:
+      test_dir = prefix + '/umask_test_dir'
+      fs.mkdir(test_dir, 0333)
+
+      test_file = prefix + '/umask_test.txt'
+      fs.create(test_file, permission=0333)
+
+      assert_equals('40333', '%o' % fs.stats(test_dir).mode)
+      assert_equals('100333', '%o' % fs.stats(test_file).mode)
+    finally:
+      fs._umask = fs_umask
+
+
+  def test_umask_without_sticky(self):
+    fs = self.cluster.fs
+
+    prefix = '/tmp/test_umask_without_sticky'
+    fs_umask = fs._umask
+    fs._umask = 022
+
+    try:
+      test_dir = prefix + '/umask_test_dir'
+      fs.mkdir(test_dir)
+
+      test_file = prefix + '/umask_test.txt'
+      fs.create(test_file)
+
+      assert_equals('41755', '%o' % fs.stats(test_dir).mode)
+      assert_equals('100644', '%o' % fs.stats(test_file).mode)
+    finally:
+      fs._umask = fs_umask
 
 
   def test_copy_remote_dir(self):
@@ -190,7 +252,7 @@ class WebhdfsTests(unittest.TestCase):
     for stat in dest_stat:
       assert_equals('testcopy', stat.user)
       assert_equals('testcopy', stat.group)
-      assert_equals('100755', '%o' % stat.mode)
+      assert_equals('100644', '%o' % stat.mode)
 
   def test_two_files_open(self):
     """

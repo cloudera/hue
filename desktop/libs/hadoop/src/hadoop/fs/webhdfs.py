@@ -59,7 +59,7 @@ class WebHdfs(Hdfs):
                hdfs_superuser=None,
                security_enabled=False,
                temp_dir="/tmp",
-               umask=1022):
+               umask=01022):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -344,11 +344,8 @@ class WebHdfs(Hdfs):
     params['op'] = 'MKDIRS'
 
     if mode is None:
-      params['permission'] = self.getDefaultFilePerms()
-      LOG.debug("No permissions set, defaulting to umask: %s" % params['permission'])
-    else:
-      params['permission'] = safe_octal(mode)
-      LOG.debug("Permissions set, using: %s" % params['permission'])
+      mode = self.getDefaultDirPerms()
+    params['permission'] = safe_octal(mode)
 
     success = self._root.put(path, params)
     if not success:
@@ -455,20 +452,14 @@ class WebHdfs(Hdfs):
 
 
   def getDefaultFilePerms(self):
-              umask = int(1777) - int(self.umask)
- 
-              # Below we are making sure that we don't lose the 0 at the beginning
-              # of the permissions
-                
-              if len(str(umask)) < 4:
-                umask = "0" + str(umask)
-                return umask
-              else:
-                return umask
+    return 0666 & (01777 ^ self.umask)
 
 
-  def create(self, path, overwrite=False, blocksize=None,
-             replication=None, permission=None, data=None):
+  def getDefaultDirPerms(self):
+    return 01777 & (01777 ^ self.umask)
+
+
+  def create(self, path, overwrite=False, blocksize=None, replication=None, permission=None, data=None):
     """
     create(path, overwrite=False, blocksize=None, replication=None, permission=None)
 
@@ -484,11 +475,8 @@ class WebHdfs(Hdfs):
     if replication is not None:
       params['replication'] = int(replication)
     if permission is None:
-      params['permission'] = self.getDefaultFilePerms()
-      LOG.debug("No permissions set, using umask: %s" % params['permission'])
-    else:
-      params['permission'] = safe_octal(permission)
-      LOG.warn("Permissions already set, using: %s" % params['permission'])
+      permission = self.getDefaultFilePerms()
+    params['permission'] = safe_octal(permission)
 
     self._invoke_with_redirect('PUT', path, params, data)
 
@@ -591,8 +579,8 @@ class WebHdfs(Hdfs):
       owner = self.DEFAULT_USER
 
     if dir_mode is None:
-      dir_mode = self.getDefaultFilePerms()
-    LOG.debug("Making directory %s with permissions %s" % (destination, dir_mode))
+      dir_mode = self.getDefaultDirPerms()
+
     self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
     for stat in self.listdir_stats(source):
@@ -653,7 +641,7 @@ class WebHdfs(Hdfs):
           dest = self.join(dest, self.basename(src))
         else:
           raise IOError(errno.EEXIST, _("Destination file %s exists and is not a directory.") % dest)
-      
+
       self.do_as_user(owner, self.mkdir, dest, mode=dir_mode)
 
       # Copy files in 'src' directory to 'dest'.
