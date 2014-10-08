@@ -632,13 +632,6 @@ from django.utils.translation import ugettext as _
             actions = $('#ch-dropdown'),
             rect = document.querySelector('body').getBoundingClientRect();
 
-          // clear out selections
-          ko.utils.arrayFilter(viewModel.files(), function (file) {
-            if (file.selected()) {
-              file.selected(false);
-            }
-          });
-
           // close the actions menu from button area if open
           if (actions.hasClass('open')) {
             actions.removeClass('open');
