@@ -33,7 +33,7 @@ from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 from useradmin.models import install_sample_user
-
+from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
@@ -64,7 +64,17 @@ class Command(NoArgsCommand):
     Document.objects.sync()
 
     if exception is not None:
-      raise exception
+      pretty_msg = None
+      
+      if "AlreadyExistsException" in exception.message:
+        pretty_msg = _("SQL table examples already installed.")
+      if "Permission denied" in exception.message:
+        pretty_msg = _("Permission denied. Please check with your system administrator.")
+
+      if pretty_msg is not None:
+        raise PopupException(pretty_msg)
+      else: 
+        raise exception
 
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
