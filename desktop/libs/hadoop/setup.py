@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "hadoop",
-      version = "3.6.0",
+      version = "3.7.0",
       url = 'http://github.com/cloudera/hue',
       description = "Hadoop Libraries",
       # Note that we're cheating by installing gen-py
