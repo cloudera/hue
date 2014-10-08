@@ -621,6 +621,7 @@ def read_contents(codec_type, path, fs, offset, length):
        Returns: A tuple of codec_type, offset, length and contents read.
     """
     contents = ''
+    fhandle = None
 
     try:
         fhandle = fs.open(path)
@@ -660,7 +661,8 @@ def read_contents(codec_type, path, fs, offset, length):
             contents = _read_simple(fhandle, path, offset, length, stats)
 
     finally:
-        fhandle.close()
+        if fhandle:
+            fhandle.close()
 
     return (codec_type, offset, length, contents)
 
