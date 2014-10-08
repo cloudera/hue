@@ -84,7 +84,7 @@ ${ layout.menubar(section='hdfs') }
     <div class="span12">
       <div class="card card-small">
         <h1 class="card-heading simple">
-          ${ _('HDFS ACLs') }
+          ${ _('File ACLs') }
         </h1>
         <div class="card-body">
           <div class="row-fluid" data-bind="visible: $root.doAs() != '${ user.username }' && ! $root.assist.isDiffMode()">
