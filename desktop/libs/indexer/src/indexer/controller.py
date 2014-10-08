@@ -116,7 +116,6 @@ class CollectionManagerController(object):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE,
                                  env={
-                                   'SOLR_HOME': conf.SOLR_HOME.get(),
                                    'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                  })
       status = process.wait()
@@ -127,7 +126,7 @@ class CollectionManagerController(object):
       if status != 0:
         LOG.error("Could not create instance directory.\nOutput: %s\nError: %s" % process.communicate())
         raise PopupException(_('Could not create instance directory. '
-                               'Check if [indexer] solr_zk_ensemble is correct in Hue config and look at the Solr error logs for more info.'))
+                               'Check if solr_zk_ensemble and solrctl_path are correct in Hue config [indexer].'))
 
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
@@ -136,7 +135,6 @@ class CollectionManagerController(object):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    env={
-                                     'SOLR_HOME': conf.SOLR_HOME.get(),
                                      'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                    })
         if process.wait() != 0:
@@ -172,7 +170,6 @@ class CollectionManagerController(object):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    env={
-                                     'SOLR_HOME': conf.SOLR_HOME.get(),
                                      'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
                                    })
         if process.wait() != 0:
