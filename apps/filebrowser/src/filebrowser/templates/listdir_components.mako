@@ -1254,6 +1254,15 @@ from django.utils.translation import ugettext as _
       };
     };
 
+    // hide the context menu based on specific events
+    var hideContextMenu = function () {
+      var cm = $('.context-menu');
+
+      if (cm.is(':visible')) {
+        cm.css({ display: 'none' });
+      }
+    };
+
     var viewModel = new FileBrowserModel([], null, [], "/");
     ko.applyBindings(viewModel);
 
@@ -1274,17 +1283,17 @@ from django.utils.translation import ugettext as _
 
       // hide context menu
       $('body').on('click', function (e) {
-        var cm = $('.context-menu');
-        if (cm.is(':visible')) {
-          cm.css({ display: 'none' });
+        hideContextMenu();
+      });
+
+      $('body').on('contextmenu', function (e) {
+        if ($.inArray(e.toElement, $('.datatables *')) === -1) {
+          hideContextMenu();
         }
       });
 
       $('body').on('contextmenu', '.context-menu', function (e) {
-        var cm = $('.context-menu');
-        if (cm.is(':visible')) {
-          cm.css({ display: 'none' });
-        }
+        hideContextMenu();
       });
 
       // Drag and drop uploads from anywhere on filebrowser screen
