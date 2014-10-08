@@ -78,12 +78,6 @@ SOLRCTL_PATH = Config(
   type=str,
   dynamic_default=solrctl)
 
-SOLR_HOME = Config(
-  key="solr_home",
-  help=_t("Location of the solr home."),
-  type=str,
-  default="/usr/lib/solr")
-
 SOLR_ZK_ENSEMBLE  = Config(
   key="solr_zk_ensemble",
   help=_t("Zookeeper ensemble."),
