@@ -139,7 +139,7 @@ ${ layout.menubar(section='hive') }
 
       <div id="edit" class="mainSection card card-small">
         <h1 class="card-heading simple">
-          ${ _('Database and Tables privileges') }
+          ${ _('Database and Table privileges') }
         </h1>
 
         <div class="card-body">
