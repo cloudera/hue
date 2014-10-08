@@ -166,7 +166,7 @@ def config_validator(user):
     if name == 'default':
       has_default = True
   if not has_default:
-    res.append("hadoop.hdfs_clusters", "You should have an HDFS called 'default'.")
+    res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # MR_CLUSTERS
   mr_down = []
