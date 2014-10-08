@@ -397,6 +397,7 @@ from django.utils.translation import ugettext as _
 
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
+  <!-- ko ifnot: $root.inTrash -->
     <li><a href="#" title="${_('Rename')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1, click: $root.renameFile,
     enable: $root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-font"></i>
     ${_('Rename')}</a></li>
@@ -411,11 +412,15 @@ from django.utils.translation import ugettext as _
     %endif
     <li><a href="#" title="${_('Change permissions')}" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
     <li class="divider"></li>
-    <!-- ko ifnot: $root.inTrash -->
     <li><a href="#"  data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0,
     click: $root.trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</a></li>
     <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
-    <!-- /ko -->
+  <!-- /ko -->
+  <!-- ko if: $root.inTrash -->
+    <li><a href="#" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash() &&  selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: restoreTrashSelected"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</a></li>
+    <li class="divider"></li>
+    <li><a href="#" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fire"></i> ${_('Empty trash')}</a></li>
+  <!-- /ko -->
   </ul>
 
   <div id="submit-wf-modal" class="modal hide"></div>
