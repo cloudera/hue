@@ -708,6 +708,8 @@ from django.utils.translation import ugettext as _
       }));
       self.files.sort(self.filesSorting)
 
+      self.homeDir = ko.observable("${home_directory}");
+
       self.breadcrumbs = ko.observableArray(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
         return new Breadcrumb(breadcrumb);
       }));
@@ -1132,7 +1134,7 @@ from django.utils.translation import ugettext as _
 
         hiddenFields($("#purgeTrashForm"), 'path', paths);
 
-        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path=urlencode('/'))}" + viewModel.homeDir().slice(1) + "/.Trash");
 
         $("#purgeTrashModal").modal({
           keyboard:true,
