@@ -37,6 +37,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
+ENV_DESKTOP_PROFILING = "DESKTOP_PROFILE"
 
 
 ############################################################
@@ -100,6 +101,7 @@ STATICFILES_DIRS = ()
 
 # For Django admin interface
 STATIC_URL = '/static/'
+STATIC_ROOT = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -127,13 +129,19 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware'
     'django.middleware.csrf.CsrfViewMiddleware'
 ]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
   logging.debug("Will try to validate generated HTML.")
+
+
+DESKTOP_PROFILING = os.environ.get(ENV_DESKTOP_PROFILING) or True
+
+if DESKTOP_PROFILING:
+  MIDDLEWARE_CLASSES.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+
 
 ROOT_URLCONF = 'desktop.urls'
 
@@ -154,7 +162,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django_extensions',
 
-    # 'debug_toolbar',
     'south', # database migration tool
 
     # i18n support
@@ -163,6 +170,10 @@ INSTALLED_APPS = [
     # Desktop injects all the other installed apps into here magically.
     'desktop'
 ]
+
+if DESKTOP_PROFILING:
+  INSTALLED_APPS.append('django.contrib.staticfiles')
+  INSTALLED_APPS.append('debug_toolbar')
 
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')
@@ -233,7 +244,7 @@ conf.initialize(_lib_conf_modules, _config_dir)
 conf.initialize(_app_conf_modules, _config_dir)
 
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
-DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
+DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get() or DESKTOP_PROFILING
 TEMPLATE_DEBUG = DEBUG
 
 ############################################################

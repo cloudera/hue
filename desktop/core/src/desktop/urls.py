@@ -20,7 +20,7 @@ import os
 import re
 
 from django.conf import settings
-from django.conf.urls.defaults import include, patterns
+from django.conf.urls.defaults import include, patterns, url
 from django.contrib import admin
 
 from desktop import appmanager
@@ -98,6 +98,18 @@ dynamic_patterns += patterns('',
 )
 
 
+if settings.DESKTOP_PROFILING:
+  import debug_toolbar
+  dynamic_patterns += patterns('',
+     url(r'^__debug__/', include(debug_toolbar.urls)),
+  )
+
+  dynamic_patterns += patterns('',
+      url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+          'document_root': settings.STATIC_ROOT,
+      }),
+ )
+
 static_patterns = []
 
 # SAML specific
@@ -117,8 +129,7 @@ if settings.OAUTH_AUTHENTICATION:
 if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
   namespace = {'namespace': 'indexer', 'app_name': 'indexer'}
   dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls', **namespace))) )
-  static_patterns.append(static_pattern('indexer/static',
-                                        os.path.join(os.path.dirname(__file__), "..", '..', '..', "libs/indexer/static/")))
+  static_patterns.append(static_pattern('indexer/static', os.path.join(os.path.dirname(__file__), "..", '..', '..', "libs/indexer/static/")))
 
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:
@@ -139,6 +150,8 @@ for app in appmanager.DESKTOP_APPS:
 # is autodiscovered
 def buildpath(d):
   return os.path.join(os.path.dirname(__file__), "..", '..', '..', d)
+
+
 static_patterns.append(static_pattern("static", buildpath("core/static")))
 static_patterns.append((r'^(?P<path>favicon.ico)$',
                         'django.views.static.serve',
