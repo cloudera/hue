@@ -29,28 +29,6 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
 
 
-def test_jframe_middleware():
-  c = make_logged_in_client()
-  path = "/about/?foo=bar&baz=3"
-  response = c.get(path)
-  assert_equal(path, response["X-Hue-JFrame-Path"])
-
-  path_nocache = "/about/?noCache=blabla&foo=bar&baz=3"
-  response = c.get(path_nocache)
-  assert_equal(path, response["X-Hue-JFrame-Path"])
-
-  path_nocache = "/about/?noCache=blabla&foo=bar&noCache=twiceover&baz=3"
-  response = c.get(path_nocache)
-  assert_equal(path, response["X-Hue-JFrame-Path"])
-
-  path = "/about/"
-  response = c.get(path)
-  assert_equal(path, response["X-Hue-JFrame-Path"])
-
-  response = c.get("/about/?")
-  assert_equal("/about/", response["X-Hue-JFrame-Path"])
-
-
 def test_view_perms():
   # Super user
   c = make_logged_in_client()

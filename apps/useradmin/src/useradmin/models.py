@@ -54,6 +54,7 @@ import logging
 
 from django.db import connection, models
 from django.contrib.auth import models as auth_models
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
@@ -97,7 +98,12 @@ class UserProfile(models.Model):
     return self.user.groups.all()
 
   def _lookup_permission(self, app, action):
-    return HuePermission.objects.get(app=app, action=action)
+    # We cache it instead of doing HuePermission.objects.get(app=app, action=action). To revert with Django 1.6
+    perms = cache.get('perms')
+    if not perms:
+      perms = dict([('%s:%s' % (p.app, p.action), p) for p in HuePermission.objects.all()])
+      cache.set('perms', perms, 60 * 60)
+    return perms.get('%s:%s' % (app, action))
 
   def has_hue_permission(self, action=None, app=None, perm=None):
     if perm is None:
