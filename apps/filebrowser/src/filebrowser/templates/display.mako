@@ -108,8 +108,11 @@ ${ fb_components.menubar() }
   var pages = {};
 
   function resizeText () {
-    $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 26);
-    $("#loader").css("marginLeft", ($("#fileArea").width() - $("#loader").width()) / 2);
+    var _fileArea = $("#fileArea");
+    if (_fileArea.height() > 0) {
+      _fileArea.height($(window).height() - _fileArea.offset().top - 26);
+      $("#loader").css("marginLeft", (_fileArea.width() - $("#loader").width()) / 2);
+    }
   }
 
   function formatHex (number, padding) {
