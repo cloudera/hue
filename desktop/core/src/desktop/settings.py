@@ -175,6 +175,9 @@ if DESKTOP_PROFILING:
   INSTALLED_APPS.append('django.contrib.staticfiles')
   INSTALLED_APPS.append('debug_toolbar')
 
+  MIDDLEWARE_CLASSES.insert(1, 'desktop.middleware.ProfileMiddleware') # Hotshot
+
+
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')
 ]
