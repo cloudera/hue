@@ -67,7 +67,7 @@ ${ layout.menubar(section='hive') }
     </div>
     <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
 
-    <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action'}" style="width: 100px"></select>
+    <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action', readonly: (privilegeType() == 'uri'), readonlySetTo: function(){ (privilegeType() == 'uri') ? $data.action($root.availableActions()[0]) : $data.action('ALL') }}" style="width: 100px"></select>
 
     <div class="new-line-if-small">
       <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>

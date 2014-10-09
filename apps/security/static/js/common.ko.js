@@ -100,6 +100,12 @@ ko.bindingHandlers.select2 = {
     if (typeof valueAccessor().update != "undefined") {
       $(element).select2("val", valueAccessor().update());
     }
+    if (typeof valueAccessor().readonly != "undefined") {
+      $(element).select2("readonly", valueAccessor().readonly);
+      if (typeof valueAccessor().readonlySetTo != "undefined") {
+        valueAccessor().readonlySetTo();
+      }
+    }
   }
 };
 
