@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v2.5.0, released Monday 15th, July 2013</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="Hue v2.5.0, released Monday 15th, July 2013" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp25250320"></a>Hue v2.5.0, released Monday 15th, July 2013</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_notable_features">1. Notable Features</a></span></dt><dt><span class="section"><a href="#_notable_fixes">2. Notable Fixes</a></span></dt><dt><span class="section"><a href="#_compatibility">3. Compatibility</a></span></dt><dt><span class="section"><a href="#_list_of_85_commits">4. List of 85 Commits</a></span></dt><dt><span class="section"><a href="#_contributors">5. Contributors</a></span></dt></dl></div><p>Hue, <a class="ulink" href="http://gethue.com" target="_top">http://gethue.com</a>, is an open source UI for Hadoop and its satellite projects.
+It makes the whole platform (e.g. HDFS, MapReduce, Hive,  Oozie, Pig, Impala, Solr…) easy to use and
+accessible from your  browser (e.g. upload files to HDFS, send Hive queries from a Web editor,
+build workflows with Drag &amp; Drop… all within a single app).</p><div class="section" title="1. Notable Features"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_features"></a>1. Notable Features</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HBase Browser application is tailored for quickly browsing huge tables and accessing any content.
+  You can also create new tables, add data, modify existing cells and filter data with the auto-completing search bar.
+</li></ul></div></div><div class="section" title="2. Notable Fixes"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_fixes"></a>2. Notable Fixes</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-1109 [beeswax] Hive Server 2 save results
+</li><li class="listitem">
+HUE-1376 [beeswax] Autocomplete doesn’t work after the <span class="emphasis"><em>where</em></span> keyword
+</li><li class="listitem">
+HUE-1135 [pig] Options support
+</li><li class="listitem">
+HUE [beeswax] Saved queries are renamed to None
+</li><li class="listitem">
+HUE-1115 [impala] Support multi db
+</li><li class="listitem">
+HUE-641 [jb] Auto-refresh the Job Browser views
+</li><li class="listitem">
+HUE-1150 [pig] Links to inputs/outputs/MR jobs
+</li><li class="listitem">
+HUE-1256 [core] Cache the HA jt
+</li></ul></div></div><div class="section" title="3. Compatibility"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_compatibility"></a>3. Compatibility</h2></div></div></div><p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL), and Ubuntu 10.04 to 12.10.</p><p>Tested with CDH4.3. Specifically:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hadoop 0.20 / 2.0.0
+</li><li class="listitem">
+Hive 0.10.0
+</li><li class="listitem">
+Oozie 3.3
+</li><li class="listitem">
+HBase 0.94
+</li><li class="listitem">
+Pig 0.11
+</li><li class="listitem">
+Impala 1.0 / 1.1
+</li><li class="listitem">
+Solr 4.0
+</li><li class="listitem">
+Sqoop2 1.99.2
+</li></ul></div><p>Supported Browsers:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
+</li><li class="listitem">
+Linux : Chrome, Firefox 3.6+
+</li><li class="listitem">
+Mac: Chrome, Firefox 3.6+, Safari 5+
+</li></ul></div></div><div class="section" title="4. List of 85 Commits"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_85_commits"></a>4. List of 85 Commits</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+aeccb34 [doc] Add HBase app in the README
+</li><li class="listitem">
+2aafca3 HUE-1337 [impala] Support refresh from 1.0 and 1.1
+</li><li class="listitem">
+ddc24ea Revert "HUE-1337 [impala] ResetCatalog() is deprecated in 1.1"
+</li><li class="listitem">
+d3ab937 [hbase] query reload fix
+</li><li class="listitem">
+11209c6 [hbase] Remove dead code failing to be parsed by babel
+</li><li class="listitem">
+2e250f8 HUE-1377 [hbase] Improve app icon
+</li><li class="listitem">
+16ae824 [hbase] Remove non ascii characters
+</li><li class="listitem">
+68ee759 [hbase] Add to app makefile
+</li><li class="listitem">
+03d097d [beeswax] revert regenerate_thrift.sh
+</li><li class="listitem">
+2bdfaa1 [hbase] cleanup regenerate_thrift.sh
+</li><li class="listitem">
+2d45ab9 [hbase] Initial Commit
+</li><li class="listitem">
+90bbe8d [beeswax] Document partition browsing limit option
+</li><li class="listitem">
+62caa93 [core] app_reg syncdb should use the hue.ini properties
+</li><li class="listitem">
+7565503 HUE-1266 [core] Add <span class="emphasis"><em>hue version</em></span> command
+</li><li class="listitem">
+9d42c9c [pig] Fix wrong Fs impersonation
+</li><li class="listitem">
+f509c90 HUE-1368 [pig] Prettify main layout
+</li><li class="listitem">
+683ced1 HUE-1376 [beeswax] Autocomplete doesn’t work after the <span class="emphasis"><em>where</em></span> keyword
+</li><li class="listitem">
+3dfb2c7 HUE-1332 [beeswax] Smarter escaping of semicolon
+</li><li class="listitem">
+767bcf9 [oozie] Minor UX cleanup
+</li><li class="listitem">
+3d0be8a [beeswax] Make create database test more robust
+</li><li class="listitem">
+5a8d816 [beeswax] Support HiveServer2 PLAIN SASL authentication
+</li><li class="listitem">
+d2b994d HUE-1233 [core] should be possible to configure user id into which supervisor drop privs
+</li><li class="listitem">
+bf3beff HUE-1281 [core] Remove unused ext-py depdencies
+</li><li class="listitem">
+1f2c714 HUE-1337 [impala] ResetCatalog() is deprecated in 1.1
+</li><li class="listitem">
+85e63ff HUE-1135 [pig] Options support
+</li><li class="listitem">
+3f800fd [beeswax] Saved query are renamed to None
+</li><li class="listitem">
+2883d30 [doc] Removed old links, bad tables, updated graphics, new search doc.
+</li><li class="listitem">
+4bfc9c6 HUE-1115 [impala] Support multi db
+</li><li class="listitem">
+900e639 HUE-1321 [oozie] Shell or sqoop arguments missing in import workflow
+</li><li class="listitem">
+f469059 HUE-1316 [oozie] Unable to use select popup box to change workflow after importing
+</li><li class="listitem">
+33c60c9 HUE-1338 [search] Support both plain text and json response from Solr
+</li><li class="listitem">
+ce1c1ed [beeswax] Create table with invalid data format is now valid
+</li><li class="listitem">
+d47bc5e [core] Detail HA howto configuration in hue.ini
+</li><li class="listitem">
+3a28455 [beeswax] Beeswax host server should appear in dump_config
+</li><li class="listitem">
+a3cde08 [fb] Fix the upload a file test
+</li><li class="listitem">
+e817179 HUE-1072 [jb] Better progress bar
+</li><li class="listitem">
+b2dbfb9 HUE-1159 [jb] MR2 Layout is broken by task and attempt IDs length
+</li><li class="listitem">
+144090d HUE-1150 [pig] Links to inputs/outputs/MR jobs
+</li><li class="listitem">
+0948e6d HUE-1349 [search] Save facets btn does not always show up
+</li><li class="listitem">
+95c716f HUE-1361 [jobbrowser] Finished jobs are said to be running
+</li><li class="listitem">
+4d61896 HUE-641 [jb] Auto-refresh the Job Browser views
+</li><li class="listitem">
+5ad4ec2 HUE-1335 [search] In place editing of facets and sorting fields
+</li><li class="listitem">
+87a713e HUE-641 [jb] Auto-refresh the Job Browser views
+</li><li class="listitem">
+0b15a7b HUE-1340 [jb] NoReverseMatch error in job page
+</li><li class="listitem">
+3d0aab2 [oozie] Fix refresh or workflow started by coordinator in dashboard
+</li><li class="listitem">
+4606538 HUE-1347 [search] Not remembering collection after a trip to the customize collection page
+</li><li class="listitem">
+445f04d [fb] Fix upload file and archive tests
+</li><li class="listitem">
+1cf0ceb HUE-1331 [core] Update calculator example
+</li><li class="listitem">
+4dbf93b HUE-1333 [core] Upgrade to knockoutjs-2.2.1
+</li><li class="listitem">
+f13a5f1 HUE-1339 [pig] UI treats numbered variables as parameters
+</li><li class="listitem">
+90cf5fd HUE-1336 [pig] Call data collection on routie changes
+</li><li class="listitem">
+6daa2fb HUE-1246 [pig] Change name of default saved script
+</li><li class="listitem">
+18dccfd [fb] Fix error message when uploading on already existing destination
+</li><li class="listitem">
+b58f58f HUE-1006 [beeswax] Support download of large files
+</li><li class="listitem">
+1d5fc18 HUE-1246 [pig] Change name of default saved script
+</li><li class="listitem">
+68eaa55 HUE-1322 [useradmin] Add support for POSIX LDAP Groups
+</li><li class="listitem">
+f9cf620 HUE-1329 [search] Improve label of range facets
+</li><li class="listitem">
+4b8098f [search] Disabled collection should not appear in the search page
+</li><li class="listitem">
+8270447 [fb] Fix upload test permissions
+</li><li class="listitem">
+891fbea HUE-1327 [search] disallow changing of collection index to non-existing index
+</li><li class="listitem">
+fca1c64 HUE-1326 [search] Date facets should filter by range
+</li><li class="listitem">
+c340157 HUE-1256 [core] Cache the HA jt
+</li><li class="listitem">
+72a17ef HUE-1165 [pig] Logs with MR2
+</li><li class="listitem">
+4ba5fe9 HUE-1178 [jb] Smarter logic for getting MR2 job information
+</li><li class="listitem">
+30d7669 HUE-1280 [fb] Inline download and preview of images and pdf mimetype
+</li><li class="listitem">
+e2a2fa7 HUE-1269 [fb] Did you know about trash activation
+</li><li class="listitem">
+f601e76 HUE-1286 [impala] Support settings with HiveServer2 API
+</li><li class="listitem">
+5529a9a HUE-908 [core] User/group membership should be delegated to the back-end
+</li><li class="listitem">
+e2b4073 HUE-1311 [fb] Editing a file corrupt it in some way
+</li><li class="listitem">
+40d046f [core] Home urls should be standard with a trailing slash
+</li><li class="listitem">
+55d077a HUE-1240 [beeswax] Save a query result when using HiveServer2 interface
+</li><li class="listitem">
+d55adbc HUE_APP_REG_DIR and HUE_PTH_DIR configurable at compile time
+</li><li class="listitem">
+3b0ed99 HUE-1273 [pig] Confirmation popup when leaving unsaved script
+</li><li class="listitem">
+f6d480d HUE-1314 [shell] Prompt line is not wide enough
+</li><li class="listitem">
+3917dcf HUE-1320 [core] Drop support for IE8 and migrate to jQuery 2
+</li><li class="listitem">
+12d574a HUE-1319 [core] Upgrade to FontAwesome 3.2
+</li><li class="listitem">
+5713568 HUE-1292 - [core] separate core app pth and installed app pth files
+</li><li class="listitem">
+5097769 [core] Set version to 2.5
+</li><li class="listitem">
+3472ecf [doc] Integrate with existing doc
+</li><li class="listitem">
+ac4055b [doc] Add user guide to the docs
+</li><li class="listitem">
+0f937c8 [core] Revert original README from search README
+</li><li class="listitem">
+fbc93b4 [about] Add link to Hue website
+</li><li class="listitem">
+aee2add [doc] Add 2.4 release notes
+</li><li class="listitem">
+9bc7f39 HUE-1313 [core] Unicode error in check_config
+</li></ul></div></div><div class="section" title="5. Contributors"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_contributors"></a>5. Contributors</h2></div></div></div><p>This Hue release is made possible thanks to the contribution from:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Aaron Newton
+</li><li class="listitem">
+Aaron T. Myers
+</li><li class="listitem">
+Abraham Elmahrek
+</li><li class="listitem">
+Aditya Acharya
+</li><li class="listitem">
+Alex Newman
+</li><li class="listitem">
+Andrew Bayer
+</li><li class="listitem">
+Andrew Yao
+</li><li class="listitem">
+Ann McCown
+</li><li class="listitem">
+bc Wong
+</li><li class="listitem">
+Ben Bishop
+</li><li class="listitem">
+Bruce Mitchener
+</li><li class="listitem">
+Bruno Mahé
+</li><li class="listitem">
+Eli Collins
+</li><li class="listitem">
+Enrico Berti
+</li><li class="listitem">
+Eric Wong
+</li><li class="listitem">
+Harsh J
+</li><li class="listitem">
+Henry Robinson
+</li><li class="listitem">
+Jon Natkins
+</li><li class="listitem">
+Kevin Wang
+</li><li class="listitem">
+Lars Francke
+</li><li class="listitem">
+Loren Siebert
+</li><li class="listitem">
+Marcus McLaughlin
+</li><li class="listitem">
+Mike Cotton
+</li><li class="listitem">
+Paul Battaglia
+</li><li class="listitem">
+Philip Zeyliger
+</li><li class="listitem">
+Romain Rigaux
+</li><li class="listitem">
+Roman Shaposhnik
+</li><li class="listitem">
+Shawn Van Ittersum
+</li><li class="listitem">
+Shrijeet Paliwal
+</li><li class="listitem">
+Thomas Aylott
+</li><li class="listitem">
+Todd Lipcon
+</li><li class="listitem">
+Vinithra Varadharajan
+</li></ul></div></div></div></body></html>

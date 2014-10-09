@@ -1,0 +1,1712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v3.6.0, released Thursday 29th, May 2014</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="Hue v3.6.0, released Thursday 29th, May 2014" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp25139184"></a>Hue v3.6.0, released Thursday 29th, May 2014</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_latest_notable_features">1. Latest Notable Features</a></span></dt><dt><span class="section"><a href="#_compatibility">2. Compatibility</a></span></dt><dt><span class="section"><a href="#_list_of_784_commits">3. List of 784 Commits</a></span></dt><dt><span class="section"><a href="#_contributors">4. Contributors</a></span></dt></dl></div><p>Hue, <a class="ulink" href="http://gethue.com" target="_top">http://gethue.com</a>, is an open source UI for doing big data analysis with Hadoop.</p><p>It features:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+File Browser for accessing HDFS
+</li><li class="listitem">
+Hive Editor for developing and running Hive queries
+</li><li class="listitem">
+Search App for querying, exploring, visualizing data and dashboards with Solr
+</li><li class="listitem">
+Impala App for executing interactive SQL queries
+</li><li class="listitem">
+Spark Editor and Dashboard
+</li><li class="listitem">
+Pig Editor for submitting Pig scripts
+</li><li class="listitem">
+Oozie Editor and Dashboard for submitting and monitoring workflows, coordinators and bundles
+</li><li class="listitem">
+HBase Browser for visualizing, querying and modifying HBase tables
+</li><li class="listitem">
+Metastore Browser for accessing Hive metadata and HCatalog
+</li><li class="listitem">
+Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
+</li><li class="listitem">
+Job Designer for creating MapReduce/Streaming/Java jobs
+</li><li class="listitem">
+A Sqoop 2 Editor and Dashboard
+</li><li class="listitem">
+A ZooKeeper Browser and Editor
+</li><li class="listitem">
+A DB Query Editor for MySql, PostgreSQL, SQLite and Oracle
+</li></ul></div><p>On top of that, a SDK is available for creating new apps integrated with Hadoop.</p><p>More user and developer documentation is available at <a class="ulink" href="http://gethue.com" target="_top">http://gethue.com</a>.</p><div class="section" title="1. Latest Notable Features"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_latest_notable_features"></a>1. Latest Notable Features</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+<a class="ulink" href="http://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr" target="_top">Search App v2: Dynamic search dashboards with Solr</a>
+</li><li class="listitem">
+100% Dynamic dashboard
+</li><li class="listitem">
+Drag &amp; Drop dashboard builder
+</li><li class="listitem">
+Text, Timeline, Pie, Line, Bar, Map, Filters, Grid and HTML widgets
+</li><li class="listitem">
+Solr Index creation wizard from a file
+</li><li class="listitem">
+<a class="ulink" href="http://gethue.com/visualize-snappy-compressed-avro-files/" target="_top">View Snappy compressed Avro</a>/Parquet files
+</li><li class="listitem">
+<a class="ulink" href="http://gethue.com/hadoop-tutorial-how-to-distribute-impala-query-load/" target="_top">Impala HA</a>
+</li></ul></div></div><div class="section" title="2. Compatibility"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_compatibility"></a>2. Compatibility</h2></div></div></div><p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL), and Ubuntu 10.04 to 12.10.
+CentOS 5 and RHEL 5 requires EPEL python 2.6 package.</p><p>Tested with CDH5. Specifically:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hadoop 0.20 / 2.3.0
+</li><li class="listitem">
+Hive 0.13.0
+</li><li class="listitem">
+Oozie 4.0
+</li><li class="listitem">
+HBase 0.98
+</li><li class="listitem">
+Pig 0.12
+</li><li class="listitem">
+Impala 1.3
+</li><li class="listitem">
+Solr 4.4
+</li><li class="listitem">
+Sqoop2 1.99.3
+</li></ul></div><p>These minimum versions should work (not tested):</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hadoop 0.20 / 1.2.0 / 2.0.0
+</li><li class="listitem">
+Hive 0.12.0
+</li><li class="listitem">
+Oozie 3.2
+</li><li class="listitem">
+HBase 0.92
+</li><li class="listitem">
+Pig 0.8
+</li><li class="listitem">
+Impala 1.0
+</li><li class="listitem">
+Solr 3.6
+</li><li class="listitem">
+Sqoop2 1.99.3
+</li></ul></div><p>Supported Browsers:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
+</li><li class="listitem">
+Linux : Chrome, Firefox 3.6+
+</li><li class="listitem">
+Mac: Chrome, Firefox 3.6+, Safari 5+
+</li></ul></div><p>Runs with Python 2.6+</p></div><div class="section" title="3. List of 784 Commits"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_784_commits"></a>3. List of 784 Commits</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+907ec26 [doc] Hue 3.6 release notes
+</li><li class="listitem">
+16ac841 [indexer] Fix quoting and python version
+</li><li class="listitem">
+55261f5 [metastore] UnicodeDecodeError when viewing schema of table
+</li><li class="listitem">
+1e8ea71 [search] Add correct start date in twitter example
+</li><li class="listitem">
+de0b82f [search] Better animate to column
+</li><li class="listitem">
+caaf31e HUE-2124 [oozie] HDFS Deployment directory is missing "slash" symbol
+</li><li class="listitem">
+7ce38bb [search] Trailing whitespaces and tabs cleanup
+</li><li class="listitem">
+bae6007 [search] Disable is editing
+</li><li class="listitem">
+335d623 [search] Changed date picker
+</li><li class="listitem">
+4b8faae [search] Editable widget popup should open on the right
+</li><li class="listitem">
+84df243 [search] Scroll to field
+</li><li class="listitem">
+66fe2b1 [search] Added spinedit for limit
+</li><li class="listitem">
+e368eee [search] Added daterangepicker
+</li><li class="listitem">
+0d507fb [search] Support moving map widgets
+</li><li class="listitem">
+ddddcf6 [search] Cleaner gridlayout headers when no fields are selected
+</li><li class="listitem">
+606c39f [search] Koify getdocument in result grid layout
+</li><li class="listitem">
+8132720 [search] Zooming out does not reset filter
+</li><li class="listitem">
+354f17e [search] Make sure min or max properties of range facet are restricted
+</li><li class="listitem">
+043230b [search] Added formatters and reverse formatters for slider
+</li><li class="listitem">
+1973d6f [search] Reduced a bit the slider size
+</li><li class="listitem">
+782c6da [search] Styled a bit the settings panel
+</li><li class="listitem">
+af93938 [search] Minor CSS fix
+</li><li class="listitem">
+40870c3 [search] Added Indexes menu link
+</li><li class="listitem">
+1ba0fba [search] Added visual hint for updating charts for slower collections
+</li><li class="listitem">
+899b800 [search] Fix range select color
+</li><li class="listitem">
+e66a598 [search] Set max width for slider to 250px
+</li><li class="listitem">
+64944e2 [search] Fixed slider z-index problem
+</li><li class="listitem">
+0963a18 [search] Fixed clearable click event
+</li><li class="listitem">
+0087d49 [search] Add min and max field properties to range facets
+</li><li class="listitem">
+e620b8c [search] Truncate milliseconds in dates for better timelines
+</li><li class="listitem">
+2df9942 [search] Restyled a bit grid results, added all/current filter
+</li><li class="listitem">
+42a2edf [search] Externalized CSS and streamlined Less addition
+</li><li class="listitem">
+4a6c582 [search] Avoid line wrapping on result row
+</li><li class="listitem">
+8981258 [search] Fix field list size for magic layout
+</li><li class="listitem">
+2884912 [search] Slider binding
+</li><li class="listitem">
+918b31f [indexer] All fields should be stored by default
+</li><li class="listitem">
+d9c9349 [core] Move create collection or core to the new dashboard
+</li><li class="listitem">
+22e5bd4 [search] Import and convert older collections
+</li><li class="listitem">
+b4d174e [indexer] Add modal dialogue for deleting a single collection
+</li><li class="listitem">
+d9cb9fc [indexer] Setup examples in search API
+</li><li class="listitem">
+3fd67ab [indexer] Unique key field must be indexed
+</li><li class="listitem">
+b37afe7 [indexer] Choose field type more intelligently
+</li><li class="listitem">
+f6f9de4 [indexer] Choose unique key field more intelligently
+</li><li class="listitem">
+0b89284 [indexer] Change config defaults
+</li><li class="listitem">
+bcc362a [search] Escape extracode in HTML widget
+</li><li class="listitem">
+b758d4a [indexer] Install examples in admin wizard
+</li><li class="listitem">
+66872a2 [indexer] All fields should be indexed by default
+</li><li class="listitem">
+9bf3501 [indexer] Add confirmation when deleting collections
+</li><li class="listitem">
+8af533f [search] Install search templates
+</li><li class="listitem">
+d6f1692 [search] Partial cleanup of indexer
+</li><li class="listitem">
+ffaea0f [search] First fix for result jump
+</li><li class="listitem">
+b05c914 [search] Use gradient map
+</li><li class="listitem">
+f6e4874 [search] Re-init range facet when deleting its filter
+</li><li class="listitem">
+eba76c4 [search] Add correct closure to support multiple bar charts
+</li><li class="listitem">
+8e627dd [search] Range and field support for bar chart
+</li><li class="listitem">
+e045c3a [search] Clearable fix for Retina displays
+</li><li class="listitem">
+9059baa [search] New binding clearable
+</li><li class="listitem">
+d14f4d2 [indexer] Add install examples view
+</li><li class="listitem">
+517c4e9 [indexer] Add logs example
+</li><li class="listitem">
+8c85408 [indexer] Add jobs example
+</li><li class="listitem">
+50aa919 [indexer] Add yelp example
+</li><li class="listitem">
+ef37713 [search] Adding collection settings tab
+</li><li class="listitem">
+66b5330 [search] Replace log_demo by log_analytics_demo
+</li><li class="listitem">
+c583e90 [search] Restrict edition to admin only
+</li><li class="listitem">
+9b09086 [search] Introduced share dialog
+</li><li class="listitem">
+0b11f78 [search] Current query is URL shareable
+</li><li class="listitem">
+348d966 [search] Added empty dashboard message
+</li><li class="listitem">
+8031706 [search] convert multi queries to new api
+</li><li class="listitem">
+4ba8eed [search] Workaround for fq filter with a space in the value
+</li><li class="listitem">
+8b17c43 [indexer] Fix <span class="emphasis"><em>nodeType</em></span> of undefined errors
+</li><li class="listitem">
+3625306 [indexer] Improve timestamp type check
+</li><li class="listitem">
+85e7ae5 [indexer] Respect newlines in quotes
+</li><li class="listitem">
+161f60b [indexer] Remove constant redirection
+</li><li class="listitem">
+f9ee757 [search] Adding Apache log demo example
+</li><li class="listitem">
+e50d144 [search] Fix for drag existing widget to new row helper
+</li><li class="listitem">
+536fc1d [search] Fixed line chart selected range values
+</li><li class="listitem">
+90fd4bd [search] Updating the tests
+</li><li class="listitem">
+260e414 [search] Remove deprecated version
+</li><li class="listitem">
+3c025f7 [search] Fixed enable selection
+</li><li class="listitem">
+5de11b8 [search] Fixed selection on line chart
+</li><li class="listitem">
+dabec3e [search] Changed color to selected area
+</li><li class="listitem">
+15691b8 [search] Plugin select events on the line and bar charts
+</li><li class="listitem">
+6764548 [search] Added more evident selected state to maps and fixed modal dialog hide event
+</li><li class="listitem">
+48a351b [search] Smarter line chart
+</li><li class="listitem">
+9b30bdf [search] Smarter date range facets
+</li><li class="listitem">
+7b42475 [search] Smarter range facets for numbers
+</li><li class="listitem">
+5c9d0ff [search] Restyled result pagination
+</li><li class="listitem">
+babb900 [search] Result pagination doesn’t scroll anymore
+</li><li class="listitem">
+365c399 [search] Finalized field list UI
+</li><li class="listitem">
+1509d0c [search] Esc on field list modal deletes the widget now
+</li><li class="listitem">
+6a621f1 [core] jHueNotify shouldn’t display HTML content
+</li><li class="listitem">
+fbde025 [search] Fix row height problem
+</li><li class="listitem">
+8763e27 [indexer] Remove example dir and use search examples
+</li><li class="listitem">
+1de9afc [indexer] Add indexer examples
+</li><li class="listitem">
+13802d6 [search] Enable selected countries/states on Datamaps
+</li><li class="listitem">
+e339079 [search] Generic URL to browse any collection
+</li><li class="listitem">
+bf519f7 [indexer] Choose between tlong and tint
+</li><li class="listitem">
+c640bf2 [indexer] Use tdate instead of date when choosing types
+</li><li class="listitem">
+6f459ad [indexer] Add labels for field separators
+</li><li class="listitem">
+4ae194a [indexer] Remove log type
+</li><li class="listitem">
+adfb2dd [indexer] Add breadcrums
+</li><li class="listitem">
+89d8298 [indexer] Change to metastore like layout
+</li><li class="listitem">
+64ac825 [indexer] Change defaults of <span class="emphasis"><em>add field</em></span> screen
+</li><li class="listitem">
+b0a69b6 [indexer] Parse timestamp field for separated files
+</li><li class="listitem">
+677273a [indexer] Use tdate instead of date when groking fields
+</li><li class="listitem">
+a29f562 [indexer] Get rid of internal collection management
+</li><li class="listitem">
+8f4049b [indexer] Improve data upload
+</li><li class="listitem">
+10f2197 [indexer] UI/UX improvements
+</li><li class="listitem">
+f3d65ef [search] Removed spinedit that broke everything.
+</li><li class="listitem">
+a2ffa3d [search] Squeeze some white spaces
+</li><li class="listitem">
+95f5401 [search] Restyled demi modal
+</li><li class="listitem">
+b333451 [search] Added enable selection to line chart
+</li><li class="listitem">
+ee437cc [search] Clickable map creates filters that can be toggled
+</li><li class="listitem">
+f2703e6 [search] Adding some various states in the example
+</li><li class="listitem">
+008e991 [search] Restyled filter bar
+</li><li class="listitem">
+367c8bd [search] Better click even for Datamaps
+</li><li class="listitem">
+68bc031 [search] Select a place on map and create a filter
+</li><li class="listitem">
+eb72327 [search] Adding scope to the map widget
+</li><li class="listitem">
+6acb6f2 [search] Added maxWidth for Pie chart
+</li><li class="listitem">
+3b7b06c [search] Converted barchart to brushBarChart
+</li><li class="listitem">
+2998bad [search] Disabled mouseover jump
+</li><li class="listitem">
+f584a9d [search] Map works with country codes
+</li><li class="listitem">
+5597be0 [search] Default text facet size is 10 even if range facet
+</li><li class="listitem">
+b0b4cdc [search] Added multiline labels after chart update
+</li><li class="listitem">
+18215b9 [search] Removed extra space underneath charts
+</li><li class="listitem">
+e6b56e2 [search] Fixed onClick event of growingMultibarChart
+</li><li class="listitem">
+990b2c4 [search] Added maxWidth to map binding
+</li><li class="listitem">
+217630e [search] Deleted unused files, Maps: added enableGeocoding, onClick event, data tooltip, Widgets: resize event, fixed double markup, updated sortable
+</li><li class="listitem">
+b9e7b0b [search] Added empty row at the beginning of a column too
+</li><li class="listitem">
+d421347 [search] New properties tab in HTML result
+</li><li class="listitem">
+b6f4f97 [search] Enable pick button when field is selected
+</li><li class="listitem">
+8e08088 [search] Highlight HTML results and escape only once
+</li><li class="listitem">
+3c346f7 [search] Add job collection to the examples
+</li><li class="listitem">
+8b6f05f [search] Added step support to slider
+</li><li class="listitem">
+8db7d31 [search] Added bindings for slider
+</li><li class="listitem">
+71557fc [search] Added Bootstrap spinedit binding
+</li><li class="listitem">
+4a87d55 [search] Field list adjust its height to the result panel
+</li><li class="listitem">
+530c833 [search] Restyled fields modal
+</li><li class="listitem">
+6c5f9b0 [indexer] Remove only selected collections
+</li><li class="listitem">
+4384698 [indexer] Remove symlink version
+</li><li class="listitem">
+04255ec [search] Synchronize dynamic fields
+</li><li class="listitem">
+abca560 [search] Synchronize static fields
+</li><li class="listitem">
+62d7b00 [search] Make field list of gridlayout a computed
+</li><li class="listitem">
+5c7feec [indexer] Hook into search app
+</li><li class="listitem">
+6e5e313 [indexer] Fix log upload
+</li><li class="listitem">
+beae907 [indexer] Make indexer lib work with its urls
+</li><li class="listitem">
+21e4b24 [indexer] Remove schema generator
+</li><li class="listitem">
+92bb82a [indexer] Move collection manager to indexer lib
+</li><li class="listitem">
+dbcb249 [collectionmanager] Add other field types
+</li><li class="listitem">
+e667f87 HUE-2037 [search] Index a file or hive table easily
+</li><li class="listitem">
+119da98 [search] Removed unused jQuery files
+</li><li class="listitem">
+529f2bd [search] Added inline document details
+</li><li class="listitem">
+a52f8d5 [search] Add location field to the log example
+</li><li class="listitem">
+1e9b35f [search] Update template of magic layout
+</li><li class="listitem">
+4db6a26 [search] Update gridlayout field list in a new dashboard
+</li><li class="listitem">
+612f200 [search] Restyled field list
+</li><li class="listitem">
+4a34768 [search] Refresh new collection redirects to collection itself
+</li><li class="listitem">
+52ebfb8 [search] Fix hover field titles
+</li><li class="listitem">
+4b95e65 [search] Update template and field list of new collections
+</li><li class="listitem">
+ae5887e [search] Fix hover field titles
+</li><li class="listitem">
+dc49588 [search] Move column chevron icons on hover
+</li><li class="listitem">
+dfe7d63 [search] Added drag to new row
+</li><li class="listitem">
+00223ff [search] Download results in json, csv or xls
+</li><li class="listitem">
+ece2c68 [search] Fixed empty callback for search
+</li><li class="listitem">
+c292bd4 [search] Added field and function selects to html resultset editor
+</li><li class="listitem">
+0731f6b [search] Pagination should use numbers and not strings
+</li><li class="listitem">
+0323612 [search] Fetch new fields when creating a collection dashboard
+</li><li class="listitem">
+9644ea0 [search] Added freshereditor
+</li><li class="listitem">
+01af39a [search] Added scroll back to initial position
+</li><li class="listitem">
+f7c57ee [search] Add field modal preview and cancel functions
+</li><li class="listitem">
+7483e40 [search] Added editable to other widgets too
+</li><li class="listitem">
+a5e7f67 [search] Fixed ko.editable to update enabled/disabled status
+</li><li class="listitem">
+cc49870 [search] Inverted X axis labels and changed icon for timeline
+</li><li class="listitem">
+b975d24 [search] Add see more or less on text facets
+</li><li class="listitem">
+6a9d1dd [search] Added multiline x-axis labels for timeline
+</li><li class="listitem">
+dfc517b [search] Update number of rows and template only after n seconds
+</li><li class="listitem">
+ef54ae3 [search] Widget name is now editable
+</li><li class="listitem">
+e86611a [search] Removed zIndex from Pie draggable
+</li><li class="listitem">
+497ceb2 [search] Next and previous pagination
+</li><li class="listitem">
+b24f682 [search] Adding number of rows pagination
+</li><li class="listitem">
+19fb05a [search] Bump jQuery and jQuery UI versions
+</li><li class="listitem">
+c9d59b7 [search] First version of result inspector
+</li><li class="listitem">
+1b17000 [search] Removed media queries for the toolbar
+</li><li class="listitem">
+73ec3ac [search] Made rows more visible in edit mode
+</li><li class="listitem">
+7b93ba9 [search] Fixed stacked hover effect
+</li><li class="listitem">
+e59ba91 [search] Limited CSS to result pane only
+</li><li class="listitem">
+97d1573 [search] Introduced ko bindings for Codemirror
+</li><li class="listitem">
+dabdab6 [search] Restyled available widgets
+</li><li class="listitem">
+24892af [search] Add move icon to drag widget
+</li><li class="listitem">
+57d487b [search] Autocomplete add a widget field input
+</li><li class="listitem">
+6c3784f [search] Only display available fields in add widget modal
+</li><li class="listitem">
+c3887a1 [search] Enable or disable available widgets
+</li><li class="listitem">
+7094a94 [search] Enforce only one instance of certain types of widgets
+</li><li class="listitem">
+e1f7da7 [search] Split grid and HTML resultset widgets
+</li><li class="listitem">
+36ef323 [search] Filter widget styled
+</li><li class="listitem">
+971655e [search] Set facet label or widget type to the widget title
+</li><li class="listitem">
+6cccf16 [search] Remove widgets inside a row when deleting it
+</li><li class="listitem">
+82a0110 [search] Removed loading from filter widget and added empty message
+</li><li class="listitem">
+8e5abfb [search] Cleaner text facet links
+</li><li class="listitem">
+00dc723 [search] Do not show field picker on Filter Bar
+</li><li class="listitem">
+fbc2272 [search] Minify widgets on new widget drag
+</li><li class="listitem">
+5102fe8 [search] Minify widgets on new widget drag
+</li><li class="listitem">
+f806b9b [search] First pass of beautification
+</li><li class="listitem">
+8f53979 [search] Switch facet type icons for widgets
+</li><li class="listitem">
+286f05c [search] Create a new template based on any solr collection
+</li><li class="listitem">
+bc88af6 [search] Fix for delete facet
+</li><li class="listitem">
+200cf51 [search] Introducting enable selection on histogram
+</li><li class="listitem">
+b6cf638 [search] Fix loading spinner on Text facet
+</li><li class="listitem">
+c355f83 [search] Authorize search page without a dashboard
+</li><li class="listitem">
+ffa2807 [search] Optimize range multi facet queries
+</li><li class="listitem">
+9de47ca [search] Multi select range facets
+</li><li class="listitem">
+8609451 [search] Prepare for multi select of range facets
+</li><li class="listitem">
+9297f30 [search] Persist stacked or not property of histogram
+</li><li class="listitem">
+37a9cd3 [search] Split facet range and sort order buttons
+</li><li class="listitem">
+4e37306 [search] Propagate state change
+</li><li class="listitem">
+d48a3e7 [search] More on maps
+</li><li class="listitem">
+871ad00 [search] Added option to set stacked for barcharts and timeline charts
+</li><li class="listitem">
+3e9580c [search] Adding count to facet multiqueries
+</li><li class="listitem">
+6652ad0 [search] Multi queries by search box or field facet logic
+</li><li class="listitem">
+be9a2dd [search] Multi search boxes queries
+</li><li class="listitem">
+039b0de [search] Fix refresh of group by option of histogram
+</li><li class="listitem">
+512c607 [search] Fix zooming back from histogram
+</li><li class="listitem">
+7ee1f8b [search] Range select should also filter the result documents
+</li><li class="listitem">
+880db24 [search] Multi queries for timeline
+</li><li class="listitem">
+3aaa909 [search] First version of Hue Geo
+</li><li class="listitem">
+05d6e92 [search] Fix multibar highlight
+</li><li class="listitem">
+72f1a71 [search] Initial map support
+</li><li class="listitem">
+154c8d7 [search] Add support for bar highlight
+</li><li class="listitem">
+b45da61 [search] Added line chart support
+</li><li class="listitem">
+cdb8763 [search] Do not show field selector for result widget
+</li><li class="listitem">
+8cd81eb [search] Dynamic range of historgram widget
+</li><li class="listitem">
+11ea101 [search] Escape HTML cells in gridlayout
+</li><li class="listitem">
+7c5e323 [search] Fix timeline data transformer
+</li><li class="listitem">
+5799efd [search] Furtherly improved d&amp;d
+</li><li class="listitem">
+e72f67a [search] Improved usability of drag &amp; drop
+</li><li class="listitem">
+996326b [search] Disable scroll to top and auto open field list demi modal
+</li><li class="listitem">
+6c28d96 [search] Visual feedback for drop targets
+</li><li class="listitem">
+c21b3ca [search] Ground work for multi serie bar charts
+</li><li class="listitem">
+542cb5d [search] Added DiscreteBarChart support
+</li><li class="listitem">
+d14fab1 [search] Escape HTML cells in gridlayout
+</li><li class="listitem">
+5791b53 [search] Retrieve single doc by id
+</li><li class="listitem">
+8dae122 [search] Added Pie chart selection and mouseover handling
+</li><li class="listitem">
+f841468 [search] Fix call to onSelectRange
+</li><li class="listitem">
+606c571 [search] Introduced media queries for the top bar
+</li><li class="listitem">
+1a1ede7 [search] Propagate onSelectRange
+</li><li class="listitem">
+251ab34 [search] Converted top bar layout images to css
+</li><li class="listitem">
+7a53776 [search] Re-enable copy/paste in edit mode
+</li><li class="listitem">
+6ddfa77 [search] Move gridlayout columns to left or right
+</li><li class="listitem">
+a64cb32 [search] Removing a widget should remove its filters
+</li><li class="listitem">
+0d23d80 [search] Splitting templates of range/field widgets like text and pie
+</li><li class="listitem">
+d12fd2a [search] Multi filter for range facets
+</li><li class="listitem">
+d3b3c9d [search] Multi fq support for text facet
+</li><li class="listitem">
+a9fb00d [search] Added new field selection modal
+</li><li class="listitem">
+b4a4f51 [search] Added selection management on multiBarChart
+</li><li class="listitem">
+3ae84c6 [search] Ask only for the used fields in the gridlayout
+</li><li class="listitem">
+4333667 [search] Make pie widget work with range facet
+</li><li class="listitem">
+bc7ca8a [search] Smarter number of slots for text range facets
+</li><li class="listitem">
+3f05860 [search] Toggle facet order and type
+</li><li class="listitem">
+df559a9 [search] Skeleton for magic layout
+</li><li class="listitem">
+6da1259 [search] Text, pie and bar facets can also be ranges
+</li><li class="listitem">
+620e231 [search] Added barChart code for handling time data
+</li><li class="listitem">
+1cf0fa2 [search] Adding bar char widget
+</li><li class="listitem">
+37c0837 [search] Add date support fo range facet
+</li><li class="listitem">
+f8c3a4c [search] Extracted charting to external js file
+</li><li class="listitem">
+886b03c [search] Added first version of multiBar
+</li><li class="listitem">
+3f3986d [search] Adding range facets with numbers
+</li><li class="listitem">
+336e3a9 [search] Adding histogram widget
+</li><li class="listitem">
+788b5ac [search] Added first version of Pie and changed drag handler
+</li><li class="listitem">
+041a01c [search] Added nvd3 dependencies
+</li><li class="listitem">
+32cac55 [search] Fix modifying an existing collection template
+</li><li class="listitem">
+142f055 [search] Add Pie widget
+</li><li class="listitem">
+18aaff6 [search] Display all the columns in the grid layout
+</li><li class="listitem">
+64ec801 [search] Add Hit Count facet
+</li><li class="listitem">
+f5bd061 [search] Save a new collection button
+</li><li class="listitem">
+02e5746 [search] Add a new template button
+</li><li class="listitem">
+65022ca [search] Adding support for sorting the grid layout
+</li><li class="listitem">
+5d260ef [search] Adding template for result pagination
+</li><li class="listitem">
+faec4ff [search] Adding empty search result message
+</li><li class="listitem">
+78a092b [search] Adding list of fields with extended metadata like types
+</li><li class="listitem">
+1a325c2 [search] Add id to widgets to map them to a model object
+</li><li class="listitem">
+f5f0201 [search] Edit and remove facet attached to the layout
+</li><li class="listitem">
+7bf0494 [search] Fix toggling of the gridlayout show field list
+</li><li class="listitem">
+5a611dc [search] Do not add dynamic fields more than once
+</li><li class="listitem">
+a661e8f [search] Do not try to convert empty collections
+</li><li class="listitem">
+f78c813 [search] Load back the saved layout
+</li><li class="listitem">
+40d6aa8 [search] Add toggle field list visibility in grid layout
+</li><li class="listitem">
+a6893ec [search] Make grid field selection button toggable
+</li><li class="listitem">
+e9d9d03 [search] Display whole json record when no fields are selected
+</li><li class="listitem">
+49edd09 [search] Fix refresh when switching back to grid layout in edit mode
+</li><li class="listitem">
+fa90c10 [search] Updating WIP
+</li><li class="listitem">
+b3892bb [search] Start to prettify
+</li><li class="listitem">
+eb46c8e [search] Guess id field for result highlighting
+</li><li class="listitem">
+dd2159d [search] Save the template of a collection
+</li><li class="listitem">
+9dc26fc [search] Collection and facet edition integration
+</li><li class="listitem">
+63e409e [search] Merging dashboard and search page
+</li><li class="listitem">
+b75ef6d [search] Refactoring API and KO models
+</li><li class="listitem">
+fe88c7d [search] Simpliying search API
+</li><li class="listitem">
+79b5bbe [search] Dashboard cleanup
+</li><li class="listitem">
+221b11c [search] Prettified dashboard
+</li><li class="listitem">
+36e8051 [search] Added dashboard toolbar
+</li><li class="listitem">
+f884511 [search] Dashboard prettify
+</li><li class="listitem">
+80d73b7 [search] Adding a dashboard
+</li><li class="listitem">
+7a603c6 HUE-2108 [metastore] Error when dropping a table
+</li><li class="listitem">
+9175b87 [useradmin] Remove server selection from ldap functionality when using legacy configuration
+</li><li class="listitem">
+11582cb [core] Invert dependency list and merge migrations
+</li><li class="listitem">
+0520f6c HUE-1957 [core] Configure thrift transport
+</li><li class="listitem">
+d8822ac HUE-2085 [core] Update migration dependencies
+</li><li class="listitem">
+9a3d1b4 HUE-2101 [fb] Copying a file trims the last chunk
+</li><li class="listitem">
+7f74580 HUE-2112 [fb] The <span class="emphasis"><em>New</em></span> dropdown goes off screen
+</li><li class="listitem">
+b186265 [search] Rename Navigator to Assist
+</li><li class="listitem">
+b05324e HUE-2111 [pig] Enable collapse of navigator items
+</li><li class="listitem">
+6ad3895 HUE-2110 [core] Update FontAwesome to 4.1
+</li><li class="listitem">
+0fd00f1 HUE-2089 [useradmin] Sync ldap users modal form is misaligned
+</li><li class="listitem">
+e988bde HUE-2099 [jobbrowser] Improve metadata tab performances
+</li><li class="listitem">
+c0c1bef HUE-2106 [beeswax] Table list and query caches should be per user
+</li><li class="listitem">
+3e3236f [core] New datanode report format
+</li><li class="listitem">
+03b82fc HUE-2095 [beeswax] Do not fetch statements without a resultset
+</li><li class="listitem">
+9fe2102 HUE-2091 [fb] Configurable tempfile.tempdir for local file upload
+</li><li class="listitem">
+0a895a9 [beeswax] Escape space to HTML spaces in some tests
+</li><li class="listitem">
+403cd90 [liboauth] Add a mapping to shorten domain names in usernames
+</li><li class="listitem">
+deeb9b6 HUE-2109 [core] Use MPL instead of LGPL for certificate bundle
+</li><li class="listitem">
+556d9fd [metastore] Do not concatenate spaces in cells result
+</li><li class="listitem">
+a1fba50 HUE-2104 [beeswax] Don’t truncate space characted values from query results
+</li><li class="listitem">
+21938ff HUE-2100 [beeswax] Query with error should not show the cancel button
+</li><li class="listitem">
+e11b285 [sqoop] Not unicode strings in argument expansion
+</li><li class="listitem">
+e436a8a [core] Stream CSV download and limit XLS download
+</li><li class="listitem">
+8c9388c HUE-1897 [oozie] Workflow ids have double trailing slashes
+</li><li class="listitem">
+7316408 [beeswax] Clone copy to a new owner option
+</li><li class="listitem">
+94026fb HUE-2058 [oozie] Incomplete save state in workflow editor
+</li><li class="listitem">
+965f9ca HUE-2039 [beeswax] Remove the need to clone a shared query
+</li><li class="listitem">
+8d72adb HUE-2059 [core] Only display history documents in their home section
+</li><li class="listitem">
+b5148b4 HUE-2096 [core] Error on login page are duplicated
+</li><li class="listitem">
+f9800d5 HUE-2087 [beeswax] Job is submitted twice when the Enter key is used for the Execute button
+</li><li class="listitem">
+72e880d HUE-2074 [core] Update Knockout to 3.1
+</li><li class="listitem">
+4196369 HUE-2070 [metastore] Improve guess of numeric data types
+</li><li class="listitem">
+465d5a0 [core] RemoteUser middleware fixes
+</li><li class="listitem">
+0f86364 [core] Improve memory debug view
+</li><li class="listitem">
+f37ba45 [core] Add BeautifulSoup and have requests use it
+</li><li class="listitem">
+9eac028 HUE-2026 [core] Create a doc model write permission
+</li><li class="listitem">
+144142a HUE-2026 [core] Create a doc model write permission
+</li><li class="listitem">
+28189e9 HUE-2026 [core] Create a doc model write permission
+</li><li class="listitem">
+0394d64 Revert "[core] Add python-snappy library"
+</li><li class="listitem">
+d09dce2 Revert "[core] make snappy a first class citizen"
+</li><li class="listitem">
+a106006 HUE-296 [core] Memory profiling config
+</li><li class="listitem">
+7e5ffff [core] Fix LDAP and useradmin group list tests
+</li><li class="listitem">
+f541560 HUE-296 [core] Add memory usage debug view
+</li><li class="listitem">
+dc17a4a HUE-296 [core] Add guppy debugger
+</li><li class="listitem">
+cf3d770 HUE-2080 [core] Update tours URLs
+</li><li class="listitem">
+8af30e0 HUE-2072 [core] Disable SSL proxy header by default
+</li><li class="listitem">
+b293f95 HUE-2072 [core] Updating Proxy SSL support to be optional
+</li><li class="listitem">
+b69811f HUE-2072 [core] Adding support for HTTPS load-balancing
+</li><li class="listitem">
+b3a760d HUE-2012 [core] AD multidomain support
+</li><li class="listitem">
+e4ff348 HUE-2012 [core] upgrade django auth ldap
+</li><li class="listitem">
+b1baed4 [filebrowser] Snappy decompression error should throw PopupException
+</li><li class="listitem">
+810af74 [desktop] A user can share a document to a group he does not belong too
+</li><li class="listitem">
+9f3fb69 [beeswax] Close HiveServer2 and Impala session command
+</li><li class="listitem">
+2321211 [filebrowser] read parquet in filebrowser
+</li><li class="listitem">
+63ba4f1 [core] update parquet-python to use file objects
+</li><li class="listitem">
+75261c1 [core] add parquet-python library
+</li><li class="listitem">
+8d15fcf [core] make snappy a first class citizen
+</li><li class="listitem">
+c8a63af [core] Add python-snappy library
+</li><li class="listitem">
+cc4a896 HUE-2068 [infra] Third-party dependencies manifest is excluded from binary distributions
+</li><li class="listitem">
+c2ec0e6 HUE-2043 [core] database options keys have unicode keys
+</li><li class="listitem">
+5fb9260 [core] Remove python 2.4 and 2.5 from python selection
+</li><li class="listitem">
+182f8da HUE-2069 [jb] The new jobs in ACCEPTED state are not automatically appearing
+</li><li class="listitem">
+9ee9004 [core] Remove some bad links in the documentation
+</li><li class="listitem">
+819ef4d [core] Yarn check config should not depend on test code
+</li><li class="listitem">
+d1e9de8 HUE-2061 [jb] Does not use the node address when task is not running
+</li><li class="listitem">
+8e79c58 HUE-2062 [pig] Editor fails with non ASCII characters
+</li><li class="listitem">
+4897c52 HUE-2065 [core] Make sure log page is proposed only to superusers
+</li><li class="listitem">
+8f82dda HUE-2063 [beeswax] The map chart does not display
+</li><li class="listitem">
+6ff62b5 HUE-2063 [beeswax] The map chart does not display
+</li><li class="listitem">
+4f60306 HUE-2061 [jb] Task logs are not retrieved if containers not on the same host
+</li><li class="listitem">
+7a67dd3 [useradmin] Fix translations in ldap cli commands
+</li><li class="listitem">
+d29a902 [useradmin] LDAP import commands carry incorrect import statements
+</li><li class="listitem">
+0a4eacd [core] Integrate feedback tab when running in demo mode
+</li><li class="listitem">
+4d7628c HUE-577 File viewer should work with snappy-compressed Avro data files
+</li><li class="listitem">
+5ff543d [core] upgrade avro library
+</li><li class="listitem">
+ee5aecc HUE-2047 [oozie] Clicking on workflows only works for first page of Workflow Manager
+</li><li class="listitem">
+0ac366c HUE-2033 [core] Cleanup and tests update
+</li><li class="listitem">
+56e21e2 HUE-2033 [core] Reviews findings
+</li><li class="listitem">
+54ab7ec HUE-2033 [core] Fixed document update after project or sharing changes
+</li><li class="listitem">
+3ab0f02 HUE-2033 Merge back the new home page
+</li><li class="listitem">
+53b07db HUE-2033 [core] Fix counting of shared documents
+</li><li class="listitem">
+5595e06 HUE-2033 [core] Added project move functionality
+</li><li class="listitem">
+ff8f72a HUE-2033 [core] Readded sharing functionality
+</li><li class="listitem">
+1f2061e HUE-2033 [core] Refactored UX for remove project
+</li><li class="listitem">
+80dab73 HUE-2033 [core] Added project management functionality
+</li><li class="listitem">
+1dc4654 HUE-2033 [core] Cleaned style of the documents and tags
+</li><li class="listitem">
+38f1ed3 HUE-2033 [core] Link back backend to homepage 2
+</li><li class="listitem">
+ed85ae4 HUE-2033 [core] Dynamic and robust home page
+</li><li class="listitem">
+a2e65e2 [beeswax] Check for ownership before saving
+</li><li class="listitem">
+cea265d [core] Add third-party dependency references
+</li><li class="listitem">
+5c7ef36 HUE-2040 [useradmin] Synchronize nested ldap groups
+</li><li class="listitem">
+7544de2 [core] make suboordinate subgroups the default
+</li><li class="listitem">
+010066f [core] remove bad import from python util tests
+</li><li class="listitem">
+69b9656 HUE-1177 [jb] Improve MR2 UX with correct percentage progress
+</li><li class="listitem">
+5784e15 HUE-2041 [pig] Improve log polling usage
+</li><li class="listitem">
+d328bd0 [core] Remove unused desktop JS libraries
+</li><li class="listitem">
+592649f HUE-1989 [core] Move the js logic to the home page
+</li><li class="listitem">
+a235e4e [core] Second pass of l10n for 3.5
+</li><li class="listitem">
+912c2f8 HUE-2010 [core] Configure Hue to terminate users who has not logged in X days
+</li><li class="listitem">
+27a5925 [oozie] Migrate examples with mkdirs and touchzs paths
+</li><li class="listitem">
+8cec8cd HUE-1890 [oozie] Longer input fields in workflow editor
+</li><li class="listitem">
+f698a29 HUE-2032 [beeswax] Order by autocomplete should propose columns
+</li><li class="listitem">
+ba5907c [jobsub] Add description to <span class="emphasis"><em>get_design</em></span> call
+</li><li class="listitem">
+267b227 [oozie] Import workflow imports mkdirs and touchsz as lists of dictionaries
+</li><li class="listitem">
+d62d465 [core] Move welcome tour to home
+</li><li class="listitem">
+33c43c7 HUE-1801 [fb] Introduce pages with scroll when viewing a file
+</li><li class="listitem">
+9a8aeae [core] Add Feedback label for demo
+</li><li class="listitem">
+1380e84 HUE-1989 [core] Welcome tour on the home page
+</li><li class="listitem">
+38ae9d6 HUE-1888 [beeswax] Code mirror placeholder i18n
+</li><li class="listitem">
+4e27324 HUE-2011 [impala] Autocomplete a non existing table hangs
+</li><li class="listitem">
+c7ae876 HUE-2016 [core] Improve the shadows for stateful buttons
+</li><li class="listitem">
+0f151d0 [core] Nested members support
+</li><li class="listitem">
+6cc6604 [core] Fix tag refresh after delete or create
+</li><li class="listitem">
+f502a5e [core] Display all the tags
+</li><li class="listitem">
+5448fb2 [metastore] Hide recent query tab when browsing a table
+</li><li class="listitem">
+0569298 [impala] Fix link to metastore browser table
+</li><li class="listitem">
+fd23026 [core] Installed apps with no webpage on dump_config should not propose links
+</li><li class="listitem">
+f208e4e HUE-1962 [hbase] Support int row key from Hive table
+</li><li class="listitem">
+d6c869c [impala] Replace non utf8 encoded chars from the resultsets
+</li><li class="listitem">
+76064c6 [liboauth] Limit oauth login to specific list of domains
+</li><li class="listitem">
+7307bf6 [liboauth] Show error message after Aouth login failure
+</li><li class="listitem">
+5cee8ea [liboauth] Indentation fix
+</li><li class="listitem">
+49bbfc8 HUE-2020 [hbase] upload an image sometimes produces an error
+</li><li class="listitem">
+cf39ae2 [hbase] Fix new cell upload
+</li><li class="listitem">
+618672d [core] Secure shared tag edition
+</li><li class="listitem">
+4a15302 HUE-1989 [site] Live demo hosting
+</li><li class="listitem">
+0ef4c1f [oozie] Change unsaved workflow message
+</li><li class="listitem">
+d45bd82 [impala] Separate server timeouts
+</li><li class="listitem">
+a5d623a [impala] Disable ssl when using impala
+</li><li class="listitem">
+abbc506 HUE-1868 [dbquery] Query then error moves headers
+</li><li class="listitem">
+02121a4 HUE-2029 [oozie] Prompt to save a workflow before submission if it was modified
+</li><li class="listitem">
+7ebffae [impala] Hide system database from the main editor dropdown
+</li><li class="listitem">
+dcfad9c [core] Adding autofocus on username field on login
+</li><li class="listitem">
+28dc4e6 [oozie] Fix delete button misrepresenting the correct permissions
+</li><li class="listitem">
+4df787b [pig] Enforce write permissions on the shared scripts
+</li><li class="listitem">
+f27cc76 HUE-1298 [impala] Multiple Impalad support
+</li><li class="listitem">
+55865b1 HUE-2022 [core] Add login button to top bar when not authenticated
+</li><li class="listitem">
+2f51c78 HUE-2021 [core] Close tours list by pressing ESC or clicking anywhere else
+</li><li class="listitem">
+d6c53e9 [impala] Align sync table tips
+</li><li class="listitem">
+077faf6 [search] Display errors from Solr instead of a 500
+</li><li class="listitem">
+75691d9 HUE-1804 [core] Serve admin static files
+</li><li class="listitem">
+d18c249 [doc] Update screenshot and app descriptions
+</li><li class="listitem">
+1f0fa51 [search] Add double and tdouble to range facets
+</li><li class="listitem">
+dba67fd HUE-2022 [core] Add login button to top bar when not authenticated
+</li><li class="listitem">
+e7d8d64 [core] Make the tours modal escape-able by escape key
+</li><li class="listitem">
+38eea26 HUE-2018 [metastore] Add column position to table view
+</li><li class="listitem">
+6860085 [core] Fix several broken and hanging tests
+</li><li class="listitem">
+518559e [hbase] A couple of bug fixes
+</li><li class="listitem">
+e3c095a HUE-1884 [core] Split tag view in shared and not shared ones
+</li><li class="listitem">
+1b9b32d HUE-1884 [core] Limit number of history documents
+</li><li class="listitem">
+05774d2 [useradmin] Hide LDAP sync buttons when LDAP is not configured
+</li><li class="listitem">
+4a728d0 [core] Update configuration check path color
+</li><li class="listitem">
+746f481 HUE-2013 [metastore] Write permission instead of read permission
+</li><li class="listitem">
+b43a601 HUE-2008 [pig] Clicking on the stop button should stop on the frontend
+</li><li class="listitem">
+f30cc0d HUE-1918 [core] Login page should accept longer password
+</li><li class="listitem">
+187e8ba HUE-1978 [beeswax] Cancel whole multi query execution
+</li><li class="listitem">
+bac49ac [core] Updating documentation
+</li><li class="listitem">
+739dff7 [pig] Logs can be missing with Yarn
+</li><li class="listitem">
+ecb4383 HUE-2007 [pig] The script is blank when loading from the dashboard section
+</li><li class="listitem">
+4afdbda [hbase] Change initialization to allow for callbacks from clusters
+</li><li class="listitem">
+579543d HUE-1624 [hbase] Configurable write permissions
+</li><li class="listitem">
+ecfcb4c [core] Pluggable auditing logger
+</li><li class="listitem">
+a84eff5 HUE-2005 [core] "Did you know?" box blocks form on login page
+</li><li class="listitem">
+d88cb9f [core] Fix doc model syncing missing some empty objects
+</li><li class="listitem">
+9585086 [core] Hide the navigation bar on the login page
+</li><li class="listitem">
+97f80a4 [pig] Support HCatalog transparently
+</li><li class="listitem">
+fb0a60a HUE-2006 [hbase] UX bug fixes for HBase 0.98
+</li><li class="listitem">
+ae9bb02 HUE-1985 [beeswax] Better save query to a file UX
+</li><li class="listitem">
+50c99be HUE-1995 [hbase] Column familly filtering is broken
+</li><li class="listitem">
+7bd57f0 [metastore] tests should be aware of database fallback to <span class="emphasis"><em>default</em></span>
+</li><li class="listitem">
+4a94165 HUE-2002 [search] Do not break the editor when bad field value or name
+</li><li class="listitem">
+df7ee86 [beeswax] Install Hive and Impala sample on a non local host
+</li><li class="listitem">
+4c2d8e1 [hbase] Use absolute root path for pointing to the example data
+</li><li class="listitem">
+4db11f2 HUE-1973 [core] django-openid-auth mysql issue
+</li><li class="listitem">
+cd5295d [metastore] Ensure database exists before creating a table
+</li><li class="listitem">
+42812d9 HUE-1999 [beeswax] Update multi query separation algorithm
+</li><li class="listitem">
+f9f1b93 HUE-1998 [search] Improve demo collection message display
+</li><li class="listitem">
+f85ee14 HUE-1997 [core] Long dropdown menu items go outside the menu area
+</li><li class="listitem">
+0c825d6 HUE-1991 [search] Add more sample data
+</li><li class="listitem">
+53abe91 [jobbrowser] Job counter error with Yarn
+</li><li class="listitem">
+9a36249 [core] First pass of l10n for 3.5
+</li><li class="listitem">
+1470f93 [core] switch to checking for is_first_login_ever existance
+</li><li class="listitem">
+9674519 HUE-1860 [core] sync ldap group memberships upon login
+</li><li class="listitem">
+444d498 HUE-1930 [core] Alert users with older browsers to upgrade instead of showing a blank page
+</li><li class="listitem">
+1581777b2 HUE-1930 [core] Alert users with older browsers to upgrade instead of showing a blank page
+</li><li class="listitem">
+d3cde24 HUE-1996 [core] Prevent ajax caching on IE
+</li><li class="listitem">
+bb66143 HUE-1993 [hbase] Add examples for HBase App
+</li><li class="listitem">
+d94bebe HUE-1994 [impala] Autocomplete UDF arguments with table columns
+</li><li class="listitem">
+8d34bef HUE-1829 [beeswax] Add back MapReduce job list
+</li><li class="listitem">
+a379a37 [core] Fix tests for RemoteDjangoUserBackend
+</li><li class="listitem">
+0e09ed5 [beeswax] Better multi query separation support
+</li><li class="listitem">
+7ce0ef2 [core] Make about page available to anonymous user
+</li><li class="listitem">
+86b2300 [impala] Faster check status until 2s of execution
+</li><li class="listitem">
+14ebbae [search] Integrating icons for demo collections
+</li><li class="listitem">
+b833aca [search] Adding sample icons
+</li><li class="listitem">
+05097ee HUE-1811 [search] Add script for creating the Solr collections
+</li><li class="listitem">
+251ea05 HUE-1811 [search] Install examples button in quick start wizard
+</li><li class="listitem">
+38da4f3 HUE-1811 [search] Alert message when using a demo collection without a valid Solr
+</li><li class="listitem">
+448cbcc HUE-1811 [search] Sample collections
+</li><li class="listitem">
+5c09057 HUE-1992 [core] set username to lowercase when using RemoteUserDjangoBackend
+</li><li class="listitem">
+a1aa5c1 [impala] Fix backward compatibility with no start_over support
+</li><li class="listitem">
+312e56d [impala] Improve result fetching status
+</li><li class="listitem">
+b5e8cad HUE-1983 [beeswax] Download result as CSV is timeouting
+</li><li class="listitem">
+39f6a58 [core] Hide some ini properties
+</li><li class="listitem">
+4271a33 HUE-1990 [impala] Should not be able to download results for explain queries
+</li><li class="listitem">
+70cd8b2 HUE-1904 [core] Friendlier login page
+</li><li class="listitem">
+a4cba30 HUE-1986 [search] Facets including multibyte chars doesn’t work
+</li><li class="listitem">
+a29baab HUE-1984 [hbase] url encode requests
+</li><li class="listitem">
+a4c373b [core] add ssl_cipher_list to hue.ini
+</li><li class="listitem">
+af75a60 HUE-1982 [impala] Column scrolling does not support aliases that are similar to the original column name
+</li><li class="listitem">
+e76e95c HUE-1975 [search] Add the dynamic fields from the Solr API
+</li><li class="listitem">
+a622530 HUE-1981 [impala] Smoothen tab jumping
+</li><li class="listitem">
+0caa68f HUE-1979 [impala] Error alert duplicates the result header
+</li><li class="listitem">
+fec34ae HUE-1977 [beeswax] Support alias autocomplete in multi queries
+</li><li class="listitem">
+bc7533e HUE-1981 [impala] Smoothen tab jumping
+</li><li class="listitem">
+2ebc313 HUE-1933 [beeswax] Do not fetch query handle for bad queries
+</li><li class="listitem">
+adcebbc [impala] Export query result
+</li><li class="listitem">
+a1093b8 HUE-1947 [beeswax] History tab integration
+</li><li class="listitem">
+f691b82 HUE-1341 [search] Support for dynamic fields
+</li><li class="listitem">
+a0f1045 HUE-1949 [impala] Friendler query expiration message
+</li><li class="listitem">
+c4d4125 HUE-1933 [impala] Export query result
+</li><li class="listitem">
+fd73459 HUE-1933 [impala] Fixing the SQL and hiding mapreduce button
+</li><li class="listitem">
+8746f4b HUE-1970 [impala] COMPUTE STATS table_name
+</li><li class="listitem">
+299baf3 HUE-1972 [impala] Update built in function autocomplete
+</li><li class="listitem">
+2913fd2 HUE-1971 [beeswax] ANALYZE TABLE command autocompletion
+</li><li class="listitem">
+0a02a89 HUE-1964 [jb] Hide see expired job checkbox
+</li><li class="listitem">
+bb813ff HUE-1734 [oozie] Re-run workflow popup is HTML escaped
+</li><li class="listitem">
+00b1453 HUE-1963 [sqoop] minor bug fixes
+</li><li class="listitem">
+b1e6aad HUE-1969 [beeswax] Beeswax polishing
+</li><li class="listitem">
+f970f38 HUE-1882 [core] Adding some missing file for OAuth support
+</li><li class="listitem">
+299c390 HUE-1968 [pig] Resubmission of a failed script seems to hang
+</li><li class="listitem">
+96a085b HUE-1958 [pig] Do not take $ sign as a parameter in regexps
+</li><li class="listitem">
+07d74af HUE-1966 [core] Integrate a font file with filetype icons
+</li><li class="listitem">
+6750aa0 HUE-1956 [beeswax] A long column name on the navigator doesn’t show the sample table
+</li><li class="listitem">
+2e4cef3 HUE-1960 [jb] Cannot access container logs because of encoded url
+</li><li class="listitem">
+5300fba HUE-1231 [oozie] Support global configuration when importing
+</li><li class="listitem">
+ee025b6 [beeswax] Close command should close the queries older than N
+</li><li class="listitem">
+c4ec766 HUE-1948 [beeswax] Autocomplete support for multi queries
+</li><li class="listitem">
+30dd3c4 [core] Fix dump_config tests by testing an app setting instead of desktop
+</li><li class="listitem">
+5d971f8 [impala] Hive metastore app links if no permission to access it
+</li><li class="listitem">
+310eef4 [core] Manage apps to load from hue.ini
+</li><li class="listitem">
+323313e HUE-1955 [beeswax] Save a query with resource fails
+</li><li class="listitem">
+c6ac0c0 HUE-1556 [core] Create the users home directory automatically at login
+</li><li class="listitem">
+051e117 HUE-1858 [oozie] "Could not save workflow" error message requires substantially more information
+</li><li class="listitem">
+2e89fd8 HUE-1950 [beeswax] Saving a query name or sql does not seem to update it with IE
+</li><li class="listitem">
+26440a3 HUE-1951 [beeswax] Add row numbers
+</li><li class="listitem">
+e59bc5c HUE-1954 [beeswax] The result table header doesn’t move on scroll or resize
+</li><li class="listitem">
+964647e HUE-1952 [core] Tutorial panel should be easier to dismiss
+</li><li class="listitem">
+66edb0d HUE-1932 [hbase] Better error message when HBase Thrift server is not there
+</li><li class="listitem">
+ee29798 [beeswax] Explain query is empty
+</li><li class="listitem">
+e4757b6 [zookeeper] Readonly for non superuser
+</li><li class="listitem">
+af4b0f9 [impala] Support Data sample even without metastore app permissions
+</li><li class="listitem">
+678faf6 HUE-1889 [beeswax] Slickier editor layout
+</li><li class="listitem">
+37fb5a2 HUE-1943 [oozie] Convert to descision node can lose all the nodes
+</li><li class="listitem">
+a67aee3 HUE-1686 [beeswax] Fix export result to HDFS test cases
+</li><li class="listitem">
+2b9f3de HUE-1946 [beeswax] Can’t select and execute more than one query
+</li><li class="listitem">
+e82e642 [impala] Downloading a result not cached anymore should fail more gracefully
+</li><li class="listitem">
+1a89213 [impala] Specific query configuration can be overriden
+</li><li class="listitem">
+ab21e5b [impala] Some URL refer to neeswax instead of impala
+</li><li class="listitem">
+7cd2b53 HUE-1889 [beeswax] Slickier editor layout
+</li><li class="listitem">
+6481060 HUE-1889 [beeswax] Slickier editor layout
+</li><li class="listitem">
+900f902 HUE-1686 [beeswax] Saving results should not re-execute the query
+</li><li class="listitem">
+a93da78 HUE-1907 [impala] Date result fields are not jsonifiable
+</li><li class="listitem">
+bbeeb68 HUE-1944 [oozie] Generic action is broken
+</li><li class="listitem">
+c53e420 HUE-1945 [core] Navigation bar is cut on some resolutions
+</li><li class="listitem">
+747add1 HUE-1939 [beeswax] CTAS redirects to the default database in the metastore
+</li><li class="listitem">
+98dfa50 [beeswax] Allow saving results to fully-qualified name database
+</li><li class="listitem">
+8dfe698 HUE-1889 [beeswax] Slickier editor UX
+</li><li class="listitem">
+4b5c9af [beeswax] Fix HTML escaping of result table
+</li><li class="listitem">
+7aa96e7 HUE-1708 [search] Allow search results to be exported
+</li><li class="listitem">
+e9d7e47 [beeswax] Prevent recursive looping in tests
+</li><li class="listitem">
+59c54f9 HUE-1324 [fb] Support upload of tar.gz archive
+</li><li class="listitem">
+f984008 HUE-1926 [beeswax] Cached query should not be replaced by a saved one
+</li><li class="listitem">
+e5c5e60 HUE-1937 [beeswax] Clarify behavior of a multi query with error
+</li><li class="listitem">
+5a98108 [core] logging should be timezone aware for all systems
+</li><li class="listitem">
+4af49f7 HUE-1934 [beeswax] Flag for automatic closing the queries
+</li><li class="listitem">
+fadfcd7 HUE-1784 [oozie] False positive variable when submit from HDFS
+</li><li class="listitem">
+1a2de1b HUE-207 [core] upgrade tablib to development version
+</li><li class="listitem">
+fbafcd2 HUE-1927 [beeswax] Loading a query history of a saved query does not load its name
+</li><li class="listitem">
+6bee6a9 HUE-1826 [impala] Download or export query result
+</li><li class="listitem">
+45a17ea HUE-207 [beeswax] Leverage tablib to enable more flexible data export from Beeswax
+</li><li class="listitem">
+80ecf51 HUE-1913 [impala] invalidate metadata breaks the editor
+</li><li class="listitem">
+5d377ac HUE-1928 [beeswax] HiveServer2 supports pass-through LDAP authentication
+</li><li class="listitem">
+83c3c18 [about] Page becomes blank when check config finishes
+</li><li class="listitem">
+5b15f0f HUE-1898 [oozie] SLA graph easier to understand or manipulate
+</li><li class="listitem">
+ff44e5f HUE-1906 [beeswax] Better UX for the goto columns on the result page
+</li><li class="listitem">
+fbf25a6 HUE-1929 [core] Create jHueDelayedInput plugin
+</li><li class="listitem">
+a8c3309 HUE-1925 [oozie] Disable drag action when around the edit button
+</li><li class="listitem">
+0ae3db3 HUE-1893 [beeswax] predictGraph() should use the metadata from the result set
+</li><li class="listitem">
+c814197 HUE-1891 [hbase] Cell edit icons are not aligned
+</li><li class="listitem">
+40501d0 HUE-1877 [beeswax] Smarter scroll to top button
+</li><li class="listitem">
+307815a [beeswax] Update tests to the latest HiveServer2
+</li><li class="listitem">
+2bd7c94 HUE-1920 [impala] Hide database is locked message
+</li><li class="listitem">
+678a2ec HUE-1923 [core] Support User filters to help limit the Users that are able to login to Hue
+</li><li class="listitem">
+52fc692 [core] Adding missing makefile in liboauth
+</li><li class="listitem">
+d13656a HUE-1901 [oozie] Add a test for import subworkflow
+</li><li class="listitem">
+c420eab HUE-1882 [core] OAuth support for Facebook, Twitter, Google+ and Linkedin
+</li><li class="listitem">
+7dd9a0c HUE-1911 [core] banner_top_html is escaped
+</li><li class="listitem">
+5f1233a HUE-1921 [core] Fix IE9 glitches
+</li><li class="listitem">
+73c8f27 [core] Do not show help app if it is not allowed
+</li><li class="listitem">
+190c6d0 [search] Search page 500 when highlighting is null
+</li><li class="listitem">
+d5f14b0 [beeswax] Fix full screen
+</li><li class="listitem">
+1c79799 HUE-1919 [beewsax] Do not jump to result tab
+</li><li class="listitem">
+8c4a8ca HUE-1658 [oozie] Adding backward compatibility flag
+</li><li class="listitem">
+2b852ec HUE-1658 [oozie] Shifting Sunday to first week day
+</li><li class="listitem">
+140dc40 HUE-1658 [oozie] Cron like scheduling
+</li><li class="listitem">
+660b16c [hbase] Invalidate cached cluster configs
+</li><li class="listitem">
+277c5c7 HUE-1908 [beeswax] Database of a saved query is not loaded back when opening it
+</li><li class="listitem">
+2f74427 [core] Improve logging timezone information
+</li><li class="listitem">
+9173a45 HUE-1915 [core] MultipleObjectsReturned for tags or permissions
+</li><li class="listitem">
+8313e81 [beeswax] force scroller to work
+</li><li class="listitem">
+bd786d5 HUE-1909 [impala] No errors are displayed
+</li><li class="listitem">
+bc65a47 [core] Ignore all the mo files except the ones from third parties in ext-py
+</li><li class="listitem">
+7e3431a HUE-218 [beeswax] Add mechanism to kill a Hive query
+</li><li class="listitem">
+8e441d8 HUE-1905 [core] Add security handling for yarn and mr2
+</li><li class="listitem">
+0d496eb [core] fix result monitoring
+</li><li class="listitem">
+a6bcdfa HUE-1857 [oozie] Allow import workflows with subworkflow identified at runtime
+</li><li class="listitem">
+03b05eb HUE-1902 [oozie] Update coordinator dataset action is broken
+</li><li class="listitem">
+ce0c982 [i18n] Removing mo files from the repository
+</li><li class="listitem">
+2617a08 [core] Set en locale not fuzzy
+</li><li class="listitem">
+224c048 HUE-1857 [oozie] Allow import workflows with subworkflow identified at runtime
+</li><li class="listitem">
+7993f4d [beeswax] Only close queries that are not running
+</li><li class="listitem">
+e03ea6a [oozie] Credentials can be combined comma separatedly in one action
+</li><li class="listitem">
+8cb022e [beeswax] Fix execute query button for temporary queries
+</li><li class="listitem">
+bd76ca1 HUE-1887 [oozie] Support dashboard Coordinator and Workflow action SLA
+</li><li class="listitem">
+5d52c3a [i18n] Removing mo file
+</li><li class="listitem">
+81b4c6e HUE-1723 [beeswax] Example SQL text should not be executable
+</li><li class="listitem">
+fb640aa HUE-1894 [beeswax] Some errors are not reseted at query execution
+</li><li class="listitem">
+8e81051 HUE-1892 [oozie] Permission denied for hive-site.xml for Hive action on workflow
+</li><li class="listitem">
+f9351fe HUE-1896 [beeswax] Query logs are queing up
+</li><li class="listitem">
+8cc2884 [beeswax] Send watch status when no error
+</li><li class="listitem">
+1b8b5ee HUE-1883 [beeswax] Query with expired result will break the editor
+</li><li class="listitem">
+a82765c [spark] Locales fail to compile because of some missing placeholders
+</li><li class="listitem">
+54233be [core] Print log time to the same timezone set in hue.ini
+</li><li class="listitem">
+7fff51a HUE-1885 [useradmin] Sanitize user list
+</li><li class="listitem">
+100e22a [core] Doc model API and desktop permissions cleanup
+</li><li class="listitem">
+6648026 [core] Remove old shell logging
+</li><li class="listitem">
+2a8f854 [pig] Use correct autocomplete view
+</li><li class="listitem">
+0fb48e5 HUE-1879 [oozie] Edit a java action twice is broken
+</li><li class="listitem">
+f24d18b HUE-1881 [impala] Close query on unload page
+</li><li class="listitem">
+6da8e0f HUE-1880 [beeswax] Multi query result opened shows twice the data
+</li><li class="listitem">
+0b7150a [impala] Close the correct query history id
+</li><li class="listitem">
+9df9961 HUE-1876 [beeswax] Can’t save result into an HDFS directory
+</li><li class="listitem">
+60d165e HUE-1776 [metastore] Support extended Unicode delimiter
+</li><li class="listitem">
+ab09a82 HUE-1302 [oozie] Optimize dashboards API calls for a single coordinator
+</li><li class="listitem">
+1cd4b2d HUE-1875 [beeswax] Friendler UX when missing query property
+</li><li class="listitem">
+4c230b0 HUE-1852 [oozie] Encoding issue in job description included in workflows
+</li><li class="listitem">
+48fe935 HUE-1871 [beeswax] Auto queries should not modify the query cookied
+</li><li class="listitem">
+8b847ec HUE-1878 [rdbms] Query with error break the editor
+</li><li class="listitem">
+968d58c HUE-1873 [beeswax] Result data not HTML encoded
+</li><li class="listitem">
+2b3f8c5 [desktop] Polish permissions based on URL
+</li><li class="listitem">
+c5ec0a2 [beeswax] File browse button missing from saved design file resources
+</li><li class="listitem">
+75a9a98 [beeswax] Convert a series of test to the new json and refresh API
+</li><li class="listitem">
+c66c9d4 HUE-1872 [oozie] convert to decision node broken
+</li><li class="listitem">
+a946620 [beeswax] Execute saved design doesn’t show name in history
+</li><li class="listitem">
+b290cc8 [beeswax] Save results to a table redirects incorrectly
+</li><li class="listitem">
+ee64583 HUE-1869 [dbquery] Query with error should not move headers
+</li><li class="listitem">
+f19016d HUE-1863 [dbquery] Explain query doesn’t work correctly
+</li><li class="listitem">
+49b6238 HUE-1864 [beeswax] download CSV doesn’t work if design was never saved
+</li><li class="listitem">
+6b4ccbf HUE-1848 [metastore] Watch query page with the new API
+</li><li class="listitem">
+dd6ed74 [search] Show other collection caret only if more than one collection
+</li><li class="listitem">
+094205e HUE-1838 [oozie] Add SLA tab on single workflow and coordinator dashboard page
+</li><li class="listitem">
+35d2c3a HUE-1866 [beeswax] Default graph preset on result page
+</li><li class="listitem">
+6d0d7a9 HUE-1862 [impala] Impala only permission requires Beeswax
+</li><li class="listitem">
+045a046 HUE-1861 [oozie] Forks can’t be created anymore in a workflow
+</li><li class="listitem">
+95d9066 HUE-1837 [oozie] SLA dashboard it is not pretty
+</li><li class="listitem">
+ff15888 HUE-1841 [core] Add support for OpenId authentication
+</li><li class="listitem">
+594c3a3 [beeswax] Fix explain query
+</li><li class="listitem">
+17c93d5 HUE-1844 [beeswax] Load back from History page
+</li><li class="listitem">
+1826833 HUE-1855 [beeswax] Error reporting is incomplete
+</li><li class="listitem">
+e351f0f [search] Add query autocomplete
+</li><li class="listitem">
+6da9621 HUE-1856 [beeswax] Multi and single query execution UX
+</li><li class="listitem">
+b5fa62a HUE-1859 [core] Add generic middleware support
+</li><li class="listitem">
+27d69fe [beeswax] Replace power UDF by tofloat in the tests
+</li><li class="listitem">
+714f83e [oozie] Always provide JT and FS addresses
+</li><li class="listitem">
+b2f7d6d HUE-1839 [oozie] SLA form is not pretty on edit workflow action popup
+</li><li class="listitem">
+2a6c670 HUE-1817 [beeswax] Disable execute button of parameterized query when blank field
+</li><li class="listitem">
+c6c2426 HUE-1843 [beeswax] Multi query support
+</li><li class="listitem">
+0db17d4 HUE-1768 [oozie] Apply the new minimal style of the graph to the editor
+</li><li class="listitem">
+320c88e [sqoop] Show error message when a starting job fails
+</li><li class="listitem">
+63558b1 HUE-1842 [beeswax] Error info above query box instead of the popup
+</li><li class="listitem">
+c83d579 [beeswax] Save the query name in the tests
+</li><li class="listitem">
+a24bfbd [doc] Cleanup how to run the tests
+</li><li class="listitem">
+3da5445 HUE-1830 [beeswax] Infinite scroll is broken
+</li><li class="listitem">
+df1b70d [oozie] Shared coordinators can not be run by non ower users
+</li><li class="listitem">
+c5e2440 [oozie] Fix Coordinator SLA edition
+</li><li class="listitem">
+0c6b56f HUE-1845 [impala] Automatic query closing
+</li><li class="listitem">
+20e1ecc [jobsub] Limit number of designs
+</li><li class="listitem">
+2498d03 HUE-1817 [beeswax] Migrate several tests to the new API
+</li><li class="listitem">
+17cb57b HUE-1574 [beeswax] ASCII error on query page
+</li><li class="listitem">
+5dc2eed HUE-1753 [beeswax] Setting and files inputs in the editor are not user friendly
+</li><li class="listitem">
+6730c7f HUE-1847 [metastore] Dropping loads of dbs or tables makes the script to timeout
+</li><li class="listitem">
+b6ad0cc HUE-1820 [jb] Finishing jobs are red and stuck
+</li><li class="listitem">
+1741851 HUE-1817 [beeswax] Add testing helper for the new API
+</li><li class="listitem">
+66f767b HUE-1840 [beeswax] Query with no result set error the editor
+</li><li class="listitem">
+18e75e1 HUE-1836 [oozie] Cloning a new action fails
+</li><li class="listitem">
+0787bf2 HUE-1828 [beeswax] Add back download and save results
+</li><li class="listitem">
+99eb7b70c [doc] Adding logos on github main page
+</li><li class="listitem">
+eb61cbb HUE-1835 [metastore] Improve database dropdown
+</li><li class="listitem">
+8827c6a HUE-1827 [beeswax] Automatic log scrolling is broken
+</li><li class="listitem">
+2d53ca4 HUE-1799 [beeswax] GetOperationStatus() now returns operational states
+</li><li class="listitem">
+49058c6 HUE-1832 [beeswax] Save query does not update url
+</li><li class="listitem">
+7ee1725 HUE-1821 [beeswax] Re-integrate graphs
+</li><li class="listitem">
+ef4908b HUE-1548 [sqoop2] Connection management refactored
+</li><li class="listitem">
+452bab5 [doc] Add Spark app to the list of apps
+</li><li class="listitem">
+95a0e14 HUE-1452 [oozie] Credentials by action for Oozie workflows
+</li><li class="listitem">
+343481f HUE-1803 [oozie] Support global configuration
+</li><li class="listitem">
+eb47ec3 HUE-1803 [oozie] Global configuration mapping
+</li><li class="listitem">
+23d63af [oozie] Front end for SLA
+</li><li class="listitem">
+1db86d3 HUE-1803 [oozie] Support global configuration
+</li><li class="listitem">
+6f672a2 HUE-1656 [oozie] Make data fully integrated in the API part 2
+</li><li class="listitem">
+b3d1abc [oozie] Front end for SLA
+</li><li class="listitem">
+71d3631 HUE-1656 [oozie] Make data fully integrated in the API part 1
+</li><li class="listitem">
+bb0b460 HUE-1657 [oozie] Basic SLA parsing for workflows
+</li><li class="listitem">
+fc728ca HUE-1656 [oozie] Adding parameters to SLA
+</li><li class="listitem">
+dd09000 HUE-1656 [oozie] Add 2 new SLA fields
+</li><li class="listitem">
+edf3af6 HUE-1656 [oozie] Create Coordinator SLA
+</li><li class="listitem">
+6e99fe4 HUE-1656 [oozie] Create empty SLA on new nodes
+</li><li class="listitem">
+b238f59 HUE-1657 [oozie] Dynamic SLA search page
+</li><li class="listitem">
+e3bc37b HUE-1656 [oozie] SLA edition by Workflow action
+</li><li class="listitem">
+b1de2fa HUE-1657 [oozie] SLA search page
+</li><li class="listitem">
+f72bb4a HUE-1656 [oozie] SLA edition
+</li><li class="listitem">
+ac64189 HUE-1657 [oozie] SLA search/lookup
+</li><li class="listitem">
+ab1f09e HUE-1822 [beeswax] Re-integrate columns in result tab
+</li><li class="listitem">
+24cf3bf HUE-1833 [spark] Gracefully fail when the server is not up
+</li><li class="listitem">
+645b872 HUE-1825 [beeswax] Re-add filebrowser to file resources
+</li><li class="listitem">
+1c50cab HUE-1823 [beeswax] Re-integrate resource lists in the editor
+</li><li class="listitem">
+0e1a003 [beeswax] Fix explain query test API and test_explain_query_i18n test
+</li><li class="listitem">
+a7e4781 HUE-1831 [beeswax] Switch view sample and open table in navigator
+</li><li class="listitem">
+34fc418 HUE-1798 [impala] Improve database dropdown
+</li><li class="listitem">
+6e87954 HUE-1790 [dbquery] Explicit db restriction property
+</li><li class="listitem">
+2e5e8b7 [core] Provide ini parameter for browser-length cookies
+</li><li class="listitem">
+7d84893 HUE-1812 [spark] UX improvements
+</li><li class="listitem">
+d076823 HUE-1812 [spark] Make it awesomer
+</li><li class="listitem">
+3fceec4 HUE-1818 [core] Remove required markup for jHueHdfsAutocomplete
+</li><li class="listitem">
+3df42de HUE-1817 [beeswax] Add watch_wait template to have at least the tests running
+</li><li class="listitem">
+06bac19 HUE-1813 [sqoop] autocomplete output directory
+</li><li class="listitem">
+dc9841d HUE-1809 [sqoop] autocomplete jdbc class and string
+</li><li class="listitem">
+282d218 HUE-1810 [sqoop] autocomplete tables and fields
+</li><li class="listitem">
+5551575 HUE-1808 [dbquery] Pull out rdbms config to librdbms app
+</li><li class="listitem">
+9393b02 HUE-1806 [beeswax] One query page editor UX cleanup
+</li><li class="listitem">
+357b1a1 [spark] Add submitted jobId in url hash
+</li><li class="listitem">
+73fc860 [docs] Fixed code style
+</li><li class="listitem">
+857e483 HUE-1800 [fb] Autocomplete edited path
+</li><li class="listitem">
+43f04d8 [spark] Add check config
+</li><li class="listitem">
+2ac1772 [spark] Support plain result
+</li><li class="listitem">
+b9eeb26 [spark] Add download result data
+</li><li class="listitem">
+23a83b1 [spark] Dynamic parameter list
+</li><li class="listitem">
+bf982df [spark] Save script in the editor
+</li><li class="listitem">
+be12dcc [spark] Save and load a script
+</li><li class="listitem">
+718c3bb [spark] Add link on jobs page to open them with their result
+</li><li class="listitem">
+632716a HUE-1219 [impala] One page app
+</li><li class="listitem">
+fd376b3 [core] Add switch for collection in the admin wizard
+</li><li class="listitem">
+1a4262b HUE-1800 [fb] Autocomplete edited path
+</li><li class="listitem">
+244f310 [spark] Adding locales
+</li><li class="listitem">
+07f87d8 HUE-1805 [spark] Second version with REST Job Server
+</li><li class="listitem">
+d3f66b4 HUE-1792 [search] Error when combining a field and grahpical facets
+</li><li class="listitem">
+bb77b4b HUE-1783 [beeswax] Result graphing
+</li><li class="listitem">
+e947a69 HUE-1795 [core] Update window title on every page with a progress bar
+</li><li class="listitem">
+d1b62c8 HUE-1796 [dbquery] Interactive feedback when sumitting queries
+</li><li class="listitem">
+d6c0f35 [impala] Fix change of Editor name
+</li><li class="listitem">
+d2f147d HUE-1348 [search] Improve collection dropdown
+</li><li class="listitem">
+9cb6857 HUE-1793 [hbase] Api Error: <span class="emphasis"><em>NoneType</em></span> object has no attribute <span class="emphasis"><em>group</em></span>
+</li><li class="listitem">
+f58c0e2 [core] Rename Beeswax to Hive Editor
+</li><li class="listitem">
+89e92a6 [beeswax] Remove dbquery app dependency
+</li><li class="listitem">
+4f5db8f HUE-1789 [fb] The dropdown icon on Chown/chmod is not aligned
+</li><li class="listitem">
+41bad76 HUE-1706 [beeswax] Sort numerical columns numerically not lexicographically
+</li><li class="listitem">
+6128c3b [beeswax] Fix query result medatadata type
+</li><li class="listitem">
+59eca94 HUE-1788 [hbase] Cannot upload image to cell
+</li><li class="listitem">
+dbbe283 HUE-1779 [core] Correct offset of notifications on close
+</li><li class="listitem">
+ac5bd4f HUE-1786 [hbase] Upload button in a cell broken
+</li><li class="listitem">
+d8d8273 HUE-1787 [sqoop2] python 2.4 json encoding issues
+</li><li class="listitem">
+773c595 HUE-1722 [impala] Scrolling below initial 100 records shows NULLs as blank values
+</li><li class="listitem">
+88ae146 [proxy] Proxy app doesn’t work if blacklist is empty
+</li><li class="listitem">
+420006c HUE-1785 [oozie] New graph CSS messes up menu labels
+</li><li class="listitem">
+6a1e98b [fb] Fix error when editing new file
+</li><li class="listitem">
+d797404 HUE-1736 [fb] Editor windown is not high enough
+</li><li class="listitem">
+e129263 [oozie] Upload test sharelib with the Oozie command
+</li><li class="listitem">
+96976bb [core] Fix description of LDAP force_username_lowercase in ini
+</li></ul></div></div><div class="section" title="4. Contributors"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_contributors"></a>4. Contributors</h2></div></div></div><p>This Hue release is made possible thanks to the contribution from:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Aaron Newton
+</li><li class="listitem">
+Aaron T. Myers
+</li><li class="listitem">
+Abraham Elmahrek
+</li><li class="listitem">
+Aditya Acharya
+</li><li class="listitem">
+Alex Newman
+</li><li class="listitem">
+Andrew Bayer
+</li><li class="listitem">
+Andrew Yao
+</li><li class="listitem">
+Ann McCown
+</li><li class="listitem">
+bc Wong
+</li><li class="listitem">
+Ben Bishop
+</li><li class="listitem">
+Bruce Mitchener
+</li><li class="listitem">
+Bruno Mahé
+</li><li class="listitem">
+Eli Collins
+</li><li class="listitem">
+Enrico Berti
+</li><li class="listitem">
+Eric Wong
+</li><li class="listitem">
+Harsh J
+</li><li class="listitem">
+Henry Robinson
+</li><li class="listitem">
+Jon Natkins
+</li><li class="listitem">
+Kevin Wang
+</li><li class="listitem">
+Lars Francke
+</li><li class="listitem">
+Loren Siebert
+</li><li class="listitem">
+Marcus McLaughlin
+</li><li class="listitem">
+Mike Cotton
+</li><li class="listitem">
+Paul Battaglia
+</li><li class="listitem">
+Philip Zeyliger
+</li><li class="listitem">
+Romain Rigaux
+</li><li class="listitem">
+Roman Shaposhnik
+</li><li class="listitem">
+Shawn Van Ittersum
+</li><li class="listitem">
+Shrijeet Paliwal
+</li><li class="listitem">
+Thomas Aylott
+</li><li class="listitem">
+Todd Lipcon
+</li><li class="listitem">
+Vinithra Varadharajan
+</li></ul></div></div></div></body></html>
