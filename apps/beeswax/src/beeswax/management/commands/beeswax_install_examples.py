@@ -35,6 +35,10 @@ from beeswax.server.dbms import get_query_server_config, QueryServerException
 from useradmin.models import install_sample_user
 
 
+# do not edit! added by PythonBreakpoints
+from pdb import set_trace as _breakpoint
+
+
 LOG = logging.getLogger(__name__)
 
 
@@ -64,7 +68,17 @@ class Command(NoArgsCommand):
     Document.objects.sync()
 
     if exception is not None:
-      raise exception
+      pretty_msg = None
+      
+      if "AlreadyExistsException" in exception.message:
+        pretty_msg = "Impala Editor Example Already Installed."
+      if "Permission denied" in exception.message:
+        pretty_msg = "Permission denied. Please check with your system administrator."
+
+      if pretty_msg is not None:
+        raise Exception(pretty_msg)
+      else:  
+        raise exception
 
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
