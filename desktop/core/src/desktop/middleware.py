@@ -73,6 +73,7 @@ class AjaxMiddleware(object):
     request.ajax = request.is_ajax() or request.REQUEST.get("format", "") == "json"
     return None
 
+
 class ExceptionMiddleware(object):
   """
   If exceptions know how to render themselves, use that.
@@ -100,28 +101,6 @@ class ExceptionMiddleware(object):
 
     return None
 
-class JFrameMiddleware(object):
-  """
-  Updates JFrame headers to update path and push flash messages into headers.
-  """
-  def process_response(self, request, response):
-    path = request.path
-    if request.GET:
-      get_params = request.GET.copy()
-      if "noCache" in get_params:
-        del get_params["noCache"]
-      query_string = get_params.urlencode()
-      if query_string:
-        path = request.path + "?" + query_string
-    response['X-Hue-JFrame-Path'] = iri_to_uri(path)
-    if response.status_code == 200:
-      if is_jframe_request(request):
-        if hasattr(request, "flash"):
-          flashes = request.flash.get()
-          if flashes:
-            response['X-Hue-Flash-Messages'] = json.dumps(flashes)
-
-    return response
 
 class ClusterMiddleware(object):
   """
@@ -383,47 +362,17 @@ class AuditLoggingMiddleware(object):
     return response
 
 
-class SessionOverPostMiddleware(object):
-  """
-  Django puts session info in cookies, which is reasonable.
-  Unfortunately, the plugin we use for file-uploading
-  doesn't forward the cookies, though it can do so over
-  POST.  So we push the POST data back in.
-
-  This is the issue discussed at
-  http://www.stereoplex.com/two-voices/cookieless-django-sessions-and-authentication-without-cookies
-  and
-  http://digitarald.de/forums/topic.php?id=20
-
-  The author of fancyupload says (http://digitarald.de/project/fancyupload/):
-    Flash-request forgets cookies and session ID
-
-    See option appendCookieData. Flash FileReference is not an intelligent
-    upload class, the request will not have the browser cookies, Flash saves
-    his own cookies. When you have sessions, append them as get-data to the the
-    URL (e.g. "upload.php?SESSID=123456789abcdef"). Of course your session-name
-    can be different.
-
-  and, indeed, folks are whining about it: http://bugs.adobe.com/jira/browse/FP-78
-
-  There seem to be some other solutions:
-  http://robrosenbaum.com/flash/using-flash-upload-with-php-symfony/
-  and it may or may not be browser and plugin-dependent.
-
-  In the meanwhile, this is pretty straight-forward.
-  """
-  def process_request(self, request):
-    cookie_key = settings.SESSION_COOKIE_NAME
-    if cookie_key not in request.COOKIES and cookie_key in request.POST:
-      request.COOKIES[cookie_key] = request.POST[cookie_key]
-      del request.POST[cookie_key]
-
-
 class DatabaseLoggingMiddleware(object):
   """
   If configured, logs database queries for every request.
   """
   DATABASE_LOG = logging.getLogger("desktop.middleware.DatabaseLoggingMiddleware")
+
+  def __init__(self):
+    if not desktop.conf.DATABASE_LOGGING.get():
+      LOG.info('Unloading DatabaseLoggingMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
   def process_response(self, request, response):
     if desktop.conf.DATABASE_LOGGING.get():
       if self.DATABASE_LOG.isEnabledFor(logging.INFO):

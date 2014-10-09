@@ -113,7 +113,6 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.DatabaseLoggingMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'desktop.middleware.SessionOverPostMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'desktop.middleware.SpnegoMiddleware',    
@@ -125,10 +124,8 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.LoginAndPermissionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'desktop.middleware.NotificationMiddleware',
-    'desktop.middleware.JFrameMiddleware',
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
-    'desktop.middleware.AppSpecificMiddleware',
     'django.middleware.transaction.TransactionMiddleware'
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
@@ -282,6 +279,12 @@ DATABASES = {
   'default': default_db
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-hue'
+    }
+}
 
 # Configure sessions
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
