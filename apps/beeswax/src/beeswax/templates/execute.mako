@@ -1916,7 +1916,12 @@ function addRowNumberToResults(data, startIndex) {
   return _tmpdata;
 }
 
+var firstFnDrawcallback = false;
+
 function addResults(viewModel, dataTable, index, pageSize) {
+  if (index == 0) {
+    firstFnDrawcallback = true;
+  }
   if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
     $(document).one('fetched.results', function () {
       $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
@@ -1925,9 +1930,6 @@ function addResults(viewModel, dataTable, index, pageSize) {
     viewModel.fetchResults();
   } else {
     dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
-  }
-  if (index == 0){
-    window.setTimeout(reinitializeTable, 500);
   }
 }
 
@@ -1945,6 +1947,10 @@ function resultsTable(e, data) {
       },
       "fnDrawCallback": function (oSettings) {
         reinitializeTableExtenders();
+        if (firstFnDrawcallback) {
+          firstFnDrawcallback = false;
+          window.setTimeout(reinitializeTable, 100);
+        }
       },
       "aoColumnDefs": [
         {
