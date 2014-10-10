@@ -141,6 +141,10 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       HISTORY_SERVER_API_URL=Config("history_server_api_url",
                   default='http://localhost:19888',
                   help="URL of the HistoryServer API"),
+      SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
+                  help="In secure mode (HTTPS), if SSL certificates from Resource Manager Rest Server have to be verified against certificate authority",
+                  default=False,
+                  type=coerce_bool)
     )
   )
 )

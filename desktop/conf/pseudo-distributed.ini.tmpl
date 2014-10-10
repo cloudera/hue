@@ -623,7 +623,11 @@
       ## proxy_api_url=http://localhost:8088
 
       # URL of the HistoryServer API
-      # history_server_api_url=http://localhost:19888
+      ## history_server_api_url=http://localhost:19888
+
+      # In secure mode (HTTPS), if SSL certificates from Resource Manager's
+      # Rest Server have to be verified against certificate authority
+      ## ssl_cert_ca_verify=False
 
     # HA support by specifying multiple clusters
     # e.g.
@@ -660,7 +664,7 @@
 
     # [[[ha]]]
       # Enter the logical name of the JobTrackers
-      # logical_name=my-jt-name
+      ## logical_name=my-jt-name
 
 
 ###########################################################################
