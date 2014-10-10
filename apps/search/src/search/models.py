@@ -530,8 +530,10 @@ def augment_solr_response(response, collection, query):
         value = smart_unicode(value, errors='replace')
         escaped_value = escape(value)
       doc[field] = escaped_value
-    doc['showDetails'] = False
-    doc['details'] = []
+
+    if not query['download']:
+      doc['showDetails'] = False
+      doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
