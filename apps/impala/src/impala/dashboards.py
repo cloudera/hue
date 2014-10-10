@@ -22,9 +22,11 @@ import json
 from math import log
 
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import render
+from desktop.models import Document2 
 
 from beeswax.design import hql_query
 from beeswax.server import dbms
@@ -37,7 +39,12 @@ LOG = logging.getLogger(__name__)
 
 
 def dashboard(request):
-  dashboard = Dashboard()
+  dashboard_id = request.GET.get('dashboard')
+  
+  if dashboard_id:
+    dashboard = Dashboard(data=Document2.objects.get(id=dashboard_id).data)
+  else:
+    dashboard = Dashboard()
 
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
@@ -173,24 +180,21 @@ def save(request):
   dashboard = json.loads(request.POST.get('dashboard', '{}')) # TODO perms
   layout = json.loads(request.POST.get('layout', '{}'))
 
-  collection['template']['extracode'] = escape(collection['template']['extracode'])
-
-  if collection:
-    if collection['id']:
-      hue_collection = Collection.objects.get(id=collection['id'])
+  if dashboard:
+    if dashboard.get('id'):
+      dashboard_doc = Document2.objects.get(id=dashboard['id'])
     else:
-      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'])
-    hue_collection.update_properties({'collection': collection})
-    hue_collection.update_properties({'layout': layout})
-    hue_collection.name = collection['name']
-    hue_collection.label = collection['label']
-    hue_collection.enabled = collection['enabled']
-    hue_collection.save()
+      dashboard['name'] = '%s.%s' % (dashboard['properties'][0]['database'], dashboard['properties'][0]['table'])
+      dashboard_doc = Document2.objects.create(name=dashboard['name'], type='impala-dashboard', owner=request.user)
+    dashboard_doc.update_data({'dashboard': dashboard})
+    dashboard_doc.update_data({'layout': layout})
+    dashboard_doc.name = dashboard['name']
+    dashboard_doc.save()
     response['status'] = 0
-    response['id'] = hue_collection.id
+    response['id'] = dashboard_doc.id
     response['message'] = _('Page saved !')
   else:
-    response['message'] = _('There is no collection to search.')
+    response['message'] = _('There is no dashboard to search.')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
