@@ -16,6 +16,8 @@
 # limitations under the License.
 
 import logging
+import uuid
+
 from itertools import chain
 
 from django.db import models
@@ -584,5 +586,36 @@ class DocumentPermission(models.Model):
   unique_together = ('doc', 'perms')
 
 
-# HistoryTable
-# VersionTable
+
+class Document2Manager(models.Manager):
+  def get_by_natural_key(self, uuid):
+    return self.get(uuid=uuid)
+
+
+def uuid_default():
+    return uuid.uuid4().hex
+
+
+class Document2(models.Model):    
+  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc_owner')
+  name = models.CharField(default='', max_length=255)
+  description = models.TextField(default='')
+  uuid = models.CharField(default=uuid_default, max_length=32, db_index=True)
+  type = models.CharField(default='', max_length=32, db_index=True, help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...'))
+
+  data = models.TextField(default='{}')
+  extra = models.TextField(default='{}')
+
+  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
+  version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True) 
+  is_history = models.BooleanField(default=False, db_index=True)
+
+  tags = models.ManyToManyField('self', db_index=True)
+  dependencies = models.ManyToManyField('self', db_index=True)
+  
+  objects = Document2Manager()
+  unique_together = ('uuid', 'version', 'is_history')
+  
+  def natural_key(self):
+    return self.uuid
+  
