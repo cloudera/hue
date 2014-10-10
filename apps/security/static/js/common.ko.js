@@ -54,6 +54,16 @@ ko.bindingHandlers.select2 = {
             valueAccessor().update(e.val);
           }
         })
+        .on("select2-focus", function(e) {
+          if (typeof options.onFocus != "undefined"){
+            options.onFocus();
+          }
+        })
+        .on("select2-blur", function(e) {
+          if (typeof options.onBlur != "undefined"){
+            options.onBlur();
+          }
+        })
         .on("select2-open", function () {
           $(".select2-input").off("keyup").data("type", options.type).on("keyup", function (e) {
             if (e.keyCode === 13) {
