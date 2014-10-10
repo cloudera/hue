@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import uuid
 
 from itertools import chain
@@ -597,7 +598,7 @@ def uuid_default():
 
 
 class Document2(models.Model):    
-  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc_owner')
+  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=32, db_index=True)
@@ -617,5 +618,19 @@ class Document2(models.Model):
   unique_together = ('uuid', 'version', 'is_history')
   
   def natural_key(self):
-    return self.uuid
+    return (self.uuid,)
   
+  @property
+  def data_dict(self):
+    if not self.data:
+      self.data = json.dumps({})
+    data_python = json.loads(self.data)
+
+    return data_python
+
+  def update_data(self, post_data):
+    data_dict = self.data_dict
+
+    data_dict.update(post_data)
+
+    self.data = json.dumps(data_dict)

@@ -23,19 +23,25 @@ from beeswax.server import dbms
 
 class Dashboard():
   
-  data = json.dumps(
-      {'layout': [
-              {"size":2,"rows":[{"widgets":[{"size":12,"name":"Total Employees","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-              {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-              "drops":["temp"],"klass":"card card-home card-column span10"}
-         ],
-      'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Total Employees', 'type': 'field', 'field': 'total_emp', 'widget_type': 'facet-widget', 
-                    'properties': {'limit': 10}}],
-      'properties': [{'database': 'default', 'table': 'sample_07', 'fields': []}]
-  })
+  def __init__(self, data=None, document=None):
+    self.document = document
+
+    if data is not None:
+      self.data = data
+    else:
+      self.data = json.dumps(
+          {'layout': [
+                  {"size":2,"rows":[{"widgets":[{"size":12,"name":"Total Employees","id":"52f07188-f30f-1296-2450-f77e02e1a5c1","widgetType":"facet-widget",
+                       "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+                  {"size":10,"rows":[{"widgets":[
+                      {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                       "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+                  "drops":["temp"],"klass":"card card-home card-column span10"}
+             ],
+          'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Total Employees', 'type': 'field', 'field': 'total_emp', 'widget_type': 'facet-widget', 
+                        'properties': {'limit': 10}}],
+          'properties': [{'database': 'default', 'table': 'sample_07', 'fields': []}]
+      })
 
   def get_json(self, user):
     _data = self.get_data()
