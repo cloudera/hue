@@ -917,6 +917,7 @@ var HiveViewModel = function (initial) {
         }
         else {
           self.roles.removeAll();
+          self.originalRoles.removeAll();
           var _roles = [];
           var _originalRoles = [];
           $.each(data.roles, function (index, item) {
