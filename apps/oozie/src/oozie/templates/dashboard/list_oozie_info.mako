@@ -123,6 +123,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
         </form>
         <ul class="nav nav-pills">
         % for obj in metrics:
+          % if obj != 'version':
           <li
             % if loop.first:
                 class="active"
@@ -130,10 +131,12 @@ ${ layout.menubar(section='oozie', dashboard=True) }
           >
           <a href="#metrics${ obj }" data-toggle="tab">${ obj }</a>
           </li>
+          % endif
         % endfor
         </ul>
         <div class="tab-content">
         % for obj in metrics:
+          % if obj != 'version':
             <div class="tab-pane
             % if loop.first:
               active
@@ -141,7 +144,8 @@ ${ layout.menubar(section='oozie', dashboard=True) }
             " id="metrics${obj}">
                 ${recurse(metrics[obj])}
             </div>
-          % endfor
+          % endif
+        % endfor
         </div>
 
     </div>
