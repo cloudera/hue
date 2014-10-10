@@ -589,8 +589,8 @@ class DocumentPermission(models.Model):
 
 
 class Document2Manager(models.Manager):
-  def get_by_natural_key(self, uuid):
-    return self.get(uuid=uuid)
+  def get_by_natural_key(self, uuid, version, is_history):
+    return self.get(uuid=uuid, version=version, is_history=is_history)
 
 
 def uuid_default():
@@ -618,7 +618,7 @@ class Document2(models.Model):
   unique_together = ('uuid', 'version', 'is_history')
   
   def natural_key(self):
-    return (self.uuid,)
+    return (self.uuid, self.version, self.is_history)
   
   @property
   def data_dict(self):

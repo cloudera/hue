@@ -127,7 +127,8 @@ var Query = function (vm, query) {
 
 var Dashboard = function (vm, dashboard) { 
   var self = this;
-  
+
+  self.id = ko.mapping.fromJS(dashboard.id);
   self.facets = ko.mapping.fromJS(dashboard.facets);
   self.properties = ko.mapping.fromJS(dashboard.properties);
 
@@ -351,7 +352,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_jso
           "layout": ko.mapping.toJSON(self.columns)
       }, function (data) {
         if (data.status == 0) {
-          self.collection.id = data.id;
+          self.dashboard.id(data.id);
           $(document).trigger("info", data.message);
           if (window.location.search.indexOf("dashboard") == -1) {
             window.location.hash = '#dashboard=' + data.id;
