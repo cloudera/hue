@@ -49,7 +49,11 @@ def SearchDataAdapter(results, format, collection):
   """
   if results and results['response'] and results['response']['docs']:
     search_data = results['response']['docs']
-    headers = [field['name'] for field in collection['fields']]
+
+    if collection['template']['fieldsSelected']:
+      headers = collection['template']['fieldsSelected']
+    else:
+      headers = [field['name'] for field in collection['fields']]
 
     rows = []
 
