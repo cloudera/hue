@@ -322,9 +322,17 @@ body.modal-open {
   margin-left: 6px;
 }
 
+.facet-field-tile {
+  float: left;
+}
+
 .card-column.span2 .facet-field-label-fixed-width {
   text-align: left;
   width: auto;
+}
+
+.card-column.span2 .facet-field-label-title {
+  padding-left: 0;
 }
 
 .card-column.span2 .simpledaterangepicker .facet-field-label-fixed-width {
@@ -352,7 +360,36 @@ body.modal-open {
   margin-bottom: 0;
 }
 
+.card-column.span2 select {
+  width: 120px;
+}
 
-.facet-field-tile {
+.card-column.span2 .facet-field-tile {
+  float: none;
+}
+
+.responsive-facet-toggle-section {
+  margin-bottom: 20px;
+}
+
+.floating-facet-toggle-section {
+  margin-bottom: 20px;
   float: left;
+  margin-right: 20px;
+}
+
+@media (min-width: 1360px) {
+  .responsive-facet-toggle-section {
+    margin-bottom: 20px;
+    float: left;
+    margin-right: 20px;
+  }
+}
+
+.dimensions-header {
+  border-bottom: none;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 3px;
 }
