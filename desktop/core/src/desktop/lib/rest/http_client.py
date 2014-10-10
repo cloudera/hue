@@ -107,6 +107,10 @@ class HttpClient(object):
   def logger(self):
     return self._logger
 
+  def set_verify(self, verify=True):
+    self._session.verify = verify
+    return self
+      
   def _get_headers(self, headers):
     if headers:
       self._session.headers.update(headers)
