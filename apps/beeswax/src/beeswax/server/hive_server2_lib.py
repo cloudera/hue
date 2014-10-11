@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from itertools import imap
 
 import logging
 import re
@@ -590,6 +591,15 @@ class HiveServerClient:
     return res, schema
 
 
+  def fetch_log(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
+    req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation,
+                           maxRows=max_rows, fetchType=1)
+    res = self.call(self._client.FetchResults, req)
+
+    lines = imap(lambda r: r.colVals[0].stringVal.value, res.results.rows)
+    return '\n'.join(lines)
+
+
   def get_operation_status(self, operation_handle):
     req = TGetOperationStatusReq(operationHandle=operation_handle)
     return self.call(self._client.GetOperationStatus, req)
@@ -759,9 +769,18 @@ class HiveServerClientCompatible(object):
     return 'Does not exist in HS2'
 
 
-  def get_log(self, handle):
+  def get_log(self, handle, start_over=True):
     operationHandle = handle.get_rpc_handle()
-    return self._client.get_log(operationHandle)
+
+    if beeswax_conf.USE_GET_LOG_API.get() or self.query_server['server_name'] == 'impala':
+      return self._client.get_log(operationHandle)
+    else:
+      if start_over:
+        orientation = TFetchOrientation.FETCH_FIRST
+      else:
+        orientation = TFetchOrientation.FETCH_NEXT
+
+      return self._client.fetch_log(operationHandle, orientation=orientation, max_rows=-1)
 
 
   def get_databases(self):

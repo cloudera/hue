@@ -2637,6 +2637,11 @@ function setupCodeMirrorSubscription() {
 
 // Knockout
 viewModel = new BeeswaxViewModel("${app_name}");
+
+% if not beeswax_conf.USE_GET_LOG_API.get() and app_name != 'impala':
+  viewModel.shouldAppendLogs = true;
+% endif
+
 % if query_history:
   loadQueryHistory(${query_history.id});
 % elif design.id:

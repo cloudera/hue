@@ -60,6 +60,14 @@ SERVER_CONN_TIMEOUT = Config(
   type=int,
   help=_t('Timeout in seconds for Thrift calls.'))
 
+USE_GET_LOG_API = Config(
+  key='use_get_log_api',
+  default=True,
+  type=coerce_bool,
+  help=_t('Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.'
+          'If false, Hue will use the FetchResults() thrift call instead.')
+)
+
 BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   key='browse_partitioned_table_limit',
   default=250,

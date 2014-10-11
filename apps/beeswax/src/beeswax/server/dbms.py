@@ -338,8 +338,8 @@ class HiveServer2Dbms(object):
     return self.client.use(query)
 
 
-  def get_log(self, query_handle):
-    return self.client.get_log(query_handle)
+  def get_log(self, query_handle, start_over=True):
+    return self.client.get_log(query_handle, start_over)
 
 
   def get_state(self, handle):

@@ -731,6 +731,10 @@
   # Timeout in seconds for thrift calls to Hive service
   ## server_conn_timeout=120
 
+  # Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.
+  # If false, Hue will use the FetchResults() thrift call instead.
+  ## use_get_log_api=true
+
   # Set a LIMIT clause when browsing a partitioned table.
   # A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.
   ## browse_partitioned_table_limit=250
