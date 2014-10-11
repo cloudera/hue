@@ -1324,11 +1324,25 @@ from django.utils.translation import ugettext as _
           $('.hoverMsg').addClass('hide');
         };
 
-        var _isDraggingOverText = false;
+        var _isDraggingOverText = false,
+          // determine if the item dragged originated outside DOM
+          _isExternalFile = true;
+
+        $('body').on('dragstart', function (e) {
+          // External files being dragged into the DOM won't have a dragstart event
+          _isExternalFile = false;
+        });
+
+        $('body').on('dragend', function (e) {
+          _isExternalFile = true;
+        });
 
         $('.card').on('dragenter', function (e) {
           e.preventDefault();
-          showHoverMsg("${_('Drop files here to upload')}");
+
+          if (_isExternalFile) {
+            showHoverMsg("${_('Drop files here to upload')}");
+          }
         });
 
         $('.hoverText').on('dragenter', function (e) {
@@ -1343,6 +1357,7 @@ from django.utils.translation import ugettext as _
           e.stopPropagation();
           e.stopImmediatePropagation();
           _isDraggingOverText = false;
+          _isExternalFile = true;
         });
 
         $('.hoverMsg').on('dragleave', function (e) {
