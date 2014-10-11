@@ -560,7 +560,8 @@ function BeeswaxViewModel(server) {
   self.watchQuery = function() {
     var data = {
       'query-query': self.design.query.value(),
-      'query-database': self.database()
+      'query-database': self.database(),
+      'log-start-over': self.design.watch.logs().length == 0
     };
     $.extend(data, self.getSettingsFormData());
     $.extend(data, self.getFileResourcesFormData());
@@ -589,6 +590,17 @@ function BeeswaxViewModel(server) {
     $.ajax(request);
   };
 
+  self.shouldAppendLogs = false;
+
+  self.applyLogs = function(log) {
+    var lines = log.split("\n")
+
+    if (self.shouldAppendLogs) {
+      lines = self.design.watch.logs().concat(lines);
+    }
+    self.design.watch.logs(lines);
+  };
+
   self.watchQueryLoop = function(fn) {
     var TIMEOUT = 100;
     var timer = null;
@@ -607,7 +619,7 @@ function BeeswaxViewModel(server) {
           clearTimeout(timer);
           self.design.isRunning(false);
           if (data.log) {
-            self.design.watch.logs(data.log.split("\n"));
+            self.applyLogs(data.log)
             // scroll logs
             self.design.watch.jobUrls(data.jobUrls);
           }
@@ -623,7 +635,7 @@ function BeeswaxViewModel(server) {
         } else {
           self.design.statement(data.statement); // In case new no result statement executed
           if (data.log) {
-            self.design.watch.logs(data.log.split("\n"));
+            self.applyLogs(data.log)
             // scroll logs
             self.design.watch.jobUrls(data.jobUrls);
           }

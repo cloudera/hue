@@ -172,7 +172,8 @@ def watch_query_refresh_json(request, id):
     handle, state = _get_query_handle_and_state(query_history)
 
   try:
-    log = db.get_log(handle)
+    start_over = request.POST.get('log-start-over') == 'true'
+    log = db.get_log(handle, start_over=start_over)
   except Exception, ex:
     log = str(ex)
 
