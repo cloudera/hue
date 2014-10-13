@@ -174,9 +174,9 @@ var Dashboard = function (vm, dashboard) {
   self.resultsetFieldsFilter = ko.observable(""); // For UI
 
   self.resultsetSelectedFields = ko.observableArray(self.fieldNames());
-  self.resultsetSelectedFields.subscribe(function(value) {
+  /**self.resultsetSelectedFields.subscribe(function(value) {
     vm.search();
-  });
+  });*/
 
   self.resultsetFilteredFields = ko.computed(function() {
     var _fields = [];
@@ -251,7 +251,7 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_jso
     loadLayout(self, dashboard_json.layout);
 
     self.query = new Query(self, query_json);
-    self.dashboard = new Dashboard(self, dashboard_json);
+    self.dashboard = new Dashboard(self, dashboard_json.dashboard);
     self.initial = initial_json;
 
     self.results = ko.observableArray([]);
