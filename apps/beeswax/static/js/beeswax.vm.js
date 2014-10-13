@@ -501,6 +501,9 @@ function BeeswaxViewModel(server) {
         self.design.errors.removeAll();
         self.design.watch.errors.removeAll();
         if (data.status == 0) {
+          if (typeof history.pushState != 'undefined') {
+            history.pushState(null, null, '/beeswax/execute/query/' + data.id + '#query/logs');
+          }
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
