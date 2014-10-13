@@ -993,17 +993,23 @@ ${ dashboard.layout_skeleton() }
         &nbsp;
       </div>
       <div class="content">
+        <strong>${_('selected')}</strong>
         <span data-bind="foreach: $data.properties" style="font-weight: normal">
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && ! f.exclude() }).length > 0 -->
+          <span class="label label-info">
             <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
             <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+          </span>
           <!-- /ko -->
         </span>
         <br/>
-        <span data-bind="foreach: $data.properties" style="font-weight: normal"  class="excluded">
+        <strong>${_('excluded')}</strong>
+        <span data-bind="foreach: $data.properties" style="font-weight: normal" class="excluded">
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && f.exclude() }).length > 0 -->
+          <span class="label label-important">
             <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
             <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+          </span>
           <!-- /ko -->
         </span>
       </div>
