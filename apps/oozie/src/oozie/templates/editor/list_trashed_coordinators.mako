@@ -96,6 +96,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div id="purge-job" class="modal hide">
   <form id="purgeForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="purgeMessage">${ _('Delete all coordinator(s)?') }</h3>
@@ -113,6 +114,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div id="destroy-job" class="modal hide">
   <form id="purgeForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="purgeMessage">${ _('Delete the selected coordinator(s)?') }</h3>
@@ -130,6 +132,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div id="restore-job" class="modal hide">
   <form id="restoreWfForm" action="${ url('oozie:restore_coordinator') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="restoreWfMessage">${ _('Restore the selected coordinator(s)?') }</h3>

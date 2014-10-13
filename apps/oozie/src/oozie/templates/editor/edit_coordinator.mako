@@ -87,6 +87,7 @@ ${ layout.menubar(section='coordinators') }
       <div class="card card-small">
         <h1 class="card-heading simple">${ _('Coordinator Editor : ') } ${ coordinator.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
+      ${ csrf_token(request) | n,unicode }
       <div id="properties" class="section">
         <ul class="nav nav-pills">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: General') }</a></li>

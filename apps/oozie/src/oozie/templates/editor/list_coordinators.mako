@@ -136,6 +136,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div id="trash-job" class="modal hide">
   <form id="trashForm" action="${ url('oozie:delete_coordinator') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="trashMessage">${ _('Move the selected coordinator(s) to trash?') }</h3>
@@ -152,6 +153,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div id="destroy-job" class="modal hide">
   <form id="destroyForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="destroyMessage">${ _('Delete the selected coordinator(s)?') }</h3>

@@ -44,6 +44,7 @@ ${ layout.menubar(section='workflows') }
           <div class="card-body">
             <p>
               <form class="form-horizontal" id="workflowForm" action="${ url('oozie:create_workflow') }" method="POST">
+                ${ csrf_token(request) | n,unicode }
               <fieldset>
               ${ utils.render_field(workflow_form['name']) }
               ${ utils.render_field(workflow_form['description']) }

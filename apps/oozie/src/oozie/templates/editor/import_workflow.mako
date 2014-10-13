@@ -39,7 +39,7 @@ ${ layout.menubar(section='workflows') }
 
     <div style="min-height:300px">
       <form class="form-horizontal" id="workflowForm" action="${ url('oozie:import_workflow') }" method="POST" enctype="multipart/form-data">
-
+      ${ csrf_token(request) | n,unicode }
       <div class="row-fluid">
         <div class="span12">
           <fieldset>
