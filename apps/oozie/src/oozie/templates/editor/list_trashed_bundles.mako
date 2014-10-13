@@ -96,6 +96,7 @@ ${ layout.menubar(section='bundles') }
 
 <div id="purge-job" class="modal hide">
   <form id="purgeForm" action="${ url('oozie:delete_bundle') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="purgefMessage">${ _('Delete all bundle(s)?') }</h3>
@@ -112,6 +113,7 @@ ${ layout.menubar(section='bundles') }
 
 <div id="destroy-job" class="modal hide">
   <form id="destroyForm" action="${ url('oozie:delete_bundle') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="destroyMessage">${ _('Delete the selected bundle(s)?') }</h3>
@@ -128,6 +130,7 @@ ${ layout.menubar(section='bundles') }
 
 <div id="restore-job" class="modal hide">
   <form id="restoreForm" action="${ url('oozie:restore_bundle') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="restoreMessage">${ _('Restore the selected bundle(s)?') }</h3>

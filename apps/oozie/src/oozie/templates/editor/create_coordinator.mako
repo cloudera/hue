@@ -64,7 +64,7 @@ ${ layout.menubar(section='coordinators') }
         <li><a href="#step5" class="step">${ _('Step 5: Advanced settings') }</a></li>
       </ul>
       <form class="form-horizontal" action="${ url('oozie:create_coordinator') }" method="POST">
-
+        ${ csrf_token(request) | n,unicode }
         <div class="steps">
 
           <div id="step1" class="stepDetails">

@@ -89,7 +89,7 @@ ${ layout.menubar(section='bundles') }
       <div class="card card-small">
       <h1 class="card-heading simple">${ _('Bundle Editor : ') } ${ bundle.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_bundle', bundle=bundle.id) }" method="POST">
-
+        ${ csrf_token(request) | n,unicode }
       <div id="properties" class="section">
         <ul class="nav nav-pills">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: General') }</a></li>

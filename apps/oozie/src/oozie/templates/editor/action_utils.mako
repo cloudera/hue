@@ -28,6 +28,7 @@
 % endif
   <div data-bind="with: context().node">
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
+      ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close">&times;</a>
         <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>

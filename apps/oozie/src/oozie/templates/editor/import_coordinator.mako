@@ -39,6 +39,7 @@ ${ layout.menubar(section='coordinators') }
 
     <div style="min-height:300px">
       <form class="form-horizontal" id="coordinatorForm" action="${ url('oozie:import_coordinator') }" method="POST" enctype="multipart/form-data">
+        ${ csrf_token(request) | n,unicode }
         <div class="row-fluid">
           <div class="span12">
             <fieldset>
