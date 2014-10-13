@@ -42,7 +42,7 @@ def dashboard(request):
   dashboard_id = request.GET.get('dashboard')
   
   if dashboard_id:
-    dashboard = Dashboard(data=Document2.objects.get(id=dashboard_id).data)
+    dashboard = Dashboard(document=Document2.objects.get(id=dashboard_id))
   else:
     dashboard = Dashboard()
 
@@ -99,6 +99,7 @@ def query(request):
     fields = [fq['field'] for fq in fqs]
     result['selected'] = facet['field'] in fields
   else:
+    dashboard['resultsetSelectedFields'] = map(lambda f: '`%s`' % f if f in ('date',) else f, dashboard['resultsetSelectedFields'])
     fields = ', '.join(dashboard['resultsetSelectedFields']) if dashboard['resultsetSelectedFields'] else '*'
     hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
         'database': database, 
@@ -158,9 +159,12 @@ def new_search(request):
   return render('dashboard.mako', request, {
     'query_json': json.dumps({}),
     'dashboard_json': json.dumps({
+      'id': None,
       'layout': [],
-      'facets': [],
-      'properties': [{'database': '', 'table': '', 'fields': []}]
+      'dashboard': {
+          'facets': [],
+          'properties': [{'database': '', 'table': '', 'fields': []}]
+        }
       }),
      'initial_json': json.dumps({
         'layout': [
@@ -181,14 +185,16 @@ def save(request):
   layout = json.loads(request.POST.get('layout', '{}'))
 
   if dashboard:
+    name = '%s.%s' % (dashboard['properties'][0]['database'], dashboard['properties'][0]['table']) # Dynamic currently
+
     if dashboard.get('id'):
       dashboard_doc = Document2.objects.get(id=dashboard['id'])
-    else:
-      dashboard['name'] = '%s.%s' % (dashboard['properties'][0]['database'], dashboard['properties'][0]['table'])
-      dashboard_doc = Document2.objects.create(name=dashboard['name'], type='impala-dashboard', owner=request.user)
+    else:      
+      dashboard_doc = Document2.objects.create(name=name, type='impala-dashboard', owner=request.user)
+
     dashboard_doc.update_data({'dashboard': dashboard})
     dashboard_doc.update_data({'layout': layout})
-    dashboard_doc.name = dashboard['name']
+    dashboard_doc.name = name
     dashboard_doc.save()
     response['status'] = 0
     response['id'] = dashboard_doc.id
