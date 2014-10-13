@@ -607,7 +607,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   }
 
   function trySaveQuery() {
-    var query = getHighlightedQuery() || codeMirror.getValue();
+    var query = codeMirror.getValue();
     viewModel.query.query(query);
     if (viewModel.query.id() && viewModel.query.id() != -1) {
       viewModel.saveQuery();
