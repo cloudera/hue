@@ -105,6 +105,7 @@ class Job(object):
     setattr(self, 'desiredMaps', None)
     setattr(self, 'finishedReduces', self.reducesCompleted)
     setattr(self, 'desiredReduces', None)
+    setattr(self, 'applicationType', None)
 
   def kill(self):
     return self.api.kill(self.id)

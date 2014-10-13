@@ -26,7 +26,6 @@
   from django.template.defaultfilters import urlencode
   from django.utils.translation import ugettext as _
 %>
-
 <%def name="task_table(dom_id, tasks)">
     <table id="${ dom_id }" class="taskTable table table-condensed">
         <thead>
@@ -101,6 +100,48 @@ ${ comps.menubar() }
   %endif
 </style>
 
+% if job.applicationType == 'SPARK':
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav" style="padding-top: 0">
+        <ul class="nav nav-list">
+          <li class="nav-header">${_('Job ID')}</li>
+          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="nav-header">${_('User')}</li>
+          <li class="white">${job.user}</li>
+          <li class="nav-header">${_('Status')}</li>
+          <li class="white" id="jobStatus">&nbsp;</li>
+          <li class="nav-header">${_('Logs')}</li>
+          <li><a href="${job.trackingUrl }" target="_blank"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
+          % if not job.is_retired:
+          <li class="nav-header">${_('Maps')}</li>
+          <li class="white" id="jobMaps">&nbsp;</li>
+          <li class="nav-header">${_('Reduces')}</li>
+          <li class="white" id="jobReduces">&nbsp;</li>
+          % endif
+          <li class="nav-header">${_('Duration')}</li>
+          <li class="white">${job.durationFormatted}</li>
+          <li class="nav-header killJob">${_('Actions')}</li>
+          <li id="killJobContainer" class="white killJob"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span10">
+      <div class="card card-small">
+        <h1 class="card-heading simple">${_(job.name)}</h1>
+        <div class="card-body">
+          <p>
+            <a href="${job.trackingUrl}" id="tracking-link" target="_blank">${_('Go to spark job list at %s' % job.trackingUrl)}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+% else:
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -147,7 +188,7 @@ ${ comps.menubar() }
     </div>
     <div class="span10">
       <div class="card card-small">
-        <h1 class="card-heading simple">${_('Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
+        <h1 class="card-heading simple">${_(job.name)}</h1>
           <div class="card-body">
             <p>
               <ul class="nav nav-tabs">
@@ -308,6 +349,7 @@ ${ comps.menubar() }
     </div>
   </div>
 </div>
+% endif
 
 
 <div id="killModal" class="modal hide fade">
@@ -396,8 +438,10 @@ $(document).ready(function () {
     $.getJSON("?format=json", function (data) {
       if (data != null && data.job != null) {
         updateJob(data.job);
-        updateFailedTasks(data.failedTasks);
-        updateRecentTasks(data.recentTasks);
+        if (data.applicationType != 'SPARK') {
+          updateFailedTasks(data.failedTasks);
+          updateRecentTasks(data.recentTasks);
+        }
       }
       isUpdating = false;
     });
@@ -545,6 +589,5 @@ $(document).ready(function () {
   $("a[data-row-selector='true']").jHueRowSelector();
 });
 </script>
-
 
 ${ commonfooter(messages) | n,unicode }

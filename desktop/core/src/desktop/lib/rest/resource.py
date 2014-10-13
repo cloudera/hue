@@ -78,7 +78,6 @@ class Resource(object):
 
     return self._format_response(resp)
 
-
   def get(self, relpath=None, params=None, headers=None):
     """
     Invoke the GET method on a resource.
@@ -107,7 +106,7 @@ class Resource(object):
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
-    @param contenttype: Optional. 
+    @param contenttype: Optional.
 
     @return: A dictionary of the JSON result.
     """
@@ -121,7 +120,7 @@ class Resource(object):
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
-    @param contenttype: Optional. 
+    @param contenttype: Optional.
 
     @return: A dictionary of the JSON result.
     """
