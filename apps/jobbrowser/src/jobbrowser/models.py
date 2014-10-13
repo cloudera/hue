@@ -77,7 +77,6 @@ class JobLinkage(object):
                     self._jobtracker.thrifttaskid_from_string(task_id))
     return Task(ttask, self._jobtracker)
 
-
 class Job(JobLinkage):
   """
   Creates a Job instance pulled from the job tracker Thrift interface.
@@ -132,6 +131,7 @@ class Job(JobLinkage):
     self._init_attributes()
     self.is_retired = hasattr(thriftJob, 'is_retired')
     self.is_mr2 = False
+    self.applicationType = thriftJob['applicationType']
 
   @property
   def counters(self):
