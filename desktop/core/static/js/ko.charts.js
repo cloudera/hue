@@ -523,6 +523,9 @@ function barChartBuilder(element, options, isTimeline) {
           });
         }
       }
+      if ($(element).width() < 300 && typeof _chart.showLegend != "undefined"){
+        _chart.showLegend(false);
+      }
       _chart.transitionDuration(0);
 
       _chart.yAxis
