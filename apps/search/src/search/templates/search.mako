@@ -852,7 +852,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div class="dimensions-header margin-bottom-10">
+      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
         <span class="muted">${ _('Selected dimensions') }</span>
       </div>
       <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
@@ -921,7 +921,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div class="dimensions-header margin-bottom-10">
+      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
         <span class="muted">${ _('Selected dimension') }</span>
       </div>
       <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">

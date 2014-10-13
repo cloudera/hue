@@ -195,36 +195,38 @@ nv.models.growingPie = function() {
 
           pieLabels.enter().append("g").classed("nv-label",true)
             .each(function(d,i) {
-                var group = d3.select(this);
+                if (d.value > 0) {
+                  var group = d3.select(this);
 
-                group
-                  .attr('transform', function(d) {
-                       if (labelSunbeamLayout) {
-                         d.outerRadius = arcRadius + 10; // Set Outer Coordinate
-                         d.innerRadius = arcRadius + 15; // Set Inner Coordinate
-                         var rotateAngle = (d.startAngle + d.endAngle) / 2 * (180 / Math.PI);
-                         if ((d.startAngle+d.endAngle)/2 < Math.PI) {
-                           rotateAngle -= 90;
+                  group
+                    .attr('transform', function(d) {
+                         if (labelSunbeamLayout) {
+                           d.outerRadius = arcRadius + 10; // Set Outer Coordinate
+                           d.innerRadius = arcRadius + 15; // Set Inner Coordinate
+                           var rotateAngle = (d.startAngle + d.endAngle) / 2 * (180 / Math.PI);
+                           if ((d.startAngle+d.endAngle)/2 < Math.PI) {
+                             rotateAngle -= 90;
+                           } else {
+                             rotateAngle += 90;
+                           }
+                           return 'translate(' + labelsArc.centroid(d) + ') rotate(' + rotateAngle + ')';
                          } else {
-                           rotateAngle += 90;
+                           d.outerRadius = radius + 10; // Set Outer Coordinate
+                           d.innerRadius = radius + 15; // Set Inner Coordinate
+                           return 'translate(' + labelsArc.centroid(d) + ')'
                          }
-                         return 'translate(' + labelsArc.centroid(d) + ') rotate(' + rotateAngle + ')';
-                       } else {
-                         d.outerRadius = radius + 10; // Set Outer Coordinate
-                         d.innerRadius = radius + 15; // Set Inner Coordinate
-                         return 'translate(' + labelsArc.centroid(d) + ')'
-                       }
-                  });
+                    });
 
-                group.append('rect')
-                    .style('stroke', '#fff')
-                    .style('fill', '#fff')
-                    .attr("rx", 3)
-                    .attr("ry", 3);
+                  group.append('rect')
+                      .style('stroke', '#fff')
+                      .style('fill', '#fff')
+                      .attr("rx", 3)
+                      .attr("ry", 3);
 
-                group.append('text')
-                    .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
-                    .style('fill', '#000')
+                  group.append('text')
+                      .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
+                      .style('fill', '#000')
+                }
 
             });
 
@@ -237,6 +239,7 @@ nv.models.growingPie = function() {
           };
           pieLabels.transition()
                 .attr('transform', function(d) {
+                if (d.value > 0) {
                   if (labelSunbeamLayout) {
                       d.outerRadius = arcRadius + 10; // Set Outer Coordinate
                       d.innerRadius = arcRadius + 15; // Set Inner Coordinate
@@ -264,17 +267,32 @@ nv.models.growingPie = function() {
                       labelLocationHash[createHashKey(center)] = true;
                       return 'translate(' + center + ')'
                     }
+                  }
                 });
           pieLabels.select(".nv-label text")
-                .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
+                .style('text-anchor', function(d){
+                  if (d.value > 0) {
+                    if (labelSunbeamLayout) {
+                      return ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end'); //center the text on it's origin or begin/end if orthogonal aligned
+                    }
+                    else {
+                       return 'middle';
+                    }
+                  }
+                })
                 .text(function(d, i) {
-                  var percent = (d.endAngle - d.startAngle) / (2 * Math.PI);
-                  var labelTypes = {
-                    "key" : getX(d.data),
-                    "value": getY(d.data),
-                    "percent": d3.format('%')(percent)
-                  };
-                  return (d.value && percent > labelThreshold) ? labelTypes[labelType] : '';
+                  if (d.value > 0) {
+                    var percent = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                    var labelTypes = {
+                      "key": getX(d.data),
+                      "value": getY(d.data),
+                      "percent": d3.format('%')(percent)
+                    };
+                    return (d.value && percent > labelThreshold) ? labelTypes[labelType] : '';
+                  }
+                  else {
+                    return '';
+                  }
                 });
         }
 

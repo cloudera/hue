@@ -268,7 +268,6 @@ nv.models.multiBarWithBrushChart = function() {
 
       selectBars = multibar.selectBars;
 
-
       var dataBars = data.filter(function(d) { return !d.disabled && d.bar });
       var barsWrap = g.select('.nv-barsWrap')
           .datum(data.filter(function(d) { return !d.disabled }))
@@ -685,7 +684,9 @@ nv.models.multiBarWithBrushChart = function() {
 
   chart.selectBars = function(args) {
     if (!arguments.length) return selectBars;
-    selectBars(args);
+    if (selectBars) {
+      selectBars(args);
+    }
     return chart;
   };
 

@@ -543,21 +543,23 @@ function barChartBuilder(element, options, isTimeline) {
             }
           }).call(_chart);
 
-      $.each(options.fqs(), function (cnt, item) {
-        if (item.field() == options.field) {
-          _chart.selectBars($.map(item.filter(), function (it) {
-            return it.value();
-          }));
-        }
-        if (item.field().indexOf(":") > -1) {
-          _chart.selectBars({
-            field: item.field(),
-            selected: $.map(item.filter(), function (it) {
+      if (_chart.selectBars) {
+        $.each(options.fqs(), function (cnt, item) {
+          if (item.field() == options.field) {
+            _chart.selectBars($.map(item.filter(), function (it) {
               return it.value();
-            })
-          });
-        }
-      });
+            }));
+          }
+          if (item.field().indexOf(":") > -1) {
+            _chart.selectBars({
+              field: item.field(),
+              selected: $.map(item.filter(), function (it) {
+                return it.value();
+              })
+            });
+          }
+        });
+      }
 
       nv.utils.windowResize(_chart.update);
 
