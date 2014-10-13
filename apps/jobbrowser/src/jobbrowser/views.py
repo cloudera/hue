@@ -127,6 +127,7 @@ def massage_job_for_json(job, request):
     'cleanupProgress': hasattr(job, 'cleanupProgress') and job.cleanupProgress or '',
     'desiredMaps': job.desiredMaps,
     'desiredReduces': job.desiredReduces,
+    'applicationType': job.applicationType,
     'mapsPercentComplete': int(job.maps_percent_complete) if job.maps_percent_complete else '',
     'finishedMaps': job.finishedMaps,
     'finishedReduces': job.finishedReduces,
@@ -157,10 +158,25 @@ def massage_task_for_json(task):
   return task
 
 
+def single_spark_job(request, job):
+  if request.REQUEST.get('format') == 'json':
+    json_job = {
+      'job': massage_job_for_json(job, request)
+    }
+    return HttpResponse(encode_json_for_js(json_job), mimetype="application/json")
+  else:
+    return render('job.mako', request, {
+      'request': request,
+      'job': job
+    })
+
 @check_job_permission
 def single_job(request, job):
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
+
+  if job.applicationType == 'SPARK':
+    return single_spark_job(request, job)
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
   failed_tasks.sort(cmp_exec_time)
