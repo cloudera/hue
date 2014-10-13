@@ -2057,7 +2057,7 @@ $(document).on('error.query', function () {
 
 // Save
 function trySaveDesign() {
-  var query = getHighlightedQuery() || codeMirror.getValue();
+  var query = codeMirror.getValue();
   viewModel.design.query.value(query);
   if (viewModel.design.id() && viewModel.design.id() != -1) {
     viewModel.saveDesign();
