@@ -131,7 +131,7 @@ class Job(JobLinkage):
     self._init_attributes()
     self.is_retired = hasattr(thriftJob, 'is_retired')
     self.is_mr2 = False
-    self.applicationType = thriftJob['applicationType']
+    self.applicationType = 'MR2'
 
   @property
   def counters(self):
