@@ -426,6 +426,7 @@ function barChartBuilder(element, options, isTimeline) {
   $(element).height(300);
 
   var _isPivot = options.isPivot != null ? options.isPivot : false;
+  var _hideSelection = options.hideSelection != null ? options.hideSelection : false;
 
   if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
     $(element).find("svg").empty();
@@ -508,7 +509,7 @@ function barChartBuilder(element, options, isTimeline) {
             _chart.enableSelection();
           }
 
-          if (_isPivot) {
+          if (_isPivot || _hideSelection) {
             _chart.hideSelection();
           }
           else {
