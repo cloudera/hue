@@ -540,8 +540,16 @@ def augment_solr_response(response, collection, query):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
-        if id_field in doc and doc[id_field] in highlighted_fields:
-          doc.update(response['highlighting'][doc[id_field]])
+        if id_field in doc and str(doc[id_field]) in highlighted_fields:
+          highlighting = response['highlighting'][str(doc[id_field])]
+
+          if highlighting:
+            escaped_highlighting = {}
+            for field, hls in highlighting.iteritems():
+              _hls = [escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>') for hl in hls]
+              escaped_highlighting[field] = _hls
+  
+            doc.update(escaped_highlighting)
     else:
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
 
