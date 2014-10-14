@@ -54,7 +54,7 @@ struct TSentryAuthorizable {
 """
 
 class SentryClient(object):
-  SENTRY_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NOSASL': 'NOSASL'}
+  SENTRY_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NOSASL': 'NOSASL', 'NONE': 'NONE'}
 
   def __init__(self, host, port, username):
     self.username = username
