@@ -60,7 +60,7 @@ def check_job_permission(view_func):
       # reverse() seems broken, using request.path but beware, it discards GET and POST info
       return job_not_assigned(request, jobid, request.path)
     except Exception, e:
-      raise PopupException(_('Could not find job %s.') % jobid, detail=e)
+       raise PopupException(_('Could not find job %s.') % jobid, detail=e)
 
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
