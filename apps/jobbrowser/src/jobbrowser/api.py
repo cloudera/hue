@@ -264,7 +264,7 @@ class YarnApi(JobBrowserApi):
       elif job['state'] == 'KILLED':
         return KilledYarnJob(self.resource_manager_api, job)
 
-      if job['applicationType'] == 'SPARK':
+      if job.get('applicationType') == 'SPARK':
         job = SparkJob(job)
       else:
         # MR id, assume 'applicationType': 'MAPREDUCE'

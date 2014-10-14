@@ -127,7 +127,7 @@ def massage_job_for_json(job, request):
     'cleanupProgress': hasattr(job, 'cleanupProgress') and job.cleanupProgress or '',
     'desiredMaps': job.desiredMaps,
     'desiredReduces': job.desiredReduces,
-    'applicationType': job.applicationType,
+    'applicationType': hasattr(job, 'applicationType') and job.applicationType or None,
     'mapsPercentComplete': int(job.maps_percent_complete) if job.maps_percent_complete else '',
     'finishedMaps': job.finishedMaps,
     'finishedReduces': job.finishedReduces,
