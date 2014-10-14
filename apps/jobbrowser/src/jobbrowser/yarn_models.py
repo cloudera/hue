@@ -19,6 +19,7 @@ import logging
 import re
 import time
 import urlparse
+import urllib2
 
 from lxml import html
 
@@ -35,7 +36,7 @@ from jobbrowser.models import format_unixtime_ms
 LOGGER = logging.getLogger(__name__)
 
 
-class Application:
+class Application(object):
 
   def __init__(self, attrs):
     for attr in attrs.keys():
@@ -65,6 +66,7 @@ class Application:
     setattr(self, 'durationInMillis', finishTime - self.startedTime)
     setattr(self, 'startTimeMs', self.startedTime)
     setattr(self, 'startTimeFormatted',  format_unixtime_ms(self.startedTime))
+    setattr(self, 'finishTimeFormatted',  format_unixtime_ms(finishTime))
     setattr(self, 'finishedMaps', None)
     setattr(self, 'desiredMaps', None)
     setattr(self, 'finishedReduces', None)
@@ -73,6 +75,44 @@ class Application:
 
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
+
+class SparkJob(Application):
+
+  def __init__(self, job):
+    super(SparkJob, self).__init__(job)
+    self._scrape()
+
+  def _history_application_metrics(self, html_doc):
+    metrics = []
+    root = html.fromstring(html_doc)
+    tables = root.findall('.//table')
+    metrics_table = tables[2].findall('.//tr')
+    for tr in metrics_table:
+        header = tr.find('.//th')
+        value = tr.findall('.//td')
+        if value:
+          header = header.text.strip().replace(':', '')
+          value = value[0].text.strip()
+          metrics.append({
+            'header': header,
+            'value': value
+          })
+    return metrics
+
+  def _scrape(self):
+    # XXX: we have to scrape the tracking URL directly because
+    # spark jobs don't have a JSON api via YARN or app server
+    # see YARN-1530, SPARK-1537 for progress on these apis
+    self.scrapedData = {}
+    try:
+      res = urllib2.urlopen(self.trackingUrl)
+      html_doc = res.read()
+      if self.trackingUI == 'History':
+        self.scrapedData['metrics'] = self._history_application_metrics(html_doc)
+    except Exception, e:
+      # Prevent a nosedive. Don't create metrics if api changes or url is unreachable.
+      self.scrapedData['metrics'] = []
+
 
 class Job(object):
 
@@ -326,3 +366,4 @@ class Container:
     setattr(self, 'maxMapTasks', None)
     setattr(self, 'maxReduceTasks', None)
     setattr(self, 'taskReports', None)
+
