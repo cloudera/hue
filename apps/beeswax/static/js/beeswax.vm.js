@@ -74,6 +74,7 @@ function BeeswaxViewModel(server) {
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
   self.chartType = ko.observable("bars");
+  self.chartSorting = ko.observable("none");
   self.chartData = ko.observableArray();
 
   self.server = ko.observable(server);

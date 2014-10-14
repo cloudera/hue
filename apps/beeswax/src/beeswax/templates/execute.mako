@@ -429,7 +429,12 @@ ${layout.menubar(section='query')}
               </label>&nbsp;&nbsp;
               <label>${_('Y-Axis')}
               <select id="blueprintY" class="blueprintSelect"></select>
-              </label>
+              </label>&nbsp;
+              <div class="btn-group" data-toggle="buttons-radio">
+                <a rel="tooltip" data-placement="top" title="${_('No sorting')}" id="blueprintNoSort" href="javascript:void(0)" class="btn active"><i class="fa fa-align-left fa-rotate-270"></i></a>
+                <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" id="blueprintSortAsc" href="javascript:void(0)" class="btn"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+                <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" id="blueprintSortDesc" href="javascript:void(0)" class="btn"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+              </div>&nbsp;&nbsp;
             </span>
             <span id="blueprintLatLng" class="hide">
               <label>${_('Latitude')}
@@ -450,7 +455,7 @@ ${layout.menubar(section='query')}
               transformer: pieChartDataTransformer,
               maxWidth: 350 }, visible: $root.chartType() == 'pie'"></div>
 
-            <div id="barChart" data-bind="barChart: {datum: {counts: $root.chartData}, fqs: ko.observableArray([]),
+            <div id="barChart" data-bind="barChart: {datum: {counts: $root.chartData}, fqs: ko.observableArray([]), hideSelection: true,
                   transformer: barChartDataTransformer}, visible: $root.chartType() == 'bars'"></div>
 
             <div id="lineChart" data-bind="lineChart: {datum: {counts: $root.chartData},
@@ -1865,6 +1870,25 @@ $(document).ready(function () {
     generateGraph(ko.HUE_CHARTS.TYPES.MAP)
   });
 
+  $("#blueprintNoSort").on("click", function () {
+    viewModel.chartSorting("none");
+    redrawChart();
+  });
+
+  $("#blueprintSortAsc").on("click", function () {
+    viewModel.chartSorting("asc");
+    redrawChart();
+  });
+
+  $("#blueprintSortDesc").on("click", function () {
+    viewModel.chartSorting("desc");
+    redrawChart();
+  });
+
+  function redrawChart() {
+    generateGraph(viewModel.chartType());
+  }
+
   $("#log pre:eq(1)").scroll(function () {
     if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
       logsAtEnd = true;
@@ -2704,6 +2728,18 @@ function pieChartDataTransformer(data) {
       obj: item
     });
   });
+
+  if (viewModel.chartSorting() == "asc"){
+    _data.sort(function(a, b){
+      return a.value > b.value
+    });
+  }
+  if (viewModel.chartSorting() == "desc"){
+    _data.sort(function(a, b){
+      return b.value > a.value
+    });
+  }
+
   return _data;
 }
 
@@ -2734,6 +2770,18 @@ function barChartDataTransformer(rawDatum) {
       });
     }
   });
+
+  if (viewModel.chartSorting() == "asc"){
+    _data.sort(function(a, b){
+      return a.y > b.y
+    });
+  }
+  if (viewModel.chartSorting() == "desc"){
+    _data.sort(function(a, b){
+      return b.y > a.y
+    });
+  }
+
   _datum.push({
     key: $("#blueprintY option:selected").text(),
     values: _data
@@ -2763,6 +2811,18 @@ function lineChartDataTransformer(rawDatum) {
         });
       }
     });
+
+    if (viewModel.chartSorting() == "asc"){
+      _data.sort(function(a, b){
+        return a.y > b.y
+      });
+    }
+    if (viewModel.chartSorting() == "desc"){
+      _data.sort(function(a, b){
+        return b.y > a.y
+      });
+    }
+
     _datum.push({
       key: $("#blueprintY option:selected").text(),
       values: _data
