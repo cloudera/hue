@@ -15,10 +15,11 @@
 ## limitations under the License.
 <%!
   from desktop.lib.django_util import extract_field_data
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from beeswax import conf as beeswax_conf
   from impala import conf as impala_conf
   from django.utils.translation import ugettext as _
+
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
@@ -275,6 +276,8 @@ ${layout.menubar(section='query')}
             <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             % endif
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
+            <button data-bind="click: tryShareQuery, css: {'hide': !$root.design.id() || $root.design.id() == -1}"
+               type="button" id="shareQuery" class="btn" tabindex="2">${_('Share')}</button>
             <button data-bind="click: tryExplainQuery, visible: $root.canExecute" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
             &nbsp; ${_('or create a')} &nbsp;
             <button data-bind="click: createNewQuery" type="button" class="btn">${_('New query')}</button>
@@ -709,6 +712,7 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
+${ commonshare() | n,unicode }
 
 <script src="/static/js/hue.json.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
@@ -716,6 +720,8 @@ ${layout.menubar(section='query')}
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/beeswax/static/js/beeswax.vm.js"></script>
+<script src="/static/js/share.vm.js"></script>
+
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/js/codemirror-hql.js"></script>
@@ -2158,6 +2164,10 @@ function tryExecuteQuery() {
   logGA('query/execute');
 }
 
+function tryShareQuery() {
+  $("#documentShareModal").modal("show");
+}
+
 function tryExecuteNextStatement() {
   var query = getHighlightedQuery() || codeMirror.getValue();
 
@@ -2685,7 +2695,11 @@ viewModel.design.fileResources.values.subscribe(function() {
   // File chooser button for file resources.
   $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
-ko.applyBindings(viewModel);
+
+var shareViewModel = setupSharing(function(doc) {
+  console.log('updating sharing', doc)
+}, "#documentShareModal");
+ko.applyBindings(viewModel, $("#query-editor")[0]);
 
 
 % if action == 'watch-results':
