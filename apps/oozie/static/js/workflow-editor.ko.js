@@ -49,11 +49,18 @@ function loadLayout(viewModel, json_layout) {
 
 // End dashboard lib
 
-var Node = function (node_json) {
+var Node = function (node) {
   var self = this;
 
-  self.id = ko.observable(typeof node_json.id != "undefined" && node_json.id != null ? node_json.id : UUID());
-  self.name = ko.observable(typeof node_json.name != "undefined" && node_json.name != null ? node_json.name : "");
+  var type = typeof node.widgetType != "undefined" ? node.widgetType : node.type; 
+
+  self.id = ko.observable(typeof node.id != "undefined" && node.id != null ? node.id : UUID());
+  self.name = ko.observable(typeof node.name != "undefined" && node.name != null ? node.name : "");
+  self.type = ko.observable(typeof type != "undefined" && type != null ? type : "");
+
+  self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
+  
+  self.childreen = ko.observable(typeof node.childreen != "undefined" && node.childreen != null ? node.childreen : []);
 }
 
 var Workflow = function (vm, workflow) {
@@ -115,15 +122,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   }
 
   self.save = function () {
-    $.post("/impala/dashboard/save", {
-        "dashboard": ko.mapping.toJSON(self.dashboard),
-        "layout": ko.mapping.toJSON(self.columns)
+    $.post("/oozie/editor/workflow/save", {        
+        "layout": ko.mapping.toJSON(self.columns),
+        "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
         self.dashboard.id(data.id);
         $(document).trigger("info", data.message);
-        if (window.location.search.indexOf("dashboard") == -1) {
-          window.location.hash = '#dashboard=' + data.id;
+        if (window.location.search.indexOf("workflow") == -1) {
+          window.location.hash = '#workflow=' + data.id;
         }
       }
       else {

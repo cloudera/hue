@@ -63,10 +63,20 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     % if user.is_superuser:
-      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></a>
+      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+        <i class="fa fa-pencil"></i>
+      </a>
+      &nbsp;
+      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
+        <i class="fa fa-cog"></i>
+      </button>
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
+        <i class="fa fa-save"></i>
+      </button>
       &nbsp;&nbsp;&nbsp;
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}"><i class="fa fa-save"></i></button>
-      <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
+      <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-file-o"></i>
+      </a>
     % endif
   </div>
 </div>
