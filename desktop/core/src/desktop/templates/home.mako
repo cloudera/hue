@@ -343,7 +343,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
           <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
           <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
-            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
+            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id, username)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
           </ul>
           <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
             <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupReadShare"> <i class="fa fa-times"></i></li>
@@ -354,7 +354,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <h4 class="muted" style="margin-top:0px">${_('Read and Modify')}</h4>
           <div data-bind="visible: (selectedDoc().perms.write.users.length == 0 && selectedDoc().perms.write.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
           <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.users">
-            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></li>
+            <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id, username)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></li>
           </ul>
           <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.groups">
             <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupWriteShare"> <i class="fa fa-times"></i></li>
@@ -397,7 +397,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   var JSON_TAGS = ${ json_tags | n,unicode };
   var JSON_DOCS = ${ json_documents | n,unicode };
 
-  function prettifyUsername(userId) {
+  function prettifyUsername(userId, username) {
     var _user = null;
     for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
       if (JSON_USERS_GROUPS.users[i].id == userId) {
@@ -407,7 +407,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     if (_user != null) {
       return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
     }
-    return "";
+    return username;
   }
 
   $(document).ready(function () {
@@ -421,7 +421,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       map = {};
 
       $.each(JSON_USERS_GROUPS.users, function (i, user) {
-        var _display = prettifyUsername(user.id);
+        var _display = prettifyUsername(user.id, user.id);
         map[_display] = user;
         dropdown.push(_display);
       });
