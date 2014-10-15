@@ -162,7 +162,7 @@ class OozieApi:
             is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
 
       except Exception, e:
-        LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
+        LOG.error('An error happen while watching the job running: %(error)s' % {'error': e})
         is_really_done = True
 
     workflow_actions = []
