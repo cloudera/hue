@@ -647,13 +647,15 @@ from django.utils.translation import ugettext as _
             actions = $('#ch-dropdown'),
             rect = document.querySelector('body').getBoundingClientRect();
 
+          e.stopPropagation();
+
           // close the actions menu from button area if open
           if (actions.hasClass('open')) {
             actions.removeClass('open');
           }
 
           // display context menu and ensure it is on-screen
-          if ($.inArray(row.name, ['..', '.']) === -1) {
+          if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
             this.selected(true);
             cm.css({ display: 'block', top: e.pageY - 15, left: (e.pageX < rect.right - 200 ) ? e.pageX : e.pageX - 250 });
           } else {
