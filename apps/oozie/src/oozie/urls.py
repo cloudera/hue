@@ -68,6 +68,13 @@ urlpatterns = patterns(
 
 
 urlpatterns += patterns(
+  'oozie.views.editor2',
+
+  url(r'^editor/workflow$', 'workflow_editor', name='workflow_editor'),
+)
+
+
+urlpatterns += patterns(
   'oozie.views.api',
 
   url(r'^workflows$', 'workflows', name='workflows'),
