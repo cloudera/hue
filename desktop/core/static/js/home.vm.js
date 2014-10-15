@@ -24,28 +24,6 @@ function HomeViewModel(json_tags, json_docs) {
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
 
-  self.selectedDoc = ko.observable(ko.mapping.fromJS({
-    perms: {
-      read: {
-        users: [],
-        groups: []
-      },
-      write: {
-        users: [],
-        groups: []
-      }
-    }
-  }));
-
-  self.selectedPerm = ko.observable('read');
-  self.selectedPermLabel = ko.computed(function() {
-    if (self.selectedPerm() == 'write') {
-      return 'Modify';
-    } else {
-      return 'Read';
-    }
-  });
-
   self.selectedTag = ko.observable({});
   self.selectedTagForDelete = ko.observable({
     name: ''

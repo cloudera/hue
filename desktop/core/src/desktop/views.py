@@ -394,6 +394,9 @@ def commonheader(title, section, user, padding="90px"):
     'is_demo': desktop.conf.DEMO_ENABLED.get()
   })
 
+def commonshare():
+  return django_mako.render_to_string("common_share.mako", {})
+
 def commonfooter(messages=None):
   """
   Returns the rendered common footer
