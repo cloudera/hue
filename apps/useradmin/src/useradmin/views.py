@@ -86,6 +86,9 @@ def list_for_autocomplete(request):
     if request.GET.get('only_mygroups'):
       groups = request.user.groups.all()
 
+    users = users[:2000]
+    groups = groups[:2000]
+
     response = {
       'users': massage_users_for_json(users, extended_user_object),
       'groups': massage_groups_for_json(groups)
