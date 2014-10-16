@@ -66,9 +66,20 @@ var Node = function (node) {
 var Workflow = function (vm, workflow) {
   var self = this;
 
-  self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : UUID());
+  self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
+  self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
   self.nodes = ko.observableArray([]);
+  
+  self.loadNodes = function(workflow) {
+    var nodes = []
+    $.each(workflow.nodes, function(index, node) {
+      var _node = new Node(node);
+      nodes.push(_node);
+    });
+    self.nodes(nodes)
+  }
+  
 
   self.addNode = function(widget) {
     if (self.nodes().length == 0) {
@@ -76,7 +87,7 @@ var Workflow = function (vm, workflow) {
       self.nodes.push(node);
     }
   }
-
+  
   self.getNodeById = function (node_id) {
     var _node = null;
     $.each(self.nodes(), function (index, node) {
@@ -105,6 +116,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   self.inited = ko.observable(self.columns().length > 0);
   self.init = function(callback) {
     loadLayout(self, layout_json);
+    self.workflow.loadNodes(workflow_json);
   }
 
   self.getWidgetById = function (widget_id) {
@@ -127,7 +139,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
         "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
-        self.dashboard.id(data.id);
+        self.workflow.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("workflow") == -1) {
           window.location.hash = '#workflow=' + data.id;
