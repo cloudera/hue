@@ -85,6 +85,43 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 ${ dashboard.layout_skeleton() }
 
 
+<script type="text/html" id="hive-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#action" data-toggle="tab">${ _('Hive') }</a></li>
+        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="action">
+          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
+        </div>
+        <div class="tab-pane" id="files">
+        </div>
+        <div class="tab-pane" id="sla">
+        </div>
+        <div class="tab-pane" id="credentials">
+        </div>
+        <div class="tab-pane" id="transitions">
+          OK --> []
+          KO --> []
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="pig-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
