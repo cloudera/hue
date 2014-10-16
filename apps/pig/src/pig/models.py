@@ -94,6 +94,10 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
     if not is_design:
       pig_script.doc.get().add_to_history()
 
+  # A user decided eventually to save an unsaved script after execution:
+  if is_design and pig_script.doc.get().is_historic():
+    pig_script.doc.get().remove_from_history()
+
   pig_script.update_from_dict({
       'name': name,
       'script': script,
