@@ -480,7 +480,7 @@ class Workflow(Job):
     return 'workflow.xml'
 
   def get_absolute_url(self):
-    if self.doc.get().extra == 'jobsub':
+    if self.doc.only('extra').get().extra == 'jobsub':
       return '/jobsub/#edit-design/%s' % self.id
     else:
       return reverse('oozie:edit_workflow', kwargs={'workflow': self.id}) + '#editWorkflow'

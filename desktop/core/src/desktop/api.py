@@ -43,18 +43,26 @@ def _get_docs(user):
         .exclude(tags__in=[trash_tag])
         .filter(tags__in=[history_tag])
         .select_related(
-          'DocumentTag',
-          'User',
-          'DocumentPermission',
+          'owner',
+          'content_type',
         )
+        .prefetch_related(
+          'tags',
+          'documentpermission_set',
+        )
+        .defer(None)
         .order_by('-last_modified')[:500],
       Document.objects.get_docs(user)
         .exclude(tags__in=[history_tag])
         .select_related(
-          'DocumentTag',
-          'User',
-          'DocumentPermission',
+          'owner',
+          'content_type',
         )
+        .prefetch_related(
+          'tags',
+          'documentpermission_set',
+        )
+        .defer(None)
         .order_by('-last_modified')[:100]
   )
   return list(docs)
@@ -168,9 +176,9 @@ def massaged_documents_for_json(documents, user):
       'perms': {
         'read': {
           'users': [{'id': perm_user.id, 'username': perm_user.username} \
-                    for perm_user in read_perms.users.all()],
+                    for perm_user in read_perms.users.all().only('id', 'username')],
           'groups': [{'id': perm_group.id, 'name': perm_group.name} \
-                     for perm_group in read_perms.groups.all()]
+                     for perm_group in read_perms.groups.all().only('id', 'name')]
         },
         'write': {
           'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in write_perms.users.all()],
