@@ -444,7 +444,7 @@ from django.utils.translation import ugettext as _
 </div>
 
   <script id="fileTemplate" type="text/html">
-    <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected() }">
+    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file', value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -454,11 +454,11 @@ from django.utils.translation import ugettext as _
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
+        <strong><a href="#" data-bind="drag: { value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 }"></a></strong>
         <!-- /ko -->
       </td>
       <td>
-        <span data-bind="visible: type=='file', text: stats.size"></span>
+        <span data-bind="visible: type == 'file', text: stats.size"></span>
       </td>
       <td>
         %if is_fs_superuser:
@@ -487,11 +487,59 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/js/jquery.hdfstree.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/js/dropzone.js" type="text/javascript" charset="utf-8"></script>
 
 
   <script charset="utf-8">
+    var _dragged;
+
+    ko.bindingHandlers.drag = {
+      init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+        var dragElement = $(element);
+        var dragOptions = {
+          helper: 'clone',
+          revert: true,
+          revertDuration: 0,
+          start: function() {
+            if ($(element).is('[draggable]')) {
+              viewModel.selected(true);
+            }
+            _dragged = ko.utils.unwrapObservable(valueAccessor().value);
+          },
+          cursor: 'default'
+        };
+        dragElement.draggable(dragOptions).disableSelection();
+      }
+    };
+
+    ko.bindingHandlers.drop = {
+      init: function(element, valueAccessor) {
+        var dropElement = $(element);
+
+        if (valueAccessor().enabled){
+          var dropOptions = {
+            hoverClass: 'drag-hover',
+            drop: function(event, ui) {
+              var destpath = valueAccessor().value.path;
+
+              dropElement.fadeOut(200, function(){
+                dropElement.fadeIn(200);
+              });
+
+              if (destpath) {
+                $('#moveDestination').val(destpath);
+                viewModel.move('nomodal');
+              }
+            }
+          };
+          dropElement.droppable(dropOptions);
+        }
+      }
+    };
+
+
     var getHistory = function () {
       return $.totalStorage('hue_fb_history') || [];
     };
@@ -937,7 +985,7 @@ from django.utils.translation import ugettext as _
         });
       };
 
-      self.move = function () {
+      self.move = function (mode) {
         var paths = [];
 
         $(self.selectedFiles()).each(function (index, file) {
@@ -948,23 +996,28 @@ from django.utils.translation import ugettext as _
 
         $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
 
-        $("#moveModal").modal({
-          keyboard:true,
-          show:true
-        });
-
-        $("#moveModal").on("shown", function(){
-          $("#moveModal .modal-footer div").show();
-          $("#moveHdfsTree").remove();
-          $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
-          $("#moveHdfsTree").jHueHdfsTree({
-            home: viewModel.currentPath(),
-            onPathChange: function(path){
-              $("#moveDestination").val(path);
-              $("#moveNameRequiredAlert").hide();
-            }
+        if (mode === 'nomodal') {
+          $.jHueNotify.info('Items moving to "' + $('#moveDestination').val() + '"');
+          $("#moveForm").submit();
+        } else {
+          $("#moveModal").modal({
+            keyboard: true,
+            show: true
           });
-        });
+
+          $("#moveModal").on("shown", function () {
+            $("#moveModal .modal-footer div").show();
+            $("#moveHdfsTree").remove();
+            $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
+            $("#moveHdfsTree").jHueHdfsTree({
+              home: viewModel.currentPath(),
+              onPathChange: function (path) {
+                $("#moveDestination").val(path);
+                $("#moveNameRequiredAlert").hide();
+              }
+            });
+          });
+        }
       };
 
       self.copy = function () {
@@ -995,8 +1048,6 @@ from django.utils.translation import ugettext as _
             }
           });
         });
-
-
       };
 
       self.changeOwner = function (data, event) {

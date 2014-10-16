@@ -222,3 +222,13 @@
   position: absolute;
   width: 250px;
 }
+
+.drag-hover {
+  background: #e5e5e5;
+  border-left: 3px solid #338bb8;
+  border-right: 3px solid #338bb8;
+}
+
+[draggable]:hover {
+  cursor: move;
+}
