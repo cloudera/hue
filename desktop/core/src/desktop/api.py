@@ -39,8 +39,23 @@ def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
   trash_tag = DocumentTag.objects.get_trash_tag(user)
   docs = itertools.chain(
-      Document.objects.get_docs(user).exclude(tags__in=[trash_tag]).filter(tags__in=[history_tag]).select_related('DocumentTag', 'User', 'DocumentPermission').order_by('-last_modified')[:500],
-      Document.objects.get_docs(user).exclude(tags__in=[history_tag]).select_related('DocumentTag', 'User', 'DocumentPermission').order_by('-last_modified')[:100]
+      Document.objects.get_docs(user)
+        .exclude(tags__in=[trash_tag])
+        .filter(tags__in=[history_tag])
+        .select_related(
+          'DocumentTag',
+          'User',
+          'DocumentPermission',
+        )
+        .order_by('-last_modified')[:500],
+      Document.objects.get_docs(user)
+        .exclude(tags__in=[history_tag])
+        .select_related(
+          'DocumentTag',
+          'User',
+          'DocumentPermission',
+        )
+        .order_by('-last_modified')[:100]
   )
   return list(docs)
 
@@ -152,7 +167,8 @@ def massaged_documents_for_json(documents, user):
                for tag in document.tags.all()],
       'perms': {
         'read': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in read_perms.users.all()],
+          'users': [{'id': perm_user.id, 'username': perm_user.username} \
+                    for perm_user in read_perms.users.all()],
           'groups': [{'id': perm_group.id, 'name': perm_group.name} \
                      for perm_group in read_perms.groups.all()]
         },
@@ -165,7 +181,7 @@ def massaged_documents_for_json(documents, user):
       'isMine': document.owner == user,
       'lastModified': document.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(document.last_modified.timetuple())
-   }
+    }
 
   return docs
 
