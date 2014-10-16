@@ -394,6 +394,10 @@ class Document(models.Model):
     tag = DocumentTag.objects.get_history_tag(user=self.owner)
     self.tags.add(tag)
 
+  def remove_from_history(self):
+    tag = DocumentTag.objects.get_history_tag(user=self.owner)
+    self.tags.remove(tag)
+
   def share_to_default(self, name='read'):
     DocumentPermission.objects.share_to_default(self, name=name)
 
