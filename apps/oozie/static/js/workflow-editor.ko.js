@@ -82,10 +82,12 @@ var Workflow = function (vm, workflow) {
   
 
   self.addNode = function(widget) {
-    if (self.nodes().length == 0) {
+	// Todo get parent cell, link nodes...
+	  
+    //if (self.nodes().length == 0) {
       var node = new Node(ko.mapping.toJS(widget));
       self.nodes.push(node);
-    }
+    //}
   }
   
   self.getNodeById = function (node_id) {
@@ -134,7 +136,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   }
 
   self.save = function () {
-    $.post("/oozie/editor/workflow/save", {        
+    $.post("/oozie/editor/workflow/save/", {        
         "layout": ko.mapping.toJSON(self.columns),
         "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
