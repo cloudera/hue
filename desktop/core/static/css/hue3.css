@@ -1894,3 +1894,7 @@ form.form-inline .modal-header .close {
 .margin-right-30 {
   margin-right: 30px;
 }
+
+.progress .bar {
+  background-color: #338BB8;
+}

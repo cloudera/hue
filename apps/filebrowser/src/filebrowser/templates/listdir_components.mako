@@ -435,12 +435,15 @@ from django.utils.translation import ugettext as _
 
   <div id="submit-wf-modal" class="modal hide"></div>
 
-  <div id="progressStatus" class="uploadstatus alert alert-info hide">
-    <div class="updateStatus"> </div>
+  <div id="progressStatus" class="uploadstatus well hide">
+    <h4>${ _('Upload progress') }</h4>
+    <div id="progressStatusBar" class="hide progress active">
+      <div class="bar"></div>
+    </div>
+    <div id="progressStatusContent" class="scrollable-uploadstatus">
+      <div class="updateStatus"> </div>
+    </div>
   <div>
-  <div id="progressStatusBar" class="uploadstatusbar hide">
-    <div></div>
-  </div>
 </div>
 
   <script id="fileTemplate" type="text/html">
@@ -1434,8 +1437,16 @@ from django.utils.translation import ugettext as _
             },
             autoDiscover: false,
             maxFilesize: 5000000,
-            previewsContainer: '#progressStatus',
-            previewTemplate: '<div class="row">\n <span class="offset4 span3 break-word"><strong data-dz-name></strong></span>\n <span class="span2">File size: <strong data-dz-size></strong></span>\n <span class="span3">Percent complete: <strong data-dz-uploadprogress></strong></span>\n <span class="span1"><a href="javascript:undefined;" title="Cancel upload" data-dz-remove><i class="fa fa-times"></i></a></span>\n </div>',
+            previewsContainer: '#progressStatusContent',
+            previewTemplate: '<div class="progress-row">' +
+                '<span class="break-word" data-dz-name></span>' +
+                '<div class="pull-right">' +
+                '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
+                '<span data-dz-remove><a href="javascript:undefined;" title="${ _('Cancel upload') }"><i class="fa fa-fw fa-times"></i></a></span>' +
+                '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
+                '</div>' +
+                '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
+                '</div>',
             drop: function (e) {
               $('.hoverMsg').addClass('hide');
 
@@ -1449,9 +1460,10 @@ from django.utils.translation import ugettext as _
             uploadprogress: function (file, progress) {
               $("[data-dz-name]").each(function (cnt, item) {
                 if ($(item).text() === file.name) {
-                  $(item).parents(".row").find("[data-dz-uploadprogress]").html(progress.toFixed() + "%");
+                  $(item).parents(".progress-row").find("[data-dz-uploadprogress]").width(progress.toFixed() + "%");
                   if (progress.toFixed() === "100"){
-                    $(item).parents(".row").find("[data-dz-remove]").hide();
+                    $(item).parents(".progress-row").find("[data-dz-remove]").hide();
+                    $(item).parents(".progress-row").find("[data-dz-uploaded]").show();
                   }
                 }
               });
