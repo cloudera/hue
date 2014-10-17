@@ -863,6 +863,8 @@ var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget']
 var SearchViewModel = function (collection_json, query_json, initial_json) {
   var self = this;
 
+  self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+
   // Models
   self.collection = new Collection(self, collection_json.collection);
   self.query = new Query(self, query_json);
