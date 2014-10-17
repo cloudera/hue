@@ -26,21 +26,14 @@
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <span class="btn-group pull-right" style="margin-right: 20px">
-      <a class="btn btn-status btn-success" data-value="success">${ _('Succeeded') }</a>
-      <a class="btn btn-status btn-warning" data-value="warning">${ _('Running') }</a>
-      <a class="btn btn-status btn-danger disable-feedback" data-value="important">${ _('Failed') }</a>
-    </span>
-    <h3>${ _('Select actions to rerun') }</h3>
+    <h3>${ _('Rerun') }</h3>
   </div>
 
   <div class="modal-body">
     <fieldset>
+      <select name="actions" id="id_actions" class="hide" multiple></select>
       <div id="config-container">
         <div class="fieldWrapper">
-          <div class="row-fluid">
-            ${ utils.render_field(rerun_form['actions'], show_label=False) }
-          </div>
           <div class="row-fluid">
             <div class="span6">
               ${ utils.render_field_no_popover(rerun_form['refresh'], show_label=True) }
@@ -88,43 +81,16 @@
   </div>
 </form>
 
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-    var ViewModel = function() {
-      var self = this;
-      self.isLoading = ko.observable(false);
-      self.actions = ko.observableArray([]);
-    };
-
-    window.viewModel = new ViewModel();
-
-    $("#id_actions").jHueSelector({
-      showSelectAll: false,
-      searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No successful actions found.')}",
-      width:558,
-      height:200
+<script charset="utf-8">
+  var frag = document.createDocumentFragment();
+  viewModel.selectedActions().forEach(function (item) {
+    var option = $('<option>', {
+      value: item,
+      selected: true
     });
 
-    // Update status color of each date
-    $(".jHueSelectorBody ul li label").each(function(index) {
-      $(this).addClass($("#date-" + index).attr('class'));
-    });
-
-    $(".btn-status").on("click", function () {
-      $(this).toggleClass("active");
-      $(".btn-status.active").each(function (cnt, item) {
-        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").prop("checked", true);
-        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").each(function(icnt, option){
-          $(option).data("opt").prop("selected", true);
-        });
-      });
-      $(".btn-status:not(.active)").each(function (cnt, item) {
-        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").prop("checked", false);
-        $(".jHueSelectorBody ul li .label-" + $(item).data("value")).find("input").each(function(icnt, option){
-          $(option).data("opt").prop("selected", false);
-        });
-      });
-    });
+    option.appendTo($(frag));
   });
+
+  $(frag).appendTo('#id_actions');
 </script>

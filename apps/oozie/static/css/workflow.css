@@ -53,7 +53,6 @@ ul {
 .node-link {
   border: 1px dashed #DDD;
   margin: 10px;
-  background: url(/oozie/static/art/droppable.png) no-repeat 50% 50%;
 }
 
 .node-description {
