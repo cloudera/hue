@@ -1,0 +1,39 @@
+.CodeMirror.cm-s-default {
+  height:500px;
+}
+
+#sla th {
+  vertical-align: middle !important;
+}
+
+#yAxisLabel {
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  writing-mode: lr-tb;
+  margin-left: -110px;
+  margin-top: 130px;
+  position: absolute;
+}
+
+#slaTable {
+  margin-top: 20px;
+}
+
+.disabled {
+  cursor: default;
+}
+
+.nav.nav-list {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.nav-list > li.white {
+  padding: 9px 15px;
+}
+
+.manage {
+  padding: 0;
+}
