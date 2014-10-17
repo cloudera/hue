@@ -195,6 +195,69 @@ ko.bindingHandlers.slider = {
 }
 
 ko.bindingHandlers.daterangepicker = {
+  INTERVAL_OPTIONS: [
+    {
+      value: "+200MILLISECONDS",
+      label: "200ms"
+    },
+    {
+      value: "+1SECONDS",
+      label: "1s"
+    },
+    {
+      value: "+1MINUTES",
+      label: "1m"
+    },
+    {
+      value: "+5MINUTES",
+      label: "5m"
+    },
+    {
+      value: "+10MINUTES",
+      label: "10m"
+    },
+    {
+      value: "+30MINUTES",
+      label: "30m"
+    },
+    {
+      value: "+1HOURS",
+      label: "1h"
+    },
+    {
+      value: "+3HOURS",
+      label: "3h"
+    },
+    {
+      value: "+6HOURS",
+      label: "6h"
+    },
+    {
+      value: "+12HOURS",
+      label: "12h"
+    },
+    {
+      value: "+1DAYS",
+      label: "1d"
+    },
+    {
+      value: "+7DAYS",
+      label: "7d"
+    },
+    {
+      value: "+1MONTHS",
+      label: "1M"
+    },
+    {
+      value: "+6MONTHS",
+      label: "6M"
+    },
+    {
+      value: "+1YEARS",
+      label: "1y"
+    }
+  ],
+
   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     var DATE_FORMAT = "YYYY-MM-DD";
     var TIME_FORMAT = "HH:mm:ss";
@@ -203,22 +266,10 @@ ko.bindingHandlers.daterangepicker = {
     var _el = $(element);
     var _options = $.extend(valueAccessor(), {});
 
-    var _intervalOptions = [
-      '<option value="+200MILLISECONDS">200ms</option>',
-      '<option value="+1SECONDS">1s</option>',
-      '<option value="+1MINUTES">1m</option>',
-      '<option value="+5MINUTES">5m</option>',
-      '<option value="+10MINUTES">10m</option>',
-      '<option value="+30MINUTES">30m</option>',
-      '<option value="+1HOURS">1h</option>',
-      '<option value="+3HOURS">3h</option>',
-      '<option value="+12HOURS">12h</option>',
-      '<option value="+1DAYS">1d</option>',
-      '<option value="+7DAYS">7d</option>',
-      '<option value="+1MONTHS">1M</option>',
-      '<option value="+6MONTHS">6M</option>',
-      '<option value="+1YEARS">1y</option>'
-    ];
+    var _intervalOptions = [];
+    ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS.forEach(function (interval) {
+      _intervalOptions.push('<option value="' + interval.value + '">' + interval.label + '</option>');
+    });
 
     function enableOptions() {
       var _opts = [];
@@ -236,7 +287,6 @@ ko.bindingHandlers.daterangepicker = {
       for (var i = 0; i < opts.length; i++) {
         _html += opts[i];
       }
-      _html += '<option value="">Custom</option>';
       return _html;
     }
 
@@ -265,10 +315,11 @@ ko.bindingHandlers.daterangepicker = {
             '</div>' +
             '<div class="facet-field-cnt picker">' +
             '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.INTERVAL + '</div>' +
+            '<div class="input-prepend input-group"><span class="add-on input-group-addon"><i class="fa fa-repeat"></i></span></div>&nbsp;' +
             '<select class="input-small interval-select" style="margin-right: 6px">' +
             renderOptions(_intervalOptions) +
             '</select>' +
-            '<input class="input interval hide" type="text" value="" />' +
+            '<input class="input interval hide" type="hidden" value="" />' +
             '</div>' +
             '<div class="facet-field-cnt picker">' +
             '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
@@ -307,16 +358,14 @@ ko.bindingHandlers.daterangepicker = {
 
     var _minMoment = moment(_options.min());
     var _maxMoment = moment(_options.max());
-    var _startMoment = moment(_options.start());
-    var _endMoment = moment(_options.end());
 
     if (_minMoment.isValid() && _maxMoment.isValid()) {
       _tmpl.find(".facet-field-cnt.custom").hide();
       _tmpl.find(".facet-field-cnt.picker").show();
-      _tmpl.find(".start-date").val(_minMoment.format(DATE_FORMAT));
-      _tmpl.find(".start-time").val(_minMoment.format(TIME_FORMAT));
-      _tmpl.find(".end-date").val(_maxMoment.format(DATE_FORMAT));
-      _tmpl.find(".end-time").val(_maxMoment.format(TIME_FORMAT));
+      _tmpl.find(".start-date").val(_minMoment.utc().format(DATE_FORMAT));
+      _tmpl.find(".start-time").val(_minMoment.utc().format(TIME_FORMAT));
+      _tmpl.find(".end-date").val(_maxMoment.utc().format(DATE_FORMAT));
+      _tmpl.find(".end-time").val(_maxMoment.utc().format(TIME_FORMAT));
       _tmpl.find(".interval").val(_options.gap());
       _tmpl.find(".interval-custom").val(_options.gap());
     }
@@ -392,45 +441,36 @@ ko.bindingHandlers.daterangepicker = {
 
     _tmpl.find(".start-date-custom").on("change", function () {
       _options.min(_tmpl.find(".start-date-custom").val());
+      _tmpl.find(".start-date").val(moment(_options.min()).utc().format(DATE_FORMAT));
+      _tmpl.find(".start-time").val(moment(_options.min()).utc().format(TIME_FORMAT));
       _options.start(_options.min());
     });
 
     _tmpl.find(".end-date-custom").on("change", function () {
       _options.max(_tmpl.find(".end-date-custom").val());
+      _tmpl.find(".end-date").val(moment(_options.max()).utc().format(DATE_FORMAT));
+      _tmpl.find(".end-time").val(moment(_options.max()).utc().format(TIME_FORMAT));
       _options.end(_options.max());
     });
 
     _tmpl.find(".interval-custom").on("change", function () {
       _options.gap(_tmpl.find(".interval-custom").val());
+      matchIntervals();
     });
 
     function matchIntervals() {
-      if (_tmpl.find(".interval-select option[value='" + _options.gap() + "']").length > 0) {
-        _tmpl.find(".interval-select").val(_options.gap());
-        _tmpl.find(".interval").hide();
-      }
-      else {
-        _tmpl.find(".interval-select").val("");
-        _tmpl.find(".interval").show();
+      _tmpl.find(".interval-select").val(_options.gap());
+      if (_tmpl.find(".interval-select").val() == null){
+        _tmpl.find(".interval-select").val(_tmpl.find(".interval-select option:first").val());
+        _options.gap(_tmpl.find(".interval-select").val());
+        _tmpl.find(".interval-custom").val(_options.gap());
       }
     }
 
     _tmpl.find(".interval-select").on("change", function () {
-      if (_tmpl.find(".interval-select").val() == "") {
-        _tmpl.find(".interval").show();
-      }
-      else {
-        _tmpl.find(".interval").hide();
-        _options.gap(_tmpl.find(".interval-select").val());
-        _tmpl.find(".interval").val(_options.gap());
-      }
-    });
-
-    _tmpl.find(".interval").on("change", function () {
-      if (_tmpl.find(".interval-select").val() == "") {
-        _options.gap(_tmpl.find(".interval").val());
-        _tmpl.find(".interval-custom").val(_options.gap());
-      }
+      _options.gap(_tmpl.find(".interval-select").val());
+      _tmpl.find(".interval").val(_options.gap());
+      _tmpl.find(".interval-custom").val(_options.gap());
     });
 
     function rangeHandler(isStart) {
@@ -438,14 +478,14 @@ ko.bindingHandlers.daterangepicker = {
       var endDate = moment(_tmpl.find(".end-date").val() + " " + _tmpl.find(".end-time").val(), DATETIME_FORMAT);
       if (startDate.valueOf() > endDate.valueOf()) {
         if (isStart) {
-          _tmpl.find(".end-date").val(startDate.format(DATE_FORMAT));
-          _tmpl.find(".end-date").datepicker('setValue', startDate.format(DATE_FORMAT));
+          _tmpl.find(".end-date").val(startDate.utc().format(DATE_FORMAT));
+          _tmpl.find(".end-date").datepicker('setValue', startDate.utc().format(DATE_FORMAT));
           _tmpl.find(".end-date").data("original-val", _tmpl.find(".end-date").val());
-          _tmpl.find(".end-time").val(startDate.format(TIME_FORMAT));
+          _tmpl.find(".end-time").val(startDate.utc().format(TIME_FORMAT));
         }
         else {
           if (_tmpl.find(".end-date").val() == _tmpl.find(".start-date").val()) {
-            _tmpl.find(".end-time").val(startDate.format(TIME_FORMAT));
+            _tmpl.find(".end-time").val(startDate.utc().format(TIME_FORMAT));
             _tmpl.find(".end-time").data("timepicker").setValues(startDate.format(TIME_FORMAT));
           }
           else {
@@ -465,8 +505,8 @@ ko.bindingHandlers.daterangepicker = {
         _tmpl.find(".end-date").datepicker("hide");
       }
 
-      var _calculatedStartDate = moment(_tmpl.find(".start-date").val() + " " + _tmpl.find(".start-time").val(), DATETIME_FORMAT).utc();
-      var _calculatedEndDate = moment(_tmpl.find(".end-date").val() + " " + _tmpl.find(".end-time").val(), DATETIME_FORMAT).utc();
+      var _calculatedStartDate = moment(_tmpl.find(".start-date").val() + " " + _tmpl.find(".start-time").val(), DATETIME_FORMAT);
+      var _calculatedEndDate = moment(_tmpl.find(".end-date").val() + " " + _tmpl.find(".end-time").val(), DATETIME_FORMAT);
 
       _options.min(_calculatedStartDate.format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
       _options.start(_options.min());
@@ -485,18 +525,18 @@ ko.bindingHandlers.daterangepicker = {
         _opts = enableOptions("5MINUTES", "10MINUTES", "30MINUTES", "1HOURS", "3HOURS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'hours') > 12 && _calculatedEndDate.diff(_calculatedStartDate, 'hours') < 36) {
-        _opts = enableOptions("10MINUTES", "30MINUTES", "1HOURS", "3HOURS", "12HOURS");
+        _opts = enableOptions("10MINUTES", "30MINUTES", "1HOURS", "3HOURS", "6HOURS", "12HOURS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 1 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 7) {
-        _opts = enableOptions("30MINUTES", "1HOURS", "3HOURS", "12HOURS", "1DAYS");
+        _opts = enableOptions("30MINUTES", "1HOURS", "3HOURS", "6HOURS", "12HOURS", "1DAYS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 7 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 14) {
-        _opts = enableOptions("3HOURS", "12HOURS", "1DAYS");
+        _opts = enableOptions("3HOURS", "6HOURS", "12HOURS", "1DAYS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'days') > 14 && _calculatedEndDate.diff(_calculatedStartDate, 'days') <= 31) {
         _opts = enableOptions("12HOURS", "1DAYS", "7DAYS");
       }
-      if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 1) {
+      if (_calculatedEndDate.diff(_calculatedStartDate, 'months') >= 1) {
         _opts = enableOptions("1DAYS", "7DAYS", "1MONTHS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 6) {

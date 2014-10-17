@@ -721,12 +721,15 @@ ${ dashboard.layout_skeleton() }
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
       <span data-bind="visible: ! $root.isEditing(), with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Interval') }</span>
-        <input type="text" data-bind="value: properties.gap" />
+         <select class="input-small" data-bind="options: $root.intervalOptions,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.gap"></select>&nbsp;
       </span>
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
-      <span class="facet-field-label">${ _('Group by') }</span>
-      <select class="input-medium" data-bind="options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
+      <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
+      <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
 
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: (typeof extraSeries != 'undefined' ? extraSeries : []), widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,

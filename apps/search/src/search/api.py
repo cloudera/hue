@@ -113,6 +113,8 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         gap = '+1HOURS'
       elif difference < 3600 * 3:
         gap = '+3HOURS'
+      elif difference < 3600 * 6:
+        gap = '+6HOURS'
       elif difference < 3600 * 12:
         gap = '+12HOURS'
       elif difference < 3600 * 24:
