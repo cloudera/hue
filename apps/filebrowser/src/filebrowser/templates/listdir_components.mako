@@ -438,7 +438,7 @@ from django.utils.translation import ugettext as _
   <div id="progressStatus" class="uploadstatus well hide">
     <h4>${ _('Upload progress') }</h4>
     <div id="progressStatusBar" class="hide progress active">
-      <div class="bar"></div>
+      <div class="bar bar-upload"></div>
     </div>
     <div id="progressStatusContent" class="scrollable-uploadstatus">
       <div class="updateStatus"> </div>

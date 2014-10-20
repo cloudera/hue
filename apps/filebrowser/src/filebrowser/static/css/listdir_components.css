@@ -236,3 +236,7 @@
 [draggable]:hover {
   cursor: move;
 }
+
+.progress .bar-upload {
+  background-color: #338BB8;
+}
