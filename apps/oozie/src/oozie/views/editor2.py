@@ -84,3 +84,19 @@ def save_workflow(request):
   response['message'] = _('Page saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def gen_xml_workflow(request):
+  response = {'status': -1}
+
+  try:
+    workflow_json = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+  
+    workflow = Workflow(workflow=workflow_json)
+  
+    response['status'] = 0
+    response['xml'] = workflow.to_xml()
+  except Exception, e:
+    response['message'] = str(e)
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json") 
