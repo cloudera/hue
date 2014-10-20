@@ -1,0 +1,42 @@
+## -*- coding: utf-8 -*-
+## Licensed to Cloudera, Inc. under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  Cloudera, Inc. licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+
+<%namespace name="common" file="workflow-common.xml.mako" />
+
+    <action name="${ node['uuid'] }"${ common.credentials(node['properties']['credentials']) }>
+        <pig>
+            <job-tracker>${'${'}jobTracker}</job-tracker>
+            <name-node>${'${'}nameNode}</name-node>
+
+            ${ common.prepares(node['properties']['prepares']) }
+            % if node['properties']['job_xml']:
+              <job-xml>${ node['properties']['job_xml'] }</job-xml>
+            % endif
+            ${ common.configuration(node['properties']['properties']) }
+
+            <script>${ node['properties']['script_path'] }</script>
+
+            % for param in node['properties']['params']:
+              <${ param['type'] }>${ param['value'] }</${ param['type'] }>
+            % endfor
+
+            ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
+        </pig>
+        <ok to="${ node['children'][0]['to'] }"/>
+        <error to="${ node['children'][0]['to'] }"/>
+        ${ common.sla(node) }
+    </action>

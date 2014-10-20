@@ -59,16 +59,18 @@ var Node = function (node) {
   self.type = ko.observable(typeof type != "undefined" && type != null ? type : "");
 
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
-  
-  self.childreen = ko.observable(typeof node.childreen != "undefined" && node.childreen != null ? node.childreen : []);
+  self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 }
+
 
 var Workflow = function (vm, workflow) {
   var self = this;
 
   self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
-  self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
+  self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");  
+
+  self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
   
   self.loadNodes = function(workflow) {
@@ -86,7 +88,10 @@ var Workflow = function (vm, workflow) {
 	  
     //if (self.nodes().length == 0) {
       var node = new Node(ko.mapping.toJS(widget));
+      node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'})
       self.nodes.push(node);
+      self.nodes()[0].children.removeAll();
+      self.nodes()[0].children().push({'to': node.id()});
     //}
   }
   
@@ -155,6 +160,22 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
     });
   };
 
+  self.gen_xml = function () {
+    $.post("/oozie/editor/workflow/gen_xml/", {        
+        "layout": ko.mapping.toJSON(self.columns),
+        "workflow": ko.mapping.toJSON(self.workflow)
+    }, function (data) {
+      if (data.status == 0) {
+        alert(data.xml);
+      }
+      else {
+        $(document).trigger("error", data.message);
+     }
+   }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+  
   function bareWidgetBuilder(name, type){
     return new Widget({
       size: 12,

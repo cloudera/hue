@@ -61,7 +61,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <div class="search-bar">
-  <div class="pull-right" style="padding-right:50px">
+  <div class="pull-right" style="padding-right:50px">    
+    <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
+      <i class="fa fa-file-code-o"></i>
+    </a>
+    &nbsp;&nbsp;
     % if user.is_superuser:
       <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
         <i class="fa fa-pencil"></i>
@@ -83,6 +87,38 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 ${ dashboard.layout_skeleton() }
+
+
+<script type="text/html" id="start-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      Start
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="end-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      End
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
 
 
 <script type="text/html" id="hive-widget">

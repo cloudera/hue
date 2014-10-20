@@ -74,6 +74,8 @@ urlpatterns += patterns(
   url(r'^editor/workflow/edit/$', 'edit_workflow', name='edit_workflow'),
   url(r'^editor/workflow/new/$', 'new_workflow', name='new_workflow'),
   url(r'^editor/workflow/save/$', 'save_workflow', name='save_workflow'),
+  
+  url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'), # Temporary
 )
 
 
