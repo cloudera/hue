@@ -65,7 +65,7 @@ class PigScript(Document):
     for attr in PigScript._ATTRIBUTES:
       if attrs.get(attr) is not None:
         data_dict[attr] = attrs[attr]
-        
+
     if 'name' in attrs:
       self.doc.update(name=attrs['name'])
 
@@ -106,7 +106,7 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
 
 
 def get_scripts(user, is_design=None):
-  scripts = []  
+  scripts = []
   data = Doc.objects.available(PigScript, user)
 
   if is_design is not None:
@@ -116,6 +116,7 @@ def get_scripts(user, is_design=None):
     data = script.dict
     massaged_script = {
       'id': script.id,
+      'docId': script.doc.get().id,
       'name': data['name'],
       'script': data['script'],
       'parameters': data['parameters'],

@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from django.utils.translation import ugettext as _
 %>
 
@@ -22,709 +22,720 @@
 
 ${ commonheader(None, "pig", user) | n,unicode }
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li class="currentApp">
-              <a href="/${app_name}">
-                <img src="/pig/static/art/icon_pig_48.png" class="app-icon"/>
-                ${ _('Pig Editor') }
-              </a>
-            </li>
-            <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
-            <li><a href="#scripts">${ _('Scripts') }</a></li>
-            <li><a href="#dashboard">${ _('Dashboard') }</a></li>
-          </ul>
+<div id="pig-editor-app">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                  <img src="/pig/static/art/icon_pig_48.png" class="app-icon"/>
+                  ${ _('Pig Editor') }
+                </a>
+              </li>
+              <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
+              <li><a href="#scripts">${ _('Scripts') }</a></li>
+              <li><a href="#dashboard">${ _('Dashboard') }</a></li>
+            </ul>
+          </div>
         </div>
       </div>
+  </div>
+
+  <div class="container-fluid">
+    <div id="scripts" class="row-fluid mainSection hide">
+      <div class="card card-small">
+        <%actionbar:render>
+          <%def name="search()">
+              <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for script name or content')}">
+          </%def>
+
+          <%def name="actions()">
+              <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="fa fa-play"></i> ${_('Run')}</button>
+              <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+              <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+          </%def>
+
+          <%def name="creation()">
+              <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="fa fa-plus-circle"></i> ${_('New Script')}</button>
+          </%def>
+        </%actionbar:render>
+        <div class="alert alert-info" data-bind="visible: scripts().length == 0">
+          ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
+        </div>
+
+        <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
+          <thead>
+          <tr>
+            <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
+            <th width="20%">${_('Name')}</th>
+            <th width="79%">${_('Script')}</th>
+          </tr>
+          </thead>
+          <tbody id="scriptTable" data-bind="template: {name: 'scriptTemplate', foreach: filteredScripts}">
+
+          </tbody>
+          <tfoot>
+          <tr data-bind="visible: isLoading()">
+            <td colspan="3" class="left">
+              <img src="/static/art/spinner.gif" />
+            </td>
+          </tr>
+          <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
+            <td colspan="3">
+              <div class="alert">
+                  ${_('There are no scripts matching the search criteria.')}
+              </div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+
+        <script id="scriptTemplate" type="text/html">
+          <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
+            <td class="center" data-bind="click: handleSelect" style="cursor: default">
+              <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+            </td>
+            <td data-bind="click: $root.confirmViewScript">
+              <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
+            </td>
+            <td data-bind="click: $root.confirmViewScript">
+              <span data-bind="text: scriptSumup"></span>
+            </td>
+          </tr>
+        </script>
+      </div>
     </div>
-</div>
 
-<div class="container-fluid">
-  <div id="scripts" class="row-fluid mainSection hide">
-    <div class="card card-small">
-      <%actionbar:render>
-        <%def name="search()">
-            <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for script name or content')}">
-        </%def>
+    <div id="editor" class="row-fluid mainSection hide">
+      <div class="span2">
+        <div class="sidebar-nav" style="padding-top: 0">
+            <ul class="nav nav-list">
+              <li class="nav-header">${_('Editor')}</li>
+              <li data-bind="click: editScript" class="active" data-section="edit">
+                <a href="#"><i class="fa fa-edit"></i> ${ _('Pig') }</a>
+              </li>
+              <li data-bind="click: editScriptProperties" data-section="properties">
+                <a href="#"><i class="fa fa-bars"></i> ${ _('Properties') }</a>
+              </li>
+              <li data-bind="click: saveScript, visible: currentScript().can_write()">
+                <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-floppy-o"></i> ${ _('Save') }
+                </a>
+              </li>
 
-        <%def name="actions()">
-            <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="fa fa-play"></i> ${_('Run')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
-        </%def>
-
-        <%def name="creation()">
-            <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="fa fa-plus-circle"></i> ${_('New Script')}</button>
-        </%def>
-      </%actionbar:render>
-      <div class="alert alert-info" data-bind="visible: scripts().length == 0">
-        ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
+              <li data-bind="click: tryShareQuery, visible: currentScript().id() != -1">
+                <a class="share-link" href="#" title="${ _('Share the script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-users"></i> ${ _('Share') }
+                </a>
+              <li data-bind="click: confirmNewScript">
+                <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-plus-circle"></i> ${ _('New Script') }
+                </a>
+              </li>
+              <li class="nav-header">${_('Run')}</li>
+              <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
+                <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-play"></i> ${ _('Submit') }
+                </a>
+              </li>
+              <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
+                <a href="#" title="${ _('Stop the script') }" rel="tooltip" data-placement="right" class="disabled">
+                  <i class="fa fa-ban"></i> ${ _('Stop') }
+                </a>
+              </li>
+              <li data-bind="click: showScriptLogs" data-section="logs">
+                <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-tasks"></i> ${ _('Logs') }
+                </a>
+              </li>
+              <li data-bind="visible: currentScript().id() != -1, click: copyScript">
+                <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-files-o"></i> ${ _('Copy') }
+                </a>
+              </li>
+              <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
+                <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
+                  <i class="fa fa-trash-o"></i> ${ _('Delete') }
+                </a>
+              </li>
+              <li>
+              <a href="#" id="help">
+                <i class="fa fa-question-circle"></i>
+              </a>
+              <div id="help-content" class="hide">
+                <ul style="text-align: left;">
+                  <li>${ _("Press CTRL + Space to autocomplete") }</li>
+                  <li>${ _("You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor") }</li>
+                </ul>
+              </div>
+              </li>
+            </ul>
+        </div>
       </div>
 
-      <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
-        <thead>
-        <tr>
-          <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
-          <th width="20%">${_('Name')}</th>
-          <th width="79%">${_('Script')}</th>
-        </tr>
-        </thead>
-        <tbody id="scriptTable" data-bind="template: {name: 'scriptTemplate', foreach: filteredScripts}">
+      <div class="span10">
+        <div class="ribbon-wrapper" data-bind="visible: isDirty">
+          <div class="ribbon">${ _('Unsaved') }</div>
+        </div>
 
-        </tbody>
-        <tfoot>
-        <tr data-bind="visible: isLoading()">
-          <td colspan="3" class="left">
-            <img src="/static/art/spinner.gif" />
+        <div class="card card-small">
+
+        <div id="edit" class="section">
+          <div class="alert alert-info">
+            <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
+            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
+            <h3><span data-bind="text: currentScript().name"></span></h3>
+          </div>
+          <div class="row-fluid">
+            <div id="queryColumn" class="span9">
+              <a id="navigatorShow" href="#" title="${_('Show the assist')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:30px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
+              <form id="queryForm">
+                <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
+              </form>
+            </div>
+            <div id="navigatorColumn" class="span3">
+              <a id="navigatorHide" href="#" title="${_('Hide the assist')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-chevron-right"></i></a>
+              <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
+              <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Assist')}</h1>
+              <div class="card-body">
+                <p>
+                  <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Function name...') }"/>
+                  <ul id="navigatorFunctions" class="unstyled">
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Eval Functions</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">AVG(%VAR%)</a></li>
+                        <li><a href="#">CONCAT(%VAR1%, %VAR2%)</a></li>
+                        <li><a href="#">COUNT(%VAR%)</a></li>
+                        <li><a href="#">COUNT_START(%VAR%)</a></li>
+                        <li><a href="#">IsEmpty(%VAR%)</a></li>
+                        <li><a href="#">DIFF(%VAR1%, %VAR2%)</a></li>
+                        <li><a href="#">MAX(%VAR%)</a></li>
+                        <li><a href="#">MIN(%VAR%)</a></li>
+                        <li><a href="#">SIZE(%VAR%)</a></li>
+                        <li><a href="#">SUM(%VAR%)</a></li>
+                        <li><a href="#">TOKENIZE(%VAR%, %DELIM%)</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Relational Operators</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">COGROUP %VAR% BY %VAR%</a></li>
+                          <li><a href="#">CROSS %VAR1%, %VAR2%;</a></li>
+                          <li><a href="#">DISTINCT %VAR%;</a></li>
+                          <li><a href="#">FILTER %VAR% BY %COND%</a></li>
+                          <li><a href="#">FLATTEN(%VAR%)</a></li>
+                          <li><a href="#">FOREACH %DATA% GENERATE %NEW_DATA%;</a></li>
+                          <li><a href="#">FOREACH %DATA% {%NESTED_BLOCK%};</a></li>
+                          <li><a href="#">GROUP %VAR% BY %VAR%</a></li>
+                          <li><a href="#">GROUP %VAR% ALL</a></li>
+                          <li><a href="#">JOIN %VAR% BY </a></li>
+                          <li><a href="#">LIMIT %VAR% %N%</a></li>
+                          <li><a href="#">ORDER %VAR% BY %FIELD%</a></li>
+                          <li><a href="#">SAMPLE %VAR% %SIZE%</a></li>
+                          <li><a href="#">SPLIT %VAR1% INTO %VAR2% IF %EXPRESSIONS%</a></li>
+                          <li><a href="#">UNION %VAR1%, %VAR2%</a></li>
+                        </ul>
+                      </li>
+
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Input/Output</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">LOAD '%FILE%';</a></li>
+                          <li><a href="#">DUMP %VAR%;</a></li>
+                          <li><a href="#">STORE %VAR% INTO %PATH%;</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Debug</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">EXPLAIN %VAR%;</a></li>
+                          <li><a href="#">ILLUSTRATE %VAR%;</a></li>
+                          <li><a href="#">DESCRIBE %VAR%;</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HCatalog</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">LOAD '%TABLE%' USING org.apache.hcatalog.pig.HCatLoader();</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Math</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">ABS(%VAR%)</a></li>
+                          <li><a href="#">ACOS(%VAR%)</a></li>
+                          <li><a href="#">ASIN(%VAR%)</a></li>
+                          <li><a href="#">ATAN(%VAR%)</a></li>
+                          <li><a href="#">CBRT(%VAR%)</a></li>
+                          <li><a href="#">CEIL(%VAR%)</a></li>
+                          <li><a href="#">COS(%VAR%)</a></li>
+                          <li><a href="#">COSH(%VAR%)</a></li>
+                          <li><a href="#">EXP(%VAR%)</a></li>
+                          <li><a href="#">FLOOR(%VAR%)</a></li>
+                          <li><a href="#">LOG(%VAR%)</a></li>
+                          <li><a href="#">LOG10(%VAR%)</a></li>
+                          <li><a href="#">RANDOM(%VAR%)</a></li>
+                          <li><a href="#">ROUND(%VAR%)</a></li>
+                          <li><a href="#">SIN(%VAR%)</a></li>
+                          <li><a href="#">SINH(%VAR%)</a></li>
+                          <li><a href="#">SQRT(%VAR%)</a></li>
+                          <li><a href="#">TAN(%VAR%)</a></li>
+                          <li><a href="#">TANH(%VAR%)</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Tuple, Bag, Map Functions</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">TOTUPLE(%VAR%)</a></li>
+                          <li><a href="#">TOBAG(%VAR%)</a></li>
+                          <li><a href="#">TOMAP(%KEY%, %VALUE%)</a></li>
+                          <li><a href="#">TOP(%topN%, %COLUMN%, %RELATION%)</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> String Functions</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">INDEXOF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
+                          <li><a href="#">LAST_INDEX_OF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
+                          <li><a href="#">LOWER(%STRING%)</a></li>
+                          <li><a href="#">REGEX_EXTRACT(%STRING%, %REGEX%, %INDEX%)</a></li>
+                          <li><a href="#">REGEX_EXTRACT_ALL(%STRING%, %REGEX%)</a></li>
+                          <li><a href="#">REPLACE(%STRING%, '%oldChar%', '%newChar%')</a></li>
+                          <li><a href="#">STRSPLIT(%STRING%, %REGEX%, %LIMIT%)</a></li>
+                          <li><a href="#">SUBSTRING(%STRING%, %STARTINDEX%, %STOPINDEX%)</a></li>
+                          <li><a href="#">TRIM(%STRING%)</a></li>
+                          <li><a href="#">UCFIRST(%STRING%)</a></li>
+                          <li><a href="#">UPPER(%STRING%)</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Macros</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">IMPORT '%PATH_TO_MACRO%';</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HBase</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li><a href="#">LOAD 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
+                          <li><a href="#">STORE %VAR% INTO 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Python UDF</a>
+                        <ul class="navigatorFunctionCategoryContent unstyled hide">
+                          <li>
+                            <a data-python="true" href="#">REGISTER 'python_udf.py' USING jython AS myfuncs;</a>
+                          </li>
+                        </ul>
+                      </li>
+                  </ul>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="properties" class="section hide">
+          <div class="alert alert-info">
+            <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
+            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
+            <h3><span data-bind="text: currentScript().name"></span></h3>
+          </div>
+          <form class="form-inline" style="padding-left: 10px">
+            <label>
+              ${ _('Script name') } &nbsp;
+              <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
+            </label>
+
+            <br/>
+            <br/>
+
+            <h4>${ _('Pig parameters') } &nbsp; <i id="parameters-dyk" class="fa fa-question-circle"></i></h4>
+            <div id="parameters-dyk-content" class="hide">
+              <ul style="text-align: left;">
+                <li>input /user/data</li>
+                <li>-param input=/user/data</li>
+                <li>-optimizer_off SplitFilter</li>
+                <li>-verbose</li>
+              </ul>
+            </div>
+            <div class="parameterTableCnt">
+              <table class="parameterTable" data-bind="visible: currentScript().parameters().length == 0">
+                <tr>
+                  <td>
+                    ${ _('There are currently no defined parameters.') }
+                    <button class="btn" data-bind="click: currentScript().addParameter" style="margin-left: 4px">
+                      <i class="fa fa-plus"></i> ${ _('Add') }
+                    </button>
+                  </td>
+                </tr>
+              </table>
+              <table data-bind="css: {'parameterTable': currentScript().parameters().length > 0}">
+                <thead data-bind="visible: currentScript().parameters().length > 0">
+                  <tr>
+                    <th>${ _('Name') }</th>
+                    <th>${ _('Value') }</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: currentScript().parameters">
+                  <tr>
+                    <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
+                    <td>
+                      <div class="input-append">
+                        <input type="text" data-bind="value: value" class="input-xxlarge" />
+                        <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                      </div>
+                    </td>
+                    <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
+                  </tr>
+                </tbody>
+                <tfoot data-bind="visible: currentScript().parameters().length > 0">
+                  <tr>
+                    <td colspan="3">
+                      <button class="btn" data-bind="click: currentScript().addParameter"><i class="fa fa-plus"></i> ${ _('Add') }</button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <br/>
+            <h4>${ _('Hadoop properties') } &nbsp; <i id="properties-dyk" class="fa fa-question-circle"></i></h4>
+            <div id="properties-dyk-content" class="hide">
+              <ul style="text-align: left; word-wrap:break-word">
+                <li>mapred.job.queue.name production</li>
+                <li>mapred.map.tasks.speculative.execution false</li>
+              </ul>
+            </div>
+            <div class="parameterTableCnt">
+              <table class="parameterTable" data-bind="visible: currentScript().hadoopProperties().length == 0">
+                <tr>
+                  <td>
+                    ${ _('There are currently no defined Hadoop properties.') }
+                    <button class="btn" data-bind="click: currentScript().addHadoopProperties" style="margin-left: 4px">
+                      <i class="fa fa-plus"></i> ${ _('Add') }
+                    </button>
+                  </td>
+                </tr>
+              </table>
+              <table data-bind="css: {'parameterTable': currentScript().hadoopProperties().length > 0}">
+                <thead data-bind="visible: currentScript().hadoopProperties().length > 0">
+                  <tr>
+                    <th>${ _('Name') }</th>
+                    <th>${ _('Value') }</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: currentScript().hadoopProperties">
+                  <tr>
+                    <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
+                    <td>
+                      <div class="input-append">
+                        <input type="text" data-bind="value: value" class="input-xxlarge" />
+                        <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                      </div>
+                    </td>
+                    <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
+                  </tr>
+                </tbody>
+                <tfoot data-bind="visible: currentScript().hadoopProperties().length > 0">
+                  <tr>
+                    <td colspan="3">
+                      <button class="btn" data-bind="click: currentScript().addHadoopProperties"><i class="fa fa-plus"></i> ${ _('Add') }</button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <br/>
+
+            <h4>${ _('Resources') } &nbsp; <i id="resources-dyk" class="fa fa-question-circle"></i></h4>
+            <div id="resources-dyk-content" class="hide">
+              <ul style="text-align: left;">
+                <li>${ _("Path to a HDFS file or zip file to add to the workspace of the running script") }</li>
+              </ul>
+            </div>
+            <div class="parameterTableCnt">
+              <table class="parameterTable" data-bind="visible: currentScript().resources().length == 0">
+                <tr>
+                  <td>
+                    ${ _('There are currently no defined resources.') }
+                    <button class="btn" data-bind="click: currentScript().addResource" style="margin-left: 4px">
+                      <i class="fa fa-plus"></i> ${ _('Add') }
+                    </button>
+                  </td>
+                </tr>
+              </table>
+              <table data-bind="css: {'parameterTable': currentScript().resources().length > 0}">
+                <thead data-bind="visible: currentScript().resources().length > 0">
+                  <tr>
+                    <th>${ _('Type') }</th>
+                    <th>${ _('Value') }</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: currentScript().resources">
+                  <tr>
+                    <td>
+                      <select type="text" data-bind="value: type" class="input-xlarge">
+                        ##<option value="udf">${ _('UDF') }</option>
+                        <option value="file">${ _('File') }</option>
+                        <option value="archive">${ _('Archive') }</option>
+                      </select>
+                    </td>
+                    <td>
+                      <div class="input-append">
+                        <input type="text" data-bind="value: value" class="input-xxlarge" />
+                        <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                      </div>
+                    </td>
+                    <td>
+                      <button data-bind="click: viewModel.currentScript().removeResource" class="btn">
+                      <i class="fa fa-trash-o"></i> ${ _('Remove') }</button>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot data-bind="visible: currentScript().resources().length > 0">
+                  <tr>
+                    <td colspan="3">
+                      <button class="btn" data-bind="click: currentScript().addResource"><i class="fa fa-plus"></i> ${ _('Add') }</button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </form>
+        </div>
+
+        <div id="logs" class="section hide">
+            <div class="alert alert-info">
+              <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
+              <h3><span data-bind="text: currentScript().name"></span></h3>
+            </div>
+            <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
+            <script id="logTemplate" type="text/html">
+              <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
+                <div class="pull-right">
+                    ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
+                </div>
+                <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
+                <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
+                  <div data-bind="css: {'bar': name != '', 'bar-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'bar-warning': status == 'RUNNING' || status == 'PREP' || !isReallyDone, 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
+                </div>
+              </div>
+            </script>
+            <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif" data-bind="visible: currentScript().isRunning()"/></pre>
+            <pre id="withLogs" class="hide scroll"></pre>
+          </div>
+        </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="row-fluid mainSection hide">
+
+      <div class="card card-small">
+        <h2 class="card-heading simple">${ _('Running') }</h2>
+        <div class="card-body">
+          <p>
+          <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
+            ${_('There are currently no running scripts.')}
+          </div>
+          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
+            <thead>
+            <tr>
+              <th width="20%">${_('Name')}</th>
+              <th width="40%">${_('Progress')}</th>
+              <th>${_('Created on')}</th>
+              <th width="30">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody data-bind="template: {name: 'runningTemplate', foreach: runningScripts}">
+
+            </tbody>
+          </table>
+          </p>
+        </div>
+      </div>
+
+      <div class="card card-small">
+        <h2 class="card-heading simple">${ _('Completed') }</h2>
+        <div class="card-body">
+          <p>
+          <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
+            ${_('There are currently no completed scripts.')}
+          </div>
+          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
+            <thead>
+            <tr>
+              <th width="20%">${_('Name')}</th>
+              <th width="40%">${_('Status')}</th>
+              <th>${_('Created on')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="template: {name: 'completedTemplate', foreach: completedScripts}">
+
+            </tbody>
+          </table>
+          </p>
+        </div>
+      </div>
+
+      <script id="runningTemplate" type="text/html">
+        <tr style="cursor: pointer">
+          <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
+            <strong><a data-bind="text: appName"></a></strong>
           </td>
-        </tr>
-        <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
-          <td colspan="3">
-            <div class="alert">
-                ${_('There are no scripts matching the search criteria.')}
+          <td>
+            <div data-bind="css: {'progress': appName != '', 'progress-striped': appName != '', 'active': status == 'RUNNING'}">
+              <div data-bind="css: {'bar': appName != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP' || status == 'SUSPENDED', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
             </div>
           </td>
+          <td data-bind="text: created"></td>
+          <td data-bind="click: $root.showLogs"><i class="fa fa-tasks"></i></td>
         </tr>
-        </tfoot>
-      </table>
+      </script>
 
-      <script id="scriptTemplate" type="text/html">
-        <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
-          <td class="center" data-bind="click: handleSelect" style="cursor: default">
-            <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+      <script id="completedTemplate" type="text/html">
+        <tr style="cursor: pointer" data-bind="click: $root.viewSubmittedScript" title="${_('Click to view')}">
+          <td>
+            <strong><a data-bind="text: appName"></a></strong>
           </td>
-          <td data-bind="click: $root.confirmViewScript">
-            <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
+          <td>
+            <span data-bind="attr: {'class': statusClass}, text: status"></span>
           </td>
-          <td data-bind="click: $root.confirmViewScript">
-            <span data-bind="text: scriptSumup"></span>
-          </td>
+          <td data-bind="text: created"></td>
         </tr>
       </script>
     </div>
   </div>
 
-  <div id="editor" class="row-fluid mainSection hide">
-    <div class="span2">
-      <div class="sidebar-nav" style="padding-top: 0">
-          <ul class="nav nav-list">
-            <li class="nav-header">${_('Editor')}</li>
-            <li data-bind="click: editScript" class="active" data-section="edit">
-              <a href="#"><i class="fa fa-edit"></i> ${ _('Pig') }</a>
-            </li>
-            <li data-bind="click: editScriptProperties" data-section="properties">
-              <a href="#"><i class="fa fa-bars"></i> ${ _('Properties') }</a>
-            </li>
-            <li data-bind="click: saveScript, visible: currentScript().can_write()">
-              <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-floppy-o"></i> ${ _('Save') }
-              </a>
-            </li>
-            <li data-bind="click: confirmNewScript">
-              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-plus-circle"></i> ${ _('New Script') }
-              </a>
-            </li>
-            <li class="nav-header">${_('Run')}</li>
-            <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
-              <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-play"></i> ${ _('Submit') }
-              </a>
-            </li>
-            <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
-              <a href="#" title="${ _('Stop the script') }" rel="tooltip" data-placement="right" class="disabled">
-                <i class="fa fa-ban"></i> ${ _('Stop') }
-              </a>
-            </li>
-            <li data-bind="click: showScriptLogs" data-section="logs">
-              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-tasks"></i> ${ _('Logs') }
-              </a>
-            </li>
-            <li data-bind="visible: currentScript().id() != -1, click: copyScript">
-              <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-files-o"></i> ${ _('Copy') }
-              </a>
-            </li>
-            <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
-              <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-trash-o"></i> ${ _('Delete') }
-              </a>
-            </li>
-            <li>
-            <a href="#" id="help">
-              <i class="fa fa-question-circle"></i>
-            </a>
-            <div id="help-content" class="hide">
-              <ul style="text-align: left;">
-                <li>${ _("Press CTRL + Space to autocomplete") }</li>
-                <li>${ _("You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor") }</li>
-              </ul>
-            </div>
-            </li>
-          </ul>
-      </div>
-    </div>
 
-    <div class="span10">
-      <div class="ribbon-wrapper" data-bind="visible: isDirty">
-        <div class="ribbon">${ _('Unsaved') }</div>
-      </div>
-
-      <div class="card card-small">
-
-      <div id="edit" class="section">
-        <div class="alert alert-info">
-          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
-          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
-          <h3><span data-bind="text: currentScript().name"></span></h3>
-        </div>
-        <div class="row-fluid">
-          <div id="queryColumn" class="span9">
-            <a id="navigatorShow" href="#" title="${_('Show the assist')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:30px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
-            <form id="queryForm">
-              <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
-            </form>
-          </div>
-          <div id="navigatorColumn" class="span3">
-            <a id="navigatorHide" href="#" title="${_('Hide the assist')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-chevron-right"></i></a>
-            <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-            <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Assist')}</h1>
-            <div class="card-body">
-              <p>
-                <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Function name...') }"/>
-                <ul id="navigatorFunctions" class="unstyled">
-                  <li>
-                    <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Eval Functions</a>
-                    <ul class="navigatorFunctionCategoryContent unstyled hide">
-                      <li><a href="#">AVG(%VAR%)</a></li>
-                      <li><a href="#">CONCAT(%VAR1%, %VAR2%)</a></li>
-                      <li><a href="#">COUNT(%VAR%)</a></li>
-                      <li><a href="#">COUNT_START(%VAR%)</a></li>
-                      <li><a href="#">IsEmpty(%VAR%)</a></li>
-                      <li><a href="#">DIFF(%VAR1%, %VAR2%)</a></li>
-                      <li><a href="#">MAX(%VAR%)</a></li>
-                      <li><a href="#">MIN(%VAR%)</a></li>
-                      <li><a href="#">SIZE(%VAR%)</a></li>
-                      <li><a href="#">SUM(%VAR%)</a></li>
-                      <li><a href="#">TOKENIZE(%VAR%, %DELIM%)</a></li>
-                    </ul>
-                  </li>
-                  <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Relational Operators</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">COGROUP %VAR% BY %VAR%</a></li>
-                        <li><a href="#">CROSS %VAR1%, %VAR2%;</a></li>
-                        <li><a href="#">DISTINCT %VAR%;</a></li>
-                        <li><a href="#">FILTER %VAR% BY %COND%</a></li>
-                        <li><a href="#">FLATTEN(%VAR%)</a></li>
-                        <li><a href="#">FOREACH %DATA% GENERATE %NEW_DATA%;</a></li>
-                        <li><a href="#">FOREACH %DATA% {%NESTED_BLOCK%};</a></li>
-                        <li><a href="#">GROUP %VAR% BY %VAR%</a></li>
-                        <li><a href="#">GROUP %VAR% ALL</a></li>
-                        <li><a href="#">JOIN %VAR% BY </a></li>
-                        <li><a href="#">LIMIT %VAR% %N%</a></li>
-                        <li><a href="#">ORDER %VAR% BY %FIELD%</a></li>
-                        <li><a href="#">SAMPLE %VAR% %SIZE%</a></li>
-                        <li><a href="#">SPLIT %VAR1% INTO %VAR2% IF %EXPRESSIONS%</a></li>
-                        <li><a href="#">UNION %VAR1%, %VAR2%</a></li>
-                      </ul>
-                    </li>
-
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Input/Output</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">LOAD '%FILE%';</a></li>
-                        <li><a href="#">DUMP %VAR%;</a></li>
-                        <li><a href="#">STORE %VAR% INTO %PATH%;</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Debug</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">EXPLAIN %VAR%;</a></li>
-                        <li><a href="#">ILLUSTRATE %VAR%;</a></li>
-                        <li><a href="#">DESCRIBE %VAR%;</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HCatalog</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">LOAD '%TABLE%' USING org.apache.hcatalog.pig.HCatLoader();</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Math</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">ABS(%VAR%)</a></li>
-                        <li><a href="#">ACOS(%VAR%)</a></li>
-                        <li><a href="#">ASIN(%VAR%)</a></li>
-                        <li><a href="#">ATAN(%VAR%)</a></li>
-                        <li><a href="#">CBRT(%VAR%)</a></li>
-                        <li><a href="#">CEIL(%VAR%)</a></li>
-                        <li><a href="#">COS(%VAR%)</a></li>
-                        <li><a href="#">COSH(%VAR%)</a></li>
-                        <li><a href="#">EXP(%VAR%)</a></li>
-                        <li><a href="#">FLOOR(%VAR%)</a></li>
-                        <li><a href="#">LOG(%VAR%)</a></li>
-                        <li><a href="#">LOG10(%VAR%)</a></li>
-                        <li><a href="#">RANDOM(%VAR%)</a></li>
-                        <li><a href="#">ROUND(%VAR%)</a></li>
-                        <li><a href="#">SIN(%VAR%)</a></li>
-                        <li><a href="#">SINH(%VAR%)</a></li>
-                        <li><a href="#">SQRT(%VAR%)</a></li>
-                        <li><a href="#">TAN(%VAR%)</a></li>
-                        <li><a href="#">TANH(%VAR%)</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Tuple, Bag, Map Functions</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">TOTUPLE(%VAR%)</a></li>
-                        <li><a href="#">TOBAG(%VAR%)</a></li>
-                        <li><a href="#">TOMAP(%KEY%, %VALUE%)</a></li>
-                        <li><a href="#">TOP(%topN%, %COLUMN%, %RELATION%)</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> String Functions</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">INDEXOF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
-                        <li><a href="#">LAST_INDEX_OF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
-                        <li><a href="#">LOWER(%STRING%)</a></li>
-                        <li><a href="#">REGEX_EXTRACT(%STRING%, %REGEX%, %INDEX%)</a></li>
-                        <li><a href="#">REGEX_EXTRACT_ALL(%STRING%, %REGEX%)</a></li>
-                        <li><a href="#">REPLACE(%STRING%, '%oldChar%', '%newChar%')</a></li>
-                        <li><a href="#">STRSPLIT(%STRING%, %REGEX%, %LIMIT%)</a></li>
-                        <li><a href="#">SUBSTRING(%STRING%, %STARTINDEX%, %STOPINDEX%)</a></li>
-                        <li><a href="#">TRIM(%STRING%)</a></li>
-                        <li><a href="#">UCFIRST(%STRING%)</a></li>
-                        <li><a href="#">UPPER(%STRING%)</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Macros</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">IMPORT '%PATH_TO_MACRO%';</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> HBase</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li><a href="#">LOAD 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
-                        <li><a href="#">STORE %VAR% INTO 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a class="navigatorFunctionCategory" href="javascript:void(0)"><i class="fa fa-caret-right"></i> Python UDF</a>
-                      <ul class="navigatorFunctionCategoryContent unstyled hide">
-                        <li>
-                          <a data-python="true" href="#">REGISTER 'python_udf.py' USING jython AS myfuncs;</a>
-                        </li>
-                      </ul>
-                    </li>
-                </ul>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="properties" class="section hide">
-        <div class="alert alert-info">
-          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
-          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
-          <h3><span data-bind="text: currentScript().name"></span></h3>
-        </div>
-        <form class="form-inline" style="padding-left: 10px">
-          <label>
-            ${ _('Script name') } &nbsp;
-            <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
-          </label>
-
-          <br/>
-          <br/>
-
-          <h4>${ _('Pig parameters') } &nbsp; <i id="parameters-dyk" class="fa fa-question-circle"></i></h4>
-          <div id="parameters-dyk-content" class="hide">
-            <ul style="text-align: left;">
-              <li>input /user/data</li>
-              <li>-param input=/user/data</li>
-              <li>-optimizer_off SplitFilter</li>
-              <li>-verbose</li>
-            </ul>
-          </div>
-          <div class="parameterTableCnt">
-            <table class="parameterTable" data-bind="visible: currentScript().parameters().length == 0">
-              <tr>
-                <td>
-                  ${ _('There are currently no defined parameters.') }
-                  <button class="btn" data-bind="click: currentScript().addParameter" style="margin-left: 4px">
-                    <i class="fa fa-plus"></i> ${ _('Add') }
-                  </button>
-                </td>
-              </tr>
-            </table>
-            <table data-bind="css: {'parameterTable': currentScript().parameters().length > 0}">
-              <thead data-bind="visible: currentScript().parameters().length > 0">
-                <tr>
-                  <th>${ _('Name') }</th>
-                  <th>${ _('Value') }</th>
-                  <th>&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody data-bind="foreach: currentScript().parameters">
-                <tr>
-                  <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
-                  <td>
-                    <div class="input-append">
-                      <input type="text" data-bind="value: value" class="input-xxlarge" />
-                      <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
-                    </div>
-                  </td>
-                  <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
-                </tr>
-              </tbody>
-              <tfoot data-bind="visible: currentScript().parameters().length > 0">
-                <tr>
-                  <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addParameter"><i class="fa fa-plus"></i> ${ _('Add') }</button>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <br/>
-          <h4>${ _('Hadoop properties') } &nbsp; <i id="properties-dyk" class="fa fa-question-circle"></i></h4>
-          <div id="properties-dyk-content" class="hide">
-            <ul style="text-align: left; word-wrap:break-word">
-              <li>mapred.job.queue.name production</li>
-              <li>mapred.map.tasks.speculative.execution false</li>
-            </ul>
-          </div>
-          <div class="parameterTableCnt">
-            <table class="parameterTable" data-bind="visible: currentScript().hadoopProperties().length == 0">
-              <tr>
-                <td>
-                  ${ _('There are currently no defined Hadoop properties.') }
-                  <button class="btn" data-bind="click: currentScript().addHadoopProperties" style="margin-left: 4px">
-                    <i class="fa fa-plus"></i> ${ _('Add') }
-                  </button>
-                </td>
-              </tr>
-            </table>
-            <table data-bind="css: {'parameterTable': currentScript().hadoopProperties().length > 0}">
-              <thead data-bind="visible: currentScript().hadoopProperties().length > 0">
-                <tr>
-                  <th>${ _('Name') }</th>
-                  <th>${ _('Value') }</th>
-                  <th>&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody data-bind="foreach: currentScript().hadoopProperties">
-                <tr>
-                  <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
-                  <td>
-                    <div class="input-append">
-                      <input type="text" data-bind="value: value" class="input-xxlarge" />
-                      <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
-                    </div>
-                  </td>
-                  <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
-                </tr>
-              </tbody>
-              <tfoot data-bind="visible: currentScript().hadoopProperties().length > 0">
-                <tr>
-                  <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addHadoopProperties"><i class="fa fa-plus"></i> ${ _('Add') }</button>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <br/>
-
-          <h4>${ _('Resources') } &nbsp; <i id="resources-dyk" class="fa fa-question-circle"></i></h4>
-          <div id="resources-dyk-content" class="hide">
-            <ul style="text-align: left;">
-              <li>${ _("Path to a HDFS file or zip file to add to the workspace of the running script") }</li>
-            </ul>
-          </div>
-          <div class="parameterTableCnt">
-            <table class="parameterTable" data-bind="visible: currentScript().resources().length == 0">
-              <tr>
-                <td>
-                  ${ _('There are currently no defined resources.') }
-                  <button class="btn" data-bind="click: currentScript().addResource" style="margin-left: 4px">
-                    <i class="fa fa-plus"></i> ${ _('Add') }
-                  </button>
-                </td>
-              </tr>
-            </table>
-            <table data-bind="css: {'parameterTable': currentScript().resources().length > 0}">
-              <thead data-bind="visible: currentScript().resources().length > 0">
-                <tr>
-                  <th>${ _('Type') }</th>
-                  <th>${ _('Value') }</th>
-                  <th>&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody data-bind="foreach: currentScript().resources">
-                <tr>
-                  <td>
-                    <select type="text" data-bind="value: type" class="input-xlarge">
-                      ##<option value="udf">${ _('UDF') }</option>
-                      <option value="file">${ _('File') }</option>
-                      <option value="archive">${ _('Archive') }</option>
-                    </select>
-                  </td>
-                  <td>
-                    <div class="input-append">
-                      <input type="text" data-bind="value: value" class="input-xxlarge" />
-                      <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
-                    </div>
-                  </td>
-                  <td>
-                    <button data-bind="click: viewModel.currentScript().removeResource" class="btn">
-                    <i class="fa fa-trash-o"></i> ${ _('Remove') }</button>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot data-bind="visible: currentScript().resources().length > 0">
-                <tr>
-                  <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addResource"><i class="fa fa-plus"></i> ${ _('Add') }</button>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </form>
-      </div>
-
-      <div id="logs" class="section hide">
-          <div class="alert alert-info">
-            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
-            <h3><span data-bind="text: currentScript().name"></span></h3>
-          </div>
-          <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
-          <script id="logTemplate" type="text/html">
-            <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
-              <div class="pull-right">
-                  ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
-              </div>
-              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
-              <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
-                <div data-bind="css: {'bar': name != '', 'bar-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'bar-warning': status == 'RUNNING' || status == 'PREP' || !isReallyDone, 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
-              </div>
-            </div>
-          </script>
-          <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif" data-bind="visible: currentScript().isRunning()"/></pre>
-          <pre id="withLogs" class="hide scroll"></pre>
-        </div>
-      </div>
-      </div>
-  </div>
-
-  <div id="dashboard" class="row-fluid mainSection hide">
-
-    <div class="card card-small">
-      <h2 class="card-heading simple">${ _('Running') }</h2>
-      <div class="card-body">
-        <p>
-        <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
-          ${_('There are currently no running scripts.')}
-        </div>
-        <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
-          <thead>
-          <tr>
-            <th width="20%">${_('Name')}</th>
-            <th width="40%">${_('Progress')}</th>
-            <th>${_('Created on')}</th>
-            <th width="30">&nbsp;</th>
-          </tr>
-          </thead>
-          <tbody data-bind="template: {name: 'runningTemplate', foreach: runningScripts}">
-
-          </tbody>
-        </table>
-        </p>
-      </div>
-    </div>
-
-    <div class="card card-small">
-      <h2 class="card-heading simple">${ _('Completed') }</h2>
-      <div class="card-body">
-        <p>
-        <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
-          ${_('There are currently no completed scripts.')}
-        </div>
-        <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
-          <thead>
-          <tr>
-            <th width="20%">${_('Name')}</th>
-            <th width="40%">${_('Status')}</th>
-            <th>${_('Created on')}</th>
-          </tr>
-          </thead>
-          <tbody data-bind="template: {name: 'completedTemplate', foreach: completedScripts}">
-
-          </tbody>
-        </table>
-        </p>
-      </div>
-    </div>
-
-    <script id="runningTemplate" type="text/html">
-      <tr style="cursor: pointer">
-        <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
-          <strong><a data-bind="text: appName"></a></strong>
-        </td>
-        <td>
-          <div data-bind="css: {'progress': appName != '', 'progress-striped': appName != '', 'active': status == 'RUNNING'}">
-            <div data-bind="css: {'bar': appName != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP' || status == 'SUSPENDED', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
-          </div>
-        </td>
-        <td data-bind="text: created"></td>
-        <td data-bind="click: $root.showLogs"><i class="fa fa-tasks"></i></td>
-      </tr>
-    </script>
-
-    <script id="completedTemplate" type="text/html">
-      <tr style="cursor: pointer" data-bind="click: $root.viewSubmittedScript" title="${_('Click to view')}">
-        <td>
-          <strong><a data-bind="text: appName"></a></strong>
-        </td>
-        <td>
-          <span data-bind="attr: {'class': statusClass}, text: status"></span>
-        </td>
-        <td data-bind="text: created"></td>
-      </tr>
-    </script>
-  </div>
-</div>
-
-
-<div id="deleteModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Delete')}</h3>
-  </div>
-  <div class="modal-body">
-    <p class="deleteMsg hide single">${_('Are you sure you want to delete this script?')}</p>
-    <p class="deleteMsg hide multiple">${_('Are you sure you want to delete these scripts?')}</p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger" data-bind="click: deleteScripts">${_('Yes')}</a>
-  </div>
-</div>
-
-<div id="logsModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Logs')}</h3>
-  </div>
-  <div class="modal-body">
-    <img src="/static/art/spinner.gif" class="hide" />
-    <pre class="scroll hide"></pre>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
-<div id="submitModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
-  </div>
-  <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
-    <legend style="color:#666">${_('Script variables')}</legend>
-    <div data-bind="foreach: submissionVariables" style="margin-bottom: 20px">
-      <div class="row-fluid">
-        <span data-bind="text: name" class="span3"></span>
-        <input type="text" data-bind="value: value" class="span9" />
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a id="runScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: runScript">${_('Yes')}</a>
-  </div>
-</div>
-
-<div id="stopModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a id="stopScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: stopScript">${_('Yes')}</a>
-  </div>
-</div>
-
-<div id="chooseFile" class="modal hide fade">
+  <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
-        <div id="filechooser">
-        </div>
+      <p class="deleteMsg hide single">${_('Are you sure you want to delete this script?')}</p>
+      <p class="deleteMsg hide multiple">${_('Are you sure you want to delete these scripts?')}</p>
     </div>
     <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-danger" data-bind="click: deleteScripts">${_('Yes')}</a>
     </div>
+  </div>
+
+  <div id="logsModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Logs')}</h3>
+    </div>
+    <div class="modal-body">
+      <img src="/static/art/spinner.gif" class="hide" />
+      <pre class="scroll hide"></pre>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('Close')}</a>
+    </div>
+  </div>
+
+  <div id="submitModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+    </div>
+    <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
+      <legend style="color:#666">${_('Script variables')}</legend>
+      <div data-bind="foreach: submissionVariables" style="margin-bottom: 20px">
+        <div class="row-fluid">
+          <span data-bind="text: name" class="span3"></span>
+          <input type="text" data-bind="value: value" class="span9" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a id="runScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: runScript">${_('Yes')}</a>
+    </div>
+  </div>
+
+  <div id="stopModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a id="stopScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: stopScript">${_('Yes')}</a>
+    </div>
+  </div>
+
+  <div id="chooseFile" class="modal hide fade">
+      <div class="modal-header">
+          <a href="#" class="close" data-dismiss="modal">&times;</a>
+          <h3>${_('Choose a file')}</h3>
+      </div>
+      <div class="modal-body">
+          <div id="filechooser">
+          </div>
+      </div>
+      <div class="modal-footer">
+      </div>
+  </div>
+
+  <div id="confirmModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Are you sure?')}</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        ${_('The current script has unsaved changes. Are you sure you want to discard the changes?')}
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-danger disable-feedback" data-bind="click: confirmScript">${_('Yes')}</a>
+    </div>
+  </div>
+
+  <div id="nameModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Save script')}</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        ${_('Give a meaningful name to this script.')}<br/><br/>
+        <label>
+          ${ _('Script name') } &nbsp;
+          <input type="text" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
+        </label>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <button class="btn btn-primary disable-feedback" data-bind="click: saveScript, enable: currentScript().name() != '' && currentScript().name() != $root.LABELS.NEW_SCRIPT_NAME">${_('Save')}</button>
+    </div>
+  </div>
 </div>
 
-<div id="confirmModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Are you sure?')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      ${_('The current script has unsaved changes. Are you sure you want to discard the changes?')}
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger disable-feedback" data-bind="click: confirmScript">${_('Yes')}</a>
-  </div>
-</div>
-
-<div id="nameModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Save script')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      ${_('Give a meaningful name to this script.')}<br/><br/>
-      <label>
-        ${ _('Script name') } &nbsp;
-        <input type="text" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
-      </label>
-    </p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <button class="btn btn-primary disable-feedback" data-bind="click: saveScript, enable: currentScript().name() != '' && currentScript().name() != $root.LABELS.NEW_SCRIPT_NAME">${_('Save')}</button>
-  </div>
-</div>
-
+${ commonshare() | n,unicode }
 
 <div class="bottomAlert alert"></div>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/pig/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/share.vm.js" type="text/javascript" charset="utf-8"></script>
+
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/js/codemirror-pig.js"></script>
@@ -764,14 +775,22 @@ ${ commonheader(None, "pig", user) | n,unicode }
     deleteUrl: "${ url('pig:delete') }"
   }
 
-  var viewModel = new PigViewModel(appProperties);
-  ko.applyBindings(viewModel);
-
   var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
   var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [503]; // error codes from beeswax/views.py - autocomplete
   var HIVE_AUTOCOMPLETE_USER = "${ user }";
 
   var codeMirror;
+
+  var viewModel = new PigViewModel(appProperties);
+  ko.applyBindings(viewModel, $("#pig-editor-app")[0]);
+  var shareViewModel = setupSharing("#documentShareModal");
+
+  function tryShareQuery() {
+    if (viewModel.currentScript().docId() != -1) {
+      shareViewModel.setDocId(viewModel.currentScript().docId())
+      $("#documentShareModal").modal("show");
+    }
+  }
 
   $(document).ready(function () {
     // initialize navigator

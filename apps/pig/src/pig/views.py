@@ -80,6 +80,7 @@ def save(request):
 
   response = {
     'id': pig_script.id,
+    'docId': pig_script.doc.get().id
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
@@ -167,6 +168,7 @@ def copy(request):
 
   response = {
     'id': script_copy.id,
+    'docId': copy_doc.id,
     'name': name,
     'script': script,
     'parameters': parameters,

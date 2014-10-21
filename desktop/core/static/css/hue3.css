@@ -1684,6 +1684,29 @@ border-bottom-left-radius: 0px;
 
 /*********************************************************
  *
+ * Sharing styles
+ *
+ ********************************************************/
+
+.baseShared {
+  color: #999;
+}
+
+.isShared {
+  color: #338bb8!important;
+}
+
+#documentShareModal .modal-body {
+  overflow-y: initial;
+}
+
+.trash-share, .share-link {
+  cursor: pointer;
+}
+
+
+/*********************************************************
+ *
  * Misc styles that can be reused as needed
  * - from admin_collections.mako template
  *

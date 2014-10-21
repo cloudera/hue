@@ -85,6 +85,7 @@ dynamic_patterns += patterns('desktop.api',
   (r'^desktop/api/tag/remove_tag$', 'remove_tag'),
   (r'^desktop/api/doc/tag$', 'tag'),
   (r'^desktop/api/doc/update_tags$', 'update_tags'),
+  (r'^desktop/api/doc/get$', 'get_document'),
 
   # Permissions
   (r'^desktop/api/doc/update_permissions', 'update_permissions'),

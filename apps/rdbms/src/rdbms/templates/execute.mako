@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from django.utils.translation import ugettext as _
 %>
 
@@ -24,173 +24,178 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 <%common:navbar></%common:navbar>
 
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span2" id="navigator">
-      <ul class="nav nav-tabs" style="margin-bottom: 0">
-        <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${ _('Assist') }</a></li>
-      </ul>
+<div id="rdbms-query-editor">
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span2" id="navigator">
+        <ul class="nav nav-tabs" style="margin-bottom: 0">
+          <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${ _('Assist') }</a></li>
+        </ul>
 
-      <div class="tab-content">
-    <div class="tab-pane active" id="navigatorTab">
-      <div class="card card-small card-tab" style="min-height: 470px;">
-        <div class="card-body" style="margin-top: 0">
-          <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-          <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
+        <div class="tab-content">
+      <div class="tab-pane active" id="navigatorTab">
+        <div class="card card-small card-tab" style="min-height: 470px;">
+          <div class="card-body" style="margin-top: 0">
+            <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
+            <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
 
-          <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
-            <li class="nav-header">${_('server')}</li>
-          </ul>
+            <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
+              <li class="nav-header">${_('server')}</li>
+            </ul>
 
-          <select data-bind="options: $root.servers, value: $root.chosenServer, optionsText: 'nice_name'" class="input-medium chosen-select chosen-server" data-placeholder="${_('Choose a database...')}"></select>
+            <select data-bind="options: $root.servers, value: $root.chosenServer, optionsText: 'nice_name'" class="input-medium chosen-select chosen-server" data-placeholder="${_('Choose a database...')}"></select>
 
-          <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
-            <li class="nav-header">${_('database')}</li>
-          </ul>
+            <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
+              <li class="nav-header">${_('database')}</li>
+            </ul>
 
-          <select data-bind="options: $root.databases, value: $root.chosenDatabase" class="input-medium chosen-select chosen-db" data-placeholder="${_('Choose a database...')}"></select>
+            <select data-bind="options: $root.databases, value: $root.chosenDatabase" class="input-medium chosen-select chosen-db" data-placeholder="${_('Choose a database...')}"></select>
 
-          <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
-          <div id="navigatorNoTables" style="margin-top: 20px">${_('The selected database has no tables.')}</div>
-          <ul id="navigatorTables" class="unstyled"></ul>
-          <div id="navigatorLoader">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-            <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-
-    </div>
-
-    <div class="span10">
-      <div id="query">
-        <div class="card card-small">
-          <div style="margin-bottom: 10px">
-            <h1 class="card-heading simple">
-              <a id="collapse-editor" href="javascript:void(0)" class="pull-right"><i class="fa fa-caret-up"></i></a>
-              ${ _('Query Editor') }
-              % if can_edit_name:
-                :
-                <a href="javascript:void(0);"
-                   id="query-name"
-                   data-type="text"
-                   data-name="name"
-                   data-value="${design.name}"
-                   data-original-title="${ _('Query name') }"
-                   data-placement="right">
-                </a>
-              %endif
-            </h1>
-            % if can_edit_name:
-              <p style="margin-left: 20px">
-                <a href="javascript:void(0);"
-                   id="query-description"
-                   data-type="textarea"
-                   data-name="description"
-                   data-value="${design.desc}"
-                   data-original-title="${ _('Query description') }"
-                   data-placement="right">
-                </a>
-              </p>
-            % endif
-          </div>
-          <div class="card-body">
-            <div class="tab-content">
-              <div id="queryPane">
-
-                <div data-bind="css: {'hide': query.errors().length == 0}" class="hide alert alert-error">
-                  <p><strong>${_('Your query has the following error(s):')}</strong></p>
-                  <div data-bind="foreach: { 'data': query.errors, 'afterRender': resizeTable }">
-                    <p data-bind="text: $data" class="queryErrorMessage"></p>
-                  </div>
-                </div>
-
-                <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
-
-                <div class="actions">
-                  <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
-                  <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
-                  <button data-bind="click: trySaveAsQuery" type="button" class="btn">${_('Save as...')}</button>
-                  <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
-                  &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url('rdbms:execute_query') }">${_('New query')}</a>
-                  <br /><br />
-              </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-bind="css: {'hide': rows().length == 0}" class="hide">
-        <div class="card card-small scrollable">
-          <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
-            <thead>
-              <tr data-bind="foreach: columns">
-                <th data-bind="text: $data"></th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-      </div>
-
-      <div data-bind="css: {'hide': !resultsEmpty()}" class="hide">
-        <div class="card card-small scrollable">
-          <div class="row-fluid">
-            <div class="span10 offset1 center empty-wrapper">
-              <i class="fa fa-frown-o"></i>
-              <h1>${_('The server returned no results.')}</h1>
-              <br />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div data-bind="css: {'hide': !isExecuting()}" class="hide">
-        <div class="card card-small scrollable">
-          <div class="row-fluid">
-            <div class="span10 offset1 center" style="padding: 30px">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+            <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
+            <div id="navigatorNoTables" style="margin-top: 20px">${_('The selected database has no tables.')}</div>
+            <ul id="navigatorTables" class="unstyled"></ul>
+            <div id="navigatorLoader">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
             </div>
           </div>
         </div>
       </div>
+
     </div>
 
+
+      </div>
+
+      <div class="span10">
+        <div id="query">
+          <div class="card card-small">
+            <div style="margin-bottom: 10px">
+              <h1 class="card-heading simple">
+                <a id="collapse-editor" href="javascript:void(0)" class="pull-right"><i class="fa fa-caret-up"></i></a>
+                % if can_edit_name:
+
+                  <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
+                    attr: {'data-original-title': '${ _("Share") } '+name},
+                    css: {'baseShared': true, 'isShared': isShared()}">
+                    <i class="fa fa-users"></i>
+                  </a>
+                  <a href="javascript:void(0);"
+                     id="query-name"
+                     data-type="text"
+                     data-name="name"
+                     data-value="${design.name}"
+                     data-original-title="${ _('Query name') }"
+                     data-placement="right">
+                  </a>
+                  <a href="javascript:void(0);"
+                     id="query-description"
+                     data-type="textarea"
+                     data-name="description"
+                     data-value="${design.desc}"
+                     data-original-title="${ _('Query description') }"
+                     data-placement="right" style="font-size: 14px; margin-left: 10px">
+                  </a>
+              </h1>
+              % endif
+            </div>
+            <div class="card-body">
+              <div class="tab-content">
+                <div id="queryPane">
+
+                  <div data-bind="css: {'hide': query.errors().length == 0}" class="hide alert alert-error">
+                    <p><strong>${_('Your query has the following error(s):')}</strong></p>
+                    <div data-bind="foreach: { 'data': query.errors, 'afterRender': resizeTable }">
+                      <p data-bind="text: $data" class="queryErrorMessage"></p>
+                    </div>
+                  </div>
+
+                  <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
+
+                  <div class="actions">
+                    <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+                    <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
+                    <button data-bind="click: trySaveAsQuery" type="button" class="btn">${_('Save as...')}</button>
+                    <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
+                    &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url('rdbms:execute_query') }">${_('New query')}</a>
+                    <br /><br />
+                </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-bind="css: {'hide': rows().length == 0}" class="hide">
+          <div class="card card-small scrollable">
+            <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+              <thead>
+                <tr data-bind="foreach: columns">
+                  <th data-bind="text: $data"></th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+
+        <div data-bind="css: {'hide': !resultsEmpty()}" class="hide">
+          <div class="card card-small scrollable">
+            <div class="row-fluid">
+              <div class="span10 offset1 center empty-wrapper">
+                <i class="fa fa-frown-o"></i>
+                <h1>${_('The server returned no results.')}</h1>
+                <br />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-bind="css: {'hide': !isExecuting()}" class="hide">
+          <div class="card card-small scrollable">
+            <div class="row-fluid">
+              <div class="span10 offset1 center" style="padding: 30px">
+                <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+                <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="saveAsQueryModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Save your query')}</h3>
+    </div>
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <div class="control-group" id="saveas-query-name">
+          <label class="control-label">${_('Name')}</label>
+          <div class="controls">
+            <input data-bind="value: $root.query.name" type="text" class="input-xlarge">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">${_('Description')}</label>
+          <div class="controls">
+            <input data-bind="value: $root.query.description" type="text" class="input-xlarge">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+      <button data-bind="click: modalSaveAsQuery" class="btn btn-primary">${_('Save')}</button>
+    </div>
   </div>
 </div>
 
+${ commonshare() | n,unicode }
 
-<div id="saveAsQueryModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Save your query')}</h3>
-  </div>
-  <div class="modal-body">
-    <form class="form-horizontal">
-      <div class="control-group" id="saveas-query-name">
-        <label class="control-label">${_('Name')}</label>
-        <div class="controls">
-          <input data-bind="value: $root.query.name" type="text" class="input-xlarge">
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label">${_('Description')}</label>
-        <div class="controls">
-          <input data-bind="value: $root.query.description" type="text" class="input-xlarge">
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: modalSaveAsQuery" class="btn btn-primary">${_('Save')}</button>
-  </div>
-</div>
 
 
 <style type="text/css">
@@ -323,6 +328,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/rdbms/static/js/rdbms.vm.js"></script>
+<script src="/static/js/share.vm.js"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-sql.js"></script>
@@ -666,6 +672,9 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
   // Knockout
   viewModel = new RdbmsViewModel();
+  shareViewModel = setupSharing("#documentShareModal");
+  shareViewModel.setDocId(${doc_id});
+
   viewModel.fetchServers();
   viewModel.database.subscribe((function() {
     // First call skipped to avoid reset of hueRdbmsLastDatabase
@@ -697,7 +706,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
     $("#executeQuery").button("reset");
   }
-  ko.applyBindings(viewModel);
+  ko.applyBindings(viewModel, $("#rdbms-query-editor")[0]);
 
   function resetNavigator() {
     renderNavigator();
