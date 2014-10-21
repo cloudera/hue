@@ -1700,26 +1700,50 @@ $(document).ready(function () {
     viewModel.search();
   }
 
-  function widgetDraggedAdditionalHandler(widget) {
-    showAddFacetDemiModal(widget);
+  function widgetDraggedAdditionalHandler(widget, row) {
+    showAddFacetDemiModal(widget, row);
+  }
+
+  function distributeRowWidgetsSize(row, waitForIt) {
+    if (row) {
+      if (waitForIt) {
+        var _initial = row.widgets().length;
+        var _widgetDropInterval = window.setInterval(function () {
+          if (row.widgets().length != _initial) {
+            window.clearInterval(_widgetDropInterval);
+            row.autosizeWidgets();
+          }
+        }, 100)
+      }
+      else {
+        row.autosizeWidgets();
+      }
+    }
   }
 
   var selectedWidget = null;
-  function showAddFacetDemiModal(widget) {
+  var selectedRow = null;
+  function showAddFacetDemiModal(widget, row) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       viewModel.collection.template.fieldsModalType(widget.widgetType());
       viewModel.collection.template.fieldsModalFilter.valueHasMutated();
       $('#addFacetInput').typeahead({
-          'source': viewModel.collection.template.availableWidgetFieldsNames(),
-          'updater': function(item) {
-              addFacetDemiModalFieldPreview({'name': function(){return item}});
-              return item;
-           }
+        'source': viewModel.collection.template.availableWidgetFieldsNames(),
+        'updater': function (item) {
+          addFacetDemiModalFieldPreview({'name': function () {
+            return item
+          }});
+          return item;
+        }
       });
       selectedWidget = widget;
+      selectedRow = row;
       $("#addFacetDemiModal").modal("show");
       $("#addFacetDemiModal input[type='text']").focus();
+    }
+    else {
+      distributeRowWidgetsSize(row, true);
     }
   }
 
@@ -1735,11 +1759,15 @@ $(document).ready(function () {
         _existingFacet.field(field.name());
       }
       $("#addFacetDemiModal").modal("hide");
+      if (selectedRow != null) {
+        distributeRowWidgetsSize(selectedRow);
+      }
     }
   }
 
   function addFacetDemiModalFieldCancel() {
     viewModel.removeWidget(selectedWidget);
+    selectedRow = null;
   }
 
   $(document).on("setResultsHeight", function () {
