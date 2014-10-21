@@ -140,8 +140,8 @@ class Node():
     if 'archives' not in self.data['properties']:
       self.data['properties']['archives'] = []
 
-    if 'script_path' not in self.data['properties']:
-      self.data['properties']['script_path'] = 'test.pig'      
+#    if 'script_path' not in self.data['properties']:
+#      self.data['properties']['script_path'] = 'test.pig'      
 
     if 'sla_enabled' not in self.data['properties']:
       self.data['properties']['sla_enabled'] = False
