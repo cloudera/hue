@@ -47,6 +47,7 @@ function loadLayout(viewModel, json_layout) {
   viewModel.columns(_columns);
 }
 
+
 // End dashboard lib
 
 var Node = function (node) {
@@ -90,6 +91,7 @@ var Workflow = function (vm, workflow) {
       var node = new Node(ko.mapping.toJS(widget));
       node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'})
       self.nodes.push(node);
+
       self.nodes()[0].children.removeAll();
       self.nodes()[0].children().push({'to': node.id()});
     //}
@@ -126,6 +128,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
     self.workflow.loadNodes(workflow_json);
   }
 
+  self.addActionScriptPath = ko.observable("");
+  
   self.getWidgetById = function (widget_id) {
     var _widget = null;
     $.each(self.columns(), function (i, col) {
@@ -133,6 +137,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
         $.each(row.widgets(), function (z, widget) {
           if (widget.id() == widget_id){
             _widget = widget;
+            return false;
           }
         });
       });

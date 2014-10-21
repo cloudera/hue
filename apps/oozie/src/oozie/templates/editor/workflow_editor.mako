@@ -81,6 +81,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
         <i class="fa fa-file-o"></i>
       </a>
+      <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-tags"></i>
+      </a>
     % endif
   </div>
 </div>
@@ -177,6 +180,7 @@ ${ dashboard.layout_skeleton() }
       <div class="tab-content">
         <div class="tab-pane active" id="action">
           <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
+          <input type="text" data-bind="value: properties.script_path" />
         </div>
         <div class="tab-pane" id="files">
         </div>
@@ -193,6 +197,21 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 </script>
+
+
+<div id="addActionDemiModal" class="demi-modal hide" data-backdrop="false">
+  <div class="modal-body">
+    <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
+    
+    <input type="text" data-bind="value: $root.addActionScriptPath"/>
+    
+    <a data-bind="click: addActionDemiModalFieldPreview">
+      Add
+    </a>
+    
+    <div>
+  </div>
+</div>
 
 
 <link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
@@ -224,8 +243,27 @@ ${ dashboard.import_bindings() }
   }
 
   function widgetDraggedAdditionalHandler(widget) {
-    viewModel.workflow.addNode(widget);
+    showAddActionDemiModal(widget);
   }
+  
+  var newAction = null;
+
+  function showAddActionDemiModal(widget) {
+    newAction = widget;
+    $("#addActionDemiModal").modal("show");
+  }
+  
+  function addActionDemiModalFieldPreview(field) {    
+    if (newAction != null) {
+      newAction.properties()['script_path'] = viewModel.addActionScriptPath();
+      viewModel.workflow.addNode(newAction);
+      $("#addActionDemiModal").modal("hide");
+    }
+  }
+    
+  function addActionDemiModalFieldCancel() {
+    //viewModel.removeWidget(selectedWidget); todo remove node
+  }  
 </script>
 
 ${ commonfooter(messages) | n,unicode }
