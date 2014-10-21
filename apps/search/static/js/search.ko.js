@@ -1122,6 +1122,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         $.each(row.widgets(), function (z, widget) {
           if (widget.id() == widget_id){
             _widget = widget;
+            return false;
           }
         });
       });
@@ -1136,6 +1137,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           if (widget && widget.id() == widget_id){
             row.widgets.remove(widget);
             row.autosizeWidgets();
+            return false;
           }
         });
       });
