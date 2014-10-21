@@ -35,15 +35,31 @@ var AppViewModel = function() {
   self.views = {
     tables: new DataTableViewModel({columns:['Table Name', 'Enabled'], el: 'views.tables', reload: function(callback) {
       var d_self = this;
+      d_self.isReLoading(true);
       d_self.items.removeAll();
       API.queryCluster("getTableList").done(function(data) {
         d_self.items.removeAll(); //need to remove again before callback executes
-        for(q=0; q<data.length; q++) {
-          d_self.items.push(new TableDataRow(data[q]));
+        function _isDropped (tableName) {
+          var _found = false;
+          d_self.droppedTables.forEach(function(t){
+            if (t.name == tableName){
+              _found = true;
+            }
+          });
+          return _found;
         }
+        var _items = [];
+        for(q=0; q<data.length; q++) {
+          if (!_isDropped(data[q].name)) {
+            _items.push(new TableDataRow(data[q]));
+          }
+        }
+        d_self.droppedTables = [];
+        d_self.items(_items);
         d_self._el.find('a[data-row-selector=true]').jHueRowSelector();
         if(callback!=null)
           callback();
+        d_self.isReLoading(false);
       });
     }}),
     tabledata: new SmartViewModel({'canWrite': canWrite, el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class?
