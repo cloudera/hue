@@ -1,3 +1,5 @@
+var shareViewModel;
+
 function ShareViewModel(updateDocF) {
   var self = this;
 
@@ -24,6 +26,25 @@ function ShareViewModel(updateDocF) {
   }))
 
   self.updateDoc = updateDocF
+
+  self.setDocId = function(docId) {
+    if (docId == -1) { return false; }
+    $.get('/desktop/api/doc/get', { id : docId },
+      function (data) {
+        shareViewModel.selectedDoc(data)
+    });
+  }
+}
+
+
+function openShareModal() {
+  $("#documentShareModal").modal("show");
+}
+
+function isShared() {
+  if (!shareViewModel) { return false; }
+  read = shareViewModel.selectedDoc().perms.read;
+  return read.users.length + read.groups.length > 0
 }
 
 function prettifyUsername(userId) {
@@ -39,7 +60,10 @@ function prettifyUsername(userId) {
   return "";
 }
 
-function setupSharing(updateFunc, id) {
+function setupSharing(id, updateFunc) {
+  if(!updateFunc) {
+    updateFunc = function () {}
+  }
   shareViewModel = new ShareViewModel(updateFunc);
   ko.applyBindings(shareViewModel, $(id)[0]);
 
@@ -104,45 +128,30 @@ function setupSharing(updateFunc, id) {
   return shareViewModel;
 }
 
-
-function removeUserReadShare(user) {
-  $(shareViewModel.selectedDoc().perms.read.users).each(function (cnt, item) {
+function updateSharePerm(perms, user) {
+  $(perms).each(function (cnt, item) {
     if (item.id == user.id) {
-      shareViewModel.selectedDoc().perms.read.users.splice(cnt, 1);
+      perms.splice(cnt, 1);
     }
   });
   shareViewModel.selectedDoc.valueHasMutated();
   shareDocFinal();
+}
+
+function removeUserReadShare(user) {
+  updateSharePerm(shareViewModel.selectedDoc().perms.read.users, user);
 }
 
 function removeUserWriteShare(user) {
-  $(shareViewModel.selectedDoc().perms.write.users).each(function (cnt, item) {
-    if (item.id == user.id) {
-      shareViewModel.selectedDoc().perms.write.users.splice(cnt, 1);
-    }
-  });
-  shareViewModel.selectedDoc.valueHasMutated();
-  shareDocFinal();
+  updateSharePerm(shareViewModel.selectedDoc().perms.write.users, user);
 }
 
 function removeGroupReadShare(group) {
-  $(shareViewModel.selectedDoc().perms.read.groups).each(function (cnt, item) {
-    if (item.id == group.id) {
-      shareViewModel.selectedDoc().perms.read.groups.splice(cnt, 1);
-    }
-  });
-  shareViewModel.selectedDoc.valueHasMutated();
-  shareDocFinal();
+  updateSharePerm(shareViewModel.selectedDoc().perms.read.groups, group);
 }
 
 function removeGroupWriteShare(group) {
-  $(shareViewModel.selectedDoc().perms.write.groups).each(function (cnt, item) {
-    if (item.id == group.id) {
-      shareViewModel.selectedDoc().perms.write.groups.splice(cnt, 1);
-    }
-  });
-  shareViewModel.selectedDoc.valueHasMutated();
-  shareDocFinal();
+  updateSharePerm(shareViewModel.selectedDoc().perms.write.groups, group);
 }
 
 function changeDocumentSharePerm(perm) {

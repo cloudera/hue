@@ -67,10 +67,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-bottom: 6px;
   }
 
-  .trash-share, .share-link {
-    cursor: pointer;
-  }
-
   .white {
     padding: 9px 18px;
     margin-top: 1px;
@@ -81,17 +77,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     text-overflow: ellipsis;
   }
 
-  .baseShared {
-    color: #999;
-  }
-
-  .isShared {
-    color: #338bb8!important;
-  }
-
-  #documentShareModal .modal-body {
-    overflow-y: initial;
-  }
 
 </style>
 
@@ -347,7 +332,7 @@ ${ commonshare() | n,unicode }
     viewModel = new HomeViewModel(JSON_TAGS, JSON_DOCS);
     ko.applyBindings(viewModel, $('#documentList')[0]);
 
-    shareViewModel = setupSharing(viewModel.updateDoc, "#documentShareModal");
+    shareViewModel = setupSharing("#documentShareModal", viewModel.updateDoc);
 
     var selectedUserOrGroup, map, dropdown = null;
 

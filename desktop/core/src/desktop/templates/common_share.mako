@@ -51,7 +51,7 @@ from django.utils.translation import ugettext as _
       <div class="clearfix"></div>
       <div style="margin-top: 20px">
         <div class="input-append">
-          <input id="documentShareTypeahead" type="text" style="width: 460px" placeholder="${_('Type a username, a group, or "Everyone"')}">
+          <input id="documentShareTypeahead" type="text" style="width: 460px" placeholder="${_('Type a username or a group name')}">
           <div class="btn-group">
             <a id="documentShareAddBtn" class="btn"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPermLabel"></span></a>
             <a class="btn dropdown-toggle" data-toggle="dropdown">

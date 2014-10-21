@@ -138,7 +138,6 @@ def _save_design(user, design, type_, design_obj, explicit_save, name=None, desc
 
   return design
 
-
 def delete_design(request):
   if request.method == 'POST':
     ids = request.POST.getlist('designs_selection')
@@ -401,6 +400,7 @@ def execute_query(request, design_id=None, query_history_id=None):
     design = safe_get_design(request, query_type, design_id)
     query_history = None
 
+  doc = design and design.id and design.doc.get()
   context = {
     'design': design,
     'query': query_history, # Backward
@@ -408,7 +408,8 @@ def execute_query(request, design_id=None, query_history_id=None):
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'autocomplete_base_url_hive': reverse('beeswax:api_autocomplete_databases', kwargs={}),
     'can_edit_name': design and design.id and not design.is_auto,
-    'can_edit': design and design.id and design.doc.get().can_write(request.user),
+    'doc_id': doc and doc.id or -1,
+    'can_edit': doc and doc.can_write(request.user),
     'action': action,
     'on_success_url': request.GET.get('on_success_url'),
     'has_metastore': 'metastore' in get_apps_dict(request.user)
