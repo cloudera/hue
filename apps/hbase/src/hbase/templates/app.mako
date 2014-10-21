@@ -55,18 +55,19 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
       </tbody>
       <tfoot>
-      <tr data-bind="visible: ${datasource}.isLoading()">
-          <td colspan="8" class="left">
-              <img src="/static/art/spinner.gif" />
-          </td>
-      </tr>
-          <tr data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading()">
-              <td colspan="8">
-                  <div class="alert">
-                      ${_('There are no tables matching the search criteria.')}
-                  </div>
+        <tr data-bind="visible: ${datasource}.isLoading() || ${datasource}.isReLoading()">
+            <td colspan="8" class="left">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
             </td>
-          </tr>
+        </tr>
+        <tr data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading() && !${datasource}.isReLoading()">
+            <td colspan="8">
+                <div class="alert">
+                    ${_('There are no tables matching the search criteria.')}
+                </div>
+          </td>
+        </tr>
       </tfoot>
   </table>
 </%def>

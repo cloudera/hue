@@ -99,6 +99,7 @@ var ListViewModel = function(options) {
     confirm("Confirm Delete", "Are you sure you want to drop the selected items? (WARNING: This cannot be undone!)", function() {
       self.batchSelected(function() {
         var s = this;
+        self.droppedTables.push(s);
         if(s.enabled && s.enabled()) {
           self.isLoading(true);
           return s.disable(function() {
@@ -114,14 +115,16 @@ var ListViewModel = function(options) {
     self.items.removeAll();
     self.isLoading(true);
     options.reload.apply(self,[function() {
-      self.isLoading(false);
       if(callback!=null)
         callback();
       self.sortDropDown.sort();
+      self.isLoading(false);
     }]);
   };
   self.searchQuery = ko.observable("");
   self.isLoading = ko.observable(false);
+  self.isReLoading = ko.observable(false);
+  self.droppedTables = [];
 };
 
 var DataRow = function(options) {
