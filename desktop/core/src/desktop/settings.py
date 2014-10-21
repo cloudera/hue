@@ -97,7 +97,7 @@ MEDIA_URL = ''
 ############################################################
 
 # Additional locations of static files
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = ((get_desktop_root("core/static/")),)
 
 # For Django admin interface
 STATIC_URL = '/static/'
@@ -175,7 +175,7 @@ if DESKTOP_PROFILING:
   INSTALLED_APPS.append('django.contrib.staticfiles')
   INSTALLED_APPS.append('debug_toolbar')
 
-  MIDDLEWARE_CLASSES.insert(1, 'desktop.middleware.ProfileMiddleware') # Hotshot
+  ## MIDDLEWARE_CLASSES.insert(1, 'desktop.middleware.ProfileMiddleware') # Hotshot
 
 
 LOCALE_PATHS = [
