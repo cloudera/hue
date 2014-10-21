@@ -88,6 +88,12 @@ var Row = function (widgets, vm) {
     });
     col.rows.remove(row);
   }
+
+  self.autosizeWidgets = function () {
+    $.each(self.widgets(), function (i, widget) {
+      widget.size(Math.floor(12 / self.widgets().length));
+    });
+  }
 }
 
 

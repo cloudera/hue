@@ -1133,8 +1133,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     $.each(self.columns(), function (i, col) {
       $.each(col.rows(), function (j, row) {
         $.each(row.widgets(), function (z, widget) {
-          if (widget.id() == widget_id){
+          if (widget && widget.id() == widget_id){
             row.widgets.remove(widget);
+            row.autosizeWidgets();
           }
         });
       });
