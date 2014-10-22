@@ -61,6 +61,7 @@ dynamic_patterns += patterns('desktop.views',
 
   (r'^desktop/prefs/(?P<key>\w+)?$', 'prefs'),
   (r'^desktop/status_bar/?$', 'status_bar'),
+  (r'^desktop/debug/is_alive$','is_alive'),
   (r'^desktop/debug/threads$', 'threads'),
   (r'^desktop/debug/memory$', 'memory'),
   (r'^desktop/debug/who_am_i$', 'who_am_i'),

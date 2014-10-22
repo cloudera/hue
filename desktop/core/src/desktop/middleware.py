@@ -39,6 +39,7 @@ from django.utils.encoding import iri_to_uri
 import django.views.static
 import django.views.generic.simple
 
+import desktop.views
 import desktop.conf
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n
@@ -60,6 +61,7 @@ MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   django.views.generic.simple.redirect_to,
+  desktop.views.is_alive,
 ]
 
 
