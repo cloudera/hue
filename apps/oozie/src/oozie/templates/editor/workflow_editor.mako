@@ -65,7 +65,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
       <i class="fa fa-file-code-o"></i>
     </a>
-    &nbsp;&nbsp;
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
+      <i class="fa fa-play"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
       <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
         <i class="fa fa-pencil"></i>
@@ -208,10 +211,11 @@ ${ dashboard.layout_skeleton() }
     <a data-bind="click: addActionDemiModalFieldPreview">
       Add
     </a>
-    
-    <div>
   </div>
 </div>
+
+
+<div id="submit-wf-modal" class="modal hide"></div>
 
 
 <link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
@@ -238,13 +242,20 @@ ${ dashboard.import_bindings() }
 
   viewModel.init();
 
+
   function columnDropAdditionalHandler(widget) {
     widgetDraggedAdditionalHandler(widget);
   }
-
   function widgetDraggedAdditionalHandler(widget) {
     showAddActionDemiModal(widget);
   }
+
+
+  $(document).on("showSubmitPopup", function(event, data){
+    $('#submit-wf-modal').html(data);
+    $('#submit-wf-modal').modal('show');
+  });
+
   
   var newAction = null;
 
@@ -252,7 +263,7 @@ ${ dashboard.import_bindings() }
     newAction = widget;
     $("#addActionDemiModal").modal("show");
   }
-  
+
   function addActionDemiModalFieldPreview(field) {    
     if (newAction != null) {
       newAction.properties()['script_path'] = viewModel.addActionScriptPath();

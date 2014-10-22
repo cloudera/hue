@@ -17,7 +17,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node['uuid'] }"${ common.credentials(node['properties']['credentials']) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <pig>
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
@@ -36,7 +36,7 @@
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </pig>
-        <ok to="${ node['children'][0]['to'] }"/>
-        <error to="${ node['children'][0]['to'] }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']] }"/>
+        <error to="${ node_mapping[node['children'][0]['to']] }"/>
         ${ common.sla(node) }
     </action>
