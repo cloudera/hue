@@ -75,7 +75,7 @@ class ConnectionConfig(object):
                kerberos_principal="thrift",
                mechanism='GSSAPI',
                username='hue',
-	             password='hue',
+               password='hue',
                ca_certs=None,
                keyfile=None,
                certfile=None,
@@ -253,7 +253,7 @@ def connect_to_thrift(conf):
       saslc.setAttr("service", str(conf.kerberos_principal))
       if conf.mechanism == 'PLAIN':
         saslc.setAttr("username", str(conf.username))
-	saslc.setAttr("password", str(conf.password)) # defaults to hue for a non-empty string unless using ldap
+        saslc.setAttr("password", str(conf.password)) # defaults to hue for a non-empty string unless using ldap
       saslc.init()
       return saslc
 
