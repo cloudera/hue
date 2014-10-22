@@ -49,12 +49,39 @@ var Column = function (size, rows) {
   };
 }
 
-var Row = function (widgets, vm) {
+var Row = function (widgets, vm, columns) {
   var self = this;
   self.widgets = ko.observableArray(widgets);
+  self.columns = ko.observableArray(columns ? columns : []);
 
   self.addWidget = function (widget) {
     self.widgets.push(widget);
+  };
+
+  self.addEmptyColumn = function () {
+    if (self.columns().length == 0){
+      var _col = self.addColumn(null);
+      if (self.widgets().length > 0){
+        var _row = _col.addEmptyRow();
+        self.widgets().forEach(function(widget){
+          _row.addWidget(widget);
+        });
+        self.widgets([]);
+      }
+    }
+    return self.addColumn(null);
+  };
+
+  self.addColumn = function (column) {
+    if (typeof column == "undefined" || column == null) {
+      var _size = Math.max(1, Math.floor(12 / (self.columns().length + 1)));
+      column = new Column(_size, []); // Hacky but needed when a new row is deleted
+      self.columns().forEach(function(col){
+        col.size(_size);
+      });
+    }
+    self.columns.push(column);
+    return column;
   };
 
   self.move = function (from, to) {
@@ -83,6 +110,14 @@ var Row = function (widgets, vm) {
   }
 
   self.remove = function (col, row) {
+    $.each(self.columns(), function (i, column) {
+      $.each(column.rows(), function (j, row) {
+        $.each(row.widgets(), function (k, widget) {
+          vm.removeWidget(widget);
+        });
+      });
+    });
+
     $.each(self.widgets(), function (i, widget) {
       vm.removeWidget(widget);
     });

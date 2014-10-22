@@ -240,6 +240,8 @@ var Dashboard = function (vm, dashboard) {
 var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_json) {
     var self = this;
 
+    self.isNested = ko.observable(false);
+
     self.isEditing = ko.observable(true);
     self.toggleEditing = function () {
       self.isEditing(! self.isEditing());
