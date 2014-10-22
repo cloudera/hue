@@ -19,7 +19,7 @@ import sys
 import socket
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from impala.settings import NICE_NAME
 
@@ -77,6 +77,46 @@ QUERY_TIMEOUT_S = Config(
   default=600
 )
 
+SSL = ConfigSection(
+  key='ssl',
+  help=_t('SSL configuration for the server.'),
+  members=dict(
+    ENABLED = Config(
+      key="enabled",
+      help=_t("SSL communication enabled for this server."),
+      type=coerce_bool,
+      default=False
+    ),
+
+    CACERTS = Config(
+      key="cacerts",
+      help=_t("Path to Certificate Authority certificates."),
+      type=str,
+      default="/etc/hue/cacerts.pem"
+    ),
+
+    KEY = Config(
+      key="key",
+      help=_t("Path to the private key file."),
+      type=str,
+      default="/etc/hue/key.pem"
+    ),
+
+    CERT = Config(
+      key="cert",
+      help=_t("Path to the public certificate file."),
+      type=str,
+      default="/etc/hue/cert.pem"
+    ),
+
+    VALIDATE = Config(
+      key="validate",
+      help=_t("Choose whether Hue should validate certificates received from the server."),
+      type=coerce_bool,
+      default=True
+    )
+  )
+)
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)

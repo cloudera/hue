@@ -761,6 +761,56 @@
 
 
 ###########################################################################
+# Settings to configure Impala
+###########################################################################
+
+[impala]
+  # Host of the Impala Server (one of the Impalad)
+  ## server_host=localhost
+
+  # Port of the Impala Server
+  ## server_port=21050
+
+  # Kerberos principal
+  ## impala_principal=impala/hostname.foo.com
+
+  # Turn on/off impersonation mechanism when talking to Impala
+  ## impersonation_enabled=False
+
+  # Number of initial rows of a result set to ask Impala to cache in order
+  # to support re-fetching them for downloading them.
+  # Set to 0 for disabling the option and backward compatibility.
+  ## querycache_rows=50000
+
+  # Timeout in seconds for thrift calls
+  ## server_conn_timeout=120
+
+  # Hue will try to close the Impala query when the user leaves the editor page.
+  # This will free all the query resources in Impala, but also make its results inaccessible.
+  ## close_queries=true
+
+  # If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work
+  # (compute or send back results) for that query within QUERY_TIMEOUT_S seconds.
+  ## query_timeout_s=600
+
+  [[ssl]]
+    # SSL communication enabled for this server.
+    ## enabled=false
+
+    # Path to Certificate Authority certificates.
+    ## cacerts=/etc/hue/cacerts.pem
+
+    # Path to the private key file.
+    ## key=/etc/hue/key.pem
+
+    # Path to the public certificate file.
+    ## cert=/etc/hue/cert.pem
+
+    # Choose whether Hue should validate certificates received from the server.
+    ## validate=true
+
+
+###########################################################################
 # Settings to configure Pig
 ###########################################################################
 
@@ -796,40 +846,6 @@
   # which match any prefix of 'host:port/path' of requested proxy target.
   # This does not support matching GET parameters.
   ## blacklist=
-
-
-###########################################################################
-# Settings to configure Impala
-###########################################################################
-
-[impala]
-  # Host of the Impala Server (one of the Impalad)
-  ## server_host=localhost
-
-  # Port of the Impala Server
-  ## server_port=21050
-
-  # Kerberos principal
-  ## impala_principal=impala/hostname.foo.com
-
-  # Turn on/off impersonation mechanism when talking to Impala
-  ## impersonation_enabled=False
-
-  # Number of initial rows of a result set to ask Impala to cache in order
-  # to support re-fetching them for downloading them.
-  # Set to 0 for disabling the option and backward compatibility.
-  ## querycache_rows=50000
-
-  # Timeout in seconds for thrift calls
-  ## server_conn_timeout=120
-
-  # Hue will try to close the Impala query when the user leaves the editor page.
-  # This will free all the query resources in Impala, but also make its results inaccessible.
-  ## close_queries=true
-
-  # If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work
-  # (compute or send back results) for that query within QUERY_TIMEOUT_S seconds.
-  ## query_timeout_s=600
 
 
 ###########################################################################

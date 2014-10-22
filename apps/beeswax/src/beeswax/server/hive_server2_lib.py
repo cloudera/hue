@@ -313,10 +313,18 @@ class HiveServerClient:
     self.impersonation_enabled = impersonation_enabled
 
     if self.query_server['server_name'] == 'impala':
-      ssl_enabled = False
+      ssl_enabled = impala_conf.SSL.ENABLED.get()
+      ca_certs = impala_conf.SSL.CACERTS.get()
+      keyfile = impala_conf.SSL.KEY.get()
+      certfile = impala_conf.SSL.CERT.get()
+      validate = impala_conf.SSL.VALIDATE.get()
       timeout = impala_conf.SERVER_CONN_TIMEOUT.get()
     else:
       ssl_enabled = beeswax_conf.SSL.ENABLED.get()
+      ca_certs = beeswax_conf.SSL.CACERTS.get()
+      keyfile = beeswax_conf.SSL.KEY.get()
+      certfile = beeswax_conf.SSL.CERT.get()
+      validate = beeswax_conf.SSL.VALIDATE.get()
       timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
     if ldap_username:
@@ -337,10 +345,10 @@ class HiveServerClient:
 					                                password=password,
                                           timeout_seconds=timeout,
                                           use_ssl=ssl_enabled,
-                                          ca_certs=beeswax_conf.SSL.CACERTS.get(),
-                                          keyfile=beeswax_conf.SSL.KEY.get(),
-                                          certfile=beeswax_conf.SSL.CERT.get(),
-                                          validate=beeswax_conf.SSL.VALIDATE.get())
+                                          ca_certs=ca_certs,
+                                          keyfile=keyfile,
+                                          certfile=certfile,
+                                          validate=validate)
 
 
   def get_security(self):
