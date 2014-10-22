@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods
 import django.views.debug
 
 import desktop.conf
@@ -50,6 +51,11 @@ from desktop import appmanager
 
 
 LOG = logging.getLogger(__name__)
+
+
+@require_http_methods(['HEAD'])
+def is_alive(request):
+  return HttpResponse('')
 
 
 def home(request):
