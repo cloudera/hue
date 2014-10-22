@@ -215,6 +215,30 @@ ${ dashboard.layout_skeleton() }
 </div>
 
 
+<div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+  <div class="modal-body">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
+      
+      ${ _('Oozie Parameters') }   
+      <ul data-bind="foreach: $root.workflow.properties.parameters">
+        <li>
+          <input data-bind="value: name"/>
+          <input data-bind="value: value"/>
+          <a href="#" data-bind="click: function(){ $root.workflow.properties.parameters.remove(this); }">
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+      </ul>
+      <button data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
+        <i class="fa fa-plus"></i>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
 <div id="submit-wf-modal" class="modal hide"></div>
 
 
