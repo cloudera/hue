@@ -871,6 +871,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   var self = this;
 
   self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+  self.isNested = ko.observable(false);
 
   // Models
   self.collection = new Collection(self, collection_json.collection);

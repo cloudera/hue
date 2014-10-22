@@ -293,3 +293,20 @@ em {
 #emptyDashboard {
   right: 70px!important;
 }
+
+.dropTarget {
+  background-color: #F6F6F6;
+  min-height: 36px;
+  border: 2px dashed #DDD;
+  text-align: center;
+  padding: 4px;
+}
+
+.ui-sortable.dropTarget {
+  min-height: 36px;
+}
+
+.dropTargetHighlight {
+  min-height: 30px;
+  background-color: #CCC;
+}
