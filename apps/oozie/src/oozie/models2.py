@@ -62,14 +62,19 @@ class Workflow():
           }
       })
       
-  @property      
+  @property
   def id(self):
     return self.document.id
 
   @property      
   def deployment_dir(self):
     _data = json.loads(self.data)
-    return _data['workflow']['properties']['deployment_dir']  
+    return _data['workflow']['properties']['deployment_dir']
+  
+  @property      
+  def parameters(self):
+    _data = json.loads(self.data)
+    return _data['workflow']['properties']['parameters']  
   
   def get_json(self):
     _data = self.get_data()
@@ -86,6 +91,10 @@ class Workflow():
       
     if 'deployment_dir' not in _data['workflow']['properties']:
       _data['workflow']['properties']['deployment_dir'] = '/tmp/aa'
+    if 'parameters' not in _data['workflow']['properties']:
+      _data['workflow']['properties']['parameters'] = [
+          {'name': 'oozie.use.system.libpath', 'value': True},
+      ]
 
     if 'sla_workflow_enabled' not in _data['workflow']['properties']:
       _data['workflow']['properties']['sla_workflow_enabled'] = False
@@ -142,8 +151,8 @@ class Workflow():
 #        if param not in params:
 #          params[param] = ''
 
-#    for param in self.get_parameters():
-#      params[param['name'].strip()] = param['value']
+    for param in self.parameters:
+      params[param['name'].strip()] = param['value']
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
