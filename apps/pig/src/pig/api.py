@@ -137,8 +137,10 @@ class OozieApi:
 
   def get_jobs(self):
     kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS,}
-    kwargs['user'] = self.user.username
-    kwargs['name'] = OozieApi.WORKFLOW_NAME
+    kwargs['filters'] = {
+        ('user', self.user.username),
+        ('name', OozieApi.WORKFLOW_NAME)
+    }
 
     return get_oozie(self.user).get_workflows(**kwargs).jobs
 
