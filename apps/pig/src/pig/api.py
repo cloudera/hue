@@ -220,9 +220,9 @@ class OozieApi:
         get_copy['format'] = 'python'
         request.GET = get_copy
         try:
-          logs, workflow_action = self.get_log(request, job)
+          logs, workflow_action, is_really_done = self.get_log(request, job)
           progress = workflow_action[0]['progress']
-        except Exception:
+        except:
           progress = 0
       else:
         progress = 100
