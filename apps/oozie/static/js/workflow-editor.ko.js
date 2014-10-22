@@ -85,12 +85,14 @@ var Workflow = function (vm, workflow) {
   
 
   self.addNode = function(widget) {
-	// Todo get parent cell, link nodes...
-	  
+  // Todo get parent cell, link nodes...
+    
     //if (self.nodes().length == 0) {
       var node = new Node(ko.mapping.toJS(widget));
       node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'})
+      var end = self.nodes.pop()  
       self.nodes.push(node);
+      self.nodes.push(end);
 
       self.nodes()[0].children.removeAll();
       self.nodes()[0].children().push({'to': node.id()});
@@ -180,6 +182,33 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
       $(document).trigger("error", xhr.responseText);
     });
   };
+
+
+  self.showSubmitPopup = function () {
+	// if self.workflow.id() == null, need to save wf
+    $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
+      }, function (data) {
+        $(document).trigger("showSubmitPopup", data);
+     }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+  
+//  self.submit = function () {
+//    $.post("/oozie/editor/workflow/submit/", {        
+//        "layout": ko.mapping.toJSON(self.columns),
+//        "workflow": ko.mapping.toJSON(self.workflow)
+//    }, function (data) {
+//      if (data.status == 0) {
+//      submitWorkflow(data);
+//      }
+//      else {
+//        $(document).trigger("error", data.message);
+//     }
+//   }).fail(function (xhr, textStatus, errorThrown) {
+//      $(document).trigger("error", xhr.responseText);
+//    });
+//  };
   
   function bareWidgetBuilder(name, type){
     return new Widget({

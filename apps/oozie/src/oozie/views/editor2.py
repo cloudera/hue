@@ -19,13 +19,20 @@ import json
 import logging
 
 from django.core.urlresolvers import reverse
+from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
+from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2
 
+from liboozie.submission2 import Submission
+
+from oozie.forms import ParameterForm
 from oozie.models2 import Workflow
 
 
@@ -100,3 +107,46 @@ def gen_xml_workflow(request):
     response['message'] = str(e)
     
   return HttpResponse(json.dumps(response), mimetype="application/json") 
+
+
+def submit_workflow(request, doc_id):
+  workflow = Workflow(document=Document2.objects.get(id=doc_id)) # Todo perms
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)    
+
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
+
+      request.info(_('Workflow submitted'))
+      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = workflow.find_all_parameters()
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                   'params_form': params_form,
+                   'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
+                 }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _submit_workflow(user, fs, jt, workflow, mapping):
+  try:
+    submission = Submission(user, workflow, fs, jt, mapping)
+    job_id = submission.run()
+    return job_id
+  except RestException, ex:
+    detail = ex._headers.get('oozie-error-message', ex)
+    if 'Max retries exceeded with url' in str(detail):
+      detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+    LOG.error(smart_str(detail))
+    raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
+
+  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
