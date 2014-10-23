@@ -183,7 +183,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
 
 
   self.showSubmitPopup = function () {
-	// if self.workflow.id() == null, need to save wf
+	// if self.workflow.id() == null, need to save wf for now
+
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);

@@ -86,6 +86,10 @@ def save_workflow(request):
   workflow_doc.update_data({'layout': layout})
   workflow_doc.name = name
   workflow_doc.save()
+  
+  workflow_instance = Workflow(document=workflow_doc)
+  workflow_instance.check_workspace(request.fs)
+  
   response['status'] = 0
   response['id'] = workflow_doc.id
   response['message'] = _('Page saved !')

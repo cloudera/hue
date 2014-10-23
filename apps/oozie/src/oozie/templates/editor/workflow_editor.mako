@@ -89,6 +89,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </a>
     % endif
   </div>
+
+  <form class="form-search" style="margin: 0">
+    <strong>${_("Name")}</strong>
+    <input data-bind="value: $root.workflow.name"/>    
+  </form>
 </div>
 
 
@@ -184,6 +189,17 @@ ${ dashboard.layout_skeleton() }
         <div class="tab-pane active" id="action">
           <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
           <input type="text" data-bind="value: properties.script_path" />
+          
+	      ${ _('Parameters') }   
+	      <ul data-bind="foreach: $root.workflow.properties.parameters">
+	        <li>
+	          <input data-bind="value: name"/>
+	          <input data-bind="value: value"/>
+	          <a href="#" data-bind="click: function(){ $root.workflow.properties.parameters.remove(this); }">
+	            <i class="fa fa-minus"></i>
+	          </a>
+	        </li>
+	      </ul>          
         </div>
         <div class="tab-pane" id="files">
         </div>
@@ -206,8 +222,10 @@ ${ dashboard.layout_skeleton() }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     
+    Script path
     <input type="text" data-bind="value: $root.addActionScriptPath"/>
     
+    <br/>
     <a data-bind="click: addActionDemiModalFieldPreview">
       Add
     </a>
@@ -233,6 +251,10 @@ ${ dashboard.layout_skeleton() }
       <button data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i>
       </button>
+
+      <br/>
+      ${_("Workspace")}
+      <input data-bind="value: $root.workflow.properties.deployment_dir"/>
 
     </div>
   </div>
