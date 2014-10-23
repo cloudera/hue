@@ -117,7 +117,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     data-message="${ _('The coordinator was killed!') }"
                     data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
                       ${_('Kill')}
-                  </button>                    
+                  </button>
                 </li>
               % endif
             </ul>
@@ -361,6 +361,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
   </div>
 </div>
 
+<div id="rerun-coord-modal" class="modal hide"></div>
+
 <script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
@@ -405,8 +407,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         this.selected(! this.selected());
         viewModel.allSelected(false);
       }
-    }
-  }
+    };
+  };
 
   var RunningCoordinatorActionsModel = function (actions) {
     var self = this;
@@ -422,7 +424,50 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     this.allSelected = ko.observable(false);
 
+    this.filter = ko.observableArray([]);
+
+    this.searchFilter = ko.observable('');
+
+    this.select = function (filter) {
+      ko.utils.arrayFilter(self.actions(), function(action) {
+        if (action.status.toLowerCase() === filter) {
+          action.selected(true);
+        }
+      });
+    };
+
+    this.clearAllSelections = function () {
+      ko.utils.arrayFilter(self.actions(), function (action) {
+        action.selected(false);
+      });
+      self.allSelected(false);
+    };
+
+    this.clearSelections = function (filter) {
+      ko.utils.arrayFilter(self.actions(), function (action) {
+        if (action.status.toLowerCase() === filter) {
+          action.selected(false);
+        }
+      });
+      self.allSelected(false);
+    };
+
     this.selectAll = function () {
+      var regexp;
+
+      if (! Array.isArray(self.filter())) {
+        ko.utils.arrayForEach(self.actions(), function (action) {
+          regexp = new RegExp(self.filter());
+
+          self.allSelected(! self.allSelected());
+
+          if (regexp.test(action.title.toLowerCase())) {
+            action.selected(! action.selected());
+          }
+        });
+        return true;
+      }
+
       self.allSelected(! self.allSelected());
 
       ko.utils.arrayForEach(self.actions(), function (action) {
@@ -444,60 +489,67 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return actionlist;
     });
 
-    this.filter = ko.observable('');
-
-    this.searchFilter = ko.observable('');
-
-    this.clearSelections = function () {
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        action.selected(false);
-      });
-      self.allSelected(false);
-    };
-
     this.searchFilter.subscribe(function () {
-      // clear out original selections
-      self.clearSelections();
-      self.filter(self.searchFilter());
+      if (self.searchFilter().length === 0) {
+        self.filter([]);
+      } else {
+        self.filter(self.searchFilter());
+      }
+
+      if (self.selectedActions().length === self.actions().length) {
+        self.allSelected(true);
+      } else {
+        self.allSelected(false);
+      }
     });
 
     this.setFilter = function (filter) {
+      if (! Array.isArray(self.filter())) {
+        self.filter([]);
+      }
+
       // checks to see if a button is toggled
-      if (filter === self.filter()) {
-        self.clearSelections();
-        self.filter('');
+      if ($.inArray(filter, self.filter()) !== -1) {
+        // remove if already in array due to toggling of filter
+        self.filter.splice(self.filter.indexOf(filter), 1);
+        self.clearSelections(filter);
+        self.allSelected(false);
       } else {
-        self.filter(filter);
+        self.filter.push(filter)
+        self.select(filter);
+      }
+
+      if (self.selectedActions().length === self.actions().length) {
+        self.allSelected(true);
       }
     };
 
     this.filteredActions = ko.computed(function () {
-      var actions = [],
-        filter = self.filter(),
-        regexp;
+      var filter = self.filter(),
+        actions = [],
+        regexp,
+        data;
 
-      if (filter === '') {
+      if (self.filter().length === 0) {
         return self.actions();
       }
 
       ko.utils.arrayFilter(self.actions(), function (action) {
-        if ($.inArray(filter, ['succeeded', 'running', 'failed']) !== -1) {
-          if (action.status.toLowerCase() === filter) {
-            self.allSelected(true);
-            action.selected(true);
-            actions.push(action);
-          }
-        } else {
+        if ($.inArray(filter.toString(), ['succeeded', 'running', 'failed']) === -1) {
           regexp = new RegExp(filter);
           if (regexp.test(action.title.toLowerCase())) {
-            self.allSelected(true);
-            action.selected(true);
             actions.push(action);
           }
         }
       });
 
-      return actions;
+      if (Array.isArray(self.filter())) {
+        data = self.actions()
+      } else {
+        data = actions;
+      }
+
+      return data;
     });
   };
 
