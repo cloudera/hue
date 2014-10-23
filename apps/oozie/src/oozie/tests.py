@@ -3149,7 +3149,7 @@ class TestDashboard(OozieMockBase):
 
   def test_rerun_coordinator(self):
     response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
-    assert_true('Select actions to rerun' in response.content, response.content)
+    assert_true('Rerun' in response.content, response.content)
 
 
   def test_rerun_coordinator_permissions(self):
@@ -3175,7 +3175,7 @@ class TestDashboard(OozieMockBase):
 
   def test_rerun_bundle(self):
     response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
-    assert_true('Select actions to rerun' in response.content, response.content)
+    assert_true('Rerun' in response.content, response.content)
 
 
   def test_rerun_bundle_permissions(self):

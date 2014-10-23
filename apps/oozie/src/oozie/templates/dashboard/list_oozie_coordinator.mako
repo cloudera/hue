@@ -78,7 +78,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   <li class="white">${ _('No available datasets') }</li>
                 % endif
 
-                % if has_job_edition_permission(oozie_coordinator, user):
+                % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status != 'KILLED':
                   <li class="nav-header">${ _('Manage') }</li>
                   <li class="white">
                     <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
