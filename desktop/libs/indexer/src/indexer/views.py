@@ -32,6 +32,7 @@ LOG = logging.getLogger(__name__)
 def collections(request, is_redirect=False):
   return render('collections.mako', request, {})
 
+
 def install_examples(request, is_redirect=False):
   result = {'status': -1, 'message': ''}
 

@@ -41,6 +41,7 @@ def parse_fields(request):
   result = {'status': -1}
 
   source_type = request.POST.get('source')
+
   if source_type == 'file':
     content_type = request.POST.get('type')
     try:
