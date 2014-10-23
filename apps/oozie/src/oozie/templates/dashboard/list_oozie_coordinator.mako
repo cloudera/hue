@@ -77,57 +77,48 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 % if not coordinator.dataset_set.all():
                   <li class="white">${ _('No available datasets') }</li>
                 % endif
+              % endif
 
-                % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status != 'KILLED':
-                  <li class="nav-header">${ _('Manage') }</li>
-                  <li class="white">
-                    <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
-                      id="kill-btn"
-                      class="btn btn-small btn-danger disable-feedback confirmationModal
-                       % if not oozie_coordinator.is_running():
-                         hide
-                       % endif
-                      "
-                      alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
-                      href="javascript:void(0)"
-                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                      data-message="${ _('The coordinator was killed!') }"
-                      data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
-                        ${_('Kill')}
-                    </button>
-                    <button data-bind="enable: selectedActions().length > 0" class="btn btn-small
-                       % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
-                         hide
-                       % endif
+              % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'KILLED', 'SUCCEEDED'):
+                <li class="nav-header">${ _('Manage') }</li>
+                <li class="white">
+                  <div id="rerun-coord-modal" class="modal hide"></div>
+                  <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
+                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
+                     data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
+                     class="btn btn-small confirmationModal
+                     % if not oozie_coordinator.is_running():
+                       hide
+                     % endif
+                     " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
+                    ${ _('Suspend') }
+                  </button>
+                  <button title="${ _('Resume the coordinator') }" id="resume-btn"
+                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
+                     data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
+                     class="btn btn-small confirmationModal
+                     % if oozie_coordinator.is_running():
+                       hide
+                     % endif
+                     " style="margin-bottom: 5px">
+                    ${ _('Resume') }
+                  </button>
+                  <br/>
+                  <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
+                   id="kill-btn"
+                    class="btn btn-small btn-danger disable-feedback confirmationModal
+                     % if not oozie_coordinator.is_running():
+                       hide
+                     % endif
                     "
-                      id="rerun-btn"
-                      data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }"
-                    style="margin-bottom: 5px">
-                      ${ _('Rerun') }
-                    </button>
-                    <div id="rerun-coord-modal" class="modal hide"></div>
-                    <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
-                       data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
-                       data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
-                       class="btn btn-small confirmationModal
-                       % if not oozie_coordinator.is_running():
-                         hide
-                       % endif
-                       " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
-                      ${ _('Suspend') }
-                    </button>
-                    <button title="${ _('Resume the coordinator') }" id="resume-btn"
-                       data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
-                       data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
-                       class="btn btn-small confirmationModal
-                       % if oozie_coordinator.is_running():
-                         hide
-                       % endif
-                       " style="margin-bottom: 5px">
-                      ${ _('Resume') }
-                    </button>
-                  </li>
-                % endif
+                    alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+                    href="javascript:void(0)"
+                    data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                    data-message="${ _('The coordinator was killed!') }"
+                    data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
+                      ${_('Kill')}
+                  </button>                    
+                </li>
               % endif
             </ul>
           </div>
