@@ -531,7 +531,7 @@ def augment_solr_response(response, collection, query):
         escaped_value = escape(value)
       doc[field] = escaped_value
 
-    if not query['download']:
+    if not query.get('download'):
       doc['showDetails'] = False
       doc['details'] = []
 
