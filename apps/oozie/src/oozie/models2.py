@@ -18,6 +18,7 @@
 import json
 import logging
 import re
+import time
 
 from string import Template
 
@@ -26,6 +27,12 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
 from desktop.models import Document2
+
+from hadoop.fs.hadoopfs import Hdfs
+from liboozie.submission2 import Submission
+from liboozie.submission2 import create_directories
+
+from oozie.conf import REMOTE_SAMPLE_DIR
 
 
 LOG = logging.getLogger(__name__)
@@ -58,7 +65,8 @@ class Workflow():
                "id": None,"uuid":"549e2697-97cf-f931-2ce4-83dfdd03b7e7","name":"My Workflow",
                "properties":{"job_xml":"","sla_enabled":False,"schema_version":"uri:oozie:workflow:0.4","sla_workflow_enabled":False,"credentials":[],"properties":{}},
                "nodes":[{"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
-                        {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]}]
+                        {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]}
+               ]
           }
       })
       
@@ -90,7 +98,8 @@ class Workflow():
       _data['workflow']['properties'] = {}
       
     if 'deployment_dir' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['deployment_dir'] = '/tmp/aa'
+      default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too
+      _data['workflow']['properties']['deployment_dir'] = default_dir
     if 'parameters' not in _data['workflow']['properties']:
       _data['workflow']['properties']['parameters'] = [
           {'name': 'oozie.use.system.libpath', 'value': True},
@@ -155,6 +164,15 @@ class Workflow():
       params[param['name'].strip()] = param['value']
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
+
+  def check_workspace(self, fs):
+    create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
+    create_directories(fs)
+      
+    perms = 0711
+    # if shared, perms = 0755
+
+    Submission(self.document.owner, self, fs, None, {})._create_dir(self.deployment_dir, perms=perms)
 
 
 class Node():
