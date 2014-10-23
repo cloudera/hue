@@ -156,16 +156,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             <div class="tab-pane active" id="calendar">
               <div class="clearfix" style="margin-bottom: 1em;">
                 <div class="pull-left">
-                  <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-large search-query" placeholder="${_('Filter results')}" style="margin-right: 1em; position: relative; top: -1px;">
+                  <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-xlarge search-query" placeholder="${_('Filter results')}">
                   % if has_job_edition_permission(oozie_coordinator, user):
-                      <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn
+                      <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn action-button"
                          % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
-                           hide
+                           disabled="disabled"
                          % endif
-                      "
-                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }"
-                      style="margin-bottom: 5px">
-                        ${ _('Rerun') }
+                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
+                        <i class="fa fa-refresh"></i> ${ _('Rerun') }
                       </button>
                   % endif
                 </div>
