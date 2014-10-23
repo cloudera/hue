@@ -52,6 +52,7 @@ def get_config_template_path(solr_cloud_mode):
   else:
     return os.path.join(conf.CONFIG_TEMPLATE_PATH.get(), 'nonsolrcloud')
 
+
 class SchemaXml(object):
   def __init__(self, xml):
     self.xml = xml
@@ -193,27 +194,27 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   if fields is None:
     field_names = None
   else:
-    field_names = [field['name'] for field in fields]
+    field_names = [field['name'].strip() for field in fields]
 
   if fields is None:
     timestamp_fields = None
   else:
-    timestamp_fields = [field['name'] for field in fields if field['type'] in DATE_FIELD_TYPES]
+    timestamp_fields = [field['name'].strip() for field in fields if field['type'] in DATE_FIELD_TYPES]
 
   if fields is None:
     integer_fields = None
   else:
-    integer_fields = [field['name'] for field in fields if field['type'] in INTEGER_FIELD_TYPES]
+    integer_fields = [field['name'].strip() for field in fields if field['type'] in INTEGER_FIELD_TYPES]
 
   if fields is None:
     decimal_fields = None
   else:
-    decimal_fields = [field['name'] for field in fields if field['type'] in DECIMAL_FIELD_TYPES]
+    decimal_fields = [field['name'].strip() for field in fields if field['type'] in DECIMAL_FIELD_TYPES]
 
   if fields is None:
     boolean_fields = None
   else:
-    boolean_fields = [field['name'] for field in fields if field['type'] in BOOLEAN_FIELD_TYPES]
+    boolean_fields = [field['name'].strip() for field in fields if field['type'] in BOOLEAN_FIELD_TYPES]
 
   content = fh.read()
   headers = None
@@ -240,6 +241,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
     # First line is headers
     if headers is None:
       headers = next(csv.reader(csvfile, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character)))
+      headers = [name.strip() for name in headers]
 
     # User dict reader
     reader = csv.DictReader(csvfile, fieldnames=headers, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
