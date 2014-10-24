@@ -30,8 +30,11 @@
 
             <script>${ node['properties']['script_path'] }</script>
 
-            % for param in node['properties']['params']:
-              <${ param['type'] }>${ param['value'] }</${ param['type'] }>
+            % for param in node['properties']['parameters']:
+              <param>${ param['value'] }</param>
+            % endfor
+            % for argument in node['properties']['arguments']:
+              <argument>${ argument['value'] }</argument>
             % endfor
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
