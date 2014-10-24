@@ -109,7 +109,8 @@ def add_node(request):
   
   properties = response['properties'] = dict([(property['name'], property['value']) for property in properties])
   properties.update({
-      'parameters': []
+      'parameters': [],
+      'arguments': []
   })
 
   response['status'] = 0

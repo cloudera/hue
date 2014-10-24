@@ -192,22 +192,29 @@ ${ dashboard.layout_skeleton() }
         <div class="tab-pane active" id="action">
           <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
           <input type="text" data-bind="value: properties.script_path" />
-          
-	      ${ _('Parameters') }   
-	      <ul data-bind="foreach: properties.parameters">
+          </br>
+	      ${ _('Variables') }   
+	      <ul data-bind="foreach: properties.arguments">
 	        <li>
-	          <input data-bind="value: name"/>
 	          <input data-bind="value: value"/>
-	          <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); }">
+	          <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
 	            <i class="fa fa-minus"></i>
 	          </a>
 	        </li>
 	      </ul>
-          <button data-bind="click: function(){ properties.parameters.push({'name': '', 'value': ''}); }">
+          <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
           </button>	      
         </div>
         <div class="tab-pane" id="files">
+          prepares <input type="text" data-bind="value: properties.prepares" /></br>
+          job_xml <input type="text" data-bind="value: properties.job_xml" /></br>
+          proeperties <input type="text" data-bind="value: properties.properties" /></br>
+          parameters <input type="text" data-bind="value: properties.parameters" /></br>
+          files <input type="text" data-bind="value: properties.files" /></br>
+          archives <input type="text" data-bind="value: properties.archives" /></br>
+          sla <input type="text" data-bind="value: properties.sla" /></br>
+          credentials <input type="text" data-bind="value: properties.credentials" /></br>
         </div>
         <div class="tab-pane" id="sla">
         </div>
@@ -348,7 +355,18 @@ ${ dashboard.import_bindings() }
         'label': '${ _("Jar Path") }',
         'value': ''
       });
-    } else {
+      viewModel.addActionProperties.push({
+        'name': 'main_class',
+        'label': '${ _("Main class") }',
+        'value': ''
+      });
+    } else if (widget.widgetType() == 'hive-widget') {
+      viewModel.addActionProperties.push({
+        'name': 'script_path',
+        'label': '${ _("Script Path") }',
+        'value': ''
+      });
+    } else if (widget.widgetType() == 'pig-widget') {
       viewModel.addActionProperties.push({
         'name': 'script_path',
         'label': '${ _("Script Path") }',

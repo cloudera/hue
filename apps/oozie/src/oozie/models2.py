@@ -207,7 +207,7 @@ class Node():
     self.data['type'] = self.data['type'].replace('-widget', '')
     self.data['uuid'] = self.data['id']
     
-    # if action node?
+    # Action Node
     if 'credentials' not in self.data['properties']:
       self.data['properties']['credentials'] = []     
     if 'prepares' not in self.data['properties']:
@@ -222,10 +222,10 @@ class Node():
       self.data['properties']['files'] = []
     if 'archives' not in self.data['properties']:
       self.data['properties']['archives'] = []
-
-
     if 'sla_enabled' not in self.data['properties']:
       self.data['properties']['sla_enabled'] = False
+    if 'sla' not in self.data['properties']:
+      self.data['properties']['sla'] = []
     
   def get_template_name(self):
     return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']    
