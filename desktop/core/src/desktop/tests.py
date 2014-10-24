@@ -627,3 +627,18 @@ def test_check_config_ajax():
   c = make_logged_in_client()
   response = c.get(reverse(check_config))
   assert_true("misconfiguration" in response.content, response.content)
+
+
+def test_cx_Oracle():
+  """
+  Tests that cx_Oracle (external dependency) is built correctly.
+  """
+  try:
+    import cx_Oracle
+    return
+  except ImportError, ex:
+    if "No module named" in ex.message:
+      assert_true(False, "cx_Oracle skipped its build. This happens if "
+          "env var ORACLE_HOME or ORACLE_INSTANTCLIENT_HOME is not defined. "
+          "So ignore this test failure if your build does not need to work "
+          "with an oracle backend.")

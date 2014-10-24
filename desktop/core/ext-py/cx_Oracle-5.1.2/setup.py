@@ -118,7 +118,7 @@ def CheckOracleHome(directoryToCheck):
     return False
 
 # try to determine the Oracle home
-userOracleHome = os.environ.get("ORACLE_HOME")
+userOracleHome = os.environ.get("ORACLE_HOME", os.environ.get("ORACLE_INSTANTCLIENT_HOME"))
 if userOracleHome is not None:
     if not CheckOracleHome(userOracleHome):
         messageFormat = "Oracle home (%s) does not refer to an " \
@@ -129,8 +129,8 @@ else:
         if CheckOracleHome(path):
             break
     if oracleHome is None:
-        raise DistutilsSetupError("cannot locate an Oracle software " \
-                "installation")
+        print >>sys.stderr, "cannot locate an Oracle software installation. skipping"
+        sys.exit(0)
 
 # define some variables
 if sys.platform == "win32":
