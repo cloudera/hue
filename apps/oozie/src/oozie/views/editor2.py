@@ -97,6 +97,28 @@ def save_workflow(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+def add_node(request):
+  response = {'status': -1}
+
+  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+  node = json.loads(request.POST.get('node', '{}'))
+  properties = json.loads(request.POST.get('properties', '{}'))
+
+  print node
+  print properties
+  
+  properties = response['properties'] = dict([(property['name'], property['value']) for property in properties])
+  properties.update({
+      'parameters': []
+  })
+
+  response['status'] = 0
+  response['properties'] = properties 
+  response['message'] = _('Page saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def gen_xml_workflow(request):
   response = {'status': -1}
 

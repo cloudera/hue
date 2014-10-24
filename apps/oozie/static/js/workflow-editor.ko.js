@@ -83,19 +83,32 @@ var Workflow = function (vm, workflow) {
     self.nodes(nodes)
   }
   
-
   self.addNode = function(widget) {
     // Todo get parent cell, link nodes... when we have the new layout
-    
-    var node = new Node(ko.mapping.toJS(widget));
-    node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'})
-    var end = self.nodes.pop()  
-    self.nodes.push(node);
-    self.nodes.push(end);
+    $.post("/oozie/editor/workflow/add_node/", {        
+        "workflow": ko.mapping.toJSON(workflow),
+        "node": ko.mapping.toJSON(widget),
+        "properties": ko.mapping.toJSON(viewModel.addActionProperties()),        
+      }, function (data) {
+      if (data.status == 0) {
+    	  widget.properties = data.properties;
+          var node = new Node(ko.mapping.toJS(widget));
+          node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}) // Link to child
 
-    self.nodes()[0].children.removeAll();
-    self.nodes()[0].children().push({'to': node.id()});
-  }
+          // Add to list of nodes
+          var end = self.nodes.pop()
+          self.nodes.push(node);
+          self.nodes.push(end);
+
+          self.nodes()[0].children.removeAll(); // Parent link to new node
+          self.nodes()[0].children().push({'to': node.id()});
+      } else {
+        $(document).trigger("error", data.message);
+       }
+     }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+     });
+  };
   
   self.getNodeById = function (node_id) {
     var _node = null;
@@ -107,7 +120,6 @@ var Workflow = function (vm, workflow) {
     });
     return _node;
   }
-
 }
 
 var WorkflowEditorViewModel = function (layout_json, workflow_json) {
@@ -128,8 +140,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
     self.workflow.loadNodes(workflow_json);
   }
 
-  self.addActionScriptPath = ko.observable("");
-  
+  self.addActionProperties = ko.observableArray([]);
+
+
   self.getWidgetById = function (widget_id) {
     var _widget = null;
     $.each(self.columns(), function (i, col) {
@@ -181,9 +194,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
     });
   };
 
-
   self.showSubmitPopup = function () {
-	// if self.workflow.id() == null, need to save wf for now
+    // if self.workflow.id() == null, need to save wf for now
 
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
       }, function (data) {

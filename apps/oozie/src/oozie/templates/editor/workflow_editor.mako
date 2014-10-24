@@ -68,15 +68,18 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-play"></i>
     </a>
-    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+      <i class="fa fa-pencil"></i>
+    </a>    
+    &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
-      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-        <i class="fa fa-pencil"></i>
-      </a>
-      &nbsp;
+      <button type="button" title="${ _('Workspace') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
+        <i class="fa fa-folder-open"></i>
+      </button>      
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
         <i class="fa fa-cog"></i>
       </button>
+      &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
         <i class="fa fa-save"></i>
       </button>
@@ -191,15 +194,55 @@ ${ dashboard.layout_skeleton() }
           <input type="text" data-bind="value: properties.script_path" />
           
 	      ${ _('Parameters') }   
-	      <ul data-bind="foreach: $root.workflow.properties.parameters">
+	      <ul data-bind="foreach: properties.parameters">
 	        <li>
 	          <input data-bind="value: name"/>
 	          <input data-bind="value: value"/>
-	          <a href="#" data-bind="click: function(){ $root.workflow.properties.parameters.remove(this); }">
+	          <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); }">
 	            <i class="fa fa-minus"></i>
 	          </a>
 	        </li>
-	      </ul>          
+	      </ul>
+          <button data-bind="click: function(){ properties.parameters.push({'name': '', 'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>	      
+        </div>
+        <div class="tab-pane" id="files">
+        </div>
+        <div class="tab-pane" id="sla">
+        </div>
+        <div class="tab-pane" id="credentials">
+        </div>
+        <div class="tab-pane" id="transitions">
+          OK --> []
+          KO --> []
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="java-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#action" data-toggle="tab">${ _('Java') }</a></li>
+        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="action">
+          <input type="text" data-bind="value: properties.jar_path" />
         </div>
         <div class="tab-pane" id="files">
         </div>
@@ -222,8 +265,12 @@ ${ dashboard.layout_skeleton() }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     
-    Script path
-    <input type="text" data-bind="value: $root.addActionScriptPath"/>
+    <ul data-bind="foreach: addActionProperties">
+      <li>        
+        <span data-bind="text: label"></span>
+        <input data-bind="value: value"/>
+      </li>
+    </ul>
     
     <br/>
     <a data-bind="click: addActionDemiModalFieldPreview">
@@ -293,6 +340,22 @@ ${ dashboard.import_bindings() }
     widgetDraggedAdditionalHandler(widget);
   }
   function widgetDraggedAdditionalHandler(widget) {
+    viewModel.addActionProperties.removeAll();
+
+    if (widget.widgetType() == 'java-widget') {
+      viewModel.addActionProperties.push({
+        'name': 'jar_path',
+        'label': '${ _("Jar Path") }',
+        'value': ''
+      });
+    } else {
+      viewModel.addActionProperties.push({
+        'name': 'script_path',
+        'label': '${ _("Script Path") }',
+        'value': ''
+      });
+    }
+    
     showAddActionDemiModal(widget);
   }
 
@@ -312,7 +375,6 @@ ${ dashboard.import_bindings() }
 
   function addActionDemiModalFieldPreview(field) {    
     if (newAction != null) {
-      newAction.properties()['script_path'] = viewModel.addActionScriptPath();
       viewModel.workflow.addNode(newAction);
       $("#addActionDemiModal").modal("hide");
     }

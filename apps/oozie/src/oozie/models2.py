@@ -167,12 +167,12 @@ class Workflow():
 
   def check_workspace(self, fs):
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
-    create_directories(fs)
       
     perms = 0711
     # if shared, perms = 0755
 
     Submission(self.document.owner, self, fs, None, {})._create_dir(self.deployment_dir, perms=perms)
+    Submission(self.document.owner, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
 
 
 class Node():
