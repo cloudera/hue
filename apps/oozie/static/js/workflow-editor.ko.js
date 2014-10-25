@@ -83,6 +83,24 @@ var Workflow = function (vm, workflow) {
     self.nodes(nodes)
   }
   
+  self.newNode = function(widget) {
+    $.ajax({
+      type: "POST",
+      url: "/oozie/editor/workflow/new_node/",
+      data: {
+        "workflow": ko.mapping.toJSON(workflow),
+        "node": ko.mapping.toJSON(widget)  
+      },
+      success: function (data) {
+        if (data.status == 0) {
+          viewModel.addActionProperties(data.properties);
+          viewModel.addActionWorkflows(data.workflows);
+        }
+      },
+      async: false
+    });
+  };
+  
   self.addNode = function(widget) {
     // Todo get parent cell, link nodes... when we have the new layout
     $.post("/oozie/editor/workflow/add_node/", {        
@@ -91,12 +109,12 @@ var Workflow = function (vm, workflow) {
         "properties": ko.mapping.toJSON(viewModel.addActionProperties()),        
       }, function (data) {
       if (data.status == 0) {
-    	  widget.properties = data.properties;
+        widget.properties = data.properties;
           var node = new Node(ko.mapping.toJS(widget));
           node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}) // Link to child
 
           // Add to list of nodes
-          var end = self.nodes.pop()
+          var end = self.nodes.pop();
           self.nodes.push(node);
           self.nodes.push(end);
 
@@ -141,6 +159,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   }
 
   self.addActionProperties = ko.observableArray([]);
+  self.addActionWorkflows = ko.observableArray([]);
 
 
   self.getWidgetById = function (widget_id) {
@@ -195,16 +214,27 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   };
 
   self.showSubmitPopup = function () {
-    // if self.workflow.id() == null, need to save wf for now
+    // If self.workflow.id() == null, need to save wf for now
 
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
-     }).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
-      });
-    };
+    });
+  };
 
+  self.removeWidgetById = function (widget_id) {
+    $.each(self.columns(), function (i, col) {
+      $.each(col.rows(), function (j, row) {
+        $.each(row.widgets(), function (z, widget) {
+          if (widget.id() == widget_id){
+            row.widgets.remove(widget);
+          }
+        });
+      });
+    });
+  }  
     
   function bareWidgetBuilder(name, type){
     return new Widget({
@@ -219,4 +249,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   self.draggablePigAction = ko.observable(bareWidgetBuilder("Pig Script", "pig-widget"));
   self.draggableJavaAction = ko.observable(bareWidgetBuilder("Java program", "java-widget"));
   self.draggableMapReduceAction = ko.observable(bareWidgetBuilder("MapReduce job", "mapreduce-widget"));
+  self.draggableSubworkflowAction = ko.observable(bareWidgetBuilder("Sub workflow", "subworkflow-widget"));
+
+  self.draggableForkNode = ko.observable(bareWidgetBuilder("Fork", "fork-widget"));
+  self.draggableDecisionNode = ko.observable(bareWidgetBuilder("Decision", "decision-widget"));
+  self.draggableStopNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };

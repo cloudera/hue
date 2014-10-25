@@ -96,6 +96,58 @@ def save_workflow(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+P = {
+  'jar_path': {
+      'name': 'jar_path',
+      'label': _("Jar Path"),
+      'value': ''
+  },
+  'main_class': {
+      'name': 'main_class',
+      'label': _("Main class"),
+      'value': ''
+  },
+  'script_path': {
+      'name': 'script_path',
+      'label': _("Script Path"),
+      'value': ''
+  }
+}
+
+def new_node(request):
+  response = {'status': -1}
+
+  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+  node = json.loads(request.POST.get('node', '{}'))
+
+  print node
+  
+  properties = []
+  workflows = []
+
+  if node['widgetType'] == 'java-widget':
+    properties = [P['jar_path'], P['main_class'] ]
+  elif node['widgetType'] == 'pig-widget':
+    properties = [P['script_path']]
+  elif node['widgetType'] == 'hive-widget':
+    properties = [P['script_path']]
+  elif node['widgetType'] == 'subworkflow-widget':
+    workflows = [{
+        'name': workflow.name,
+        'owner': workflow.owner.username,
+        'value': workflow.uuid
+      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
+    ]
+    
+  print properties
+  
+
+  response['status'] = 0
+  response['properties'] = properties 
+  response['workflows'] = workflows
+  
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 def add_node(request):
   response = {'status': -1}
@@ -115,7 +167,6 @@ def add_node(request):
 
   response['status'] = 0
   response['properties'] = properties 
-  response['message'] = _('Page saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

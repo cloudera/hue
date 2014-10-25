@@ -56,6 +56,42 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
          title="${_('MapReduce job')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableSubworkflowAction(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true }" rel="tooltip" data-placement="top">
+          
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableForkNode(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Fork')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-share-alt"></i></a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableDecisionNode(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Decision')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-question"></i></a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableStopNode(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Kill')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-stop"></i></a>
+    </div>
 </%def>
 </%dashboard:layout_toolbar>
 
@@ -268,16 +304,105 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="subworkflow-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#action" data-toggle="tab">${ _('Java') }</a></li>
+        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="action">
+          <input type="text" data-bind="value: properties.jar_path" />
+        </div>
+        <div class="tab-pane" id="files">
+        </div>
+        <div class="tab-pane" id="sla">
+        </div>
+        <div class="tab-pane" id="credentials">
+        </div>
+        <div class="tab-pane" id="transitions">
+          OK --> []
+          KO --> []
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="fork-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      End
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="decision-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      End
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="enkill-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      End
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <div id="addActionDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     
     <ul data-bind="foreach: addActionProperties">
-      <li>        
+      <li>
         <span data-bind="text: label"></span>
         <input data-bind="value: value"/>
       </li>
     </ul>
+    
+    <!-- ko if: addActionWorkflows().length > 0 -->
+      <select data-bind="options: addActionWorkflows, optionsText: 'name'"></select>
+    <!-- /ko -->        
     
     <br/>
     <a data-bind="click: addActionDemiModalFieldPreview">
@@ -326,6 +451,7 @@ ${ dashboard.layout_skeleton() }
 
 ${ dashboard.import_layout() }
 
+
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
@@ -346,34 +472,9 @@ ${ dashboard.import_bindings() }
   function columnDropAdditionalHandler(widget) {
     widgetDraggedAdditionalHandler(widget);
   }
-  function widgetDraggedAdditionalHandler(widget) {
-    viewModel.addActionProperties.removeAll();
 
-    if (widget.widgetType() == 'java-widget') {
-      viewModel.addActionProperties.push({
-        'name': 'jar_path',
-        'label': '${ _("Jar Path") }',
-        'value': ''
-      });
-      viewModel.addActionProperties.push({
-        'name': 'main_class',
-        'label': '${ _("Main class") }',
-        'value': ''
-      });
-    } else if (widget.widgetType() == 'hive-widget') {
-      viewModel.addActionProperties.push({
-        'name': 'script_path',
-        'label': '${ _("Script Path") }',
-        'value': ''
-      });
-    } else if (widget.widgetType() == 'pig-widget') {
-      viewModel.addActionProperties.push({
-        'name': 'script_path',
-        'label': '${ _("Script Path") }',
-        'value': ''
-      });
-    }
-    
+  function widgetDraggedAdditionalHandler(widget) {
+    viewModel.workflow.newNode(widget);
     showAddActionDemiModal(widget);
   }
 
@@ -397,10 +498,10 @@ ${ dashboard.import_bindings() }
       $("#addActionDemiModal").modal("hide");
     }
   }
-    
+
   function addActionDemiModalFieldCancel() {
-    //viewModel.removeWidget(selectedWidget); todo remove node
-  }  
+    viewModel.removeWidgetById(newAction.id());
+  }
 </script>
 
 ${ commonfooter(messages) | n,unicode }
