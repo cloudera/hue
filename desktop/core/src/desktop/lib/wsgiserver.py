@@ -1667,6 +1667,7 @@ class CherryPyWSGIServer(object):
             ctx.set_cipher_list(self.ssl_cipher_list)
             ctx.use_privatekey_file(self.ssl_private_key)
             ctx.use_certificate_file(self.ssl_certificate)
+            ctx.set_options(SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3)
             self.socket = SSLConnection(ctx, self.socket)
             self.populate_ssl_environ()
             
