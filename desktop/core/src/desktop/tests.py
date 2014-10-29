@@ -633,6 +633,9 @@ def test_cx_Oracle():
   """
   Tests that cx_Oracle (external dependency) is built correctly.
   """
+  if 'ORACLE_HOME' not in os.environ and 'ORACLE_INSTANTCLIENT_HOME' not in os.environ:
+    raise SkipTest
+
   try:
     import cx_Oracle
     return
