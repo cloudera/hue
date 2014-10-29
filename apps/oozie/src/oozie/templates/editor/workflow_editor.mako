@@ -54,7 +54,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('MapReduce job')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
+         <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -219,7 +219,7 @@ ${ dashboard.layout_skeleton() }
     <div>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#action" data-toggle="tab">${ _('Pig') }</a></li>
-        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
         <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
         <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
         <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
@@ -241,13 +241,25 @@ ${ dashboard.layout_skeleton() }
           <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
           </button>	      
+          </br>
+          ${ _('Files') }   
+          <ul data-bind="foreach: properties.files">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.files.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
         </div>
-        <div class="tab-pane" id="files">
+        <div class="tab-pane" id="properties">
           prepares <input type="text" data-bind="value: properties.prepares" /></br>
           job_xml <input type="text" data-bind="value: properties.job_xml" /></br>
           proeperties <input type="text" data-bind="value: properties.properties" /></br>
           parameters <input type="text" data-bind="value: properties.parameters" /></br>
-          files <input type="text" data-bind="value: properties.files" /></br>
           archives <input type="text" data-bind="value: properties.archives" /></br>
           sla <input type="text" data-bind="value: properties.sla" /></br>
           credentials <input type="text" data-bind="value: properties.credentials" /></br>
@@ -314,7 +326,7 @@ ${ dashboard.layout_skeleton() }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Java') }</a></li>
+        <li class="active"><a href="#action" data-toggle="tab">${ _('Sub-workflow') }</a></li>
         <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
         <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
         <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
@@ -322,7 +334,7 @@ ${ dashboard.layout_skeleton() }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="action">
-          <input type="text" data-bind="value: properties.jar_path" />
+          <input type="text" data-bind="value: properties.subworkflow" />
         </div>
         <div class="tab-pane" id="files">
         </div>
@@ -401,7 +413,7 @@ ${ dashboard.layout_skeleton() }
     </ul>
     
     <!-- ko if: addActionWorkflows().length > 0 -->
-      <select data-bind="options: addActionWorkflows, optionsText: 'name'"></select>
+      <select data-bind="options: addActionWorkflows, optionsText: 'name', value: selectedSubWorkflow"></select>
     <!-- /ko -->        
     
     <br/>

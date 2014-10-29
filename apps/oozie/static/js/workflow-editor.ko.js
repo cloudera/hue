@@ -106,7 +106,8 @@ var Workflow = function (vm, workflow) {
     $.post("/oozie/editor/workflow/add_node/", {        
         "workflow": ko.mapping.toJSON(workflow),
         "node": ko.mapping.toJSON(widget),
-        "properties": ko.mapping.toJSON(viewModel.addActionProperties()),        
+        "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
+        "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}',
       }, function (data) {
       if (data.status == 0) {
         widget.properties = data.properties;
@@ -158,8 +159,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
     self.workflow.loadNodes(workflow_json);
   }
 
+  self.depen = ko.observableArray(workflow_json.dependencies);
+  
   self.addActionProperties = ko.observableArray([]);
   self.addActionWorkflows = ko.observableArray([]);
+  self.selectedSubWorkflow = ko.observable();
 
 
   self.getWidgetById = function (widget_id) {
