@@ -82,6 +82,11 @@ def save_workflow(request):
   else:      
     workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=request.user)
 
+  subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
+  if subworkflows:
+    dependencies = Document2.objects.filter(uuid__in=subworkflows)
+    workflow_doc.dependencies = dependencies
+
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
   workflow_doc.name = name
@@ -95,6 +100,7 @@ def save_workflow(request):
   response['message'] = _('Page saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 P = {
   'jar_path': {
@@ -155,14 +161,21 @@ def add_node(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
   properties = json.loads(request.POST.get('properties', '{}'))
+  subworkflow = json.loads(request.POST.get('subworkflow', '{}'))
 
   print node
-  print properties
+  print subworkflow
   
   properties = response['properties'] = dict([(property['name'], property['value']) for property in properties])
+  if subworkflow:
+    properties.update({
+       'subworkflow': subworkflow['value']
+    })
   properties.update({
       'parameters': [],
-      'arguments': []
+      'arguments': [],
+      'files': [],
+      'archives': []
   })
 
   response['status'] = 0

@@ -94,6 +94,10 @@ class Workflow():
     
     if self.document is not None:
       _data['workflow']['id'] = self.document.id
+      _data['workflow']['dependencies'] = self.document.dependencies
+    else:
+      _data['workflow']['dependencies'] = []
+
     if 'properties' not in _data['workflow']:
       _data['workflow']['properties'] = {}
       
