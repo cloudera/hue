@@ -726,31 +726,88 @@ ko.bindingHandlers.typeahead = {
   init: function (element, valueAccessor) {
     var binding = this;
     var elem = $(element);
-    var value = valueAccessor();
+    var valueAccessor = valueAccessor();
 
     var _options = {
       source: function () {
-        return ko.utils.unwrapObservable(value.source);
+        var _source = ko.utils.unwrapObservable(valueAccessor.source);
+        if (valueAccessor.extraKeywords) {
+          _source = _source.concat(valueAccessor.extraKeywords.split(" "))
+        }
+        return _source;
       },
       onselect: function (val) {
-        value.target(val);
+        valueAccessor.target(val);
       }
     }
 
-    if (value.triggerOnFocus){
-      _options.minLength =  0;
+    function extractor(query) {
+      var result = /([^ ]+)$/.exec(query);
+      if (result && result[1])
+        return result[1].trim();
+      return "";
+    }
+
+    if (valueAccessor.multipleValues) {
+      _options.updater = function (item) {
+        var _val = this.$element.val();
+        var _separator = (valueAccessor.multipleValuesSeparator || ":");
+        if (valueAccessor.extraKeywords && valueAccessor.extraKeywords.split(" ").indexOf(item) > -1) {
+          _separator = "";
+        }
+        if (_val.indexOf(" ") > -1) {
+          return _val.substring(0, _val.lastIndexOf(" ")) + " " + item + _separator;
+        }
+        else {
+          return item + _separator;
+        }
+      }
+      _options.matcher = function (item) {
+        var _tquery = extractor(this.query);
+        if (!_tquery) return false;
+        return ~item.toLowerCase().indexOf(_tquery.toLowerCase());
+      },
+          _options.highlighter = function (item) {
+            var _query = extractor(this.query).replace(/[\-\[\]{}()*+?.:\\\^$|#\s]/g, '\\$&');
+            return item.replace(new RegExp('(' + _query + ')', 'ig'), function ($1, match) {
+              return '<strong>' + match + '</strong>'
+            });
+          }
+    }
+
+    if (valueAccessor.completeSolrRanges) {
+      elem.on("keyup", function (e) {
+        if (e.keyCode != 8 && e.which != 8 && elem.val() && (elem.val().slice(-1) == "[" || elem.val().slice(-1) == "{")) {
+          var _index = elem.val().length;
+          elem.val(elem.val() + " TO " + (elem.val().slice(-1) == "[" ? "]" : "}"));
+
+          if (element.createTextRange) {
+            var range = element.createTextRange();
+            range.move("character", _index);
+            range.select();
+          } else if (element.selectionStart != null) {
+            element.focus();
+            element.setSelectionRange(_index, _index);
+          }
+
+        }
+      });
+    }
+
+    if (valueAccessor.triggerOnFocus) {
+      _options.minLength = 0;
     }
 
     elem.typeahead(_options);
 
-    if (value.triggerOnFocus){
+    if (valueAccessor.triggerOnFocus){
       elem.on('focus', function(){
         elem.trigger("keyup");
       });
     }
 
     elem.blur(function () {
-      value.target(elem.val());
+      valueAccessor.target(elem.val());
     });
   },
   update: function (element, valueAccessor) {
