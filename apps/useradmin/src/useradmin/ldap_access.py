@@ -35,12 +35,10 @@ CACHED_LDAP_CONN = None
 
 
 def get_connection_from_server(server=None):
-  if server:
-    return get_connection(desktop.conf.LDAP.LDAP_SERVERS.get()[server], search_bind_authentication=desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get())
-  else:
-    return get_connection(desktop.conf.LDAP, search_bind_authentication=desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get())
+  ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+  return get_connection(ldap_config)
 
-def get_connection(ldap_config, search_bind_authentication):
+def get_connection(ldap_config):
   global CACHED_LDAP_CONN
   if CACHED_LDAP_CONN is not None:
     return CACHED_LDAP_CONN
@@ -49,6 +47,7 @@ def get_connection(ldap_config, search_bind_authentication):
   username = ldap_config.BIND_DN.get()
   password = ldap_config.BIND_PASSWORD.get()
   ldap_cert = ldap_config.LDAP_CERT.get()
+  search_bind_authentication = ldap_config.SEARCH_BIND_AUTHENTICATION.get()
 
   if ldap_url is None:
     raise Exception('No LDAP URL was specified')
