@@ -953,7 +953,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
       sort_dir, sort_attr = DEFAULT_SORT
   else:
     sort_dir, sort_attr = DEFAULT_SORT
-  db_queryset = db_queryset.order_by(sort_dir + SORT_ATTR_TRANSLATION[sort_attr])
+  db_queryset = db_queryset.order_by(sort_dir + SORT_ATTR_TRANSLATION[sort_attr], '-id')
 
   # Get the total return count before slicing
   total_count = db_queryset.count()
