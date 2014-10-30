@@ -1043,6 +1043,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             var leafletmap = {};
             $.each(data.response.docs, function (index, item) {
               var row = [];
+              var _showDetails = item.showDetails;
+              var _details = item.details;
+              delete item["showDetails"];
+              delete item["details"];
               var fields = self.collection.template.fieldsSelected();
               // Display selected fields or whole json document
               if (fields.length != 0) {
@@ -1062,9 +1066,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               var doc = {
                 'id': item[self.collection.idField()],
                 'row': row,
-                'showDetails': ko.observable(item.showDetails),
-                'details': ko.observableArray(item.details),
-                'leafletmap': leafletmap,
+                'showDetails': ko.observable(_showDetails),
+                'details': ko.observableArray(_details),
+                'leafletmap': leafletmap
               };
               _docs.push(doc);
             });
