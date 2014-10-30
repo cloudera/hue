@@ -28,7 +28,11 @@ SPEC = DjangoCommandSupervisee("kt_renewer")
 NEED_KRB181_WORKAROUND=None
 
 def renew_from_kt():
+  # The config is specified in seconds. But we ask for that same amount in
+  # minutes to give ourselves a large renewal buffer.
+  renewal_lifetime = "%sm" % (CONF.KEYTAB_REINIT_FREQUENCY.get(),)
   cmdv = [CONF.KINIT_PATH.get(),
+          "-r", renewal_lifetime,
           "-k", # host ticket
           "-t", CONF.HUE_KEYTAB.get(), # specify keytab
           "-c", CONF.CCACHE_PATH.get(), # specify credentials cache
