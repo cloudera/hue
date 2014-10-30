@@ -37,6 +37,7 @@ from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db import transaction
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -616,6 +617,9 @@ for x in sys.stdin:
 
     for t in threads:
       t.join()
+
+    # Commit transactions to be sure that QueryHistory up to date
+    transaction.commit()
 
     for i in range(PARALLEL_TASKS):
       csv = get_csv(self.client, responses[i])
