@@ -1115,10 +1115,6 @@ ${ commonshare() | n,unicode }
       showAlert("<b>" + viewModel.currentScript().name() + "</b> ${_('has been saved correctly.')}");
     });
 
-    $(document).on("refreshDashboard", function () {
-      refreshDashboard();
-    });
-
     $(document).on("showDashboard", function () {
       routie("dashboard");
       $.jHueTitleUpdater.reset();
@@ -1168,15 +1164,10 @@ ${ commonshare() | n,unicode }
 
     refreshDashboard();
 
-    var dashboardRefreshInterval = window.setInterval(function () {
-      if (viewModel.runningScripts().length > 0) {
-        refreshDashboard();
-      }
-    }, 3000);
-
     function refreshDashboard() {
       $.getJSON("${ url('pig:dashboard') }", function (data) {
         viewModel.updateDashboard(data);
+        window.setTimeout(refreshDashboard, viewModel.runningScripts().length > 0 ? 3000 : 10000);
       });
     }
 
