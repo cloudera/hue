@@ -30,7 +30,7 @@ from django.shortcuts import redirect
 
 from desktop.lib.django_util import render, encode_json_for_js
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import smart_str, smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
@@ -554,7 +554,7 @@ def rerun_oozie_coordinator(request, job_id, app_path):
       request.info(_('Coordinator re-running.'))
       return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
-      request.error(_('Invalid submission form: %s' % (rerun_form.errors,)))
+      request.error(_('Invalid submission form: %s') % smart_unicode(rerun_form.errors))
       return list_oozie_coordinator(request, job_id)
   else:
     rerun_form = RerunCoordForm(oozie_coordinator=oozie_coordinator)
