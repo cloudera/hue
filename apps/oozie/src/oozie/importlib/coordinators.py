@@ -152,44 +152,39 @@ def _process_metadata(coordinator, metadata):
 
 
 def import_coordinator_root(coordinator, coordinator_definition_root, metadata=None):
-  try:
-    xslt_definition_fh = open("%(xslt_dir)s/coordinator.xslt" % {
-      'xslt_dir': os.path.join(conf.DEFINITION_XSLT_DIR.get(), 'coordinators')
+  xslt_definition_fh = open("%(xslt_dir)s/coordinator.xslt" % {
+    'xslt_dir': os.path.join(conf.DEFINITION_XSLT_DIR.get(), 'coordinators')
+  })
+
+  tag = etree.QName(coordinator_definition_root.tag)
+  schema_version = tag.namespace
+
+  # Ensure namespace exists
+  if schema_version not in OOZIE_NAMESPACES:
+    raise RuntimeError(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
+      'namespace': coordinator_definition_root.tag,
+      'namespaces': ', '.join(OOZIE_NAMESPACES)
     })
 
-    tag = etree.QName(coordinator_definition_root.tag)
-    schema_version = tag.namespace
+  # Get XSLT and Transform XML
+  xslt = etree.parse(xslt_definition_fh)
+  xslt_definition_fh.close()
+  transform = etree.XSLT(xslt)
+  transformed_root = transform(coordinator_definition_root)
 
-    # Ensure namespace exists
-    if schema_version not in OOZIE_NAMESPACES:
-      raise RuntimeError(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
-        'namespace': coordinator_definition_root.tag,
-        'namespaces': ', '.join(OOZIE_NAMESPACES)
-      })
+  # Deserialize XML
+  objects = serializers.deserialize('xml', etree.tostring(transformed_root))
+  # Resolve coordinator dependencies and node types and link dependencies
+  _set_coordinator_properties(coordinator, coordinator_definition_root, schema_version)
+  _set_controls(coordinator, coordinator_definition_root, schema_version)
+  _reconcile_datasets(coordinator, objects, coordinator_definition_root, schema_version)
+  _set_properties(coordinator, coordinator_definition_root, schema_version)
+  if metadata:
+    _process_metadata(coordinator, metadata)
 
-    # Get XSLT and Transform XML
-    xslt = etree.parse(xslt_definition_fh)
-    xslt_definition_fh.close()
-    transform = etree.XSLT(xslt)
-    transformed_root = transform(coordinator_definition_root)
-
-    # Deserialize XML
-    objects = serializers.deserialize('xml', etree.tostring(transformed_root))
-    # Resolve coordinator dependencies and node types and link dependencies
-    _set_coordinator_properties(coordinator, coordinator_definition_root, schema_version)
-    _set_controls(coordinator, coordinator_definition_root, schema_version)
-    _reconcile_datasets(coordinator, objects, coordinator_definition_root, schema_version)
-    _set_properties(coordinator, coordinator_definition_root, schema_version)
-    if metadata:
-      _process_metadata(coordinator, metadata)
-
-    # Update schema_version
-    coordinator.schema_version = schema_version
-    coordinator.save()
-  except:
-    # There was an error importing the coordinator so delete every thing associated with it.
-    coordinator.delete(skip_trash=True)
-    raise
+  # Update schema_version
+  coordinator.schema_version = schema_version
+  coordinator.save()
 
 
 def import_coordinator(coordinator, coordinator_definition, metadata=None):
