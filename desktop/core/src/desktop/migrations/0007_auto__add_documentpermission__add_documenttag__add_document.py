@@ -7,69 +7,73 @@ from django.db import connection, models
 from desktop.models import Document
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'DocumentPermission'
-        db.create_table('desktop_documentpermission', (
-            ('perms', self.gf('django.db.models.fields.TextField')(default='read')),
-            ('doc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['desktop.Document'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('desktop', ['DocumentPermission'])
+        if 'desktop_documentpermission' not in connection.introspection.table_names():
+            db.create_table('desktop_documentpermission', (
+                ('perms', self.gf('django.db.models.fields.TextField')(default='read')),
+                ('doc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['desktop.Document'])),
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ))
+            db.send_create_signal('desktop', ['DocumentPermission'])
 
         # Adding M2M table for field users on 'DocumentPermission'
-        db.create_table('documentpermission_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('documentpermission_users', ['documentpermission_id', 'user_id'])
+        if 'documentpermission_users' not in connection.introspection.table_names():
+            db.create_table('documentpermission_users', (
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
+                ('user', models.ForeignKey(orm['auth.user'], null=False))
+            ))
+            db.create_unique('documentpermission_users', ['documentpermission_id', 'user_id'])
 
         # Adding M2M table for field groups on 'DocumentPermission'
-        db.create_table('documentpermission_groups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
-            ('group', models.ForeignKey(orm['auth.group'], null=False))
-        ))
-        db.create_unique('documentpermission_groups', ['documentpermission_id', 'group_id'])
+        if 'documentpermission_groups' not in connection.introspection.table_names():
+            db.create_table('documentpermission_groups', (
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                ('documentpermission', models.ForeignKey(orm['desktop.documentpermission'], null=False)),
+                ('group', models.ForeignKey(orm['auth.group'], null=False))
+            ))
+            db.create_unique('documentpermission_groups', ['documentpermission_id', 'group_id'])
 
         # Adding model 'DocumentTag'
-        db.create_table('desktop_documenttag', (
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('tag', self.gf('django.db.models.fields.SlugField')(max_length=50, db_index=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('desktop', ['DocumentTag'])
+        if 'desktop_documenttag' not in connection.introspection.table_names():
+            db.create_table('desktop_documenttag', (
+                ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+                ('tag', self.gf('django.db.models.fields.SlugField')(max_length=50, db_index=True)),
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ))
+            db.send_create_signal('desktop', ['DocumentTag'])
 
         # Adding model 'Document'
-        db.create_table('desktop_document', (
-            ('description', self.gf('django.db.models.fields.TextField')(default='')),
-            ('extra', self.gf('django.db.models.fields.TextField')(default='')),
-            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('version', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='doc_owner', to=orm['auth.User'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.TextField')(default='')),
-        ))
-        db.send_create_signal('desktop', ['Document'])
+        if 'desktop_document' not in connection.introspection.table_names():
+            db.create_table('desktop_document', (
+                ('description', self.gf('django.db.models.fields.TextField')(default='')),
+                ('extra', self.gf('django.db.models.fields.TextField')(default='')),
+                ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
+                ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+                ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+                ('version', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
+                ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='doc_owner', to=orm['auth.User'])),
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+                ('name', self.gf('django.db.models.fields.TextField')(default='')),
+            ))
+            db.send_create_signal('desktop', ['Document'])
 
         # Adding M2M table for field tags on 'Document'
-        db.create_table('desktop_document_tags', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('document', models.ForeignKey(orm['desktop.document'], null=False)),
-            ('documenttag', models.ForeignKey(orm['desktop.documenttag'], null=False))
-        ))
-        db.create_unique('desktop_document_tags', ['document_id', 'documenttag_id'])
-    
-    
+        if 'desktop_document_tags' not in connection.introspection.table_names():
+            db.create_table('desktop_document_tags', (
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                ('document', models.ForeignKey(orm['desktop.document'], null=False)),
+                ('documenttag', models.ForeignKey(orm['desktop.documenttag'], null=False))
+            ))
+            db.create_unique('desktop_document_tags', ['document_id', 'documenttag_id'])
+
         Document.objects.sync()
-    
-    
+
     def backwards(self, orm):
-        
+
         # Deleting model 'DocumentPermission'
         db.delete_table('desktop_documentpermission')
 
