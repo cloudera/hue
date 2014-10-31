@@ -135,8 +135,25 @@ def oozie_to_django_datetime(dt_string):
   return None
 
 
+class InvalidFrequency(Exception):
+  pass
+
+
 def oozie_to_hue_frequency(frequency_string):
-  # Get frequency number and units from frequency
-  # frequency units and number are just different parts of the EL function.
+  """
+  Get frequency number and units from frequency, which must be of the format
+  "${coord:$unit($number)}".
+
+  frequency units and number are just different parts of the EL function.
+
+  Returns:
+    A tuple of the frequency unit and number
+
+  Raises:
+    InvalidFrequency: If the `frequency_string` does not match the frequency pattern.
+  """
   matches = re.match(FREQUENCY_REGEX, frequency_string)
-  return matches.group('frequency_unit'), matches.group('frequency_number')
+  if matches:
+    return matches.group('frequency_unit'), matches.group('frequency_number')
+  else:
+    raise InvalidFrequency(_('invalid frequency: %s') % frequency_string)
