@@ -542,7 +542,6 @@ var PigViewModel = function (props) {
           script.isRunning(true);
           script.watchUrl(data.watchUrl);
           $(document).trigger("startLogsRefresh");
-          $(document).trigger("refreshDashboard");
           self.updateScripts();
         }, "json").fail( function(xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
