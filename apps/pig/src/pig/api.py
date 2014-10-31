@@ -157,6 +157,7 @@ class OozieApi:
 
       except Exception, e:
         LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
+        is_really_done = True
 
     workflow_actions = []
 
