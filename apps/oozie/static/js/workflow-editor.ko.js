@@ -109,18 +109,20 @@ var Workflow = function (vm, workflow) {
         "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
         "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}',
       }, function (data) {
-      if (data.status == 0) {
-        widget.properties = data.properties;
-          var node = new Node(ko.mapping.toJS(widget));
-          node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}) // Link to child
+      if (data.status == 0) {        
+        var _node = ko.mapping.toJS(widget);
+        _node.properties = data.properties;
+        _node.name = data.name;
+        var node = new Node(_node);
+        node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}) // Link to child
 
-          // Add to list of nodes
-          var end = self.nodes.pop();
-          self.nodes.push(node);
-          self.nodes.push(end);
+        // Add to list of nodes
+        var end = self.nodes.pop();
+        self.nodes.push(node);
+        self.nodes.push(end);
 
-          self.nodes()[0].children.removeAll(); // Parent link to new node
-          self.nodes()[0].children().push({'to': node.id()});
+        self.nodes()[0].children.removeAll(); // Parent link to new node
+        self.nodes()[0].children().push({'to': node.id()});
       } else {
         $(document).trigger("error", data.message);
        }

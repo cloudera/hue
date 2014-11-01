@@ -179,7 +179,8 @@ def add_node(request):
   })
 
   response['status'] = 0
-  response['properties'] = properties 
+  response['properties'] = properties
+  response['name'] = '%s-%s' % (node['widgetType'].split('-')[0], node['id'][:4])
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
