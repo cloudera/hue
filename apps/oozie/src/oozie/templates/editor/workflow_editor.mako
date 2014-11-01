@@ -274,7 +274,20 @@ ${ dashboard.layout_skeleton() }
           </button>
           <br/>
           ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" /></br>
-          proeperties <input type="text" data-bind="value: properties.properties" /></br>
+          ${ _('Properties') }   
+          <ul data-bind="foreach: properties.properties">
+            <li>
+              <input data-bind="value: name"/>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.properties.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.properties.push({'name': '', 'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>       
+          <br/>          
           parameters <input type="text" data-bind="value: properties.parameters" /></br>
           archives <input type="text" data-bind="value: properties.archives" /></br>
           sla <input type="text" data-bind="value: properties.sla" /></br>
