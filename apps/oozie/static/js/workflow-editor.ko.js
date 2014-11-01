@@ -143,7 +143,7 @@ var Workflow = function (vm, workflow) {
   }
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json) {
   var self = this;
 
   self.isEditing = ko.observable(true);
@@ -154,6 +154,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json) {
   self.columns = ko.observable([]);
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
+  self.credentials = ko.mapping.fromJSON(credentials_json);
 
   self.inited = ko.observable(self.columns().length > 0);
   self.init = function(callback) {

@@ -327,7 +327,7 @@ ${ dashboard.layout_skeleton() }
           
         </div>
         <div class="tab-pane" id="credentials">
-          credentials <input type="text" data-bind="value: properties.credentials" /></br>
+          <select data-bind="options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
         </div>
         <div class="tab-pane" id="transitions">
           OK --> []
@@ -539,7 +539,7 @@ ${ dashboard.import_bindings() }
   ${ utils.slaGlobal() }
 
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode });
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode });
   ko.applyBindings(viewModel);
 
   viewModel.init();

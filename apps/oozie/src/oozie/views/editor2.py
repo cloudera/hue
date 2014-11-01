@@ -30,6 +30,8 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2
 
+from liboozie.credentials import Credentials
+from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
@@ -59,9 +61,14 @@ def edit_workflow(request):
   
   workflow_data = workflow.get_data()
 
+  api = get_oozie(request.user)
+  credentials = Credentials()
+  credentials.fetch(api)
+
   return render('editor/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout']),
-      'workflow_json': json.dumps(workflow_data['workflow'])
+      'workflow_json': json.dumps(workflow_data['workflow']),
+      'credentials_json': json.dumps(credentials.credentials.keys())
   })
 
 
@@ -189,7 +196,8 @@ def add_node(request):
           {'key': 'alert-contact', 'value': ''},
           {'key': 'notification-msg', 'value': ''},
           {'key': 'upstream-apps', 'value': ''},
-      ]      
+      ],
+      'credentials': []
   })
 
   response['status'] = 0
