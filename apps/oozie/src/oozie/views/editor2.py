@@ -178,6 +178,7 @@ def add_node(request):
       'archives': [],
       'prepares': [],
       'job_xml': '',
+      'properties': [],
   })
 
   response['status'] = 0
