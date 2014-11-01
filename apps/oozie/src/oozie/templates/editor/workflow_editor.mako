@@ -273,8 +273,7 @@ ${ dashboard.layout_skeleton() }
             ${ _('Delete') } <i class="fa fa-plus"></i>
           </button>
           <br/>
-          prepares <input type="text" data-bind="value: properties.prepares" /></br>
-          job_xml <input type="text" data-bind="value: properties.job_xml" /></br>
+          ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" /></br>
           proeperties <input type="text" data-bind="value: properties.properties" /></br>
           parameters <input type="text" data-bind="value: properties.parameters" /></br>
           archives <input type="text" data-bind="value: properties.archives" /></br>
