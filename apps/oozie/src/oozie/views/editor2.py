@@ -179,6 +179,17 @@ def add_node(request):
       'prepares': [],
       'job_xml': '',
       'properties': [],
+      'sla': [
+          {'key': 'enabled', 'value': False},
+          {'key': 'nominal-time', 'value': ''},
+          {'key': 'should-start', 'value': ''},
+          {'key': 'should-end', 'value': ''},
+          {'key': 'max-duration', 'value': ''},
+          {'key': 'alert-events', 'value': ''},
+          {'key': 'alert-contact', 'value': ''},
+          {'key': 'notification-msg', 'value': ''},
+          {'key': 'upstream-apps', 'value': ''},
+      ]      
   })
 
   response['status'] = 0

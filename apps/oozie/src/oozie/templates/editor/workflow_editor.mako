@@ -19,6 +19,7 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
+<%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
@@ -314,14 +315,19 @@ ${ dashboard.layout_skeleton() }
           <button data-bind="click: function(){ properties.parameters.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
           </button>       
-          </br>          
-          
-          sla <input type="text" data-bind="value: properties.sla" /></br>
-          credentials <input type="text" data-bind="value: properties.credentials" /></br>
+          </br>                    
         </div>
-        <div class="tab-pane" id="sla">
+        <div class="tab-pane" id="sla">          
+          <div class="control-group">
+            <label class="control-label">${ _('SLA Configuration') }</label>
+            <div class="controls" data-bind="with: properties">
+              ${ utils.slaForm() }
+            </div>
+          </div>          
+          
         </div>
         <div class="tab-pane" id="credentials">
+          credentials <input type="text" data-bind="value: properties.credentials" /></br>
         </div>
         <div class="tab-pane" id="transitions">
           OK --> []
@@ -530,6 +536,9 @@ ${ dashboard.import_bindings() }
 
 
 <script type="text/javascript">
+  ${ utils.slaGlobal() }
+
+
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode });
   ko.applyBindings(viewModel);
 
