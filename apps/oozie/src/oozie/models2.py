@@ -94,7 +94,7 @@ class Workflow():
     
     if self.document is not None:
       _data['workflow']['id'] = self.document.id
-      _data['workflow']['dependencies'] = self.document.dependencies
+      _data['workflow']['dependencies'] = list(self.document.dependencies.values())
     else:
       _data['workflow']['dependencies'] = []
 

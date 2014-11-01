@@ -175,7 +175,8 @@ def add_node(request):
       'parameters': [],
       'arguments': [],
       'files': [],
-      'archives': []
+      'archives': [],
+      'prepares': [],
   })
 
   response['status'] = 0
