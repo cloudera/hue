@@ -256,6 +256,23 @@ ${ dashboard.layout_skeleton() }
           </button>
         </div>
         <div class="tab-pane" id="properties">
+          ${ _('Prepare') }   
+          <ul data-bind="foreach: properties.prepares">
+            <li>
+              <span data-bind="text: type"></span>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
+            ${ _('Directory') } <i class="fa fa-plus"></i>
+          </button>
+          <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
+            ${ _('Delete') } <i class="fa fa-plus"></i>
+          </button>
+          <br/>
           prepares <input type="text" data-bind="value: properties.prepares" /></br>
           job_xml <input type="text" data-bind="value: properties.job_xml" /></br>
           proeperties <input type="text" data-bind="value: properties.properties" /></br>
