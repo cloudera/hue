@@ -287,9 +287,35 @@ ${ dashboard.layout_skeleton() }
           <button data-bind="click: function(){ properties.properties.push({'name': '', 'value': ''}); }">
             <i class="fa fa-plus"></i>
           </button>       
-          <br/>          
-          parameters <input type="text" data-bind="value: properties.parameters" /></br>
-          archives <input type="text" data-bind="value: properties.archives" /></br>
+          <br/>                    
+          ${ _('Archives') }   
+          <ul data-bind="foreach: properties.archives">
+            <li>
+              <input data-bind="value: name"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.archives.push({'name': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>      
+          <br/>    
+          
+          ${ _('Parameters') }   
+          <ul data-bind="foreach: properties.parameters">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.parameters.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>       
+          </br>          
+          
           sla <input type="text" data-bind="value: properties.sla" /></br>
           credentials <input type="text" data-bind="value: properties.credentials" /></br>
         </div>
