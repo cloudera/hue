@@ -2277,7 +2277,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
     assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
     workflow.delete(skip_trash=True)
@@ -2382,7 +2382,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
     assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
     workflow.delete(skip_trash=True)
@@ -2406,7 +2406,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
     assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow).filter(parent__name='TeraGenWorkflow').filter(name='error').filter(child__node_type='java')))
@@ -3028,7 +3028,8 @@ class TestOozieSubmissions(OozieBase):
                            data={u'form-MAX_NUM_FORMS': [u''],
                                 u'form-0-name': [u'records'], u'form-0-value': [u'10'],
                                 u'form-1-name': [u' output_dir '], u'form-1-value': [u'${nameNode}/user/test/out/terasort'],
-                                u'form-INITIAL_FORMS': [u'2'], u'form-TOTAL_FORMS': [u'2']},
+                                u'form-2-name': [u'terasort_reducers'], u'form-2-value': [u'3'],
+                                u'form-INITIAL_FORMS': [u'3'], u'form-TOTAL_FORMS': [u'3']},
                            follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
