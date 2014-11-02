@@ -17,6 +17,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>org.apache.hadoop.examples.terasort.TeraSort</main-class>
+            <arg>-Dmapred.reduce.tasks=${terasort_reducers}</arg>
             <arg>${output_dir}/teragen</arg>
             <arg>${output_dir}/terasort</arg>
         </java>
