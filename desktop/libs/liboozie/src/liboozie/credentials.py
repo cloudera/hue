@@ -31,7 +31,10 @@ class Credentials(object):
   }
 
   def __init__(self, credentials=None):
-    self.credentials = credentials
+    if credentials is None:
+      self.credentials = {}
+    else:
+      self.credentials = credentials
 
   def fetch(self, oozie_api):
     configuration = oozie_api.get_configuration()

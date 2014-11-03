@@ -63,7 +63,11 @@ def edit_workflow(request):
 
   api = get_oozie(request.user)
   credentials = Credentials()
-  credentials.fetch(api)
+  
+  try:  
+    credentials.fetch(api)
+  except Exception, e:
+    LOG.error(smart_str(e))
 
   return render('editor/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout']),

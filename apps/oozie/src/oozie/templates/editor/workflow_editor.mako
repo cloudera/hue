@@ -190,7 +190,8 @@ ${ dashboard.layout_skeleton() }
     ${ _('Delete') } <i class="fa fa-plus"></i>
   </button>
   <br/>
-  ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" /></br>
+  ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" />
+  <br/>
   ${ _('Properties') }
   <ul data-bind="foreach: properties.properties">
     <li>
@@ -307,7 +308,8 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div class="tab-pane" id="properties">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
-
+          <br/>
+          <br/>
           ${ _('Parameters') }
           <ul data-bind="foreach: properties.parameters">
             <li>
@@ -514,6 +516,25 @@ ${ dashboard.layout_skeleton() }
       <br/>
       ${_("Workspace")}
       <input data-bind="value: $root.workflow.properties.deployment_dir"/>
+
+	  <br/>
+	  ${ _('Hadoop Properties') }
+	  <ul data-bind="foreach: $root.workflow.properties.properties">
+	    <li>
+	      <input data-bind="value: name"/>
+	      <input data-bind="value: value"/>
+	      <a href="#" data-bind="click: function(){ $root.workflow.properties.properties.remove(this); }">
+	        <i class="fa fa-minus"></i>
+	      </a>
+	    </li>
+	  </ul>
+	  <button data-bind="click: function(){ $root.workflow.properties.properties.push({'name': '', 'value': ''}); }">
+	    <i class="fa fa-plus"></i>
+	  </button>
+
+      <br/>
+      ${_("Job XML")}
+      <input data-bind="value: $root.workflow.properties.job_xml"/>
 
     </div>
   </div>
