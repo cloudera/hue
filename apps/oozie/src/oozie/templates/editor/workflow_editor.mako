@@ -179,6 +179,24 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass">
+    <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
+
+    <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
+      <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+    </div>
+    <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
+    </div>
+    <div class="container-fluid" data-bind="visible: $root.isEditing() && (rows().length > 0 ||  $root.isNested())">
+      <div data-bind="click: function(){$data.addEmptyRow()}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+    </div>
+
+    <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
+  </div>
+</script>
+
+
+<script type="text/html" id="internal-column-template">
+  <div data-bind="css: klass">
 ##
 ##    <div class="container-fluid">
 ##      <div class="row-fluid">
@@ -197,7 +215,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
-    <div data-bind="template: { name: 'row-template', foreach: rows}">
+    <div data-bind="template: { name: 'internal-row-template', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && (rows().length > 0 ||  $root.isNested())">
       <div data-bind="click: function(){$data.addEmptyRow()}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
@@ -206,6 +224,22 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="row-template">
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span12">
+        <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
+          sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)), isEnabled: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)),
+          options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
+              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+              dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="internal-row-template">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1 && ! $root.isNested">
     <img src="/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
@@ -220,7 +254,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <div class="span10">
 
 
-      <div data-bind="visible: columns().length == 0, style: { 'border-bottom': $root.isNested() ? 'none' : '' }, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
+      <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
         sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)), isEnabled: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)),
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
@@ -229,12 +263,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
     <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
-        <div data-bind="template: { name: 'column-template', foreach: columns}">
+        <div data-bind="template: { name: 'internal-column-template', foreach: columns}">
         </div>
       </div>
     </div>
-
-
 
 
       </div>
@@ -745,7 +777,6 @@ ${ dashboard.import_bindings() }
 
   viewModel.init();
   fullLayout(viewModel);
-
 
   function columnDropAdditionalHandler(widget) {
     widgetDraggedAdditionalHandler(widget);

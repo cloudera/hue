@@ -67,7 +67,7 @@ class Workflow():
           'layout': [
               {"size":12, "rows":[
                     {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
-                    {"widgets":[]},  
+                    # {"widgets":[]},
                     {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}], 
                  "drops":[ "temp"],
                  "klass":"card card-home card-column span12"}              

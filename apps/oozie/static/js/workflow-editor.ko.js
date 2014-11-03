@@ -79,7 +79,6 @@ function loadLayout(viewModel, json_layout) {
     var column = new Column(json_col.size, _rows);
     _columns = _columns.concat(column);
   });
-
   viewModel.columns(_columns);
 }
 
