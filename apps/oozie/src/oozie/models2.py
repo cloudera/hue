@@ -42,6 +42,17 @@ LOG = logging.getLogger(__name__)
 class Workflow():
   XML_FILE_NAME = 'workflow.xml'
   PROPERTY_APP_PATH = 'oozie.wf.application.path'
+  SLA_DEFAULT = [
+      {'key': 'enabled', 'value': False},
+      {'key': 'nominal-time', 'value': ''},
+      {'key': 'should-start', 'value': ''},
+      {'key': 'should-end', 'value': ''},
+      {'key': 'max-duration', 'value': ''},
+      {'key': 'alert-events', 'value': ''},
+      {'key': 'alert-contact', 'value': ''},
+      {'key': 'notification-msg', 'value': ''},
+      {'key': 'upstream-apps', 'value': ''},
+  ]
   HUE_ID = 'hue-id-w'
   
   def __init__(self, data=None, document=None, workflow=None):
@@ -69,7 +80,8 @@ class Workflow():
                     "schema_version": "uri:oozie:workflow:0.4",
                     "sla_workflow_enabled": False,
                     "credentials": [],
-                    "properties": []
+                    "properties": [],
+                    "sla": Workflow.SLA_DEFAULT
               },
               "nodes":[
                   {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            

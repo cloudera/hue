@@ -533,9 +533,16 @@ ${ dashboard.layout_skeleton() }
 	  </button>
 
       <br/>
-      ${_("Job XML")}
+      ${ _("Job XML") }
       <input data-bind="value: $root.workflow.properties.job_xml"/>
 
+      <br/>
+      <div class="control-group">
+        <label class="control-label">${ _('SLA Configuration') }</label>
+        <div class="controls" data-bind="with: $root.workflow.properties">
+          ${ utils.slaForm() }
+        </div>
+      </div>
     </div>
   </div>
 </div>
