@@ -28,6 +28,37 @@ var Column = function (size, rows) {
   var self = this;
   self.size = ko.observable(size);
   self.rows = ko.observableArray(rows);
+  self.oozieStartRow = ko.computed(function() {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function(row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "start-widget")){
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+  self.oozieEndRow = ko.computed(function() {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function(row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "end-widget")){
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+
+  self.oozieRows = ko.computed(function() {
+    var _rows = [];
+    ko.utils.arrayForEach(self.rows(), function(row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() != "start-widget" && row.widgets()[0].widgetType() != "end-widget") || row.widgets().length == 0){
+        _rows.push(row);
+      }
+    });
+    return _rows;
+  }, self);
+
   self.drops = ko.observableArray(["temp"]);
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
@@ -223,7 +254,7 @@ function setLayout(colSizes, vm) {
   $(vm.columns()).each(function (cnt, col) {
     var _tRows = [];
     $(col.rows()).each(function (icnt, row) {
-      if (row.widgets().length > 0) {
+      if (row.widgets().length > 0 || (typeof vm.isNested != "undefined" && vm.isNested())) {
         _tRows.push(row);
       }
     });
