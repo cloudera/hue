@@ -67,7 +67,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div data-bind="css: { 'draggable-widget': true }" rel="tooltip" data-placement="top">
-          
+
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -98,7 +98,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <div class="search-bar">
-  <div class="pull-right" style="padding-right:50px">    
+  <div class="pull-right" style="padding-right:50px">
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
       <i class="fa fa-file-code-o"></i>
     </a>
@@ -107,12 +107,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
-    </a>    
+    </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
       <button type="button" title="${ _('Workspace') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
         <i class="fa fa-folder-open"></i>
-      </button>      
+      </button>
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
         <i class="fa fa-cog"></i>
       </button>
@@ -132,7 +132,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
   <form class="form-search" style="margin: 0">
     <strong>${_("Name")}</strong>
-    <input data-bind="value: $root.workflow.name"/>    
+    <input data-bind="value: $root.workflow.name"/>
   </form>
 </div>
 
@@ -172,6 +172,54 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="common-action-properties">
+  ${ _('Prepare') }
+  <ul data-bind="foreach: properties.prepares">
+    <li>
+      <span data-bind="text: type"></span>
+      <input data-bind="value: value"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
+  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
+    ${ _('Directory') } <i class="fa fa-plus"></i>
+  </button>
+  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
+    ${ _('Delete') } <i class="fa fa-plus"></i>
+  </button>
+  <br/>
+  ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" /></br>
+  ${ _('Properties') }
+  <ul data-bind="foreach: properties.properties">
+    <li>
+      <input data-bind="value: name"/>
+      <input data-bind="value: value"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.properties.remove(this); }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
+  <button data-bind="click: function(){ properties.properties.push({'name': '', 'value': ''}); }">
+    <i class="fa fa-plus"></i>
+  </button>
+  <br/>
+  ${ _('Archives') }
+  <ul data-bind="foreach: properties.archives">
+    <li>
+      <input data-bind="value: name"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
+  <button data-bind="click: function(){ properties.archives.push({'name': ''}); }">
+    <i class="fa fa-plus"></i>
+  </button>
+</script>
+
+
 <script type="text/html" id="hive-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
@@ -183,7 +231,7 @@ ${ dashboard.layout_skeleton() }
     <div>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#action" data-toggle="tab">${ _('Hive') }</a></li>
-        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
         <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
         <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
         <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
@@ -192,7 +240,8 @@ ${ dashboard.layout_skeleton() }
         <div class="tab-pane active" id="action">
           <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
         </div>
-        <div class="tab-pane" id="files">
+        <div class="tab-pane" id="properties">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
         <div class="tab-pane" id="sla">
         </div>
@@ -230,7 +279,7 @@ ${ dashboard.layout_skeleton() }
           <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
           <input type="text" data-bind="value: properties.script_path" />
           </br>
-	      ${ _('Variables') }   
+	      ${ _('Variables') }
 	      <ul data-bind="foreach: properties.arguments">
 	        <li>
 	          <input data-bind="value: value"/>
@@ -241,9 +290,9 @@ ${ dashboard.layout_skeleton() }
 	      </ul>
           <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
-          </button>	      
+          </button>	
           </br>
-          ${ _('Files') }   
+          ${ _('Files') }
           <ul data-bind="foreach: properties.files">
             <li>
               <input data-bind="value: value"/>
@@ -257,53 +306,9 @@ ${ dashboard.layout_skeleton() }
           </button>
         </div>
         <div class="tab-pane" id="properties">
-          ${ _('Prepare') }   
-          <ul data-bind="foreach: properties.prepares">
-            <li>
-              <span data-bind="text: type"></span>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
-            ${ _('Directory') } <i class="fa fa-plus"></i>
-          </button>
-          <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
-            ${ _('Delete') } <i class="fa fa-plus"></i>
-          </button>
-          <br/>
-          ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" /></br>
-          ${ _('Properties') }   
-          <ul data-bind="foreach: properties.properties">
-            <li>
-              <input data-bind="value: name"/>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.properties.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.properties.push({'name': '', 'value': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>       
-          <br/>                    
-          ${ _('Archives') }   
-          <ul data-bind="foreach: properties.archives">
-            <li>
-              <input data-bind="value: name"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.archives.push({'name': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>      
-          <br/>    
-          
-          ${ _('Parameters') }   
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+
+          ${ _('Parameters') }
           <ul data-bind="foreach: properties.parameters">
             <li>
               <input data-bind="value: value"/>
@@ -314,17 +319,17 @@ ${ dashboard.layout_skeleton() }
           </ul>
           <button data-bind="click: function(){ properties.parameters.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
-          </button>       
-          </br>                    
+          </button>
+          </br>
         </div>
-        <div class="tab-pane" id="sla">          
+        <div class="tab-pane" id="sla">
           <div class="control-group">
             <label class="control-label">${ _('SLA Configuration') }</label>
             <div class="controls" data-bind="with: properties">
               ${ utils.slaForm() }
             </div>
-          </div>          
-          
+          </div>
+
         </div>
         <div class="tab-pane" id="credentials">
           <select data-bind="options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
@@ -351,7 +356,7 @@ ${ dashboard.layout_skeleton() }
     <div>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#action" data-toggle="tab">${ _('Java') }</a></li>
-        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
         <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
         <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
         <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
@@ -360,7 +365,8 @@ ${ dashboard.layout_skeleton() }
         <div class="tab-pane active" id="action">
           <input type="text" data-bind="value: properties.jar_path" />
         </div>
-        <div class="tab-pane" id="files">
+        <div class="tab-pane" id="properties">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
         <div class="tab-pane" id="sla">
         </div>
@@ -388,7 +394,7 @@ ${ dashboard.layout_skeleton() }
     <div>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#action" data-toggle="tab">${ _('Sub-workflow') }</a></li>
-        <li><a href="#files" data-toggle="tab">${ _('Files') }</a></li>
+        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
         <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
         <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
         <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
@@ -397,7 +403,8 @@ ${ dashboard.layout_skeleton() }
         <div class="tab-pane active" id="action">
           <input type="text" data-bind="value: properties.subworkflow" />
         </div>
-        <div class="tab-pane" id="files">
+        <div class="tab-pane" id="properties">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
         <div class="tab-pane" id="sla">
         </div>
@@ -465,18 +472,18 @@ ${ dashboard.layout_skeleton() }
 <div id="addActionDemiModal" class="demi-modal hide" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
-    
+
     <ul data-bind="foreach: addActionProperties">
       <li>
         <span data-bind="text: label"></span>
         <input data-bind="value: value"/>
       </li>
     </ul>
-    
+
     <!-- ko if: addActionWorkflows().length > 0 -->
       <select data-bind="options: addActionWorkflows, optionsText: 'name', value: selectedSubWorkflow"></select>
-    <!-- /ko -->        
-    
+    <!-- /ko -->
+
     <br/>
     <a data-bind="click: addActionDemiModalFieldPreview">
       Add
@@ -489,8 +496,8 @@ ${ dashboard.layout_skeleton() }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
-      
-      ${ _('Oozie Parameters') }   
+
+      ${ _('Oozie Parameters') }
       <ul data-bind="foreach: $root.workflow.properties.parameters">
         <li>
           <input data-bind="value: name"/>
@@ -560,7 +567,7 @@ ${ dashboard.import_bindings() }
     $('#submit-wf-modal').modal('show');
   });
 
-  
+
   var newAction = null;
 
   function showAddActionDemiModal(widget) {
@@ -568,7 +575,7 @@ ${ dashboard.import_bindings() }
     $("#addActionDemiModal").modal("show");
   }
 
-  function addActionDemiModalFieldPreview(field) {    
+  function addActionDemiModalFieldPreview(field) {
     if (newAction != null) {
       viewModel.workflow.addNode(newAction);
       $("#addActionDemiModal").modal("hide");
