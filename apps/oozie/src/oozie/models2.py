@@ -62,11 +62,19 @@ class Workflow():
                  "klass":"card card-home card-column span12"}              
           ],
           'workflow': workflow if workflow is not None else {
-               "id": None,"uuid":"549e2697-97cf-f931-2ce4-83dfdd03b7e7","name":"My Workflow",
-               "properties":{"job_xml":"","sla_enabled":False,"schema_version":"uri:oozie:workflow:0.4","sla_workflow_enabled":False,"credentials":[],"properties":{}},
-               "nodes":[{"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
-                        {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]}
-               ]
+              "id": None,"uuid":"549e2697-97cf-f931-2ce4-83dfdd03b7e7","name":"My Workflow",
+              "properties": {
+                    "job_xml": "",
+                    "sla_enabled": False,
+                    "schema_version": "uri:oozie:workflow:0.4",
+                    "sla_workflow_enabled": False,
+                    "credentials": [],
+                    "properties": []
+              },
+              "nodes":[
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
+                  {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]}
+              ]
           }
       })
       
@@ -101,6 +109,8 @@ class Workflow():
     if 'properties' not in _data['workflow']:
       _data['workflow']['properties'] = {}
       
+    if 'properties' not in _data['workflow']['properties']:
+      _data['workflow']['properties']['properties'] = []      
     if 'deployment_dir' not in _data['workflow']['properties']:
       default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too
       _data['workflow']['properties']['deployment_dir'] = default_dir
@@ -118,8 +128,6 @@ class Workflow():
       _data['workflow']['properties']['schema_version'] = 'uri:oozie:workflow:0.4'
     if 'job_xml' not in _data['workflow']['properties']:
       _data['workflow']['properties']['job_xml'] = ''
-    if 'properties' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['properties'] = {}
 
     if 'credentials' not in _data['workflow']['properties']:
       _data['workflow']['properties']['credentials'] = []
