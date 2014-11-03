@@ -37,6 +37,7 @@
 <%def name="layout_toolbar()">
 
 <div class="card card-toolbar" data-bind="slideVisible: isEditing">
+  %if not hasattr(caller, "skipLayout"):
   <div style="float: left">
     <div class="toolbar-label">${_('LAYOUT')}</div>
     <a href="javascript: oneSixthLeftLayout(viewModel)" onmouseover="viewModel.previewColumns('oneSixthLeft')" onmouseout="viewModel.previewColumns('')">
@@ -56,6 +57,7 @@
       </div>
     </a>
   </div>
+  %endif
   %if hasattr(caller, "results"):
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     <div class="toolbar-label">${_('RESULTS')}</div>

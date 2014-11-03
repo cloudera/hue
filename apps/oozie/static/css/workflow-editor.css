@@ -294,7 +294,7 @@ em {
   right: 70px!important;
 }
 
-.dropTarget {
+.drop-target {
   background-color: #F6F6F6;
   min-height: 36px;
   border: 2px dashed #DDD;
@@ -302,11 +302,15 @@ em {
   padding: 4px;
 }
 
-.ui-sortable.dropTarget {
+.ui-sortable.drop-target {
   min-height: 36px;
 }
 
-.dropTargetHighlight {
-  min-height: 30px;
+.drop-target-highlight {
+  min-height: 36px;
   background-color: #CCC;
+}
+
+.drop-target-side {
+  min-height: 100px;
 }

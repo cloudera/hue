@@ -25,6 +25,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <%dashboard:layout_toolbar>
+  <%def name="skipLayout()"></%def>
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
@@ -182,12 +183,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
-      <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && (rows().length > 0 ||  $root.isNested())">
-      <div data-bind="click: function(){$data.addEmptyRow()}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
@@ -197,28 +198,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="internal-column-template">
   <div data-bind="css: klass">
-##
-##    <div class="container-fluid">
-##      <div class="row-fluid">
-##        <div class="span12" data-bind="click: function(){$data.addEmptyRow(true)}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
-##      </div>
-##      <div class="row-fluid">
-##        <div class="span1">W</div>
-##        <div class="span10" data-bind="template: { name: 'row-template', foreach: rows}"></div>
-##        <div class="span1">E</div>
-##      </div>
-##      <div class="row-fluid">
-##        <div class="span12" data-bind="click: function(){$data.addEmptyRow()}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
-##      </div>
-##    </div>
-
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
-      <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && (rows().length > 0 ||  $root.isNested())">
-      <div data-bind="click: function(){$data.addEmptyRow()}, css: {'dropTarget': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'dropTargetHighlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="click: function(){$data.addEmptyRow()}, css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
   </div>
 </script>
@@ -248,58 +234,30 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span1 pointer">
-        <div data-bind="css: {'dropTarget': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
+      <div class="span1">
+        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
       </div>
       <div class="span10">
-
-
-      <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
-        sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)), isEnabled: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)),
-        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
-            'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
-            dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
-    </div>
-    <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
-      <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
-        <div data-bind="template: { name: 'internal-column-template', foreach: columns}">
+        <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
+          sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
+          options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
+              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+              dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
+        </div>
+        <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
+          <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
+            <div data-bind="template: { name: 'internal-column-template', foreach: columns}">
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-
-      </div>
       <div class="span1">
-        <div data-bind="css: {'dropTarget': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
+        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
       </div>
     </div>
   </div>
 
-##  <div class="container-fluid">
-##    <div class="row-header" data-bind="visible: $root.isEditing">
-##      <span class="muted">${_('Row')}</span>
-##      <div style="display: inline; margin-left: 60px">
-##        <a href="javascript:void(0)" data-bind="visible: $root.isNested, click: function(){ $data.addEmptyColumn(); }"><i class="fa fa-columns"></i></a>
-##        <a href="javascript:void(0)" data-bind="visible: $index()<$parent.rows().length-1, click: function(){moveDown($parent, this)}"><i class="fa fa-chevron-down"></i></a>
-##        <a href="javascript:void(0)" data-bind="visible: $index()>0, click: function(){moveUp($parent, this)}"><i class="fa fa-chevron-up"></i></a>
-##        <a href="javascript:void(0)" data-bind="visible: $parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
-##      </div>
-##    </div>
-##    <div data-bind="visible: columns().length == 0, style: { 'border-bottom': $root.isNested() ? 'none' : '' }, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
-##        sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)), isEnabled: $root.isEditing() && (! $root.isNested() || ($root.isNested() && widgets().length < 1)),
-##        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-##            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
-##            'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
-##            dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
-##    </div>
-##    <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
-##      <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
-##        <div data-bind="template: { name: 'column-template', foreach: columns}">
-##        </div>
-##      </div>
-##    </div>
-##  </div>
 </script>
 
 <script type="text/html" id="widget-template">
