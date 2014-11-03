@@ -85,6 +85,10 @@ var Row = function (widgets, vm, columns) {
   self.widgets = ko.observableArray(widgets);
   self.columns = ko.observableArray(columns ? columns : []);
 
+  self.enableOozieDrop = ko.computed(function(){
+    return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
+  });
+
   self.addWidget = function (widget) {
     self.widgets.push(widget);
   };

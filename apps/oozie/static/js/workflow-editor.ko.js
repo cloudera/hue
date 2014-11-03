@@ -21,7 +21,7 @@ ko.bindingHandlers.droppable = {
 
     if (_options.enabled){
       var _dropOptions = {
-        hoverClass: 'drag-hover',
+        hoverClass: 'drop-target-highlight',
         drop: _options.onDrop
       };
       _dropElement.droppable(_dropOptions);
