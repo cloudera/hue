@@ -15,6 +15,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <kill name="${ node }">
-        <message>${ node.message }</message>
+    <kill name="${ node['name'] }">
+        <message>${ node['properties']['message'] }</message>
     </kill>

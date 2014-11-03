@@ -68,23 +68,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div data-bind="css: { 'draggable-widget': true }" rel="tooltip" data-placement="top">
-
-    </div>
-
-    <div data-bind="css: { 'draggable-widget': true },
-                    draggable: {data: draggableForkNode(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Fork')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-share-alt"></i></a>
-    </div>
-
-    <div data-bind="css: { 'draggable-widget': true },
-                    draggable: {data: draggableDecisionNode(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Decision')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-question"></i></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -209,6 +192,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   </div>
 </script>
 
+
 <script type="text/html" id="row-template">
   <div class="container-fluid">
     <div class="row-fluid">
@@ -286,14 +270,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
   </div>
 </script>
-
-
-
-
-
-
-
-
 
 
 <script type="text/html" id="start-widget">
@@ -493,8 +469,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           <select data-bind="options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
         </div>
         <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+          <!-- ko if: children().length > 0 -->
+          OK --> <input type="text" data-bind="value: children()[0]['ok']" />
+          <br/>
+          KO --> <input type="text" data-bind="value: children()[0]['error']" />
+          <!-- /ko -->
         </div>
       </div>
     </div>
