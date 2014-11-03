@@ -128,7 +128,12 @@ P = {
       'name': 'script_path',
       'label': _("Script Path"),
       'value': ''
-  }
+  },
+  'message': {
+      'name': 'message',
+      'label': _("Message"),
+      'value': ''
+  }     
 }
 
 def new_node(request):
@@ -137,8 +142,6 @@ def new_node(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
 
-  print node
-  
   properties = []
   workflows = []
 
@@ -148,6 +151,8 @@ def new_node(request):
     properties = [P['script_path']]
   elif node['widgetType'] == 'hive-widget':
     properties = [P['script_path']]
+  elif node['widgetType'] == 'kill-widget':
+    properties = [P['message']]
   elif node['widgetType'] == 'subworkflow-widget':
     workflows = [{
         'name': workflow.name,
@@ -156,9 +161,6 @@ def new_node(request):
       } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
     ]
     
-  print properties
-  
-
   response['status'] = 0
   response['properties'] = properties 
   response['workflows'] = workflows
@@ -174,9 +176,6 @@ def add_node(request):
   properties = json.loads(request.POST.get('properties', '{}'))
   subworkflow = json.loads(request.POST.get('subworkflow', '{}'))
 
-  print node
-  print subworkflow
-  
   properties = response['properties'] = dict([(property['name'], property['value']) for property in properties])
   if subworkflow:
     properties.update({

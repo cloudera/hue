@@ -67,7 +67,6 @@ class Workflow():
           'layout': [
               {"size":12, "rows":[
                     {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
-                    # {"widgets":[]},
                     {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}], 
                  "drops":[ "temp"],
                  "klass":"card card-home card-column span12"}              
@@ -85,7 +84,8 @@ class Workflow():
               },
               "nodes":[
                   {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
-                  {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]}
+                  {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]},
+                  {"id":"17c9c895-5a16-7443-bb81-f34b30b21548","name":"Kill","type":"kill-widget","properties":{'message': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]')},"children":[]}
               ]
           }
       })
@@ -210,7 +210,7 @@ class Node():
       mapping = {}
     if node_mapping is None:
       node_mapping = {}
-      
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -226,7 +226,7 @@ class Node():
   @property      
   def id(self):
     return self.data['id']    
-  
+
   def _augment_data(self):
     self.data['type'] = self.data['type'].replace('-widget', '')
     self.data['uuid'] = self.data['id']

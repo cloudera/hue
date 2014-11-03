@@ -39,7 +39,7 @@
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </pig>
-        <ok to="${ node_mapping[node['children'][0]['to']] }"/>
-        <error to="${ node_mapping[node['children'][0]['to']] }"/>
+        <ok to="${ node_mapping[node['children'][0]['ok']] }"/>
+        <error to="${ node_mapping[node['children'][1]['error']] }"/>
         ${ common.sla(node) }
     </action>

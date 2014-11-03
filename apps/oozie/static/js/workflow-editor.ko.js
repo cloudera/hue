@@ -96,6 +96,34 @@ var Node = function (node) {
 
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
+  
+  self.get_link = function(name) {
+    var _link = null;
+    $.each(self.children(), function(index, link) {
+      if (name in link) {
+        _link = link;
+        return false;
+      }
+    });
+    return _link;
+  }
+  
+  self.set_link = function(name, node_id) {
+	var _link = {};
+    $.each(self.children(), function(index, link) {
+      if (name in link) {
+        _link = link;
+        return false;
+      }
+    });
+    
+    var notFound = $.isEmptyObject(_link);
+    _link[name] = node_id;
+    
+    if (notFound) {
+      self.children.push(_link);
+    }
+  }
 }
 
 
@@ -144,20 +172,45 @@ var Workflow = function (vm, workflow) {
         "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
         "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}',
       }, function (data) {
-      if (data.status == 0) {        
+      if (data.status == 0) {
         var _node = ko.mapping.toJS(widget);
         _node.properties = data.properties;
         _node.name = data.name;
-        var node = new Node(_node);
-        node.children().push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}) // Link to child
 
+        var node = new Node(_node);    	 
+        
         // Add to list of nodes
         var end = self.nodes.pop();
         self.nodes.push(node);
-        self.nodes.push(end);
+        self.nodes.push(end);        
+        
+       // if node != kill node
 
-        self.nodes()[0].children.removeAll(); // Parent link to new node
-        self.nodes()[0].children().push({'to': node.id()});
+        // if was dragged on the sides ?
+    	  // get neighbor
+    	  
+    	// else    	  
+    	  // get parent
+          var parent = self.nodes()[0];
+    	  
+    	  // if parent is start node
+          if (self.nodes().length == 4) {	        
+	        // Star node link to new node	        
+	        parent.set_link('to', node.id());
+	        
+	        // Link to end
+	        node.set_link('ok', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
+	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+          } else {
+          // else if parent regular node        	
+        	var parent = self.nodes()[self.nodes().length - 3];
+        	
+  	        node.set_link('ok', parent.get_link('ok'));
+  	        parent.set_link('ok', node.id());        	  
+          }    	  
+    	  // else if parent fork/decision/join...
+          
+
       } else {
         $(document).trigger("error", data.message);
        }
@@ -465,7 +518,5 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableMapReduceAction = ko.observable(bareWidgetBuilder("MapReduce job", "mapreduce-widget"));
   self.draggableSubworkflowAction = ko.observable(bareWidgetBuilder("Sub workflow", "subworkflow-widget"));
 
-  self.draggableForkNode = ko.observable(bareWidgetBuilder("Fork", "fork-widget"));
-  self.draggableDecisionNode = ko.observable(bareWidgetBuilder("Decision", "decision-widget"));
   self.draggableStopNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
