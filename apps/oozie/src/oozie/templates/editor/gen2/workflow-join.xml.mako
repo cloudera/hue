@@ -15,4 +15,4 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <join name="${ node }" to="${ node.get_oozie_child('to') }"/>
+    <join name="${ node['name'] }" to="${ node_mapping[node['children'][0]['to']] }"/>

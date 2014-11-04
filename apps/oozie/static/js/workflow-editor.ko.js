@@ -180,14 +180,46 @@ var Workflow = function (vm, workflow) {
 
        // if node != kill node
 
-        // if was dragged on the sides ?
-    	  // get neighbor
-    	
-    	// else    	
-    	  // get parent
+        // Added to the side ?
+        if (true) {
+          var parent = self.getNodeById('3f107997-04cc-8733-60a9-a4bb62cebffc');
+          
+          if (parent.type() != 'fork-widget') {          
+            var fork = new Node({});
+            fork.name('fork' + '-' + fork.id().slice(0, 4));
+            fork.type('fork-widget');
+          
+            var join = new Node({});
+            join.name('join' + '-' + fork.id().slice(0, 4));
+            join.type('join-widget');
+            
+            // Start node
+            var afterStartId = ko.mapping.toJS(parent.get_link('to')).to;
+            var afterStart = self.getNodeById(afterStartId);
+            fork.children.push({'to': afterStartId});
+            fork.children.push({'to': node.id()});
+            
+            parent.get_link('to')['to'] = fork.id();
+            
+            join.set_link('to', afterStart.get_link('ok')['ok']);
 
-        var parentWidget = vm.getWidgetPredecessor(node.id());
-        var parent = self.getNodeById(parentWidget.id());
+            afterStart.set_link('ok', join.id());
+	        node.set_link('ok', join.id());
+	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
+	        
+	        var end = self.nodes.pop();
+	        self.nodes.push(fork);
+	        self.nodes.push(join);
+	        self.nodes.push(end)	        
+            // Regular node
+          
+            // Join node
+          } else {
+            // Just add to existing fork
+          }
+        } else {
+          var parentWidget = vm.getWidgetPredecessor(node.id());
+          var parent = self.getNodeById(parentWidget.id());
 
           if (parentWidget.widgetType() == 'start-widget') {	
 	        // Star node link to new node	
@@ -197,15 +229,14 @@ var Workflow = function (vm, workflow) {
 	        node.set_link('ok', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else if (parentWidget.widgetType() == 'pig-widget') {
-          // Parent regular node        	
-
+            // Parent regular node        	
   	        node.set_link('ok', parent.get_link('ok')['ok']);
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
   	
   	        parent.set_link('ok', node.id());        	
           }
     	  // Parent fork/decision/join...
-
+        }
 
       } else {
         $(document).trigger("error", data.message);
