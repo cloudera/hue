@@ -283,6 +283,22 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
+  self.getWidgetPredecessor = function (widget_id) {
+    var _row = self.getWidgetParentRow(widget_id);
+    var _col = self.getRowParentColumn(_row.id());
+    var _prevRow = null;
+    for (var i = 0; i < _col.rows().length; i++) {
+      if (_col.rows()[i].id() == _row.id()) {
+        break;
+      }
+      _prevRow = _col.rows()[i];
+    }
+    if (_prevRow != null) {
+      return _prevRow.widgets()[0];
+    }
+    return null;
+  }
+
   self.getWidgetParentRow = function (widget_id) {
     var _row = null;
     for (var i = 0; i < self.columns().length; i++) {

@@ -29,20 +29,20 @@ var Column = function (size, rows) {
   self.id = ko.observable(UUID());
   self.size = ko.observable(size);
   self.rows = ko.observableArray(rows);
-  self.oozieStartRow = ko.computed(function() {
+  self.oozieStartRow = ko.computed(function () {
     var _row = null;
-    ko.utils.arrayForEach(self.rows(), function(row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "start-widget")){
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "start-widget")) {
         _row = row;
       }
     });
     return _row;
   }, self);
 
-  self.oozieEndRow = ko.computed(function() {
+  self.oozieEndRow = ko.computed(function () {
     var _row = null;
-    ko.utils.arrayForEach(self.rows(), function(row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "end-widget")){
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "end-widget")) {
         _row = row;
       }
     });
@@ -50,10 +50,10 @@ var Column = function (size, rows) {
   }, self);
 
 
-  self.oozieRows = ko.computed(function() {
+  self.oozieRows = ko.computed(function () {
     var _rows = [];
-    ko.utils.arrayForEach(self.rows(), function(row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() != "start-widget" && row.widgets()[0].widgetType() != "end-widget") || row.widgets().length == 0){
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() != "start-widget" && row.widgets()[0].widgetType() != "end-widget") || row.widgets().length == 0) {
         _rows.push(row);
       }
     });
@@ -64,18 +64,24 @@ var Column = function (size, rows) {
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
   });
-  self.addEmptyRow = function (atBeginning) {
-    return self.addRow(null, atBeginning);
+  self.addEmptyRow = function (atBeginning, atIndex) {
+    return self.addRow(null, atBeginning, atIndex);
   };
-  self.addRow = function (row, atBeginning) {
+  self.addRow = function (row, atBeginning, atIndex) {
     if (typeof row == "undefined" || row == null) {
       row = new Row([], viewModel); // Hacky but needed when a new row is deleted
     }
-    if (typeof atBeginning == "undefined" || atBeginning == null) {
-      self.rows.push(row);
+
+    if (typeof atIndex != "undefined" && atIndex != null) {
+      self.rows.splice(atIndex, 0, row);
     }
     else {
-      self.rows.unshift(row);
+      if (typeof atBeginning == "undefined" || atBeginning == null) {
+        self.rows.push(row);
+      }
+      else {
+        self.rows.unshift(row);
+      }
     }
     return row;
   };
