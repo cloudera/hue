@@ -88,7 +88,7 @@ function loadLayout(viewModel, json_layout) {
 var Node = function (node) {
   var self = this;
 
-  var type = typeof node.widgetType != "undefined" ? node.widgetType : node.type; 
+  var type = typeof node.widgetType != "undefined" ? node.widgetType : node.type;
 
   self.id = ko.observable(typeof node.id != "undefined" && node.id != null ? node.id : UUID());
   self.name = ko.observable(typeof node.name != "undefined" && node.name != null ? node.name : "");
@@ -96,7 +96,7 @@ var Node = function (node) {
 
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
-  
+
   self.get_link = function(name) {
     var _link = null;
     $.each(self.children(), function(index, link) {
@@ -107,22 +107,16 @@ var Node = function (node) {
     });
     return _link;
   }
-  
+
   self.set_link = function(name, node_id) {
-	var _link = {};
-    $.each(self.children(), function(index, link) {
-      if (name in link) {
-        _link = link;
-        return false;
-      }
-    });
-    
-    var notFound = $.isEmptyObject(_link);
-    _link[name] = node_id;
-    
-    if (notFound) {
+	var _link = self.get_link(name);
+
+    if (_link == null) {
+      _link = {};
       self.children.push(_link);
     }
+
+    _link[name] = node_id;
   }
 }
 
@@ -132,11 +126,11 @@ var Workflow = function (vm, workflow) {
 
   self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
-  self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");  
+  self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
-  
+
   self.loadNodes = function(workflow) {
     var nodes = []
     $.each(workflow.nodes, function(index, node) {
@@ -145,14 +139,14 @@ var Workflow = function (vm, workflow) {
     });
     self.nodes(nodes)
   }
-  
+
   self.newNode = function(widget) {
     $.ajax({
       type: "POST",
       url: "/oozie/editor/workflow/new_node/",
       data: {
         "workflow": ko.mapping.toJSON(workflow),
-        "node": ko.mapping.toJSON(widget)  
+        "node": ko.mapping.toJSON(widget)
       },
       success: function (data) {
         if (data.status == 0) {
@@ -163,10 +157,10 @@ var Workflow = function (vm, workflow) {
       async: false
     });
   };
-  
+
   self.addNode = function(widget) {
     // Todo get parent cell, link nodes... when we have the new layout
-    $.post("/oozie/editor/workflow/add_node/", {        
+    $.post("/oozie/editor/workflow/add_node/", {
         "workflow": ko.mapping.toJSON(workflow),
         "node": ko.mapping.toJSON(widget),
         "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
@@ -177,39 +171,41 @@ var Workflow = function (vm, workflow) {
         _node.properties = data.properties;
         _node.name = data.name;
 
-        var node = new Node(_node);    	 
-        
+        var node = new Node(_node);    	
+
         // Add to list of nodes
         var end = self.nodes.pop();
         self.nodes.push(node);
-        self.nodes.push(end);        
-        
+        self.nodes.push(end);
+
        // if node != kill node
 
         // if was dragged on the sides ?
     	  // get neighbor
-    	  
-    	// else    	  
+    	
+    	// else    	
     	  // get parent
-          var parent = self.nodes()[0];
-    	  
-    	  // if parent is start node
-          if (self.nodes().length == 4) {	        
-	        // Star node link to new node	        
+
+        var parentWidget = vm.getWidgetPredecessor(node.id());
+        var parent = self.getNodeById(parentWidget.id());
+
+          if (parentWidget.widgetType() == 'start-widget') {	
+	        // Star node link to new node	
 	        parent.set_link('to', node.id());
-	        
+	
 	        // Link to end
 	        node.set_link('ok', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
-          } else {
-          // else if parent regular node        	
-        	var parent = self.nodes()[self.nodes().length - 3];
-        	
-  	        node.set_link('ok', parent.get_link('ok'));
-  	        parent.set_link('ok', node.id());        	  
-          }    	  
-    	  // else if parent fork/decision/join...
-          
+          } else if (parentWidget.widgetType() == 'pig-widget') {
+          // Parent regular node        	
+
+  	        node.set_link('ok', parent.get_link('ok')['ok']);
+  	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+  	
+  	        parent.set_link('ok', node.id());        	
+          }
+    	  // Parent fork/decision/join...
+
 
       } else {
         $(document).trigger("error", data.message);
@@ -218,7 +214,7 @@ var Workflow = function (vm, workflow) {
         $(document).trigger("error", xhr.responseText);
      });
   };
-  
+
   self.getNodeById = function (node_id) {
     var _node = null;
     $.each(self.nodes(), function (index, node) {
@@ -253,7 +249,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.depen = ko.observableArray(workflow_json.dependencies);
-  
+
   self.addActionProperties = ko.observableArray([]);
   self.addActionWorkflows = ko.observableArray([]);
   self.selectedSubWorkflow = ko.observable();
@@ -475,7 +471,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
-    $.post("/oozie/editor/workflow/save/", {        
+    $.post("/oozie/editor/workflow/save/", {
         "layout": ko.mapping.toJSON(self.columns),
         "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
@@ -495,7 +491,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.gen_xml = function () {
-    $.post("/oozie/editor/workflow/gen_xml/", {        
+    $.post("/oozie/editor/workflow/gen_xml/", {
         "layout": ko.mapping.toJSON(self.columns),
         "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
