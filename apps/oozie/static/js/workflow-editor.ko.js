@@ -264,6 +264,28 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.addDraggedWidget = function (row, atBeginning) {
     if (self.currentlyDraggedWidget != null) {
+      var _parentCol = self.getRowParentColumn(row.id());
+      var _rowIdx = 0;
+      $.each(_parentCol.rows(), function (i, irow) {
+        if (irow.id() == row.id()) {
+          _rowIdx = i;
+        }
+      });
+
+      var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
+      var _fork = new Widget({
+        size: 12,
+        id: UUID(),
+        name: "fork",
+        widgetType: "fork-widget",
+        properties: {},
+        offset: 0,
+        loading: true,
+        vm: self
+      });
+
+      _forkRow.widgets([_fork]);
+
       var _w = new Widget({
         size: self.currentlyDraggedWidget.size(),
         id: UUID(),
@@ -278,6 +300,20 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       var _col = row.addEmptyColumn(atBeginning);
       var _row = new Row([_w], self);
       _col.addRow(_row);
+
+      var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
+      var _join = new Widget({
+        size: 12,
+        id: UUID(),
+        name: "join",
+        widgetType: "join-widget",
+        properties: {},
+        offset: 0,
+        loading: true,
+        vm: self
+      });
+
+      _joinRow.widgets([_join]);
 
       self.currentlyDraggedWidget = null;
       return _w;
@@ -362,6 +398,20 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
     if (_prevRow != null) {
       return _prevRow.widgets()[0];
+    }
+    else {
+      var _parentRow = self.getColumnParentRow(_col.id());
+      var _parentColumn = self.getRowParentColumn(_parentRow.id());
+      var _prevParentRow = null;
+      for (var i = 0; i < _parentColumn.rows().length; i++) {
+        if (_parentColumn.rows()[i].id() == _parentRow.id()) {
+          break;
+        }
+        _prevParentRow = _parentColumn.rows()[i];
+      }
+      if (_prevParentRow != null) {
+        return _prevParentRow.widgets()[0];
+      }
     }
     return null;
   }
