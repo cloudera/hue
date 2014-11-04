@@ -403,12 +403,26 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         }
         else {
           var _rows = parent.columns()[0].rows();
+          var _parentRows = self.getRowParentColumn(parent.id()).rows;
+          var _prevRowIdx = -1;
+          for (var i = 0; i < _parentRows().length; i++) {
+            if (_parentRows()[i].id() == parent.id()) {
+              break;
+            }
+            _prevRowIdx = i;
+          }
+
+          if (_prevRowIdx > -1 && _parentRows()[_prevRowIdx].widgets().length > 0 && _parentRows()[_prevRowIdx].widgets()[0].widgetType() == "fork-widget"){
+            _parentRows.remove(_parentRows()[_prevRowIdx]);
+            _parentRows.remove(_parentRows()[_prevRowIdx+1]);
+          }
+
           for (var i=0;i<_rows.length;i++){
             if (i==0){
               parent.widgets(_rows[i].widgets());
             }
             else {
-              self.getRowParentColumn(parent.id()).rows.push(_rows[i]);
+              _parentRows.push(_rows[i]);
             }
           }
           parent.columns([]);
