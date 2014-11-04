@@ -161,6 +161,7 @@ from django.utils.translation import ugettext as _
   <div class="row">
     <div class="login-content">
       <form method="POST" action="${action}" class="well">
+        ${ csrf_token(request) | n,unicode }
         <img id="logo" src="/static/art/hue-login-logo.png" data-orig="/static/art/hue-login-logo.png"
              data-hover="/static/art/hue-login-logo-skew.png"/>
 
