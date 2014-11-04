@@ -181,17 +181,12 @@ var Workflow = function (vm, workflow) {
        // if node != kill node
 
         // Added to the side ?
-        if (true) {
+        if (vm.currentlyCreatingFork) {
           var parent = self.getNodeById('3f107997-04cc-8733-60a9-a4bb62cebffc');
-          
+
           if (parent.type() != 'fork-widget') {          
-            var fork = new Node({});
-            fork.name('fork' + '-' + fork.id().slice(0, 4));
-            fork.type('fork-widget');
-          
-            var join = new Node({});
-            join.name('join' + '-' + fork.id().slice(0, 4));
-            join.type('join-widget');
+            var fork = new Node(vm.currentlyCreatedFork);
+            var join = new Node(vm.currentlyCreatedJoin);
             
             // Start node
             var afterStartId = ko.mapping.toJS(parent.get_link('to')).to;
@@ -210,7 +205,7 @@ var Workflow = function (vm, workflow) {
 	        var end = self.nodes.pop();
 	        self.nodes.push(fork);
 	        self.nodes.push(join);
-	        self.nodes.push(end)	        
+	        self.nodes.push(end);	        
             // Regular node
           
             // Join node
@@ -238,6 +233,8 @@ var Workflow = function (vm, workflow) {
     	  // Parent fork/decision/join...
         }
 
+        vm.currentlyCreatingFork = false;
+        
       } else {
         $(document).trigger("error", data.message);
        }
@@ -287,6 +284,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.currentlyDraggedWidget = null;
+  self.currentlyCreatingFork = false;
+  self.currentlyCreatedFork = null;
+  self.currentlyCreatedJoin = null;
   self.isDragging = ko.observable(false);
 
   self.setCurrentDraggedWidget = function (widget) {
@@ -304,10 +304,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       });
 
       var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
+      var _id = UUID();
       var _fork = new Widget({
         size: 12,
-        id: UUID(),
-        name: "fork",
+        id: _id,
+        name: 'fork' + '-' + _id.slice(0, 4),
         widgetType: "fork-widget",
         properties: {},
         offset: 0,
@@ -333,10 +334,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       _col.addRow(_row);
 
       var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
+      var _id = UUID();
       var _join = new Widget({
         size: 12,
-        id: UUID(),
-        name: "join",
+        id: _id,
+        name: "join" + '-' + _id.slice(0, 4),
         widgetType: "join-widget",
         properties: {},
         offset: 0,
@@ -347,6 +349,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       _joinRow.widgets([_join]);
 
       self.currentlyDraggedWidget = null;
+      self.currentlyCreatingFork = true;
+      self.currentlyCreatedFork = ko.mapping.toJS(_fork);
+      self.currentlyCreatedJoin = ko.mapping.toJS(_join);
+
       return _w;
     }
   }
