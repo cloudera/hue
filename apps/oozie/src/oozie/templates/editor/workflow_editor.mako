@@ -29,7 +29,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>
@@ -37,7 +37,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggablePigAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                         'stop': function(event, ui){$('.card-body').slideDown('fast'); }}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_pig_48.png" class="app-icon"></a>
@@ -45,7 +45,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaAction(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableJavaAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
@@ -235,7 +235,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span1">
-        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
+        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div class="span10">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
@@ -253,7 +253,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         </div>
       </div>
       <div class="span1">
-        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ console.log('dropped'); $data.addEmptyColumn(); } }"></div>
+        <div data-bind="css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
     </div>
   </div>
