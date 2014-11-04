@@ -279,6 +279,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- /ko -->
 </script>
 
+
 <script type="text/html" id="join-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
