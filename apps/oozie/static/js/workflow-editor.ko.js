@@ -316,22 +316,40 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.deeplyRemoveWidgetById = function (widget_id, col, parent) {
     if (col) {
       $.each(col.rows(), function (j, row) {
-        $.each(row.widgets(), function (z, widget) {
-          if (widget.id() == widget_id) {
-            row.widgets.remove(widget);
-            col.rows.remove(row);
+        if (row && row.widgets()){
+          $.each(row.widgets(), function (z, widget) {
+            if (widget.id() == widget_id) {
+              row.widgets.remove(widget);
+              col.rows.remove(row);
+            }
+          });
           }
-        });
-        $.each(row.columns(), function (i, icol) {
-          self.deeplyRemoveWidgetById(widget_id, icol, row);
-        });
+        if (row && row.columns()) {
+          $.each(row.columns(), function (i, icol) {
+            self.deeplyRemoveWidgetById(widget_id, icol, row);
+          });
+        }
       });
       if (col.rows().length == 0) {
         parent.columns.remove(col);
-        var _size = Math.max(1, Math.floor(12 / (parent.columns().length)));
-        parent.columns().forEach(function (icol) {
-          icol.size(_size);
-        });
+        if (parent.columns().length > 1) {
+          var _size = Math.max(1, Math.floor(12 / (parent.columns().length)));
+          parent.columns().forEach(function (icol) {
+            icol.size(_size);
+          });
+        }
+        else {
+          var _rows = parent.columns()[0].rows();
+          for (var i=0;i<_rows.length;i++){
+            if (i==0){
+              parent.widgets(_rows[i].widgets());
+            }
+            else {
+              self.getRowParentColumn(parent.id()).rows.push(_rows[i]);
+            }
+          }
+          parent.columns([]);
+        }
       }
     }
   }
