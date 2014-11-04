@@ -266,6 +266,37 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 
+<script type="text/html" id="fork-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      I AM A FORK
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="join-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      FIN.
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="start-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
