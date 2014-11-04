@@ -206,6 +206,35 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.selectedSubWorkflow = ko.observable();
 
 
+  self.currentlyDraggedWidget = null;
+  self.isDragging = ko.observable(false);
+
+  self.setCurrentDraggedWidget = function (widget) {
+    self.currentlyDraggedWidget = widget;
+  }
+
+  self.addDraggedWidget = function (row, atBeginning) {
+    if (self.currentlyDraggedWidget != null) {
+      var _w = new Widget({
+        size: self.currentlyDraggedWidget.size(),
+        id: UUID(),
+        name: self.currentlyDraggedWidget.name(),
+        widgetType: self.currentlyDraggedWidget.widgetType(),
+        properties: self.currentlyDraggedWidget.properties(),
+        offset: self.currentlyDraggedWidget.offset(),
+        loading: true,
+        vm: self
+      });
+
+      var _col = row.addEmptyColumn(atBeginning);
+      var _row = new Row([_w], self);
+      _col.addRow(_row);
+
+      self.currentlyDraggedWidget = null;
+      return _w;
+    }
+  }
+
   self.getWidgetById = function (widget_id) {
     var _widget = null;
     $.each(self.columns(), function (i, col) {

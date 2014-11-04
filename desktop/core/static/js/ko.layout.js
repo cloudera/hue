@@ -93,9 +93,9 @@ var Row = function (widgets, vm, columns) {
     self.widgets.push(widget);
   };
 
-  self.addEmptyColumn = function () {
+  self.addEmptyColumn = function (atBeginning) {
     if (self.columns().length == 0){
-      var _col = self.addColumn(null);
+      var _col = self.addColumn(null, atBeginning);
       if (self.widgets().length > 0){
         var _row = _col.addEmptyRow();
         self.widgets().forEach(function(widget){
@@ -104,10 +104,10 @@ var Row = function (widgets, vm, columns) {
         self.widgets([]);
       }
     }
-    return self.addColumn(null);
+    return self.addColumn(null, atBeginning);
   };
 
-  self.addColumn = function (column) {
+  self.addColumn = function (column, atBeginning) {
     if (typeof column == "undefined" || column == null) {
       var _size = Math.max(1, Math.floor(12 / (self.columns().length + 1)));
       column = new Column(_size, []); // Hacky but needed when a new row is deleted
@@ -115,7 +115,12 @@ var Row = function (widgets, vm, columns) {
         col.size(_size);
       });
     }
-    self.columns.push(column);
+    if (typeof atBeginning == "undefined" || atBeginning == null || ! atBeginning) {
+      self.columns.push(column);
+    }
+    else {
+      self.columns.unshift(column);
+    }
     return column;
   };
 
