@@ -243,8 +243,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
-        <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
-        <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
         &nbsp;
       </span>
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
@@ -255,7 +253,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
-      <div class="inline pull-right" data-bind="visible: $root.isEditing">
+      <div class="inline pull-right" data-bind="visible: $root.isEditing() && ['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1">
         <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
