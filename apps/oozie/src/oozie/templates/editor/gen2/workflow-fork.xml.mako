@@ -15,8 +15,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <fork name="${ node }">
-        % for child in node.get_children('start'):
-        <path start="${ child }" />
+    <fork name="${ node['name'] }">
+        % for child in node['children']:
+        <path start="${ node_mapping[child['to']] }" />
         % endfor
     </fork>
