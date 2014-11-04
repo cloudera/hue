@@ -21,6 +21,7 @@ import logging
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from desktop.lib.django_util import render
@@ -39,7 +40,7 @@ from pig.models import get_workflow_output, hdfs_link, PigScript,\
 
 LOG = logging.getLogger(__name__)
 
-
+@ensure_csrf_cookie
 def app(request):
   return render('app.mako', request, {
     'autocomplete_base_url': reverse('beeswax:api_autocomplete_databases', kwargs={}),
