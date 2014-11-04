@@ -401,14 +401,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Pig') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Pig') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
           <input type="text" data-bind="value: properties.script_path" />
           </br>
@@ -438,7 +438,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
             <i class="fa fa-plus"></i>
           </button>
         </div>
-        <div class="tab-pane" id="properties">
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
           <br/>
@@ -456,19 +457,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           </button>
           </br>
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
           <div class="control-group">
             <label class="control-label">${ _('SLA Configuration') }</label>
             <div class="controls" data-bind="with: properties">
               ${ utils.slaForm() }
             </div>
           </div>
-
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
           <select data-bind="options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
         </div>
-        <div class="tab-pane" id="transitions">
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
           <!-- ko if: children().length > 0 -->
           OK --> <input type="text" data-bind="value: children()[0]['ok']" />
           <br/>
