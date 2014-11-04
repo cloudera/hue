@@ -26,6 +26,7 @@ function UUID() {
 
 var Column = function (size, rows) {
   var self = this;
+  self.id = ko.observable(UUID());
   self.size = ko.observable(size);
   self.rows = ko.observableArray(rows);
   self.oozieStartRow = ko.computed(function() {
@@ -82,6 +83,7 @@ var Column = function (size, rows) {
 
 var Row = function (widgets, vm, columns) {
   var self = this;
+  self.id = ko.observable(UUID());
   self.widgets = ko.observableArray(widgets);
   self.columns = ko.observableArray(columns ? columns : []);
 
