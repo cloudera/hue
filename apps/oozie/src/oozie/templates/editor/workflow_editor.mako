@@ -29,7 +29,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>

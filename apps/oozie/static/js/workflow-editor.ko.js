@@ -412,20 +412,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         }
       });
 
-      var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
-      var _id = UUID();
-      var _fork = new Widget({
-        size: 12,
-        id: _id,
-        name: 'fork' + '-' + _id.slice(0, 4),
-        widgetType: "fork-widget",
-        properties: {},
-        offset: 0,
-        loading: true,
-        vm: self
-      });
+      var _addForkAndJoin = (row.columns().length == 0);
 
-      _forkRow.widgets([_fork]);
+      if (_addForkAndJoin){
+        var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
+        var _id = UUID();
+        var _fork = new Widget({
+          size: 12,
+          id: _id,
+          name: 'fork' + '-' + _id.slice(0, 4),
+          widgetType: "fork-widget",
+          properties: {},
+          offset: 0,
+          loading: true,
+          vm: self
+        });
+
+        _forkRow.widgets([_fork]);
+      }
 
       var _w = new Widget({
         size: self.currentlyDraggedWidget.size(),
@@ -442,28 +446,27 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       var _row = new Row([_w], self);
       _col.addRow(_row);
 
-      var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
-      var _id = UUID();
-      var _join = new Widget({
-        size: 12,
-        id: _id,
-        name: "join" + '-' + _id.slice(0, 4),
-        widgetType: "join-widget",
-        properties: {},
-        offset: 0,
-        loading: true,
-        vm: self
-      });
+      if (_addForkAndJoin) {
+        var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
+        var _id = UUID();
+        var _join = new Widget({
+          size: 12,
+          id: _id,
+          name: "join" + '-' + _id.slice(0, 4),
+          widgetType: "join-widget",
+          properties: {},
+          offset: 0,
+          loading: true,
+          vm: self
+        });
 
-      _joinRow.widgets([_join]);
+        _joinRow.widgets([_join]);
+        self.currentlyCreatingFork = true;
+        self.currentlyCreatedFork = ko.mapping.toJS(_fork);
+        self.currentlyCreatedJoin = ko.mapping.toJS(_join);
+      }
 
       self.currentlyDraggedWidget = null;
-      self.currentlyCreatingFork = true;
-      self.currentlyCreatedFork = ko.mapping.toJS(_fork);
-      self.currentlyCreatedJoin = ko.mapping.toJS(_join);
-
-      linkWidgets(_fork.id(), _w.id());
-      linkWidgets(_w.id(), _join.id());
 
       return _w;
     }
