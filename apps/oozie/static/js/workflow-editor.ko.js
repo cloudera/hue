@@ -215,28 +215,25 @@ var Workflow = function (vm, workflow) {
 
         // Added to the side ?
         if (vm.currentlyCreatingFork) {
-            var parentWidget = vm.getWidgetPredecessor(node.id()); console.log(parentWidget.id());
+          var parentWidget = vm.getWidgetPredecessor(node.id());
 
           if (self.getNodeById(parentWidget.id()) == null) { // New fork
         	
-        	  
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
             
-            //var parent = self.getNodeById(parentWidget.id());
-            var parent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
+            var forkParent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
             
-            // Start node
-            var afterStartId = ko.mapping.toJS(parent.get_link('to')).to;
-            var afterStart = self.getNodeById(afterStartId);
-            fork.children.push({'to': afterStartId});
+            var afterParentId = ko.mapping.toJS(forkParent.get_link('to')).to;
+            var afterParent = self.getNodeById(afterParentId);
+            fork.children.push({'to': afterParentId});
             fork.children.push({'to': node.id()});
             
-            parent.get_link('to')['to'] = fork.id();
+            forkParent.get_link('to')['to'] = fork.id();
             
-            join.set_link('to', afterStart.get_link('to')['to']);
+            join.set_link('to', afterParent.get_link('to')['to']);
 
-            afterStart.set_link('to', join.id());
+            afterParent.set_link('to', join.id());
 	        node.set_link('to', join.id());
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
 	        
