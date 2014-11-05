@@ -305,7 +305,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-      Start
+       <!-- ko if: children().length == 1 -->
+       Start --> <input type="text" data-bind="value: children()[0]['to']" />
+       <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
@@ -497,7 +499,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
         <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
           <!-- ko if: children().length == 2 -->
-          OK --> <input type="text" data-bind="value: children()[0]['ok']" />
+          OK --> <input type="text" data-bind="value: children()[0]['to']" />
           <br/>
           KO --> <input type="text" data-bind="value: children()[1]['error']" />
           <!-- /ko -->
