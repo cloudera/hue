@@ -118,6 +118,19 @@ var Node = function (node) {
 
     _link[name] = node_id;
   }
+
+  self.remove_link = function(name, child) {
+    var _link = null;
+    $.each(self.children(), function(index, link) {
+      if (name in link && link[name] == child) {
+        _link = link;
+        return false;
+      }
+    });
+    if (_link != null) {
+      self.children.remove(_link);
+    }
+  }  
 }
 
 
@@ -196,10 +209,10 @@ var Workflow = function (vm, workflow) {
             
             parent.get_link('to')['to'] = fork.id();
             
-            join.set_link('to', afterStart.get_link('ok')['ok']);
+            join.set_link('to', afterStart.get_link('to')['to']);
 
-            afterStart.set_link('ok', join.id());
-	        node.set_link('ok', join.id());
+            afterStart.set_link('to', join.id());
+	        node.set_link('to', join.id());
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
 	        
 	        var end = self.nodes.pop();
@@ -221,14 +234,14 @@ var Workflow = function (vm, workflow) {
 	        parent.set_link('to', node.id());
 	
 	        // Link to end
-	        node.set_link('ok', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
+	        node.set_link('to', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else if (parentWidget.widgetType() == 'pig-widget') {
             // Parent regular node        	
-  	        node.set_link('ok', parent.get_link('ok')['ok']);
+  	        node.set_link('to', parent.get_link('to')['to']);
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
   	
-  	        parent.set_link('ok', node.id());        	
+  	        parent.set_link('to', node.id());        	
           }
     	  // Parent fork/decision/join...
         }
@@ -246,32 +259,35 @@ var Workflow = function (vm, workflow) {
   self.removeNode = function(node_id) {
 	var node = self.getNodeById(node_id);
 	
-    var parentWidget = vm.getWidgetPredecessor(node_id);
+    var parentWidget = vm.getWidgetPredecessor(node_id); // Use smarter self.getParents if action node with multi parents
     var parent = self.getNodeById(parentWidget.id());
-    var childLink = null;
 
-    // If parent start
-    if (parentWidget.widgetType() == 'start-widget' || parentWidget.widgetType() == 'join-widget') {
-      childLink = node.get_link('ok')['ok'];
-      parent.set_link('to', childLink);    	
-    } else {
-      // If parent normal node
-      childLink = node.get_link('ok')['ok'];
-      parent.set_link('ok', childLink);
-    }
-
+    var childLink = node.get_link('to');
+    var childId = ko.mapping.toJS(childLink)['to'];
+    
+    parent.remove_link('to', node_id);
+    parent.children.push({'to': childId});
     self.nodes.remove(node);
     
     // If need to remove fork
     if (parentWidget.widgetType() == 'fork-widget') {
-      var newChild = self.getNodeById(childLink);
-      if (newChild.getType() == 'join-widget') {
-    	if (newChild.children().length == 2) {
-          // Delete fork / join
-    	  var forkParent = self.getParents(parentWidget.id());
-    	} else {
-          // Just delete link
-    	  parent.children.remove(childLink);
+      var fork = parent;
+      var join = self.getNodeById(childId);
+      if (join.type() == 'join-widget') {
+    	if (join.children().length == 1) {
+    		
+          // Link top to above and delete fork
+    	  var forkParent = self.getParents(fork.id());
+    	  forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']);
+
+    	  self.nodes.remove(fork);
+
+    	  // Link bottom to child of join
+    	  var beboreJoin = self.getParents(childId);
+    	  var joinChildId = ko.mapping.toJS(join.get_link('to'))['to'];
+    	  beboreJoin.set_link('to', joinChildId);
+
+    	  self.nodes.remove(join); 
     	}
       }
     }
@@ -282,7 +298,7 @@ var Workflow = function (vm, workflow) {
     $.each(self.nodes(), function (index, node) {
       $.each(node.children(), function(index, link) {
     	var _link = ko.mapping.toJS(link);
-        if (('to' in _link && _link.to == node_id) || ('ok' in _link && _link.ok == node_id)) {
+        if ('to' in _link && _link.to == node_id) {
           _node = node;
           return false;
         }  
