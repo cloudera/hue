@@ -212,10 +212,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <script type="text/html" id="internal-row-template">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span1">
+      <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
-      <div class="span10">
+      <div  data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
           options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -230,7 +230,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           </div>
         </div>
       </div>
-      <div class="span1">
+      <div  data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
     </div>
