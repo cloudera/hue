@@ -215,11 +215,16 @@ var Workflow = function (vm, workflow) {
 
         // Added to the side ?
         if (vm.currentlyCreatingFork) {
-          var parent = self.getNodeById('3f107997-04cc-8733-60a9-a4bb62cebffc');
+            var parentWidget = vm.getWidgetPredecessor(node.id()); alert(parentWidget.id());
 
-          if (parent.type() != 'fork-widget') {          
+          if (self.getNodeById(parentWidget.id()) == null) { // New fork
+        	
+        	  
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
+            
+            //var parent = self.getNodeById(parentWidget.id());
+            var parent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
             
             // Start node
             var afterStartId = ko.mapping.toJS(parent.get_link('to')).to;
@@ -256,7 +261,7 @@ var Workflow = function (vm, workflow) {
 	        // Link to end
 	        node.set_link('to', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
-          } else if (parentWidget.widgetType() == 'pig-widget') {
+          } else {
             // Parent regular node        	
   	        node.set_link('to', parent.get_link('to')['to']);
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
