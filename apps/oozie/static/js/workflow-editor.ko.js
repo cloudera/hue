@@ -417,6 +417,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       self.currentlyCreatedFork = ko.mapping.toJS(_fork);
       self.currentlyCreatedJoin = ko.mapping.toJS(_join);
 
+      linkWidgets(_fork.id(), _w.id());
+      linkWidgets(_w.id(), _join.id());
+
       return _w;
     }
   }
