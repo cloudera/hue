@@ -248,17 +248,48 @@ var Workflow = function (vm, workflow) {
 	
     var parentWidget = vm.getWidgetPredecessor(node_id);
     var parent = self.getNodeById(parentWidget.id());
+    var childLink = null;
 
     // If parent start
     if (parentWidget.widgetType() == 'start-widget' || parentWidget.widgetType() == 'join-widget') {
-      parent.set_link('to', node.get_link('ok')['ok']);    	
+      childLink = node.get_link('ok')['ok'];
+      parent.set_link('to', childLink);    	
     } else {
       // If parent normal node
-      parent.set_link('ok', node.get_link('ok')['ok']);
+      childLink = node.get_link('ok')['ok'];
+      parent.set_link('ok', childLink);
     }
 
     self.nodes.remove(node);
+    
+    // If need to remove fork
+    if (parentWidget.widgetType() == 'fork-widget') {
+      var newChild = self.getNodeById(childLink);
+      if (newChild.getType() == 'join-widget') {
+    	if (newChild.children().length == 2) {
+          // Delete fork / join
+    	  var forkParent = self.getParents(parentWidget.id());
+    	} else {
+          // Just delete link
+    	  parent.children.remove(childLink);
+    	}
+      }
+    }
   };
+  
+  self.getParents = function(node_id) { // Only one for now
+    var _node = null;
+    $.each(self.nodes(), function (index, node) {
+      $.each(node.children(), function(index, link) {
+    	var _link = ko.mapping.toJS(link);
+        if (('to' in _link && _link.to == node_id) || ('ok' in _link && _link.ok == node_id)) {
+          _node = node;
+          return false;
+        }  
+      })
+    });
+    return _node;  
+  }
 
   self.getNodeById = function (node_id) {
     var _node = null;
