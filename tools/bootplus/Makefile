@@ -17,8 +17,8 @@ build:
 	@echo "Building Bootplus..."
 	@echo "${HR}\n"
 	@printf "Compiling LESS with Recess..."
-	@recess --compile ${BOOTPLUS_LESS} > ${BOOTPLUS}
-	@recess --compile ${BOOTPLUS_RESPONSIVE_LESS} > ${BOOTPLUS_RESPONSIVE}
+	@recess --compress ${BOOTPLUS_LESS} > ${BOOTPLUS}
+	@recess --compress ${BOOTPLUS_RESPONSIVE_LESS} > ${BOOTPLUS_RESPONSIVE}
 	@echo "             ${CHECK}"
 	@echo "\n${HR}"
 	@echo "Bootplus successfully built at ${DATE}."
