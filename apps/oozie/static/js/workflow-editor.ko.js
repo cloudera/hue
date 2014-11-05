@@ -676,6 +676,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             break;
           }
         }
+        if (_row != null) {
+          break;
+        }
         for (var z = 0; z < row.columns().length; z++) {
           _row = self.traverseColumnForWidget(widget_id, row.columns()[z]);
           if (_row != null) {
