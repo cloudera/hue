@@ -493,7 +493,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       if (self.searchFilter().length === 0) {
         self.filter([]);
       } else {
-        self.filter(self.searchFilter());
+        self.filter(self.searchFilter().toLowerCase());
       }
 
       if (self.selectedActions().length === self.actions().length) {
