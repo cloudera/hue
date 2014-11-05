@@ -143,6 +143,21 @@ var Workflow = function (vm, workflow) {
 
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
+  
+  self.linkMapping = ko.computed(function() {
+	var mapping = {};
+    $.each(self.nodes(), function(index, node) {
+      var links = []
+      $.each(node.children(), function(index, link) {
+        if ('to' in link) {
+          links.push(link['to']);
+        }
+      });
+      mapping[node.id()] = links
+    });
+
+    return mapping;
+  });
 
   self.loadNodes = function(workflow) {
     var nodes = []
