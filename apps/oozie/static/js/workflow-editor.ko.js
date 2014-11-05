@@ -595,6 +595,38 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     return null;
   }
 
+  self.getWidgetSuccessor = function (widget_id) {
+    var _row = self.getWidgetParentRow(widget_id);
+    var _col = self.getRowParentColumn(_row.id());
+    var _nextRow = null;
+    for (var i = 0; i < _col.rows().length; i++) {
+      if (_col.rows()[i].id() == _row.id()) {
+        _nextRow = _col.rows()[i+1];
+        break;
+      }
+      _nextRow = _col.rows()[i];
+    }
+    if (_nextRow != null) {
+      return _nextRow.widgets()[0];
+    }
+    else {
+      var _parentRow = self.getColumnParentRow(_col.id());
+      var _parentColumn = self.getRowParentColumn(_parentRow.id());
+      var _nextParentRow = null;
+      for (var i = 0; i < _parentColumn.rows().length; i++) {
+        if (_parentColumn.rows()[i].id() == _parentRow.id()) {
+          _nextParentRow = _parentColumn.rows()[i+1];
+          break;
+        }
+        _nextParentRow = _parentColumn.rows()[i];
+      }
+      if (_nextParentRow != null) {
+        return _nextParentRow.widgets()[0];
+      }
+    }
+    return null;
+  }
+
   self.getWidgetParentRow = function (widget_id) {
     var _row = null;
     for (var i = 0; i < self.columns().length; i++) {
