@@ -29,40 +29,35 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
-                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction());}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggablePigAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                        'stop': function(event, ui){$('.card-body').slideDown('fast'); }}}"
+                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggablePigAction());}}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_pig_48.png" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaAction(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableJavaAction()); lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableJavaAction());}}}"
          title="${_('Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableMapReduceAction(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: {'start': function(event, ui){}}}"
          title="${_('MapReduce job')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: {'start': function(event, ui){}}}"
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
     </div>
@@ -72,8 +67,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableStopNode(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: {'start': function(event, ui){}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-stop"></i></a>
     </div>
@@ -166,12 +160,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
-      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true, 1); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true, 1); _r.addWidget(widget); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){}}}"></div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
-      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(false, $data.rows().length - 1); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(false, $data.rows().length - 1); _r.addWidget(widget); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){}}}"></div>
     </div>
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
@@ -182,12 +176,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <script type="text/html" id="internal-column-template">
   <div data-bind="css: klass">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
-      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){}}}"></div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
-      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
+      <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){}}}"></div>
     </div>
   </div>
 </script>
@@ -200,9 +194,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && widgets().length < 1, isEnabled: $root.isEditing() && widgets().length < 1,
           options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
-              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
-              dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
+              'stop': function(event, ui){},
+              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+              dragged: function(widget){widgetDraggedAdditionalHandler(widget)}}">
         </div>
       </div>
     </div>
@@ -226,9 +220,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
           options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
-              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
-              dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});widgetDraggedAdditionalHandler(widget)}}">
+              'stop': function(event, ui){},
+              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+              dragged: function(widget){widgetDraggedAdditionalHandler(widget)}}">
         </div>
         <div class="container-fluid" data-bind="visible: columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
           <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
