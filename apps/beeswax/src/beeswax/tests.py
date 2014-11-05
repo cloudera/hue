@@ -887,7 +887,7 @@ for x in sys.stdin:
 
       # Check that data is right
       if verify:
-        target_ls = self.cluster.fs.listdir(target_dir)
+        target_ls = self.cluster.fs.listdir(target_dir)[1:]
         assert_true(len(target_ls) >= 1)
         data_buf = ""
 
