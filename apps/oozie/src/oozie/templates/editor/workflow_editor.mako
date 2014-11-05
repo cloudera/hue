@@ -732,6 +732,7 @@ ${ dashboard.import_layout() }
 ${ dashboard.import_bindings() }
 
 <script src="/oozie/static/js/workflow-editor.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.curvedarrow.js" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript">
@@ -776,6 +777,45 @@ ${ dashboard.import_bindings() }
 
   function addActionDemiModalFieldCancel() {
     viewModel.removeWidgetById(newAction.id());
+  }
+
+  function linkWidgets(fromId, toId) {
+    var _from = $("#wdg_" + fromId);
+    var _to = $("#wdg_" + toId);
+
+    var _fromCenter = {
+      x: _from.position().left + _from.outerWidth() / 2,
+      y: _from.position().top + _from.outerHeight()
+    }
+
+    var _toCenter = {
+      x: _to.position().left + _to.outerWidth() / 2,
+      y: _to.position().top
+    }
+
+    var _curveCoords = {};
+
+    if (_fromCenter.x == _toCenter.x) {
+      _curveCoords.x = _fromCenter.x;
+      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
+    }
+    else {
+      _curveCoords.x = _fromCenter.x - (_fromCenter.x - _toCenter.x) / 4;
+      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
+    }
+
+    $(document.body).curvedArrow({
+      p0x: _fromCenter.x,
+      p0y: _fromCenter.y,
+      p1x: _curveCoords.x,
+      p1y: _curveCoords.y,
+      p2x: _toCenter.x,
+      p2y: _toCenter.y,
+      lineWidth: 2,
+      size: 10,
+      strokeStyle: '#CCCCCC'
+    });
+
   }
 
 </script>
