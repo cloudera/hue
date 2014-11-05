@@ -186,7 +186,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: rows}">
     </div>
-    <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
+    <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="css: {'drop-target': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'drop-target-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
   </div>
@@ -211,9 +211,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="internal-row-template">
   <div class="container-fluid">
+    <div class="row-fluid" data-bind="visible: $index() > 0" style="margin-bottom: 10px">
+      <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
+      <div data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
+        <div data-bind="visible: $root.isEditing(), css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+      </div>
+      <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
+    </div>
     <div class="row-fluid">
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
-        <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div  data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
@@ -231,7 +238,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         </div>
       </div>
       <div  data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
-        <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: $root.isEditing(), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
     </div>
   </div>
