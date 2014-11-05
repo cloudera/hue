@@ -314,3 +314,12 @@ em {
 .drop-target-side {
   min-height: 100px;
 }
+
+.dashboard .row-fluid .span10.readonly {
+  width: 100%;
+  margin-left: 0;
+}
+
+.dashboard .row-fluid .span1.readonly {
+  width: 0;
+}
