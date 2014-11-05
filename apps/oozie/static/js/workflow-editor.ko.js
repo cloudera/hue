@@ -146,7 +146,7 @@ var Workflow = function (vm, workflow) {
   self.nodes = ko.observableArray([]);
   
   self.linkMapping = ko.computed(function() {
-	var mapping = {};
+	  var mapping = {};
     $.each(self.nodes(), function(index, node) {
       var links = []
       $.each(node.children(), function(index, link) {
@@ -158,6 +158,10 @@ var Workflow = function (vm, workflow) {
     });
 
     return mapping;
+  });
+
+  self.linkMapping.subscribe(function(newVal){
+    $(document).trigger("drawArrows");
   });
 
   self.loadNodes = function(workflow) {
@@ -341,6 +345,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.isNested = ko.observable(true);
 
   self.isEditing = ko.observable(true);
+  self.isEditing.subscribe(function(newVal){
+    $(document).trigger("editingToggled");
+  });
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
   };

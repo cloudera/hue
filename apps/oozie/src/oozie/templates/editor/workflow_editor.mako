@@ -755,6 +755,7 @@ ${ dashboard.import_bindings() }
 
   function widgetDraggedAdditionalHandler(widget) {
     viewModel.workflow.newNode(widget);
+    $("canvas").remove();
     showAddActionDemiModal(widget);
   }
 
@@ -784,8 +785,8 @@ ${ dashboard.import_bindings() }
   }
 
   function linkWidgets(fromId, toId) {
-    var _from = $("#wdg_" + fromId);
-    var _to = $("#wdg_" + toId);
+    var _from = $("#wdg_" + (typeof fromId == "function"?fromId():fromId));
+    var _to = $("#wdg_" + (typeof toId == "function"?toId():toId));
 
     var _fromCenter = {
       x: _from.position().left + _from.outerWidth() / 2,
@@ -821,6 +822,29 @@ ${ dashboard.import_bindings() }
     });
 
   }
+
+  function drawArrows(){
+    $("canvas").remove();
+    var _links = viewModel.workflow.linkMapping();
+    Object.keys(_links).forEach(function(id){
+      if (_links[id].length > 0){
+        _links[id].forEach(function(nextId){
+          linkWidgets(id, nextId);
+        });
+      }
+    });
+  }
+
+  var _linkMappingTimeout = -1;
+  $(document).on("drawArrows", function(){
+    window.clearTimeout(_linkMappingTimeout);
+    _linkMappingTimeout = window.setTimeout(drawArrows, 25);
+  });
+
+  $(document).on("editingToggled", function(){
+    $("canvas").remove();
+    window.setTimeout(drawArrows, 100);
+  });
 
 </script>
 
