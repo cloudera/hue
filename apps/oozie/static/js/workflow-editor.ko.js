@@ -122,7 +122,8 @@ var Node = function (node) {
   self.remove_link = function(name, child) {
     var _link = null;
     $.each(self.children(), function(index, link) {
-      if (name in link && link[name] == child) {
+      var _l = ko.mapping.toJS(link);
+      if (name in _l && _l[name] == child) {
         _link = link;
         return false;
       }

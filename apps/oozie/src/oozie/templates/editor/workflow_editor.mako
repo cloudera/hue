@@ -273,7 +273,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-      I AM A FORK
+      To:
+      <span data-bind="foreach: children">
+        <span data-bind="text: $data['to']" /></span>
+      </span>
     </div>
   </div>
   <!-- /ko -->
@@ -289,7 +292,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-      FIN.
+      Then --> <span data-bind="text: children()[0]['to']" /></span>
     </div>
   </div>
   <!-- /ko -->
@@ -305,9 +308,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-       <!-- ko if: children().length == 1 -->
-       Start --> <input type="text" data-bind="value: children()[0]['to']" />
-       <!-- /ko -->
+      <!-- ko if: children().length == 1 -->
+      Start --> <input type="text" data-bind="value: children()[0]['to']" />
+      <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
