@@ -216,7 +216,7 @@ var Workflow = function (vm, workflow) {
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
-          if (parentWidget.widgetType() == 'start-widget') {	
+          if (parentWidget.widgetType() == 'start-widget') {
 	        // Star node link to new node	
 	        parent.set_link('to', node.id());
 	
@@ -242,6 +242,24 @@ var Workflow = function (vm, workflow) {
         $(document).trigger("error", xhr.responseText);
      });
   };
+  
+  self.removeNode = function(node_id) { alert(node_id);
+	var node = self.getNodeById(node_id);
+	
+    var parentWidget = vm.getWidgetPredecessor(node_id);
+    var parent = self.getNodeById(parentWidget.id());
+
+    // if parent start
+    if (parentWidget.widgetType() == 'start-widget') {
+      parent.set_link('to', node.get_link('ok')['ok']);
+    }
+
+    self.nodes.remove(node);
+
+	// if parent normal node
+	  
+	// if parent is fork
+  };
 
   self.getNodeById = function (node_id) {
     var _node = null;
@@ -252,7 +270,7 @@ var Workflow = function (vm, workflow) {
       }
     });
     return _node;
-  }
+  };
 }
 
 var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json) {
@@ -373,7 +391,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.removeWidget = function (widget_json) {
-    self.removeWidgetById(widget_json.id());
+	self.workflow.removeNode(widget_json.id());
+    self.removeWidgetById(widget_json.id());    
   }
 
   self.removeWidgetById = function (widget_id) {
