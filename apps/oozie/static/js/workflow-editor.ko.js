@@ -376,6 +376,35 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.addDraggedWidget = function (row, atBeginning) {
     if (self.currentlyDraggedWidget != null) {
       var _parentCol = self.getRowParentColumn(row.id());
+
+      var _rowIdx = 0;
+      $.each(_parentCol.rows(), function (i, irow) {
+        if (irow.id() == row.id()) {
+          _rowIdx = i;
+        }
+      });
+
+      var _newRow = _parentCol.addEmptyRow(false, _rowIdx);
+      var _w = new Widget({
+        size: self.currentlyDraggedWidget.size(),
+        id: UUID(),
+        name: self.currentlyDraggedWidget.name(),
+        widgetType: self.currentlyDraggedWidget.widgetType(),
+        properties: self.currentlyDraggedWidget.properties(),
+        offset: self.currentlyDraggedWidget.offset(),
+        loading: true,
+        vm: self
+      });
+
+      _newRow.widgets([_w]);
+
+      return _w;
+    }
+  }
+
+  self.addSideDraggedWidget = function (row, atBeginning) {
+    if (self.currentlyDraggedWidget != null) {
+      var _parentCol = self.getRowParentColumn(row.id());
       var _rowIdx = 0;
       $.each(_parentCol.rows(), function (i, irow) {
         if (irow.id() == row.id()) {
