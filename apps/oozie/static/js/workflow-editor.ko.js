@@ -565,43 +565,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
-  self.getWidgetPredecessor = function (widget_id) {
-    var _row = self.getWidgetParentRow(widget_id);
-    var _col = self.getRowParentColumn(_row.id());
-    var _prevRow = null;
-    for (var i = 0; i < _col.rows().length; i++) {
-      if (_col.rows()[i].id() == _row.id()) {
-        break;
-      }
-      _prevRow = _col.rows()[i];
-    }
-    if (_prevRow != null) {
-      return _prevRow.widgets()[0];
-    }
-    else {
-      var _parentRow = self.getColumnParentRow(_col.id());
-      var _parentColumn = self.getRowParentColumn(_parentRow.id());
-      var _prevParentRow = null;
-      for (var i = 0; i < _parentColumn.rows().length; i++) {
-        if (_parentColumn.rows()[i].id() == _parentRow.id()) {
-          break;
-        }
-        _prevParentRow = _parentColumn.rows()[i];
-      }
-      if (_prevParentRow != null) {
-        return _prevParentRow.widgets()[0];
-      }
-    }
-    return null;
-  }
-
-  self.getWidgetSuccessor = function (widget_id) {
+  self.getWidgetRelative = function (widget_id, isPredecessor) {
     var _row = self.getWidgetParentRow(widget_id);
     var _col = self.getRowParentColumn(_row.id());
     var _nextRow = null;
     for (var i = 0; i < _col.rows().length; i++) {
       if (_col.rows()[i].id() == _row.id()) {
-        _nextRow = _col.rows()[i+1];
+        if (!isPredecessor && _col.rows().length >= i + 1) {
+          _nextRow = _col.rows()[i + 1];
+        }
         break;
       }
       _nextRow = _col.rows()[i];
@@ -611,20 +583,32 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
     else {
       var _parentRow = self.getColumnParentRow(_col.id());
-      var _parentColumn = self.getRowParentColumn(_parentRow.id());
-      var _nextParentRow = null;
-      for (var i = 0; i < _parentColumn.rows().length; i++) {
-        if (_parentColumn.rows()[i].id() == _parentRow.id()) {
-          _nextParentRow = _parentColumn.rows()[i+1];
-          break;
+      if (_parentRow) {
+        var _parentColumn = self.getRowParentColumn(_parentRow.id());
+        var _nextParentRow = null;
+        for (var i = 0; i < _parentColumn.rows().length; i++) {
+          if (_parentColumn.rows()[i].id() == _parentRow.id()) {
+            if (!isPredecessor && _parentColumn.rows().length >= i + 1) {
+              _nextParentRow = _parentColumn.rows()[i + 1];
+            }
+            break;
+          }
+          _nextParentRow = _parentColumn.rows()[i];
         }
-        _nextParentRow = _parentColumn.rows()[i];
-      }
-      if (_nextParentRow != null) {
-        return _nextParentRow.widgets()[0];
+        if (_nextParentRow != null) {
+          return _nextParentRow.widgets()[0];
+        }
       }
     }
     return null;
+  }
+
+  self.getWidgetPredecessor = function (widget_id) {
+    return self.getWidgetRelative(widget_id, true);
+  }
+
+  self.getWidgetSuccessor = function (widget_id) {
+    return self.getWidgetRelative(widget_id, false);
   }
 
   self.getWidgetParentRow = function (widget_id) {
