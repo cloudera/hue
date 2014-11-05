@@ -243,22 +243,21 @@ var Workflow = function (vm, workflow) {
      });
   };
   
-  self.removeNode = function(node_id) { alert(node_id);
+  self.removeNode = function(node_id) {
 	var node = self.getNodeById(node_id);
 	
     var parentWidget = vm.getWidgetPredecessor(node_id);
     var parent = self.getNodeById(parentWidget.id());
 
-    // if parent start
-    if (parentWidget.widgetType() == 'start-widget') {
-      parent.set_link('to', node.get_link('ok')['ok']);
+    // If parent start
+    if (parentWidget.widgetType() == 'start-widget' || parentWidget.widgetType() == 'join-widget') {
+      parent.set_link('to', node.get_link('ok')['ok']);    	
+    } else {
+      // If parent normal node
+      parent.set_link('ok', node.get_link('ok')['ok']);
     }
 
     self.nodes.remove(node);
-
-	// if parent normal node
-	  
-	// if parent is fork
   };
 
   self.getNodeById = function (node_id) {
