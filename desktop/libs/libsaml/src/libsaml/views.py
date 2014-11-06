@@ -14,6 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from djangosaml2.views import login, echo_attributes, metadata,\
 							  assertion_consumer_service, logout_service
@@ -24,6 +26,8 @@ import libsaml.conf
 __all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata']
 
 
+@require_POST
+@csrf_exempt
 def acs(request, config_loader_path=None, attribute_mapping=None, create_unknown_user=None):
   username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
   return assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
