@@ -324,3 +324,7 @@ em {
 .dashboard .row-fluid .span1.readonly {
   width: 0;
 }
+
+.readonly .card-widget {
+  border: 1px solid #d8d8d8!important;
+}
