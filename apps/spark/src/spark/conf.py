@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import os
 import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -46,6 +47,12 @@ LANGUAGES = Config(
       {"name": "Text", "type": "text"}
   ]"""
 )
+
+SPARK_SERVER_BIN = Config(
+  key="spark_server_bin",
+  help=_t("Path to spark_server.sh"),
+  private=True,
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "spark_server.sh"))
 
 
 def get_spark_status(user):
