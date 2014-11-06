@@ -144,6 +144,12 @@ LOGOUT_ENABLED = Config(
   type=coerce_bool,
   help=_t("Performs the logout or not."))
 
+NAME_ID_FORMAT = Config(
+  key="name_id_format",
+  default=saml2.saml.NAMEID_FORMAT_PERSISTENT,
+  type=str,
+  help=_t("Request this NameID format from the server"))
+
 
 def config_validator(user):
   res = []

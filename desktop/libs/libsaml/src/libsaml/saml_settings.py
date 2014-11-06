@@ -47,6 +47,7 @@ SAML_CONFIG = {
   'service': {
     'sp' : {
       'name': 'hue',
+      'name_id_format': libsaml.conf.NAME_ID_FORMAT.get(),
       'endpoints': {
         # url and binding to the assetion consumer service view
         # do not change the binding or service name
