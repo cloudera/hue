@@ -54,10 +54,11 @@ SAML_CONFIG = {
         'assertion_consumer_service': [
           ("%s/saml2/acs/" % BASE_URL, saml2.BINDING_HTTP_POST),
         ],
-        # url and binding to the single logout service view
+        # url and binding to the logout service view
         # do not change the binding or service name
         'single_logout_service': [
           ("%s/saml2/ls/" % BASE_URL, saml2.BINDING_HTTP_REDIRECT),
+          ("%s/saml2/ls/post/" % BASE_URL, saml2.BINDING_HTTP_POST),
         ],
       },
 

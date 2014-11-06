@@ -18,7 +18,9 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 from djangosaml2.views import login, echo_attributes, metadata,\
-							  assertion_consumer_service, logout_service
+                              assertion_consumer_service, \
+                              logout_service_redirect, \
+                              logout_service_post
 
 import libsaml.conf
 
@@ -33,7 +35,8 @@ def acs(request, config_loader_path=None, attribute_mapping=None, create_unknown
   return assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
 
 
-setattr(logout_service, 'login_notrequired', True)
+setattr(logout_service_redirect, 'login_notrequired', True)
+setattr(logout_service_post, 'login_notrequired', True)
 setattr(login, 'login_notrequired', True)
 setattr(echo_attributes, 'login_notrequired', True)
 setattr(acs, 'login_notrequired', True)
