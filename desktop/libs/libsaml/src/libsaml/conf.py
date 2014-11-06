@@ -20,12 +20,25 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+import saml2
+import saml2.saml
 from desktop.lib.conf import Config, coerce_bool, coerce_csv
+
+try:
+  from saml2.sigver import get_xmlsec_binary
+except ImportError:
+  get_xmlsec_binary = None
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
 USERNAME_SOURCES = ('attributes', 'nameid')
+
+
+if get_xmlsec_binary:
+  xmlsec_path = get_xmlsec_binary(['/usr/bin', '/usr/local/bin', '/opt/local/bin'])
+else:
+  xmlsec_path = '/usr/local/bin/xmlsec1'
 
 
 def dict_list_map(value):
@@ -41,7 +54,7 @@ def dict_list_map(value):
 
 XMLSEC_BINARY = Config(
   key="xmlsec_binary",
-  default="/usr/local/bin/xmlsec1",
+  default=xmlsec_path,
   type=str,
   help=_t("Xmlsec1 binary path. This program should be executable by the user running Hue."))
 
