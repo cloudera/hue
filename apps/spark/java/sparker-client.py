@@ -17,6 +17,7 @@ class SparkerClient:
     # Constants
     POST = 'POST'
     GET = 'GET'
+    DELETE = 'DELETE'
     ROOT = '/'
     OK = 200
     def __init__(self, host=sparker_client_default_host, port=sparker_client_default_port):
@@ -47,6 +48,8 @@ class SparkerClient:
         output = self.get_session()[self.output_cursor:]
         self.output_cursor += len(output)
         return output
+    def delete_session(self):
+        self.http_json(self.DELETE, self.ROOT + self.session_id)
     def close_connection(self):
         self.connection.close()
 
@@ -78,7 +81,7 @@ try:
         client.post_input(line)
 except:
     poller.stop_polling()
-    # TODO: delete session?
+    client.delete_session()
     client.close_connection()
 
 sys.exit(0)
