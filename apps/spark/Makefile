@@ -22,3 +22,37 @@ endif
 
 APP_NAME = spark
 include $(ROOT)/Makefile.sdk
+
+SPARK_ROOT := $(realpath .)
+BLD_DIR_SPARK = $(SPARK_ROOT)/java/target
+SPARK_JAVA_LIB = $(SPARK_ROOT)/java-lib
+
+SPARK := $(SPARK_JAVA_LIB)/SparkServer.jar
+SPARK_JAVA_DIR := $(SPARK_ROOT)/java
+
+HAVE_JAVA_SRC = $(wildcard $(SPARK_JAVA_DIR))
+
+compile: $(SPARK)
+
+ifneq (,$(HAVE_JAVA_SRC))
+
+clean::
+	rm -Rf $(SPARK_JAVA_LIB)
+	cd $(SPARK_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) || :
+
+$(SPARK): $(shell find $(SPARK_JAVA_DIR) -type f)
+	@echo "--- Building Desktop spark"
+	cd $(SPARK_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+	@mkdir -p $(SPARK_JAVA_LIB)
+	@cp $(BLD_DIR_SPARK)/spark-server-$(MAVEN_VERSION).jar $@
+
+else
+$(SPARK):
+	$(error Cannot build spark jars without source)
+endif
+
+BDIST_EXCLUDES += \
+	--exclude=java
+
+SDIST_EXCLUDES += \
+	--exclude=java-lib
