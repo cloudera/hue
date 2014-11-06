@@ -875,6 +875,15 @@ ${ dashboard.import_bindings() }
 
   $(document).ready(function(){
     renderChangeables();
+
+    var resizeTimeout = -1;
+    $(window).on("resize", function () {
+      window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(function () {
+        renderChangeables();
+      }, 200);
+    });
+
   });
 
 </script>
