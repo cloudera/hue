@@ -112,11 +112,12 @@ var Node = function (node) {
 	var _link = self.get_link(name);
 
     if (_link == null) {
-      _link = {};
+      _link = {}
+      _link[name] = node_id;
       self.children.push(_link);
+    } else {
+      _link[name] = node_id;
     }
-
-    _link[name] = node_id;
   }
 
   self.remove_link = function(name, child) {
@@ -246,6 +247,11 @@ var Workflow = function (vm, workflow) {
             // Join node
           } else {
             // Just add to existing fork
+        	var join = vm.getWidgetSuccessor(node.id()); 
+            node.set_link('to', join.id());
+    	    node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+
+    	    self.getNodeById(parentWidget.id()).children.push({'to': node.id()});          	  
           }
         } else {
           var parentWidget = vm.getWidgetPredecessor(node.id());
@@ -469,12 +475,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           vm: self
         });
 
-        _joinRow.widgets([_join]);
-        self.currentlyCreatingFork = true;
+        _joinRow.widgets([_join]);        
         self.currentlyCreatedFork = ko.mapping.toJS(_fork);
         self.currentlyCreatedJoin = ko.mapping.toJS(_join);
       }
 
+      self.currentlyCreatingFork = true;
       self.currentlyDraggedWidget = null;
 
       return _w;
