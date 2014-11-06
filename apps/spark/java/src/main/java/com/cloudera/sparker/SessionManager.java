@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 public class SessionManager {
 
-    private ConcurrentHashMap<String, SparkerSession> sessions = new ConcurrentHashMap<String, SparkerSession>();
+    private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
     public SessionManager() {
         new SessionManagerGarbageCollector(this).start();
@@ -38,14 +38,25 @@ public class SessionManager {
 
     public Session create() throws IOException, InterruptedException {
         String key = UUID.randomUUID().toString();
-        SparkerSession session = new SparkerSession(key);
+        Session session = new SparkerSession(key);
         sessions.put(key, session);
         return session;
     }
 
-    public void close() throws InterruptedException, TimeoutException, IOException {
-        for (SparkerSession session : sessions.values()) {
+    public void close() {
+        for (Session session : sessions.values()) {
+            this.close(session.getKey());
+        }
+    }
+
+    public void close(String key) {
+        Session session = this.get(key);
+        sessions.remove(key);
+        try {
             session.close();
+        } catch (Exception e) {
+            // throws InterruptedException, TimeoutException, IOException
+            e.printStackTrace();
         }
     }
 
@@ -55,15 +66,10 @@ public class SessionManager {
 
     public void garbageCollect() {
         long timeout = 60000; // Time in milliseconds; TODO: make configurable
-        for (SparkerSession session : sessions.values()) {
+        for (Session session : sessions.values()) {
             long now = System.currentTimeMillis();
             if ((now - session.getLastActivity()) > timeout) {
-                sessions.remove(session.getKey());
-                try {
-                   session.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                this.close(session.getKey());
             }
         }
     }
@@ -82,7 +88,6 @@ public class SessionManager {
         public void run() {
             try {
                 while(true) {
-                    System.out.println("Starting garbage collection");
                     manager.garbageCollect();
                     sleep(period);
                 }

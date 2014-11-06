@@ -105,6 +105,27 @@ public class SparkerServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType(APPLICATION_JSON_MIME);
+        resp.setStatus(HttpServletResponse.SC_OK);
+
+        String requestType = req.getPathInfo();
+        requestType = (requestType != null) ? requestType.toLowerCase() : ROOT;
+
+        if (requestType.equals(ROOT)) {
+            resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else {
+            Matcher m = SESSION_ID.matcher(requestType);
+            if (m.matches()) {
+                String key = m.group(1);
+                manager.close(key);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
+    }
+
     private void createSession(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             Session session = manager.create();

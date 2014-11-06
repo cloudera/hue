@@ -20,6 +20,7 @@ package com.cloudera.sparker;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 public interface Session {
 
@@ -32,5 +33,7 @@ public interface Session {
     List<String> getInputLines();
 
     List<String> getOutputLines();
+
+    public void close() throws IOException, InterruptedException, TimeoutException;
 }
 
