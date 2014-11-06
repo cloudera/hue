@@ -846,12 +846,27 @@ ${ dashboard.import_bindings() }
   var _linkMappingTimeout = -1;
   $(document).on("drawArrows", function(){
     window.clearTimeout(_linkMappingTimeout);
-    _linkMappingTimeout = window.setTimeout(drawArrows, 25);
+    _linkMappingTimeout = window.setTimeout(renderChangeables, 25);
   });
 
   $(document).on("editingToggled", function(){
     $("canvas").remove();
-    window.setTimeout(drawArrows, 100);
+    window.setTimeout(renderChangeables, 100);
+  });
+
+  function resizeDrops() {
+    $(".drop-target-side").each(function () {
+      $(this).height($(this).parent().parent().innerHeight() - 12);
+    });
+  }
+
+  function renderChangeables() {
+    resizeDrops();
+    drawArrows();
+  }
+
+  $(document).ready(function(){
+    renderChangeables();
   });
 
 </script>
