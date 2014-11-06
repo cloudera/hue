@@ -23,6 +23,14 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
+<script type="text/javascript">
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("workflow") > -1) {
+      location.href = "/oozie/editor/workflow/edit/?" + window.location.hash.substr(1);
+    }
+  }
+</script>
+
 
 <%dashboard:layout_toolbar>
   <%def name="skipLayout()"></%def>
