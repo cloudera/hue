@@ -215,7 +215,7 @@ var Workflow = function (vm, workflow) {
 
         // Added to the side ?
         if (vm.currentlyCreatingFork) {
-            var parentWidget = vm.getWidgetPredecessor(node.id()); alert(parentWidget.id());
+            var parentWidget = vm.getWidgetPredecessor(node.id()); console.log(parentWidget.id());
 
           if (self.getNodeById(parentWidget.id()) == null) { // New fork
         	
@@ -744,7 +744,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
-        alert(data.xml);
+        console.log(data.xml);
       }
       else {
         $(document).trigger("error", data.message);

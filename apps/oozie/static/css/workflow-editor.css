@@ -313,6 +313,7 @@ em {
 
 .drop-target-side {
   min-height: 100px;
+  height: 100%;
 }
 
 .dashboard .row-fluid .span10.readonly {
