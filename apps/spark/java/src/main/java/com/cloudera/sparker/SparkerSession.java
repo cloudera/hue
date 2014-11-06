@@ -39,6 +39,8 @@ public class SparkerSession implements Session {
     private final Queue<String> outputLines = new ConcurrentLinkedQueue<String>();
 
     public SparkerSession(String key) throws IOException, InterruptedException {
+        this.touchLastActivity();
+
         this.key = key;
 
         ProcessBuilder pb = new ProcessBuilder("spark-shell")
@@ -91,6 +93,7 @@ public class SparkerSession implements Session {
     }
 
     public void execute(String command) throws IOException {
+        this.touchLastActivity();
         if (!command.endsWith("\n")) {
             command += "\n";
         }
@@ -102,11 +105,13 @@ public class SparkerSession implements Session {
 
     @Override
     public List<String> getInputLines() {
+        this.touchLastActivity();
         return Lists.newArrayList(inputLines);
     }
 
     @Override
     public List<String> getOutputLines() {
+        this.touchLastActivity();
         return Lists.newArrayList(outputLines);
     }
 
@@ -119,5 +124,16 @@ public class SparkerSession implements Session {
             process.destroy();
             throw new TimeoutException();
         }
+    }
+
+    protected long lastActivity = Long.MAX_VALUE;
+
+    public void touchLastActivity() {
+        long now = System.currentTimeMillis();
+        this.lastActivity = now;
+    }
+
+    public long getLastActivity() {
+        return this.lastActivity;
     }
 }

@@ -43,8 +43,6 @@ clean::
 $(SPARK): $(shell find $(SPARK_JAVA_DIR) -type f)
 	@echo "--- Building Desktop spark"
 	cd $(SPARK_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
-	@mkdir -p $(SPARK_JAVA_LIB)
-	@cp $(BLD_DIR_SPARK)/spark-server-$(MAVEN_VERSION).jar $@
 
 else
 $(SPARK):
