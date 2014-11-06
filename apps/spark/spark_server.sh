@@ -47,7 +47,7 @@ set -o errexit
 #echo \$HIVE_HOME=$HIVE_HOME
 #
 SPARK_ROOT=$(dirname $0)
-SPARK_JAR=$SPARK_ROOT/java-lib/SparkServer.jar
+SPARK_JAR=$SPARK_ROOT/java/target/spark-server-3.7.0-SNAPSHOT.jar
 #HIVE_LIB=$HIVE_HOME/lib
 #
 #export HADOOP_CLASSPATH=$(find $HADOOP_HOME -name hue-plugins*.jar | tr "\n" :):$(find $HIVE_LIB -name "*.jar" | tr "\n" :)

@@ -27,6 +27,8 @@ public interface Session {
 
     public void execute(String command) throws IOException;
 
+    public long getLastActivity();
+
     List<String> getInputLines();
 
     List<String> getOutputLines();

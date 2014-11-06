@@ -29,7 +29,7 @@ public class SessionManager {
     private ConcurrentHashMap<String, SparkerSession> sessions = new ConcurrentHashMap<String, SparkerSession>();
 
     public SessionManager() {
-
+        new SessionManagerGarbageCollector(this).start();
     }
 
     public Session get(String key) {
@@ -51,5 +51,44 @@ public class SessionManager {
 
     public Enumeration<String> getSessionKeys() {
         return sessions.keys();
+    }
+
+    public void garbageCollect() {
+        long timeout = 60000; // Time in milliseconds; TODO: make configurable
+        for (SparkerSession session : sessions.values()) {
+            long now = System.currentTimeMillis();
+            if ((now - session.getLastActivity()) > timeout) {
+                sessions.remove(session.getKey());
+                try {
+                   session.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    protected class SessionManagerGarbageCollector extends Thread {
+
+        protected SessionManager manager;
+
+        protected long period = 60000; // Time in milliseconds; TODO: make configurable
+
+        public SessionManagerGarbageCollector(SessionManager manager) {
+            super();
+            this.manager = manager;
+        }
+
+        public void run() {
+            try {
+                while(true) {
+                    System.out.println("Starting garbage collection");
+                    manager.garbageCollect();
+                    sleep(period);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
