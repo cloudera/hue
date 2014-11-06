@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.sparker;
+package com.cloudera.hue.sparker;
 
 import java.io.IOException;
 import java.util.List;

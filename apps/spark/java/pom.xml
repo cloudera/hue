@@ -27,13 +27,13 @@
         <version>3.7.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.cloudera.sparker</groupId>
-    <artifactId>spark-server</artifactId>
-    <packaging>jar</packaging>
+    <groupId>com.cloudera.hue.sparker</groupId>
+    <artifactId>sparker-main</artifactId>
+    <packaging>pom</packaging>
     <version>3.7.0-SNAPSHOT</version>
 
-    <name>Spark Server</name>
-    <description>Spark Server</description>
+    <name>Spark Main</name>
+    <description>Spark Main</description>
 
     <licenses>
         <license>
@@ -55,8 +55,12 @@
         <slf4j.version>${cdh.slf4j.version}</slf4j.version>
         <jetty.version>8.1.14.v20131031</jetty.version>
         -->
-        <spark.version></spark.version>
     </properties>
+
+    <modules>
+        <module>sparker-server</module>
+        <module>sparker-repl</module>
+    </modules>
 
     <repositories>
         <repository>
@@ -86,52 +90,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <dependencies>
-        <!--
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-bagel_2.10</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.10</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.10</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
-        -->
-
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-repl_2.10</artifactId>
-            <version>1.1.0-cdh5.2.0-SNAPSHOT</version>
-
-
-                <!--
-                ${spark.version}</version>
-                -->
-
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>
