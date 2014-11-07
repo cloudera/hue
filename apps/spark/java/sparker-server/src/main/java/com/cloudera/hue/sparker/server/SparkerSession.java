@@ -29,17 +29,24 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SparkerSession implements Session {
 
+    private static final Logger logger = Logger.getLogger("SparkerSession");
+
     private final String key;
     private final Process process;
-    private final Thread readerThread;
+    private final Thread stdoutThread;
+    private final Thread stderrThread;
 
     private final Queue<String> inputLines = new ConcurrentLinkedQueue<String>();
     private final Queue<String> outputLines = new ConcurrentLinkedQueue<String>();
 
-    public SparkerSession(String key) throws IOException, InterruptedException {
+    public SparkerSession(final String key) throws IOException, InterruptedException {
+        logger.info("[" + key + "]: creating sparker session");
+
         this.touchLastActivity();
 
         this.key = key;
@@ -52,7 +59,7 @@ public class SparkerSession implements Session {
 
         this.process = pb.start();
 
-        this.readerThread = new Thread(new Runnable() {
+        this.stdoutThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -63,6 +70,8 @@ public class SparkerSession implements Session {
                     ObjectMapper mapper = new ObjectMapper();
 
                     while ((line = reader.readLine()) != null) {
+                        logger.info("[" + key + "] stdout: " + line);
+
                         JsonNode node = mapper.readTree(line);
                         String type = node.get("type").asText();
                         if (type.equals("ready")) {
@@ -85,7 +94,31 @@ public class SparkerSession implements Session {
             }
         });
 
-        readerThread.start();
+        stdoutThread.start();
+
+        this.stderrThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+                try {
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        logger.info("[" + key + "] stderr: " + line);
+                        outputLines.add(line);
+                    }
+
+                    process.waitFor();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        stderrThread.start();
     }
 
     @Override
@@ -94,6 +127,8 @@ public class SparkerSession implements Session {
     }
 
     public void execute(String command) throws IOException {
+        logger.info("[" + key + "]: execute: " + command);
+
         this.touchLastActivity();
         if (!command.endsWith("\n")) {
             command += "\n";
@@ -117,14 +152,20 @@ public class SparkerSession implements Session {
     }
 
     public void close() throws IOException, InterruptedException, TimeoutException {
+        logger.info("[" + key + "]: closing shell");
         process.getOutputStream().close();
 
-        readerThread.join();
-        if (readerThread.isAlive()) {
-            readerThread.interrupt();
+        stdoutThread.join(1000);
+        stderrThread.join(1000);
+
+        if (stdoutThread.isAlive() || stderrThread.isAlive()) {
+            stdoutThread.interrupt();
+            stderrThread.interrupt();
             process.destroy();
             throw new TimeoutException();
         }
+
+        logger.info("[" + key + "]: shell closed");
     }
 
     protected long lastActivity = Long.MAX_VALUE;
