@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
 public class SparkerSession implements Session {
@@ -50,8 +49,6 @@ public class SparkerSession implements Session {
 
         this.process = pb.start();
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
         this.readerThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -59,15 +56,6 @@ public class SparkerSession implements Session {
 
                 try {
                     String line;
-
-                    /*
-                    while ((line = reader.readLine()) != null) {
-                        outputLines.add(line);
-                        if (line.equals("Spark context available as sc.")) {
-                            latch.countDown();
-                        }
-                    }
-                    */
 
                     while ((line = reader.readLine()) != null) {
                         outputLines.add(line);
@@ -83,8 +71,6 @@ public class SparkerSession implements Session {
         });
 
         readerThread.start();
-
-        //latch.await();
     }
 
     @Override
@@ -129,8 +115,7 @@ public class SparkerSession implements Session {
     protected long lastActivity = Long.MAX_VALUE;
 
     public void touchLastActivity() {
-        long now = System.currentTimeMillis();
-        this.lastActivity = now;
+        this.lastActivity = System.currentTimeMillis();
     }
 
     public long getLastActivity() {
