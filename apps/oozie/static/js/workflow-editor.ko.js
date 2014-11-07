@@ -256,14 +256,7 @@ var Workflow = function (vm, workflow) {
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
-          if (parentWidget.widgetType() == 'start-widget') {
-	        // Star node link to new node	
-	        parent.set_link('to', node.id());
-	
-	        // Link to end
-	        node.set_link('to', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
-	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
-          } else if (parentWidget.widgetType() == 'fork-widget') {
+          if (parentWidget.widgetType() == 'fork-widget') {
             var child = vm.getWidgetSuccessor(node.id());
             parent.remove_link('to', child.id());            
             parent.children.push({'to': node.id()});
