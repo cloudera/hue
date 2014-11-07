@@ -78,4 +78,4 @@ export SPARKER_HOME=$(dirname $0)
 # determined with a seemingly appropriate find command.
 echo CWD=$(pwd)
 echo Executing java -jar $SPARK_JAR "$@"
-exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -jar $SPARK_JAR "$@"
+exec java -jar $SPARK_JAR "$@"
