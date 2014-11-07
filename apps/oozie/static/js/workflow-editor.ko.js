@@ -302,8 +302,7 @@ var Workflow = function (vm, workflow) {
       var fork = parent;
       var join = self.getNodeById(childId);
       if (join.type() == 'join-widget') {
-    	if (join.children().length == 1) {
-    		
+    	if (fork.children().length == 2) {
           // Link top to above and delete fork
     	  var forkParent = self.getParents(fork.id());
     	  forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']);
@@ -316,6 +315,8 @@ var Workflow = function (vm, workflow) {
     	  beboreJoin.set_link('to', joinChildId);
 
     	  self.nodes.remove(join); 
+    	} else {
+    	  parent.remove_link('to', childId);
     	}
       }
     }
