@@ -213,10 +213,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="internal-row-template">
   <div class="container-fluid">
-    <div class="row-fluid" data-bind="visible: $index() > 0 && $root.isEditing()" style="margin-bottom: 10px">
+    <div class="row-fluid" data-bind="visible: $index() > 0 && $root.isEditing() && ! $root.isRowBeforeJoin($data) && ! $root.isRowAfterFork($data)" style="margin-bottom: 10px">
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
       <div data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
-        <div data-bind="visible: $root.isEditing(), css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div style="text-align: left" data-bind="visible: $root.isEditing(), css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
     </div>
