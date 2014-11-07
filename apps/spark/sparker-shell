@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec java -cp "java/sparker-repl/target/lib/*:java/sparker-repl/target/sparker-repl-3.7.0-SNAPSHOT.jar" com.cloudera.hue.sparker.repl.Main -usejavacp "$@"
