@@ -2,6 +2,7 @@
 
 import json
 import httplib
+import urllib
 
 sparker_client_default_host = 'localhost'
 sparker_client_default_port = 8080
@@ -20,11 +21,11 @@ class SparkerClient:
     DELETE = 'DELETE'
     ROOT = '/'
     OK = 200
-    def __init__(self, host=sparker_client_default_host, port=sparker_client_default_port):
+    def __init__(self, host=sparker_client_default_host, port=sparker_client_default_port, lang=None):
         self.host = host
         self.port = port
         self.connection = self.create_connection()
-        self.session_id = self.create_session()
+        self.session_id = self.create_session(lang)
     def http_json(self, method, url, body=''):
         self.connection.request(method, url, body)
         response = self.connection.getresponse()
@@ -36,8 +37,8 @@ class SparkerClient:
         return ''
     def create_connection(self):
         return httplib.HTTPConnection(self.host, self.port)
-    def create_session(self):
-        return self.http_json(self.POST, self.ROOT)
+    def create_session(self, lang):
+        return self.http_json(self.POST, self.ROOT, urllib.urlencode({'lang': lang}))
     def get_sessions(self):
         return self.http_json(self.GET, self.ROOT)
     def get_session(self):
@@ -71,7 +72,12 @@ class SparkerPoller(threading.Thread):
                 print(line)
             time.sleep(1)
 
-client = SparkerClient()
+if len(sys.argv) == 2:
+    lang = sys.argv[1]
+else:
+    lang = 'scala'
+
+client = SparkerClient(lang=lang)
 poller = SparkerPoller(client)
 poller.start()
 
