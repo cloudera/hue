@@ -19,6 +19,8 @@
 package com.cloudera.hue.sparker.server;
 
 import com.google.common.collect.Lists;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,10 +44,11 @@ public class SparkerSession implements Session {
 
         this.key = key;
 
-        ProcessBuilder pb = new ProcessBuilder("spark-shell")
+        String sparker_home = System.getenv("SPARKER_HOME");
+
+        ProcessBuilder pb = new ProcessBuilder(Lists.newArrayList(sparker_home + "/sparker-shell"))
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectErrorStream(true);
+                .redirectOutput(ProcessBuilder.Redirect.PIPE);
 
         this.process = pb.start();
 
@@ -57,8 +60,20 @@ public class SparkerSession implements Session {
                 try {
                     String line;
 
+                    ObjectMapper mapper = new ObjectMapper();
+
                     while ((line = reader.readLine()) != null) {
-                        outputLines.add(line);
+                        JsonNode node = mapper.readTree(line);
+                        String type = node.get("type").asText();
+                        if (type.equals("ready")) {
+                            outputLines.add("> ");
+                        } else if (type.equals("done")) {
+                            break;
+                        } else  if (type.equals("result")) {
+                            String output = node.get("output").asText();
+                            outputLines.add(output);
+                            outputLines.add("> ");
+                        }
                     }
 
                     process.waitFor();

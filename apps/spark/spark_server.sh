@@ -72,8 +72,10 @@ SPARK_JAR=$SPARK_ROOT/java/sparker-server/target/sparker-server-3.7.0-SNAPSHOT.j
 #echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 #echo \$HADOOP_MAPRED_HOME=$HADOOP_MAPRED_HOME
 
+export SPARKER_HOME=$(dirname $0)
+
 # Note: I've had trouble running this with just "java -jar" with the classpath
 # determined with a seemingly appropriate find command.
 echo CWD=$(pwd)
-echo Executing java jar $SPARK_JAR "$@"
-exec java -jar $SPARK_JAR "$@"
+echo Executing java -jar $SPARK_JAR "$@"
+exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -jar $SPARK_JAR "$@"

@@ -29,7 +29,7 @@ class SparkerClient:
         self.connection.request(method, url, body)
         response = self.connection.getresponse()
         if response.status != self.OK:
-            raise Exception(str(resonse.status) + ' ' + response.reason)
+            raise Exception(str(response.status) + ' ' + response.reason)
         response_text = response.read()
         if len(response_text) != 0:
             return json.loads(response_text)

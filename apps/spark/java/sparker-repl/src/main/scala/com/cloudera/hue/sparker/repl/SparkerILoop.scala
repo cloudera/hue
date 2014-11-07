@@ -83,7 +83,8 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       else command(line) match {
         case Result(false, _)           => false
         case Result(_, Some(finalLine)) => {
-          val output: String = outString.getBuffer.toString.substring("scala> ".length)
+          var output: String = outString.getBuffer.toString
+          output = output.substring("scala> ".length + 1, output.length - 1)
           outString.getBuffer.setLength(0)
           println(compact(render(Map("type" -> "result", "input" -> finalLine, "output" -> output))))
           addReplay(finalLine)
