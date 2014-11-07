@@ -264,14 +264,21 @@ var Workflow = function (vm, workflow) {
 	        // Link to end
 	        node.set_link('to', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+          } if (parentWidget.widgetType() == 'fork-widget') {
+            var child = vm.getWidgetSuccessor(node.id());
+            parent.remove_link('to', child.id());            
+            parent.children.push({'to': node.id()});
+
+  	        node.set_link('to', child.id());
+  	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else {
-            // Parent regular node        	
+            // Parent is regular node        	
   	        node.set_link('to', parent.get_link('to')['to']);
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
   	
   	        parent.set_link('to', node.id());        	
           }
-    	  // Parent fork/decision/join...
+    	  // Todo decision/join
         }
 
         vm.currentlyCreatingFork = false;
@@ -289,7 +296,7 @@ var Workflow = function (vm, workflow) {
 	
     var parentWidget = vm.getWidgetPredecessor(node_id); // Use smarter self.getParents if action node with multi parents
     var parent = self.getNodeById(parentWidget.id());
-
+    
     var childLink = node.get_link('to');
     var childId = ko.mapping.toJS(childLink)['to'];
     
@@ -301,6 +308,7 @@ var Workflow = function (vm, workflow) {
     if (parentWidget.widgetType() == 'fork-widget') {
       var fork = parent;
       var join = self.getNodeById(childId);
+
       if (join.type() == 'join-widget') {
     	if (fork.children().length == 2) {
           // Link top to above and delete fork
