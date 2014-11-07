@@ -26,6 +26,10 @@ import java.util.concurrent.TimeoutException;
 
 public class SessionManager {
 
+    public static final int UNKNOWN = 0;
+    public static final int SCALA = 1;
+    public static final int PYTHON = 2;
+
     private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
     public SessionManager() {
@@ -36,9 +40,14 @@ public class SessionManager {
         return sessions.get(key);
     }
 
-    public Session create() throws IOException, InterruptedException {
+    public Session create(int language) throws IllegalArgumentException, IOException, InterruptedException {
         String key = UUID.randomUUID().toString();
-        Session session = new SparkerSession(key);
+        Session session;
+        switch (language) {
+            case SCALA:  session = new SparkerSession(key); break;
+            case PYTHON: session = new PySparkSession(key); break;
+            default: throw new IllegalArgumentException("Invalid language specified for shell session");
+        }
         sessions.put(key, session);
         return session;
     }
