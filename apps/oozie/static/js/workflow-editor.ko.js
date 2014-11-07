@@ -113,11 +113,10 @@ var Node = function (node) {
 
     if (_link == null) {
       _link = {}
-      _link[name] = node_id;
       self.children.push(_link);
-    } else {
-      _link[name] = node_id;
     }
+    _link[name] = node_id;
+    
   }
 
   self.remove_link = function(name, child) {
@@ -147,7 +146,7 @@ var Workflow = function (vm, workflow) {
   self.nodes = ko.observableArray([]);
   
   self.linkMapping = ko.computed(function() {
-	  var mapping = {};
+	var mapping = {};
     $.each(self.nodes(), function(index, node) {
       var links = []
       $.each(node.children(), function(index, link) {
@@ -264,7 +263,7 @@ var Workflow = function (vm, workflow) {
 	        // Link to end
 	        node.set_link('to', '33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
-          } if (parentWidget.widgetType() == 'fork-widget') {
+          } else if (parentWidget.widgetType() == 'fork-widget') {
             var child = vm.getWidgetSuccessor(node.id());
             parent.remove_link('to', child.id());            
             parent.children.push({'to': node.id()});
@@ -276,9 +275,9 @@ var Workflow = function (vm, workflow) {
   	        node.set_link('to', parent.get_link('to')['to']);
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
   	
-  	        parent.set_link('to', node.id());        	
+  	        parent.set_link('to', node.id());
+  	        parent.children.valueHasMutated();
           }
-    	  // Todo decision/join
         }
 
         vm.currentlyCreatingFork = false;
