@@ -85,7 +85,8 @@ public class SparkerSession implements Session {
                         }
                     }
 
-                    process.waitFor();
+                    int exitCode = process.waitFor();
+                    logger.info("[" + key + "]: process exited with " + exitCode);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -165,7 +166,7 @@ public class SparkerSession implements Session {
             throw new TimeoutException();
         }
 
-        logger.info("[" + key + "]: shell closed");
+        logger.info("[" + key + "]: shell closed with " + process.exitValue());
     }
 
     protected long lastActivity = Long.MAX_VALUE;
