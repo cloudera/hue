@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.sparker;
+package com.cloudera.hue.sparker.repl;
 
 import org.apache.spark.repl.Main;
 import org.apache.spark.repl.SparkILoop;

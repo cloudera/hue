@@ -49,12 +49,6 @@
 
     <properties>
         <javaVersion>1.7</javaVersion>
-        <!--
-        <hadoop.version>${cdh.hadoop.version}</hadoop.version>
-        <spark.version>${cdh.spark.version}</spark.version>
-        <slf4j.version>${cdh.slf4j.version}</slf4j.version>
-        <jetty.version>8.1.14.v20131031</jetty.version>
-        -->
     </properties>
 
     <modules>
@@ -239,39 +233,6 @@
                 </executions>
             </plugin>
             -->
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.cloudera.sparker.SparkerMain</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
 
         </plugins>
 

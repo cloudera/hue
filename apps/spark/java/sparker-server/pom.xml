@@ -30,9 +30,6 @@
     <artifactId>sparker-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>Spark Server</name>
-    <description>Spark Server</description>
-
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -48,6 +45,11 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0.1</version>
         </dependency>
     </dependencies>
 
@@ -80,7 +82,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.cloudera.hue.sparker.SparkerMain</mainClass>
+                            <mainClass>com.cloudera.hue.sparker.server.SparkerMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
