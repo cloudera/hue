@@ -66,7 +66,7 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
   }
 
   override def loop(): Unit = {
-    println(compact(render(Map("type" -> "ready"))))
+    println(compact(render(Map("state" -> "ready"))))
 
     def readOneLine() = {
       out.flush()
@@ -86,7 +86,7 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
           var output: String = outString.getBuffer.toString
           output = output.substring("scala> ".length + 1, output.length - 1)
           outString.getBuffer.setLength(0)
-          println(compact(render(Map("type" -> "result", "input" -> finalLine, "output" -> output))))
+          println(compact(render(Map("state" -> "stdout", "input" -> finalLine, "msg" -> output))))
           addReplay(finalLine)
         } ; true
         case _                          => true
@@ -100,7 +100,7 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       if (shouldContinue)
         innerLoop()
       else {
-        println(compact(render(Map("type" -> "done"))))
+        println(compact(render(Map("state" -> "quit"))))
       }
     }
     innerLoop()

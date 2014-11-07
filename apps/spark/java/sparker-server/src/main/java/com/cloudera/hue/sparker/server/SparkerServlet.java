@@ -18,8 +18,10 @@
 
 package com.cloudera.hue.sparker.server;
 
+/*
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
+*/
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +33,7 @@ import java.util.regex.Pattern;
 
 public class SparkerServlet extends HttpServlet {
 
+    /*
     public static final String SESSION_DATA = "sparky.sessions";
 
     private static final String ROOT = "/";
@@ -166,4 +169,5 @@ public class SparkerServlet extends HttpServlet {
         }
     }
 
+*/
 }

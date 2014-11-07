@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
 
 public class SessionManager {
 
@@ -44,7 +43,7 @@ public class SessionManager {
         String key = UUID.randomUUID().toString();
         Session session;
         switch (language) {
-            case SCALA:  session = new SparkerSession(key); break;
+            case SCALA:  session = new SparkSession(key); break;
             case PYTHON: session = new PySparkSession(key); break;
             default: throw new IllegalArgumentException("Invalid language specified for shell session");
         }

@@ -18,21 +18,27 @@
 
 package com.cloudera.hue.sparker.server;
 
+import org.codehaus.jackson.JsonNode;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 public interface Session {
 
-    String getKey();
+    String getId();
 
-    public void execute(String command) throws IOException;
+    public Cell executeStatement(String statement) throws IOException, ClosedSessionException;
 
     public long getLastActivity();
 
+    List<Cell> getCells();
+
+    /*
     List<String> getInputLines();
 
-    List<String> getOutputLines();
+    List<JsonNode> getOutputLines();
+    */
 
     public void close() throws IOException, InterruptedException, TimeoutException;
 }

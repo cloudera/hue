@@ -18,15 +18,75 @@
 
 package com.cloudera.hue.sparker.server;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-
 public class SparkerMain {
 
+    /*
+    class Binder extends AbstractBinder {
+        @Override
+        protected void configure() {
+            bind()
+        }
+    }
+
+    public SparkerMain() {
+        register(new Binder());
+        packages(true, "com.cloudera.hue.sparker.server");
+    }
+
     public static void main(String[] args) throws Exception {
+
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+
+        Server jettyServer = new Server(8080);
+        jettyServer.setHandler(context);
+
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*"
+        );
+        jerseyServlet.setInitOrder(0);
+
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.classnames",
+                Service.class.getCanonicalName());
+
         SessionManager manager = new SessionManager();
 
+        context.setAttribute("sessionManager", manager);
+
+        try {
+            jettyServer.start();
+            jettyServer.join();
+        } finally {
+            jettyServer.destroy();
+        }
+
+
+        /*
+        Server server = new Server(8080);
+
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        context.setContextPath("/*");
+        server.setHandler(context);
+
+        ServletHolder holder = context.addServlet(ServletContainer.class, "/goo");
+        holder.setInitOrder(1);
+        holder.setInitParameter("jersey.config.server.provider.packages", "com.cloudera.hue.sparker.server.Service");
+
+        server.start();
+        server.join();
+        */
+
+        /*
+        ServletHolder servletHolder = new ServletHolder(ServletContainer.class);
+        server.setHandler(servletHolder);
+        */
+
+        /*
+        SessionManager manager = new SessionManager();
+        */
+
+        /*
         Server httpServer = new Server(8080);
 
         ServletContextHandler context = new ServletContextHandler();
@@ -34,6 +94,7 @@ public class SparkerMain {
 
         context.setContextPath("/");
         context.addServlet(new ServletHolder(new SparkerServlet(manager)), "/*");
+        */
 
         /*
         //InetSocketAddress address = NetUtils.createSocketAddr()
@@ -45,8 +106,10 @@ public class SparkerMain {
         httpServer.addHandler(context);
         */
 
+        /*
         httpServer.start();
         httpServer.join();
+        */
 
         /*
         BufferedReader reader = new BufferedReader(new StringReader(""));
@@ -93,5 +156,5 @@ public class SparkerMain {
             manager.close();
         }
         */
-    }
+    //}
 }
