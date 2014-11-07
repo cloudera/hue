@@ -74,7 +74,7 @@ class SolrApi(object):
         for field in fields:
           f = []
           for _filter in fq['filter']:
-            values = _filter['value'].split(':')
+            values = _filter['value'].split(':') if len(fields) > 1 else [_filter['value']]
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
               exclude = '-' if _filter['exclude'] else ''
