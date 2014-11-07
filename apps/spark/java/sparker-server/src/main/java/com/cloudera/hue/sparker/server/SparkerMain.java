@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.sparker;
+package com.cloudera.hue.sparker.server;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

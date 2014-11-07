@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.sparker;
+package com.cloudera.hue.sparker.server;
 
 import com.google.common.collect.Lists;
 
