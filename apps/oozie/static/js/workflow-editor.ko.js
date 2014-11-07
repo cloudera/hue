@@ -615,6 +615,26 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     return self.getWidgetRelative(widget_id, false);
   }
 
+  self.isRowAfterFork = function (row) {
+    var _parentColumn = self.getRowParentColumn(row.id());
+    var _prevRow = null;
+    for (var i = 0; i < _parentColumn.rows().length; i++) {
+      var _currentRow = _parentColumn.rows()[i];
+      if (_currentRow.id() == row.id()){
+        break;
+      }
+      _prevRow = _currentRow;
+    }
+    if (_prevRow != null){
+      return _prevRow.widgets().length > 0 && _prevRow.widgets()[0].widgetType() == "fork-widget";
+    }
+    return false;
+  }
+
+  self.isRowBeforeJoin = function (row) {
+    return row.widgets().length > 0 && row.widgets()[0].widgetType() == "join-widget";
+  }
+
   self.getWidgetParentRow = function (widget_id) {
     var _row = null;
     for (var i = 0; i < self.columns().length; i++) {
