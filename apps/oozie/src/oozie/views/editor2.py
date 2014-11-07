@@ -35,7 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Workflow
+from oozie.models2 import Workflow, NODES, WORKFLOW_NODE_PROPERTIES
 
 
 LOG = logging.getLogger(__name__)
@@ -72,7 +72,8 @@ def edit_workflow(request):
   return render('editor/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout']),
       'workflow_json': json.dumps(workflow_data['workflow']),
-      'credentials_json': json.dumps(credentials.credentials.keys())
+      'credentials_json': json.dumps(credentials.credentials.keys()),
+      'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
   })
 
 
@@ -112,29 +113,18 @@ def save_workflow(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+#  elif node['widgetType'] == 'hive-widget':
+#    properties = [WORKFLOW_PROPERTIES['script_path']]
+#  elif node['widgetType'] == 'kill-widget':
+#    properties = [WORKFLOW_PROPERTIES['message']]
+#  elif node['widgetType'] == 'subworkflow-widget':
+#    workflows = [{
+#        'name': workflow.name,
+#        'owner': workflow.owner.username,
+#        'value': workflow.uuid
+#      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
+#    ]
 
-P = {
-  'jar_path': {
-      'name': 'jar_path',
-      'label': _("Jar Path"),
-      'value': ''
-  },
-  'main_class': {
-      'name': 'main_class',
-      'label': _("Main class"),
-      'value': ''
-  },
-  'script_path': {
-      'name': 'script_path',
-      'label': _("Script Path"),
-      'value': ''
-  },
-  'message': {
-      'name': 'message',
-      'label': _("Message"),
-      'value': ''
-  }     
-}
 
 def new_node(request):
   response = {'status': -1}
@@ -142,24 +132,8 @@ def new_node(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
 
-  properties = []
+  properties = NODES[node['widgetType']].get_mandatory_fields()
   workflows = []
-
-  if node['widgetType'] == 'java-widget':
-    properties = [P['jar_path'], P['main_class'] ]
-  elif node['widgetType'] == 'pig-widget':
-    properties = [P['script_path']]
-  elif node['widgetType'] == 'hive-widget':
-    properties = [P['script_path']]
-  elif node['widgetType'] == 'kill-widget':
-    properties = [P['message']]
-  elif node['widgetType'] == 'subworkflow-widget':
-    workflows = [{
-        'name': workflow.name,
-        'owner': workflow.owner.username,
-        'value': workflow.uuid
-      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
-    ]
     
   response['status'] = 0
   response['properties'] = properties 
@@ -176,25 +150,20 @@ def add_node(request):
   properties = json.loads(request.POST.get('properties', '{}'))
   subworkflow = json.loads(request.POST.get('subworkflow', '{}'))
 
-  properties = response['properties'] = dict([(property['name'], property['value']) for property in properties])
+  _properties = dict(NODES[node['widgetType']].get_fields())
+  _properties.update(dict([(_property['name'], _property['value']) for _property in properties]))
+
   if subworkflow:
-    properties.update({
+    _properties.update({
        'subworkflow': subworkflow['value']
     })
-  properties.update({
-      'parameters': [],
-      'arguments': [],
-      'files': [],
-      'archives': [],
-      'prepares': [],
-      'job_xml': '',
-      'properties': [],
+  _properties.update({
       'sla': Workflow.SLA_DEFAULT,
       'credentials': []
   })
 
   response['status'] = 0
-  response['properties'] = properties
+  response['properties'] = _properties
   response['name'] = '%s-%s' % (node['widgetType'].split('-')[0], node['id'][:4])
 
   return HttpResponse(json.dumps(response), mimetype="application/json")

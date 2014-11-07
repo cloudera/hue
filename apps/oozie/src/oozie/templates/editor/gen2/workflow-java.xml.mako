@@ -17,34 +17,34 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <java>
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
-            ${ common.prepares(node.get_prepares()) }
-            % if node.job_xml:
-              <job-xml>${ node.job_xml }</job-xml>
+            ${ common.prepares(node['properties']['prepares']) }
+            % if node['properties']['job_xml']:
+              <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node.get_properties()) }
+            ${ common.configuration(node['properties']['properties']) }
 
-            <main-class>${ node.main_class }</main-class>
+            <main-class>${ node['properties']['main_class'] }</main-class>
 
-            % if node.java_opts:
-            <java-opts>${ node.java_opts }</java-opts>
+            % if node['properties']['java_opts']:
+            <java-opts>${ node['properties']['java_opts'] }</java-opts>
             % endif
 
-            % for arg in node.args.split():
-            <arg>${ arg }</arg>
+            % for arg in node['properties']['arguments']:
+            <arg>${ arg['value'] }</arg>
             % endfor
 
-            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+            ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
 
-            % if node.capture_output:
+            % if node['properties']['capture_output']:
             <capture-output/>
             % endif
         </java>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']] }"/>
+        <error to="${ node_mapping[node['children'][1]['error']] }"/>
         ${ common.sla(node) }
     </action>
