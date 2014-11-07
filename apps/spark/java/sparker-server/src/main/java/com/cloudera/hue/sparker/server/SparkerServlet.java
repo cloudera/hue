@@ -35,6 +35,7 @@ public class SparkerServlet extends HttpServlet {
 
     private static final String ROOT = "/";
     private static final Pattern SESSION_ID = Pattern.compile("^/([-A-Za-z90-9]+)$");
+    private static final Pattern SESSION_LANG = Pattern.compile("^lang=(scala|python)$");
 
     private static final String APPLICATION_JSON_MIME = "application/json";
 
@@ -85,7 +86,7 @@ public class SparkerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, IllegalArgumentException {
         resp.setContentType(APPLICATION_JSON_MIME);
         resp.setStatus(HttpServletResponse.SC_OK);
 
@@ -126,9 +127,22 @@ public class SparkerServlet extends HttpServlet {
         }
     }
 
-    private void createSession(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void createSession(HttpServletRequest req, HttpServletResponse resp) throws IOException, IllegalArgumentException {
         try {
-            Session session = manager.create();
+            Matcher m = SESSION_LANG.matcher(req.getReader().readLine());
+            if (!m.matches()) {
+                throw new IllegalArgumentException("Invalid language or no language specified");
+            }
+            String lang = m.group(1);
+
+            int sessionType = SessionManager.UNKNOWN;
+            if (lang.equals("scala")) {
+                sessionType = SessionManager.SCALA;
+            }
+            else if (lang.equals("python")) {
+                sessionType = SessionManager.PYTHON;
+            }
+            Session session = manager.create(sessionType);
 
             jsonWriter.writeValue(resp.getOutputStream(), session.getKey());
         } catch (InterruptedException e) {
