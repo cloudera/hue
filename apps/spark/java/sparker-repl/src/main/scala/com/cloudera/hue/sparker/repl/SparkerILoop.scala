@@ -2,12 +2,12 @@ package com.cloudera.hue.sparker.repl
 
 import java.io.{BufferedReader, StringWriter}
 
-import scala.tools.nsc.interpreter._
-
-import org.apache.spark.repl.{SparkIMain, SparkILoop}
+import org.apache.spark.repl.SparkILoop
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
 import scala.tools.nsc.SparkHelper
-import scala.tools.nsc.interpreter.Formatting
+import scala.tools.nsc.interpreter.{Formatting, _}
 import scala.tools.nsc.util.ClassPath
 
 class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
@@ -20,16 +20,13 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
     }
     override protected def parentClassLoader = SparkHelper.explicitParentLoader(settings).getOrElse(classOf[SparkILoop].getClassLoader)
 
+    /*
     override def interpret(line: String, synthetic: Boolean): IR.Result = {
       val result = super.interpret(line, synthetic)
-        /*
-      match result {
-        case IR.Success(foo) =>
-      }
-      */
       print("interpret: " + result + "\n")
       result
     }
+    */
   }
 
   /** Create a new interpreter. */
@@ -69,25 +66,26 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
   }
 
   override def loop(): Unit = {
+    println(compact(render(Map("type" -> "ready"))))
+
     def readOneLine() = {
       out.flush()
-      val line = in readLine prompt
-      print("readOneLine: " + line + "\n")
-      line
+      in readLine prompt
     }
     // return false if repl should exit
     def processLine(line: String): Boolean = {
-      print("processLine: " + line + "\n")
       if (isAsync) {
         if (!awaitInitialized()) return false
         runThunks()
       }
+
       if (line eq null) false               // assume null means EOF
       else command(line) match {
         case Result(false, _)           => false
         case Result(_, Some(finalLine)) => {
-          print("out: " + finalLine)
-          print("out2: (" + outString.getBuffer.toString + ")")
+          val output: String = outString.getBuffer.toString.substring("scala> ".length)
+          outString.getBuffer.setLength(0)
+          println(compact(render(Map("type" -> "result", "input" -> finalLine, "output" -> output))))
           addReplay(finalLine)
         } ; true
         case _                          => true
@@ -100,6 +98,9 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       } catch {case t: Throwable => crashRecovery(t)}
       if (shouldContinue)
         innerLoop()
+      else {
+        println(compact(render(Map("type" -> "done"))))
+      }
     }
     innerLoop()
   }
