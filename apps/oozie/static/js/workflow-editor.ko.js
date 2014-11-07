@@ -430,7 +430,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
       var _addForkAndJoin = (row.columns().length == 0);
 
-      if (_addForkAndJoin){
+      if (_addForkAndJoin) {
         var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
         var _id = UUID();
         var _fork = new Widget({
@@ -458,7 +458,26 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         vm: self
       });
 
-      var _col = row.addEmptyColumn(atBeginning);
+      if (row.columns().length == 0) {
+        var _col = row.addColumn(null, atBeginning);
+        if (row.widgets().length > 0) {
+          var _row = _col.addEmptyRow();
+          row.widgets().forEach(function (widget) {
+            _row.addWidget(widget);
+          });
+          if (row.widgets()[0].widgetType() == "fork-widget") {
+            var _widgetsRow = self.getNextRow(row);
+            var _joinRow = self.getNextRow(_widgetsRow);
+            _col.rows.push(_widgetsRow);
+            _col.rows.push(_joinRow);
+            self.getRowParentColumn(row.id()).rows.remove(_widgetsRow);
+            self.getRowParentColumn(row.id()).rows.remove(_joinRow);
+          }
+          row.widgets([]);
+        }
+      }
+
+      var _col = row.addColumn(null, atBeginning);
       var _row = new Row([_w], self);
       _col.addRow(_row);
 
@@ -476,7 +495,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           vm: self
         });
 
-        _joinRow.widgets([_join]);        
+        _joinRow.widgets([_join]);
         self.currentlyCreatedFork = ko.mapping.toJS(_fork);
         self.currentlyCreatedJoin = ko.mapping.toJS(_join);
       }
@@ -633,6 +652,21 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.isRowBeforeJoin = function (row) {
     return row.widgets().length > 0 && row.widgets()[0].widgetType() == "join-widget";
+  }
+
+  self.getNextRow = function (row) {
+    var _parentColumn = self.getRowParentColumn(row.id());
+    var _nextParentRow = null;
+    for (var i = 0; i < _parentColumn.rows().length; i++) {
+      if (_parentColumn.rows()[i].id() == row.id()) {
+        if (_parentColumn.rows().length >= i + 1) {
+          _nextParentRow = _parentColumn.rows()[i + 1];
+        }
+        break;
+      }
+      _nextParentRow = _parentColumn.rows()[i];
+    }
+    return _nextParentRow;
   }
 
   self.getWidgetParentRow = function (widget_id) {
