@@ -256,6 +256,225 @@ class Node():
 
 
 
+class PigAction():
+  TYPE = 'pig'
+  FIELDS = {
+     'script_path': { 
+          'name': 'script_path',
+          'label': _('Script name'),
+          'value': '',
+          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+     },            
+     'parameters': { 
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The Pig parameters of the script without -param. e.g. INPUT=${inputDir}')
+     },
+     'arguments': { 
+          'name': 'arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('The Pig parameters of the script as is. e.g. -param, INPUT=${inputDir}')
+     },
+     # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                       'Properties specified in the Job Properties element override properties specified in the '
+                       'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['script_path']]
+
+
+class JavaAction():
+  TYPE = 'java'
+  FIELDS = {
+     'jar_path': { 
+          'name': 'jar_path',
+          'label': _('Jar name'),
+          'value': '',
+          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'Java'}
+     },            
+     'main_class': { 
+          'name': 'main_class',
+          'label': _('Main class'),
+          'value': '',
+          'help_text': _('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep')
+     },
+     'arguments': { 
+          'name': 'arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('Arguments of the main method. The value of each arg element is considered a single argument '
+                       'and they are passed to the main method in the same order.')
+     },
+     'java_opts': { 
+          'name': 'java_opts',
+          'label': _('Java options'),
+          'value': [],
+          'help_text': _('Command-line parameters used to start the JVM that will execute '
+                        'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
+                        'configuration property. E.g. -Dexample-property=hue')
+     },
+     'capture_output': { 
+          'name': 'capture_output',
+          'label': _('Capture output'),
+          'value': False,
+          'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                         'command output must be in Java Properties file format and it must not exceed 2KB. '
+                         'From within the workflow definition, the output of an %(program)s action node is accessible '
+                         'via the String action:output(String node, String key) function') % {'program': TYPE.title()}
+     },
+     # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                       'Properties specified in the Job Properties element override properties specified in the '
+                       'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['jar_path'], cls.FIELDS['main_class']]
+  
+  
+class HiveAction():
+  TYPE = 'hive'
+  FIELDS = {
+     'script_path': { 
+          'name': 'script_path',
+          'label': _('Script name'),
+          'value': '',
+          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+     },            
+     'parameters': { 
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': ('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
+     },
+     # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                       'Properties specified in the Job Properties element override properties specified in the '
+                       'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['script_path']]
+
+
+NODES = {
+  'pig-widget': PigAction,
+  'java-widget': JavaAction,
+  'hive-widget': HiveAction
+}
+
+WORKFLOW_NODE_PROPERTIES = {}
+for node in NODES.itervalues():
+  WORKFLOW_NODE_PROPERTIES.update(node.FIELDS)
+
+
+
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:

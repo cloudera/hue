@@ -116,7 +116,7 @@ var Node = function (node) {
       self.children.push(_link);
     }
     _link[name] = node_id;
-    
+    self.children.valueHasMutated(); 
   }
 
   self.remove_link = function(name, child) {
@@ -216,6 +216,7 @@ var Workflow = function (vm, workflow) {
         // Added to the side ?
         if (vm.currentlyCreatingFork) {
           var parentWidget = vm.getWidgetPredecessor(node.id());
+          var parent = self.getNodeById(parentWidget.id());
 
           if (self.getNodeById(parentWidget.id()) == null) { // New fork
         	
@@ -240,17 +241,14 @@ var Workflow = function (vm, workflow) {
 	        var end = self.nodes.pop();
 	        self.nodes.push(fork);
 	        self.nodes.push(join);
-	        self.nodes.push(end);	        
-            // Regular node
-          
-            // Join node
+	        self.nodes.push(end);
           } else {
             // Just add to existing fork
         	var join = vm.getWidgetSuccessor(node.id()); 
             node.set_link('to', join.id());
     	    node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
 
-    	    self.getNodeById(parentWidget.id()).children.push({'to': node.id()});          	  
+    	    parent.children.push({'to': node.id()});          	  
           }
         } else {
           var parentWidget = vm.getWidgetPredecessor(node.id());
@@ -269,7 +267,6 @@ var Workflow = function (vm, workflow) {
   	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
   	
   	        parent.set_link('to', node.id());
-  	        parent.children.valueHasMutated();
           }
         }
 
@@ -348,7 +345,7 @@ var Workflow = function (vm, workflow) {
   };
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
@@ -368,6 +365,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.inited = ko.observable(self.columns().length > 0);
   self.init = function(callback) {
+	self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
   }
@@ -858,6 +856,14 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableJavaAction = ko.observable(bareWidgetBuilder("Java program", "java-widget"));
   self.draggableMapReduceAction = ko.observable(bareWidgetBuilder("MapReduce job", "mapreduce-widget"));
   self.draggableSubworkflowAction = ko.observable(bareWidgetBuilder("Sub workflow", "subworkflow-widget"));
+  self.draggableSqoopAction = ko.observable(bareWidgetBuilder("Sqoop 1", "sqoop-widget"));
+  self.draggableShellAction = ko.observable(bareWidgetBuilder("Shell", "shell-widget"));
+  self.draggableSshAction = ko.observable(bareWidgetBuilder("Ssh", "ssh-widget"));
+  self.draggableFsAction = ko.observable(bareWidgetBuilder("HDFS Fs", "fs-widget"));
+  self.draggableEmailAction = ko.observable(bareWidgetBuilder("Email", "email-widget"));
+  self.draggableStreamingAction = ko.observable(bareWidgetBuilder("Streaming", "streaming-widget"));
+  self.draggableDistCpAction = ko.observable(bareWidgetBuilder("Distcp", "distcp-widget"));
+
 
   self.draggableStopNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };

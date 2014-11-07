@@ -17,26 +17,26 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
-            ${ common.prepares(node.get_prepares()) }
-            % if node.job_xml:
-              <job-xml>${ node.job_xml }</job-xml>
+            ${ common.prepares(node['properties']['prepares']) }
+            % if node['properties']['job_xml']:
+              <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node.get_properties()) }
+            ${ common.configuration(node['properties']['properties']) }
 
-            <script>${ node.script_path }</script>
+            <script>${ node['properties']['script_path'] }</script>
 
-            % for param in node.get_params():
-              <${ param['type'] }>${ param['value'] }</${ param['type'] }>
+            % for param in node['properties']['parameters']:
+              <param>${ param['value'] }</param>
             % endfor
 
-            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+            ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </hive>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']] }"/>
+        <error to="${ node_mapping[node['children'][1]['error']] }"/>
         ${ common.sla(node) }
     </action>
