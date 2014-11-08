@@ -35,10 +35,14 @@ BASEDIR = os.path.dirname(os.path.abspath(__file__))
 USERNAME_SOURCES = ('attributes', 'nameid')
 
 
-if get_xmlsec_binary:
-  xmlsec_path = get_xmlsec_binary(['/usr/bin', '/usr/local/bin', '/opt/local/bin'])
-else:
-  xmlsec_path = '/usr/local/bin/xmlsec1'
+def xmlsec():
+  """
+  xmlsec path
+  """
+  if get_xmlsec_binary:
+    return get_xmlsec_binary(['/usr/bin', '/usr/local/bin', '/opt/local/bin'])
+  else:
+    return '/usr/local/bin/xmlsec1'
 
 
 def dict_list_map(value):
@@ -54,7 +58,7 @@ def dict_list_map(value):
 
 XMLSEC_BINARY = Config(
   key="xmlsec_binary",
-  default=xmlsec_path,
+  dynamic_default=xmlsec,
   type=str,
   help=_t("Xmlsec1 binary path. This program should be executable by the user running Hue."))
 
