@@ -17,15 +17,25 @@
 
 from django.conf.urls.defaults import patterns, url
 
+try:
+  from djangosaml2.views import logout_service_post
+except ImportError:
+  # We are on an older version of djangosaml2
+  logout_service_post = None
+
+
 urlpatterns = patterns(
     'djangosaml2.views',
     url(r'^logout/$', 'logout', name='saml2_logout')
 )
 
 urlpatterns += patterns('libsaml.views',
-                        url(r'^ls/$', 'logout_service_redirect', name='saml2_ls_redirect'),
-                        url(r'^ls/post/$', 'logout_service_post', name='saml2_ls_post'),
+                        url(r'^ls/$', 'logout_service', name='saml2_ls'),
                         url(r'^acs/$', 'acs', name='saml2_acs'),
                         url(r'^login/$', 'login', name='saml2_login'),
                         url(r'^metadata/$', 'metadata', name='saml2_metadata'),
                         url(r'^test/$', 'echo_attributes'))
+
+if logout_service_post is not None:
+  urlpatterns += patterns('libsaml.views',
+                          url(r'^ls/post/$', 'logout_service_post', name='saml2_ls_post'))
