@@ -389,18 +389,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.currentlyDraggedWidget = widget;
   }
 
-  self.addDraggedWidget = function (row, atBeginning) {
+  self.addDraggedWidget = function (target, atBeginning) {
     if (self.currentlyDraggedWidget != null) {
-      var _parentCol = self.getRowParentColumn(row.id());
+      var _parentCol = target instanceof Column ? target : self.getRowParentColumn(target.id());
 
-      var _rowIdx = 0;
-      $.each(_parentCol.rows(), function (i, irow) {
-        if (irow.id() == row.id()) {
-          _rowIdx = i;
-        }
-      });
+      var _newRow = null;
+      if (typeof atBeginning != "undefined"){
+        _newRow = _parentCol.addEmptyRow(atBeginning);
+      }
+      else {
+        var _rowIdx = 0;
+        $.each(_parentCol.rows(), function (i, irow) {
+          if (irow.id() == target.id()) {
+            _rowIdx = i;
+          }
+        });
 
-      var _newRow = _parentCol.addEmptyRow(false, _rowIdx);
+        _newRow = _parentCol.addEmptyRow(false, _rowIdx);
+      }
       var _w = new Widget({
         size: self.currentlyDraggedWidget.size(),
         id: UUID(),
