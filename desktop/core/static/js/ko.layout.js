@@ -76,7 +76,7 @@ var Column = function (size, rows) {
       self.rows.splice(atIndex, 0, row);
     }
     else {
-      if (typeof atBeginning == "undefined" || atBeginning == null) {
+      if (typeof atBeginning == "undefined" || atBeginning == null || !atBeginning) {
         self.rows.push(row);
       }
       else {
