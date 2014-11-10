@@ -40,7 +40,7 @@ def xmlsec():
   xmlsec path
   """
   if get_xmlsec_binary:
-    return get_xmlsec_binary(['/usr/bin', '/usr/local/bin', '/opt/local/bin'])
+    return get_xmlsec_binary()
   else:
     return '/usr/local/bin/xmlsec1'
 
