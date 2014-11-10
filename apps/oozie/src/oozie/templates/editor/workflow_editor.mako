@@ -864,7 +864,11 @@ ${ dashboard.import_bindings() }
 
   function resizeDrops() {
     $(".drop-target-side").each(function () {
-      $(this).height($(this).parent().parent().innerHeight() - 12);
+      var _el = $(this);
+      _el.height(0);
+      window.setTimeout(function(){
+        _el.height(_el.parent().parent().innerHeight() - 12);
+      }, 20);
     });
   }
 
