@@ -34,6 +34,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.hdfs_site import get_nn_sentry_prefixes
 
 import hadoop.conf
 import desktop.conf
@@ -104,6 +105,12 @@ class WebHdfs(Hdfs):
   @property
   def logical_name(self):
     return self._logical_name
+
+  @classmethod
+  def is_sentry_managed(cls, path):
+    prefixes = get_nn_sentry_prefixes().split(',')
+
+    return any([path.startswith(p) for p in prefixes if p])
 
   @property
   def fs_defaultfs(self):
