@@ -32,17 +32,20 @@ import libsaml.conf
 __all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata']
 
 
-@require_POST
-@csrf_exempt
-def acs(request, config_loader_path=None, attribute_mapping=None, create_unknown_user=None):
-  username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
-  return assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
+if logout_service_post is None:
+  _assertion_consumer_service = assertion_consumer_service
+
+  @require_POST
+  @csrf_exempt
+  def assertion_consumer_service(request, config_loader_path=None, attribute_mapping=None, create_unknown_user=None):
+    username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
+    return _assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
 
 
 setattr(logout_service, 'login_notrequired', True)
 setattr(login, 'login_notrequired', True)
 setattr(echo_attributes, 'login_notrequired', True)
-setattr(acs, 'login_notrequired', True)
+setattr(assertion_consumer_service, 'login_notrequired', True)
 setattr(metadata, 'login_notrequired', True)
 
 if logout_service_post is not None:

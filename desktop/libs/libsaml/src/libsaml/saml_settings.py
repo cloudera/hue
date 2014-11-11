@@ -90,3 +90,6 @@ SAML_CONFIG = {
 
 SAML_ATTRIBUTE_MAPPING = libsaml.conf.USER_ATTRIBUTE_MAPPING.get()
 SAML_CREATE_UNKNOWN_USER = libsaml.conf.CREATE_USERS_ON_LOGIN.get()
+
+if libsaml.conf.USERNAME_SOURCE.get() == 'nameid':
+  SAML_USE_NAME_ID_AS_USERNAME = True
