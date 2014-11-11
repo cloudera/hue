@@ -400,22 +400,17 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       var _parentCol = target instanceof Column ? target : self.getRowParentColumn(target.id());
 
       var _newRow = null;
-      if (typeof atBeginning != "undefined"){
-        if (atBeginning){
-          if (_parentCol.rows().length > 0 && _parentCol.rows()[0].widgets() && _parentCol.rows()[0].widgets().length > 0  && _parentCol.rows()[0].widgets()[0].widgetType()=="start-widget"){
+      if (typeof atBeginning != "undefined") {
+        if (_parentCol.rows().length > 0 && _parentCol.rows()[0].widgets() && _parentCol.rows()[0].widgets().length > 0 && _parentCol.rows()[0].widgets()[0].widgetType() == "start-widget") {
+          if (atBeginning) {
             _newRow = _parentCol.addEmptyRow(false, 1);
           }
           else {
-            _newRow = _parentCol.addEmptyRow(atBeginning);
+            _newRow = _parentCol.addEmptyRow(false, _parentCol.rows().length - 1);
           }
         }
         else {
-          if (_parentCol.rows().length > 0 && _parentCol.rows()[0].widgets() && _parentCol.rows()[0].widgets().length > 0  && _parentCol.rows()[0].widgets()[0].widgetType()=="start-widget"){
-            _newRow = _parentCol.addEmptyRow(false, _parentCol.rows().length - 1);
-          }
-          else {
-            _newRow = _parentCol.addEmptyRow(atBeginning);
-          }
+          _newRow = _parentCol.addEmptyRow(atBeginning);
         }
       }
       else {
