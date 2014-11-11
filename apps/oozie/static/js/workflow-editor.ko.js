@@ -219,7 +219,10 @@ var Workflow = function (vm, workflow) {
           var parent = self.getNodeById(parentWidget.id());
 
           if (self.getNodeById(parentWidget.id()) == null) { // New fork
-        	
+
+        	vm.currentlyCreatedJoin.properties['fork_id'] = vm.currentlyCreatedFork.id;
+            vm.currentlyCreatedFork.properties['join_id'] = vm.currentlyCreatedJoin.id;
+        	  
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
             
@@ -232,9 +235,14 @@ var Workflow = function (vm, workflow) {
             
             forkParent.get_link('to')['to'] = fork.id();
             
-            join.set_link('to', afterParent.get_link('to')['to']);
-
-            afterParent.set_link('to', join.id());
+            var belowJoin = vm.getWidgetSuccessor(join.id());
+            join.set_link('to', belowJoin.id());
+          
+            if (afterParent.type() == 'fork-widget') {
+              self.getNodeById(afterParent.properties.join_id()).set_link('to', join.id());
+            } else {
+              afterParent.set_link('to', join.id());
+            }
 	        node.set_link('to', join.id());
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
 	        
