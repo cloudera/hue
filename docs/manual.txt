@@ -52,27 +52,27 @@ tarball, you must have the following installed:
 
 .Required Dependencies
 [grid="rows"]
-``~
-Redhat,Ubuntu
+```~
+Redhat,Ubuntu 10.04,Ubuntu 12.04/14.04
 ~~~~~~~~~~
-gcc,gcc
-g++,g++
-libxml2-devel,libxml2-dev
-libxslt-devel,libxslt-dev
-cyrus-sasl-devel,libsasl2-dev
-cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
-mysql-devel,libmysqlclient-dev
-python-devel,python-dev
-python-setuptools,python-setuptools
-python-simplejson,python-simplejson
-sqlite-devel,libsqlite3-dev
-ant,ant
-libsasl2-dev,cyrus-sasl-devel
-libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi
-libkrb5-dev,krb5-devel        
-libtidy-0.99-0,libtidy (For unit tests only)
-mvn,mvn (From maven2 package or tarball)
-openldap-dev / libldap2-dev, openldap-devel
+gcc,gcc,gcc
+g++,g++,g++
+libxml2-devel,libxml2-dev,libxml2-dev
+libxslt-devel,libxslt-dev,libxslt-dev
+cyrus-sasl-devel,libsasl2-dev,libsasl2-dev
+cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit,libsasl2-modules-gssapi-mit
+mysql-devel,libmysqlclient-dev,libmysqlclient-dev
+python-devel,python-dev,python-dev
+python-setuptools,python-setuptools,python-setuptools
+python-simplejson,python-simplejson,python-simplejson
+sqlite-devel,libsqlite3-dev,libsqlite3-dev
+ant,ant,ant
+libsasl2-dev,cyrus-sasl-devel,libsasl2-dev
+libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
+libkrb5-dev,krb5-devel,libkrb5-dev
+libtidy-0.99-0,libtidy,libtidy-0.99-0 (For unit tests only)
+mvn,mvn (From maven2 package or tarball),mvn (From maven2/maven3 package or tarball)
+openldap-dev / libldap2-dev,openldap-devel,libldap2-dev
 ~~~~~~~~~~
 
 The full list is here: https://github.com/cloudera/hue#development-prerequisites
