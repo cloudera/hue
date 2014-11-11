@@ -297,7 +297,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentDraggedWidget($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -1153,9 +1153,15 @@ ${ dashboard.import_bindings() }
   }
 
   function widgetDraggedAdditionalHandler(widget) {
-    viewModel.workflow.newNode(widget);
     $("canvas").remove();
-    showAddActionDemiModal(widget);
+    if (viewModel.currentlyDraggedWidget && viewModel.currentlyDraggedWidget.id() == ""){
+      viewModel.workflow.newNode(widget);
+      showAddActionDemiModal(widget);
+    }
+    else {
+      // TODO: rebuild nodes here, it's after a d'n'd
+      $(document).trigger("drawArrows");
+    }
   }
 
 
