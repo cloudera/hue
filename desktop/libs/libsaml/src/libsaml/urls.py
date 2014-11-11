@@ -31,7 +31,7 @@ urlpatterns = patterns(
 
 urlpatterns += patterns('libsaml.views',
                         url(r'^ls/$', 'logout_service', name='saml2_ls'),
-                        url(r'^acs/$', 'acs', name='saml2_acs'),
+                        url(r'^acs/$', 'assertion_consumer_service', name='saml2_acs'),
                         url(r'^login/$', 'login', name='saml2_login'),
                         url(r'^metadata/$', 'metadata', name='saml2_metadata'),
                         url(r'^test/$', 'echo_attributes'))
