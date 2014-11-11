@@ -24,7 +24,9 @@ CodeMirror.defineMode("sql", function (config, parserConfig) {
       operatorChars = parserConfig.operatorChars || /^[*+\-%<>!=&|~^]/,
       support = parserConfig.support || {},
       hooks = parserConfig.hooks || {},
-      dateSQL = parserConfig.dateSQL || {"date": true, "time": true, "timestamp": true};
+      dateSQL = parserConfig.dateSQL || {"date": true, "time": true, "timestamp": true},
+      functions = parserConfig.functions || {},
+      analytics = parserConfig.analytics || {};
 
   function tokenBase(stream, state) {
     var ch = stream.next();
@@ -92,6 +94,8 @@ CodeMirror.defineMode("sql", function (config, parserConfig) {
       if (builtin.hasOwnProperty(word)) return "builtin";
       if (keywords.hasOwnProperty(word)) return "keyword";
       if (client.hasOwnProperty(word)) return "string-2";
+      if (functions.hasOwnProperty(word)) return "functions";
+      if (analytics.hasOwnProperty(word)) return "analytics";
       return null;
     }
   }
@@ -296,11 +300,12 @@ CodeMirror.defineMode("sql", function (config, parserConfig) {
 
   CodeMirror.defineMIME("text/x-impalaql", {
     name: "sql",
-    keywords: set("all and as by case comment create database databases delimited describe distinct drop exists explain external fields format from group having if insert into join like limit lines location not or order overwrite partitioned refresh row schema schemas select show stored table tables terminated union use when where invalidate metadata compute stats"),
+    keywords: set("add aggregate all and api_version as avro binary by cached case change char class close_fn column columns comment compute create cross data database databases decimal delimited describe distinct div drop else end escaped exists explain external false fields fileformat finalize_fn first format formatted from full function functions group having if init_fn inner inpath insert integer intermediate interval into invalidate join last left like limit lines load location merge_fn metadata not null nulls offset or order outer overwrite parquet partition partitioned partitions prepare_fn produced real refresh regexp rename replace returns right rlike row schema schemas select semi serdeproperties serialize_fn show stats stored straight_join symbol table tables tblproperties terminated then to true uncached union update_fn use using view when where with"),
     builtin: set("tinyint smallint int bigint boolean float double string timestamp parquetfile sequencefile textfile rcfile"),
     functions: set("abs acos ascii asin atan avg bin cast ceil ceiling coalesce concat concat_ws count conv cos date_add date_sub datediff day dayname dayofmonth dayofweek degrees e exp find_in_set floor fnv_hash from_unixtime from_utc_timestamp greatest group_concat hex hour if initcap instr isnull lcase least length ln locate log log10 log2 lower lpad ltrim max min minute month ndv negative now nvl parse_url pi pmod positive pow power quotient radians rand regexp_extract repeat reverse round rpad rtrim second sign sin space sqrt substr substring sum tan to_date to_utc_timestamp translate trim ucase unhex unix_timestamp upper user weekofyear year"),
+    analytics: set("dense_rank first_value lag last_value lead over rank row_number window"),
     atoms: set("false true null"),
     operatorChars: /^[*+\-%<>!=~&|^]/,
-    dateSQL: set("timestamp")
+    dateSQL: set("date datetime timestamp")
   });
 }());
