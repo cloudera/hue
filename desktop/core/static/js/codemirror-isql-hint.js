@@ -68,21 +68,25 @@
     });
   };
 
-  var impalaSQLKeywords = "ALL AND AS BY CASE COMMENT CREATE DATABASE DATABASES DELIMITED DESCRIBE DISTINCT DROP EXISTS EXPLAIN EXTERNAL FIELDS FORMAT FROM GROUP HAVING IF INSERT INTO JOIN LIKE LIMIT LINES LOCATION NOT OR ORDER OVERWRITE PARTITIONED REFRESH ROW SCHEMA SCHEMAS SELECT SHOW STORED TABLE TABLES TERMINATED UNION USE WHEN WHERE INVALIDATE METADATA COMPUTE STATS";
-  var impalaSQLKeywordsU = impalaSQLKeywords.split(" ");
+  var impalaSQLKeywords = "add aggregate all and api_version as avro binary by cached case change char class close_fn column columns comment compute create cross data database databases decimal delimited describe distinct div drop else end escaped exists explain external false fields fileformat finalize_fn first format formatted from full function functions group having if init_fn inner inpath insert integer intermediate interval into invalidate join last left like limit lines load location merge_fn metadata not null nulls offset or order outer overwrite parquet partition partitioned partitions prepare_fn produced real refresh regexp rename replace returns right rlike row schema schemas select semi serdeproperties serialize_fn show stats stored straight_join symbol table tables tblproperties terminated then to true uncached union update_fn use using view when where with";
+  var impalaSQLKeywordsU = impalaSQLKeywords.toUpperCase().split(" ");
   var impalaSQLKeywordsL = impalaSQLKeywords.toLowerCase().split(" ");
 
   var impalaSQLKeywordsAfterTables = "JOIN ON WHERE ORDER BY ASC DESC LIMIT";
-  var impalaSQLKeywordsAfterTablesU = impalaSQLKeywordsAfterTables.split(" ");
+  var impalaSQLKeywordsAfterTablesU = impalaSQLKeywordsAfterTables.toUpperCase().split(" ");
   var impalaSQLKeywordsAfterTablesL = impalaSQLKeywordsAfterTables.toLowerCase().split(" ");
 
-  var impalaSQLTypes = "TINYINT SMALLINT INT BIGINT BOOLEAN FLOAT DOUBLE STRING TIMESTAMP PARQUETFILE SEQUENCEFILE TEXTFILE RCFILE";
-  var impalaSQLTypesU = impalaSQLTypes.split(" ");
+  var impalaSQLTypes = "DATE DATETIME TINYINT SMALLINT INT BIGINT BOOLEAN FLOAT DOUBLE STRING TIMESTAMP PARQUETFILE SEQUENCEFILE TEXTFILE RCFILE";
+  var impalaSQLTypesU = impalaSQLTypes.toUpperCase().split(" ");
   var impalaSQLTypesL = impalaSQLTypes.toLowerCase().split(" ");
 
   var impalaSQLBuiltins = "ABS ACOS ASCII ASIN ATAN AVG BIN CAST CEIL CEILING COALESCE CONCAT CONCAT_WS COUNT CONV COS DATE_ADD DATE_SUB DATEDIFF DAY DAYNAME DAYOFMONTH DAYOFWEEK DEGREES E EXP FIND_IN_SET FLOOR FNV_HASH FROM_UNIXTIME FROM_UTC_TIMESTAMP GREATEST GROUP_CONCAT HEX HOUR IF INITCAP INSTR ISNULL LCASE LEAST LENGTH LN LOCATE LOG LOG10 LOG2 LOWER LPAD LTRIM MAX MIN MINUTE MONTH NDV NEGATIVE NOW NVL PARSE_URL PI PMOD POSITIVE POW POWER QUOTIENT RADIANS RAND REGEXP_EXTRACT REPEAT REVERSE ROUND RPAD RTRIM SECOND SIGN SIN SPACE SQRT SUBSTR SUBSTRING SUM TAN TO_DATE TO_UTC_TIMESTAMP TRANSLATE TRIM UCASE UNHEX UNIX_TIMESTAMP UPPER USER WEEKOFYEAR YEAR";
-  var impalaSQLBuiltinsU = impalaSQLBuiltins.split(" ").join("() ").split(" ");
+  var impalaSQLBuiltinsU = impalaSQLBuiltins.toUpperCase().split(" ").join("() ").split(" ");
   var impalaSQLBuiltinsL = impalaSQLBuiltins.toLowerCase().split(" ").join("() ").split(" ");
+
+  var impalaSQLAnalytics = "dense_rank first_value lag last_value lead over rank row_number window";
+  var impalaSQLAnalyticsU = impalaSQLAnalytics.toUpperCase().split(" ").join("() ").split(" ");
+  var impalaSQLAnalyticsL = impalaSQLAnalytics.toLowerCase().split(" ").join("() ").split(" ");
 
   function getCompletions(token, context) {
     var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
@@ -124,6 +128,8 @@
           forEach(impalaSQLTypesL, maybeAdd);
           forEach(impalaSQLKeywordsU, maybeAdd);
           forEach(impalaSQLKeywordsL, maybeAdd);
+          forEach(impalaSQLAnalyticsU, maybeAdd);
+          forEach(impalaSQLAnalyticsL, maybeAdd);
         }
         else {
           forEach(catalogTablesL, maybeAddToExtra);
