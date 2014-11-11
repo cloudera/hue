@@ -423,16 +423,22 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
         _newRow = _parentCol.addEmptyRow(false, _rowIdx);
       }
+
       var _w = new Widget({
-        size: self.currentlyDraggedWidget.size(),
-        id: UUID(),
-        name: self.currentlyDraggedWidget.name(),
-        widgetType: self.currentlyDraggedWidget.widgetType(),
-        properties: self.currentlyDraggedWidget.properties(),
-        offset: self.currentlyDraggedWidget.offset(),
-        loading: true,
-        vm: self
-      });
+          size: self.currentlyDraggedWidget.size(),
+          id: UUID(),
+          name: self.currentlyDraggedWidget.name(),
+          widgetType: self.currentlyDraggedWidget.widgetType(),
+          properties: self.currentlyDraggedWidget.properties(),
+          offset: self.currentlyDraggedWidget.offset(),
+          loading: true,
+          vm: self
+        });
+
+      if (self.currentlyDraggedWidget.id() != ""){
+        self.removeWidgetById(self.currentlyDraggedWidget.id());
+        _w = self.currentlyDraggedWidget;
+      }
 
       _newRow.widgets([_w]);
 
@@ -523,7 +529,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
 
       self.currentlyCreatingFork = true;
-      self.currentlyDraggedWidget = null;
 
       return _w;
     }
@@ -848,7 +853,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   function bareWidgetBuilder(name, type){
     return new Widget({
       size: 12,
-      id: UUID(),
+      id: "",
       name: name,
       widgetType: type
     });
