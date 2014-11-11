@@ -463,10 +463,31 @@ class HiveAction():
     return [cls.FIELDS['script_path']]
 
 
+class KillAction():
+  TYPE = 'kill'
+  FIELDS = {
+     'message': { 
+          'name': 'message',
+          'label': _('Message'),
+          'value': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'),
+          'help_text': _('Message to display when the workflow fails. Can contain some EL functions.')
+     }
+  }
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['message']]
+
+
 NODES = {
   'pig-widget': PigAction,
   'java-widget': JavaAction,
-  'hive-widget': HiveAction
+  'hive-widget': HiveAction,
+  'kill-widget': KillAction
 }
 
 WORKFLOW_NODE_PROPERTIES = {}

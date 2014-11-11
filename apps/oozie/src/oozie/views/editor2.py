@@ -113,10 +113,6 @@ def save_workflow(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-#  elif node['widgetType'] == 'hive-widget':
-#    properties = [WORKFLOW_PROPERTIES['script_path']]
-#  elif node['widgetType'] == 'kill-widget':
-#    properties = [WORKFLOW_PROPERTIES['message']]
 #  elif node['widgetType'] == 'subworkflow-widget':
 #    workflows = [{
 #        'name': workflow.name,
