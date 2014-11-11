@@ -123,8 +123,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
-                    draggable: {data: draggableStopNode(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    draggable: {data: draggableKillNode(), isEnabled: true,
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableKillNode());}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-stop"></i></a>
     </div>
@@ -1023,7 +1023,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 
-<script type="text/html" id="enkill-widget">
+<script type="text/html" id="kill-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
@@ -1032,7 +1032,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-      End
+      <input type="text" data-bind="value: properties.message" />
     </div>
   </div>
   <!-- /ko -->

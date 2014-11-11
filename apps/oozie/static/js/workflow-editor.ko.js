@@ -211,10 +211,8 @@ var Workflow = function (vm, workflow) {
         self.nodes.push(node);
         self.nodes.push(end);
 
-       // if node != kill node
-
-        // Added to the side ?
         if (vm.currentlyCreatingFork) {
+          // Added to the side ?
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
@@ -262,7 +260,9 @@ var Workflow = function (vm, workflow) {
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
-          if (parentWidget.widgetType() == 'fork-widget') {
+          if (widget.widgetType() == 'kill-widget') {
+        	parent.set_link('to', node.id());
+          } else if (parentWidget.widgetType() == 'fork-widget') {
             var child = vm.getWidgetSuccessor(node.id());
             parent.remove_link('to', child.id());            
             parent.children.push({'to': node.id()});
@@ -872,6 +872,5 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableStreamingAction = ko.observable(bareWidgetBuilder("Streaming", "streaming-widget"));
   self.draggableDistCpAction = ko.observable(bareWidgetBuilder("Distcp", "distcp-widget"));
 
-
-  self.draggableStopNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
+  self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
