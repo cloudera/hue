@@ -78,6 +78,12 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                       default='/tmp', type=str),
       UMASK=Config("umask", help="Default umask for file and directory creation, specified in an octal value",
                    default='022', type=coerce_umask),
+      HADOOP_CONF_DIR = Config(
+        key="hadoop_conf_dir",
+        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
+        help=("Directory of the Hadoop configuration) Defaults to the environment variable " +
+              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
+      )
     )
   )
 )

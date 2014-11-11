@@ -442,7 +442,8 @@ def listdir_paged(request, path):
         'is_superuser': request.user.username == request.fs.superuser,
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
-        'superuser': request.fs.superuser
+        'superuser': request.fs.superuser,
+        'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
     return render('listdir.mako', request, data)
 
