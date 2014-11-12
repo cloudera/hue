@@ -113,14 +113,6 @@ def save_workflow(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-#  elif node['widgetType'] == 'subworkflow-widget':
-#    workflows = [{
-#        'name': workflow.name,
-#        'owner': workflow.owner.username,
-#        'value': workflow.uuid
-#      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
-#    ]
-
 
 def new_node(request):
   response = {'status': -1}
@@ -130,6 +122,14 @@ def new_node(request):
 
   properties = NODES[node['widgetType']].get_mandatory_fields()
   workflows = []
+
+  if node['widgetType'] == 'subworkflow-widget':
+    workflows = [{
+        'name': workflow.name,
+        'owner': workflow.owner.username,
+        'value': workflow.uuid
+      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
+    ]
     
   response['status'] = 0
   response['properties'] = properties 
@@ -151,7 +151,7 @@ def add_node(request):
 
   if subworkflow:
     _properties.update({
-       'subworkflow': subworkflow['value']
+       'workflow': subworkflow['value']
     })
   _properties.update({
       'sla': Workflow.SLA_DEFAULT,

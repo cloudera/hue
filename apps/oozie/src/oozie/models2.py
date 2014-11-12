@@ -153,13 +153,17 @@ class Workflow():
 
     data = self.get_data()
     nodes = [Node(node) for node in data['workflow']['nodes']]
-    node_mapping = dict([(node.id, node.name) for node in nodes])
+    node_mapping = dict([(node.id, node) for node in nodes])
+    
+    sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
+    workflow_mapping = dict([(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
 
     xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
               'workflow': data['workflow'],
               'nodes': nodes,
               'mapping': mapping,
-              'node_mapping': node_mapping
+              'node_mapping': node_mapping,
+              'workflow_mapping': workflow_mapping
           }))
     return force_unicode(xml)  
 
@@ -205,16 +209,19 @@ class Node():
     
     self._augment_data()
     
-  def to_xml(self, mapping=None, node_mapping=None):
+  def to_xml(self, mapping=None, node_mapping=None, workflow_mapping=None):
     if mapping is None:
       mapping = {}
     if node_mapping is None:
       node_mapping = {}
+    if workflow_mapping is None:
+      workflow_mapping = {}
 
     data = {
       'node': self.data,
       'mapping': mapping,
-      'node_mapping': node_mapping
+      'node_mapping': node_mapping,
+      'workflow_mapping': workflow_mapping
     }
 
     return django_mako.render_to_string(self.get_template_name(), data)
@@ -463,6 +470,38 @@ class HiveAction():
     return [cls.FIELDS['script_path']]
 
 
+class SubWorkflowAction():
+  TYPE = 'subworkflow'
+  FIELDS = {
+     'workflow': { 
+          'name': 'workflow',
+          'label': _('Sub-workflow'),
+          'value': None,
+          'help_text': _('The sub-workflow application to include. You must own all the sub-workflows')
+     },
+     'propagate_configuration': { 
+          'name': 'propagate_configuration',
+          'label': _('Propagate configuration'),
+          'value': True,
+          'help_text': _('If the workflow job configuration should be propagated to the child workflow.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('Can be used to specify the job properties that are required to run the child workflow job.')
+     }
+  }
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return []
+
+
 class KillAction():
   TYPE = 'kill'
   FIELDS = {
@@ -487,6 +526,7 @@ NODES = {
   'pig-widget': PigAction,
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
+  'subworkflow-widget': SubWorkflowAction,
   'kill-widget': KillAction
 }
 

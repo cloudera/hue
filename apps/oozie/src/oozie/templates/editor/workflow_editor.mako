@@ -72,7 +72,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableSubworkflowAction());}}}"
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
     </div>
@@ -707,7 +707,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="action">
-          <input type="text" data-bind="value: properties.subworkflow" />
+          <span data-bind="text: $root.workflow_properties.workflow.label"></span>
+          <input type="text" data-bind="value: properties.workflow" />
+          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
         </div>
         <div class="tab-pane" id="properties">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
