@@ -44,7 +44,7 @@
             <capture-output/>
             % endif
         </java>
-        <ok to="${ node_mapping[node['children'][0]['to']] }"/>
-        <error to="${ node_mapping[node['children'][1]['error']] }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>

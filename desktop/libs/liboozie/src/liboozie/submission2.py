@@ -147,10 +147,10 @@ class Submission(object):
     if hasattr(self.job, 'actions'):
       for action in self.job.actions:
         # Make sure XML is there
-        # Don't support shared sub-worfklow
-        if action.node_type == 'subworkflow':
-          node = action.get_full_node()
-          sub_deploy = Submission(self.user, node.sub_workflow, self.fs, self.jt, self.properties)
+        # Don't support shared sub-worfklow, ore more than one level sub-workflow
+        if action.data['type'] == 'subworkflow':
+          workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
+          sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           sub_deploy.deploy()
 
     return deployment_dir

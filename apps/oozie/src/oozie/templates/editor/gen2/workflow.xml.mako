@@ -47,7 +47,7 @@
   </credentials>
   % endif
   % for node in nodes:
-      ${ node.to_xml(mapping, node_mapping) | n }
+      ${ node.to_xml(mapping, node_mapping, workflow_mapping) | n }
   % endfor
   ${ common.sla(workflow) }
 </workflow-app>

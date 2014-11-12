@@ -17,17 +17,17 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <sub-workflow>
-            <app-path>${'${'}nameNode}${ node.sub_workflow.deployment_dir }</app-path>
+            <app-path>${'${'}nameNode}${ workflow_mapping[node['properties']['workflow']].deployment_dir }</app-path>
 
-            % if node.propagate_configuration:
+            % if node['properties']['propagate_configuration']:
               <propagate-configuration/>
             % endif
 
-            ${ common.configuration(node.get_properties()) }
+            ${ common.configuration(node['properties']['job_properties']) }
         </sub-workflow>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>

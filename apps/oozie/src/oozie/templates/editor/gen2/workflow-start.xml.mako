@@ -15,4 +15,4 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <start to="${ node_mapping[node['children'][0]['to']] }"/>
+    <start to="${ node_mapping[node['children'][0]['to']].name }"/>

@@ -17,6 +17,6 @@
 
     <fork name="${ node['name'] }">
         % for child in node['children']:
-        <path start="${ node_mapping[child['to']] }" />
+        <path start="${ node_mapping[child['to']].name }" />
         % endfor
     </fork>
