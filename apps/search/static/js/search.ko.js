@@ -133,6 +133,7 @@ var Query = function (vm, query) {
       });
     }
 
+    self.start(0);
     vm.search();
   }
 
@@ -153,6 +154,7 @@ var Query = function (vm, query) {
     self.toggleFacet({'widget_id': id, 'facet': {'cat': data.val.cat, 'value': data.val.value}, 'exclude': exclude});
     vm.search();
   }
+
   self.addSingleTermFacet = function(data) {
     _toggleSingleTermFacet(data, false);
   }
@@ -193,6 +195,7 @@ var Query = function (vm, query) {
       }
     }
 
+    self.start(0);
     if (data.no_refresh == undefined) {
       vm.search();
     }
