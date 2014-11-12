@@ -20,14 +20,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-import saml2
-import saml2.saml
 from desktop.lib.conf import Config, coerce_bool, coerce_csv
-
-try:
-  from saml2.sigver import get_xmlsec_binary
-except ImportError:
-  get_xmlsec_binary = None
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,9 +32,10 @@ def xmlsec():
   """
   xmlsec path
   """
-  if get_xmlsec_binary:
-    return get_xmlsec_binary()
-  else:
+  try:
+    proc = subprocess.Popen(['which', 'xmlsec1'], stdout=subprocess.PIPE)
+    return proc.stdout.read().strip()
+  except subprocess.CalledProcessError:
     return '/usr/local/bin/xmlsec1'
 
 
@@ -150,7 +144,7 @@ LOGOUT_ENABLED = Config(
 
 NAME_ID_FORMAT = Config(
   key="name_id_format",
-  default=saml2.saml.NAMEID_FORMAT_PERSISTENT,
+  default="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   type=str,
   help=_t("Request this NameID format from the server"))
 
