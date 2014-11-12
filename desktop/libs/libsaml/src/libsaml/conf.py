@@ -17,6 +17,7 @@
 
 import json
 import os
+import subprocess
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
