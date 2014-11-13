@@ -803,6 +803,29 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     return _row;
   }
 
+  self.convertToDecision = function (widget, node) {
+    if (widget.widgetType() == "fork-widget"){
+      widget.widgetType("decision-widget");
+      node.type("decision-widget");
+      var _newName = "decision-" + node.id().slice(0, 4);
+      node.name(_newName);
+      widget.name(_newName);
+      $(document).trigger("drawArrows");
+    }
+  }
+
+  self.convertToFork = function (widget, node) {
+
+    if (widget.widgetType() == "decision-widget"){
+      widget.widgetType("fork-widget");
+      node.type("fork-widget");
+      var _newName = "fork-" + node.id().slice(0, 4);
+      node.name(_newName);
+      widget.name(_newName);
+      $(document).trigger("drawArrows");
+    }
+  }
+
   self.save = function () {
     $.post("/oozie/editor/workflow/save/", {
         "layout": ko.mapping.toJSON(self.columns),
