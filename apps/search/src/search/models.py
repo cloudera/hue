@@ -278,6 +278,10 @@ class Collection(models.Model):
       properties = facet['properties']
       if 'gap' in properties and not 'initial_gap' in properties:
         properties['initial_gap'] = properties['gap']
+      if 'start' in properties and not 'initial_start' in properties:
+        properties['initial_start'] = properties['start']
+      if 'end' in properties and not 'initial_end' in properties:
+        properties['initial_end'] = properties['end']
 
     return json.dumps(props)
 
