@@ -336,6 +336,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <span data-bind="text: $data['to']" /></span>
       </span>
     </div>
+    <a class="pointer" data-bind="click: function() { $root.convertToDecision($parent, $data) }">Convert to Decision</a>
   </div>
   <!-- /ko -->
 </script>
@@ -991,22 +992,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="fork-widget">
-  <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
-    </div>
-
-    <div>
-      End
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
-
 <script type="text/html" id="decision-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
@@ -1016,7 +1001,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
-      End
+      <a class="pointer" data-bind="click: function() { $root.convertToFork($parent, $data) }">Convert to Fork</a>
     </div>
   </div>
   <!-- /ko -->
