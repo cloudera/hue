@@ -858,7 +858,7 @@ var NewTemplate = function (vm, initial) {
 
 
 var DATE_TYPES = ['date', 'tdate'];
-var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat'];
+var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble'];
 
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
