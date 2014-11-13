@@ -272,7 +272,7 @@ ${ dashboard.layout_skeleton() }
 
     <!-- ko if: type() == 'range' -->
       <!-- ko ifnot: properties.isDate() -->
-        <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.gap, min: properties.start, max: properties.end}"></div>
+        <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, min: properties.min, max: properties.max}"></div>
