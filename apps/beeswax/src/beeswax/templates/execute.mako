@@ -1081,7 +1081,7 @@ $(document).ready(function () {
       $("#recentQueries").show().css("width", "100%");
       reinitializeTableExtenders();
     });
-  }
+  };
 
   $(document).on("click", "#recentQueries code", function(){
     codeMirror.setValue($(this).text());
@@ -1114,7 +1114,7 @@ $(document).ready(function () {
   resizeNavigator = function () {
     $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
     $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
-  }
+  };
 
   resetNavigator = function () {
     var _db = viewModel.database();
@@ -1131,7 +1131,7 @@ $(document).ready(function () {
         $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
       });
     }
-  }
+  };
 
   renderNavigator = function () {
     $("#navigatorTables").empty();
@@ -1165,7 +1165,7 @@ $(document).ready(function () {
                   _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
                   $(extended_columns).each(function (iCnt, col) {
                     var _column = $("<li>");
-                    _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
+                    _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($('<span>').text(col.type).html().trim()  != "" ? " (" + $('<span>').text(col.type).html().trim() + ")" : "") + "</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
                       codeMirror.replaceSelection($.trim(col.name) + ', ');
@@ -1222,7 +1222,7 @@ $(document).ready(function () {
         }
       });
     }
-  }
+  };
 
   $("#expandResults").on("click", function(){
     if ($(this).find("i").hasClass("fa-expand")){
@@ -1270,7 +1270,7 @@ $(document).ready(function () {
             }
           }
         });
-      }
+      };
 
       window.setTimeout(syncWithHive, 100);
 
@@ -1548,7 +1548,7 @@ $(document).ready(function () {
         }
       });
     }
-  }
+  };
 
   function fieldsAutocomplete(cm) {
     CodeMirror.possibleSoloField = true;
