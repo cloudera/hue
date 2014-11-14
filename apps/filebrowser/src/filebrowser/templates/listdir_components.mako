@@ -59,7 +59,7 @@ from django.utils.translation import ugettext as _
       <tr data-bind="visible: files().length === 0 && !isLoading()">
         <td colspan="8">
           <div class="alert">
-            There are no files matching the search criteria.
+            ${_('There are no files matching the search criteria.')}
           </div>
         </td>
       </tr>
@@ -418,9 +418,9 @@ from django.utils.translation import ugettext as _
     <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     <li class="divider"></li>
     %if is_fs_superuser:
-    <li><a href="#" title="${_('Change owner/group')}" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
     %endif
-    <li><a href="#" title="${_('Change permissions')}" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
     <li class="divider"></li>
     <li><a href="#"  data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0,
     click: $root.trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</a></li>
@@ -473,15 +473,15 @@ from django.utils.translation import ugettext as _
       </td>
       <td>
         %if is_fs_superuser:
-        <span data-bind="text: stats.group, visible: ! selected()"></span>
-        <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}" data-bind="text: stats.group, visible: ! $root.inTrash() && selected(), click: $root.changeOwner"></a>
+        <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
+        <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}" data-bind="text: stats.group, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changeOwner"></a>
         %else:
         <span data-bind="text: stats.group"></span>
         %endif
       </td>
       <td>
-        <span data-bind="text: permissions, visible: ! selected()"></span>
-        <a href="#" rel="tooltip" title="${_('Change permissions')}" data-bind="text: permissions, visible: ! $root.inTrash() && selected(), click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
+        <span data-bind="text: permissions, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
+        <a href="#" rel="tooltip" title="${_('Change permissions')}" data-bind="text: permissions, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
       </td>
       <td data-bind="text: stats.mtime" style="white-space: nowrap;"></td>
     </tr>
@@ -753,6 +753,7 @@ from django.utils.translation import ugettext as _
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
+      self.isCurrentDirSentryManaged = ko.observable(false);
 
       self.filesSorting = function (l, r) {
         if (l.name == ".." && r.name == "."){
@@ -855,7 +856,7 @@ from django.utils.translation import ugettext as _
             return false;
           }
 
-          self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path);
+          self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path, data.is_sentry_managed);
 
           if ($("#hueBreadcrumbText").is(":visible")) {
             $(".hueBreadcrumb").show();
@@ -865,8 +866,10 @@ from django.utils.translation import ugettext as _
         });
       };
 
-      self.updateFileList = function (files, page, breadcrumbs, currentDirPath) {
+      self.updateFileList = function (files, page, breadcrumbs, currentDirPath, isSentryManaged) {
         $(".tooltip").hide();
+
+        self.isCurrentDirSentryManaged(isSentryManaged);
 
         self.page(new Page(page));
 
@@ -1054,79 +1057,83 @@ from django.utils.translation import ugettext as _
       };
 
       self.changeOwner = function (data, event) {
-        var paths = [];
-        event.preventDefault();
-        event.stopPropagation();
+        if (!self.isCurrentDirSentryManaged()) {
+          var paths = [];
+          event.preventDefault();
+          event.stopPropagation();
 
-        $(self.selectedFiles()).each(function (index, file) {
-          paths.push(file.path);
-        });
+          $(self.selectedFiles()).each(function (index, file) {
+            paths.push(file.path);
+          });
 
-        hiddenFields($("#chownForm"), 'path', paths);
+          hiddenFields($("#chownForm"), 'path', paths);
 
-        $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
 
-        $("select[name=user]").val(self.selectedFile().stats.user);
+          $("select[name=user]").val(self.selectedFile().stats.user);
 
-        if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
-          $("select[name=group]").val(self.selectedFile().stats.group);
-        } else {
-          $("select[name=group]").val("__other__");
-          $("input[name=group_other]").val(self.selectedFile().stats.group);
+          if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
+            $("select[name=group]").val(self.selectedFile().stats.group);
+          } else {
+            $("select[name=group]").val("__other__");
+            $("input[name=group_other]").val(self.selectedFile().stats.group);
+          }
+
+          $("select[name=group]").change();
+
+          $("#changeOwnerModal").modal({
+            keyboard: true,
+            show: true
+          });
         }
-
-        $("select[name=group]").change();
-
-        $("#changeOwnerModal").modal({
-          keyboard:true,
-          show:true
-        });
       };
 
       self.changePermissions = function (data, event) {
-        var paths = [];
-        var allFileType = true;
+        if (!self.isCurrentDirSentryManaged()) {
+          var paths = [];
+          var allFileType = true;
 
-        event.preventDefault();
-        event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
 
-        $(self.selectedFiles()).each(function (index, file) {
-          if ("dir" == file.type){
-            allFileType = false;
+          $(self.selectedFiles()).each(function (index, file) {
+            if ("dir" == file.type) {
+              allFileType = false;
+            }
+            paths.push(file.path);
+          });
+
+          hiddenFields($("#chmodForm"), 'path', paths);
+
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+
+          $("#changePermissionModal").modal({
+            keyboard: true,
+            show: true
+          });
+
+          // Initial values for form
+          var permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
+          var mode = octal(self.selectedFile().mode) & 01777;
+
+          for (var i = 0; i < permissions.length; i++) {
+            if (mode & 1) {
+              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", true);
+            } else {
+              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
+            }
+            mode >>>= 1;
           }
-          paths.push(file.path);
-        });
 
-        hiddenFields($("#chmodForm"), 'path', paths);
-
-        $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
-
-        $("#changePermissionModal").modal({
-          keyboard:true,
-          show:true
-        });
-
-        // Initial values for form
-        var permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
-        var mode = octal(self.selectedFile().mode) & 01777;
-
-        for (var i = 0; i < permissions.length; i++) {
-          if (mode & 1) {
-            $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", true);
+          if (allFileType) {
+            $("#chmodForm input[name='user_execute']").attr("disabled", "disabled");
+            $("#chmodForm input[name='group_execute']").attr("disabled", "disabled");
+            $("#chmodForm input[name='other_execute']").attr("disabled", "disabled");
           } else {
-            $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
+            $("#chmodForm input[name='user_execute']").removeAttr("disabled");
+            $("#chmodForm input[name='group_execute']").removeAttr("disabled");
+            $("#chmodForm input[name='other_execute']").removeAttr("disabled");
           }
-          mode >>>= 1;
-        }
-
-        if (allFileType){
-          $("#chmodForm input[name='user_execute']").attr("disabled", "disabled");
-          $("#chmodForm input[name='group_execute']").attr("disabled", "disabled");
-          $("#chmodForm input[name='other_execute']").attr("disabled", "disabled");
-        } else {
-          $("#chmodForm input[name='user_execute']").removeAttr("disabled");
-          $("#chmodForm input[name='group_execute']").removeAttr("disabled");
-          $("#chmodForm input[name='other_execute']").removeAttr("disabled");
         }
       };
 

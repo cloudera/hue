@@ -62,9 +62,9 @@ ${ fb_components.menubar() }
               <li><a href="#" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
               <li class="divider"></li>
               %if is_fs_superuser:
-              <li><a href="#" title="${_('Change owner/group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
               %endif
-              <li><a href="#" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
             </ul>
           </div>
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
@@ -118,6 +118,9 @@ ${ fb_components.menubar() }
     <div class="scrollable">
       <div class="alert alert-warn" data-bind="visible: inTrash">
         ${ _("This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.") }
+      </div>
+      <div class="alert alert-warn" data-bind="visible: isCurrentDirSentryManaged">
+        ${ _('The permissions for this folder are managed by the Sentry Namenode plugin.') }
       </div>
 
       % if breadcrumbs:
