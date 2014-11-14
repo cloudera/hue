@@ -47,7 +47,8 @@
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
-    <javaVersion>1.7</javaVersion>
+    <minJavaVersion>1.7</minJavaVersion>
+    <maxJavaVersion>1.8</maxJavaVersion>
     <sourceJavaVersion>1.7</sourceJavaVersion>
     <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
@@ -92,7 +93,7 @@
               <version>[2.0.0,)</version>
             </requireMavenVersion>
             <requireJavaVersion>
-              <version>[${javaVersion}.0,${javaVersion}.1000]</version>
+              <version>[${minJavaVersion}.0,${maxJavaVersion}.1000]</version>
             </requireJavaVersion>
           </rules>
         </configuration>
