@@ -263,12 +263,19 @@ class HiveServer2Dbms(object):
 
     return self.execute_query(query, design)
 
+  def _get_and_validate_select_query(self, design, query_history):
+    query = design.get_query_statement(query_history.statement_number)
+    if not query.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided query: %(query)s') % {'query': query})
+
+    return query
+
   def insert_query_into_directory(self, query_history, target_dir):
     design = query_history.design.get_design()
     database = design.query['database']
     self.use(database)
-
-    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (target_dir, design.query['query'])
+    query = self._get_and_validate_select_query(design, query_history)
+    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (target_dir, query)
     return self.execute_statement(hql)
 
 
@@ -279,8 +286,8 @@ class HiveServer2Dbms(object):
     # Case 1: Hive Server 2 backend or results straight from an existing table
     if result_meta.in_tablename:
       self.use(database)
-
-      hql = 'CREATE TABLE %s.%s AS %s' % (target_database, target_table, design.query['query'])
+      query = self._get_and_validate_select_query(design, query_history)
+      hql = 'CREATE TABLE %s.%s AS %s' % (target_database, target_table, query)
       query_history = self.execute_statement(hql)
     else:
       # Case 2: The results are in some temporary location
