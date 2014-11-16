@@ -58,11 +58,15 @@ function hac_getTableAliases(textScanned) {
   return _aliases;
 }
 
-function hac_getTotalStorageUserPrefix(){
-  if (typeof HIVE_AUTOCOMPLETE_USER != "undefined") {
-    return HIVE_AUTOCOMPLETE_USER + "_";
+function hac_getTotalStorageUserPrefix() {
+  var _app = "";
+  if (typeof HIVE_AUTOCOMPLETE_APP != "undefined") {
+    _app = HIVE_AUTOCOMPLETE_APP;
   }
-  return "";
+  if (typeof HIVE_AUTOCOMPLETE_USER != "undefined") {
+    return _app + "_" + HIVE_AUTOCOMPLETE_USER + "_";
+  }
+  return (_app != "" ? _app + "_" : "");
 }
 
 function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
