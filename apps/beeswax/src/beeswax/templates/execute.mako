@@ -978,6 +978,7 @@ var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, ren
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
 var HIVE_AUTOCOMPLETE_USER = "${ user }";
+var HIVE_AUTOCOMPLETE_APP = "${app_name}";
 
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   if (data != null && data.error && typeof resetNavigator != "undefined") {
