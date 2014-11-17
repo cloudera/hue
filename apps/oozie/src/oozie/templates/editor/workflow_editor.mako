@@ -1146,7 +1146,7 @@ ${ dashboard.import_bindings() }
       showAddActionDemiModal(widget);
     }
     else {
-      // TODO: rebuild nodes here, it's after a d'n'd
+      viewModel.workflow.moveNode(widget);
       $(document).trigger("drawArrows");
     }
   }
