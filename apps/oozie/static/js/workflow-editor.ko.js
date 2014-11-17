@@ -327,6 +327,24 @@ var Workflow = function (vm, workflow) {
     }
   };
   
+  self.moveNode = function(widget) { alert(vm.currentlyCreatingFork);
+    if (! vm.currentlyCreatingFork) {
+      var node = self.getNodeById(widget.id());
+      var oldChildId = ko.mapping.toJS(node.get_link('to'))['to'];
+    
+      var parentWidget = vm.getWidgetPredecessor(node.id());
+      var parent = self.getNodeById(parentWidget.id());
+    
+      var childLink = parent.get_link('to');
+      var childId = ko.mapping.toJS(childLink)['to'];
+      var child = self.getNodeById(childId);
+    
+      parent.set_link('to', node.id());
+      child.set_link('to', oldChildId);
+      node.set_link('to', child.id());
+    }
+  };
+  
   self.getParents = function(node_id) { // Only one for now
     var _node = null;
     $.each(self.nodes(), function (index, node) {
@@ -339,7 +357,7 @@ var Workflow = function (vm, workflow) {
       })
     });
     return _node;  
-  }
+  };
 
   self.getNodeById = function (node_id) {
     var _node = null;
