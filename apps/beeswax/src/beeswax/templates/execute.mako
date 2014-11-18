@@ -986,6 +986,25 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   }
 };
 
+var escapeOutput = function (str) {
+  return $('<span>').text(str).html().trim();
+};
+
+var truncateOutput = function (obj) {
+  //default to 20 characters (column output displays first 21 chars so we need to consider the length of both column name and type
+  var chars = obj.chars || 20,
+    name = obj.name || '',
+    type = obj.type || '',
+    output = name.length + type.length,
+    trim;
+
+  if (output > chars) {
+    trim = Math.abs((output + 4) - chars); // 4 accounts for ellipsis, spaces, parenthesis
+    type = type.slice(0, Math.abs(type.length - trim));
+  }
+  return escapeOutput(type) + '&hellip;';
+};
+
 function placeResizePanelHandle() {
   // dynamically positioning the resize panel handle since IE doesn't play well with styles.
   $("#resizePanel a").css("left", $("#resizePanel").position().left + $("#resizePanel").width()/2 - 8);
@@ -1166,7 +1185,25 @@ $(document).ready(function () {
                   _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
                   $(extended_columns).each(function (iCnt, col) {
                     var _column = $("<li>");
-                    _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($('<span>').text(col.type).html().trim()  != "" ? " (" + $('<span>').text(col.type).html().trim() + ")" : "") + "</a>");
+
+                    var getTitle = function () {
+                      var title = '';
+
+                      var isTruncated = function () {
+                        return (col.name.length + col.type.length) > 20;
+                      }
+
+                      if (col.comment && isTruncated()) {
+                        title = col.type + ": " + col.comment;
+                      } else if (isTruncated()) {
+                        title = col.type;
+                      } else if (col.comment) {
+                        title = col.comment;
+                      }
+                      return escapeOutput(title);
+                    };
+
+                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'><i class='fa fa-columns'></i> " + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
                       codeMirror.replaceSelection($.trim(col.name) + ', ');
