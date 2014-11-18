@@ -403,18 +403,31 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.selectedSubWorkflow = ko.observable();
 
 
-  self.currentlyDraggedWidget = null;
+  self.currentlyDraggedWidget = ko.observable(null);
+  self.currentlyDraggedWidget.subscribe(function (widget) {
+    toggleSideDrop(widget, false);
+  });
+
+  self.enableSideDrop = function (widget) {
+    toggleSideDrop(widget, true);
+  }
+
+  function toggleSideDrop(widget, enable) {
+    if (widget != null && widget.id() != "") {
+      var _row = self.getWidgetParentRow(widget.id());
+      if (_row) {
+        _row.enableOozieDropOnSide(enable);
+      }
+    }
+  }
+
   self.currentlyCreatingFork = false;
   self.currentlyCreatedFork = null;
   self.currentlyCreatedJoin = null;
   self.isDragging = ko.observable(false);
 
-  self.setCurrentDraggedWidget = function (widget) {
-    self.currentlyDraggedWidget = widget;
-  }
-
   self.addDraggedWidget = function (target, atBeginning) {
-    if (self.currentlyDraggedWidget != null) {
+    if (self.currentlyDraggedWidget() != null) {
       var _parentCol = target instanceof Column ? target : self.getRowParentColumn(target.id());
 
       var _newRow = null;
@@ -443,19 +456,19 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
 
       var _w = new Widget({
-          size: self.currentlyDraggedWidget.size(),
+          size: self.currentlyDraggedWidget().size(),
           id: UUID(),
-          name: self.currentlyDraggedWidget.name(),
-          widgetType: self.currentlyDraggedWidget.widgetType(),
-          properties: self.currentlyDraggedWidget.properties(),
-          offset: self.currentlyDraggedWidget.offset(),
+          name: self.currentlyDraggedWidget().name(),
+          widgetType: self.currentlyDraggedWidget().widgetType(),
+          properties: self.currentlyDraggedWidget().properties(),
+          offset: self.currentlyDraggedWidget().offset(),
           loading: true,
           vm: self
         });
 
-      if (self.currentlyDraggedWidget.id() != ""){
-        self.removeWidgetById(self.currentlyDraggedWidget.id());
-        _w = self.currentlyDraggedWidget;
+      if (self.currentlyDraggedWidget().id() != ""){
+        self.removeWidgetById(self.currentlyDraggedWidget().id());
+        _w = self.currentlyDraggedWidget();
       }
 
       _newRow.widgets([_w]);
@@ -465,7 +478,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.addSideDraggedWidget = function (row, atBeginning) {
-    if (self.currentlyDraggedWidget != null) {
+    if (self.currentlyDraggedWidget() != null) {
       var _parentCol = self.getRowParentColumn(row.id());
       var _rowIdx = 0;
       $.each(_parentCol.rows(), function (i, irow) {
@@ -494,19 +507,19 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
 
       var _w = new Widget({
-        size: self.currentlyDraggedWidget.size(),
+        size: self.currentlyDraggedWidget().size(),
         id: UUID(),
-        name: self.currentlyDraggedWidget.name(),
-        widgetType: self.currentlyDraggedWidget.widgetType(),
-        properties: self.currentlyDraggedWidget.properties(),
-        offset: self.currentlyDraggedWidget.offset(),
+        name: self.currentlyDraggedWidget().name(),
+        widgetType: self.currentlyDraggedWidget().widgetType(),
+        properties: self.currentlyDraggedWidget().properties(),
+        offset: self.currentlyDraggedWidget().offset(),
         loading: true,
         vm: self
       });
 
-      if (self.currentlyDraggedWidget.id() != ""){
-        self.removeWidgetById(self.currentlyDraggedWidget.id());
-        _w = self.currentlyDraggedWidget;
+      if (self.currentlyDraggedWidget().id() != ""){
+        self.removeWidgetById(self.currentlyDraggedWidget().id());
+        _w = self.currentlyDraggedWidget();
       }
 
       if (row.columns().length == 0) {
