@@ -327,7 +327,7 @@ var Workflow = function (vm, workflow) {
     }
   };
   
-  self.moveNode = function(widget) { alert(vm.currentlyCreatingFork);
+  self.moveNode = function(widget) {
     if (! vm.currentlyCreatingFork) {
       var node = self.getNodeById(widget.id());
       var oldChildId = ko.mapping.toJS(node.get_link('to'))['to'];
@@ -503,6 +503,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         loading: true,
         vm: self
       });
+
+      if (self.currentlyDraggedWidget.id() != ""){
+        self.removeWidgetById(self.currentlyDraggedWidget.id());
+        _w = self.currentlyDraggedWidget;
+      }
 
       if (row.columns().length == 0) {
         var _col = row.addColumn(null, atBeginning);
