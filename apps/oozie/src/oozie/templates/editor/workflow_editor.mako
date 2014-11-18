@@ -37,21 +37,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
-                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggableHiveAction());}}}"
+                    options: {'refreshPositions': true, 'start': function(event, ui){$root.currentlyDraggedWidget(draggableHiveAction());}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,
-                    options: {'refreshPositions': true, 'start': function(event, ui){$root.setCurrentDraggedWidget(draggablePigAction());}}}"
+                    options: {'refreshPositions': true, 'start': function(event, ui){$root.currentlyDraggedWidget(draggablePigAction());}}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="/oozie/static/art/icon_pig_48.png" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaAction(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableJavaAction());}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableJavaAction());}}}"
          title="${_('Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
@@ -72,7 +72,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableSubworkflowAction());}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableSubworkflowAction());}}}"
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
     </div>
@@ -124,7 +124,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
-                    options: {'start': function(event, ui){$root.setCurrentDraggedWidget(draggableKillNode());}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableKillNode());}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-stop"></i></a>
     </div>
@@ -271,7 +271,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
     <div class="row-fluid">
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
-        <div data-bind="visible: $root.isEditing() && !($data.widgets().length > 0 && $data.widgets()[0].widgetType() == 'join-widget'), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && $data.widgets()[0].widgetType() == 'join-widget'), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div  data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
@@ -289,7 +289,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         </div>
       </div>
       <div  data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
-        <div data-bind="visible: $root.isEditing() && !($data.widgets().length > 0 && $data.widgets()[0].widgetType() == 'join-widget'),, css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && $data.widgets()[0].widgetType() == 'join-widget'),, css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
     </div>
   </div>
@@ -297,7 +297,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentDraggedWidget($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.currentlyDraggedWidget($data); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -1141,7 +1141,7 @@ ${ dashboard.import_bindings() }
 
   function widgetDraggedAdditionalHandler(widget) {
     $("canvas").remove();
-    if (viewModel.currentlyDraggedWidget && viewModel.currentlyDraggedWidget.id() == ""){
+    if (viewModel.currentlyDraggedWidget() && viewModel.currentlyDraggedWidget().id() == ""){
       viewModel.workflow.newNode(widget);
       showAddActionDemiModal(widget);
     }

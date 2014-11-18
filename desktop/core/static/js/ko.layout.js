@@ -97,6 +97,8 @@ var Row = function (widgets, vm, columns) {
     return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
   });
 
+  self.enableOozieDropOnSide = ko.observable(true);
+
   self.addWidget = function (widget) {
     self.widgets.push(widget);
   };
