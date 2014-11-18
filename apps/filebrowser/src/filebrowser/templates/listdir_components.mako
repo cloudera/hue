@@ -465,8 +465,8 @@ from django.utils.translation import ugettext as _
       </td>
       <td>
         %if is_fs_superuser:
-        <span data-bind="text: stats.user, visible: ! selected()"></span>
-        <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}" data-bind="text: stats.user, visible: ! $root.inTrash() && selected(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
+        <span data-bind="text: stats.user, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
+        <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}" data-bind="text: stats.user, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
         %else:
         <span data-bind="text: stats.user"></span>
         %endif
