@@ -863,6 +863,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.convertToDecision = function (widget, node) {
     if (widget.widgetType() == "fork-widget"){
+      var _row = self.getWidgetParentRow(widget.id());
+      var _next = self.getNextRow(_row);
+      while (_next.widgets().length == 0){
+        _next = self.getNextRow(_next);
+      }
+      self.removeWidgetById(_next.widgets()[0].id()); // remove the join
       widget.widgetType("decision-widget");
       node.type("decision-widget");
       var _newName = "decision-" + node.id().slice(0, 4);
