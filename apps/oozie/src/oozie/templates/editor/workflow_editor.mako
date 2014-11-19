@@ -145,12 +145,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
-      <button type="button" title="${ _('Workspace') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
-        <i class="fa fa-folder-open"></i>
-      </button>
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
         <i class="fa fa-cog"></i>
       </button>
+      <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
+          data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
+          data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
+        <i class="fa fa-folder-open"></i>
+      </a>      
       &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
         <i class="fa fa-save"></i>
