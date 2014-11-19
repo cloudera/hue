@@ -1008,10 +1008,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
     </div>
-
-    <div>
-      <a class="pointer" data-bind="click: function() { $root.convertToFork($parent, $data) }">Convert to Fork</a>
-    </div>
   </div>
   <!-- /ko -->
 </script>
