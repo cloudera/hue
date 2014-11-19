@@ -198,6 +198,9 @@ var Widget = function (params) {
   self.offset = ko.observable(typeof params.offset != "undefined" && params.offset != null ? params.offset : 0).extend({ numeric: 0 });
   self.isLoading = ko.observable(typeof params.loading != "undefined" && params.loading != null ? params.loading : false);
 
+  self.oozieMovable = ko.computed(function() {
+    return ["end-widget", "start-widget", "fork-widget", "decision-widget"].indexOf(self.widgetType()) == - 1
+  });
 
   self.klass = ko.computed(function () {
     return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
