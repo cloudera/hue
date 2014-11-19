@@ -715,7 +715,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       _prevRow = _currentRow;
     }
     if (_prevRow != null){
-      return _prevRow.widgets().length > 0 && _prevRow.widgets()[0].widgetType() == "fork-widget";
+      return _prevRow.widgets().length > 0 && (_prevRow.widgets()[0].widgetType() == "fork-widget" || _prevRow.widgets()[0].widgetType() == "decision-widget");
     }
     return false;
   }
