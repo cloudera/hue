@@ -522,13 +522,28 @@ class KillAction():
     return [cls.FIELDS['message']]
 
 
+class JoinAction():
+  TYPE = 'join'
+  FIELDS = {}
+
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return []
+
+
 NODES = {
   'pig-widget': PigAction,
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
   'subworkflow-widget': SubWorkflowAction,
-  'kill-widget': KillAction
+  'kill-widget': KillAction,
+  'join-widget': JoinAction,
 }
+
 
 WORKFLOW_NODE_PROPERTIES = {}
 for node in NODES.itervalues():
