@@ -311,6 +311,12 @@ em {
   background-color: #CCC;
 }
 
+.drop-target-disabled {
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+
 .drop-target-side {
   min-height: 100px;
   height: 100%;
