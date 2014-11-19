@@ -357,8 +357,45 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <!-- ko if: children().length == 1 -->
-      Then --> <span data-bind="text: children()[0]['to']" /></span>
+      Then --> <span data-bind="text: children()[0]['to']"></span>
       <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="decision-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+    
+    <div>
+      To:
+      <span data-bind="foreach: children">
+        <span data-bind="text: $data['to']"></span> if <input data-bind="value: $data['decision']" />
+      </span>
+      <span data-bind="text: properties.default['to']"></span> by default
+      <a>${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="kill-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <input type="text" data-bind="value: properties.message" />
     </div>
   </div>
   <!-- /ko -->
@@ -996,33 +1033,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           KO --> []
         </div>
       </div>
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
-<script type="text/html" id="decision-widget">
-  <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
-
-<script type="text/html" id="kill-widget">
-  <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
-    </div>
-
-    <div>
-      <input type="text" data-bind="value: properties.message" />
     </div>
   </div>
   <!-- /ko -->
