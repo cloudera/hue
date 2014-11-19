@@ -110,7 +110,7 @@ class WebHdfs(Hdfs):
   def is_sentry_managed(cls, path):
     prefixes = get_nn_sentry_prefixes().split(',')
 
-    return any([path.startswith(p) for p in prefixes if p])
+    return any([path == p or path.startswith(p + '/') for p in prefixes if p])
 
   @property
   def fs_defaultfs(self):
