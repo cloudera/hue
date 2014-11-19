@@ -249,7 +249,7 @@ ${ comps.menubar() }
     </div>
     <div class="span10">
       <div class="card card-small">
-        <h1 class="card-heading simple">${_(job.name)}</h1>
+	<h1 class="card-heading simple">${_('Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
           <div class="card-body">
             <p>
 
