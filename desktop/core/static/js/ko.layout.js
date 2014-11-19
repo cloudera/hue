@@ -60,6 +60,9 @@ var Column = function (size, rows) {
     return _rows;
   }, self);
 
+  self.enableOozieDropOnBefore = ko.observable(true);
+  self.enableOozieDropOnAfter = ko.observable(true);
+
   self.drops = ko.observableArray(["temp"]);
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
@@ -97,6 +100,7 @@ var Row = function (widgets, vm, columns) {
     return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
   });
 
+  self.enableOozieDropOnBefore = ko.observable(true);
   self.enableOozieDropOnSide = ko.observable(true);
 
   self.addWidget = function (widget) {
