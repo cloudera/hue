@@ -144,10 +144,12 @@ var Workflow = function (vm, workflow) {
 
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
+  self.movedNode = null;
   
   self.linkMapping = ko.computed(function() {
 	var mapping = {};
     $.each(self.nodes(), function(index, node) {
+      //if (node) {
       var links = []
       $.each(node.children(), function(index, link) {
         if ('to' in link) {
@@ -155,6 +157,7 @@ var Workflow = function (vm, workflow) {
         }
       });
       mapping[node.id()] = links
+      //}
     });
 
     return mapping;
@@ -204,7 +207,8 @@ var Workflow = function (vm, workflow) {
         _node.properties = data.properties;
         _node.name = data.name;
 
-        var node = new Node(_node);    	
+        var node = new Node(_node);
+        //var node = self.movedNode;
 
         // Add to list of nodes
         var end = self.nodes.pop();
@@ -290,27 +294,27 @@ var Workflow = function (vm, workflow) {
   
   self.removeNode = function(node_id) {
 	var node = self.getNodeById(node_id);
+	var parent = self.getParents(node_id); // Beware, support only one parent
 	
-    var parentWidget = vm.getWidgetPredecessor(node_id); // Use smarter self.getParents if action node with multi parents
-    var parent = self.getNodeById(parentWidget.id());
-    
     var childLink = node.get_link('to');
     var childId = ko.mapping.toJS(childLink)['to'];
     
     parent.remove_link('to', node_id);
-    parent.children.push({'to': childId});
+    parent.children.unshift({'to': childId});
+
     self.nodes.remove(node);
     
     // If need to remove fork
-    if (parentWidget.widgetType() == 'fork-widget') {
+    if (parent.type() == 'fork-widget') {
       var fork = parent;
       var join = self.getNodeById(childId);
 
       if (join.type() == 'join-widget') {
-    	if (fork.children().length == 2) {
+    	if (fork.children().length == 2) {    	  
           // Link top to above and delete fork
+    	  fork.remove_link('to', childId);
     	  var forkParent = self.getParents(fork.id());
-    	  forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']);
+    	  forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
 
     	  self.nodes.remove(fork);
 
@@ -330,18 +334,23 @@ var Workflow = function (vm, workflow) {
   self.moveNode = function(widget) {
     if (! vm.currentlyCreatingFork) {
       var node = self.getNodeById(widget.id());
-      var oldChildId = ko.mapping.toJS(node.get_link('to'))['to'];
-    
-      var parentWidget = vm.getWidgetPredecessor(node.id());
-      var parent = self.getNodeById(parentWidget.id());
-    
-      var childLink = parent.get_link('to');
-      var childId = ko.mapping.toJS(childLink)['to'];
-      var child = self.getNodeById(childId);
-    
-      parent.set_link('to', node.id());
-      child.set_link('to', oldChildId);
-      node.set_link('to', child.id());
+      self.movedNode = node;
+      
+      self.removeNode(node.id());
+      //self.addNode(widget);
+      
+//      var oldChildId = ko.mapping.toJS(node.get_link('to'))['to'];
+//    
+//      var parentWidget = vm.getWidgetPredecessor(node.id());
+//      var parent = self.getNodeById(parentWidget.id());
+//    
+//      var childLink = parent.get_link('to');
+//      var childId = ko.mapping.toJS(childLink)['to'];
+//      var child = self.getNodeById(childId);
+//    
+//      parent.set_link('to', node.id());
+//      child.set_link('to', oldChildId);
+//      node.set_link('to', child.id());
     }
   };
   
