@@ -35,7 +35,7 @@ function magicLayout(vm) {
   $(document).trigger("magicLayout");
 }
 
-function loadLayout(viewModel, json_layout) {
+function loadColumns(viewModel, json_layout) {
   var _columns = [];
 
   $(json_layout).each(function (cnt, json_col) {
@@ -44,7 +44,7 @@ function loadLayout(viewModel, json_layout) {
       var row = new Row([], viewModel);
       $(json_row.widgets).each(function (wcnt, widget) {
         row.addWidget(new Widget({
-          size:widget.size,
+          size: widget.size,
           id: widget.id,
           name: widget.name,
           widgetType: widget.widgetType,
@@ -54,33 +54,19 @@ function loadLayout(viewModel, json_layout) {
           vm: viewModel
         }));
       });
-      $(json_row.columns).each(function (ccnt, column) {
-        var _irows = [];
-        $(column.rows).each(function (ircnt, json_irow) {
-          var _irow = new Row([], viewModel);
-          $(json_irow.widgets).each(function (iwcnt, iwidget) {
-            _irow.addWidget(new Widget({
-              size:iwidget.size,
-              id: iwidget.id,
-              name: iwidget.name,
-              widgetType: iwidget.widgetType,
-              properties: iwidget.properties,
-              offset: iwidget.offset,
-              loading: true,
-              vm: viewModel
-            }));
-          });
-          _irows.push(_irow);
-        });
-        row.addColumn(new Column(column.size, _irows));
-      });
+      row.columns(loadColumns(viewModel, json_row.columns));
       _rows.push(row);
     });
     var column = new Column(json_col.size, _rows);
     _columns = _columns.concat(column);
   });
-  viewModel.columns(_columns);
+  return _columns;
 }
+
+function loadLayout(viewModel, json_layout) {
+  viewModel.columns(loadColumns(viewModel, json_layout));
+}
+
 
 
 // End dashboard lib
@@ -369,6 +355,7 @@ var Workflow = function (vm, workflow) {
 }
 
 var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json) {
+
   var self = this;
 
   self.isNested = ko.observable(true);
