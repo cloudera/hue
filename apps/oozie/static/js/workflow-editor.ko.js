@@ -299,7 +299,7 @@ var Workflow = function (vm, workflow) {
 	
     var childLink = node.get_link('to');
     var childId = ko.mapping.toJS(childLink)['to'];
-    
+
     parent.remove_link('to', node_id);
     parent.children.unshift({'to': childId});
 
@@ -333,15 +333,13 @@ var Workflow = function (vm, workflow) {
   };
   
   self.moveNode = function(widget) {
-    if (! vm.currentlyCreatingFork) {
-      var node = self.getNodeById(widget.id());
-      self.movedNode = node;
+    var node = self.getNodeById(widget.id());
+    self.movedNode = node;
       
-      self.removeNode(node.id());
-      self.addNode(widget);
+    self.removeNode(node.id());
+    self.addNode(widget);
       
-      self.movedNode = null;
-    }
+    self.movedNode = null;
   };
   
   self.getParents = function(node_id) { // Only one for now

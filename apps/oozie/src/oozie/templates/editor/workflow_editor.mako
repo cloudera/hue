@@ -351,7 +351,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     </div>
 
     <div>
+      <!-- ko if: children().length == 1 -->
       Then --> <span data-bind="text: children()[0]['to']" /></span>
+      <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
