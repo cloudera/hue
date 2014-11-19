@@ -149,7 +149,6 @@ var Workflow = function (vm, workflow) {
   self.linkMapping = ko.computed(function() {
 	var mapping = {};
     $.each(self.nodes(), function(index, node) {
-      //if (node) {
       var links = []
       $.each(node.children(), function(index, link) {
         if ('to' in link) {
@@ -157,7 +156,6 @@ var Workflow = function (vm, workflow) {
         }
       });
       mapping[node.id()] = links
-      //}
     });
 
     return mapping;
@@ -207,8 +205,11 @@ var Workflow = function (vm, workflow) {
         _node.properties = data.properties;
         _node.name = data.name;
 
-        var node = new Node(_node);
-        //var node = self.movedNode;
+        if (self.movedNode) {
+          var node = self.movedNode;
+        } else {
+          var node = new Node(_node);
+        }
 
         // Add to list of nodes
         var end = self.nodes.pop();
@@ -337,20 +338,9 @@ var Workflow = function (vm, workflow) {
       self.movedNode = node;
       
       self.removeNode(node.id());
-      //self.addNode(widget);
+      self.addNode(widget);
       
-//      var oldChildId = ko.mapping.toJS(node.get_link('to'))['to'];
-//    
-//      var parentWidget = vm.getWidgetPredecessor(node.id());
-//      var parent = self.getNodeById(parentWidget.id());
-//    
-//      var childLink = parent.get_link('to');
-//      var childId = ko.mapping.toJS(childLink)['to'];
-//      var child = self.getNodeById(childId);
-//    
-//      parent.set_link('to', node.id());
-//      child.set_link('to', oldChildId);
-//      node.set_link('to', child.id());
+      self.movedNode = null;
     }
   };
   
