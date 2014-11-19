@@ -376,9 +376,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div>
       To:
       <span data-bind="foreach: children">
-        <span data-bind="text: $data['to']"></span> if <input data-bind="value: $data['decision']" />
+        <span data-bind="text: $data['to']"></span> if <input data-bind="value: $data['condition']" />
       </span>
-      <span data-bind="text: properties.default['to']"></span> by default
       <a>${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
     </div>
   </div>
