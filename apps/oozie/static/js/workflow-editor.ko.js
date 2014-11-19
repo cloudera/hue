@@ -211,7 +211,6 @@ var Workflow = function (vm, workflow) {
 
         	vm.currentlyCreatedJoin.properties['fork_id'] = vm.currentlyCreatedFork.id;
             vm.currentlyCreatedFork.properties['join_id'] = vm.currentlyCreatedJoin.id;
-            vm.currentlyCreatedFork.properties['default'] = {'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'};
         	  
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
@@ -222,6 +221,7 @@ var Workflow = function (vm, workflow) {
             var afterParent = self.getNodeById(afterParentId);
             fork.children.push({'to': afterParentId, 'condition': ''});
             fork.children.push({'to': node.id(), 'condition': ''});
+            fork.children.push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a', 'condition': 'default'});
             
             forkParent.get_link('to')['to'] = fork.id();
             
@@ -246,7 +246,7 @@ var Workflow = function (vm, workflow) {
             node.set_link('to', join.id());
     	    node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
 
-    	    parent.children.push({'to': node.id()});          	  
+    	    parent.children.push({'to': node.id(), 'condition': ''});          	  
           }
         } else {
           var parentWidget = vm.getWidgetPredecessor(node.id());

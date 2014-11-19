@@ -15,13 +15,19 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <decision name="${ node }">
+    <decision name="${ node['name'] }">
         <switch>
-        % for link in node.get_children_links('start'):
-            <case to="${ link.child }">
-              ${ link.comment }
+          % for child in node['children']:
+            % if child['condition'] != 'default':
+            <case to="${ node_mapping[child['to']].name }">
+              ${ child['condition'] }
             </case>
-        % endfor
-            <default to="${ node.get_oozie_child('default') }"/>
+            % endif
+          % endfor
+          % for child in node['children']:
+            % if child['condition'] == 'default':          
+            <default to="${ node_mapping[child['to']].name }"/>
+            % endif
+          % endfor            
         </switch>
     </decision>
