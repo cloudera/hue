@@ -147,7 +147,7 @@ REDIRECT_WHITELIST = Config(
          "For example, to restrict to your local domain and FQDN, the following value can be used:"
          "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
   type=list_of_compiled_res(skip_empty=True),
-  default='')
+  default='^\/.*$')
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",

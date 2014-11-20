@@ -17,6 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop import conf
 %>
 
 ${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
@@ -37,6 +38,10 @@ ${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
               %endif
 
               <a class="btn" onclick="history.back()">${ _('Back') }</a>
+
+              %if conf.REDIRECT_WHITELIST.get():
+                <a class="btn btn-primary" href="/">${ _('Home') }</a>
+              % endif
             </p>
           </div>
         </div>

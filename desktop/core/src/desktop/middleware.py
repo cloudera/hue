@@ -259,6 +259,7 @@ class AppSpecificMiddleware(object):
         result['exception'].insert(0, mw_instance.process_exception)
     return result
 
+
 class LoginAndPermissionMiddleware(object):
   """
   Middleware that forces all views (except those that opt out) through authentication.
@@ -487,6 +488,7 @@ class HtmlValidationMiddleware(object):
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 
+
 class SpnegoMiddleware(object):
   """
   Based on the WSGI SPNEGO middlware class posted here:
@@ -622,8 +624,12 @@ class EnsureSafeRedirectURLMiddleware(object):
   Middleware to white list configured redirect URLs.
   """
   def process_response(self, request, response):
-    if response.status_code == 302:
-      if any([regexp.match(response['Location']) for regexp in desktop.conf.REDIRECT_WHITELIST.get()]):
+    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location'):
+      redirection_pattern =  desktop.conf.REDIRECT_WHITELIST.get()
+      if 'HTTP_HOST' in request.META.keys():
+        redirection_pattern.append(re.compile(r"^http:\/\/" + request.META.get('HTTP_HOST') + ".*$"))
+
+      if any([regexp.match(response['Location']) for regexp in redirection_pattern]):
         return response
 
       response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
@@ -631,3 +637,4 @@ class EnsureSafeRedirectURLMiddleware(object):
       return response
     else:
       return response
+
