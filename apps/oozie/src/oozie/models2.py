@@ -152,9 +152,8 @@ class Workflow():
     tmpl = 'editor/gen2/workflow.xml.mako'
 
     data = self.get_data()
-    nodes = [Node(node) for node in data['workflow']['nodes']]
-    end = nodes.pop(1)
-    nodes.append(end) # End at the end 
+    nodes = [Node(node) for node in data['workflow']['nodes'] if node['name'] != 'End'] + [
+                Node(node) for node in data['workflow']['nodes'] if node['name'] == 'End'] # End at the end
     node_mapping = dict([(node.id, node) for node in nodes])
     
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
