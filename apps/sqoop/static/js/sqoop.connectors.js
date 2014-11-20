@@ -20,26 +20,26 @@ var connectors = (function($) {
     'id': -1,
     'name': null,
     'class': null,
-    'job_forms': {
-      'IMPORT': [],
-      'EXPORT': []
+    'job_config': {
+      'FROM': [],
+      'TO': []
     },
-    'con_forms': [],
+    'link_config': [],
     'version': null,
-    'resources': {},
+    'config_resources': {},
     'initialize': function(attrs) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
       _attrs = transform_keys(_attrs, {
-        'job-forms': 'job_forms',
-        'con-forms': 'con_forms'
+        'link_config': 'link_config',
+        'job_config': 'job_config'
       });
       _attrs = transform_values(_attrs, {
-        'con_forms': to_forms,
-        'job_forms': function(key, value) {
+        'link_config': to_configs,
+        'job_config': function(key, value) {
           transform_values(value, {
-            'IMPORT': to_forms,
-            'EXPORT': to_forms
+            'FROM': to_configs,
+            'TO': to_configs
           });
           return value;
         }
@@ -62,7 +62,7 @@ var connectors = (function($) {
       var self = this;
       var mapping_options = $.extend(true, {
         'ignore': ['parent', 'initialize']
-      }, forms.MapProperties);
+      }, configs.MapProperties);
       if ('__ko_mapping__' in self) {
         ko.mapping.fromJS(self.model, mapping_options, self);
       } else {

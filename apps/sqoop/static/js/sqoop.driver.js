@@ -16,41 +16,29 @@
 
 
 
-var framework = (function($) {
-  var FrameworkModel = koify.Model.extend({
+var driver = (function($) {
+  var DriverModel = koify.Model.extend({
     'id': 1,
-    'job_forms': {
-      'IMPORT': [],
-      'EXPORT': []
-    },
-    'con_forms': [],
-    'resources': {},
+    'job_config': [],
+    'config_resources': {},
     'initialize': function(attrs) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
       _attrs = transform_keys(_attrs, {
-        'job-forms': 'job_forms',
-        'con-forms': 'con_forms'
+        'job_config': 'job_config'
       });
       _attrs = transform_values(_attrs, {
-        'con_forms': to_forms,
-        'job_forms': function(key, value) {
-          transform_values(value, {
-            'IMPORT': to_forms,
-            'EXPORT': to_forms
-          });
-          return value;
-        }
+        'job_config': to_configs
       });
       return _attrs;
     }
   });
 
-  var Framework = koify.Node.extend({
-    'identifier': 'framework',
+  var Driver = koify.Node.extend({
+    'identifier': 'driver',
     'persists': false,
-    'model_class': FrameworkModel,
-    'base_url': '/sqoop/api/framework/',
+    'model_class': DriverModel,
+    'base_url': '/sqoop/api/driver/',
     'initialize': function() {
       var self = this;
       self.parent.initialize.apply(self, arguments);
@@ -60,7 +48,7 @@ var framework = (function($) {
       var self = this;
       var mapping_options = $.extend(true, {
         'ignore': ['parent', 'initialize']
-      }, forms.MapProperties);
+      }, configs.MapProperties);
       if ('__ko_mapping__' in self) {
         ko.mapping.fromJS(self.model, mapping_options, self);
       } else {
@@ -71,7 +59,7 @@ var framework = (function($) {
   });
 
   return {
-    'FrameworkModel': FrameworkModel,
-    'Framework': Framework
+    'DriverModel': DriverModel,
+    'Driver': Driver
   }
 })($);

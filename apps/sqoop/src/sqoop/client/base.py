@@ -28,9 +28,9 @@ from django.utils.translation import ugettext as _
 from desktop.conf import TIME_ZONE
 from desktop.lib.rest.http_client import HttpClient
 
-from connection import Connection, SqoopConnectionException
+from link import Link, SqoopLinkException
 from connector import Connector
-from framework import Framework
+from driver import Driver
 from job import Job, SqoopJobException
 from submission import Submission, SqoopSubmissionException
 from resource import SqoopResource
@@ -44,9 +44,7 @@ _JSON_CONTENT_TYPE = 'application/json'
 
 
 class SqoopClient(object):
-  """
-  Sqoop client
-  """
+
   STATUS_GOOD = ('FINE', 'ACCEPTABLE')
   STATUS_BAD = ('UNACCEPTABLE', 'FAILURE_ON_SUBMIT')
 
@@ -75,91 +73,90 @@ class SqoopClient(object):
   def get_version(self):
     return self._root.get('version', headers=self.headers)
 
-  def get_framework(self):
-    resp_dict = self._root.get('%s/framework/all' % API_VERSION, headers=self.headers)
-    framework = Framework.from_dict(resp_dict)
-    return framework
+  def get_driver(self):
+    resp_dict = self._root.get('%s/driver' % API_VERSION, headers=self.headers)
+    driver = Driver.from_dict(resp_dict)
+    return driver
 
   def get_connectors(self):
-    resp_dict = self._root.get('%s/connector/all' % API_VERSION, headers=self.headers)
-    connectors = [ Connector.from_dict(connector_dict, resp_dict['resources-connector']) for connector_dict in resp_dict['all'] ]
+    resp_dict = self._root.get('%s/connectors' % API_VERSION, headers=self.headers)
+    connectors = [ Connector.from_dict(connector_dict) for connector_dict in resp_dict['connectors'] ]
     return connectors
 
   def get_connector(self, connector_id):
     resp_dict = self._root.get('%s/connector/%d/' % (API_VERSION, connector_id), headers=self.headers)
-    if resp_dict['all']:
-      return Connector.from_dict(resp_dict['all'][0], resp_dict['resources-connector'])
+    if resp_dict['connector']:
+      return Connector.from_dict(resp_dict['connector'])
     return None
 
-  def get_connections(self):
-    resp_dict = self._root.get('%s/connection/all' % API_VERSION, headers=self.headers)
-    connections = [Connection.from_dict(conn_dict) for conn_dict in resp_dict['all']]
-    return connections
+  def get_links(self):
+    resp_dict = self._root.get('%s/links' % API_VERSION, headers=self.headers)
+    links = [Link.from_dict(link_dict) for link_dict in resp_dict['links']]
+    return links
 
-  def get_connection(self, connection_id):
-    resp_dict = self._root.get('%s/connection/%d/' % (API_VERSION, connection_id), headers=self.headers)
-    if resp_dict['all']:
-      return Connection.from_dict(resp_dict['all'][0])
+  def get_link(self, link_id):
+    resp_dict = self._root.get('%s/link/%d/' % (API_VERSION, link_id), headers=self.headers)
+    if resp_dict['link']:
+      return Link.from_dict(resp_dict['link'][0])
     return None
 
-  def create_connection(self, connection):
-    if not connection.connector:
-      connection.connector = self.get_connectors()[0].con_forms
-    if not connection.framework:
-      connection.framework = self.get_framework().con_forms
-    connection.creation_date = int( round(time.time() * 1000) )
-    connection.update_date = connection.creation_date
-    connection_dict = connection.to_dict()
+  def create_link(self, link):
+    if not link.connector:
+      link.connector = self.get_connectors()[0].link_config
+    if not link.driver:
+      link.driver = self.get_driver().job_config
+    link.creation_date = int( round(time.time() * 1000) )
+    link.update_date = link.creation_date
+    link_dict = link.to_dict()
     request_dict = {
-      'all': [connection_dict]
+      'link': [link_dict]
     }
-    resp = self._root.post('%s/connection/' % API_VERSION, data=json.dumps(request_dict), headers=self.headers)
+    resp = self._root.post('%s/link/' % API_VERSION, data=json.dumps(request_dict), headers=self.headers)
     if 'id' not in resp:
-      raise SqoopConnectionException.from_dict(resp)
-    connection.id = resp['id']
-    return connection
+      raise SqoopLinkException.from_dict(resp)
+    link.id = resp['id']
+    return link
 
-  def update_connection(self, connection):
-    """ Update a connection """
-    if not connection.connector:
-      connection.connector = self.get_connectors()[0].con_forms
-    if not connection.framework:
-      connection.framework = self.get_framework().con_forms
-    connection.updated = int( round(time.time() * 1000) )
-    connection_dict = connection.to_dict()
+  def update_link(self, link):
+    if not link.link_config_values:
+      link.link_config_values = self.get_connectors()[0].link_config
+    link.updated = int( round(time.time() * 1000) )
+    link_dict = link.to_dict()
     request_dict = {
-      'all': [connection_dict]
+      'link': [link_dict]
     }
-    resp = self._root.put('%s/connection/%d/' % (API_VERSION, connection.id), data=json.dumps(request_dict), headers=self.headers)
-    if resp['connector']['status'] in SqoopClient.STATUS_BAD or resp['framework']['status'] in SqoopClient.STATUS_BAD:
-      raise SqoopConnectionException.from_dict(resp)
-    return connection
+    resp = self._root.put('%s/link/%d/' % (API_VERSION, link.id), data=json.dumps(request_dict), headers=self.headers)
+    if resp['connector']['status'] in SqoopClient.STATUS_BAD or resp['driver']['status'] in SqoopClient.STATUS_BAD:
+      raise SqoopLinkException.from_dict(resp)
+    return link
 
-  def delete_connection(self, connection):
-    resp = self._root.delete('%s/connection/%d/' % (API_VERSION, connection.id), headers=self.headers)
+  def delete_link(self, link):
+    resp = self._root.delete('%s/link/%d/' % (API_VERSION, link.id), headers=self.headers)
     return None
 
   def get_jobs(self):
-    resp_dict = self._root.get('%s/job/all' % API_VERSION, headers=self.headers)
-    jobs = [Job.from_dict(job_dict) for job_dict in resp_dict['all']]
+    resp_dict = self._root.get('%s/jobs' % API_VERSION, headers=self.headers)
+    jobs = [Job.from_dict(job_dict) for job_dict in resp_dict['jobs']]
     return jobs
 
   def get_job(self, job_id):
     resp_dict = self._root.get('%s/job/%d/' % (API_VERSION, job_id), headers=self.headers)
-    if resp_dict['all']:
-      return Job.from_dict(resp_dict['all'][0])
+    if resp_dict['job']:
+      return Job.from_dict(resp_dict['job'])
     return None
 
   def create_job(self, job):
-    if not job.connector:
-      job.connector = self.get_connectors()[0].job_forms[job.type.upper()]
-    if not job.framework:
-      job.framework = self.get_framework().job_forms[job.type.upper()]
+    if not job.from_config_values:
+      job.from_config_values = self.get_connectors()[0].job_config['FROM']
+    if not job.to_config_values:
+      job.to_config_values = self.get_connectors()[0].job_config['TO']
+    if not job.driver_config_values:
+      job.driver_config_values = self.get_driver().job_config
     job.creation_date = int( round(time.time() * 1000) )
     job.update_date = job.creation_date
     job_dict = job.to_dict()
     request_dict = {
-      'all': [job_dict]
+      'job': [job_dict]
     }
     resp = self._root.post('%s/job/' % API_VERSION, data=json.dumps(request_dict), headers=self.headers)
     if 'id' not in resp:
@@ -168,17 +165,19 @@ class SqoopClient(object):
     return job
 
   def update_job(self, job):
-    if not job.connector:
-      job.connector = self.get_connectors()[0].job_forms[job.type.upper()]
-    if not job.framework:
-      job.framework = self.get_framework().job_forms[job.type.upper()]
+    if not job.from_config_values:
+      job.from_config_values = self.get_connectors()[0].job_config['FROM']
+    if not job.to_config_values:
+      job.to_config_values = self.get_connectors()[0].job_config['TO']
+    if not job.driver_config_values:
+      job.driver_config_values = self.get_driver().job_config
     job.updated = int( round(time.time() * 1000) )
     job_dict = job.to_dict()
     request_dict = {
-      'all': [job_dict]
+      'job': [job_dict]
     }
     resp = self._root.put('%s/job/%d/' % (API_VERSION, job.id), data=json.dumps(request_dict), headers=self.headers)
-    if resp['connector']['status'] in SqoopClient.STATUS_BAD or resp['framework']['status'] in SqoopClient.STATUS_BAD:
+    if resp['connector']['status'] in SqoopClient.STATUS_BAD or resp['driver']['status'] in SqoopClient.STATUS_BAD:
       raise SqoopJobException.from_dict(resp)
     return job
 
@@ -187,22 +186,22 @@ class SqoopClient(object):
     return None
 
   def get_job_status(self, job):
-    resp_dict = self._root.get('%s/submission/action/%d/' % (API_VERSION, job.id), headers=self.headers)
-    return Submission.from_dict(resp_dict['all'][0])
+    resp_dict = self._root.get('%s/job/status/%d/' % (API_VERSION, job.id), headers=self.headers)
+    return Submission.from_dict(resp_dict['submission'])
 
   def start_job(self, job):
-    resp_dict = self._root.post('%s/submission/action/%d/' % (API_VERSION, job.id), headers=self.headers)
-    if resp_dict['all'][0]['status'] in SqoopClient.STATUS_BAD:
-      raise SqoopSubmissionException.from_dict(resp_dict['all'][0])
-    return Submission.from_dict(resp_dict['all'][0])
+    resp_dict = self._root.post('%s/job/start/%d/' % (API_VERSION, job.id), headers=self.headers)
+    if resp_dict['submission'][0]['status'] in SqoopClient.STATUS_BAD:
+      raise SqoopSubmissionException.from_dict(resp_dict['submission'])
+    return Submission.from_dict(resp_dict['submission'])
 
   def stop_job(self, job):
-    resp_dict = self._root.delete('%s/submission/action/%d/' % (API_VERSION, job.id), headers=self.headers)
-    return Submission.from_dict(resp_dict['all'][0])
+    resp_dict = self._root.delete('%s/job/stop/%d/' % (API_VERSION, job.id), headers=self.headers)
+    return Submission.from_dict(resp_dict['submission'])
 
   def get_submissions(self):
-    resp_dict = self._root.get('%s/submission/history/all' % API_VERSION, headers=self.headers)
-    submissions = [Submission.from_dict(submission_dict) for submission_dict in resp_dict['all']]
+    resp_dict = self._root.get('%s/submissions' % API_VERSION, headers=self.headers)
+    submissions = [Submission.from_dict(submission_dict) for submission_dict in resp_dict['submissions']]
     return submissions
 
   def set_user(self, user):

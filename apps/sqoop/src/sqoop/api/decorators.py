@@ -38,12 +38,6 @@ LOG = logging.getLogger(__name__)
 
 
 def get_connector_or_exception(exception_class=PopupException):
-  """
-  Decorator ensuring that the user has access to the Connector.
-
-  :param connector_id: Connector ID
-  :returns: Connector
-  """
   def inner(view_func):
     def decorate(request, connector_id, *args, **kwargs):
       try:
@@ -56,32 +50,20 @@ def get_connector_or_exception(exception_class=PopupException):
   return inner
 
 
-def get_connection_or_exception(exception_class=PopupException):
-  """
-  Decorator ensuring that the user has access to the connection.
-
-  :param connection_id: Connection ID
-  :returns: Connection
-  """
+def get_link_or_exception(exception_class=PopupException):
   def inner(view_func):
-    def decorate(request, connection_id, *args, **kwargs):
+    def decorate(request, link_id, *args, **kwargs):
       try:
         c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-        connection = c.get_connection(int(connection_id))
+        link = c.get_link(int(link_id))
       except RestException, e:
-        handle_rest_exception(e, _('Could not get connection.'))
-      return view_func(request, connection=connection, *args, **kwargs)
+        handle_rest_exception(e, _('Could not get link.'))
+      return view_func(request, link=link, *args, **kwargs)
     return wraps(view_func)(decorate)
   return inner
 
 
 def get_job_or_exception(exception_class=PopupException):
-  """
-  Decorator ensuring that the user has access to the job.
-
-  :param job_id: Job ID
-  :returns: Job
-  """
   def inner(view_func):
     def decorate(request, job_id, *args, **kwargs):
       try:
@@ -95,12 +77,6 @@ def get_job_or_exception(exception_class=PopupException):
 
 
 def get_submission_or_exception(exception_class=PopupException):
-  """
-  Decorator ensuring that the user has access to the submission.
-
-  :param submission_id: Submission ID
-  :returns: Submission
-  """
   def inner(view_func):
     def decorate(request, submission_id, *args, **kwargs):
       try:

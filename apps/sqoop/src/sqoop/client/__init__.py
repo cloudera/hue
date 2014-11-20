@@ -15,8 +15,8 @@
 # limitations under the License.
 
 from base import SqoopClient
-from connection import Connection
+from link import Link
 from connector import Connector
-from framework import Framework
+from driver import Driver
 from job import Job
 from submission import Submission

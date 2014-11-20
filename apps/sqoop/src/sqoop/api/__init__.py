@@ -16,10 +16,10 @@
 # limitations under the License.
 
 from autocomplete import autocomplete
-from connection import get_connections, create_connection, update_connection,\
-                       connection, connections, connection_clone, connection_delete
+from link import get_links, create_link, update_link,\
+                       link, links, link_clone, link_delete
 from connector import get_connectors, connectors, connector
-from framework import framework
+from driver import driver
 from job import get_jobs, create_job, update_job,\
                 job, jobs, job_clone, job_delete,\
                 job_start, job_stop, job_status

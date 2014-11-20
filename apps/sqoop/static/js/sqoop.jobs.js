@@ -22,23 +22,25 @@ var jobs = (function($) {
   var JobModel = koify.Model.extend({
     'id': -1,
     'name': null,
-    'type': 'IMPORT',
-    'connector_id': 0,
-    'connection_id': 0,
-    'connector': [],
-    'framework': [],
+    'from_connector_id': 0,
+    'from_link_id': 0,
+    'to_connector_id': 0,
+    'to_link_id': 0,
+    'from_config_values': [],
+    'to_config_values': [],
+    'driver_config_values': [],
     'creation_date': null,
     'creation_user': null,
     'update_date': null,
     'update_user': null,
-    'setImport': function(){
-      this.type("IMPORT");
+    'setFrom': function(){
+      this.type("FROM");
       // Huge hack for now
       $('a').filter(function(index) { return $(this).text() === "Step 2: To"; }).text("Step 2: From");
       $('a').filter(function(index) { return $(this).text() === "Step 3: From"; }).text("Step 3: To");
     },
-    'setExport': function(){
-      this.type("EXPORT");
+    'setTo': function(){
+      this.type("TO");
       $('a').filter(function(index) { return $(this).text() === "Step 2: From"; }).text("Step 2: To");
       $('a').filter(function(index) { return $(this).text() === "Step 3: To"; }).text("Step 3: From");
     },
@@ -46,12 +48,15 @@ var jobs = (function($) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
       _attrs = transform_keys(_attrs, {
-        'connector-id': 'connector_id',
-        'connection-id': 'connection_id'
+        'from-connector-id': 'from_connector_id',
+        'to-connector-id': 'to_connector_id',
+        'from-link-id': 'from_link_id',
+        'to-link-id': 'to_link_id'
       });
       _attrs = transform_values(_attrs, {
-        'connector': to_forms,
-        'framework': to_forms
+        'from-config-values': to_configs,
+        'to-config-values': to_configs,
+        'driver-config-values': to_configs
       });
       return _attrs;
     }
@@ -67,14 +72,14 @@ var jobs = (function($) {
       self.parent.initialize.apply(self, arguments);
       self.createdFormatted = ko.computed(function() {
         if (self.creation_date()) {
-          return moment(self.creation_date()).format('MM/DD/YYYY hh:mm A');
+          return moment(self.creation_date()).configat('MM/DD/YYYY hh:mm A');
         } else {
           return 0;
         }
       });
       self.updatedFormatted = ko.computed(function() {
         if (self.update_date()) {
-          return moment(self.update_date()).format('MM/DD/YYYY hh:mm A');
+          return moment(self.update_date()).configat('MM/DD/YYYY hh:mm A');
         } else {
           return 0;
         }
@@ -115,9 +120,9 @@ var jobs = (function($) {
       });
       self.outputDirectoryFilebrowserURL = ko.computed(function() {
         var output_directory = null;
-        $.each(self.framework(), function(index, form) {
-          if (form.name() == 'output') {
-            $.each(form.inputs(), function(index, input) {
+        $.each(self.to_config_values(), function(index, config) {
+          if (config.name() == 'output') {
+            $.each(config.inputs(), function(index, input) {
               if (input.name() == 'output.outputDirectory') {
                 output_directory = input.value();
               }
@@ -128,9 +133,9 @@ var jobs = (function($) {
       });
       self.inputDirectoryFilebrowserURL = ko.computed(function() {
         var input_directory = null;
-        $.each(self.framework(), function(index, form) {
-          if (form.name() == 'input') {
-            $.each(form.inputs(), function(index, input) {
+        $.each(self.from_config_values(), function(index, config) {
+          if (config.name() == 'input') {
+            $.each(config.inputs(), function(index, input) {
               if (input.name() == 'input.inputDirectory') {
                 input_directory = input.value();
               }
@@ -141,11 +146,11 @@ var jobs = (function($) {
       });
       self.storageType = ko.computed(function() {
         var storage_type = null;
-        $.each(self.framework(), function(index, form) {
-          if (form.name() == 'input') {
+        $.each(self.from_config_values(), function(index, config) {
+          if (config.name() == 'input') {
             storage_type = 'HDFS'; // Hardcoded for now
-          } else if (form.name() == 'output') {
-            $.each(form.inputs(), function(index, input) {
+          } else if (config.name() == 'output') {
+            $.each(config.inputs(), function(index, input) {
               if (input.name() == 'output.storageType') {
                 storage_type = input.value();
               }
@@ -156,9 +161,9 @@ var jobs = (function($) {
       });
       self.table = ko.computed(function() {
         var table = null;
-        $.each(self.connector(), function(index, form) {
-          if (form.name() == 'table') {
-            $.each(form.inputs(), function(index, input) {
+        $.each(self.from_config_values(), function(index, config) {
+          if (config.name() == 'table') {
+            $.each(config.inputs(), function(index, input) {
               if (input.name() == 'table.tableName') {
                 table = input.value();
               }
@@ -174,7 +179,7 @@ var jobs = (function($) {
       var self = this;
       var mapping_options = $.extend(true, {
         'ignore': ['parent', 'initialize']
-      }, forms.MapProperties);
+      }, configs.MapProperties);
       if ('__ko_mapping__' in self) {
         ko.mapping.fromJS(self.model, mapping_options, self);
       } else {
@@ -205,7 +210,7 @@ var jobs = (function($) {
     },
     'stop': function(options) {
       var self = this;
-      $(document).trigger('start.job', [options, self]);
+      $(document).trigger('stop.job', [options, self]);
       var options = $.extend({
         type: 'POST',
         success: function(data) {
@@ -281,6 +286,6 @@ var jobs = (function($) {
     'Job': Job,
     'fetchJobs': fetch_jobs,
     'putJob': put_job,
-    'getJob': get_job,
+    'getJob': get_job
   }
 })($);

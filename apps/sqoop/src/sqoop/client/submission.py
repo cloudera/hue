@@ -19,7 +19,7 @@ import logging
 from desktop.lib.python_util import force_dict_to_strings
 
 from exception import SqoopException
-from form import Form
+from config import Config
 
 
 class Submission(object):
@@ -75,24 +75,7 @@ class Submission(object):
 
 
 class SqoopSubmissionException(SqoopException):
-  """
-  Sqoop submission object.
 
-  Example of sqoop submission exception dictionary received by server:
-  {
-    "all": [
-      {
-        "status": "FAILURE_ON_SUBMIT",
-        "exception": "org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory test already exists",
-        "exception-trace": "org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory test already exists\n\tat org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.checkOutputSpecs(FileOutputFormat.java:132)\n\tat org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:984)\n\tat org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:945)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:396)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1408)\n\tat org.apache.hadoop.mapred.JobClient.submitJobInternal(JobClient.java:945)\n\tat org.apache.hadoop.mapreduce.Job.submit(Job.java:566)\n\tat org.apache.sqoop.submission.mapreduce.MapreduceSubmissionEngine.submit(MapreduceSubmissionEngine.java:265)\n\tat org.apache.sqoop.framework.JobManager.submit(JobManager.java:382)\n\tat org.apache.sqoop.handler.SubmissionRequestHandler.submissionSubmit(SubmissionRequestHandler.java:128)\n\tat org.apache.sqoop.handler.SubmissionRequestHandler.handleActionEvent(SubmissionRequestHandler.java:106)\n\tat org.apache.sqoop.handler.SubmissionRequestHandler.handleEvent(SubmissionRequestHandler.java:72)\n\tat org.apache.sqoop.server.v1.SubmissionServlet.handlePostRequest(SubmissionServlet.java:44)\n\tat org.apache.sqoop.server.SqoopProtocolServlet.doPost(SqoopProtocolServlet.java:63)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:637)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:717)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)\n\tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)\n\tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)\n\tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)\n\tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103)\n\tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)\n\tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:293)\n\tat org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:861)\n\tat org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:606)\n\tat org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)\n\tat java.lang.Thread.run(Thread.java:662)\n",
-        "job": 1,
-        "creation-date": 1372390164970,
-        "progress": -1.0,
-        "last-update-date": 1372390164970
-      }
-    ]
-  }
-  """
   def __init__(self, job_id, status, progress, created, updated, **kwargs):
     self.job_id = job_id
     self.status = status
