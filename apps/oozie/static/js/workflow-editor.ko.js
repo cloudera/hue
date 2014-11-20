@@ -216,10 +216,7 @@ var Workflow = function (vm, workflow) {
           var node = new Node(_node);
         }
 
-        // Add to list of nodes before end
-        var end = self.nodes.pop();
         self.nodes.push(node);
-        self.nodes.push(end);
 
         if (vm.currentlyCreatingFork) {
           // Added to the side ?
@@ -234,13 +231,15 @@ var Workflow = function (vm, workflow) {
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
             
+	        self.nodes.push(fork);
+	        self.nodes.push(join);
+            
             var forkParent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
             
             var afterParentId = ko.mapping.toJS(forkParent.get_link('to')).to;
             var afterParent = self.getNodeById(afterParentId);
             fork.children.push({'to': afterParentId, 'condition': ''});
             fork.children.push({'to': node.id(), 'condition': ''});
-            fork.children.push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a', 'condition': 'default'});
             
             forkParent.get_link('to')['to'] = fork.id();
             
@@ -252,13 +251,9 @@ var Workflow = function (vm, workflow) {
             } else {
               afterParent.set_link('to', join.id());
             }
+            
 	        node.set_link('to', join.id());
 	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
-	        
-	        var end = self.nodes.pop();
-	        self.nodes.push(fork);
-	        self.nodes.push(join);
-	        self.nodes.push(end);
           } else {
             // Just add to existing fork
         	var join = vm.getWidgetSuccessor(node.id()); 
@@ -897,6 +892,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       // Remove the join
       self.workflow.removeNode(_next.widgets()[0].id());
       self.removeWidgetById(_next.widgets()[0].id());
+      
+      node.children.push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a', 'condition': 'default'});
 
       widget.widgetType("decision-widget");
       node.type("decision-widget");
