@@ -6,7 +6,7 @@
 
   <field name="params" type="TextField">
     <xsl:text>[</xsl:text>
-    <xsl:for-each select="*[local-name()='param'] | *[local-name()='argument']">
+    <xsl:for-each select="*[local-name()='param'] | *[starts-with(local-name(), 'arg')]">
       <xsl:choose>
         <xsl:when test="position() &lt; last()">
           <xsl:text><![CDATA[{"type":"]]></xsl:text><xsl:value-of select="local-name()" /><xsl:text><![CDATA[","value":"]]></xsl:text><xsl:value-of select="." /><xsl:text><![CDATA["},]]></xsl:text>
