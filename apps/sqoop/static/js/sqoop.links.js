@@ -15,17 +15,16 @@
 // limitations under the License.
 
 
-var connections = (function($) {
-  var ConnectionModel = koify.Model.extend({
+var links = (function($) {
+  var LinkModel = koify.Model.extend({
     'id': -1,
     'name': null,
-    'connector': [],
+    'link_config_values': [],
     'connector_id': 0,
     'creation_date': null,
     'creation_user': null,
     'update_date': null,
     'update_user': null,
-    'framework': [],
     'initialize': function(attrs) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
@@ -33,18 +32,17 @@ var connections = (function($) {
         'connector-id': 'connector_id'
       });
       _attrs = transform_values(_attrs, {
-        'connector': to_forms,
-        'framework': to_forms
+        'link_config_values': to_configs
       });
       return _attrs;
     }
   });
 
-  var Connection = koify.Node.extend({
-    'identifier': 'connection',
+  var Link = koify.Node.extend({
+    'identifier': 'linkConfig',
     'persists': true,
-    'model_class': ConnectionModel,
-    'base_url': '/sqoop/api/connections/',
+    'model_class': LinkModel,
+    'base_url': '/sqoop/api/links/',
     'initialize': function(options) {
       var self = this;
       self.parent.initialize.apply(self, arguments);
@@ -53,24 +51,24 @@ var connections = (function($) {
         return self.id() > -1;
       });
       self.connectionString = ko.computed(function() {
-        var connection_string = null;
-        $.each(self.connector(), function(index, form) {
-          if (form.name() == 'connection') {
-            $.each(form.inputs(), function(index, input) {
-              if (input.name() == 'connection.connectionString') {
-                connection_string = input.value();
+        var link_string = null;
+        $.each(self.link_config_values(), function(index, config) {
+          if (config.name() == 'linkConfig') {
+            $.each(config.inputs(), function(index, input) {
+              if (input.name() == 'linkConfig.connectionString') {
+                link_string = input.value();
               }
             });
           }
         });
-        return connection_string;
+        return link_string;
       });
       self.jdbcDriver = ko.computed(function() {
         var jdbc_driver = null;
-        $.each(self.connector(), function(index, form) {
-          if (form.name() == 'connection') {
-            $.each(form.inputs(), function(index, input) {
-              if (input.name() == 'connection.jdbcDriver') {
+        $.each(self.link_config_values(), function(index, config) {
+          if (config.name() == 'linkConfig') {
+            $.each(config.inputs(), function(index, input) {
+              if (input.name() == 'linkConfig.jdbcDriver') {
                 jdbc_driver = input.value();
               }
             });
@@ -157,10 +155,10 @@ var connections = (function($) {
       });
       self.username = ko.computed(function() {
         var username = null;
-        $.each(self.connector(), function(index, form) {
-          if (form.name() == 'connection') {
-            $.each(form.inputs(), function(index, input) {
-              if (input.name() == 'connection.username') {
+        $.each(self.link_config_values(), function(index, config) {
+          if (config.name() == 'linkConfig') {
+            $.each(config.inputs(), function(index, input) {
+              if (input.name() == 'linkConfig.username') {
                 username = input.value();
               }
             });
@@ -170,10 +168,10 @@ var connections = (function($) {
       });
       self.password = ko.computed(function() {
         var password = null;
-        $.each(self.connector(), function(index, form) {
-          if (form.name() == 'connection') {
-            $.each(form.inputs(), function(index, input) {
-              if (input.name() == 'connection.password') {
+        $.each(self.link_config_values(), function(index, config) {
+          if (config.name() == 'linkConfig') {
+            $.each(config.inputs(), function(index, input) {
+              if (input.name() == 'linkConfig.password') {
                 password = input.value();
               }
             });
@@ -196,34 +194,34 @@ var connections = (function($) {
       });
     },
     'map': function() {
-      var self = this;
-      var mapping_options = $.extend(true, {
-        'ignore': ['parent', 'initialize']
-      }, forms.MapProperties);
-      if ('__ko_mapping__' in self) {
-        ko.mapping.fromJS(self.model, mapping_options, self);
-      } else {
-        var mapped = ko.mapping.fromJS(self.model, mapping_options);
-        $.extend(self, mapped);
-      }
-    },
+        var self = this;
+        var mapping_options = $.extend(true, {
+            'ignore': ['parent', 'initialize']
+        }, configs.MapProperties);
+        if ('__ko_mapping__' in self) {
+            ko.mapping.fromJS(self.model, mapping_options, self);
+        } else {
+            var mapped = ko.mapping.fromJS(self.model, mapping_options);
+            $.extend(self, mapped);
+        }
+    }
   });
 
-  function fetch_connections(options) {
-    $(document).trigger('load.connections', [options]);
+  function fetch_links(options) {
+    $(document).trigger('load.links', [options]);
     var request = $.extend({
-      url: '/sqoop/api/connections/',
+      url: '/sqoop/api/links/',
       dataType: 'json',
       type: 'GET',
-      success: fetcher_success('connections', Connection, options),
-      error: fetcher_error('connections', Connection, options)
+      success: fetcher_success('links', Link, options),
+      error: fetcher_error('links', Link, options)
     }, options || {});
     $.ajax(request);
   }
 
   return {
-    'ConnectionModel': ConnectionModel,
-    'Connection': Connection,
-    'fetchConnections': fetch_connections
+    'LinkModel': LinkModel,
+    'Link': Link,
+    'fetchLinks': fetch_links
   }
 })($);

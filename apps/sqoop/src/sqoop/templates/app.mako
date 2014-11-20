@@ -28,21 +28,21 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Manage connections')}" href="#connections" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage connections')}</a>
+      <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
     </div>
     <h4>${_('Sqoop Jobs')}</h4>
     <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
   </div>
 
-  <div class="top-bar" data-bind="visible:shownSection() == 'connections-list'">
+  <div class="top-bar" data-bind="visible:shownSection() == 'links-list'">
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new connection')}" href="#connection/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New connection')}</a>
+      <a title="${_('Create a new link')}" href="#link/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New link')}</a>
     </div>
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
       <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
     </div>
-    <h4>${_('Sqoop Connections')}</h4>
-    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for connection name or content')}"  data-bind="visible: isReady">
+    <h4>${_('Sqoop Links')}</h4>
+    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
   </div>
 
   <!-- ko if: job -->
@@ -54,9 +54,9 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'fa fa-arrow-circle-o-down': type() == 'IMPORT', 'fa fa-upload': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
   </div>
 
-  <div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'fa fa-arrow-circle-o-down': $root.job().type() == 'IMPORT', 'fa fa-upload': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
+  <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: editLink">
+    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i data-bind="css:{'fa fa-arrow-circle-o-down': $root.job().type() == 'IMPORT', 'fa fa-upload': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
   </div>
   <!-- /ko -->
 </div>
@@ -221,32 +221,32 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     </div>
   </div>
 
-  <div id="connections" class="row-fluid mainSection hide">
-    <div id="connections-list" class="row-fluid section hide">
+  <div id="links" class="row-fluid mainSection hide">
+    <div id="links-list" class="row-fluid section hide">
       <div class="row-fluid" data-bind="if: isReady">
-        <ul class="major-list" data-bind="foreach: filteredConnections">
-          <li data-bind="routie: 'connection/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="main" data-bind="template: {name: 'connection-list-item'}"></div>
+        <ul class="major-list" data-bind="foreach: filteredLinks">
+          <li data-bind="routie: 'link/edit/' + id()" title="${ _('Click to edit') }">
+            <div class="main" data-bind="template: {name: 'link-list-item'}"></div>
           </li>
         </ul>
-        <div class="card" data-bind="visible: filteredConnections().length == 0">
+        <div class="card" data-bind="visible: filteredLinks().length == 0">
           <div class="span10 offset1 center nojobs">
-            <a href="#connection/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
-            <h1 class="emptyMessage">${ _('There are currently no connections.') }<br/><a href="#connection/new">${ _('Click here to add one.') }</a></h1>
+            <a href="#link/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
+            <h1 class="emptyMessage">${ _('There are currently no links.') }<br/><a href="#link/new">${ _('Click here to add one.') }</a></h1>
           </div>
           <div class="clearfix"></div>
         </div>
       </div>
     </div>
 
-    <div id="connection-editor" class="row-fluid section hide" data-bind="with: editConnection">
-      <div id="connection-forms" class="span12">
+    <div id="link-editor" class="row-fluid section hide" data-bind="with: editLink">
+      <div id="link-forms" class="span12">
         <form method="POST" class="form form-horizontal noPadding">
           ${ csrf_token(request) | n,unicode }
           <div class="control-group">
             <label class="control-label">${ _('Name') }</label>
             <div class="controls">
-              <input type="text" name="connection-name" data-bind="value: name">
+              <input type="text" name="link-name" data-bind="value: name">
             </div>
           </div>
           <div class="control-group" data-bind="visible: !persisted()">
@@ -261,14 +261,14 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
               <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
             </div>
           </fieldset>
-          <fieldset data-bind="foreach: framework">
+          <fieldset data-bind="foreach: driver">
             <div data-bind="foreach: inputs">
-              <div data-bind="template: 'framework-' + type().toLowerCase()"></div>
+              <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
             </div>
           </fieldset>
           <div class="form-actions">
-            <a href="#connection/edit-cancel" class="btn">${_('Cancel')}</a>
-            <a href="#connection/save" class="btn btn-primary">${_('Save')}</a>
+            <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
+            <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
           </div>
         </form>
       </div>
@@ -301,19 +301,19 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </div>
 </script>
 
-<script type="text/html" id="delete-connection-modal">
+<script type="text/html" id="delete-link-modal">
 <div class="modal-header">
   <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
-  <h3 class="message">${_("Are you sure you'd like to delete this connection?") }</h3>
+  <h3 class="message">${_("Are you sure you'd like to delete this link?") }</h3>
 </div>
 <div class="modal-body"></div>
-<div class="modal-footer" data-bind="if: $root.connection">
+<div class="modal-footer" data-bind="if: $root.link">
   <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
-  <a data-bind="routie: {'url': 'connection/delete/' + $root.connection().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
+  <a data-bind="routie: {'url': 'link/delete/' + $root.link().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
 </script>
 
-<script type="text/html" id="connection-list-item">
+<script type="text/html" id="link-list-item">
 <h4 style="display: inline-block">
   <i class="fa fa-cog"></i>&nbsp;
   <span data-bind="text: name" class="muted"></span>
@@ -330,7 +330,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <i class="fa fa-download"></i>&nbsp;
   <span data-bind="text: type"></span>
   <span>${_('from ')}</span>
-  <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+  <span data-bind="text: $root.getDatabaseByConnectionId(link_id())"></span>
   <span>${_('to ')}</span>
   <span data-bind="text: storageType"></span>
   <span data-bind="text: name" class="muted"></span>
@@ -341,7 +341,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <span>${_('from ')}</span>
   <span data-bind="text: storageType"></span>
   <span>${_('to ')}</span>
-  <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+  <span data-bind="text: $root.getDatabaseByConnectionId(link_id())"></span>
   <span data-bind="text: name" class="muted"></span>
   <!-- /ko -->
 </h4>
@@ -379,12 +379,12 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 
 <script type="text/html" id="job-editor-begin">
 <fieldset>
-  <div data-bind="template: {'name': 'job-editor-form-error', 'data': {'name': ko.observable('connection')}}" class=""></div>
+  <div data-bind="template: {'name': 'job-editor-form-error', 'data': {'name': ko.observable('link')}}" class=""></div>
 
   <div class="control-group">
     <label class="control-label">${ _('Name') }</label>
     <div class="controls">
-      <input type="text" name="connection-name" data-bind="value: name">
+      <input type="text" name="link-name" data-bind="value: name">
     </div>
   </div>
 
@@ -406,11 +406,11 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <div class="control-group">
     <label class="control-label">${ _('Connection') }</label>
     <div class="controls">
-      <select name="connection" class="input-xlarge" data-bind="'options': $root.persistedConnections, 'optionsText': function(item) {return item.name();}, 'value': $root.connection">
+      <select name="link" class="input-xlarge" data-bind="'options': $root.persistedLinks, 'optionsText': function(item) {return item.name();}, 'value': $root.link">
       </select>
-      <!-- ko if: $root.connection() -->
+      <!-- ko if: $root.link() -->
       <div style="display:inline">
-        <a data-bind="routie: 'connection/edit/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+        <a data-bind="routie: 'link/edit/' + $root.link().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
           <i class="fa fa-edit"></i> ${_('Edit')}
         </a>
         <a data-bind="click: $root.showDeleteConnectionModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
@@ -419,8 +419,8 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       </div>
       <!-- /ko -->
       <div class="clearfix"></div>
-      <a data-bind="routie: 'connection/new'" href="javascript:void(0);" style="margin: 5px; display: block">
-        <i class="fa fa-plus"></i> ${_('Add a new connection')}
+      <a data-bind="routie: 'link/new'" href="javascript:void(0);" style="margin: 5px; display: block">
+        <i class="fa fa-plus"></i> ${_('Add a new link')}
       </a>
     </div>
   </div>
@@ -436,21 +436,21 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </fieldset>
 </script>
 
-<script type="text/html" id="job-editor-framework">
-<fieldset data-bind="foreach: framework">
+<script type="text/html" id="job-editor-driver">
+<fieldset data-bind="foreach: driver">
   <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
   <div data-bind="foreach: inputs">
-    <div data-bind="template: 'framework-' + type().toLowerCase()"></div>
+    <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
   </div>
 </fieldset>
 </script>
 
-<script type="text/html" id="framework-map">
+<script type="text/html" id="driver-map">
 <div data-bind="css: {
                   warning: name() in $root.warnings(),
                   error: name() in $root.errors()
                 }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name())"></label>
+  <label class="control-label" data-bind="text: $root.label('driver', name())"></label>
   <div class="controls">
 
     <table data-bind="visible: value() && value().length > 0" style="margin-bottom: 4px">
@@ -466,7 +466,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
           <td>
             <input data-bind="'value': key,
                               'attr': {
-                                'title': $root.help('framework', $parent.name())
+                                'title': $root.help('driver', $parent.name())
                               }" type="text" class="span12 required propKey" />
           </td>
           <td>
@@ -484,49 +484,49 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </div>
 </script>
 
-<script type="text/html" id="framework-enum">
+<script type="text/html" id="driver-enum">
 <div data-bind="css:{'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
-  <label class="control-label" data-bind="text: $root.label('framework', name())"></label>
+  <label class="control-label" data-bind="text: $root.label('driver', name())"></label>
   <div class="controls">
-    <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', 'attr': { 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
+    <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', 'attr': { 'name': name, 'title': $root.help('driver', name())}" rel="tooltip">
     </select>
     <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
   </div>
 </div>
 </script>
 
-<script type="text/html" id="framework-string">
+<script type="text/html" id="driver-string">
 <div data-bind="css: {
                   warning: name() in $root.warnings(),
                   error: name() in $root.errors()
                 }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
+  <label class="control-label" data-bind="text: $root.label('driver', name())" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="css: {'input-xxlarge': name != '', 'pathChooser': name != '', 'pathChooserExport': $root.job().type() == 'EXPORT'}, value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip"><button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+    <input data-bind="css: {'input-xxlarge': name != '', 'pathChooser': name != '', 'pathChooserExport': $root.job().type() == 'EXPORT'}, value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('driver', name()) }" rel="tooltip"><button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
-<script type="text/html" id="framework-integer">
+<script type="text/html" id="driver-integer">
 <div data-bind="css: {
                   warning: name() in $root.warnings(),
                   error: name() in $root.errors()
                 }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
+  <label class="control-label" data-bind="text: $root.label('driver', name())" rel="tooltip"></label>
   <div class="controls">
-    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('driver', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
-<script type="text/html" id="framework-boolean">
+<script type="text/html" id="driver-boolean">
 <div data-bind="css: {
                   warning: name() in $root.warnings(),
                   error: name() in $root.errors()
                 }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
+  <label class="control-label" data-bind="text: $root.label('driver', name())" rel="tooltip"></label>
   <div class="controls">
     <div class="btn-group inline" data-toggle="buttons-radio" style="display: inline">
       <button data-bind="clickValue: value, attr: {'name': name}" type="button" value="true" class="btn" data-toggle="button">${_('True')}</button>
@@ -649,10 +649,10 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <script src="/sqoop/static/js/sqoop.autocomplete.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.wizard.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.forms.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.framework.js" type="text/javascript" charset="utf-8"></script>
+<script src="/sqoop/static/js/sqoop.configs.js" type="text/javascript" charset="utf-8"></script>
+<script src="/sqoop/static/js/sqoop.driver.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.connectors.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.connections.js" type="text/javascript" charset="utf-8"></script>
+<script src="/sqoop/static/js/sqoop.links.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.jobs.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.submissions.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.js" type="text/javascript" charset="utf-8"></script>
@@ -677,11 +677,11 @@ viewModel.job.subscribe(function(job) {
         'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-framework',
+        'identifier': 'job-editor-driver',
         'caption': job.type() == 'IMPORT' ? '${_("Step 2: To")}' : '${_("Step 2: From")}',
         'description': '${_("HDFS")}',
         'node': job,
-        'template': 'job-editor-framework'
+        'template': 'job-editor-driver'
       }));
     } else {
       viewModel.jobWizard.addPage(new wizard.Page({
@@ -699,11 +699,11 @@ viewModel.job.subscribe(function(job) {
         'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-framework',
+        'identifier': 'job-editor-driver',
         'caption': '${_("Step 3: To")}',
         'description': '${_("HDFS")}',
         'node': job,
-        'template': 'job-editor-framework'
+        'template': 'job-editor-driver'
       }));
     }
   }
@@ -762,25 +762,25 @@ function handle_form_errors(e, node, options, data) {
 
   if (first_error_component == 'connector') {
     routie('job/edit/wizard/job-editor-connector');
-  } else if (first_error_component == 'framework') {
-    routie('job/edit/wizard/job-editor-framework');
+  } else if (first_error_component == 'driver') {
+    routie('job/edit/wizard/job-editor-driver');
   }
 }
 
-function connection_missing_error(e, node) {
+function link_missing_error(e, node) {
   // Resets save and run btns
   reset_save_buttons();
   viewModel.errors({
-    'connection': [{
+    'link': [{
       'status': 'UNACCEPTABLE',
-      'message': '${_("Please specify a connection.")}'
+      'message': '${_("Please specify a link.")}'
     }]
   });
   viewModel.warnings({});
   routie('job/edit/wizard/job-editor-begin');
 }
 
-$(document).on('connection_error.jobs', function(e, name, options, jqXHR) {
+$(document).on('link_error.jobs', function(e, name, options, jqXHR) {
   viewModel.sqoop_errors.removeAll();
   viewModel.sqoop_errors.push("${ _('Cannot connect to sqoop server.') }");
   routie('error');
@@ -811,8 +811,8 @@ $(document).one('load_fail.job', function() {
 });
 
 $(document).on('save_fail.job', handle_form_errors);
-$(document).on('connection_missing.job', connection_missing_error);
-$(document).on('save_fail.connection', handle_form_errors);
+$(document).on('link_missing.job', link_missing_error);
+$(document).on('save_fail.link', handle_form_errors);
 $(document).on('delete_fail.job', handle_form_errors);
 
 $(document).on('show_section', function(e, section){
@@ -822,8 +822,8 @@ $(document).on('changed.page', function(e, jobWizard) {
   // Autocomplete fields and table name
   $('input[name="table.tableName"]').typeahead({
     'source': function(query, process) {
-      var database = viewModel.connection().database();
-      switch (viewModel.connection().jdbcDriver()) {
+      var database = viewModel.link().database();
+      switch (viewModel.link().jdbcDriver()) {
         case 'com.mysql.jdbc.Driver':
         return autocomplete.tables('mysql', database);
         case 'org.postgresql.Driver':
@@ -836,10 +836,10 @@ $(document).on('changed.page', function(e, jobWizard) {
   });
   $('input[name="table.partitionColumn"],input[name="table.columns"]').typeahead({
     'source': function(query, process) {
-      var database = viewModel.connection().database();
+      var database = viewModel.link().database();
       if (viewModel.job()) {
         var table = viewModel.job().table();
-        switch (viewModel.connection().jdbcDriver()) {
+        switch (viewModel.link().jdbcDriver()) {
           case 'com.mysql.jdbc.Driver':
           return autocomplete.columns('mysql', database, table);
           break;
@@ -860,21 +860,21 @@ $(document).on('changed.page', function(e, jobWizard) {
   });
 });
 $(document).on('shown_section', (function(){
-  var connectionEditorShown = false;
+  var linkEditorShown = false;
   return function(e, section) {
-    if (section == 'connection-editor' && !connectionEditorShown) {
-      connectionEditorShown = true;
-      $('input[name="connection.jdbcDriver"]').typeahead({
+    if (section == 'link-editor' && !linkEditorShown) {
+      linkEditorShown = true;
+      $('input[name="link.jdbcDriver"]').typeahead({
         'source': [
           'com.mysql.jdbc.Driver',
           'org.postgresql.Driver',
           'oracle.jdbc.OracleDriver'
         ]
       });
-      $('input[name="connection.connectionString"]').typeahead({
+      $('input[name="link.linkString"]').typeahead({
         'source': function(query, process) {
           var arr = [];
-          switch (viewModel.connection().jdbcDriver()) {
+          switch (viewModel.link().jdbcDriver()) {
             case 'com.mysql.jdbc.Driver':
             arr = $.map(autocomplete.databases('mysql'), function(value, index) {
               return 'jdbc:mysql://' + host + ':' + port + '/' + value;
@@ -911,7 +911,7 @@ $("#jobs-list tbody").on('click', 'tr', function() {
 });
 
 //// Load all the data
-var framework = new framework.Framework();
+var driver = new driver.Driver();
 (function() {
   function fail(e, options, data) {
     viewModel.isLoading(false);
@@ -932,15 +932,15 @@ var framework = new framework.Framework();
     window.location.hash = 'error';
   }
   $(document).one('load_error.jobs', fail);
-  $(document).one('load_error.framework', fail);
+  $(document).one('load_error.driver', fail);
   $(document).one('load_error.connectors', fail);
-  $(document).one('load_error.connections', fail);
+  $(document).one('load_error.links', fail);
   $(document).one('load_error.submissions', fail);
-  $(document).one('connection_error.jobs', fail);
-  $(document).one('connection_error.framework', fail);
-  $(document).one('connection_error.connectors', fail);
-  $(document).one('connection_error.connections', fail);
-  $(document).one('connection_error.submissions', fail);
+  $(document).one('link_error.jobs', fail);
+  $(document).one('link_error.driver', fail);
+  $(document).one('link_error.connectors', fail);
+  $(document).one('link_error.links', fail);
+  $(document).one('link_error.submissions', fail);
 
   var count = 0;
   function check() {
@@ -951,14 +951,14 @@ var framework = new framework.Framework();
   }
 
   $(document).one('loaded.jobs', check);
-  $(document).one('loaded.framework', check);
+  $(document).one('loaded.driver', check);
   $(document).one('loaded.connectors', check);
-  $(document).one('loaded.connections', check);
+  $(document).one('loaded.links', check);
   $(document).one('loaded.submissions', check);
   $(document).one('loaded.jobs', function() {
-    framework.load();
+    driver.load();
     connectors.fetchConnectors();
-    connections.fetchConnections();
+    links.fetchLinks();
     submissions.fetchSubmissions();
   });
   viewModel.isLoading(true);
@@ -966,13 +966,13 @@ var framework = new framework.Framework();
   jobs.fetchJobs();
 })();
 
-var fetch_connections = function() {
+var fetch_links = function() {
   viewModel.isLoading(true);
-  connections.fetchConnections();
-  $(document).one('loaded.connections', function() {
+  links.fetchLinks();
+  $(document).one('loaded.links', function() {
     viewModel.isLoading(false);
   });
-  $(document).one('load_error.connections', function() {
+  $(document).one('load_error.links', function() {
     viewModel.isLoading(false);
   });
 };
@@ -988,11 +988,11 @@ var fetch_jobs = function() {
   });
 };
 
-$(document).on('saved.connection', fetch_connections);
+$(document).on('saved.link', fetch_links);
 $(document).on('saved.job', fetch_jobs);
-$(document).on('cloned.connection', fetch_connections);
+$(document).on('cloned.link', fetch_links);
 $(document).on('cloned.job', fetch_jobs);
-$(document).on('deleted.connection', fetch_connections);
+$(document).on('deleted.link', fetch_links);
 $(document).on('deleted.job', fetch_jobs);
 
 function enable_save_buttons() {
@@ -1193,68 +1193,68 @@ $(document).ready(function () {
       viewModel.chooseJobById(id);
       routie('job/delete');
     },
-    "connections": function() {
-      showSection("connections", "connections-list");
+    "links": function() {
+      showSection("links", "links-list");
     },
-    "connection/edit": function() {
-      // if (viewModel.connection()) {
+    "link/edit": function() {
+      // if (viewModel.link()) {
       //   routie('')
       // }
-      showSection("connections", "connection-editor");
+      showSection("links", "link-editor");
       $("*[rel=tooltip]").tooltip({
         placement: 'right'
       });
     },
-    "connection/edit/:id": function(id) {
-      viewModel.chooseConnectionById(id);
-      showSection("connections", "connection-editor");
+    "link/edit/:id": function(id) {
+      viewModel.chooseLinkById(id);
+      showSection("links", "link-editor");
       $("*[rel=tooltip]").tooltip({
         placement: 'right'
       });
     },
-    "connection/edit-cancel": function() {
-      if (viewModel.connection() && !viewModel.connection().persisted()) {
-        viewModel.connections.pop();
+    "link/edit-cancel": function() {
+      if (viewModel.link() && !viewModel.link().persisted()) {
+        viewModel.links.pop();
       }
       // routie('job/edit');
       window.history.go(-2);
     },
-    "connection/new": function() {
+    "link/new": function() {
       $(window).one('hashchange', function() {
         viewModel.newConnection();
-        routie('connection/edit');
+        routie('link/edit');
       });
       window.history.back();
     },
-    "connection/save": function() {
+    "link/save": function() {
       viewModel.saveConnection();
-      $(document).one('saved.connection', function(){
+      $(document).one('saved.link', function(){
         routie('job/edit');
       });
-      $(document).one('save_fail.connection', function(){
-        routie('connection/edit');
+      $(document).one('save_fail.link', function(){
+        routie('link/edit');
       });
     },
-    "connection/copy": function() {
-      if (viewModel.connection()) {
-        viewModel.connection().clone();
+    "link/copy": function() {
+      if (viewModel.link()) {
+        viewModel.link().clone();
       }
       routie('job/edit');
     },
-    "connection/delete": function() {
-      if (viewModel.connection()) {
-        viewModel.connection().delete();
-        $(document).one('deleted.connection', function(){
+    "link/delete": function() {
+      if (viewModel.link()) {
+        viewModel.link().delete();
+        $(document).one('deleted.link', function(){
           routie('job/edit');
         });
       } else {
         routie('job/edit');
       }
     },
-    "connection/delete/:id": function(id) {
-      viewModel.chooseConnectionById(id);
-      viewModel.connection().delete();
-      $(document).one('deleted.connection', function(){
+    "link/delete/:id": function(id) {
+      viewModel.chooseLinkById(id);
+      viewModel.link().delete();
+      $(document).one('deleted.link', function(){
         routie('job/edit');
       });
     }

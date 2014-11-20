@@ -55,18 +55,16 @@ function showSubsection(mainSection, section, subSection) {
 
 
 //// Constructors
-function create_connection(attrs, options) {
+function create_link(attrs, options) {
   var options = options || {};
   options.modelDict = attrs || {};
-  var node = new connections.Connection(options);
-  // Need a copy of the forms so that when editing
-  // we don't re-use forms.
-  $.each(viewModel.connector().con_forms(), function(index, form) {
-    node.connector.push($.extend(true, {}, form));
+  var node = new links.Link(options);
+  // Need a copy of the configs so that when editing
+  // we don't re-use configs.
+  $.each(viewModel.link().link_config_values(), function(index, config) {
+    node.connector.push($.extend(true, {}, config));
   });
-  $.each(viewModel.framework().con_forms(), function(index, form) {
-    node.framework.push($.extend(true, {}, form));
-  });
+
   return node;
 }
 
@@ -87,12 +85,12 @@ var viewModel = new (function() {
   self.sqoop_errors = ko.observableArray([]);
   self.errors = ko.observable({});
   self.warnings = ko.observable({});
-  self.framework = ko.observable();
+  self.driver = ko.observable();
   self.connectors = ko.observableArray();
-  self.connections = ko.observableArray();
+  self.links = ko.observableArray();
   self.jobs = ko.observableArray();
-  self.connection = ko.observable();
-  self.editConnection = ko.observable();
+  self.link = ko.observable();
+  self.editLink = ko.observable();
   self.modal = {
     'name': ko.observable()
   };
@@ -110,12 +108,12 @@ var viewModel = new (function() {
 
   // Must always have a value.
   self.connector = ko.computed(function() {
-    // Fall back to first connector so that a connector is selected when we are creating a connection.
-    if (!self.connection()) {
+    // Fall back to first connector so that a connector is selected when we are creating a link.
+    if (!self.link()) {
       return self.connectors()[0];
     }
     var connectorArr = ko.utils.arrayFilter(self.connectors(), function (connector) {
-      return connector.id() == self.connection().connector_id();
+      return connector.id() == self.link().connector_id();
     });
     return (connectorArr.length > 0) ? connectorArr[0] : self.connectors()[0];
   });
@@ -124,9 +122,9 @@ var viewModel = new (function() {
       return job.persisted();
     });
   });
-  self.persistedConnections = ko.computed(function() {
-    return ko.utils.arrayFilter(self.connections(), function (connection) {
-      return connection.persisted();
+  self.persistedLinks = ko.computed(function() {
+    return ko.utils.arrayFilter(self.links(), function (link) {
+      return link.persisted();
     });
   });
   self.filteredJobs = ko.computed(function() {
@@ -139,11 +137,11 @@ var viewModel = new (function() {
       }
     });
   });
-  self.filteredConnections = ko.computed(function() {
+  self.filteredLinks = ko.computed(function() {
     var filter = self.filter().toLowerCase();
-    return ko.utils.arrayFilter(self.persistedConnections(), function (connection) {
-      if (connection.name()) {
-        return connection.name().toLowerCase().indexOf(filter) > -1 || connection.type().toLowerCase().indexOf(filter) > -1;
+    return ko.utils.arrayFilter(self.persistedLinks(), function (link) {
+      if (link.name()) {
+        return link.name().toLowerCase().indexOf(filter) > -1 || link.type().toLowerCase().indexOf(filter) > -1;
       } else {
         return false;
       }
@@ -165,52 +163,45 @@ var viewModel = new (function() {
   });
 
 
-  // Update forms for connectors, jobs, and connections.
-  // In sqoop, the connector and framework provides
-  // attributes that need to be filled in for connections
-  // and jobs. The framework and connector will provide
-  // different forms for IMPORT and EXPORT jobs.
-  self.framework.subscribe(function(value) {
-    // We assume that the framework components
-    // are not going to change so we do not update connection
-    // and job objects unless they lack forms.
+  // The driver and connector provide configurations for job
+  self.driver.subscribe(function(value) {
+    // We assume that the driver components
+    // are not going to change so w do not update job objects unless they lack configs.
     if (value) {
-      if (self.editConnection() && self.editConnection().framework().length == 0) {
-        self.editConnection().framework(value.con_forms());
-      }
-      if (self.job() && self.job().framework().length == 0) {
-        var type = self.job().type().toUpperCase();
-        self.job().framework(value.job_forms[type]());
+      if (self.job() && self.job().driver_config_values().length == 0) {
+        self.job().driver_config_values(value.job_config());
       }
     }
   });
 
   self.connector.subscribe(function(value) {
     // We assume that the connectors component
-    // are not going to change so we do not update connection
-    // and job objects unless they lack forms.
+    // are not going to change so we do not update link
+    // and job objects unless they lack configs.
     if (value) {
-      if (self.editConnection() && self.editConnection().connector().length == 0) {
-        self.editConnection().connector(value.con_forms());
+      if (self.editLink() && self.editLink().link_config_values().length == 0) {
+        self.editLink().link_config_values(value.link_config());
       }
-      if (self.job() && self.job().connector().length == 0) {
-        var type = self.job().type().toUpperCase();
-        self.job().connector(value.job_forms[type]());
+      if (self.job() && self.job().from_config_values().length == 0) {
+        self.job().from_config_values(value.job_config['FROM']());
+      }
+       if (self.job() && self.job().to_config_values().length == 0) {
+        self.job().to_config_values(value.job_config['TO']());
       }
     }
   });
 
-  // Forms are swapped between IMPORT and EXPORT types.
+  // Forms are swapped between FROM and TO types.
   // Use of "beforeChange" subscription event to
   // remove subscriptions and help with swapping.
   var job_type_subscriptions = [];
-  var old_connector_forms = {
-    'IMPORT': null,
-    'EXPORT': null
+  var old_connector_configs = {
+    'FROM': null,
+    'TO': null
   };
-  var old_framework_forms = {
-    'IMPORT': null,
-    'EXPORT': null
+  var old_driver_configs = {
+    'FROM': null,
+    'TO': null
   };
   self.job.subscribe(function(old_job) {
     if (job_type_subscriptions) {
@@ -221,43 +212,42 @@ var viewModel = new (function() {
   }, self, "beforeChange");
   self.job.subscribe(function(job) {
     if (job) {
-      var type = job.type().toUpperCase();
 
-      if (self.connector() && job.connector().length == 0) {
-        job.connector(self.connector().job_forms[type]());
+      if (self.from_config_values() && job.from_config_values().length == 0) {
+        job.from_config_values(self.from_config_values());
       }
 
-      if (self.framework() && job.framework().length == 0) {
-        job.framework(self.framework().job_forms[type]());
+      if (self.to_config_values() && job.to_config_values().length == 0) {
+        job.to_config_values(self.to_config_values());
+      }
+      if (self.driver_config_values() && job.driver_config_values().length == 0) {
+        job.driver_config_values(self.driver_config_values());
       }
 
-      job_type_subscriptions.push(job.type.subscribe(function(new_type) {
-        var connector = old_connector_forms[new_type] || self.connector().job_forms[new_type]();
-        var framework = old_framework_forms[new_type] || self.framework().job_forms[new_type]();
-        old_connector_forms[new_type] = null;
-        old_framework_forms[new_type] = null;
+      /*job_type_subscriptions.push(job.type.subscribe(function(new_type) {
+        var connector = old_connector_configs[new_type] || self.connector().job_configs[new_type]();
+        var driver = old_driver_configs[new_type] || self.driver().job_configs[new_type]();
+        old_connector_configs[new_type] = null;
+        old_driver_configs[new_type] = null;
         job.connector(connector);
-        job.framework(framework);
+        job.driver(driver);
       }));
 
       job_type_subscriptions.push(job.type.subscribe(function(old_type) {
         if (job.connector().length > 0) {
-          old_connector_forms[old_type] = job.connector();
+          old_connector_configs[old_type] = job.connector();
         }
-        if (job.framework().length > 0) {
-          old_framework_forms[old_type] = job.framework();
+        if (job.driver_config_values().length > 0) {
+          old_driver_configs[old_type] = job.driver();
         }
-      }, self, "beforeChange"));
+      }, self, "beforeChange"));*/
     }
   });
 
-  self.editConnection.subscribe(function() {
-    if (self.editConnection()) {
-      if (self.connector() && self.editConnection().connector().length == 0) {
-        self.editConnection().connector(self.connector().con_forms());
-      }
-      if (self.framework() && !self.editConnection().framework().length == 0) {
-        self.editConnection().framework(self.framework().con_forms());
+  self.editLink.subscribe(function() {
+    if (self.editLink()) {
+      if (self.link_config_values() && self.editLink().link_config_values().length == 0) {
+        self.editLink().link_config_values(self.link_config_values());
       }
     }
   });
@@ -267,39 +257,39 @@ var viewModel = new (function() {
     self.warnings({});
   });
 
-  self.newConnection = function() {
+  self.newLink = function() {
     var self = this;
-    if (!self.connection() || self.connection().persisted()) {
-      var conn = create_connection();
-      self.editConnection(conn);
+    if (!self.link() || self.link().persisted()) {
+      var conn = create_link();
+      self.editLink(conn);
     }
   };
 
-  self.saveConnection = function() {
-    var connection = self.editConnection();
-    if (connection) {
-      connection.connector_id(self.connector().id());
-      connection.save();
+  self.saveLink = function() {
+    var link = self.editLink();
+    if (link) {
+      link.connector_id(self.connector().id());
+      link.save();
     }
   };
 
-  self.getConnectionById = function(id) {
-    var connection = null;
-    $.each(self.connections(), function(index, conn) {
+  self.getLinkById = function(id) {
+    var link = null;
+    $.each(self.links(), function(index, conn) {
       if (conn.id() == id) {
-        connection = conn;
+        link = conn;
       }
     });
-    return connection;
+    return link;
   };
 
-  self.chooseConnectionById = function(id) {
+  self.chooseLinkById = function(id) {
     var self = this;
-    self.editConnection(self.getConnectionById(id) || self.editConnection());
+    self.editLink(self.getLinkById(id) || self.editLink());
   };
 
-  self.deselectAllConnections = function() {
-    $.each(self.connections(), function(index, value) {
+  self.deselectAllLinks = function() {
+    $.each(self.links(), function(index, value) {
       value.selected(false);
     });
   };
@@ -318,12 +308,12 @@ var viewModel = new (function() {
   self.saveJob = function() {
     var job = self.job();
     if (job) {
-      if (!self.connection()) {
-        $(document).trigger('connection_missing.job', [self, null, {}]);
+      if (!self.link()) {
+        $(document).trigger('link_missing.job', [self, null, {}]);
         return;
       }
       job.connector_id((self.connector()) ? self.connector().id() : null);
-      job.connection_id((self.connection()) ? self.connection().id() : null);
+      job.link_id((self.link()) ? self.link().id() : null);
       job.save();
     }
   };
@@ -371,15 +361,15 @@ var viewModel = new (function() {
     return self[component]().resources[name + '.help'];
   };
 
-  self.getDatabaseByConnectionId = function(id) {
+  self.getDatabaseByLinkId = function(id) {
     var self = this;
-    var connection = self.getConnectionById(id);
-    if (connection) {
-      var connection_string = connection.connectionString();
-      if (connection_string) {
-        var connection_string_parts = connection.connectionString().split(':');
-        if (connection_string_parts.length > 2) {
-          return connection_string_parts[1].toUpperCase();
+    var link = self.getLinkById(id);
+    if (link) {
+      var link_string = link.linkString();
+      if (link_string) {
+        var link_string_parts = link.linkString().split(':');
+        if (link_string_parts.length > 2) {
+          return link_string_parts[1].toUpperCase();
         }
       }
     }
@@ -398,9 +388,9 @@ var viewModel = new (function() {
     self.showModal(name);
   };
 
-  self.showDeleteConnectionModal = function() {
+  self.showDeleteLinkModal = function() {
     var self = this;
-    var name = 'delete-connection-modal';
+    var name = 'delete-link-modal';
     self.showModal(name);
   }
 
@@ -426,18 +416,18 @@ var viewModel = new (function() {
 })();
 
 //// Event handling
-function set_framework(e, framework, options) {
-  viewModel.framework(framework);
+function set_driver(e, driver, options) {
+  viewModel.driver(driver);
 }
 
 function set_connectors(e, connectors, options) {
   viewModel.connectors(connectors);
 }
 
-function set_connections(e, connections, options) {
-  viewModel.connections(connections);
-  if (viewModel.connections().length > 0) {
-    viewModel.connection(viewModel.connections()[0]);
+function set_links(e, links, options) {
+  viewModel.links(links);
+  if (viewModel.links().length > 0) {
+    viewModel.link(viewModel.links()[0]);
   }
 }
 
@@ -455,8 +445,8 @@ function update_job_submissions(e, submissions, options) {
   });
 }
 
-$(document).on('loaded.framework', set_framework);
+$(document).on('loaded.driver', set_driver);
 $(document).on('loaded.connectors', set_connectors);
-$(document).on('loaded.connections', set_connections);
+$(document).on('loaded.links', set_links);
 $(document).on('loaded.jobs', set_jobs);
 $(document).on('loaded.submissions', update_job_submissions);

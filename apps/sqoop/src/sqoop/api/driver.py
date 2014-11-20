@@ -31,24 +31,24 @@ from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from django.views.decorators.cache import never_cache
 
-__all__ = ['framework']
+__all__ = ['driver']
 
 
 LOG = logging.getLogger(__name__)
 
 @never_cache
-def framework(request):
+def driver(request):
   response = {
     'status': 0,
     'errors': None,
-    'framework': None
+    'driver': None
   }
   if request.method == 'GET':
     try:
       c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-      response['framework'] = c.get_framework().to_dict()
+      response['driver'] = c.get_driver().to_dict()
     except RestException, e:
-      response.update(handle_rest_exception(e, _('Could not get framework.')))
+      response.update(handle_rest_exception(e, _('Could not get driver.')))
     return HttpResponse(json.dumps(response), mimetype="application/json")
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET request required.'), error_code=405)

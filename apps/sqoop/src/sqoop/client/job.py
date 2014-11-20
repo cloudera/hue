@@ -19,169 +19,51 @@ import logging
 from desktop.lib.python_util import force_dict_to_strings
 
 from exception import SqoopException
-from form import Form
+from config import Config
 
 
 class Job(object):
-  """
-  Sqoop job object.
 
-  Example of sqoop job dictionary received by server: {
-    "connection-id": 1,
-    "id": 1,
-    "updated": 1371246055277,
-    "created": 1371246055277,
-    "name": "import1",
-    "connector": [
-      {
-        "id": 3,
-        "inputs": [
-          {
-            "id": 10,
-            "name": "table.schemaName",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          },
-          {
-            "id": 11,
-            "name": "table.tableName",
-            "value": "derbyDB",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          },
-          {
-            "id": 12,
-            "name": "table.sql",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          },
-          {
-            "id": 13,
-            "name": "table.columns",
-            "value": "addr",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          },
-          {
-            "id": 14,
-            "name": "table.partitionColumn",
-            "value": "num",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          },
-          {
-            "id": 15,
-            "name": "table.boundaryQuery",
-            "type": "STRING",
-            "size": 50,
-            "sensitive": false
-          }
-        ],
-        "name": "table",
-        "type": "CONNECTION"
-      }
-    ],
-    "connector-id": 1,
-    "type": "IMPORT",
-    "framework": [
-      {
-        "id": 7,
-        "inputs": [
-          {
-            "id": 20,
-            "values": "HDFS",
-            "name": "output.storageType",
-            "value": "HDFS",
-            "type": "ENUM",
-            "sensitive": false
-          },
-          {
-            "id": 21,
-            "values": "TEXT_FILE,SEQUENCE_FILE",
-            "name": "output.outputFormat",
-            "value": "TEXT_FILE",
-            "type": "ENUM",
-            "sensitive": false
-          },
-          {
-            "id": 22,
-            "name": "output.outputDirectory",
-            "value": "%2Ftmp%2Fimport1-out",
-            "type": "STRING",
-            "size": 255,
-            "sensitive": false
-          }
-        ],
-        "name": "output",
-        "type": "CONNECTION"
-      },
-      {
-        "id": 8,
-        "inputs": [
-          {
-            "id": 23,
-            "name": "throttling.extractors",
-            "type": "INTEGER",
-            "sensitive": false
-          },
-          {
-            "id": 24,
-            "name": "throttling.loaders",
-            "type": "INTEGER",
-            "sensitive": false
-          }
-        ],
-        "name": "throttling",
-        "type": "CONNECTION"
-      }
-    ]
-  }
-
-  Some of the key-value pairs are structured and others are not.
-  For example, every job will have a name, id, type, connection-id, and connector-id key,
-  but the values of the ``connector`` and ``connection`` keys
-  will vary given the chosen connector and connection.
-  The same is true for the ``framework`` key.
-
-  The job object will have two framework components
-  and a single connector, for the moment.
-
-  @see sqoop.client.form for more information on unstructured forms in sqoop.
-  """
   SKIP = ('id', 'creation_date', 'creation_user', 'update_date', 'update_user')
 
-  def __init__(self, type, name, connection_id, connector_id, connector=None, framework=None, enabled=True, creation_user='hue', creation_date=0, update_user='hue', update_date=0, **kwargs):
+  def __init__(self, name, from_link_id, to_link_id, from_connector_id, to_connector_id, from_config_values=None, to_config_values=None, driver_config_values=None, enabled=True, creation_user='hue', creation_date=0, update_user='hue', update_date=0, **kwargs):
     self.id = kwargs.setdefault('id', -1)
     self.creation_user = creation_user
     self.creation_date = creation_date
     self.update_user = update_user
     self.update_date = update_date
     self.enabled = enabled
-    self.type = type
     self.name = name
-    self.connection_id = connection_id
-    self.connector_id = connector_id
-    self.connector = connector
-    self.framework = framework
+    self.from_link_id = from_link_id
+    self.to_link_id = to_link_id
+    self.from_connector_id = from_connector_id
+    self.to_connector_id = to_connector_id
+    self.from_config_values = from_config_values
+    self.to_config_values = to_config_values
+    self.driver_config_values = driver_config_values
 
   @staticmethod
   def from_dict(job_dict):
-    job_dict.setdefault('connector', [])
-    job_dict['connector'] = [ Form.from_dict(con_form_dict) for con_form_dict in job_dict['connector'] ]
+    job_dict.setdefault('from_config_values', [])
+    job_dict['from_config_values'] = [ Config.from_dict(from_config_value_dict) for from_config_value_dict in job_dict['from-config-values'] ]
 
-    job_dict.setdefault('framework', [])
-    job_dict['framework'] = [ Form.from_dict(framework_form_dict) for framework_form_dict in job_dict['framework'] ]
+    job_dict.setdefault('to_config_values', [])
+    job_dict['to_config_values'] = [ Config.from_dict(to_config_value_dict) for to_config_value_dict in job_dict['to-config-values'] ]
 
-    if not 'connection_id' in job_dict:
-      job_dict['connection_id'] = job_dict['connection-id']
+    job_dict.setdefault('driver_config_values', [])
+    job_dict['driver_config_values'] = [ Config.from_dict(driver_config_value_dict) for driver_config_value_dict in job_dict['driver-config-values'] ]
 
-    if not 'connector_id' in job_dict:
-      job_dict['connector_id'] = job_dict['connector-id']
+    if not 'from_link_id' in job_dict:
+      job_dict['from_link_id'] = job_dict['from-link-id']
+
+    if not 'to_link_id' in job_dict:
+      job_dict['to_link_id'] = job_dict['to-link-id']
+
+    if not 'from_connector_id' in job_dict:
+      job_dict['from_connector_id'] = job_dict['from-connector-id']
+
+    if not 'to_connector_id' in job_dict:
+      job_dict['to_connector_id'] = job_dict['to-connector-id']
 
     if not 'creation_user' in job_dict:
       job_dict['creation_user'] = job_dict.setdefault('creation-user', 'hue')
@@ -200,16 +82,18 @@ class Job(object):
   def to_dict(self):
     d = {
       'id': self.id,
-      'type': self.type,
       'name': self.name,
       'creation-user': self.creation_user,
       'creation-date': self.creation_date,
       'update-user': self.update_user,
       'update-date': self.update_date,
-      'connection-id': self.connection_id,
-      'connector-id': self.connector_id,
-      'connector': [ connector.to_dict() for connector in self.connector ],
-      'framework': [ framework.to_dict() for framework in self.framework ],
+      'from-link-id': self.from_link_id,
+      'to-link-id': self.to_link_id,
+      'from-connector-id': self.from_connector_id,
+      'to-connector-id': self.to_connector_id,
+      'from-config-values': [ from_config_value.to_dict() for from_config_value in self.from_config_values ],
+      'to-config-values': [ to_config_value.to_dict() for to_config_value in self.to_config_values ],
+      'driver-config-values': [ driver_config_value.to_dict() for driver_config_value in self.driver_config_values ],
       'enabled': self.enabled
     }
     return d
@@ -223,32 +107,11 @@ class Job(object):
         setattr(self, key, getattr(job, key, getattr(self, key)))
 
 class SqoopJobException(SqoopException):
-  """
-  This is what the sqoop server generally responds with:
-  {
-    "connector": {
-      "status": "UNACCEPTABLE",
-      "messages": {
-        "table": {
-          "message": "Either table name or SQL must be specified",
-          "status": "UNACCEPTABLE"
-        }
-      }
-    },
-    "framework": {
-      "status": "UNACCEPTABLE",
-      "messages": {
-        "output.outputDirectory": {
-          "message": "Output directory is empty",
-          "status": "UNACCEPTABLE"
-        }
-      }
-    }
-  }
-  """
-  def __init__(self, connector, framework):
-    self.connector = connector
-    self.framework = framework
+  def __init__(self, from_config_values, to_config_values, driver_config_values):
+    self.link_config_values = from_config_values
+    self.link_config_values = to_config_values
+    self.link_config_values = driver_config_values
+
 
   @classmethod
   def from_dict(cls, error_dict):
@@ -256,10 +119,11 @@ class SqoopJobException(SqoopException):
 
   def to_dict(self):
     return {
-      'connector': self.connector,
-      'framework': self.framework
+      'from-config-values': self.from_config_values,
+      'to-config-values': self.to_config_values,
+      'driver-config-values': self.driver_config_values
     }
 
   def __str__(self):
-    return 'Connector: %s\nFramework: %s\n' % (self.connector, self.framework)
+    return 'From Config Values: %s\nTo Config Values: %s\nDriver Config Values: %s\n' % (self.from_config_values, self.to_config_values, self.driver_config_values)
 
