@@ -2243,6 +2243,23 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.delete(skip_trash=True)
 
 
+  def test_import_workflow_ssh(self):
+    """
+    Validates import for ssh node: params.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-ssh.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    node = Node.objects.get(workflow=workflow, node_type='ssh').get_full_node()
+    assert_equal('${user}@${host}', node.host)
+    assert_equal('ls', node.command)
+    assert_equal('[{"type":"args","value":"-l"}]', node.params)
+    workflow.delete(skip_trash=True)
+
+
   def test_import_workflow_java(self):
     """
     Validates import for java node: main_class, args.
