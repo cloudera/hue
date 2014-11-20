@@ -375,7 +375,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
     
-    <div>
+    <div data-bind="visible: $root.isEditing">
       To:
       <span data-bind="foreach: children">
         <select data-bind="options: $root.workflow.nodeIds,
@@ -416,7 +416,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div data-bind="visible: $root.isEditing">
       <!-- ko if: children().length == 1 -->
       Start --> <input type="text" data-bind="value: children()[0]['to']" />
       <!-- /ko -->
