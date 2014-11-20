@@ -18,6 +18,7 @@
 import os
 import socket
 import stat
+import logging
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -792,6 +793,35 @@ def validate_ldap(user, config):
 
   return res
 
+def validate_mysql_storage():
+
+  from django.db import connection
+
+  LOG = logging.getLogger(__name__)
+  res = []
+
+  if connection.vendor == 'mysql':
+      cursor = connection.cursor();
+
+      try:
+        innodb_table_count = cursor.execute('''
+            SELECT *
+            FROM information_schema.tables
+            WHERE table_schema=DATABASE() AND engine = "innodb"''')
+
+        total_table_count = cursor.execute('''
+            SELECT *
+            FROM information_schema.tables
+            WHERE table_schema=DATABASE()''')
+
+        if innodb_table_count != 0 and innodb_table_count != total_table_count:
+          res.append(('MYSQL_STORAGE_ENGINE', unicode(_('''All tables in the database must be of the same
+                                                        storage engine type (preferably InnoDB).'''))))
+      except Exception, ex:
+        LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
+
+  return res
+
 
 def config_validator(user):
   """
@@ -835,5 +865,8 @@ def config_validator(user):
       res.extend(validate_ldap(user, LDAP.LDAP_SERVERS.get()[ldap_record_key]))
   else:
     res.extend(validate_ldap(user, LDAP))
+
+  # Validate MYSQL storage engine of all tables
+  res.extend(validate_mysql_storage())
 
   return res
