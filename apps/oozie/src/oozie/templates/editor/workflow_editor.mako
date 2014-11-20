@@ -378,7 +378,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div>
       To:
       <span data-bind="foreach: children">
-        <span data-bind="text: $data['to']"></span> if <input data-bind="value: $data['condition']" />
+        <select data-bind="options: $root.workflow.nodeIds,
+                     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
+                     value: $data['to']
+                     ">
+        </select>      
+        if <input data-bind="value: $data['condition']" />
       </span>
       <a>${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
     </div>
@@ -536,9 +541,19 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="common-action-transition">
   <!-- ko if: children().length == 2 -->
-  OK --> <input type="text" data-bind="value: children()[0]['to']" />
+  OK -->
+  <select data-bind="options: $root.workflow.nodeIds,
+                     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
+                     value: children()[0]['to']
+                     ">
+  </select>
   <br/>
-  KO --> <input type="text" data-bind="value: children()[1]['error']" />
+  KO -->
+  <select data-bind="options: $root.workflow.nodeIds,
+                     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
+                     value: children()[1]['error']
+                     ">
+  </select>
   <!-- /ko -->
 </script>
 

@@ -132,9 +132,28 @@ var Workflow = function (vm, workflow) {
   self.nodes = ko.observableArray([]);
   self.movedNode = null;
   
+  self.nodeIds = ko.computed(function() {
+    var mapping = [];
+    
+    $.each(self.nodes(), function(index, node) {
+      mapping.push(node.id());
+    });
+
+    return mapping;
+  });
+  self.nodeNamesMapping = ko.computed(function() {
+    var mapping = {};
+    
+    $.each(self.nodes(), function(index, node) {
+      mapping[node.id()] = node.name();
+    });
+
+    return mapping;
+  });
   self.linkMapping = ko.computed(function() {
 	var mapping = {};
-    $.each(self.nodes(), function(index, node) {
+    
+	$.each(self.nodes(), function(index, node) {
       var links = []
       $.each(node.children(), function(index, link) {
         if ('to' in link) {
