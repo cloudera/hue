@@ -34,22 +34,22 @@ function transform_values(model, func_dict) {
   return model;
 }
 
-function to_form(value) {
-  return new forms.FormModel(value);
+function to_config(value) {
+  return new configs.ConfigModel(value);
 }
 
-function to_forms(key, value) {
+function to_configs(key, value) {
   $.each(value, function(index, form_dict) {
-    value[index] = to_form(form_dict);
+    value[index] = to_config(form_dict);
   });
   return value;
 }
 
 function to_input(value) {
   if (value.type.toLowerCase() == 'map') {
-    return new forms.MapInputModel(value);
+    return new configs.MapInputModel(value);
   } else {
-    return new forms.InputModel(value);
+    return new configs.InputModel(value);
   }
 }
 
@@ -61,15 +61,15 @@ function to_inputs(key, value) {
 }
 
 
-var forms = (function($) {
-  var map_form_properties = {
+var configs = (function($) {
+  var map_config_properties = {
     'create': function(options) {
-      return new SqoopForm({modelDict: options.data});
+      return new SqoopConfig({modelDict: options.data});
     },
     'update': function(options) {
       options.target.initialize({modelDict: options.data})
       return options.target;
-    },
+    }
   };
   var map_input_properties = {
     'create': function(options) {
@@ -84,17 +84,17 @@ var forms = (function($) {
     'update': function(options) {
       options.target.initialize({modelDict: options.data})
       return options.target;
-    },
+    }
   };
   var map_properties = {
-    'connector': map_form_properties,
-    'framework': map_form_properties,
-    'con-forms': map_form_properties,
-    'job-forms': map_form_properties,
+    'link-config': map_config_properties,
+    'from-job-config': map_config_properties,
+    'to-job-config': map_config_properties,
+    'driver-config': map_config_properties,
     'inputs': map_input_properties
   };
 
-  var FormModel = koify.Model.extend({
+  var ConfigModel = koify.Model.extend({
     'id': -1,
     'inputs': [],
     'name': null,
@@ -152,9 +152,8 @@ var forms = (function($) {
     }
   });
 
-  // Form is reserved word
-  var SqoopForm = koify.MinimalNode.extend({
-    'model_class': FormModel,
+  var SqoopConfig = koify.MinimalNode.extend({
+    'model_class': ConfigModel,
     'map': function() {
       var self = this;
       var mapping_options = $.extend(true, {
@@ -224,10 +223,10 @@ var forms = (function($) {
   });
 
   return {
-    'FormModel': FormModel,
+    'ConfigModel': ConfigModel,
     'InputModel': InputModel,
     'MapInputModel': MapInputModel,
-    'Form': SqoopForm,
+    'Config': SqoopConfig,
     'Input': SqoopInput,
     'MapInput': SqoopMapInput,
     'MapProperties': map_properties

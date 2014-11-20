@@ -45,7 +45,7 @@ def get_submissions(request):
     'errors': None,
     'submissions': []
   }
-  status = request.GET.get('status', 'all').split(',')
+  status = request.GET.get('status', 'submissions').split(',')
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
     submissions = c.get_submissions()

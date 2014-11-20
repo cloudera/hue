@@ -16,7 +16,7 @@
 
 import logging
 
-from form import Form
+from config import Config
 
 
 class SqoopException(Exception):

@@ -27,132 +27,132 @@ from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
-from sqoop.client.connection import SqoopConnectionException
-from decorators import get_connection_or_exception
+from sqoop.client.link import SqoopLinkException
+from decorators import get_link_or_exception
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
 from django.views.decorators.cache import never_cache
 
-__all__ = ['get_connections', 'create_connection', 'update_connection', 'connection', 'connections', 'connection_clone', 'connection_delete']
+__all__ = ['get_links', 'create_link', 'update_link', 'link', 'links', 'link_clone', 'link_delete']
 
 
 LOG = logging.getLogger(__name__)
 
 @never_cache
-def get_connections(request):
+def get_links(request):
   response = {
     'status': 0,
     'errors': None,
-    'connections': []
+    'links': []
   }
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-    response['connections'] = list_to_dict(c.get_connections())
+    response['links'] = list_to_dict(c.get_links())
   except RestException, e:
-    response.update(handle_rest_exception(e, _('Could not get connections.')))
+    response.update(handle_rest_exception(e, _('Could not get links.')))
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 @never_cache
-def create_connection(request):
+def create_link(request):
   response = {
     'status': 0,
     'errors': None,
-    'connection': None
+    'link': None
   }
 
-  if 'connection' not in request.POST:
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving connection'), data={'errors': 'Connection is missing.'}, error_code=400)
+  if 'link' not in request.POST:
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  d = json.loads(smart_str(request.POST['connection']))
-  conn = client.Connection.from_dict(d)
+  d = json.loads(smart_str(request.POST['link']))
+  link = client.Link.from_dict(d)
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-    response['connection'] = c.create_connection(conn).to_dict()
+    response['link'] = c.create_link(link).to_dict()
   except RestException, e:
-    response.update(handle_rest_exception(e, _('Could not create connection.')))
-  except SqoopConnectionException, e:
+    response.update(handle_rest_exception(e, _('Could not create link.')))
+  except SqoopLinkException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 @never_cache
-def update_connection(request, connection):
+def update_link(request, link):
   response = {
     'status': 0,
     'errors': None,
-    'connection': None
+    'link': None
   }
 
-  if 'connection' not in request.POST:
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving connection'), data={'errors': 'Connection is missing.'}, error_code=400)
+  if 'link' not in request.POST:
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  connection.update_from_dict(json.loads(smart_str(request.POST['connection'])))
+  link.update_from_dict(json.loads(smart_str(request.POST['link'])))
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-    response['connection'] = c.update_connection(connection).to_dict()
+    response['link'] = c.update_link(link).to_dict()
   except RestException, e:
-    response.update(handle_rest_exception(e, _('Could not update connection.')))
-  except SqoopConnectionException, e:
+    response.update(handle_rest_exception(e, _('Could not update link.')))
+  except SqoopLinkException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 @never_cache
-def connections(request):
+def links(request):
   if request.method == 'GET':
-    return get_connections(request)
+    return get_links(request)
   elif request.method == 'POST':
-    return create_connection(request)
+    return create_link(request)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
 @never_cache
-@get_connection_or_exception()
-def connection(request, connection):
+@get_link_or_exception()
+def link(request, link):
   response = {
     'status': 0,
     'errors': None,
-    'connection': None
+    'link': None
   }
   if request.method == 'GET':
-    response['connection'] = connection.to_dict()
+    response['link'] = link.to_dict()
     return HttpResponse(json.dumps(response), mimetype="application/json")
   elif request.method == 'POST':
-    return update_connection(request, connection)
+    return update_link(request, link)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
 @never_cache
-@get_connection_or_exception()
-def connection_clone(request, connection):
+@get_link_or_exception()
+def link_clone(request, link):
   if request.method != 'POST':
     raise StructuredException(code="INVALID_METHOD", message=_('POST request required.'), error_code=405)
 
   response = {
     'status': 0,
     'errors': None,
-    'connection': None
+    'link': None
   }
 
-  connection.id = -1
-  connection.name = '%s-copy' % connection.name
+  link.id = -1
+  link.name = '%s-copy' % link.name
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-    response['connection'] = c.create_connection(connection).to_dict()
+    response['link'] = c.create_link(link).to_dict()
   except RestException, e:
-    response.update(handle_rest_exception(e, _('Could not clone connection.')))
-  except SqoopConnectionException, e:
+    response.update(handle_rest_exception(e, _('Could not clone link.')))
+  except SqoopLinkException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 @never_cache
-@get_connection_or_exception()
-def connection_delete(request, connection):
+@get_link_or_exception()
+def link_delete(request, link):
   if request.method != 'POST':
     raise StructuredException(code="INVALID_METHOD", message=_('POST request required.'), error_code=405)
 
@@ -163,10 +163,10 @@ def connection_delete(request, connection):
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
-    c.delete_connection(connection)
+    c.delete_link(link)
   except RestException, e:
-    response.update(handle_rest_exception(e, _('Could not delete connection.')))
-  except SqoopConnectionException, e:
+    response.update(handle_rest_exception(e, _('Could not delete link.')))
+  except SqoopLinkException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
