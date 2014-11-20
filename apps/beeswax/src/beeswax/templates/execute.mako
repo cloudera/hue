@@ -396,6 +396,7 @@ ${layout.menubar(section='query')}
               </tr>
               </thead>
             </table>
+            <a class="pointer" data-bind="visible: $root.scrollNotWorking() && $root.hasMoreResults(), click: manualFetch" style="padding: 10px">${ _('Show more results...') }</a>
           </div>
 
           <div data-bind="css: {'hide': !$root.design.results.empty() || $root.design.results.expired()}" id="resultEmpty">
@@ -1327,6 +1328,7 @@ function reinitializeTable(max) {
   function fn(){
     var container = $($("a[data-toggle='tab']:not(.sidetab)").parent(".active").find("a").attr("href"));
     if ($("#results .dataTables_wrapper").height() > 0) {
+
       $("#results .dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - 150,
         heightAfterCorrection: 0
@@ -1899,6 +1901,7 @@ function resizeLogs() {
 // Result Datatable
 function cleanResultsTable() {
   if (dataTable) {
+    viewModel.design.results.rows([]);
     dataTable.fnClearTable();
     dataTable.fnDestroy();
     viewModel.design.results.columns.valueHasMutated();
@@ -1916,89 +1919,91 @@ function addRowNumberToResults(data, startIndex) {
   return _tmpdata;
 }
 
+var _scrollTimeout = -1;
+function datatableScroll() {
+ viewModel.scrollNotWorking(false);
+
+  // Automatic results grower
+  var dataTableEl = $("#results .dataTables_wrapper");
+  var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
+  window.clearTimeout(_scrollTimeout);
+  _scrollTimeout = window.setTimeout(function(){
+    dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
+    if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
+      dataTableEl.animate({opacity: '0.55'}, 200);
+      viewModel.fetchResults();
+    }
+  }, 100);
+}
+
 var firstFnDrawcallback = false;
 
-function addResults(viewModel, dataTable, index, pageSize) {
-  if (index == 0) {
+function addResults(viewModel, dataTable, startRow, nextRow) {
+  if (startRow == 0) {
     firstFnDrawcallback = true;
   }
-  if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
-    $(document).one('fetched.results', function () {
-      $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
-      dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
-    });
-    viewModel.fetchResults();
-  } else {
-    dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
-  }
+  dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(startRow, nextRow), startRow));
 }
 
 function resultsTable(e, data) {
-  if (!dataTable && viewModel.design.results.columns().length > 0) {
-    dataTable = $("#resultTable").dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
-      "bInfo": false,
-      "bDestroy": true,
-      "bAutoWidth": false,
-      "oLanguage": {
-        "sEmptyTable": "${_('No data available')}",
-        "sZeroRecords": "${_('No matching records')}"
-      },
-      "fnDrawCallback": function (oSettings) {
-        reinitializeTableExtenders();
-        if (firstFnDrawcallback) {
-          firstFnDrawcallback = false;
-          window.setTimeout(reinitializeTable, 100);
-        }
-      },
-      "aoColumnDefs": [
-        {
-          "sType": "numeric",
-          "aTargets": [ "sort-numeric" ]
+  $("#results .dataTables_wrapper").animate({opacity: '1'}, 50);
+  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
+  if (viewModel.design.results.columns().length > 0) {
+    if (!dataTable) {
+      dataTable = $("#resultTable").dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bInfo": false,
+        "bDestroy": true,
+        "bAutoWidth": false,
+        "oLanguage": {
+          "sEmptyTable": "${_('No data available')}",
+          "sZeroRecords": "${_('No matching records')}"
         },
-        {
-          "sType": "string",
-          "aTargets": [ "sort-string" ]
+        "fnDrawCallback": function (oSettings) {
+          reinitializeTableExtenders();
+          if (firstFnDrawcallback) {
+            firstFnDrawcallback = false;
+            window.setTimeout(reinitializeTable, 100);
+          }
         },
-        {
-          "sType": "date",
-          "aTargets": [ "sort-date" ]
+        "aoColumnDefs": [
+          {
+            "sType": "numeric",
+            "aTargets": [ "sort-numeric" ]
+          },
+          {
+            "sType": "string",
+            "aTargets": [ "sort-string" ]
+          },
+          {
+            "sType": "date",
+            "aTargets": [ "sort-date" ]
+          }
+        ]
+      });
+      $(".dataTables_filter").hide();
+      reinitializeTable();
+      var _options = '<option value="-1">${ _("Please select a column")}</option>';
+      $(viewModel.design.results.columns()).each(function(cnt, item){
+        if (cnt > 0){
+          _options += '<option value="'+(cnt + 1)+'">'+ item.name +'</option>';
         }
-      ]
-    });
-    $(".dataTables_filter").hide();
-    reinitializeTable();
-    var _options = '<option value="-1">${ _("Please select a column")}</option>';
-    $(viewModel.design.results.columns()).each(function(cnt, item){
-      if (cnt > 0){
-        _options += '<option value="'+(cnt + 1)+'">'+ item.name +'</option>';
-      }
-    });
-    $(".blueprintSelect").html(_options);
+      });
+      $(".blueprintSelect").html(_options);
 
-    // Automatic results grower
-    var dataTableEl = $("#results .dataTables_wrapper");
-    var index = 0;
-    var pageSize = 100;
-    var _scrollTimeout = -1;
-    dataTableEl.on("scroll", function (e) {
-      var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
-      window.clearTimeout(_scrollTimeout);
-      _scrollTimeout = window.setTimeout(function(){
-        dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
-        if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
-          dataTableEl.animate({opacity: '0.55'}, 200);
-          addResults(viewModel, dataTable, index, pageSize);
-          index += pageSize;
-          dataTableEl.animate({opacity: '1'}, 50);
-        }
-      }, 100);
-    });
-    addResults(viewModel, dataTable, index, pageSize);
-    index += pageSize;
-    dataTableEl.jHueScrollUp();
+      // Automatic results grower
+      var dataTableEl = $("#results .dataTables_wrapper");
+      dataTableEl.on("scroll", datatableScroll);
+    }
+
+    addResults(viewModel, dataTable, data.start_row, data.next_row);
   }
+}
+
+function manualFetch() {
+  $("#results .dataTables_wrapper").css("opacity", "0.55");
+  viewModel.fetchResults();
 }
 
 $(document).on('execute.query', cleanResultsTable);
@@ -2107,6 +2112,8 @@ $(document).on('saved.results', function() {
 
 // Querying and click events.
 function tryExecuteQuery() {
+  viewModel.scrollNotWorking(true);
+  $("#results .dataTables_wrapper").off("scroll", datatableScroll);
   $(".jHueTableExtenderClonedContainer").hide();
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
@@ -2130,6 +2137,7 @@ function tryExecuteQuery() {
 }
 
 function tryExecuteNextStatement() {
+  viewModel.scrollNotWorking(true);
   var query = getHighlightedQuery() || codeMirror.getValue();
 
   // If we highlight a part of query, we update the query and restart the query history
@@ -2149,6 +2157,7 @@ function tryExecuteNextStatement() {
 }
 
 function tryExecuteParameterizedQuery() {
+  viewModel.scrollNotWorking(true);
   $(".tooltip").remove();
   viewModel.executeQuery();
   routie('query');
@@ -2572,7 +2581,13 @@ function getDatabases(callback){
       else {
         $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", null);
       }
-      renderNavigator();
+      var _waitForNavigatorInit = -1;
+      _waitForNavigatorInit = window.setInterval(function () {
+        if (typeof renderNavigator != "undefined") {
+          renderNavigator();
+          window.clearInterval(_waitForNavigatorInit);
+        }
+      }, 100);
     }, 200)
   });
   hac_getDatabases(function (dbs) {

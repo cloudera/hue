@@ -83,6 +83,7 @@ function BeeswaxViewModel(server) {
   // Use a view model attribute so that we don't have to override KO.
   // This allows Hue to disable the execute button until the query placeholder dies.
   self.queryEditorBlank = ko.observable(false);
+  self.scrollNotWorking = ko.observable(true);
 
   self.canExecute = ko.computed(function() {
     return !self.design.isRunning() && self.design.isFinished();
@@ -500,6 +501,9 @@ function BeeswaxViewModel(server) {
         self.design.errors.removeAll();
         self.design.watch.errors.removeAll();
         if (data.status == 0) {
+          if (typeof history.pushState != 'undefined') {
+            history.pushState(null, null, '/' + self.server() + '/execute/query/' + data.id + '#query/logs');
+          }
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
