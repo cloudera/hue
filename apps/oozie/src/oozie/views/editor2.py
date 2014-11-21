@@ -58,7 +58,6 @@ def edit_workflow(request):
     workflow = Workflow(document=Document2.objects.get(id=workflow_id)) # Todo perms
   else:
     workflow = Workflow()
-    workflow = import_workflows_from_hue_3_7()
   
   workflow_data = workflow.get_data()
 
