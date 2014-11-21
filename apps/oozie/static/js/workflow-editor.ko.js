@@ -940,6 +940,20 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     });
   };
 
+  self.import_workflows = function () {
+    $.post("/oozie/editor/workflow/import_workflows/", {
+    }, function (data) {
+      if (data.status == 0) {
+        console.log(data.json);
+      }
+      else {
+        $(document).trigger("error", data.message);
+     }
+   }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+  
   self.showSubmitPopup = function () {
     // If self.workflow.id() == null, need to save wf for now
 

@@ -35,7 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Workflow, NODES, WORKFLOW_NODE_PROPERTIES
+from oozie.models2 import Workflow, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
 
 
 LOG = logging.getLogger(__name__)
@@ -58,6 +58,7 @@ def edit_workflow(request):
     workflow = Workflow(document=Document2.objects.get(id=workflow_id)) # Todo perms
   else:
     workflow = Workflow()
+    workflow = import_workflows_from_hue_3_7()
   
   workflow_data = workflow.get_data()
 
@@ -153,10 +154,6 @@ def add_node(request):
     _properties.update({
        'workflow': subworkflow['value']
     })
-  _properties.update({
-      'sla': Workflow.SLA_DEFAULT,
-      'credentials': []
-  })
 
   response['status'] = 0
   response['properties'] = _properties
@@ -222,3 +219,16 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+
+
+def import_hue_3_7_workflows(request):
+  response = {'status': -1}
+
+  try:
+    response['status'] = 0
+    response['json'] = import_workflows_from_hue_3_7().to_xml()
+  except Exception, e:
+    response['message'] = str(e)
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json") 
+  
