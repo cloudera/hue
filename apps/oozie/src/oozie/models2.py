@@ -19,6 +19,7 @@ import json
 import logging
 import re
 import time
+import uuid
 
 from string import Template
 
@@ -33,6 +34,7 @@ from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
+from oozie.models import Workflow as OldWorflows
 
 
 LOG = logging.getLogger(__name__)
@@ -64,23 +66,26 @@ class Workflow():
       self.data = data
     else:
       self.data = json.dumps({
-          'layout': [
-              {"size":12, "rows":[
-                    {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
-                    {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}], 
-                 "drops":[ "temp"],
-                 "klass":"card card-home card-column span12"}              
-          ],
+          'layout': [{
+              "size":12, "rows":[
+                  {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
+                  {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}
+              ], 
+              "drops":[ "temp"],
+              "klass":"card card-home card-column span12"
+          }],
           'workflow': workflow if workflow is not None else {
-              "id": None,"uuid":"549e2697-97cf-f931-2ce4-83dfdd03b7e7","name":"My Workflow",
+              "id": None, 
+              "uuid": None,
+              "name": "My Workflow",
               "properties": {
-                    "job_xml": "",
-                    "sla_enabled": False,
-                    "schema_version": "uri:oozie:workflow:0.4",
-                    "sla_workflow_enabled": False,
-                    "credentials": [],
-                    "properties": [],
-                    "sla": Workflow.SLA_DEFAULT
+                  "job_xml": "",
+                  "sla_enabled": False,
+                  "schema_version": "uri:oozie:workflow:0.4",
+                  "sla_workflow_enabled": False,
+                  "credentials": [],
+                  "properties": [],
+                  "sla": Workflow.SLA_DEFAULT
               },
               "nodes":[
                   {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
@@ -263,8 +268,14 @@ class Node():
     return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']    
 
 
+class Action(object):
+  
+  @classmethod
+  def get_fields(cls):
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', [])]
 
-class PigAction():
+
+class PigAction(Action):
   TYPE = 'pig'
   FIELDS = {
      'script_path': { 
@@ -321,15 +332,11 @@ class PigAction():
   }
 
   @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
-  
-  @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['script_path']]
 
 
-class JavaAction():
+class JavaAction(Action):
   TYPE = 'java'
   FIELDS = {
      'jar_path': { 
@@ -404,15 +411,11 @@ class JavaAction():
   }
 
   @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
-  
-  @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['jar_path'], cls.FIELDS['main_class']]
   
   
-class HiveAction():
+class HiveAction(Action):
   TYPE = 'hive'
   FIELDS = {
      'script_path': { 
@@ -463,15 +466,11 @@ class HiveAction():
   }
 
   @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
-  
-  @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['script_path']]
 
 
-class SubWorkflowAction():
+class SubWorkflowAction(Action):
   TYPE = 'subworkflow'
   FIELDS = {
      'workflow': { 
@@ -495,15 +494,11 @@ class SubWorkflowAction():
   }
 
   @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
-  
-  @classmethod
   def get_mandatory_fields(cls):
     return []
 
 
-class KillAction():
+class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
      'message': { 
@@ -515,21 +510,13 @@ class KillAction():
   }
 
   @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
-  
-  @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['message']]
 
 
-class JoinAction():
+class JoinAction(Action):
   TYPE = 'join'
   FIELDS = {}
-
-  @classmethod
-  def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()]
   
   @classmethod
   def get_mandatory_fields(cls):
@@ -586,4 +573,125 @@ def find_json_parameters(fields):
             params.append(name)
 
   return params
+
+
+
+def import_workflows_from_hue_3_7():
+#[<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
+#[<Start: start>, <Mapreduce: Sleep>, [<Kill: kill>], [<End: end>]]
+#[<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
+#[<Start: start>, <Hive: Hive>, [<Kill: kill>], [<End: end>]]
+#[<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
+#[<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
+#[<Start: start>, <Mapreduce: Sleep>, [<Kill: kill>], [<End: end>]]
+  
+  uuids = {}
+  
+  old_wf = OldWorflows.objects.filter(managed=True).filter(is_trashed=False)[10].get_full_node() 
+  old_nodes = old_wf.get_hierarchy()
+  
+  wf = Workflow()
+  wf_rows = []
+  wf_nodes = []
+  
+  data = wf.get_data()
+  
+  # UUIDs node mapping
+  for node in old_wf.node_list:    
+    if node.name == 'kill':
+      node_uuid = '17c9c895-5a16-7443-bb81-f34b30b21548'
+    elif node.name == 'start':
+      node_uuid = '3f107997-04cc-8733-60a9-a4bb62cebffc'
+    elif node.name == 'end':
+      node_uuid = '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
+    else:
+      node_uuid = str(uuid.uuid4())
+
+    uuids[node.id] = node_uuid
+    
+  # Workflow
+  data['workflow']['uuid'] = str(uuid.uuid4())
+  data['workflow']['name'] = old_wf.name
+  data['workflow']['properties']['properties'] = json.loads(old_wf.job_properties)
+  data['workflow']['properties']['job_xml'] = old_wf.job_xml
+  data['workflow']['properties']['description'] = old_wf.description
+  data['workflow']['properties']['schema_version'] = old_wf.schema_version
+  data['workflow']['properties']['deployment_dir'] = old_wf.deployment_dir
+  data['workflow']['properties']['parameters'] = json.loads(old_wf.parameters)
+    
+  # Layout
+  rows = data['layout'][0]['rows']
+  
+  def _create_layout(nodes, size=12):
+    wf_rows = []
+    
+    for node in nodes:      
+      if type(node) == list and len(node) == 1:
+        node = node[0]
+      if type(node) != list:
+        if node.node_type != 'kill': # No kill widget displayed yet
+          wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})
+      else:
+        if node[0].node_type == 'fork':
+          wf_rows.append({"widgets":[{"size":size, "name": node[0].name.title(), "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})  
+          
+          wf_rows.append({  
+            "id": str(uuid.uuid4()),
+            "widgets":[  
+
+            ],
+            "columns":[  
+               {  
+                  "id": str(uuid.uuid4()),
+                  "size": (size / len(node[1])),
+                  "rows":
+                     [{  
+                        "id": str(uuid.uuid4()),
+                        "widgets": col['widgets'] 
+                      } 
+                  ]
+                  ,                  
+                  "klass":"card card-home card-column span%s" % (size / len(node[1]))
+               }
+               for col in _create_layout(node[1], size)
+            ]
+          })
+          
+          wf_rows.append({"widgets":[{"size":size, "name": node[2].name.title(), "id":  uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})
+        else:
+          wf_rows += _create_layout(node, size)
+
+    return wf_rows
+  
+  wf_rows = _create_layout(old_nodes[1:-1])      
+
+    
+  if wf_rows:
+    data['layout'][0]['rows'] = [data['layout'][0]['rows'][0]] + wf_rows + [data['layout'][0]['rows'][-1]]
+  
+  # Content
+  def _dig_nodes(nodes):
+    for node in nodes:
+      if type(node) != list:
+        properties = {}
+        if '%s-widget' % node.node_type in NODES and node.node_type != 'kill-widget':
+          properties = dict(NODES['%s-widget' % node.node_type].get_fields())
+        # TODO map and fill up properties
+        
+        wf_nodes.append({
+            "id": uuids[node.id],
+            "name": node.name.title(), # + uuid
+            "type": "%s-widget" % node.node_type,
+            "properties": properties,
+            "children":[{('to' if link.name == 'ok' else link.name): uuids[link.child.get_full_node().id]} for link in node.get_children_links()]
+        })
+      else:
+        _dig_nodes(node)
+  _dig_nodes(old_nodes)
+  
+  data['workflow']['nodes'] = wf_nodes
+
+  return Workflow(data=json.dumps(data))
+  
+
 

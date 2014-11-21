@@ -137,6 +137,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
       <i class="fa fa-file-code-o"></i>
     </a>
+    <a title="${ _('Import workflows') }" rel="tooltip" data-placement="bottom" data-bind="click: import_workflows, css: {'btn': true}">
+      <i class="fa fa fa-download"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-play"></i>
     </a>

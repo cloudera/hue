@@ -79,6 +79,7 @@ urlpatterns += patterns(
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
   
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'), # Temporary
+  url(r'^editor/workflow/import_workflows/$', 'import_hue_3_7_workflows', name='import_hue_3_7_workflows'), # Temporary
 )
 
 
