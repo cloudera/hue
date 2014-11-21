@@ -577,17 +577,20 @@ def find_json_parameters(fields):
 
 
 def import_workflows_from_hue_3_7():
-#[<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
-#[<Start: start>, <Mapreduce: Sleep>, [<Kill: kill>], [<End: end>]]
-#[<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
-#[<Start: start>, <Hive: Hive>, [<Kill: kill>], [<End: end>]]
-#[<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
-#[<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
-#[<Start: start>, <Mapreduce: Sleep>, [<Kill: kill>], [<End: end>]]
+  return import_workflow_from_hue_3_7(OldWorflows.objects.filter(managed=True).filter(is_trashed=False)[12].get_full_node())
+
+
+def import_workflow_from_hue_3_7(old_wf):
+  """
+  Example of data to transform
+
+  [<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
+  [<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
+  [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
+  """
   
   uuids = {}
-  
-  old_wf = OldWorflows.objects.filter(managed=True).filter(is_trashed=False)[10].get_full_node() 
+
   old_nodes = old_wf.get_hierarchy()
   
   wf = Workflow()
@@ -618,7 +621,10 @@ def import_workflows_from_hue_3_7():
   data['workflow']['properties']['schema_version'] = old_wf.schema_version
   data['workflow']['properties']['deployment_dir'] = old_wf.deployment_dir
   data['workflow']['properties']['parameters'] = json.loads(old_wf.parameters)
-    
+  data['workflow']['properties']['description'] = old_wf.description
+  data['workflow']['properties']['sla'] = old_wf.sla
+  data['workflow']['properties']['sla_enabled'] = old_wf.sla_enabled
+      
   # Layout
   rows = data['layout'][0]['rows']
   
@@ -630,10 +636,10 @@ def import_workflows_from_hue_3_7():
         node = node[0]
       if type(node) != list:
         if node.node_type != 'kill': # No kill widget displayed yet
-          wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})
+          wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
         if node[0].node_type == 'fork':
-          wf_rows.append({"widgets":[{"size":size, "name": node[0].name.title(), "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})  
+          wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})  
           
           wf_rows.append({  
             "id": str(uuid.uuid4()),
@@ -644,12 +650,18 @@ def import_workflows_from_hue_3_7():
                {  
                   "id": str(uuid.uuid4()),
                   "size": (size / len(node[1])),
-                  "rows":
+                  "rows": 
                      [{  
                         "id": str(uuid.uuid4()),
-                        "widgets": col['widgets'] 
+                        "widgets": c['widgets'],
+                        "columns":[]
                       } 
-                  ]
+                    for c in col] if type(col) == list else [{  
+                        "id": str(uuid.uuid4()),
+                        "widgets": col['widgets'],
+                        "columns":[]
+                      }
+                   ] 
                   ,                  
                   "klass":"card card-home card-column span%s" % (size / len(node[1]))
                }
@@ -657,18 +669,18 @@ def import_workflows_from_hue_3_7():
             ]
           })
           
-          wf_rows.append({"widgets":[{"size":size, "name": node[2].name.title(), "id":  uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size}]})
+          wf_rows.append({"widgets":[{"size":size, "name": 'Join', "id":  uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
         else:
-          wf_rows += _create_layout(node, size)
-
+          wf_rows.append(_create_layout(node, size))
+    
     return wf_rows
   
-  wf_rows = _create_layout(old_nodes[1:-1])      
-
+  wf_rows = _create_layout(old_nodes[1:-1])
     
   if wf_rows:
     data['layout'][0]['rows'] = [data['layout'][0]['rows'][0]] + wf_rows + [data['layout'][0]['rows'][-1]]
-  
+
+
   # Content
   def _dig_nodes(nodes):
     for node in nodes:
@@ -676,22 +688,32 @@ def import_workflows_from_hue_3_7():
         properties = {}
         if '%s-widget' % node.node_type in NODES and node.node_type != 'kill-widget':
           properties = dict(NODES['%s-widget' % node.node_type].get_fields())
-        # TODO map and fill up properties
         
+        if node.node_type == 'pig-widget':
+          properties['script_path'] = node.script_path
+          properties['params'] = json.loads(node.params)
+          properties['files'] = json.loads(node.files)
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.archives)          
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+
         wf_nodes.append({
             "id": uuids[node.id],
-            "name": node.name.title(), # + uuid
+            "name": '%s-%s' % (node.node_type.split('-')[0], uuids[node.id][:4]),
             "type": "%s-widget" % node.node_type,
             "properties": properties,
-            "children":[{('to' if link.name == 'ok' else link.name): uuids[link.child.get_full_node().id]} for link in node.get_children_links()]
+            "children":[{('to' if link.name in ('ok', 'start') else link.name): uuids[link.child.get_full_node().id]} for link in node.get_children_links()]
         })
       else:
         _dig_nodes(node)
+
   _dig_nodes(old_nodes)
   
   data['workflow']['nodes'] = wf_nodes
 
   return Workflow(data=json.dumps(data))
-  
-
 
