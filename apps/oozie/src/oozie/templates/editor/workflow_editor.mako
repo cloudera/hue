@@ -324,9 +324,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
-      <div class="inline pull-right" data-bind="visible: $root.isEditing() && ['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1">
-        <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
-      </div>
+      <!-- ko if: widgetType() == 'decision-widget' -->
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1">
+          <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: widgetType() != 'decision-widget' -->
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1)">
+          <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
+        </div>
+      <!-- /ko -->
     </h2>
     <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
