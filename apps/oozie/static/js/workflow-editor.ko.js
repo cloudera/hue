@@ -179,7 +179,7 @@ var Workflow = function (vm, workflow) {
     self.nodes(nodes)
   }
 
-  self.newNode = function(widget) {
+  self.newNode = function(widget, callback) {
     $.ajax({
       type: "POST",
       url: "/oozie/editor/workflow/new_node/",
@@ -191,6 +191,9 @@ var Workflow = function (vm, workflow) {
         if (data.status == 0) {
           viewModel.addActionProperties(data.properties);
           viewModel.addActionWorkflows(data.workflows);
+          if (callback){
+            callback(widget);
+          }
         }
       },
       async: false
@@ -408,16 +411,22 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.currentlyDraggedWidget = ko.observable(null);
+  self.currentlyDraggedOp = ko.observable("move");
   self.currentlyDraggedWidget.subscribe(function (widget) {
     toggleSideDrop(widget, false);
   });
+
+  self.setCurrentlyDraggedWidget = function (widget, op) {
+    self.currentlyDraggedOp($(op).hasClass("fa-copy") ? "copy" : "move");
+    self.currentlyDraggedWidget(widget);
+  }
 
   self.enableSideDrop = function (widget) {
     toggleSideDrop(widget, true);
   }
 
   function toggleSideDrop(widget, enable) {
-    if (widget != null && widget.id() != "") {
+    if (widget != null && widget.id() != "" && self.currentlyDraggedOp() == "move") {
       var _row = self.getWidgetParentRow(widget.id());
       if (_row) {
         _row.enableOozieDropOnSide(enable);
@@ -483,17 +492,17 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
 
       var _w = new Widget({
-          size: self.currentlyDraggedWidget().size(),
-          id: UUID(),
-          name: self.currentlyDraggedWidget().name(),
-          widgetType: self.currentlyDraggedWidget().widgetType(),
-          properties: self.currentlyDraggedWidget().properties(),
-          offset: self.currentlyDraggedWidget().offset(),
-          loading: true,
-          vm: self
-        });
+        size: self.currentlyDraggedWidget().size(),
+        id: UUID(),
+        name: self.currentlyDraggedWidget().name(),
+        widgetType: self.currentlyDraggedWidget().widgetType(),
+        properties: self.currentlyDraggedWidget().properties(),
+        offset: self.currentlyDraggedWidget().offset(),
+        loading: true,
+        vm: self
+      });
 
-      if (self.currentlyDraggedWidget().id() != ""){
+      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move"){
         self.removeWidgetById(self.currentlyDraggedWidget().id());
         _w = self.currentlyDraggedWidget();
       }
