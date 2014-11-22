@@ -94,7 +94,16 @@ def jobs(request):
   retired = request.GET.get('retired')
 
   if request.GET.get('format') == 'json':
-    jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired)
+    try:
+      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired)
+    except Exception, ex:
+      ex_message = str(ex)
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
+      elif 'Could not connect to' in ex_message:
+        raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
+      else:
+        raise ex
     json_jobs  = [massage_job_for_json(job, request) for job in jobs]
     return HttpResponse(encode_json_for_js(json_jobs), mimetype="application/json")
 
