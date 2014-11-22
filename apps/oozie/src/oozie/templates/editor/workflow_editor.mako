@@ -224,7 +224,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
       <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
-      <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+      <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(x, y){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
     </div>
@@ -260,7 +260,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <div class="span12">
         <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && widgets().length < 1, isEnabled: $root.isEditing() && widgets().length < 1,
-          options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+          options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
               'stop': function(event, ui){},
               'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
               dragged: function(widget){widgetDraggedAdditionalHandler(widget)}}">
@@ -287,7 +287,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <div  data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
-          options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+          options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
               'stop': function(event, ui){},
               'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
               dragged: function(widget){widgetDraggedAdditionalHandler(widget)}}">
@@ -308,10 +308,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.currentlyDraggedWidget($data); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing() && oozieMovable()">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
+        &nbsp;
+        <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
         &nbsp;
       </span>
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
@@ -1179,7 +1181,12 @@ ${ dashboard.import_bindings() }
       showAddActionDemiModal(widget);
     }
     else {
-      viewModel.workflow.moveNode(widget);
+      if (viewModel.currentlyDraggedOp() == "move"){
+        viewModel.workflow.moveNode(widget);
+      }
+      else {
+        viewModel.workflow.newNode(widget, viewModel.workflow.addNode);
+      }
       $(document).trigger("drawArrows");
     }
   }
