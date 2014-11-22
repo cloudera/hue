@@ -61,6 +61,8 @@ def jt_ha(funct):
         LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
         jt_ha = get_next_ha_mrcluster()
         if jt_ha is not None:
+          if jt_ha[1].host == api.jt.host:
+            raise ex
           config, api.jt = jt_ha
           return funct(api, *args, **kwargs)
       raise ex
@@ -80,6 +82,8 @@ def rm_ha(funct):
         LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
         rm_ha = get_next_ha_yarncluster()
         if rm_ha is not None:
+          if rm_ha[1].url == api.resource_manager_api.url:
+            raise ex
           config, api.resource_manager_api = rm_ha
           return funct(api, *args, **kwargs)
       raise ex
