@@ -484,7 +484,8 @@ def _massage_stats(request, stats):
         'rwx': rwx(stats['mode'], stats['aclBit']),
         'mode': stringformat(stats['mode'], "o"),
         'url': make_absolute(request, "view", dict(path=urlquote(normalized))),
-        }
+        'is_sentry_managed': request.fs.is_sentry_managed(path)
+    }
 
 
 def stat(request, path):

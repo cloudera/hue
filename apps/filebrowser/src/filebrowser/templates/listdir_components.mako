@@ -417,10 +417,18 @@ from django.utils.translation import ugettext as _
     isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</a></li>
     <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     <li class="divider"></li>
-    %if is_fs_superuser:
-    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
-    %endif
-    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
+    % if is_fs_superuser:
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }">
+      <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
+        <i class="fa fa-user"></i> ${_('Change owner / group')}
+      </a>
+    </li>
+    % endif
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
+      <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
+        <i class="fa fa-list-alt"></i> ${_('Change permissions')}
+      </a>
+    </li>
     <li class="divider"></li>
     <li><a href="#"  data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0,
     click: $root.trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</a></li>
@@ -464,24 +472,27 @@ from django.utils.translation import ugettext as _
         <span data-bind="visible: type == 'file', text: stats.size"></span>
       </td>
       <td>
-        %if is_fs_superuser:
-        <span data-bind="text: stats.user, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
-        <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}" data-bind="text: stats.user, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
-        %else:
+        % if is_fs_superuser:
+        <span data-bind="text: stats.user, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}"
+            data-bind="text: stats.user, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
+        % else:
         <span data-bind="text: stats.user"></span>
-        %endif
+        % endif
       </td>
       <td>
-        %if is_fs_superuser:
-        <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
-        <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}" data-bind="text: stats.group, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changeOwner"></a>
-        %else:
+        % if is_fs_superuser:
+        <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}"
+            data-bind="text: stats.group, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changeOwner"></a>
+        % else:
         <span data-bind="text: stats.group"></span>
-        %endif
+        % endif
       </td>
       <td>
-        <span data-bind="text: permissions, visible: ! selected() || $root.isCurrentDirSentryManaged()"></span>
-        <a href="#" rel="tooltip" title="${_('Change permissions')}" data-bind="text: permissions, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged(), click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
+        <span data-bind="text: permissions, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <a href="#" rel="tooltip" title="${_('Change permissions')}"
+            data-bind="text: permissions, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
       </td>
       <td data-bind="text: stats.mtime" style="white-space: nowrap;"></td>
     </tr>
@@ -679,13 +690,14 @@ from django.utils.translation import ugettext as _
         type: file.type,
         permissions: file.rwx,
         mode: file.mode,
+        isSentryManaged: file.is_sentry_managed,
         stats: {
           size: file.humansize,
           user: file.stats.user,
           group: file.stats.group,
           mtime: file.mtime
         },
-        selected:ko.observable(false),
+        selected: ko.observable(false),
         handleSelect: function (row, e) {
           e.preventDefault();
           e.stopPropagation();
@@ -713,7 +725,7 @@ from django.utils.translation import ugettext as _
             cm.css({ display: 'none' });
           }
         },
-        hovered:ko.observable(false),
+        hovered: ko.observable(false),
         toggleHover: function (row, e) {
           this.hovered(! this.hovered());
         },
@@ -811,6 +823,12 @@ from django.utils.translation import ugettext as _
       self.selectedFiles = ko.computed(function () {
         return ko.utils.arrayFilter(self.files(), function (file) {
           return file.selected();
+        });
+      }, self);
+
+      self.selectedSentryFiles = ko.computed(function () {
+        return ko.utils.arrayFilter(self.files(), function (file) {
+          return file.selected() && file.isSentryManaged;
         });
       }, self);
 
