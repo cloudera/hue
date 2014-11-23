@@ -59,12 +59,24 @@ ${ fb_components.menubar() }
               isCurrentDirSelected().length == 0"><i class="fa fa-random"></i> ${_('Move')}</a></li>
               <li><a href="#" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</a></li>
-              <li><a href="#" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
+              <li>
+                <a href="#" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
+                  <i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}
+                </a>
+              </li>
               <li class="divider"></li>
-              %if is_fs_superuser:
-              <li data-bind="css: {'disabled': isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
-              %endif
-              <li data-bind="css: {'disabled': isCurrentDirSentryManaged }"><a href="#" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="fa fa-list-alt"></i> ${_('Change permissions')}</a></li>
+              % if is_fs_superuser:
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
+                <a href="#" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
+                  <i class="fa fa-user"></i> ${_('Change owner / group')}
+                </a>
+              </li>
+              % endif
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
+                <a href="#" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
+                  <i class="fa fa-list-alt"></i> ${_('Change permissions')}
+                </a>
+              </li>
             </ul>
           </div>
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
@@ -121,6 +133,9 @@ ${ fb_components.menubar() }
       </div>
       <div class="alert alert-warn" data-bind="visible: isCurrentDirSentryManaged">
         ${ _('The permissions for this folder are managed by the Sentry Namenode plugin.') }
+      </div>
+      <div class="alert alert-warn" data-bind="visible:selectedSentryFiles().length > 0">
+        ${ _('The permissions of some of the selected files are managed by the Sentry Namenode plugin.') }
       </div>
 
       % if breadcrumbs:
