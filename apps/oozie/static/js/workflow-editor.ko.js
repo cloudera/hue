@@ -432,23 +432,39 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         _row.enableOozieDropOnSide(enable);
         _row.enableOozieDropOnBefore(enable);
 
+        var _parentRow = self.getRowParentRow(_row.id());
+        if (_parentRow) {
+          _parentRow.enableOozieDropOnSide(enable);
+          if (_parentRow.columns().length <= 2) {
+            _parentRow.columns().forEach(function (col) {
+              col.enableOozieDropOnBefore(enable);
+              col.enableOozieDropOnAfter(enable);
+              col.rows()[0].enableOozieDropOnSide(enable);
+            });
+            var _prevParentRow = self.getPrevRow(_parentRow);
+            if (_prevParentRow && _prevParentRow.widgets().length > 0 && _prevParentRow.widgets()[0].widgetType() == "fork-widget") {
+              _prevParentRow.enableOozieDropOnSide(enable);
+            }
+          }
+        }
+
         var _col = self.getRowParentColumn(_row.id());
-        if (self.getColumnParentRow(_col.id())!=null){
+        if (self.getColumnParentRow(_col.id()) != null) {
           _col.enableOozieDropOnBefore(enable);
           _col.enableOozieDropOnAfter(enable);
         }
 
         var _prevRow = self.getPrevRow(_row);
-        if (_prevRow){
-          if (_prevRow.widgets().length > 0 && _prevRow.widgets()[0].widgetType() == "start-widget"){
+        if (_prevRow) {
+          if (_prevRow.widgets().length > 0 && _prevRow.widgets()[0].widgetType() == "start-widget") {
             _prevRow.enableOozieDropOnSide(enable);
             self.getRowParentColumn(_prevRow.id()).enableOozieDropOnBefore(enable);
           }
         }
         var _nextRow = self.getNextRow(_row);
-        if (_nextRow){
+        if (_nextRow) {
           _nextRow.enableOozieDropOnBefore(enable);
-          if (_nextRow.widgets().length > 0 && _nextRow.widgets()[0].widgetType() == "end-widget"){
+          if (_nextRow.widgets().length > 0 && _nextRow.widgets()[0].widgetType() == "end-widget") {
             _nextRow.enableOozieDropOnSide(enable);
             self.getRowParentColumn(_nextRow.id()).enableOozieDropOnAfter(enable);
           }
