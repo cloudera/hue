@@ -226,7 +226,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </div>
 
 <script type="text/html" id="column-template">
-  <div data-bind="css: klass">
+  <div data-bind="css: klass" style="min-height: 50px !important;">
     <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
@@ -246,7 +246,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <script type="text/html" id="internal-column-template">
-  <div data-bind="css: klass">
+  <div data-bind="css: klass" style="min-height: 50px !important;">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
@@ -315,9 +315,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (oozieExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
     <h2 class="card-heading simple">
-      <span data-bind="visible: $root.isEditing() && oozieMovable()">
+      <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded()">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
         <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
@@ -332,17 +332,25 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
       <!-- ko if: widgetType() == 'decision-widget' -->
-        <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1">
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded()">
           <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
       <!-- ko if: widgetType() != 'decision-widget' -->
-        <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1)">
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1) && ! oozieExpanded()">
           <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: oozieExpanded() -->
+        <div class="inline pull-right">
+          <a href="javascript:void(0)" data-bind="click: toggleProperties"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
     </h2>
     <div class="card-body" style="padding: 5px;">
+      <span data-bind="visible: $root.isEditing() && ! oozieExpanded() && oozieMovable()">
+        <a class="btn" data-bind="click: toggleProperties"><i class="fa fa-cogs"></i></a>
+      </span>
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
@@ -602,7 +610,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Hive') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -708,7 +716,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Pig') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1342,6 +1350,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <div id="submit-wf-modal" class="modal hide"></div>
 
+<div id="exposeOverlay"></div>
 
 <link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
@@ -1503,8 +1512,57 @@ ${ dashboard.import_bindings() }
     drawArrows();
   }
 
+  var lastSeenPosition = null;
+  var lastExpandedWidget = null;
+  function toggleProperties(widget) {
+    if (widget.oozieMovable()){
+      var _el = $("#wdg_" + widget.id());
+      if (! widget.oozieExpanded()){
+        lastExpandedWidget = widget;
+        _el.css("z-index", "99999");
+        lastSeenPosition = _el.position();
+        _el.css("position", "fixed");
+        _el.css({
+          "top": lastSeenPosition.top + "px",
+          "left": lastSeenPosition.left + "px",
+          "width": "97%",
+          "margin-top": "1%",
+          "margin-left": "1.5%",
+          "height": "93%"
+        });
+        _el.animate({
+          "top": "10px",
+          "left": "0"
+        }, 200);
+        _el.find(".prop-editor").show();
+        $("#exposeOverlay").fadeIn(300);
+        widget.oozieExpanded(!widget.oozieExpanded());
+      }
+      else {
+        $("#exposeOverlay").click();
+      }
+    }
+  }
+
   $(document).ready(function(){
     renderChangeables();
+
+    $("#exposeOverlay").on("click", function (e) {
+      if (lastExpandedWidget) {
+        lastExpandedWidget.oozieExpanded(false);
+      }
+      $(".prop-editor").hide();
+      $(".card-widget").css("position", "initial");
+      $("#exposeOverlay").fadeOut(300, function () {
+        $(".card-widget").css("z-index", "1");
+      });
+    });
+
+    $(document).keyup(function(e) {
+      if (e.keyCode == 27) {
+        $("#exposeOverlay").click();
+      }
+    });
 
     var resizeTimeout = -1;
     $(window).on("resize", function () {
