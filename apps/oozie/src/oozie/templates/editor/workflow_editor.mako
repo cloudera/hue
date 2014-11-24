@@ -93,14 +93,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSshAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableSshAction());}}}"
          title="${_('Ssh')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-tty"></i></a>
     </div>
         
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableFsAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableFsAction());}}}"
          title="${_('HDFS Fs')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-o"></i></a>
     </div>    
@@ -1091,26 +1091,47 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Ssh') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Ssh') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <i class="fa fa-tty"></i>
         </div>
-        <div class="tab-pane" id="properties">
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">          
+          <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
+          <input type="checkbox" data-bind="checked: properties.capture_output" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.env_var.label"></span>
+          <ul data-bind="foreach: properties.env_var">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.env_var.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.env_var.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>           
+          <br/>
           <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
         </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
         </div>
       </div>
     </div>
@@ -1129,26 +1150,133 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Fs') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Fs') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
+          <span data-bind="text: $root.workflow_properties.deletes.label"></span>
+          <ul data-bind="foreach: properties.deletes">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.deletes.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>  
+                   
+          <br/>
+          
+          <span data-bind="text: $root.workflow_properties.mkdirs.label"></span>
+          <ul data-bind="foreach: properties.mkdirs">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.mkdirs.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button> 
+                    
+          <br/>
+          
+          <span data-bind="text: $root.workflow_properties.touchzs.label"></span>
+          <ul data-bind="foreach: properties.touchzs">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.touchzs.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button> 
+                    
+          <br/>
+          
+          <span data-bind="text: $root.workflow_properties.moves.label"></span>
+          <span data-bind="text: $root.workflow_properties.moves.label"></span>
+          <ul data-bind="foreach: properties.moves">
+            <li>
+              <input data-bind="value: source"/>
+              <input data-bind="value: target"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.moves.push({'source': '', 'target': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>    
+      
+          <br/>
+               
+          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
+          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
+          <ul data-bind="foreach: properties.chmods">
+            <li>
+              ${ _('Path') }
+              <input data-bind="value: value"/>
+              ${ _('Permissions') }
+              <input data-bind="value: permissions"/>
+              ${ _('Also apply to files') }
+              <input type="checkbox" data-bind="value: dir_files"/>
+              ${ _('Recursive') }
+              <input type="checkbox" data-bind="value: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'permissions': '600', 'dir_files': true, 'recursive': false}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+                     
+          <br/>
+          
+          <span data-bind="text: $root.workflow_properties.chgrps.label"></span>
+          <ul data-bind="foreach: properties.chgrps">
+            <li>
+              ${ _('Path') }
+              <input data-bind="value: value"/>
+              ${ _('Group') }
+              <input data-bind="value: group"/>
+              ${ _('Also apply to files') }
+              <input type="checkbox" data-bind="value: dir_files"/>
+              ${ _('Recursive') }
+              <input type="checkbox" data-bind="value: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'group': 'mygroup', 'dir_files': false, 'recursive': false}); }">
+            <i class="fa fa-plus"></i>
+          </button>           
         </div>
-        <div class="tab-pane" id="properties">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
         </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
         </div>
       </div>
     </div>
@@ -1174,7 +1302,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <i class="fa fa-envelope-o"></i>
         </div>
         <div class="tab-pane" id="properties">
