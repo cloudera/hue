@@ -114,7 +114,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableStreamingAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableStreamingAction());}}}"
          title="${_('Streaming')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-exchange"></i></a>
     </div>    
@@ -1350,26 +1350,35 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Streaming') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Streaming') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
+          <span data-bind="text: $root.workflow_properties.mapper.label"></span>
+          <input type="text" data-bind="value: properties.mapper" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.reducer.label"></span>
+          <input type="text" data-bind="value: properties.reducer" />
         </div>
-        <div class="tab-pane" id="properties">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>       
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
         </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
         </div>
       </div>
     </div>
