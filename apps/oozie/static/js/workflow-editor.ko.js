@@ -569,7 +569,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         vm: self
       });
 
-      if (self.currentlyDraggedWidget().id() != ""){
+      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move"){
         self.removeWidgetById(self.currentlyDraggedWidget().id());
         _w = self.currentlyDraggedWidget();
       }
