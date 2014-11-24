@@ -670,6 +670,78 @@ class MapReduceAction(Action):
     return [cls.FIELDS['jar_path']]
 
 
+class ShellAction(Action):
+  TYPE = 'shell' 
+  FIELDS = {
+     'shell_command': { 
+          'name': 'shell_command',
+          'label': _('Shell command'),
+          'value': 'script.sh',
+          'help_text': _('The path of the Shell command to execute.')
+     },            
+     'arguments': {
+          'name': 'arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('The arguments of the command can then be specified using one or more argument element.')
+     },    
+     'env_var': { 
+          'name': 'env_var',
+          'label': _('Environment variables'),
+          'value': [],
+          'help_text': _('Environemnt to be passed to the Shell command. env-var should contain only one pair of environment variable and value. '
+                         'If the pair contains the variable such as $PATH, it should follow the Unix convention such as PATH=$PATH:mypath. '
+                         'Don\'t use ${PATH} which will be substitued by Oozie\'s EL evaluator.')
+     },         
+     'capture_output': { 
+          'name': 'capture_output',
+          'label': _('Capture output'),
+          'value': True,
+          'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                         'command output must be in Java Properties file format and it must not exceed 2KB. '
+                         'From within the workflow definition, the output of an %(program)s action node is accessible '
+                         'via the String action:output(String node, String key) function') % {'program': TYPE}
+     },
+     # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                        'Properties specified in the Job Properties element override properties specified in the '
+                        'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['shell_command']]
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -703,6 +775,7 @@ NODES = {
   'sqoop-widget': SqoopAction,
   'mapreduce-widget': MapReduceAction,  
   'subworkflow-widget': SubWorkflowAction,
+  'shell-widget': ShellAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
 }
