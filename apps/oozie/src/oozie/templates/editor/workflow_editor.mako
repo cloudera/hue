@@ -1100,26 +1100,29 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <i class="fa fa-tty"></i>
+          <span data-bind="text: $root.workflow_properties.host.label"></span>
+          <input type="text" data-bind="value: properties.host" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.ssh_command.label"></span>
+          <input type="text" data-bind="value: properties.ssh_command" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.arguments.label"></span>
+          <ul data-bind="foreach: properties.arguments">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>           
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">          
           <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
           <input type="checkbox" data-bind="checked: properties.capture_output" />
-          <br/>
-          <span data-bind="text: $root.workflow_properties.env_var.label"></span>
-          <ul data-bind="foreach: properties.env_var">
-            <li>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.env_var.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.env_var.push({'value': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>           
-          <br/>
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
