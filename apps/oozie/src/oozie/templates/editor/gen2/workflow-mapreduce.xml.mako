@@ -17,20 +17,20 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <map-reduce>
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
-            ${ common.prepares(node.get_prepares()) }
-            % if node.job_xml:
-              <job-xml>${ node.job_xml }</job-xml>
+            ${ common.prepares(node['properties']['prepares']) }
+            % if node['properties']['job_xml']:
+              <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node.get_properties()) }
+            ${ common.configuration(node['properties']['properties']) }
 
-            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+            ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </map-reduce>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>
