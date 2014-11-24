@@ -315,7 +315,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (oozieExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}}}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (oozieExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded()">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -1549,13 +1549,20 @@ ${ dashboard.import_bindings() }
 
     $("#exposeOverlay").on("click", function (e) {
       if (lastExpandedWidget) {
+        var _el = $("#wdg_" + lastExpandedWidget.id());
+        _el.css("position", "initial");
+        _el.find(".prop-editor").hide();
+        _el.css({
+          "top": "",
+          "left": "",
+          "width": "",
+          "margin-top": "",
+          "margin-left": "",
+          "height": ""
+        });
         lastExpandedWidget.oozieExpanded(false);
       }
-      $(".prop-editor").hide();
-      $(".card-widget").css("position", "initial");
-      $("#exposeOverlay").fadeOut(300, function () {
-        $(".card-widget").css("z-index", "1");
-      });
+      $("#exposeOverlay").fadeOut(300);
     });
 
     $(document).keyup(function(e) {
