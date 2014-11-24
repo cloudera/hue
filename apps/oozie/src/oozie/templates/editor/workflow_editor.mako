@@ -86,7 +86,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableShellAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableShellAction());}}}"
          title="${_('Shell')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
     </div>
@@ -852,8 +852,97 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
         <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
-          <br/>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="mapreduce-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('MapReduce') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
+          <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
+          <input type="text" data-bind="value: properties.jar_path" />                    
           </br>
+          <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="subworkflow-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+      <input type="text" data-bind="value: id" />
+      <input type="text" data-bind="value: name" />
+    </div>
+
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Sub Workflow') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
+          <span data-bind="text: $root.workflow_properties.workflow.label"></span>
+          <input type="text" data-bind="value: properties.workflow" />
+          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -901,8 +990,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
         <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
-          <br/>
-          </br>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -923,84 +1010,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </script>
 
 
-<script type="text/html" id="subworkflow-widget">
-  <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
-    </div>
-
-    <div>
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Sub-workflow') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="action">
-          <span data-bind="text: $root.workflow_properties.workflow.label"></span>
-          <input type="text" data-bind="value: properties.workflow" />
-          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
-        </div>
-        <div class="tab-pane" id="properties">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
-        </div>
-        <div class="tab-pane" id="sla">
-        </div>
-        <div class="tab-pane" id="credentials">
-        </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
-
-<script type="text/html" id="sqoop-widget">
-  <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
-    </div>
-
-    <div>
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Sqoop') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="action">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
-        </div>
-        <div class="tab-pane" id="properties">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
-        </div>
-        <div class="tab-pane" id="sla">
-        </div>
-        <div class="tab-pane" id="credentials">
-        </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
-
 <script type="text/html" id="shell-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
@@ -1011,26 +1020,51 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Ssh') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Shell') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <i class="fa fa-terminal"></i>
+          <span data-bind="text: $root.workflow_properties.shell_command.label"></span>
+          <input type="text" data-bind="value: properties.shell_command" />
+          <br/>
+          <span data-bind="template: { name: 'common-properties-arguments' }"></span>
         </div>
-        <div class="tab-pane" id="properties">
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">          
+          <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
+          <input type="checkbox" data-bind="checked: properties.capture_output" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.env_var.label"></span>
+          <ul data-bind="foreach: properties.env_var">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.env_var.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.env_var.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>           
+          <br/>
           <span data-bind="template: { name: 'common-action-properties' }"></span>
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
         </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
         </div>
       </div>
     </div>
