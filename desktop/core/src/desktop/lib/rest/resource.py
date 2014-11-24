@@ -17,6 +17,8 @@
 import logging
 import posixpath
 
+from desktop.lib.i18n import smart_unicode
+
 LOG = logging.getLogger(__name__)
 
 
@@ -72,9 +74,12 @@ class Resource(object):
                                 allow_redirects=allow_redirects,
                                 urlencode=self._urlencode)
 
-    self._client.logger.debug(
-        "%s Got response: %s%s" %
-        (method, resp.content[:32], len(resp.content) > 32 and "..." or ""))
+    if self._client.logger.isEnabledFor(logging.DEBUG):
+      self._client.logger.debug(
+          "%s Got response: %s%s" %
+          (method,
+           smart_unicode(resp.content[:32], errors='replace'),
+           len(resp.content) > 32 and "..." or ""))
 
     return self._format_response(resp)
 
