@@ -17,16 +17,16 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <email xmlns="uri:oozie:email-action:0.1">
-            <to>${ node.to }</to>
-            % if node.cc:
-              <cc>${ node.cc }</cc>
+            <to>${ node['properties']['to'] }</to>
+            % if node['properties']['cc']:
+            <cc>${ node['properties']['cc'] }</cc>
             % endif
-            <subject>${ node.subject }</subject>
-            <body>${ node.body }</body>
+            <subject>${ node['properties']['subject'] }</subject>
+            <body>${ node['properties']['body'] }</body>
         </email>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>

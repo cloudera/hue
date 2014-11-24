@@ -829,6 +829,40 @@ class FsAction(Action):
     return []
 
 
+class EmailAction(Action):
+  TYPE = 'email' 
+  FIELDS = {
+     'to': { 
+          'name': 'to',
+          'label': _('To addresses'),
+          'value': '',
+          'help_text': _('Comma-separated values.')
+     },         
+     'cc': { 
+          'name': 'cc',
+          'label': _('Cc addresses (optional)'),
+          'value': '',
+          'help_text': _('Comma-separated values.')
+     },    
+     'subject': {
+          'name': 'subject',
+          'label': _('Subject'),
+          'value': 'Subject',
+          'help_text': _('Plain-text.')
+     },
+     'body': { 
+          'name': 'body',
+          'label': _('Body'),
+          'value': '',
+          'help_text': _('Plain-text.')
+     },
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['to'], cls.FIELDS['subject'], cls.FIELDS['body']]
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -863,8 +897,9 @@ NODES = {
   'mapreduce-widget': MapReduceAction,  
   'subworkflow-widget': SubWorkflowAction,
   'shell-widget': ShellAction,
-  'ssh-widget': SshAction,
-  'fs-widget': FsAction,    
+  'ssh-widget': SshAction,  
+  'fs-widget': FsAction,
+  'email-widget': EmailAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
 }
