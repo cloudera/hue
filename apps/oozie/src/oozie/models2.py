@@ -428,9 +428,76 @@ class HiveAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': ('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
      },
      # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                       'Properties specified in the Job Properties element override properties specified in the '
+                       'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['script_path']]
+
+
+class HiveServer2Action(Action):
+  TYPE = 'hive2'
+  FIELDS = {
+     'script_path': { 
+          'name': 'script_path',
+          'label': _('Script name'),
+          'value': '',
+          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+     },            
+     'parameters': { 
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
+     },
+     # Common
+     'jdbc_url': { 
+          'name': 'jdbc_url',
+          'label': _('JDBC URL'),
+          'value': 'jdbc:hive2://localhost:10000/default',
+          'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.')
+     },     
+     'password': { 
+          'name': 'password',
+          'label': _('Password'),
+          'value': '',
+          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.')
+     },
      'files': { 
           'name': 'files',
           'label': _('Files'),
@@ -527,6 +594,7 @@ NODES = {
   'pig-widget': PigAction,
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
+  'hive2-widget': HiveServer2Action,  
   'subworkflow-widget': SubWorkflowAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
