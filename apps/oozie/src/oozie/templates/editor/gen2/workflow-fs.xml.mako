@@ -21,35 +21,41 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <fs>
-            % for param in node.get_deletes():
-              <delete path='${ smart_path(param['name'], mapping) }'/>
+            % for param in node['properties']['deletes']:
+              <delete path='${ smart_path(param['value'], mapping) }'/>
             % endfor
 
-            % for param in node.get_mkdirs():
-              <mkdir path='${ smart_path(param['name'], mapping) }'/>
+            % for param in node['properties']['mkdirs']:
+              <mkdir path='${ smart_path(param['value'], mapping) }'/>
             % endfor
 
-            % for param in node.get_moves():
-              <move source='${ smart_path(param['source'], mapping) }' target='${ smart_path(param['destination'], mapping) }'/>
+            % for param in node['properties']['moves']:
+              <move source='${ smart_path(param['source'], mapping) }' target='${ smart_path(param['target'], mapping) }'/>
             % endfor
 
-            % for param in node.get_chmods():
-              <%
-                if param['recursive']:
-                  recursive = 'true'
-                else:
-                  recursive = 'false'
-              %>
-              <chmod path='${ smart_path(param['path'], mapping) }' permissions='${ param['permissions'] }' dir-files='${ recursive }'/>
+            % for param in node['properties']['moves']:
+              <chmod path='${ smart_path(param['value'], mapping) }' permissions='${ param['permissions'] }' dir-files='${ 'true' if dir_files else 'false' }'>
+              % if param['recursive']:
+                <recursive/>
+              % endif
+              </chmod>              
             % endfor
 
-            % for param in node.get_touchzs():
-              <touchz path='${ smart_path(param['name'], mapping) }'/>
+            % for param in node['properties']['touchzs']:
+              <touchz path='${ smart_path(param['value'], mapping) }'/>
             % endfor
+            
+            % for param in node['properties']['chgrps']:
+              <chgrp path='${ smart_path(param['value'], mapping) }' group='${ param['group'] }' dir-files='${ 'true' if dir_files else 'false' }'>
+              % if param['recursive']:
+                <recursive/>
+              % endif
+              </chgrp>              
+            % endfor            
         </fs>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>
