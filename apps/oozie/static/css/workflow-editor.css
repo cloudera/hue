@@ -334,3 +334,15 @@ em {
 .readonly .card-widget {
   border: 1px solid #d8d8d8!important;
 }
+
+.row-fluid [class*="span"] {
+  margin-left: 0.5%;
+}
+
+.row-fluid .span10 {
+  width: 90%;
+}
+
+.row-fluid .span1 {
+  width: 4.5%;
+}
