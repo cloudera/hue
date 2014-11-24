@@ -202,6 +202,8 @@ var Widget = function (params) {
     return ["end-widget", "start-widget", "fork-widget", "decision-widget", "kill-widget", "join-widget"].indexOf(self.widgetType()) == - 1
   });
 
+  self.oozieExpanded = ko.observable(false);
+
   self.klass = ko.computed(function () {
     return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
   });
