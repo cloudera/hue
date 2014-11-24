@@ -18,7 +18,7 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
     <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
-        <hive xmlns="uri:oozie:hive2-action:0.1">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
@@ -27,18 +27,19 @@
               <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
             ${ common.configuration(node['properties']['properties']) }
-
-            <script>${ node['properties']['script_path'] }</script>
+            
             <jdbc-url>${ node['properties']['jdbc_url'] }</jdbc-url>
             % if node['properties']['password']:
             <password>${ node['properties']['password'] }</password>
             % endif
+            <script>${ node['properties']['script_path'] }</script>
+
             % for param in node['properties']['parameters']:
               <param>${ param['value'] }</param>
             % endfor
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
-        </hive>
+        </hive2>
         <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
         <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
