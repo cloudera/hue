@@ -621,6 +621,55 @@ class SqoopAction(Action):
     return [cls.FIELDS['command']]
 
 
+class MapReduceAction(Action):
+  TYPE = 'mapreduce'
+  FIELDS = {
+     'jar_path': { 
+          'name': 'jar_path',
+          'label': _('Jar name'),
+          'value': '',
+          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': TYPE}
+     },
+     # Common
+     'files': { 
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+     },
+     'archives': { 
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_xml': { 
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                        'Properties specified in the Job Properties element override properties specified in the '
+                        'files specified in the Job XML element.')
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['jar_path']]
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -650,9 +699,10 @@ NODES = {
   'pig-widget': PigAction,
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
-  'hive2-widget': HiveServer2Action,  
-  'subworkflow-widget': SubWorkflowAction,
+  'hive2-widget': HiveServer2Action,
   'sqoop-widget': SqoopAction,
+  'mapreduce-widget': MapReduceAction,  
+  'subworkflow-widget': SubWorkflowAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
 }
