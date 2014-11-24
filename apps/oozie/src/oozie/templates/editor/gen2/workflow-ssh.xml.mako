@@ -17,20 +17,20 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <ssh xmlns="uri:oozie:ssh-action:0.1">
-            <host>${ node.user }@${ node.host }</host>
-            <command>${ node.command }</command>
+            <host>${ node['properties']['host'] }</host>
+            <command>${ node['properties']['ssh_command'] }</command>
 
-            % for param in node.get_params():
-              <args>${ param['value'] }</args>
+            % for param in node['properties']['arguments']:
+            <args>${ param['value'] }</args>
             % endfor
 
-            % if node.capture_output:
-              <capture-output/>
+            % if node['properties']['capture_output']:
+            <capture-output/>
             % endif
         </ssh>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>
