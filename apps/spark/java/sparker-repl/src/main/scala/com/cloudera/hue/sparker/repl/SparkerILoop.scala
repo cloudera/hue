@@ -3,6 +3,7 @@ package com.cloudera.hue.sparker.repl
 import java.io.{BufferedReader, StringWriter}
 
 import org.apache.spark.repl.SparkILoop
+import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
@@ -80,16 +81,44 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       }
 
       if (line eq null) false               // assume null means EOF
-      else command(line) match {
-        case Result(false, _)           => false
-        case Result(_, Some(finalLine)) => {
-          var output: String = outString.getBuffer.toString
-          output = output.substring("scala> ".length + 1, output.length - 1)
-          outString.getBuffer.setLength(0)
-          println(compact(render(Map("state" -> "stdout", "input" -> finalLine, "msg" -> output))))
-          addReplay(finalLine)
-        } ; true
-        case _                          => true
+      else {
+        implicit val formats = DefaultFormats
+
+        val request = parse(line)
+        val type_ = (request \ "type").extract[Option[String]]
+
+        type_ match {
+          case Some("stdin") => {
+            (request \ "statement").extract[Option[String]] match {
+              case Some(statement) => {
+                command(statement) match {
+                  case Result(false, _) => false
+                  case Result(true, finalLine) => {
+                    finalLine match {
+                      case Some(line) => addReplay(line)
+                      case _ =>
+                    }
+
+                    var output: String = outString.getBuffer.toString
+                    output = output.substring("scala> ".length + 1, output.length - 1)
+                    outString.getBuffer.setLength(0)
+                    println(compact(render(Map("state" -> "stdout", "stdout" -> output))))
+
+                    true
+                  }
+                }
+              }
+              case _ => {
+                println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
+                true
+              }
+            }
+          }
+          case _ => {
+            println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
+            true
+          }
+        }
       }
     }
     def innerLoop() {
