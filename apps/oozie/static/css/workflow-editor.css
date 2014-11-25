@@ -351,6 +351,11 @@ em {
   display: none;
 }
 
+.prop-editor .tab-pane {
+  overflow-y: auto;
+  max-height: 350px;
+}
+
 .card-widget {
   position:relative;
 }
@@ -364,5 +369,5 @@ em {
   position:fixed;
   top:0;
   left:0;
-  z-index:99998;
+  z-index:1031;
 }

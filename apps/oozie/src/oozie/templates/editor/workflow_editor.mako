@@ -1669,26 +1669,29 @@ ${ dashboard.import_bindings() }
   var lastSeenPosition = null;
   var lastExpandedWidget = null;
   function toggleProperties(widget) {
-    if (widget.oozieMovable()){
+    if (widget.oozieMovable()) {
       var _el = $("#wdg_" + widget.id());
-      if (! widget.oozieExpanded()){
+      if (!widget.oozieExpanded()) {
         lastExpandedWidget = widget;
-        _el.css("z-index", "99999");
+        _el.css("z-index", "1032");
         lastSeenPosition = _el.position();
-        _el.css("position", "fixed");
+        var _width = _el.width();
+
+        _el.css("position", "absolute");
         _el.css({
-          "top": lastSeenPosition.top + "px",
+          "top": (lastSeenPosition.top) + "px",
           "left": lastSeenPosition.left + "px",
-          "width": "97%",
-          "margin-top": "1%",
-          "margin-left": "1.5%",
-          "height": "93%"
+          "width": _width
         });
         _el.animate({
-          "top": "10px",
-          "left": "0"
-        }, 200);
+          "width": 600
+        }, 200, function () {
+          if ($(document).width() > $(window).width()) {
+            $(document).scrollLeft($(document).width() - $(window).width());
+          }
+        });
         _el.find(".prop-editor").show();
+
         $("#exposeOverlay").fadeIn(300);
         widget.oozieExpanded(!widget.oozieExpanded());
       }
