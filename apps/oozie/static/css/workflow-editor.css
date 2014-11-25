@@ -371,3 +371,11 @@ em {
   left:0;
   z-index:1031;
 }
+
+.ui-sortable-disabled {
+  background-color: #f1f1f1!important;
+}
+
+.card-column-disabled {
+  background-color: #f1f1f1;
+}
