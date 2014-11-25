@@ -17,22 +17,23 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ common.credentials(node.credentials) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <distcp xmlns="uri:oozie:distcp-action:0.1">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
-            ${ common.prepares(node.get_prepares()) }
-            % if node.job_xml:
-              <job-xml>${ node.job_xml }</job-xml>
-            % endif
-            ${ common.configuration(node.get_properties()) }
+            ${ common.prepares(node['properties']['prepares']) }
+            ${ common.configuration(node['properties']['job_properties']) }
 
-            % for param in node.get_params():
-              <arg>${ param['value'] }</arg>
+            % if node['properties']['java_opts']:
+              <java-opts>${ node['properties']['java_opts'] }</java-opts>
+            % endif
+
+            % for argument in node['properties']['distcp_parameters']:
+              <argument>${ argument['value'] }</argument>
             % endfor
         </distcp>
-        <ok to="${ node.get_oozie_child('ok') }"/>
-        <error to="${ node.get_oozie_child('error') }"/>
+        <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+        <error to="${ node_mapping[node['children'][1]['error']].name }"/>
         ${ common.sla(node) }
     </action>

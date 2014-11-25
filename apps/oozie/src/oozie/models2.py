@@ -918,6 +918,42 @@ class StreamingAction(Action):
     return [cls.FIELDS['mapper'], cls.FIELDS['reducer']]
 
 
+class DistCpAction(Action):
+  TYPE = 'distcp'
+  FIELDS = {
+     'prepares': { 
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+     },
+     'job_properties': { 
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+     },
+     'java_opts': { 
+          'name': 'java_opts',
+          'label': _('Java options'),
+          'value': '',
+          'help_text': _('Command-line parameters used to start the JVM that will execute '
+                        'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
+                        'configuration property. E.g. -Dexample-property=hue')
+     },
+     'distcp_parameters': { 
+          'name': 'distcp_parameters',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('The arguments of the %(type)s command. Put options first, then source paths, then destination path.') % {'type': TYPE.title()}
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return []
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -955,7 +991,8 @@ NODES = {
   'ssh-widget': SshAction,  
   'fs-widget': FsAction,
   'email-widget': EmailAction,
-  'streaming-widget': StreamingAction,  
+  'streaming-widget': StreamingAction,
+  'distcp-widget': DistCpAction,  
   'kill-widget': KillAction,
   'join-widget': JoinAction,
 }
