@@ -93,19 +93,29 @@ public class SparkSession implements Session {
     }
 
     @Override
-    public List<Cell> getCells() {
-        return cells;
+    synchronized public List<Cell> getCells() {
+        return Lists.newArrayList(cells);
     }
 
     @Override
-    public Cell executeStatement(String statement) throws IOException, ClosedSessionException, InterruptedException {
+    synchronized public List<Cell> getCellRange(int fromIndex, int toIndex) {
+        return cells.subList(fromIndex, toIndex);
+    }
+
+    @Override
+    synchronized public Cell getCell(int index) {
+        return cells.get(index);
+    }
+
+    @Override
+    synchronized public Cell executeStatement(String statement) throws IOException, ClosedSessionException, InterruptedException {
         if (isClosed) {
             throw new ClosedSessionException();
         }
 
         touchLastActivity();
 
-        Cell cell = new Cell();
+        Cell cell = new Cell(cells.size());
         cells.add(cell);
 
         cell.addInput(statement);
@@ -142,7 +152,7 @@ public class SparkSession implements Session {
     }
 
     @Override
-    public void close() {
+    synchronized public void close() {
         isClosed = true;
         process.destroy();
     }

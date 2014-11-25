@@ -9,10 +9,18 @@ import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -87,9 +95,14 @@ public class SessionResource {
     @Path("/{id}")
     @POST
     @Timed
-    public Cell executeStatement(@PathParam("id") String id, @Valid ExecuteStatementRequest request) throws Exception, ClosedSessionException, SessionManager.SessionNotFound {
+    public Response executeStatement(@PathParam("id") String id, @Valid ExecuteStatementRequest request) throws Exception, ClosedSessionException, SessionManager.SessionNotFound {
         Session session = sessionManager.get(id);
-        return session.executeStatement(request.getStatement());
+
+        // The cell is evaluated inline, but eventually it'll be turned into an asynchronous call.
+        Cell cell = session.executeStatement(request.getStatement());
+
+        URI location = new URI("/sessions/" + session.getId() + "/cells/" + cell.getId());
+        return new ResponseBuilderImpl().status(Response.Status.SEE_OTHER).contentLocation(location).build();
     }
 
     @Path("/{id}")

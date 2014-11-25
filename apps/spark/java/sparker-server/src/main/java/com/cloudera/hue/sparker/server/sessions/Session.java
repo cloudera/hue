@@ -32,6 +32,10 @@ public interface Session {
     @JsonProperty
     List<Cell> getCells();
 
+    List<Cell> getCellRange(int fromIndex, int toIndex);
+
+    Cell getCell(int cellId);
+
     @JsonProperty
     public long getLastActivity();
 

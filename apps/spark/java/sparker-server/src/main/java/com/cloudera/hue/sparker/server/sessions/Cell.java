@@ -15,17 +15,24 @@ public class Cell {
         COMPLETE,
     }
 
+    int id;
     State state;
     final List<String> input = new ArrayList<String>();
     final List<String> output = new ArrayList<String>();
 
     final List<String> error = new ArrayList<String>();
 
-    public Cell() {
-        this.state = State.NOT_READY;
+    public Cell(int id) {
+        this.id = id;
+        this.state = State.COMPLETE;
     }
 
-    @JsonProperty("type")
+    @JsonProperty
+    public int getId() {
+        return id;
+    }
+
+    @JsonProperty("state")
     public State getState() {
         return state;
     }
