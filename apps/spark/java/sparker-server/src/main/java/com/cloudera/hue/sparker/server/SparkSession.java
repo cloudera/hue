@@ -49,10 +49,10 @@ import java.util.List;
  */
 public class SparkSession implements Session {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SparkSession.class);
+
     private static final String SPARKER_HOME = System.getenv("SPARKER_HOME");
     private static final String SPARKER_SHELL = SPARKER_HOME + "/sparker-shell";
-
-    private static final Logger logger = LoggerFactory.getLogger(SparkSession.class);
 
     private final String id;
     private final Process process;
@@ -60,19 +60,22 @@ public class SparkSession implements Session {
     private final BufferedReader reader;
     private final List<Cell> cells = new ArrayList<Cell>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Thread thread;
+    /*
+    private final StdoutWorkerThread stdoutWorkerThread = new StdoutWorkerThread();
+    private final Queue<JsonNode> requests = new ConcurrentLinkedDeque<JsonNode>();
+    private final Queue<JsonNode> responses = new ConcurrentLinkedDeque<JsonNode>();
+    */
+
     private boolean isClosed = false;
 
     protected long lastActivity = Long.MAX_VALUE;
 
     public SparkSession(final String id) throws IOException, InterruptedException {
-        logger.info("[" + id + "]: creating spark session");
+        LOG.info("[" + id + "]: creating spark session");
 
         touchLastActivity();
 
         this.id = id;
-
-        cells.add(new Cell());
 
         ProcessBuilder pb = new ProcessBuilder(Lists.newArrayList(SPARKER_SHELL))
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
@@ -80,15 +83,19 @@ public class SparkSession implements Session {
 
         this.process = pb.start();
 
-        this.writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        this.reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+        reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        /*
+        stdoutWorkerThread.setDaemon(true);
+        stdoutWorkerThread.start();
+        */
     }
 
     @Override
     public String getId() {
         return id;
     }
-
 
     @Override
     public long getLastActivity() {
@@ -101,54 +108,59 @@ public class SparkSession implements Session {
     }
 
     @Override
-    public Cell executeStatement(String statement) throws IOException, ClosedSessionException {
+    public Cell executeStatement(String statement) throws IOException, ClosedSessionException, InterruptedException {
         if (isClosed) {
             throw new ClosedSessionException();
         }
 
         touchLastActivity();
 
-        Cell cell = cells.get(cells.size() - 1);
+        Cell cell = new Cell();
+        cells.add(cell);
+
         cell.addInput(statement);
 
         ObjectNode request = objectMapper.createObjectNode();
-        request.put("type", "execute-statement");
+        request.put("type", "stdin");
         request.put("statement", statement);
 
         writer.write(request.toString());
+        writer.write("\n");
+        writer.flush();
 
-        String line;
+        String line = reader.readLine();
 
-        while ((line = reader.readLine()) != null) {
-            JsonNode response = objectMapper.readTree(line);
+        if (line == null) {
+            // The process must have shutdown on us!
+            process.waitFor();
+            throw new ClosedSessionException();
+        }
 
-            if (response.has("stdout")) {
-                cell.addOutput(response.get("stdout").asText());
-            }
+        LOG.info("[" + id + "] spark stdout: " + line);
 
-            if (response.has("stderr")) {
-                cell.addOutput(response.get("stderr").asText());
-            }
+        JsonNode response = objectMapper.readTree(line);
 
-            String state = response.get("state").asText();
+        if (response.has("stdout")) {
+            cell.addOutput(response.get("stdout").asText());
+        }
 
-            if (state.equals("complete") || state.equals("incomplete")) {
-                break;
-            }
+        if (response.has("stderr")) {
+            cell.addOutput(response.get("stderr").asText());
         }
 
         return cell;
     }
 
-    public void
-
     @Override
     public void close() {
         isClosed = true;
+        process.destroy();
 
+        /*
         if (process.isAlive()) {
             process.destroy();
         }
+        */
     }
 
     private void touchLastActivity() {
@@ -169,7 +181,7 @@ public class SparkSession implements Session {
                     ObjectMapper mapper = new ObjectMapper();
 
                     while ((line = reader.readLine()) != null) {
-                        logger.info("[" + id + "] spark stdout: " + line);
+                        LOG.info("[" + id + "] spark stdout: " + line);
 
                         JsonNode node = mapper.readTree(line);
 
@@ -206,7 +218,7 @@ public class SparkSession implements Session {
                     }
 
                     int exitCode = process.waitFor();
-                    logger.info("[" + id + "]: process exited with " + exitCode);
+                    LOG.info("[" + id + "]: process exited with " + exitCode);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -229,7 +241,7 @@ public class SparkSession implements Session {
                     ObjectMapper mapper = new ObjectMapper();
 
                     while ((line = reader.readLine()) != null) {
-                        logger.info("[" + id + "] stderr: " + line);
+                        LOG.info("[" + id + "] stderr: " + line);
 
 
 
@@ -259,7 +271,7 @@ public class SparkSession implements Session {
     }
 
     public void execute(String command) throws IOException {
-        logger.info("[" + id + "]: execute: " + command);
+        LOG.info("[" + id + "]: execute: " + command);
 
         this.touchLastActivity();
         if (!command.endsWith("\n")) {
@@ -297,7 +309,7 @@ public class SparkSession implements Session {
     }
 
     public void close() throws IOException, InterruptedException, TimeoutException {
-        logger.info("[" + id + "]: closing shell");
+        LOG.info("[" + id + "]: closing shell");
         process.getOutputStream().close();
 
         stdoutThread.join(1000);
@@ -310,8 +322,27 @@ public class SparkSession implements Session {
             throw new TimeoutException();
         }
 
-        logger.info("[" + id + "]: shell closed with " + process.exitValue());
+        LOG.info("[" + id + "]: shell closed with " + process.exitValue());
     }
 
+    */
+
+    /*
+    private class StdoutWorkerThread extends Thread {
+        @Override
+        public void run() {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            try {
+                while ((line = reader.readLine()) != null) {
+                    JsonNode response = objectMapper.readTree(line);
+                    responses.add(response);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     */
 }

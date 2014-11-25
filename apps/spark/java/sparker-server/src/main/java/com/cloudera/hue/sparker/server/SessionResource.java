@@ -1,15 +1,16 @@
 package com.cloudera.hue.sparker.server;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sun.jersey.api.Responses;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @Path("/sessions")
 @Produces(MediaType.APPLICATION_JSON)
@@ -27,19 +28,18 @@ public class SessionResource {
     @GET
     @Timed
     public List<String> getSessions() {
-        return Collections.list(sessionManager.getSessionKeys());
+        return Collections.list(sessionManager.getSessionIds());
     }
-
-    /*
-    @GET
-    @Timed
-    public Session getSession()
-    */
 
     @POST
     @Timed
     public String createSession(@QueryParam("lang") String language) throws IOException, InterruptedException {
         int sessionType;
+
+        if (language == null) {
+            Response resp = new ResponseBuilderImpl().status(400).entity("missing language").build();
+            throw new WebApplicationException(resp);
+        }
 
         if (language.equals(SCALA)) {
             sessionType = SessionManager.SCALA;
@@ -52,19 +52,46 @@ public class SessionResource {
 
         Session session = sessionManager.create(sessionType);
 
-        return session.getKey();
+        return session.getId();
     }
 
     @Path("/{id}")
     @GET
     @Timed
-    public List<String> getSession(@PathParam("id") String id) {
+    public List<Cell> getSession(@PathParam("id") String id,
+                                 @QueryParam("from") Integer fromCell,
+                                 @QueryParam("limit") Integer limit) throws SessionManager.SessionNotFound {
         Session session = sessionManager.get(id);
-        if (session == null) {
-            Response resp = new ResponseBuilderImpl().status(404).entity("unknown session").build();
-            throw new WebApplicationException(resp);
+        List<Cell> cells = session.getCells();
+
+        if (fromCell != null || limit != null) {
+            if (fromCell == null) {
+                fromCell = 0;
+            }
+
+            if (limit == null) {
+                limit = cells.size();
+            }
+
+            cells = cells.subList(fromCell, fromCell + limit);
         }
 
-        session.getOutputLines();
+        return cells;
+    }
+
+    @Path("/{id}")
+    @POST
+    @Timed
+    public Cell executeStatement(@PathParam("id") String id, @Valid ExecuteStatementRequest request) throws Exception, ClosedSessionException, SessionManager.SessionNotFound {
+        Session session = sessionManager.get(id);
+        return session.executeStatement(request.getStatement());
+    }
+
+    @Path("/{id}")
+    @DELETE
+    @Timed
+    public Response closeSession(@PathParam("id") String id) throws InterruptedException, TimeoutException, IOException, SessionManager.SessionNotFound {
+        sessionManager.close(id);
+        return Response.noContent().build();
     }
 }

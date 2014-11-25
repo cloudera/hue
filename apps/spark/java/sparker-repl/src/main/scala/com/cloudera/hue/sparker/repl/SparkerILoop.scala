@@ -80,44 +80,51 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
         runThunks()
       }
 
-      if (line eq null) false               // assume null means EOF
-      else {
-        implicit val formats = DefaultFormats
+      if (line eq null) {
+        return false                // assume null means EOF
+      }
 
-        val request = parse(line)
-        val type_ = (request \ "type").extract[Option[String]]
+      val request = parseOpt(line) match {
+        case Some(request) => request;
+        case None => {
+          println(compact(render(Map("type" -> "error", "msg" -> "invalid json"))))
+          return true
+        }
+      }
 
-        type_ match {
-          case Some("stdin") => {
-            (request \ "statement").extract[Option[String]] match {
-              case Some(statement) => {
-                command(statement) match {
-                  case Result(false, _) => false
-                  case Result(true, finalLine) => {
-                    finalLine match {
-                      case Some(line) => addReplay(line)
-                      case _ =>
-                    }
+      implicit val formats = DefaultFormats
+      val type_ = (request \ "type").extract[Option[String]]
 
-                    var output: String = outString.getBuffer.toString
-                    output = output.substring("scala> ".length + 1, output.length - 1)
-                    outString.getBuffer.setLength(0)
-                    println(compact(render(Map("state" -> "stdout", "stdout" -> output))))
-
-                    true
+      type_ match {
+        case Some("stdin") => {
+          (request \ "statement").extract[Option[String]] match {
+            case Some(statement) => {
+              command(statement) match {
+                case Result(false, _) => false
+                case Result(true, finalLine) => {
+                  finalLine match {
+                    case Some(line) => addReplay(line)
+                    case _ =>
                   }
+
+                  var output: String = outString.getBuffer.toString
+                  output = output.substring("scala> ".length + 1, output.length - 1)
+                  outString.getBuffer.setLength(0)
+                  println(compact(render(Map("type" -> "stdout", "stdout" -> output))))
+
+                  true
                 }
               }
-              case _ => {
-                println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
-                true
-              }
+            }
+            case _ => {
+              println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
+              true
             }
           }
-          case _ => {
-            println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
-            true
-          }
+        }
+        case _ => {
+          println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
+          true
         }
       }
     }

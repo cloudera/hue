@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 public class SessionManager {
 
@@ -32,52 +33,58 @@ public class SessionManager {
     private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
     public SessionManager() {
-        new SessionManagerGarbageCollector(this).start();
+        SessionManagerGarbageCollector gc = new SessionManagerGarbageCollector(this);
+        gc.setDaemon(true);
+        gc.start();
     }
 
-    public Session get(String key) {
-        return sessions.get(key);
-    }
-
-    public Session create(int language) throws IllegalArgumentException, IOException, InterruptedException {
-        String key = UUID.randomUUID().toString();
-        Session session;
-        switch (language) {
-            case SCALA:  session = new SparkSession(key); break;
-            case PYTHON: session = new PySparkSession(key); break;
-            default: throw new IllegalArgumentException("Invalid language specified for shell session");
+    public Session get(String id) throws SessionNotFound {
+        Session session = sessions.get(id);
+        if (session == null) {
+            throw new SessionNotFound(id);
         }
-        sessions.put(key, session);
         return session;
     }
 
-    public void close() {
+    public Session create(int language) throws IllegalArgumentException, IOException, InterruptedException {
+        String id = UUID.randomUUID().toString();
+        Session session;
+        switch (language) {
+            case SCALA:  session = new SparkSession(id); break;
+            //case PYTHON: session = new PySparkSession(id); break;
+            default: throw new IllegalArgumentException("Invalid language specified for shell session");
+        }
+        sessions.put(id, session);
+        return session;
+    }
+
+    public void close() throws InterruptedException, IOException, TimeoutException {
         for (Session session : sessions.values()) {
-            this.close(session.getKey());
-        }
-    }
-
-    public void close(String key) {
-        Session session = this.get(key);
-        sessions.remove(key);
-        try {
+            sessions.remove(session.getId());
             session.close();
-        } catch (Exception e) {
-            // throws InterruptedException, TimeoutException, IOException
-            e.printStackTrace();
         }
     }
 
-    public Enumeration<String> getSessionKeys() {
+    public void close(String id) throws InterruptedException, TimeoutException, IOException, SessionNotFound {
+        Session session = this.get(id);
+        sessions.remove(id);
+        session.close();
+    }
+
+    public Enumeration<String> getSessionIds() {
         return sessions.keys();
     }
 
-    public void garbageCollect() {
+    public void garbageCollect() throws InterruptedException, IOException, TimeoutException {
         long timeout = 60000; // Time in milliseconds; TODO: make configurable
         for (Session session : sessions.values()) {
             long now = System.currentTimeMillis();
             if ((now - session.getLastActivity()) > timeout) {
-                this.close(session.getKey());
+                try {
+                    this.close(session.getId());
+                } catch (SessionNotFound sessionNotFound) {
+                    // Ignore
+                }
             }
         }
     }
@@ -101,7 +108,17 @@ public class SessionManager {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
+    }
+
+    public class SessionNotFound extends Throwable {
+        public SessionNotFound(String id) {
+            super(id);
         }
     }
 }
