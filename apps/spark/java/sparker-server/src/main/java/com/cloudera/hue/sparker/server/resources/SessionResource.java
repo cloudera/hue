@@ -104,6 +104,10 @@ public class SessionResource {
         @NotEmpty
         private String statement;
 
+        public ExecuteStatementRequest(String statement) {
+            this.statement = statement;
+        }
+
         public String getStatement() {
             return statement;
         }
