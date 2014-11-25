@@ -1,8 +1,12 @@
 package com.cloudera.hue.sparker.server;
 
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 public class SparkerApp extends Application<SparkerConfiguration> {
 
@@ -20,5 +24,14 @@ public class SparkerApp extends Application<SparkerConfiguration> {
         final SessionManager sessionManager = new SessionManager();
         final SessionResource resource = new SessionResource(sessionManager);
         environment.jersey().register(resource);
+        environment.jersey().register(new SessionManagerExceptionMapper());
+    }
+
+    private class SessionManagerExceptionMapper implements ExceptionMapper<SessionManager.SessionNotFound> {
+
+        @Override
+        public Response toResponse(SessionManager.SessionNotFound sessionNotFound) {
+            return new ResponseBuilderImpl().status(404).entity("session not found").build();
+        }
     }
 }

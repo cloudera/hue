@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.sparker.server;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,19 +26,16 @@ import java.util.concurrent.TimeoutException;
 
 public interface Session {
 
+    @JsonProperty
     String getId();
 
-    public Cell executeStatement(String statement) throws IOException, ClosedSessionException;
-
-    public long getLastActivity();
-
+    @JsonProperty
     List<Cell> getCells();
 
-    /*
-    List<String> getInputLines();
+    @JsonProperty
+    public long getLastActivity();
 
-    List<JsonNode> getOutputLines();
-    */
+    public Cell executeStatement(String statement) throws Exception, ClosedSessionException;
 
     public void close() throws IOException, InterruptedException, TimeoutException;
 }
