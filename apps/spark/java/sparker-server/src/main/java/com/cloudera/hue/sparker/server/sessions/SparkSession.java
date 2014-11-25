@@ -60,11 +60,6 @@ public class SparkSession implements Session {
     private final BufferedReader reader;
     private final List<Cell> cells = new ArrayList<Cell>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    /*
-    private final StdoutWorkerThread stdoutWorkerThread = new StdoutWorkerThread();
-    private final Queue<JsonNode> requests = new ConcurrentLinkedDeque<JsonNode>();
-    private final Queue<JsonNode> responses = new ConcurrentLinkedDeque<JsonNode>();
-    */
 
     private boolean isClosed = false;
 
@@ -85,11 +80,6 @@ public class SparkSession implements Session {
 
         writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        /*
-        stdoutWorkerThread.setDaemon(true);
-        stdoutWorkerThread.start();
-        */
     }
 
     @Override
@@ -155,194 +145,9 @@ public class SparkSession implements Session {
     public void close() {
         isClosed = true;
         process.destroy();
-
-        /*
-        if (process.isAlive()) {
-            process.destroy();
-        }
-        */
     }
 
     private void touchLastActivity() {
         this.lastActivity = System.currentTimeMillis();
     }
-
-
-    /*
-
-        this.stdoutThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                try {
-                    String line;
-
-                    ObjectMapper mapper = new ObjectMapper();
-
-                    while ((line = reader.readLine()) != null) {
-                        LOG.info("[" + id + "] spark stdout: " + line);
-
-                        JsonNode node = mapper.readTree(line);
-
-                        String state = node.get("state").asText();
-
-                        lock.lock();
-                        try {
-                            Cell cell = cells.get(cells.size() - 1);
-
-                            if (state.equals("ready")) {
-                                cell.setState(Cell.State.READY);
-                            } else  if (state.equals("incomplete")) {
-                                cell.setState(Cell.State.INCOMPLETE);
-                            } else if (state.equals("running")) {
-                                cell.setState(Cell.State.RUNNING);
-                            } else if (state.equals("complete")) {
-                                cell.setState(Cell.State.COMPLETE);
-
-                                // Start a new cell.
-                                cells.add(new Cell());
-                            }
-
-                            if (node.has("stdout")) {
-                                cell.addOutput(node.get("stdout").asText());
-                            }
-
-                            if (node.has("stderr")) {
-                                cell.addOutput(node.get("stderr").asText());
-                            }
-
-                        } finally {
-                            lock.unlock();
-                        }
-                    }
-
-                    int exitCode = process.waitFor();
-                    LOG.info("[" + id + "]: process exited with " + exitCode);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        stdoutThread.start();
-
-        /*
-        this.stderrThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-                try {
-                    String line;
-
-                    ObjectMapper mapper = new ObjectMapper();
-
-                    while ((line = reader.readLine()) != null) {
-                        LOG.info("[" + id + "] stderr: " + line);
-
-
-
-                        ObjectNode node = mapper.createObjectNode();
-                        node.put("type", "stderr");
-                        node.put("msg", line);
-
-                        outputLines.add(node);
-                    }
-
-                    process.waitFor();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        stderrThread.start();
-        * /
-    }
-
-    @Override
-    public String getKey() {
-        return id;
-    }
-
-    public void execute(String command) throws IOException {
-        LOG.info("[" + id + "]: execute: " + command);
-
-        this.touchLastActivity();
-        if (!command.endsWith("\n")) {
-            command += "\n";
-        }
-
-        inputLines.add(command);
-        process.getOutputStream().write(command.getBytes("UTF-8"));
-        process.getOutputStream().flush();
-    }
-
-    /*
-    @Override
-    public List<String> getInputLines() {
-        this.touchLastActivity();
-        return Lists.newArrayList(inputLines);
-    }
-    * /
-
-    /*
-    @Override
-    public List<JsonNode> getOutputLines() {
-        this.touchLastActivity();
-        return Lists.newArrayList(outputLines);
-    }
-    * /
-
-    public List<Cell> getCells() {
-        lock.lock();
-        try {
-            return Lists.newArrayList(cells);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void close() throws IOException, InterruptedException, TimeoutException {
-        LOG.info("[" + id + "]: closing shell");
-        process.getOutputStream().close();
-
-        stdoutThread.join(1000);
-        //stderrThread.join(1000);
-
-        if (stdoutThread.isAlive()) { // || stderrThread.isAlive()) {
-            stdoutThread.interrupt();
-            //stderrThread.interrupt();
-            process.destroy();
-            throw new TimeoutException();
-        }
-
-        LOG.info("[" + id + "]: shell closed with " + process.exitValue());
-    }
-
-    */
-
-    /*
-    private class StdoutWorkerThread extends Thread {
-        @Override
-        public void run() {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-
-            try {
-                while ((line = reader.readLine()) != null) {
-                    JsonNode response = objectMapper.readTree(line);
-                    responses.add(response);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 }
