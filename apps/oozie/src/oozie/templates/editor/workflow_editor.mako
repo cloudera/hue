@@ -660,7 +660,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Hive') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -769,7 +769,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Java') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -841,7 +841,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Sqoop') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -888,7 +888,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('MapReduce') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -934,7 +934,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Sub Workflow') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -979,7 +979,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('MapReduce') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1026,7 +1026,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Shell') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1089,7 +1089,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Ssh') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1151,7 +1151,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Fs') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1295,7 +1295,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Email') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1348,7 +1348,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Streaming') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1395,7 +1395,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <input type="text" data-bind="value: name" />
     </div>
 
-    <div>
+    <div class="prop-editor">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Dist Cp') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1732,7 +1732,7 @@ ${ dashboard.import_bindings() }
           "width": _width
         });
         _el.animate({
-          "width": 600
+          "width": _width < $(window).width()/2 ? $(window).width()/2 : _width
         }, 200, function () {
           if ($(document).width() > $(window).width()) {
             $(document).scrollLeft($(document).width() - $(window).width());
