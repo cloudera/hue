@@ -5,7 +5,11 @@ __LXML_VERSION = None
 def version():
     global __LXML_VERSION
     if __LXML_VERSION is None:
-        __LXML_VERSION = open(os.path.join(get_base_dir(), 'version.txt')).read().strip()
+        f = open(os.path.join(get_base_dir(), 'version.txt'))
+        try:
+            __LXML_VERSION = f.read().strip()
+        finally:
+            f.close()
     return __LXML_VERSION
 
 def branch_version():
@@ -33,7 +37,7 @@ def svn_version():
         data = f.read()
         f.close()
 
-        if data[:1] in ('8', '9'):
+        if data[:1] in ('8', '9') or data[:2] == '10':
             # SVN >= 1.4
             data = [ d.splitlines() for d in data.split('\n\x0c\n') ]
             del data[0][0] # get rid of the '8'
@@ -114,7 +118,7 @@ def create_version_h(svn_version):
             svn_version += '.0'
 
     version_h = open(
-        os.path.join(get_base_dir(), 'src', 'lxml', 'lxml-version.h'),
+        os.path.join(get_base_dir(), 'src', 'lxml', 'includes', 'lxml-version.h'),
         'w')
     version_h.write('''\
 #ifndef LXML_VERSION_STRING

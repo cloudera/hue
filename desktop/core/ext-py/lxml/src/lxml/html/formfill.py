@@ -3,9 +3,10 @@ from lxml.html import fromstring, tostring, XHTML_NAMESPACE
 from lxml.html import _forms_xpath, _options_xpath, _nons, _transform_result
 from lxml.html import defs
 import copy
+
 try:
-    basestring = __builtins__["basestring"]
-except (KeyError, NameError):
+    basestring
+except NameError:
     # Python 3
     basestring = str
 
@@ -126,7 +127,6 @@ def _select(el, select):
 
 def _fill_single(input, value):
     if _nons(input.tag) == 'textarea':
-        input.clear()
         input.text = value
     else:
         input.set('value', value)

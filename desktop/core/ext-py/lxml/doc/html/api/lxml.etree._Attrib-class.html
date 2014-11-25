@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -69,7 +69,7 @@ object --+
 </pre>
 
 <hr />
-A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">Element.attrib</span></tt> property.
+A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">Element.attrib</tt> property.
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -97,6 +97,38 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
           <td><span class="summary-sig"><a name="__contains__"></a><span class="summary-sig-name">__contains__</span>(<span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>)</span><br />
       y in x</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__copy__"></a><span class="summary-sig-name">__copy__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__deepcopy__"></a><span class="summary-sig-name">__deepcopy__</span>(<span class="summary-sig-arg">...</span>)</span></td>
           <td align="right" valign="top">
             
             
@@ -166,7 +198,9 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__getitem__"></a><span class="summary-sig-name">__getitem__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="__getitem__"></a><span class="summary-sig-name">__getitem__</span>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>)</span><br />
+      x[y]</td>
           <td align="right" valign="top">
             
             
@@ -200,24 +234,8 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Attrib-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      iter(x)</td>
           <td align="right" valign="top">
             
             
@@ -339,7 +357,7 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Attrib-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._Attrib-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">x</span>)</span><br />
       repr(x)</td>
           <td align="right" valign="top">
             
@@ -549,12 +567,16 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -602,29 +624,6 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">...</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
-  <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -657,7 +656,7 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">...</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">x</span>)</span>
     <br /><em class="fname">(Representation operator)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -669,7 +668,6 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
   <dl class="fields">
     <dt>Overrides:
         object.__repr__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -699,14 +697,14 @@ A dict-like proxy for the <tt class="rst-rst-rst-docutils literal rst-rst-docuti
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

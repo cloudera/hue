@@ -1,5 +1,5 @@
 #  support for XMLSchema validation
-cimport xmlschema
+from lxml.includes cimport xmlschema
 
 class XMLSchemaError(LxmlError):
     u"""Base class of all XML Schema errors
@@ -36,49 +36,40 @@ cdef class XMLSchema(_Validator):
     cdef xmlschema.xmlSchema* _c_schema
     cdef bint _has_default_attributes
     cdef bint _add_attribute_defaults
+    def __cinit__(self):
+        self._c_schema = NULL
+        self._has_default_attributes = True # play safe
+        self._add_attribute_defaults = False
 
     def __init__(self, etree=None, *, file=None, attribute_defaults=False):
         cdef _Document doc
         cdef _Element root_node
         cdef xmlDoc* fake_c_doc
         cdef xmlNode* c_node
-        cdef char* c_href
         cdef xmlschema.xmlSchemaParserCtxt* parser_ctxt
 
-        self._has_default_attributes = True # play safe
         self._add_attribute_defaults = attribute_defaults
-        self._c_schema = NULL
         _Validator.__init__(self)
         fake_c_doc = NULL
         if etree is not None:
             doc = _documentOrRaise(etree)
             root_node = _rootNodeOrRaise(etree)
-
-            # work around for libxml2 bug if document is not XML schema at all
-            if _LIBXML_VERSION_INT < 20624:
-                c_node = root_node._c_node
-                c_href = _getNs(c_node)
-                if c_href is NULL or \
-                       cstd.strcmp(c_href, 'http://www.w3.org/2001/XMLSchema') != 0:
-                    raise XMLSchemaParseError, u"Document is not XML Schema"
-
             fake_c_doc = _fakeRootDoc(doc._c_doc, root_node._c_node)
-            self._error_log.connect()
             parser_ctxt = xmlschema.xmlSchemaNewDocParserCtxt(fake_c_doc)
         elif file is not None:
             if _isString(file):
                 doc = None
                 filename = _encodeFilename(file)
-                self._error_log.connect()
                 parser_ctxt = xmlschema.xmlSchemaNewParserCtxt(_cstr(filename))
             else:
                 doc = _parseDocument(file, None, None)
-                self._error_log.connect()
                 parser_ctxt = xmlschema.xmlSchemaNewDocParserCtxt(doc._c_doc)
         else:
             raise XMLSchemaParseError, u"No tree or file given"
 
         if parser_ctxt is not NULL:
+            xmlschema.xmlSchemaSetParserStructuredErrors(
+                parser_ctxt, _receiveError, <void*>self._error_log)
             if doc is None:
                 with nogil:
                     self._c_schema = xmlschema.xmlSchemaParse(parser_ctxt)
@@ -90,11 +81,7 @@ cdef class XMLSchema(_Validator):
                 __GLOBAL_PARSER_CONTEXT.pushImpliedContextFromParser(doc._parser)
                 self._c_schema = xmlschema.xmlSchemaParse(parser_ctxt)
                 __GLOBAL_PARSER_CONTEXT.popImpliedContext()
-
-            if _LIBXML_VERSION_INT >= 20624:
-                xmlschema.xmlSchemaFreeParserCtxt(parser_ctxt)
-
-        self._error_log.disconnect()
+            xmlschema.xmlSchemaFreeParserCtxt(parser_ctxt)
 
         if fake_c_doc is not NULL:
             _destroyFakeDoc(doc._c_doc, fake_c_doc)
@@ -126,27 +113,30 @@ cdef class XMLSchema(_Validator):
         cdef xmlDoc* c_doc
         cdef int ret
 
+        assert self._c_schema is not NULL, "Schema instance not initialised"
         doc = _documentOrRaise(etree)
         root_node = _rootNodeOrRaise(etree)
 
-        self._error_log.connect()
         valid_ctxt = xmlschema.xmlSchemaNewValidCtxt(self._c_schema)
         if valid_ctxt is NULL:
-            self._error_log.disconnect()
-            return python.PyErr_NoMemory()
+            raise MemoryError()
 
-        if self._add_attribute_defaults:
-            xmlschema.xmlSchemaSetValidOptions(
-                valid_ctxt, xmlschema.XML_SCHEMA_VAL_VC_I_CREATE)
+        try:
+            if self._add_attribute_defaults:
+                xmlschema.xmlSchemaSetValidOptions(
+                    valid_ctxt, xmlschema.XML_SCHEMA_VAL_VC_I_CREATE)
 
-        c_doc = _fakeRootDoc(doc._c_doc, root_node._c_node)
-        with nogil:
-            ret = xmlschema.xmlSchemaValidateDoc(valid_ctxt, c_doc)
-        _destroyFakeDoc(doc._c_doc, c_doc)
+            self._error_log.clear()
+            xmlschema.xmlSchemaSetValidStructuredErrors(
+                valid_ctxt, _receiveError, <void*>self._error_log)
 
-        xmlschema.xmlSchemaFreeValidCtxt(valid_ctxt)
+            c_doc = _fakeRootDoc(doc._c_doc, root_node._c_node)
+            with nogil:
+                ret = xmlschema.xmlSchemaValidateDoc(valid_ctxt, c_doc)
+            _destroyFakeDoc(doc._c_doc, c_doc)
+        finally:
+            xmlschema.xmlSchemaFreeValidCtxt(valid_ctxt)
 
-        self._error_log.disconnect()
         if ret == -1:
             raise XMLSchemaValidateError(
                 u"Internal error in XML Schema validation.",
@@ -159,19 +149,23 @@ cdef class XMLSchema(_Validator):
     cdef _ParserSchemaValidationContext _newSaxValidator(
             self, bint add_default_attributes):
         cdef _ParserSchemaValidationContext context
-        context = NEW_SCHEMA_CONTEXT(_ParserSchemaValidationContext)
+        context = _ParserSchemaValidationContext.__new__(_ParserSchemaValidationContext)
         context._schema = self
-        context._valid_ctxt = NULL
-        context._sax_plug = NULL
         context._add_default_attributes = (self._has_default_attributes and (
             add_default_attributes or self._add_attribute_defaults))
         return context
 
+@cython.final
+@cython.internal
 cdef class _ParserSchemaValidationContext:
     cdef XMLSchema _schema
     cdef xmlschema.xmlSchemaValidCtxt* _valid_ctxt
     cdef xmlschema.xmlSchemaSAXPlugStruct* _sax_plug
     cdef bint _add_default_attributes
+    def __cinit__(self):
+        self._valid_ctxt = NULL
+        self._sax_plug = NULL
+        self._add_default_attributes = False
 
     def __dealloc__(self):
         self.disconnect()
@@ -179,6 +173,7 @@ cdef class _ParserSchemaValidationContext:
             xmlschema.xmlSchemaFreeValidCtxt(self._valid_ctxt)
 
     cdef _ParserSchemaValidationContext copy(self):
+        assert self._schema is not None, "_ParserSchemaValidationContext not initialised"
         return self._schema._newSaxValidator(
             self._add_default_attributes)
 
@@ -190,16 +185,18 @@ cdef class _ParserSchemaValidationContext:
             with nogil:
                 xmlschema.xmlSchemaValidateDoc(self._valid_ctxt, c_doc)
 
-    cdef int connect(self, xmlparser.xmlParserCtxt* c_ctxt) except -1:
+    cdef int connect(self, xmlparser.xmlParserCtxt* c_ctxt, _BaseErrorLog error_log) except -1:
         if self._valid_ctxt is NULL:
             self._valid_ctxt = xmlschema.xmlSchemaNewValidCtxt(
                 self._schema._c_schema)
             if self._valid_ctxt is NULL:
-                return python.PyErr_NoMemory()
+                raise MemoryError()
             if self._add_default_attributes:
                 xmlschema.xmlSchemaSetValidOptions(
-                    self._valid_ctxt,
-                    xmlschema.XML_SCHEMA_VAL_VC_I_CREATE)
+                    self._valid_ctxt, xmlschema.XML_SCHEMA_VAL_VC_I_CREATE)
+        if error_log is not None:
+            xmlschema.xmlSchemaSetValidStructuredErrors(
+                self._valid_ctxt, _receiveError, <void*>error_log)
         self._sax_plug = xmlschema.xmlSchemaSAXPlug(
             self._valid_ctxt, &c_ctxt.sax, &c_ctxt.userData)
 
@@ -207,12 +204,11 @@ cdef class _ParserSchemaValidationContext:
         if self._sax_plug is not NULL:
             xmlschema.xmlSchemaSAXUnplug(self._sax_plug)
             self._sax_plug = NULL
+        if self._valid_ctxt is not NULL:
+            xmlschema.xmlSchemaSetValidStructuredErrors(
+                self._valid_ctxt, NULL, NULL)
 
     cdef bint isvalid(self):
         if self._valid_ctxt is NULL:
             return 1 # valid
         return xmlschema.xmlSchemaIsValid(self._valid_ctxt)
-
-cdef extern from "etree_defs.h":
-    # macro call to 't->tp_new()' for fast instantiation
-    cdef _ParserSchemaValidationContext NEW_SCHEMA_CONTEXT "PY_NEW" (object t)

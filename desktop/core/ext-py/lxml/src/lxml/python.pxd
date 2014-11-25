@@ -1,9 +1,13 @@
-from cstd cimport FILE
+from libc cimport stdio
+from libc.string cimport const_char
+cimport cython
+
+cdef extern from *:
+    cdef bint PEP393_ENABLED "CYTHON_PEP393_ENABLED"
 
 cdef extern from "Python.h":
     ctypedef struct PyObject
     ctypedef struct PyThreadState
-    cdef int INT_MAX
     cdef int PY_SSIZE_T_MAX
     cdef int PY_VERSION_HEX
 
@@ -11,38 +15,30 @@ cdef extern from "Python.h":
     cdef void Py_DECREF(object o)
     cdef void Py_XDECREF(PyObject* o)
 
-    ctypedef class __builtin__.slice [object PySliceObject]:
-        cdef object start
-        cdef object stop
-        cdef object step
+    cdef stdio.FILE* PyFile_AsFile(object p)
 
-    ctypedef class __builtin__.unicode [object PyUnicodeObject]:
-        pass
+    # PEP 393
+    cdef bint PyUnicode_IS_READY(object u)
+    cdef Py_ssize_t PyUnicode_GET_LENGTH(object u)
+    cdef int PyUnicode_KIND(object u)
+    cdef void* PyUnicode_DATA(object u)
 
-    cdef FILE* PyFile_AsFile(object p)
-
-    cdef bint PyUnicode_Check(object obj)
-    cdef bint PyUnicode_CheckExact(object obj)
-    cdef bint PyString_Check(object obj)
-    cdef bint PyString_CheckExact(object obj)
-
-    cdef object PyUnicode_FromEncodedObject(object s, char* encoding,
-                                            char* errors)
-    cdef object PyUnicode_AsEncodedString(object u, char* encoding,
-                                          char* errors)
-    cdef object PyUnicode_FromFormat(char* format, ...) # Python 3
-    cdef object PyUnicode_Decode(char* s, Py_ssize_t size,
-                                 char* encoding, char* errors)
-    cdef object PyUnicode_DecodeUTF8(char* s, Py_ssize_t size, char* errors)
-    cdef object PyUnicode_DecodeLatin1(char* s, Py_ssize_t size, char* errors)
-    cdef object PyUnicode_AsUTF8String(object ustring)
-    cdef object PyUnicode_AsASCIIString(object ustring)
+    cdef bytes PyUnicode_AsEncodedString(object u, char* encoding,
+                                         char* errors)
+    cdef cython.unicode PyUnicode_FromFormat(char* format, ...) # Python 3
+    cdef cython.unicode PyUnicode_Decode(char* s, Py_ssize_t size,
+                                         char* encoding, char* errors)
+    cdef cython.unicode PyUnicode_DecodeUTF8(char* s, Py_ssize_t size, char* errors)
+    cdef cython.unicode PyUnicode_DecodeLatin1(char* s, Py_ssize_t size, char* errors)
+    cdef object PyUnicode_RichCompare(object o1, object o2, int op)  # not in Py2.4
+    cdef bytes PyUnicode_AsUTF8String(object ustring)
+    cdef bytes PyUnicode_AsASCIIString(object ustring)
     cdef char* PyUnicode_AS_DATA(object ustring)
     cdef Py_ssize_t PyUnicode_GET_DATA_SIZE(object ustring)
     cdef Py_ssize_t PyUnicode_GET_SIZE(object ustring)
-    cdef object PyString_FromStringAndSize(char* s, Py_ssize_t size)
-    cdef object PyString_FromFormat(char* format, ...)
-    cdef Py_ssize_t PyString_GET_SIZE(object s)
+    cdef bytes PyBytes_FromStringAndSize(char* s, Py_ssize_t size)
+    cdef bytes PyBytes_FromFormat(char* format, ...)
+    cdef Py_ssize_t PyBytes_GET_SIZE(object s)
 
     cdef object PyNumber_Int(object value)
     cdef Py_ssize_t PyInt_AsSsize_t(object value)
@@ -71,31 +67,28 @@ cdef extern from "Python.h":
     cdef object PySequence_List(object o)
     cdef object PySequence_Tuple(object o)
 
-    cdef bint PyDict_Check(object instance)
-    cdef bint PyList_Check(object instance)
-    cdef bint PyTuple_Check(object instance)
     cdef bint PyNumber_Check(object instance)
-    cdef bint PyBool_Check(object instance)
     cdef bint PySequence_Check(object instance)
     cdef bint PyType_Check(object instance)
     cdef bint PyTuple_CheckExact(object instance)
-    cdef bint PySlice_Check(object instance)
 
     cdef int _PyEval_SliceIndex(object value, Py_ssize_t* index) except 0
-    cdef int PySlice_GetIndicesEx(slice slice, Py_ssize_t length,
-                                  Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
-                                  Py_ssize_t *slicelength) except -1
+    cdef int PySlice_GetIndicesEx "_lx_PySlice_GetIndicesEx" (
+            object slice, Py_ssize_t length,
+            Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
+            Py_ssize_t *slicelength) except -1
 
-    cdef int PyObject_SetAttr(object o, object name, object value)
     cdef object PyObject_RichCompare(object o1, object o2, int op)
     cdef int PyObject_RichCompareBool(object o1, object o2, int op)
+
+    PyObject* PyWeakref_NewRef(object ob, PyObject* callback) except NULL  # used for PyPy only
+    object PyWeakref_LockObject(PyObject* ob) # PyPy only
 
     cdef void* PyMem_Malloc(size_t size)
     cdef void* PyMem_Realloc(void* p, size_t size)
     cdef void PyMem_Free(void* p)
 
-    # these two always return NULL to pass on the exception
-    cdef object PyErr_NoMemory()
+    # always returns NULL to pass on the exception
     cdef object PyErr_SetFromErrno(object type)
 
     cdef PyThreadState* PyEval_SaveThread()
@@ -103,8 +96,8 @@ cdef extern from "Python.h":
     cdef PyObject* PyThreadState_GetDict()
 
     # some handy functions
-    cdef int callable "PyCallable_Check" (object obj)
-    cdef char* _cstr "PyString_AS_STRING" (object s)
+    cdef char* _cstr "PyBytes_AS_STRING" (object s)
+    cdef char* __cstr "PyBytes_AS_STRING" (PyObject* s)
 
     # Py_buffer related flags
     cdef int PyBUF_SIMPLE
@@ -132,6 +125,11 @@ cdef extern from "pythread.h":
 
 cdef extern from "etree_defs.h": # redefines some functions as macros
     cdef bint _isString(object obj)
-    cdef char* _fqtypename(object t)
+    cdef const_char* _fqtypename(object t)
     cdef object PY_NEW(object t)
+    cdef bint LXML_UNICODE_STRINGS
     cdef bint IS_PYTHON3
+    cdef bint IS_PYPY
+
+cdef extern from "lxml_endian.h":
+    cdef bint PY_BIG_ENDIAN  # defined in later Py3.x versions

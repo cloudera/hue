@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -61,12 +61,12 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module objectify</h1><p class="nomargin-top"></p>
-The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">lxml.objectify</span></tt> module implements a Python object API for
+The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">lxml.objectify</tt> module implements a Python object API for
 XML.  It is based on <a href="lxml.etree-module.html" class="link">lxml.etree</a>.
 
 <hr />
 <div class="fields">      <p><strong>Version:</strong>
-        2.2.2-65845
+        3.4.1
       </p>
 </div><!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -150,7 +150,8 @@ Immutable object that represents a compiled object path.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.objectify.ObjectifiedDataElement-class.html" class="summary-name">ObjectifiedDataElement</a><br />
-      This is the base class for all data type Elements.
+      This is the base class for all data type Elements.  Subclasses should
+override the 'pyval' property and possibly the __str__ method.
     </td>
   </tr>
 <tr>
@@ -185,13 +186,6 @@ User defined type.
     </td><td class="summary">
         <a href="lxml.objectify.StringElement-class.html" class="summary-name">StringElement</a><br />
       String data class.
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="lxml.objectify._ObjectifyElementMakerCaller-class.html" class="summary-name" onclick="show_private();">_ObjectifyElementMakerCaller</a>
     </td>
   </tr>
 </table>
@@ -248,6 +242,28 @@ keyword arguments or a dictionary passed as second argument.</td>
         <span class="summary-sig-arg">**_attributes</span>)</span><br />
       Objectify specific version of the lxml.etree Element() factory that
 always creates a structural (tree) element.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="SubElement"></a><span class="summary-sig-name">SubElement</span>(<span class="summary-sig-arg">_parent</span>,
+        <span class="summary-sig-arg">_tag</span>,
+        <span class="summary-sig-arg">attrib</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">nsmap</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">**_extra</span>)</span><br />
+      Subelement factory.  This function creates an element instance, and
+appends it to an existing element.</td>
           <td align="right" valign="top">
             
             
@@ -374,7 +390,8 @@ and/or 'py:pytype' attributes.</td>
           <td><span class="summary-sig"><a href="lxml.objectify-module.html#deannotate" class="summary-sig-name">deannotate</a>(<span class="summary-sig-arg">element_or_tree</span>,
         <span class="summary-sig-arg">pytype</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">xsi</span>=<span class="summary-sig-default">True</span>,
-        <span class="summary-sig-arg">xsi_nil</span>=<span class="summary-sig-default">False</span>)</span><br />
+        <span class="summary-sig-arg">xsi_nil</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">cleanup_namespaces</span>=<span class="summary-sig-default">False</span>)</span><br />
       Recursively de-annotate the elements of an XML tree by removing 'py:pytype'
 and/or 'xsi:type' attributes and/or 'xsi:nil' attributes.</td>
           <td align="right" valign="top">
@@ -612,7 +629,7 @@ attributes.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="E"></a><span class="summary-name">E</span> = <code title="&lt;lxml.objectify.ElementMaker object at 0xa58339c&gt;">&lt;lxml.objectify.ElementMaker object at 0xa58339c&gt;</code>
+        <a name="E"></a><span class="summary-name">E</span> = <code title="&lt;lxml.objectify.ElementMaker object at 0x2b9efa116b30&gt;">&lt;lxml.objectify.ElementMaker object at 0x2b9efa116b30&gt;</code>
     </td>
   </tr>
 <tr>
@@ -620,6 +637,21 @@ attributes.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.objectify-module.html#PYTYPE_ATTRIBUTE" class="summary-name">PYTYPE_ATTRIBUTE</a> = <code title="'{http://codespeak.net/lxml/objectify/pytype}pytype'"><code class="variable-quote">'</code><code class="variable-string">{http://codespeak.net/lxml/objectify/pytyp</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code><br />
+      hash(x)
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__test__"></a><span class="summary-name">__test__</span> = <code title="{}"><code class="variable-group">{</code><code class="variable-group">}</code></code>
     </td>
   </tr>
 </table>
@@ -716,7 +748,7 @@ always creates a structural (tree) element.</p>
   <p>Objectify specific version of the lxml.etree XML() literal factory
 that uses the objectify parser.</p>
 <p>You can pass a different parser as second argument.</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">base_url</span></tt> keyword argument allows to set the original base URL of
+<p>The <tt class="rst-docutils literal">base_url</tt> keyword argument allows to set the original base URL of
 the document to support relative Paths when looking up external entities
 (DTD, XInclude, ...).</p>
   <dl class="fields">
@@ -757,10 +789,10 @@ Currently, only the first XSI type name in the corresponding PyType
 definition will be used for annotation.  Thus, you should consider naming
 the widest type first if you define additional types.</p>
 <p>The default 'py:pytype' annotation of empty elements can be set with the
-<tt class="rst-docutils literal"><span class="pre">empty_pytype</span></tt> keyword argument. Pass 'str', for example, to make
+<tt class="rst-docutils literal">empty_pytype</tt> keyword argument. Pass 'str', for example, to make
 string values the default.</p>
 <p>The default 'xsi:type' annotation of empty elements can be set with the
-<tt class="rst-docutils literal"><span class="pre">empty_type</span></tt> keyword argument.  The default is not to annotate empty
+<tt class="rst-docutils literal">empty_type</tt> keyword argument.  The default is not to annotate empty
 elements.  Pass 'string', for example, to make string values the default.</p>
 <p>The keyword arguments 'annotate_xsi' (default: 0) and 'annotate_pytype'
 (default: 1) control which kind(s) of annotation to use.</p>
@@ -778,7 +810,8 @@ elements.  Pass 'string', for example, to make string values the default.</p>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">deannotate</span>(<span class="sig-arg">element_or_tree</span>,
         <span class="sig-arg">pytype</span>=<span class="sig-default">True</span>,
         <span class="sig-arg">xsi</span>=<span class="sig-default">True</span>,
-        <span class="sig-arg">xsi_nil</span>=<span class="sig-default">False</span>)</span>
+        <span class="sig-arg">xsi_nil</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">cleanup_namespaces</span>=<span class="sig-default">False</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -792,6 +825,9 @@ attributes will be removed. If the 'xsi' keyword argument is True (the
 default), 'xsi:type' attributes will be removed.
 If the 'xsi_nil' keyword argument is True (default: False), 'xsi:nil'
 attributes will be removed.</p>
+<p>Note that this does not touch the namespace declarations by
+default.  If you want to remove unused namespace declarations from
+the tree, pass the option <tt class="rst-docutils literal">cleanup_namespaces=True</tt>.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -835,7 +871,7 @@ attributes will be removed.</p>
   <p>Objectify specific version of the lxml.etree fromstring() function
 that uses the objectify parser.</p>
 <p>You can pass a different parser as second argument.</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">base_url</span></tt> keyword argument allows to set the original base URL of
+<p>The <tt class="rst-docutils literal">base_url</tt> keyword argument allows to set the original base URL of
 the document to support relative Paths when looking up external entities
 (DTD, XInclude, ...).</p>
   <dl class="fields">
@@ -886,9 +922,9 @@ end of the type list.</p>
   
   <p>Create a new XML parser for objectify trees.</p>
 <p>You can pass all keyword arguments that are supported by
-<tt class="rst-docutils literal"><span class="pre">etree.XMLParser()</span></tt>.  Note that this parser defaults to removing
+<tt class="rst-docutils literal">etree.XMLParser()</tt>.  Note that this parser defaults to removing
 blank text.  You can disable this by passing the
-<tt class="rst-docutils literal"><span class="pre">remove_blank_text</span></tt> boolean keyword option yourself.</p>
+<tt class="rst-docutils literal">remove_blank_text</tt> boolean keyword option yourself.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -911,7 +947,7 @@ blank text.  You can disable this by passing the
   
   <p>Parse a file or file-like object with the objectify parser.</p>
 <p>You can pass a different parser as second argument.</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">base_url</span></tt> keyword allows setting a URL for the document
+<p>The <tt class="rst-docutils literal">base_url</tt> keyword allows setting a URL for the document
 when parsing from a file-like object.  This is needed when looking
 up external entities (DTD, XInclude, ...) with relative paths.</p>
   <dl class="fields">
@@ -940,11 +976,11 @@ attributes.</p>
 <p>If the 'ignore_old' keyword argument is True (the default), current 'pytype'
 attributes will be ignored and replaced.  Otherwise, they will be checked
 and only replaced if they no longer fit the current text value.</p>
-<p>Setting the keyword argument <tt class="rst-docutils literal"><span class="pre">ignore_xsi</span></tt> to True makes the function
-additionally ignore existing <tt class="rst-docutils literal"><span class="pre">xsi:type</span></tt> annotations.  The default is to
+<p>Setting the keyword argument <tt class="rst-docutils literal">ignore_xsi</tt> to True makes the function
+additionally ignore existing <tt class="rst-docutils literal">xsi:type</tt> annotations.  The default is to
 use them as a type hint.</p>
 <p>The default annotation of empty elements can be set with the
-<tt class="rst-docutils literal"><span class="pre">empty_pytype</span></tt> keyword argument.  The default is not to annotate empty
+<tt class="rst-docutils literal">empty_pytype</tt> keyword argument.  The default is not to annotate empty
 elements.  Pass 'str', for example, to make string values the default.</p>
   <dl class="fields">
   </dl>
@@ -1021,11 +1057,11 @@ checked and only replaced if they no longer fit the current text value.</p>
 Currently, only the first XSI type name in the corresponding PyType
 definition will be used for annotation.  Thus, you should consider naming
 the widest type first if you define additional types.</p>
-<p>Setting the keyword argument <tt class="rst-docutils literal"><span class="pre">ignore_pytype</span></tt> to True makes the function
-additionally ignore existing <tt class="rst-docutils literal"><span class="pre">pytype</span></tt> annotations.  The default is to
+<p>Setting the keyword argument <tt class="rst-docutils literal">ignore_pytype</tt> to True makes the function
+additionally ignore existing <tt class="rst-docutils literal">pytype</tt> annotations.  The default is to
 use them as a type hint.</p>
 <p>The default annotation of empty elements can be set with the
-<tt class="rst-docutils literal"><span class="pre">empty_type</span></tt> keyword argument.  The default is not to annotate empty
+<tt class="rst-docutils literal">empty_type</tt> keyword argument.  The default is not to annotate empty
 elements.  Pass 'string', for example, to make string values the default.</p>
   <dl class="fields">
   </dl>
@@ -1093,14 +1129,14 @@ elements.  Pass 'string', for example, to make string values the default.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

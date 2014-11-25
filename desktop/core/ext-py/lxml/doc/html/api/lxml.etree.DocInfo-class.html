@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -90,23 +90,6 @@ Document information provided by parser and DTD.
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="lxml.etree.DocInfo-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">a new object with type S, a subtype of T</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -127,13 +110,17 @@ Document information provided by parser and DTD.
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -215,8 +202,13 @@ Document information provided by parser and DTD.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.etree.DocInfo-class.html#standalone" class="summary-name">standalone</a><br />
-      Returns the standalone flag as declared by the document.
+        <a name="standalone"></a><span class="summary-name">standalone</span><br />
+      Returns the standalone flag as declared by the document.  The possible
+values are True (<tt class="rst-docutils literal"><span class="pre">standalone='yes'</span></tt>), False
+(<tt class="rst-docutils literal"><span class="pre">standalone='no'</span></tt> or flag not provided in the declaration),
+and None (unknown or no declaration found).  Note that a
+normal truth test on this value will always tell if the
+<tt class="rst-docutils literal">standalone</tt> flag was set to <tt class="rst-docutils literal">'yes'</tt> or not.
     </td>
   </tr>
 <tr>
@@ -261,29 +253,6 @@ Document information provided by parser and DTD.
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">...</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
-  <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -306,41 +275,6 @@ Document information provided by parser and DTD.
     <dt>Overrides:
         object.__new__
     </dt>
-  </dl>
-</td></tr></table>
-</div>
-<br />
-<!-- ==================== PROPERTY DETAILS ==================== -->
-<a name="section-PropertyDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Property Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-PropertyDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="standalone"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">standalone</h3>
-  Returns the standalone flag as declared by the document.  The possible
-values are True (<tt class="rst-docutils literal"><span class="pre">standalone='yes'</span></tt>), False
-(<tt class="rst-docutils literal"><span class="pre">standalone='no'</span></tt> or flag not provided in the declaration),
-and None (unknown or no declaration found).  Note that a
-normal truth test on this value will always tell if the
-<tt class="rst-docutils literal"><span class="pre">standalone</span></tt> flag was set to <tt class="rst-docutils literal"><span class="pre">'yes'</span></tt> or not.
-  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -369,14 +303,14 @@ normal truth test on this value will always tell if the
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

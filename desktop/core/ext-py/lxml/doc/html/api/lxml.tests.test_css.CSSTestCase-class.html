@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -66,7 +66,7 @@
 <pre class="base-tree">
                object --+        
                         |        
-        unittest.TestCase --+    
+   unittest.case.TestCase --+    
                             |    
 <a href="lxml.tests.common_imports.HelperTestCase-class.html">common_imports.HelperTestCase</a> --+
                                 |
@@ -93,7 +93,7 @@
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.TestCase</code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b>:
       <code><a href="exceptions.AssertionError-class.html">failureException</a></code>
       </p>
     </td>
@@ -122,46 +122,9 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.tests.test_css.CSSTestCase-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">index</span>)</span><br />
-      Create an instance of the class that will use the named test
-method when executed.</td>
+          <td><span class="summary-sig"><a name="test_cssselect"></a><span class="summary-sig-name">test_cssselect</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.__init__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="runTest"></a><span class="summary-sig-name">runTest</span>(<span class="summary-sig-arg">self</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.runTest">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="lxml.tests.test_css.CSSTestCase-class.html#shortDescription" class="summary-sig-name">shortDescription</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Returns a one-line description of the test, or None if no
-description has been provided.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.shortDescription">source&nbsp;code</a></span>
+            <span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.test_cssselect">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -178,24 +141,54 @@ description has been provided.</td>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.tests.common_imports.HelperTestCase-class.html">common_imports.HelperTestCase</a></code></b> (private):
       <code><a href="lxml.tests.common_imports.HelperTestCase-class.html#_rootstring" onclick="show_private();">_rootstring</a></code>
       </p></div>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.TestCase</code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b>:
       <code>__call__</code>,
+      <code>__eq__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__ne__</code>,
       <code>__repr__</code>,
       <code>__str__</code>,
+      <code>addCleanup</code>,
+      <code>addTypeEqualityFunc</code>,
       <code>assertAlmostEqual</code>,
       <code>assertAlmostEquals</code>,
+      <code>assertDictContainsSubset</code>,
+      <code>assertDictEqual</code>,
       <code>assertEqual</code>,
       <code>assertEquals</code>,
+      <code>assertGreater</code>,
+      <code>assertGreaterEqual</code>,
+      <code>assertIn</code>,
+      <code>assertIs</code>,
+      <code>assertIsInstance</code>,
+      <code>assertIsNone</code>,
+      <code>assertIsNot</code>,
+      <code>assertIsNotNone</code>,
+      <code>assertItemsEqual</code>,
+      <code>assertLess</code>,
+      <code>assertLessEqual</code>,
+      <code>assertListEqual</code>,
+      <code>assertMultiLineEqual</code>,
       <code>assertNotAlmostEqual</code>,
       <code>assertNotAlmostEquals</code>,
       <code>assertNotEqual</code>,
       <code>assertNotEquals</code>,
+      <code>assertNotIn</code>,
+      <code>assertNotIsInstance</code>,
+      <code>assertNotRegexpMatches</code>,
       <code>assertRaises</code>,
+      <code>assertRaisesRegexp</code>,
+      <code>assertRegexpMatches</code>,
+      <code>assertSequenceEqual</code>,
+      <code>assertSetEqual</code>,
       <code>assertTrue</code>,
+      <code>assertTupleEqual</code>,
       <code>assert_</code>,
       <code>countTestCases</code>,
       <code>debug</code>,
       <code>defaultTestResult</code>,
+      <code>doCleanups</code>,
       <code>fail</code>,
       <code>failIf</code>,
       <code>failIfAlmostEqual</code>,
@@ -206,19 +199,28 @@ description has been provided.</td>
       <code>failUnlessRaises</code>,
       <code>id</code>,
       <code>run</code>,
-      <code>setUp</code>
+      <code>setUp</code>,
+      <code>shortDescription</code>,
+      <code>skipTest</code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.TestCase</code></b> (private):
-      <code>_exc_info</code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b> (private):
+      <code>_addSkip</code>,
+      <code>_baseAssertEqual</code>,
+      <code>_deprecate</code>,
+      <code>_formatMessage</code>,
+      <code>_getAssertEqualityFunc</code>,
+      <code>_truncateMessage</code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
-      <code>__hash__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
-      <code>__setattr__</code>
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -240,20 +242,12 @@ description has been provided.</td>
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="all"></a><span class="summary-sig-name">all</span>(<span class="summary-sig-arg">cls</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.all">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b>:
+      <code>setUpClass</code>,
+      <code>tearDownClass</code>
+      </p>
     </td>
   </tr>
 </table>
@@ -278,15 +272,8 @@ description has been provided.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.tests.test_css.CSSTestCase-class.html#selectors" class="summary-name">selectors</a> = <code title="[('*', 246),
- ('div:only-child', 22),
- ('div:contains(CELIA)', 30),
- ('div:nth-child(even)', 106),
- ('div:nth-child(2n)', 106),
- ('div:nth-child(odd)', 137),
- ('div:nth-child(2n+1)', 137),
- ('div:nth-child(n)', 243),
-..."><code class="variable-group">[</code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">*</code><code class="variable-quote">'</code><code class="variable-op">, </code>246<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:only-child</code><code class="variable-quote">'</code><code class="variable-op">, </code>22<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:contain</code><code class="variable-ellipsis">...</code></code>
+        <a href="lxml.tests.test_css.CSSTestCase-class.html#pytestmark" class="summary-name">pytestmark</a> = <code title="&lt;MarkDecorator 'skipif' {'args': ('cssselect is None',), 'kwargs': {}}\
+&gt;">&lt;MarkDecorator 'skipif' {'args': ('cssselect is N<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
   <tr>
@@ -294,6 +281,14 @@ description has been provided.</td>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.tests.common_imports.HelperTestCase-class.html">common_imports.HelperTestCase</a></code></b>:
       <code><a href="lxml.tests.common_imports.HelperTestCase-class.html#assertFalse">assertFalse</a></code>
       </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b>:
+      <code>longMessage</code>,
+      <code>maxDiff</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>unittest.case.TestCase</code></b> (private):
+      <code>_classSetupFailed</code>,
+      <code>_diffThreshold</code>
+      </p></div>
     </td>
   </tr>
 </table>
@@ -322,78 +317,6 @@ description has been provided.</td>
     </td>
   </tr>
 </table>
-<!-- ==================== METHOD DETAILS ==================== -->
-<a name="section-MethodDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Method Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-MethodDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="__init__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">index</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.__init__">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Create an instance of the class that will use the named test
-method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.
-  <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="shortDescription"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">shortDescription</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.tests.test_css-pysrc.html#CSSTestCase.shortDescription">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Returns a one-line description of the test, or None if no
-description has been provided.</p>
-<p>The default implementation of this method returns the first line of
-the specified test method's docstring.</p>
-  <dl class="fields">
-    <dt>Overrides:
-        unittest.TestCase.shortDescription
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== CLASS VARIABLE DETAILS ==================== -->
 <a name="section-ClassVariableDetails"></a>
 <table class="details" border="1" cellpadding="3"
@@ -412,27 +335,20 @@ the specified test method's docstring.</p>
   </td>
 </tr>
 </table>
-<a name="selectors"></a>
+<a name="pytestmark"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">selectors</h3>
+  <h3 class="epydoc">pytestmark</h3>
   
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">[</code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">*</code><code class="variable-quote">'</code><code class="variable-op">, </code>246<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:only-child</code><code class="variable-quote">'</code><code class="variable-op">, </code>22<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:contains(CELIA)</code><code class="variable-quote">'</code><code class="variable-op">, </code>30<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:nth-child(even)</code><code class="variable-quote">'</code><code class="variable-op">, </code>106<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:nth-child(2n)</code><code class="variable-quote">'</code><code class="variable-op">, </code>106<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:nth-child(odd)</code><code class="variable-quote">'</code><code class="variable-op">, </code>137<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:nth-child(2n+1)</code><code class="variable-quote">'</code><code class="variable-op">, </code>137<code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">div:nth-child(n)</code><code class="variable-quote">'</code><code class="variable-op">, </code>243<code class="variable-group">)</code><code class="variable-op">,</code>
-<code class="variable-ellipsis">...</code>
+&lt;MarkDecorator 'skipif' {'args': ('cssselect is None',), 'kwargs': {}}<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+&gt;
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -463,14 +379,14 @@ the specified test method's docstring.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:40 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

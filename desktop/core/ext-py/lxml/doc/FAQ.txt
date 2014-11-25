@@ -26,6 +26,7 @@ ElementTree_.
      1.7  What about that trailing text on serialised Elements?
      1.8  How can I find out if an Element is a comment or PI?
      1.9  How can I map an XML tree into a dict of dicts?
+     1.10 Why does lxml sometimes return 'str' values for text in Python 2?
    2  Installation
      2.1  Which version of libxml2 and libxslt should I use or require?
      2.2  Where are the binary builds?
@@ -47,9 +48,12 @@ ElementTree_.
    6  Parsing and Serialisation
      6.1  Why doesn't the ``pretty_print`` option reformat my XML output?
      6.2  Why can't lxml parse my XML from unicode strings?
-     6.3  What is the difference between str(xslt(doc)) and xslt(doc).write() ?
-     6.4  Why can't I just delete parents or clear the root node in iterparse()?
-     6.5  How do I output null characters in XML text?
+     6.3  Can lxml parse from file objects opened in unicode mode?
+     6.4  What is the difference between str(xslt(doc)) and xslt(doc).write() ?
+     6.5  Why can't I just delete parents or clear the root node in iterparse()?
+     6.6  How do I output null characters in XML text?
+     6.7  Is lxml vulnerable to XML bombs?
+     6.8  How do I configure lxml safely as a web-service endpoint?
    7  XPath and Document Traversal
      7.1  What are the ``findall()`` and ``xpath()`` methods on Element(Tree)?
      7.2  Why doesn't ``findall()`` support full XPath expressions?
@@ -128,7 +132,7 @@ The `generated API documentation`_ is a comprehensive API reference
 for the lxml package.
 
 .. _`ElementTree API`: http://effbot.org/zone/element-index.htm
-.. _`the web page`:    http://codespeak.net/lxml/#documentation
+.. _`the web page`:    http://lxml.de/#documentation
 .. _`generated API documentation`: api/index.html
 
 
@@ -160,9 +164,16 @@ support for various XML standards.  The important ones are:
 * xml:base
 
 Support for XML Schema is currently not 100% complete in libxml2, but
-is definitely very close to compliance.  Schematron is supported,
-although not necessarily complete.  libxml2 also supports loading
-documents through HTTP and FTP.
+is definitely very close to compliance.  Schematron is supported in
+two ways, the best being the original ISO Schematron reference
+implementation via XSLT.  libxml2 also supports loading documents
+through HTTP and FTP.
+
+For `RelaxNG Compact Syntax <http://relaxng.org/compact-tutorial-20030326.html>`_
+support, there is a tool called `rnc2rng <http://www.gnosis.cx/download/relax/>`_,
+written by David Mertz, which you might be able to use from Python.  Failing
+that, `trang <http://code.google.com/p/jing-trang/>`_ is the 'official'
+command line tool (written in Java) to do the conversion.
 
 
 Who uses lxml?
@@ -170,58 +181,67 @@ Who uses lxml?
 
 As an XML library, lxml is often used under the hood of in-house
 server applications, such as web servers or applications that
-facilitate some kind of document management.  Many people who deploy
-Zope_ or Plone_ use it together with lxml.  Therefore, it is hard to
-get an idea of who uses it, and the following list of 'users and
-projects we know of' is definitely not a complete list of lxml's
-users.
+facilitate some kind of content management.  Many people who deploy
+Zope_, Plone_ or Django_ use it together with lxml in the background,
+without speaking publicly about it.  Therefore, it is hard to get an
+idea of who uses it, and the following list of 'users and projects we
+know of' is very far from a complete list of lxml's users.
 
 Also note that the compatibility to the ElementTree library does not
 require projects to set a hard dependency on lxml - as long as they do
 not take advantage of lxml's enhanced feature set.
 
-* cssutils_, a CSS parser and toolkit, can be used with ``lxml.cssselect``
-* Deliverance_, a content theming tool
-* `Enfold Proxy 4`_, a web server accelerator with on-the-fly XSLT processing
-* Inteproxy_, a secure HTTP proxy
-* lwebstring_, an XML template engine
-* OpenXMLlib_, a library for handling OpenXML document meta data
-* Pycoon_, a WSGI web development framework based on XML pipelines
-* PyQuery_, a query framework for XML/HTML, similar to jQuery for JavaScript
-* Rambler_, a meta search engine that aggregates different data sources
-* rdfadict_, an RDFa parser with a simple dictionary-like interface.
+* `cssutils <http://code.google.com/p/cssutils/source/browse/trunk/examples/style.py?r=917>`_,
+  a CSS parser and toolkit, can be used with ``lxml.cssselect``
+* `Deliverance <http://www.openplans.org/projects/deliverance/project-home>`_,
+  a content theming tool
+* `Enfold Proxy 4 <http://www.enfoldsystems.com/Products/Proxy/4>`_,
+  a web server accelerator with on-the-fly XSLT processing
+* `Inteproxy <http://lists.wald.intevation.org/pipermail/inteproxy-devel/2007-February/000000.html>`_,
+  a secure HTTP proxy
+* `lwebstring <http://pypi.python.org/pypi/lwebstring>`_,
+  an XML template engine
+* `OpenXMLlib <http://permalink.gmane.org/gmane.comp.python.lxml.devel/3250>`_,
+  a library for handling OpenXML document meta data
+* `PsychoPy <http://www.psychopy.org/>`_,
+  psychology software in Python
+* `Pycoon <http://pypi.python.org/pypi/pycoon>`_,
+  a WSGI web development framework based on XML pipelines
+* `PyQuery <http://pypi.python.org/pypi/pyquery>`_,
+  a query framework for XML/HTML, similar to jQuery for JavaScript
+* `python-docx <http://github.com/mikemaccana/python-docx>`_,
+  a package for handling Microsoft's Word OpenXML format
+* `Rambler <http://beta.rambler.ru/srch?query=python+lxml&searchtype=web>`_,
+  a meta search engine that aggregates different data sources
+* `rdfadict <http://pypi.python.org/pypi/rdfadict>`_,
+  an RDFa parser with a simple dictionary-like interface.
+* `xupdate-processor <http://pypi.python.org/pypi/xupdate-processor>`_,
+  an XUpdate implementation for lxml.etree
+* `Diazo <http://docs.diazo.org/>`_,
+  an XSLT-under-the-hood web site theming engine
 
 Zope3 and some of its extensions have good support for lxml:
 
-* gocept.lxml_, Zope3 interface bindings for lxml
-* z3c.rml_, an implementation of ReportLab's RML format
-* zif.sedna_, an XQuery based interface to the Sedna OpenSource XML database
+* `gocept.lxml <http://pypi.python.org/pypi/gocept.lxml>`_,
+  Zope3 interface bindings for lxml
+* `z3c.rml <http://pypi.python.org/pypi/z3c.rml>`_,
+  an implementation of ReportLab's RML format
+* `zif.sedna <http://pypi.python.org/pypi/zif.sedna>`_,
+  an XQuery based interface to the Sedna OpenSource XML database
 
 And don't miss the quotes by our generally happy_ users_, and other
-`sites that link to lxml`_.  As `Liza Daly`_ puts it: "Many software
+`sites that link to lxml`_.   As `Liza Daly`_ puts it: "Many software
 products come with the pick-two caveat, meaning that you must choose
 only two: speed, flexibility, or readability.  When used carefully,
 lxml can provide all three."
 
 .. _Zope: http://www.zope.org/
 .. _Plone: http://www.plone.org/
-.. _cssutils: http://code.google.com/p/cssutils/source/browse/trunk/examples/style.py?r=917
-.. _Deliverance: http://www.openplans.org/projects/deliverance/project-home
-.. _`Enfold Proxy 4`: http://www.enfoldsystems.com/Products/Proxy/4
-.. _gocept.lxml: http://pypi.python.org/pypi/gocept.lxml
-.. _Inteproxy: http://lists.wald.intevation.org/pipermail/inteproxy-devel/2007-February/000000.html
-.. _lwebstring: http://pypi.python.org/pypi/lwebstring
-.. _OpenXMLlib: http://permalink.gmane.org/gmane.comp.python.lxml.devel/3250
-.. _Pycoon: http://pypi.python.org/pypi/pycoon
-.. _PyQuery: http://pypi.python.org/pypi/pyquery
-.. _Rambler: http://beta.rambler.ru/srch?query=python+lxml&searchtype=web
-.. _rdfadict: http://pypi.python.org/pypi/rdfadict
-.. _z3c.rml: http://pypi.python.org/pypi/z3c.rml
-.. _zif.sedna: http://pypi.python.org/pypi/zif.sedna
+.. _Django: https://www.djangoproject.com/
 
 .. _happy: http://thread.gmane.org/gmane.comp.python.lxml.devel/3244/focus=3244
 .. _users: http://article.gmane.org/gmane.comp.python.lxml.devel/3246
-.. _`sites that link to lxml`: http://www.google.com/search?as_lq=http:%2F%2Fcodespeak.net%2Flxml
+.. _`sites that link to lxml`: http://www.google.com/search?as_lq=http:%2F%2Flxml.de%2F
 .. _`Liza Daly`: http://www.ibm.com/developerworks/xml/library/x-hiperfparse/
 
 
@@ -341,6 +361,25 @@ I'm glad you asked.
                 dict(map(recursive_dict, element)) or element.text
 
 
+Why does lxml sometimes return 'str' values for text in Python 2?
+-----------------------------------------------------------------
+
+In Python 2, lxml's API returns byte strings for plain ASCII text
+values, be it for tag names or text in Element content.  This is the
+same behaviour as known from ElementTree.  The reasoning is that ASCII
+encoded byte strings are compatible with Unicode strings in Python 2,
+but consume less memory (usually by a factor of 2 or 4) and are faster
+to create because they do not require decoding.  Plain ASCII string
+values are very common in XML, so this optimisation is generally worth
+it.
+
+In Python 3, lxml always returns Unicode strings for text and names,
+as does ElementTree.  Since Python 3.3, Unicode strings containing
+only characters that can be encoded in ASCII or Latin-1 are generally
+as efficient as byte strings.  In older versions of Python 3, the
+above mentioned drawbacks apply.
+
+
 Installation
 ============
 
@@ -380,35 +419,27 @@ see when (or if) a specific bug has been fixed.
 Where are the binary builds?
 ----------------------------
 
-Sidnei da Silva regularly contributes Windows binaries for new
-releases.  This is because two of the major problems of Microsoft
-Windows make it non-trivial for users to build lxml on this platform:
-the lack of a pre-installed standard compiler and the missing package
-management.
+Binary builds are most often requested by users of Microsoft Windows.
+Two of the major design issues of this operating system make it
+non-trivial for its users to build lxml: the lack of a pre-installed
+standard compiler and the missing package management.
 
-If there is not currently a binary distribution of the most recent
-lxml release for this platform available from the Python Package Index
-(PyPI), please look through the older versions to see if they provide
-a binary build.  This is done by appending the version number to the
-PyPI URL, e.g.::
-
-	  http://pypi.python.org/pypi/lxml/2.1.5
-
-Apart from that, we generally do not provide binary builds of lxml, as
-most of the other operating systems out there can build lxml without
-problems (with the exception of `MacOS-X`_), and the sheer mass of
-variations between platforms makes it futile to provide builds for
-everyone.
+For recent lxml releases, PyPI provides community donated Windows binaries.
+Besides that, Christoph Gohlke generously provides `unofficial lxml binary
+builds for Windows <http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml>`_
+that are usually very up to date.  Consider using them if you prefer a
+binary build over a signed official source release.
 
 
 Why do I get errors about missing UCS4 symbols when installing lxml?
 --------------------------------------------------------------------
 
-Most likely, you use a Python installation that was configured for internal
-use of UCS2 unicode, meaning 16-bit unicode.  The lxml egg distributions are
-generally compiled on platforms that use UCS4, a 32-bit unicode encoding, as
-this is used on the majority of platforms.  Sadly, both are not compatible, so
-the eggs can only support the one they were compiled with.
+You are using a Python installation that was configured for a different
+internal Unicode representation than the lxml package you are trying to
+install.  CPython versions before 3.3 allowed to switch between two types
+at build time: the 32 bit encoding UCS4 and the 16 bit encoding UCS2.
+Sadly, both are not compatible, so eggs and other binary distributions
+can only support the one they were compiled with.
 
 This means that you have to compile lxml from sources for your system.  Note
 that you do not need Cython for this, the lxml source distribution is directly
@@ -430,7 +461,7 @@ required for performance reasons.
 
 However, to avoid writing plain C-code and caring too much about the
 details of built-in types and reference counting, lxml is written in
-Cython_, a Python-like language that is translated into C-code.
+Cython_, a superset of the Python language that translates to C-code.
 Chances are that if you know Python, you can write `code that Cython
 accepts`_.  Again, the C-ish style used in the lxml code is just for
 performance optimisations.  If you want to contribute, don't bother
@@ -438,7 +469,7 @@ with the details, a Python implementation of your contribution is
 better than none.  And keep in mind that lxml's flexible API often
 favours an implementation of features in pure Python, without
 bothering with C-code at all.  For example, the ``lxml.html`` package
-is entirely written in Python.
+is written entirely in Python.
 
 Please contact the `mailing list`_ if you need any help.
 
@@ -461,8 +492,8 @@ implement but didn't due to lack if time.  If *you* find the time,
 patches are very welcome.
 
 .. _ReST: http://docutils.sourceforge.net/rst.html
-.. _`text files`: http://codespeak.net/svn/lxml/trunk/doc/
-.. _`list of missing features`: http://codespeak.net/svn/lxml/trunk/IDEAS.txt
+.. _`text files`: https://github.com/lxml/lxml/tree/master/doc
+.. _`list of missing features`: https://github.com/lxml/lxml/blob/master/IDEAS.txt
 
 Besides enhancing the code, there are a lot of places where you can help the
 project and its user base.  You can
@@ -541,10 +572,10 @@ I think I have found a bug in lxml. What should I do?
 -----------------------------------------------------
 
 First, you should look at the `current developer changelog`_ to see if this
-is a known problem that has already been fixed in the SVN trunk since the
+is a known problem that has already been fixed in the master branch since the
 release you are using.
 
-.. _`current developer changelog`: http://codespeak.net/svn/lxml/trunk/CHANGES.txt
+.. _`current developer changelog`: https://github.com/lxml/lxml/blob/master/CHANGES.txt
 
 Also, the 'crash' section above has a few good advices what to try to see if
 the problem is really in lxml - and not in your setup.  Believe it or not,
@@ -557,12 +588,15 @@ versions of libxml2 and libxslt - and make sure they are used.
 
 .. sourcecode:: python
 
+   import sys
    from lxml import etree
-   print "lxml.etree:       ", etree.LXML_VERSION
-   print "libxml used:      ", etree.LIBXML_VERSION
-   print "libxml compiled:  ", etree.LIBXML_COMPILED_VERSION
-   print "libxslt used:     ", etree.LIBXSLT_VERSION
-   print "libxslt compiled: ", etree.LIBXSLT_COMPILED_VERSION
+
+   print("%-20s: %s" % ('Python',           sys.version_info))
+   print("%-20s: %s" % ('lxml.etree',       etree.LXML_VERSION))
+   print("%-20s: %s" % ('libxml used',      etree.LIBXML_VERSION))
+   print("%-20s: %s" % ('libxml compiled',  etree.LIBXML_COMPILED_VERSION))
+   print("%-20s: %s" % ('libxslt used',     etree.LIBXSLT_VERSION))
+   print("%-20s: %s" % ('libxslt compiled', etree.LIBXSLT_COMPILED_VERSION))
 
 If you can figure that the problem is not in lxml but in the
 underlying libxml2 or libxslt, you can ask right on the respective
@@ -570,11 +604,12 @@ mailing lists, which may considerably reduce the time to find a fix or
 work-around.  See the next question for some hints on how to do that.
 
 Otherwise, we would really like to hear about it.  Please report it to
-the `mailing list`_ so that we can fix it.  It is very helpful in this
-case if you can come up with a short code snippet that demonstrates
-your problem.  If others can reproduce and see the problem, it is much
-easier for them to fix it - and maybe even easier for you to describe
-it and get people convinced that it really is a problem to fix.
+the `bug tracker`_ or to the `mailing list`_ so that we can fix it.
+It is very helpful in this case if you can come up with a short code
+snippet that demonstrates your problem.  If others can reproduce and
+see the problem, it is much easier for them to fix it - and maybe even
+easier for you to describe it and get people convinced that it really
+is a problem to fix.
 
 It is important that you always report the version of lxml, libxml2
 and libxslt that you get from the code snippet above.  If we do not
@@ -584,7 +619,8 @@ take longer for you to get a helpful answer.
 Since as a user of lxml you are likely a programmer, you might find
 `this article on bug reports`_ an interesting read.
 
-.. _`mailing list`: http://codespeak.net/mailman/listinfo/lxml-dev
+.. _`bug tracker`: https://bugs.launchpad.net/lxml/
+.. _`mailing list`: http://lxml.de/mailinglist/
 .. _`this article on bug reports`: http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
 
 
@@ -749,6 +785,13 @@ for possible approaches to solve your specific problem:
 
       http://comments.gmane.org/gmane.comp.python.lxml.devel/2942
 
+* in a threaded environment, try to initially import ``lxml.etree``
+  from the main application thread instead of doing first-time imports
+  separately in each spawned worker thread.  If you cannot control the
+  thread spawning of your web/application server, an import of
+  ``lxml.etree`` in sitecustomize.py or usercustomize.py may still do
+  the trick.
+
 * compile lxml without threading support by running ``setup.py`` with the
   ``--without-threading`` option.  While this might be slower in certain
   scenarios on multi-processor systems, it *might* also keep your application
@@ -816,6 +859,35 @@ This will allow the parser to drop blank text nodes when constructing the
 tree.  If you now call a serialization function to pretty print this tree,
 lxml can add fresh whitespace to the XML tree to indent it.
 
+Note that the ``remove_blank_text`` option also uses a heuristic if it
+has no definite knowledge about the document's ignorable whitespace.
+It will keep blank text nodes that appear after non-blank text nodes
+at the same level.  This is to prevent document-style XML from loosing
+content.
+
+The HTMLParser has this structural knowledge built-in, which means that
+most whitespace that appears between tags in HTML documents will *not*
+be removed by this option, except in places where it is truly ignorable,
+e.g. in the page header, between table structure tags, etc.  Therefore,
+it is also safe to use this option with the HTMLParser, as it will keep
+content like the following intact (i.e. it will not remove the space
+that separates the two words):
+
+.. sourcecode:: html
+
+   <p><b>some</b> <em>text</em></p>
+
+If you want to be sure all blank text is removed from an XML document
+(or just more blank text than the parser does by itself), you have to
+use either a DTD to tell the parser which whitespace it can safely
+ignore, or remove the ignorable whitespace manually after parsing,
+e.g. by setting all tail text to None:
+
+.. sourcecode:: python
+
+   for element in root.iter():
+       element.tail = None
+
 Fredrik Lundh also has a Python-level function for indenting XML by
 appending whitespace to tags.  It can be found on his `element
 library`_ recipe page.
@@ -824,22 +896,66 @@ library`_ recipe page.
 Why can't lxml parse my XML from unicode strings?
 -------------------------------------------------
 
-lxml can read Python unicode strings and even tries to support them if libxml2
-does not.  However, if the unicode string declares an XML encoding internally
+First of all, XML is explicitly defined as a stream of bytes.  It's not
+Unicode text.  Take a look at the `XML specification`_, it's all about byte
+sequences and how to map them to text and structure.  That leads to rule
+number one: do not decode your XML data yourself.  That's a part of the
+work of an XML parser, and it does it very well.  Just pass it your data as
+a plain byte stream, it will always do the right thing, by specification.
+
+This also includes not opening XML files in text mode.  Make sure you always
+use binary mode, or, even better, pass the file path into lxml's ``parse()``
+function to let it do the file opening, reading and closing itself.  This
+is the most simple and most efficient way to do it.
+
+That being said, lxml can read Python unicode strings and even tries to
+support them if libxml2 does not.  This is because there is one valid use
+case for parsing XML from text strings: literal XML fragments in source
+code.
+
+However, if the unicode string declares an XML encoding internally
 (``<?xml encoding="..."?>``), parsing is bound to fail, as this encoding is
-most likely not the real encoding used in Python unicode.  The same is true
-for HTML unicode strings that contain charset meta tags, although the problems
-may be more subtle here.  The libxml2 HTML parser may not be able to parse the
-meta tags in broken HTML and may end up ignoring them, so even if parsing
-succeeds, later handling may still fail with character encoding errors.
+almost certainly not the real encoding used in Python unicode.  The same is
+true for HTML unicode strings that contain charset meta tags, although the
+problems may be more subtle here.  The libxml2 HTML parser may not be able
+to parse the meta tags in broken HTML and may end up ignoring them, so even
+if parsing succeeds, later handling may still fail with character encoding
+errors.  Therefore, parsing HTML from unicode strings is a much saner thing
+to do than parsing XML from unicode strings.
 
 Note that Python uses different encodings for unicode on different platforms,
 so even specifying the real internal unicode encoding is not portable between
 Python interpreters.  Don't do it.
 
-Python unicode strings with XML data or HTML data that carry encoding
-information are broken.  lxml will not parse them.  You must provide parsable
-data in a valid encoding.
+Python unicode strings with XML data that carry encoding information are
+broken.  lxml will not parse them.  You must provide parsable data in a
+valid encoding.
+
+.. _`XML specification`: http://www.w3.org/TR/REC-xml/
+
+
+Can lxml parse from file objects opened in unicode/text mode?
+-------------------------------------------------------------
+
+Technically, yes. However, you likely do not want to do that, because
+it is extremely inefficient. The text encoding that libxml2 uses
+internally is UTF-8, so parsing from a Unicode file means that Python
+first reads a chunk of data from the file, then decodes it into a new
+buffer, and then copies it into a new unicode string object, just to
+let libxml2 make yet another copy while encoding it down into UTF-8
+in order to parse it. It's clear that this involves a lot more
+recoding and copying than when parsing straight from the bytes that
+the file contains.
+
+If you really know the encoding better than the parser (e.g. when
+parsing HTML that lacks a content declaration), then instead of passing
+an encoding parameter into the file object when opening it, create a
+new instance of an XMLParser or HTMLParser and pass the encoding into
+its constructor.  Afterwards, use that parser for parsing, e.g. by
+passing it into the ``etree.parse(file, parser)`` function.  Remember
+to open the file in binary mode (mode="rb"), or, if possible, prefer
+passing the file path directly into ``parse()`` instead of an opened
+Python file object.
 
 
 What is the difference between str(xslt(doc)) and xslt(doc).write() ?
@@ -879,6 +995,96 @@ Don't.  What you would produce is not well-formed XML.  XML parsers
 will refuse to parse a document that contains null characters.  The
 right way to embed binary data in XML is using a text encoding such as
 uuencode or base64.
+
+
+Is lxml vulnerable to XML bombs?
+--------------------------------
+
+This has nothing to do with lxml itself, only with the parser of
+libxml2.  Since libxml2 version 2.7, the parser imposes hard security
+limits on input documents to prevent DoS attacks with forged input
+data.  Since lxml 2.2.1, you can disable these limits with the
+``huge_tree`` parser option if you need to parse *really* large,
+trusted documents.  All lxml versions will leave these restrictions
+enabled by default.
+
+Note that libxml2 versions of the 2.6 series do not restrict their
+parser and are therefore vulnerable to DoS attacks.
+
+Note also that these "hard limits" may still be high enough to
+allow for excessive resource usage in a given use case.  They are
+compile time modifiable, so building your own library versions will
+allow you to change the limits to your own needs. Also see the next
+question.
+
+
+How do I use lxml safely as a web-service endpoint?
+---------------------------------------------------
+
+XML based web-service endpoints are generally subject to several
+types of attacks if they allow some kind of untrusted input.
+From the point of view of the underlying XML tool, the most
+obvious attacks try to send a relatively small amount of data
+that induces a comparatively large resource consumption on the
+receiver side.
+
+First of all, make sure network access is not enabled for the XML
+parser that you use for parsing untrusted content and that it is
+not configured to load external DTDs.  Otherwise, attackers can
+try to trick the parser into an attempt to load external resources
+that are overly slow or impossible to retrieve, thus wasting time
+and other valuable resources on your server such as socket
+connections.  Note that you can register your own document loader
+in lxml, which allows for fine-grained control over any read access
+to resources.
+
+Some of the most famous excessive content expansion attacks
+use XML entity references.  Luckily, entity expansion is mostly
+useless for the data commonly sent through web services and
+can simply be disabled, which rules out several types of
+denial of service attacks at once.  This also involves an attack
+that reads local files from the server, as XML entities can be
+defined to expand into their content.   Consequently, version
+1.2 of the SOAP standard explicitly disallows entity references
+in the XML stream.
+
+To disable entity expansion, use an XML parser that is configured
+with the option ``resolve_entities=False``.  Then, after (or
+while) parsing the document, use ``root.iter(etree.Entity)`` to
+recursively search for entity references.  If it contains any,
+reject the entire input document with a suitable error response.
+In lxml 3.x, you can also use the new DTD introspection API to
+apply your own restrictions on input documents.
+
+Another attack to consider is compression bombs.  If you allow
+compressed input into your web service, attackers can try to send
+well forged highly repetitive and thus very well compressing input
+that unpacks into a very large XML document in your server's main
+memory, potentially a thousand times larger than the compressed
+input data.
+
+As a counter measure, either disable compressed input for your
+web server, at least for untrusted sources, or use incremental
+parsing with ``iterparse()`` instead of parsing the whole input
+document into memory in one shot.  That allows you to enforce
+suitable limits on the input by applying semantic checks that
+detect and prevent an illegitimate use of your service.  If
+possible, you can also use this to reduce the amount of data
+that you need to keep in memory while parsing the document,
+thus further reducing the possibility of an attacker to trick
+your system into excessive resource usage.
+
+Finally, please be aware that XPath suffers from the same
+vulnerability as SQL when it comes to content injection.  The
+obvious fix is to not build any XPath expressions via string
+formatting or concatenation when the parameters may come from
+untrusted sources, and instead use XPath variables, which
+safely expose their values to the evaluation engine.
+
+The defusedxml_ package comes with an example setup and a wrapper
+API for lxml that applies certain counter measures internally.
+
+.. _defusedxml: https://bitbucket.org/tiran/defusedxml
 
 
 XPath and Document Traversal

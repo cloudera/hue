@@ -1,16 +1,24 @@
 # Custom resolver API
 
 ctypedef enum _InputDocumentDataType:
+    PARSER_DATA_INVALID
     PARSER_DATA_EMPTY
     PARSER_DATA_STRING
     PARSER_DATA_FILENAME
     PARSER_DATA_FILE
 
+@cython.final
+@cython.internal
 cdef class _InputDocument:
     cdef _InputDocumentDataType _type
-    cdef object _data_bytes
+    cdef bytes _data_bytes
     cdef object _filename
     cdef object _file
+    cdef bint _close_file
+
+    def __cinit__(self):
+        self._type = PARSER_DATA_INVALID
+
 
 cdef class Resolver:
     u"This is the base class of all resolvers."
@@ -47,9 +55,9 @@ cdef class Resolver:
         argument.
         """
         cdef _InputDocument doc_ref
-        if python.PyUnicode_Check(string):
-            string = python.PyUnicode_AsUTF8String(string)
-        elif not python.PyString_Check(string):
+        if isinstance(string, unicode):
+            string = (<unicode>string).encode('utf8')
+        elif not isinstance(string, bytes):
             raise TypeError, "argument must be a byte string or unicode string"
         doc_ref = _InputDocument()
         doc_ref._type = PARSER_DATA_STRING
@@ -72,14 +80,15 @@ cdef class Resolver:
         doc_ref._filename = _encodeFilename(filename)
         return doc_ref
 
-    def resolve_file(self, f, context, *, base_url=None):
-        u"""resolve_file(self, f, context, base_url=None)
+    def resolve_file(self, f, context, *, base_url=None, bint close=True):
+        u"""resolve_file(self, f, context, base_url=None, close=True)
 
         Return an open file-like object as input document.
 
         Pass open file and context as parameters.  You can pass the
         base URL or filename of the file through the ``base_url``
-        keyword argument.
+        keyword argument.  If the ``close`` flag is True (the
+        default), the file will be closed after reading.
 
         Note that using ``.resolve_filename()`` is more efficient,
         especially in threaded environments.
@@ -95,13 +104,16 @@ cdef class Resolver:
             doc_ref._filename = _encodeFilename(base_url)
         else:
             doc_ref._filename = _getFilenameForFile(f)
+        doc_ref._close_file = close
         doc_ref._file = f
         return doc_ref
 
+@cython.final
+@cython.internal
 cdef class _ResolverRegistry:
     cdef object _resolvers
     cdef Resolver _default_resolver
-    def __init__(self, Resolver default_resolver=None):
+    def __cinit__(self, Resolver default_resolver=None):
         self._resolvers = set()
         self._default_resolver = default_resolver
 
@@ -145,6 +157,7 @@ cdef class _ResolverRegistry:
     def __repr__(self):
         return repr(self._resolvers)
 
+@cython.internal
 cdef class _ResolverContext(_ExceptionContext):
     cdef _ResolverRegistry _resolvers
     cdef _TempStore _storage

@@ -3,15 +3,15 @@ The lxml.etree Tutorial
 =======================
  
 .. meta::
-  :description: The lxml tutorial on XML that feels like Python
-  :keywords: lxml, etree, tutorial, ElementTree, Python, XML, HTML
+  :description: The lxml tutorial on XML processing with Python
+  :keywords: XML processing with Python, lxml, lxml.etree, tutorial, ElementTree, Python, XML, HTML
 
 :Author:
   Stefan Behnel
 
-This tutorial briefly overviews the main concepts of the `ElementTree API`_ as
-implemented by ``lxml.etree``, and some simple enhancements that make your
-life as a programmer easier.
+This is a tutorial on XML processing with ``lxml.etree``.  It briefly
+overviews the main concepts of the `ElementTree API`_, and some simple
+enhancements that make your life as a programmer easier.
 
 For a complete reference of the API, see the `generated API
 documentation`_.
@@ -42,19 +42,22 @@ documentation`_.
 
 
 ..
-  >>> try: from StringIO import StringIO
+  >>> try: from StringIO import StringIO as BytesIO
   ... except ImportError:
   ...    from io import BytesIO
-  ...    def StringIO(s):
+  ...    def BytesIO(s, BytesIO=BytesIO):
   ...        if isinstance(s, str): s = s.encode("UTF-8")
   ...        return BytesIO(s)
 
-  >>> try: unicode = __builtins__["unicode"]
+  >>> try: unicode = unicode
   ... except (NameError, KeyError): unicode = str
 
-  >>> try: basestring = __builtins__["basestring"]
+  >>> try: basestring = basestring
   ... except (NameError, KeyError): basestring = str
 
+  >>> try: next = next
+  ... except NameError:
+  ...     def next(it): return it.next()
 
 A common way to import ``lxml.etree`` is as follows:
 
@@ -95,7 +98,7 @@ of) the following import chain as a fall-back to the original ElementTree:
               print("Failed to import ElementTree from any known place")
 
 To aid in writing portable code, this tutorial makes it clear in the examples
-which part of the presented API is an extension of lxml.etree over the
+which part of the presented API is an extension of ``lxml.etree`` over the
 original `ElementTree API`_, as defined by Fredrik Lundh's `ElementTree
 library`_.
 
@@ -171,8 +174,9 @@ To see that this is really XML, you can serialise the tree you have created:
 Elements are lists
 ------------------
 
-To make the access to these subelements as easy and straight forward as
-possible, elements behave like normal Python lists:
+To make the access to these subelements easy and straight forward,
+elements mimic the behaviour of normal Python lists as closely as
+possible:
 
 .. sourcecode:: pycon
 
@@ -203,28 +207,79 @@ possible, elements behave like normal Python lists:
     >>> print(end[0].tag)
     child3
 
-    >>> root[0] = root[-1] # this moves the element!
+Prior to ElementTree 1.3 and lxml 2.0, you could also check the truth value of
+an Element to see if it has children, i.e. if the list of children is empty:
+
+.. sourcecode:: python
+
+   if root:   # this no longer works!
+       print("The root element has children")
+
+This is no longer supported as people tend to expect that a "something"
+evaluates to True and expect Elements to be "something", may they have
+children or not.  So, many users find it surprising that any Element
+would evaluate to False in an if-statement like the above.  Instead,
+use ``len(element)``, which is both more explicit and less error prone.
+
+.. sourcecode:: pycon
+
+   >>> print(etree.iselement(root))  # test if it's some kind of Element
+   True
+   >>> if len(root):                 # test if it has children
+   ...     print("The root element has children")
+   The root element has children
+
+There is another important case where the behaviour of Elements in lxml
+(in 2.0 and later) deviates from that of lists and from that of the
+original ElementTree (prior to version 1.3 or Python 2.7/3.2):
+
+.. sourcecode:: pycon
+
+    >>> for child in root:
+    ...     print(child.tag)
+    child0
+    child1
+    child2
+    child3
+    >>> root[0] = root[-1]  # this moves the element in lxml.etree!
     >>> for child in root:
     ...     print(child.tag)
     child3
     child1
     child2
 
-Prior to ElementTree 1.3 and lxml 2.0, you could also check the truth value of
-an Element to see if it has children, i.e. if the list of children is empty.
-This is no longer supported as people tend to find it surprising that a
-non-None reference to an existing Element can evaluate to False.  Instead, use
-``len(element)``, which is both more explicit and less error prone.
+In this example, the last element is *moved* to a different position,
+instead of being copied, i.e. it is automatically removed from its
+previous position when it is put in a different place.  In lists,
+objects can appear in multiple positions at the same time, and the
+above assignment would just copy the item reference into the first
+position, so that both contain the exact same item:
 
-Note in the examples that the last element was *moved* to a different position
-in the last example.  This is a difference from the original ElementTree (and
-from lists), where elements can sit in multiple positions of any number of
-trees.  In lxml.etree, elements can only sit in one position of one tree at a
-time.
+.. sourcecode:: pycon
 
-If you want to *copy* an element to a different position, consider creating an
-independent *deep copy* using the ``copy`` module from Python's standard
-library:
+   >>> l = [0, 1, 2, 3]
+   >>> l[0] = l[-1]
+   >>> l
+   [3, 1, 2, 3]
+
+Note that in the original ElementTree, a single Element object can sit
+in any number of places in any number of trees, which allows for the same
+copy operation as with lists.  The obvious drawback is that modifications
+to such an Element will apply to all places where it appears in a tree,
+which may or may not be intended.
+
+The upside of this difference is that an Element in ``lxml.etree`` always
+has exactly one parent, which can be queried through the ``getparent()``
+method.  This is not supported in the original ElementTree.
+
+.. sourcecode:: pycon
+
+    >>> root is root[0].getparent()  # lxml.etree only!
+    True
+
+If you want to *copy* an element to a different position in ``lxml.etree``,
+consider creating an independent *deep copy* using the ``copy`` module
+from Python's standard library:
 
 .. sourcecode:: pycon
 
@@ -238,13 +293,6 @@ library:
     >>> print([ c.tag for c in root ])
     ['child3', 'child1', 'child2']
 
-The way up in the tree is provided through the ``getparent()`` method:
-
-.. sourcecode:: pycon
-
-    >>> root is root[0].getparent()  # lxml.etree only!
-    True
-
 The siblings (or neighbours) of an element are accessed as next and previous
 elements:
 
@@ -256,8 +304,8 @@ elements:
     True
 
 
-Elements carry attributes
--------------------------
+Elements carry attributes as a dict
+-----------------------------------
 
 XML elements support attributes.  You can create them directly in the Element
 factory:
@@ -268,36 +316,62 @@ factory:
     >>> etree.tostring(root)
     b'<root interesting="totally"/>'
 
-Fast and direct access to these attributes is provided by the ``set()`` and
-``get()`` methods of elements:
+Attributes are just unordered name-value pairs, so a very convenient way
+of dealing with them is through the dictionary-like interface of Elements:
 
 .. sourcecode:: pycon
 
     >>> print(root.get("interesting"))
     totally
 
-    >>> root.set("interesting", "somewhat")
-    >>> print(root.get("interesting"))
-    somewhat
+    >>> print(root.get("hello"))
+    None
+    >>> root.set("hello", "Huhu")
+    >>> print(root.get("hello"))
+    Huhu
 
-However, a very convenient way of dealing with them is through the dictionary
-interface of the ``attrib`` property:
+    >>> etree.tostring(root)
+    b'<root interesting="totally" hello="Huhu"/>'
+
+    >>> sorted(root.keys())
+    ['hello', 'interesting']
+
+    >>> for name, value in sorted(root.items()):
+    ...     print('%s = %r' % (name, value))
+    hello = 'Huhu'
+    interesting = 'totally'
+
+For the cases where you want to do item lookup or have other reasons for
+getting a 'real' dictionary-like object, e.g. for passing it around,
+you can use the ``attrib`` property:
 
 .. sourcecode:: pycon
 
     >>> attributes = root.attrib
 
     >>> print(attributes["interesting"])
-    somewhat
-
-    >>> print(attributes.get("hello"))
+    totally
+    >>> print(attributes.get("no-such-attribute"))
     None
 
     >>> attributes["hello"] = "Guten Tag"
-    >>> print(attributes.get("hello"))
+    >>> print(attributes["hello"])
     Guten Tag
     >>> print(root.get("hello"))
     Guten Tag
+
+Note that ``attrib`` is a dict-like object backed by the Element itself.
+This means that any changes to the Element are reflected in ``attrib``
+and vice versa.  It also means that the XML tree stays alive in memory
+as long as the ``attrib`` of one of its Elements is in use.  To get an
+independent snapshot of the attributes that does not depend on the XML
+tree, copy it into a dict:
+
+.. sourcecode:: pycon
+
+    >>> d = dict(root.attrib)
+    >>> sorted(d.items())
+    [('hello', 'Guten Tag'), ('interesting', 'totally')]
 
 
 Elements contain text
@@ -479,7 +553,8 @@ serialised the tree to XML:
     another - Child 3
 
 If you know you are only interested in a single tag, you can pass its name to
-``iter()`` to have it filter for you:
+``iter()`` to have it filter for you.  Starting with lxml 3.0, you can also
+pass more than one tag to intercept on multiple tags during iteration.
 
 .. sourcecode:: pycon
 
@@ -487,6 +562,12 @@ If you know you are only interested in a single tag, you can pass its name to
     ...     print("%s - %s" % (element.tag, element.text))
     child - Child 1
     child - Child 2
+
+    >>> for element in root.iter("another", "child"):
+    ...     print("%s - %s" % (element.tag, element.text))
+    child - Child 1
+    child - Child 2
+    another - Child 3
 
 By default, iteration yields all nodes in the tree, including
 ProcessingInstructions, Comments and Entity instances.  If you want to
@@ -521,7 +602,10 @@ make sure only Element objects are returned, you can pass the
     ...     print(element.text)
     &#234;
 
-In lxml.etree, elements provide `further iterators`_ for all directions in the
+Note that passing a wildcard ``"*"`` tag name will also yield all
+``Element`` nodes (and only elements).
+
+In ``lxml.etree``, elements provide `further iterators`_ for all directions in the
 tree: children, parents (or rather ancestors) and siblings.
 
 .. _`further iterators`: api.html#iteration
@@ -561,9 +645,9 @@ ASCII:
 
 Note that pretty printing appends a newline at the end.
 
-Since lxml 2.0 (and ElementTree 1.3), the serialisation functions can
-do more than XML serialisation.  You can serialise to HTML or extract
-the text content by passing the ``method`` keyword:
+In lxml 2.0 and later (as well as ElementTree 1.3), the serialisation
+functions can do more than XML serialisation.  You can serialise to
+HTML or extract the text content by passing the ``method`` keyword:
 
 .. sourcecode:: pycon
 
@@ -593,7 +677,7 @@ serialisation is ASCII:
 
 .. sourcecode:: pycon
 
-   >>> br = root.find('.//br')
+   >>> br = next(root.iter('br'))  # get first result of iteration
    >>> br.tail = u'W\xf6rld'
 
    >>> etree.tostring(root, method='text')  # doctest: +ELLIPSIS
@@ -605,64 +689,74 @@ serialisation is ASCII:
    b'HelloW\xc3\xb6rld'
 
 Here, serialising to a Python unicode string instead of a byte string
-might become handy.  Just pass the ``unicode`` type as encoding:
+might become handy.  Just pass the name ``'unicode'`` as encoding:
 
 .. sourcecode:: pycon
 
-   >>> etree.tostring(root, encoding=unicode, method='text')
+   >>> etree.tostring(root, encoding='unicode', method='text')
    u'HelloW\xf6rld'
+
+The W3C has a good `article about the Unicode character set and
+character encodings
+<http://www.w3.org/International/tutorials/tutorial-char-enc/>`_.
 
 
 The ElementTree class
 =====================
 
 An ``ElementTree`` is mainly a document wrapper around a tree with a
-root node.  It provides a couple of methods for parsing, serialisation
-and general document handling.  One of the bigger differences is that
-it serialises as a complete document, as opposed to a single
-``Element``.  This includes top-level processing instructions and
-comments, as well as a DOCTYPE and other DTD content in the document:
+root node.  It provides a couple of methods for serialisation and
+general document handling.
 
 .. sourcecode:: pycon
 
-    >>> tree = etree.parse(StringIO('''\
+    >>> root = etree.XML('''\
     ... <?xml version="1.0"?>
-    ... <!DOCTYPE root SYSTEM "test" [ <!ENTITY tasty "eggs"> ]>
+    ... <!DOCTYPE root SYSTEM "test" [ <!ENTITY tasty "parsnips"> ]>
     ... <root>
     ...   <a>&tasty;</a>
     ... </root>
-    ... '''))
+    ... ''')
 
+    >>> tree = etree.ElementTree(root)
+    >>> print(tree.docinfo.xml_version)
+    1.0
     >>> print(tree.docinfo.doctype)
     <!DOCTYPE root SYSTEM "test">
 
-    >>> # lxml 1.3.4 and later
-    >>> print(etree.tostring(tree))
+An ``ElementTree`` is also what you get back when you call the
+``parse()`` function to parse files or file-like objects (see the
+parsing section below).
+
+One of the important differences is that the ``ElementTree`` class
+serialises as a complete document, as opposed to a single ``Element``.
+This includes top-level processing instructions and comments, as well
+as a DOCTYPE and other DTD content in the document:
+
+.. sourcecode:: pycon
+
+    >>> print(etree.tostring(tree))  # lxml 1.3.4 and later
     <!DOCTYPE root SYSTEM "test" [
-    <!ENTITY tasty "eggs">
+    <!ENTITY tasty "parsnips">
     ]>
     <root>
-      <a>eggs</a>
+      <a>parsnips</a>
     </root>
 
-    >>> # lxml 1.3.4 and later
-    >>> print(etree.tostring(etree.ElementTree(tree.getroot())))
-    <!DOCTYPE root SYSTEM "test" [
-    <!ENTITY tasty "eggs">
-    ]>
-    <root>
-      <a>eggs</a>
-    </root>
+In the original xml.etree.ElementTree implementation and in lxml
+up to 1.3.3, the output looks the same as when serialising only
+the root Element:
 
-    >>> # ElementTree and lxml <= 1.3.3
+.. sourcecode:: pycon
+
     >>> print(etree.tostring(tree.getroot()))
     <root>
-      <a>eggs</a>
+      <a>parsnips</a>
     </root>
 
-Note that this has changed in lxml 1.3.4 to match the behaviour of
-lxml 2.0.  Before, the examples were serialised without DTD content,
-which made lxml loose DTD information in an input-output cycle.
+This serialisation behaviour has changed in lxml 1.3.4.  Before,
+the tree was serialised without DTD content, which made lxml
+lose DTD information in an input-output cycle.
 
 
 Parsing from strings and files
@@ -706,17 +800,26 @@ commonly used to write XML literals right into the source:
     >>> etree.tostring(root)
     b'<root>data</root>'
 
+There is also a corresponding function ``HTML()`` for HTML literals.
+
 
 The parse() function
 --------------------
 
-The ``parse()`` function is used to parse from files and file-like objects:
+The ``parse()`` function is used to parse from files and file-like objects.
+
+As an example of such a file-like object, the following code uses the
+``BytesIO`` class for reading from a string instead of an external file.
+That class comes from the ``io`` module in Python 2.6 and later.  In older
+Python versions, you will have to use the ``StringIO`` class from the
+``StringIO`` module.  However, in real life, you would obviously avoid
+doing this all together and use the string parsing functions above.
 
 .. sourcecode:: pycon
 
-    >>> some_file_like = StringIO("<root>data</root>")
+    >>> some_file_like_object = BytesIO("<root>data</root>")
 
-    >>> tree = etree.parse(some_file_like)
+    >>> tree = etree.parse(some_file_like_object)
 
     >>> etree.tostring(tree)
     b'<root>data</root>'
@@ -738,7 +841,7 @@ commonly used to parse XML fragments.
 
 The ``parse()`` function supports any of the following sources:
 
-* an open file object
+* an open file object (make sure to open it in binary mode)
 
 * a file-like object that has a ``.read(byte_count)`` method returning
   a byte string on each call
@@ -748,7 +851,11 @@ The ``parse()`` function supports any of the following sources:
 * an HTTP or FTP URL string
 
 Note that passing a filename or URL is usually faster than passing an
-open file.
+open file or file-like object.  However, the HTTP/FTP client in libxml2
+is rather simple, so things like HTTP authentication require a dedicated
+URL request library, e.g. ``urllib2`` or ``request``.  These libraries
+usually provide a file-like object for the result that you can parse
+from while the response is streaming in.
 
 
 Parser objects
@@ -863,7 +970,7 @@ Here is a simple ``iterparse()`` example:
 
 .. sourcecode:: pycon
 
-    >>> some_file_like = StringIO("<root><a>data</a></root>")
+    >>> some_file_like = BytesIO("<root><a>data</a></root>")
 
     >>> for event, element in etree.iterparse(some_file_like):
     ...     print("%s, %4s, %s" % (event, element.tag, element.text))
@@ -875,7 +982,7 @@ element, but you can control this through the ``events`` keyword argument:
 
 .. sourcecode:: pycon
 
-    >>> some_file_like = StringIO("<root><a>data</a></root>")
+    >>> some_file_like = BytesIO("<root><a>data</a></root>")
 
     >>> for event, element in etree.iterparse(some_file_like,
     ...                                       events=("start", "end")):
@@ -885,18 +992,18 @@ element, but you can control this through the ``events`` keyword argument:
       end,    a, data
       end, root, None
 
-Note that the text, tail and children of an Element are not necessarily there
+Note that the text, tail, and children of an Element are not necessarily present
 yet when receiving the ``start`` event.  Only the ``end`` event guarantees
 that the Element has been parsed completely.
 
-It also allows to ``.clear()`` or modify the content of an Element to
+It also allows you to ``.clear()`` or modify the content of an Element to
 save memory. So if you parse a large tree and you want to keep memory
 usage small, you should clean up parts of the tree that you no longer
 need:
 
 .. sourcecode:: pycon
 
-    >>> some_file_like = StringIO(
+    >>> some_file_like = BytesIO(
     ...     "<root><a><b>data</b></a><a><b/></a></root>")
 
     >>> for event, element in etree.iterparse(some_file_like):
@@ -910,10 +1017,35 @@ need:
     None
     ** cleaning up the subtree
 
-If memory is a real bottleneck, or if building the tree is not desired at all,
-the target parser interface of ``lxml.etree`` can be used.  It creates
-SAX-like events by calling the methods of a target object.  By implementing
-some or all of these methods, you can control which events are generated:
+A very important use case for ``iterparse()`` is parsing large
+generated XML files, e.g. database dumps.  Most often, these XML
+formats only have one main data item element that hangs directly below
+the root node and that is repeated thousands of times.  In this case,
+it is best practice to let ``lxml.etree`` do the tree building and only to
+intercept on exactly this one Element, using the normal tree API
+for data extraction.
+
+.. sourcecode:: pycon
+
+    >>> xml_file = BytesIO('''\
+    ... <root>
+    ...   <a><b>ABC</b><c>abc</c></a>
+    ...   <a><b>MORE DATA</b><c>more data</c></a>
+    ...   <a><b>XYZ</b><c>xyz</c></a>
+    ... </root>''')
+
+    >>> for _, element in etree.iterparse(xml_file, tag='a'):
+    ...     print('%s -- %s' % (element.findtext('b'), element[1].text))
+    ...     element.clear()
+    ABC -- abc
+    MORE DATA -- more data
+    XYZ -- xyz
+
+If, for some reason, building the tree is not desired at all, the
+target parser interface of ``lxml.etree`` can be used.  It creates
+SAX-like events by calling the methods of a target object.  By
+implementing some or all of these methods, you can control which
+events are generated:
 
 .. sourcecode:: pycon
 
@@ -943,7 +1075,7 @@ some or all of these methods, you can control which events are generated:
      * test = true
 
 You can reuse the parser and its target as often as you like, so you
-should take care that the ``.close()`` methods really resets the
+should take care that the ``.close()`` method really resets the
 target to a usable state (also in the case of an error!).
 
 .. sourcecode:: pycon
@@ -969,8 +1101,9 @@ target to a usable state (also in the case of an error!).
 Namespaces
 ==========
 
-The ElementTree API avoids `namespace prefixes`_ wherever possible and deploys
-the real namespaces instead:
+The ElementTree API avoids
+`namespace prefixes <http://www.w3.org/TR/xml-names/#ns-qualnames>`_
+wherever possible and deploys the real namespace (the URI) instead:
 
 .. sourcecode:: pycon
 
@@ -983,14 +1116,20 @@ the real namespaces instead:
       <html:body>Hello World</html:body>
     </html:html>
 
-.. _`namespace prefixes`: http://www.w3.org/TR/xml-names/#ns-qualnames
+The notation that ElementTree uses was originally brought up by
+`James Clark <http://www.jclark.com/xml/xmlns.htm>`_.  It has the major
+advantage of providing a universally qualified name for a tag, regardless
+of any prefixes that may or may not have been used or defined in a document.
+By moving the indirection of prefixes out of the way, it makes namespace
+aware code much clearer and easier to get right.
 
-As you can see, prefixes only become important when you serialise the result.
-However, the above code becomes somewhat verbose due to the lengthy namespace
-names.  And retyping or copying a string over and over again is error prone.
-It is therefore common practice to store a namespace URI in a global variable.
-To adapt the namespace prefixes for serialisation, you can also pass a mapping
-to the Element factory, e.g. to define the default namespace:
+As you can see from the example, prefixes only become important when
+you serialise the result.  However, the above code looks somewhat
+verbose due to the lengthy namespace names.  And retyping or copying a
+string over and over again is error prone.  It is therefore common
+practice to store a namespace URI in a global variable.  To adapt the
+namespace prefixes for serialisation, you can also pass a mapping to
+the Element factory function, e.g. to define the default namespace:
 
 .. sourcecode:: pycon
 
@@ -1008,7 +1147,72 @@ to the Element factory, e.g. to define the default namespace:
       <body>Hello World</body>
     </html>
 
-Namespaces on attributes work alike:
+You can also use the ``QName`` helper class to build or split qualified
+tag names:
+
+.. sourcecode:: pycon
+
+    >>> tag = etree.QName('http://www.w3.org/1999/xhtml', 'html')
+    >>> print(tag.localname)
+    html
+    >>> print(tag.namespace)
+    http://www.w3.org/1999/xhtml
+    >>> print(tag.text)
+    {http://www.w3.org/1999/xhtml}html
+
+    >>> tag = etree.QName('{http://www.w3.org/1999/xhtml}html')
+    >>> print(tag.localname)
+    html
+    >>> print(tag.namespace)
+    http://www.w3.org/1999/xhtml
+
+    >>> root = etree.Element('{http://www.w3.org/1999/xhtml}html')
+    >>> tag = etree.QName(root)
+    >>> print(tag.localname)
+    html
+
+    >>> tag = etree.QName(root, 'script')
+    >>> print(tag.text)
+    {http://www.w3.org/1999/xhtml}script
+    >>> tag = etree.QName('{http://www.w3.org/1999/xhtml}html', 'script')
+    >>> print(tag.text)
+    {http://www.w3.org/1999/xhtml}script
+
+lxml.etree allows you to look up the current namespaces defined for a
+node through the ``.nsmap`` property:
+
+.. sourcecode:: pycon
+
+    >>> xhtml.nsmap
+    {None: 'http://www.w3.org/1999/xhtml'}
+
+Note, however, that this includes all prefixes known in the context of
+an Element, not only those that it defines itself.
+
+.. sourcecode:: pycon
+
+    >>> root = etree.Element('root', nsmap={'a': 'http://a.b/c'})
+    >>> child = etree.SubElement(root, 'child',
+    ...                          nsmap={'b': 'http://b.c/d'})
+    >>> len(root.nsmap)
+    1
+    >>> len(child.nsmap)
+    2
+    >>> child.nsmap['a']
+    'http://a.b/c'
+    >>> child.nsmap['b']
+    'http://b.c/d'
+
+Therefore, modifying the returned dict cannot have any meaningful
+impact on the Element.  Any changes to it are ignored.
+
+Namespaces on attributes work alike, but as of version 2.3, ``lxml.etree``
+will ensure that the attribute uses a prefixed namespace
+declaration.  This is because unprefixed attribute names are not
+considered being in a namespace by the XML namespace specification
+(`section 6.2`_), so they may end up loosing their namespace on a
+serialise-parse roundtrip, even if they appear in a namespaced
+element.
 
 .. sourcecode:: pycon
 
@@ -1016,7 +1220,7 @@ Namespaces on attributes work alike:
 
     >>> print(etree.tostring(xhtml, pretty_print=True))
     <html xmlns="http://www.w3.org/1999/xhtml">
-      <body bgcolor="#CCFFAA">Hello World</body>
+      <body xmlns:html="http://www.w3.org/1999/xhtml" html:bgcolor="#CCFFAA">Hello World</body>
     </html>
 
     >>> print(body.get("bgcolor"))
@@ -1024,7 +1228,9 @@ Namespaces on attributes work alike:
     >>> body.get(XHTML + "bgcolor")
     '#CCFFAA'
 
-You can also use XPath in this way:
+.. _`section 6.2`: http://www.w3.org/TR/2009/REC-xml-names-20091208/#defaulting
+
+You can also use XPath with fully qualified names:
 
 .. sourcecode:: pycon
 
@@ -1034,6 +1240,34 @@ You can also use XPath in this way:
 
     >>> print(results[0].tag)
     {http://www.w3.org/1999/xhtml}body
+
+For convenience, you can use ``"*"`` wildcards in all iterators of ``lxml.etree``,
+both for tag names and namespaces:
+
+.. sourcecode:: pycon
+
+    >>> for el in xhtml.iter('*'): print(el.tag)   # any element
+    {http://www.w3.org/1999/xhtml}html
+    {http://www.w3.org/1999/xhtml}body
+    >>> for el in xhtml.iter('{http://www.w3.org/1999/xhtml}*'): print(el.tag)
+    {http://www.w3.org/1999/xhtml}html
+    {http://www.w3.org/1999/xhtml}body
+    >>> for el in xhtml.iter('{*}body'): print(el.tag)
+    {http://www.w3.org/1999/xhtml}body
+
+To look for elements that do not have a namespace, either use the
+plain tag name or provide the empty namespace explicitly:
+
+.. sourcecode:: pycon
+
+    >>> [ el.tag for el in xhtml.iter('{http://www.w3.org/1999/xhtml}body') ]
+    ['{http://www.w3.org/1999/xhtml}body']
+    >>> [ el.tag for el in xhtml.iter('body') ]
+    []
+    >>> [ el.tag for el in xhtml.iter('{}body') ]
+    []
+    >>> [ el.tag for el in xhtml.iter('{}*') ]
+    []
 
 
 The E-factory
@@ -1080,7 +1314,7 @@ HTML:
       </body>
     </html>
 
-The Element creation based on attribute access makes it easy to build up a
+Element creation based on attribute access makes it easy to build up a
 simple vocabulary for an XML language:
 
 .. sourcecode:: pycon
@@ -1125,6 +1359,13 @@ simple vocabulary for an XML language:
 One such example is the module ``lxml.html.builder``, which provides a
 vocabulary for HTML.
 
+When dealing with multiple namespaces, it is good practice to define
+one ElementMaker for each namespace URI.  Again, note how the above
+example predefines the tag builders in named constants.  That makes it
+easy to put all tag declarations of a namespace into one Python module
+and to import/use the tag name constants from there.  This avoids
+pitfalls like typos or accidentally missing namespaces.
+
 
 ElementPath
 ===========
@@ -1138,7 +1379,7 @@ available.
 .. _ElementPath: http://effbot.org/zone/element-xpath.htm
 .. _`full XPath implementation`: xpathxslt.html#xpath
 
-In addition to a `full XPath implementation`_, lxml.etree supports the
+In addition to a `full XPath implementation`_, ``lxml.etree`` supports the
 ElementPath language in the same way ElementTree does, even using
 (almost) the same implementation.  The API provides four methods here
 that you can find on Elements and ElementTrees:
@@ -1184,3 +1425,40 @@ Find Elements with a certain attribute:
     a
     >>> print(root.findall(".//a[@y]"))
     []
+
+In lxml 3.4, there is a new helper to generate a structural ElementPath
+expression for an Element:
+
+.. sourcecode:: pycon
+
+    >>> tree = etree.ElementTree(root)
+    >>> a = root[0]
+    >>> print(tree.getelementpath(a[0]))
+    a/b[1]
+    >>> print(tree.getelementpath(a[1]))
+    a/c
+    >>> print(tree.getelementpath(a[2]))
+    a/b[2]
+    >>> tree.find(tree.getelementpath(a[2])) == a[2]
+    True
+
+As long as the tree is not modified, this path expression represents an
+identifier for a given element that can be used to ``find()`` it in the same
+tree later.  Compared to XPath, ElementPath expressions have the advantage
+of being self-contained even for documents that use namespaces.
+
+The ``.iter()`` method is a special case that only finds specific tags
+in the tree by their name, not based on a path.  That means that the
+following commands are equivalent in the success case:
+
+.. sourcecode:: pycon
+
+    >>> print(root.find(".//b").tag)
+    b
+    >>> print(next(root.iterfind(".//b")).tag)
+    b
+    >>> print(next(root.iter("b")).tag)
+    b
+
+Note that the ``.find()`` method simply returns None if no match is found,
+whereas the other two examples would raise a ``StopIteration`` exception.

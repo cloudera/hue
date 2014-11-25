@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -70,25 +70,25 @@ one:</p>
 
 &gt;&gt;&gt; import lxml.html.usedoctest # for HTML output
 </pre>
-<p>To use this module directly, you must call <tt class="rst-docutils literal"><span class="pre">lxmldoctest.install()</span></tt>,
+<p>To use this module directly, you must call <tt class="rst-docutils literal">lxmldoctest.install()</tt>,
 which will cause doctest to use this in all subsequent calls.</p>
 <p>This changes the way output is checked and comparisons are made for
 XML or HTML-like content.</p>
-<p>XML or HTML content is noticed because the example starts with <tt class="rst-docutils literal"><span class="pre">&lt;</span></tt>
-(it's HTML if it starts with <tt class="rst-docutils literal"><span class="pre">&lt;html</span></tt>).  You can also use the
-<tt class="rst-docutils literal"><span class="pre">PARSE_HTML</span></tt> and <tt class="rst-docutils literal"><span class="pre">PARSE_XML</span></tt> flags to force parsing.</p>
+<p>XML or HTML content is noticed because the example starts with <tt class="rst-docutils literal">&lt;</tt>
+(it's HTML if it starts with <tt class="rst-docutils literal">&lt;html</tt>).  You can also use the
+<tt class="rst-docutils literal">PARSE_HTML</tt> and <tt class="rst-docutils literal">PARSE_XML</tt> flags to force parsing.</p>
 <p>Some rough wildcard-like things are allowed.  Whitespace is generally
 ignored (except in attributes).  In text (attributes and text in the
-body) you can use <tt class="rst-docutils literal"><span class="pre">...</span></tt> as a wildcard.  In an example it also
+body) you can use <tt class="rst-docutils literal">...</tt> as a wildcard.  In an example it also
 matches any trailing tags in the element, though it does not match
-leading tags.  You may create a tag <tt class="rst-docutils literal"><span class="pre">&lt;any&gt;</span></tt> or include an <tt class="rst-docutils literal"><span class="pre">any</span></tt>
-attribute in the tag.  An <tt class="rst-docutils literal"><span class="pre">any</span></tt> tag matches any tag, while the
+leading tags.  You may create a tag <tt class="rst-docutils literal">&lt;any&gt;</tt> or include an <tt class="rst-docutils literal">any</tt>
+attribute in the tag.  An <tt class="rst-docutils literal">any</tt> tag matches any tag, while the
 attribute matches any and all attributes.</p>
 <p>When a match fails, the reformatted example and gotten text is
 displayed (indented), and a rough diff-like output is given.  Anything
-marked with <tt class="rst-docutils literal"><span class="pre">-</span></tt> is in the output but wasn't supposed to be, and
-similarly <tt class="rst-docutils literal"><span class="pre">+</span></tt> means its in the example but wasn't in the output.</p>
-<p>You can disable parsing on one line with <tt class="rst-docutils literal"><span class="pre">#</span> <span class="pre">doctest:+NOPARSE_MARKUP</span></tt></p>
+marked with <tt class="rst-docutils literal">-</tt> is in the output but wasn't supposed to be, and
+similarly <tt class="rst-docutils literal">+</tt> means its in the example but wasn't in the output.</p>
+<p>You can disable parsing on one line with <tt class="rst-docutils literal"># <span class="pre">doctest:+NOPARSE_MARKUP</span></tt></p>
 
 <!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -328,6 +328,13 @@ doctest only.</td>
 ..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">basic</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">\n    &gt;&gt;&gt; temp_install()\n    &gt;&gt;&gt; print </code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'lxml'"><code class="variable-quote">'</code><code class="variable-string">lxml</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
 </table>
 <!-- ==================== FUNCTION DETAILS ==================== -->
 <a name="section-FunctionDetails"></a>
@@ -479,14 +486,14 @@ etree.HTMLParser(recover= False, remove_blank_text= True)
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

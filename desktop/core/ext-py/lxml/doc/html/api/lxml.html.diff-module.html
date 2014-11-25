@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -83,6 +83,14 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="str-class.html" class="summary-name" onclick="show_private();">basestring</a><br />
+      str(object='') -&gt; string
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="lxml.html.diff.DEL_START-class.html" class="summary-name" onclick="show_private();">DEL_START</a>
     </td>
   </tr>
@@ -108,7 +116,11 @@
     </td><td class="summary">
         <a href="lxml.html.diff.token-class.html" class="summary-name" onclick="show_private();">token</a><br />
       Represents a diffable token, generally a word that is displayed to
-the user.
+the user.  Opening tags are attached to this token when they are
+adjacent (pre_tags) and closing tags that follow the word
+(post_tags).  Some exceptions occur when there are empty tags
+adjacent to a word, so there may be close tags in pre_tags, or
+open tags in post_tags.
     </td>
   </tr>
 <tr class="private">
@@ -116,7 +128,9 @@ the user.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.diff.tag_token-class.html" class="summary-name" onclick="show_private();">tag_token</a><br />
-      Represents a token that is actually a tag.
+      Represents a token that is actually a tag.  Currently this is just
+the &lt;img&gt; tag, which takes up visible space just like a word but
+is only represented in a document by a tag.
     </td>
   </tr>
 <tr class="private">
@@ -124,7 +138,8 @@ the user.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.diff.href_token-class.html" class="summary-name" onclick="show_private();">href_token</a><br />
-      Represents the href in an anchor tag.
+      Represents the href in an anchor tag.  Unlike other words, we only
+show the href when it changes.
     </td>
   </tr>
 <tr class="private">
@@ -178,7 +193,7 @@ blocks amidst large spans of changes
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.diff-module.html#html_annotate" class="summary-sig-name">html_annotate</a>(<span class="summary-sig-arg">doclist</span>,
-        <span class="summary-sig-arg">markup</span>=<span class="summary-sig-default">&lt;function default_markup at 0xa876374&gt;</span>)</span><br />
+        <span class="summary-sig-arg">markup</span>=<span class="summary-sig-default">&lt;function default_markup at 0x2b9efb4670c8&gt;</span>)</span><br />
       doclist should be ordered from oldest to newest, like:</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#html_annotate">source&nbsp;code</a></span>
@@ -308,7 +323,9 @@ markup_func around text to add annotations.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.diff-module.html#htmldiff" class="summary-sig-name">htmldiff</a>(<span class="summary-sig-arg">old_html</span>,
         <span class="summary-sig-arg">new_html</span>)</span><br />
-      Do a diff of the old and new document.</td>
+      Do a diff of the old and new document.  The documents are HTML
+<em>fragments</em> (str/UTF8 or unicode), they are not complete documents
+(i.e., no &lt;html&gt; tag).</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#htmldiff">source&nbsp;code</a></span>
             
@@ -381,10 +398,11 @@ here we add &lt;ins&gt;ins_chunks&lt;/ins&gt; to the end of that.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#merge_delete" class="summary-sig-name" onclick="show_private();">merge_delete</a>(<span class="summary-sig-arg">del_chunks</span>,
+          <td><span class="summary-sig"><a name="merge_delete"></a><span class="summary-sig-name">merge_delete</span>(<span class="summary-sig-arg">del_chunks</span>,
         <span class="summary-sig-arg">doc</span>)</span><br />
       Adds the text chunks in del_chunks to the document doc (another
-list of text chunks) with marker to show it is a delete.</td>
+list of text chunks) with marker to show it is a delete.
+cleanup_delete later resolves these markers into &lt;del&gt; tags.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#merge_delete">source&nbsp;code</a></span>
             
@@ -402,7 +420,8 @@ list of text chunks) with marker to show it is a delete.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.diff-module.html#cleanup_delete" class="summary-sig-name" onclick="show_private();">cleanup_delete</a>(<span class="summary-sig-arg">chunks</span>)</span><br />
       Cleans up any DEL_START/DEL_END markers in the document, replacing
-them with &lt;del&gt;&lt;/del&gt;.</td>
+them with &lt;del&gt;&lt;/del&gt;.  To do this while keeping the document
+valid, it may need to drop some tags (either start or end tags).</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#cleanup_delete">source&nbsp;code</a></span>
             
@@ -436,9 +455,11 @@ a list of text and tag chunks.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#split_delete" class="summary-sig-name" onclick="show_private();">split_delete</a>(<span class="summary-sig-arg">chunks</span>)</span><br />
+          <td><span class="summary-sig"><a name="split_delete"></a><span class="summary-sig-name">split_delete</span>(<span class="summary-sig-arg">chunks</span>)</span><br />
       Returns (stuff_before_DEL_START, stuff_inside_DEL_START_END,
-stuff_after_DEL_END).</td>
+stuff_after_DEL_END).  Returns the first case found (there may be
+more DEL_STARTs in stuff_after_DEL_END).  Raises NoDeletes if
+there's no DEL_START found.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#split_delete">source&nbsp;code</a></span>
             
@@ -458,7 +479,9 @@ stuff_after_DEL_END).</td>
         <span class="summary-sig-arg">pre_delete</span>,
         <span class="summary-sig-arg">post_delete</span>)</span><br />
       pre_delete and post_delete implicitly point to a place in the
-document (where the two were split).</td>
+document (where the two were split).  This moves that point (by
+popping items from one and pushing them onto the other).  It moves
+the point to try to find a place where unbalanced_start applies.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#locate_unbalanced_start">source&nbsp;code</a></span>
             
@@ -514,7 +537,8 @@ possibly moving the point earlier in the document.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.diff-module.html#parse_html" class="summary-sig-name" onclick="show_private();">parse_html</a>(<span class="summary-sig-arg">html</span>,
         <span class="summary-sig-arg">cleanup</span>=<span class="summary-sig-default">True</span>)</span><br />
-      Parses an HTML fragment, returning an lxml element.</td>
+      Parses an HTML fragment, returning an lxml element.  Note that the HTML will be
+wrapped in a &lt;div&gt; tag that was not in the original document.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#parse_html">source&nbsp;code</a></span>
             
@@ -530,11 +554,29 @@ possibly moving the point earlier in the document.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#cleanup_html" class="summary-sig-name" onclick="show_private();">cleanup_html</a>(<span class="summary-sig-arg">html</span>)</span><br />
+          <td><span class="summary-sig"><a name="cleanup_html"></a><span class="summary-sig-name">cleanup_html</span>(<span class="summary-sig-arg">html</span>)</span><br />
       This 'cleans' the HTML, meaning that any page structure is removed
-(only the contents of &lt;body&gt; are used, if there is any &lt;body).</td>
+(only the contents of &lt;body&gt; are used, if there is any &lt;body).
+Also &lt;ins&gt; and &lt;del&gt; tags are removed.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#cleanup_html">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#split_trailing_whitespace" class="summary-sig-name" onclick="show_private();">split_trailing_whitespace</a>(<span class="summary-sig-arg">word</span>)</span><br />
+      This function takes a word, such as 'test</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html.diff-pysrc.html#split_trailing_whitespace">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -569,7 +611,8 @@ possibly moving the point earlier in the document.</td>
         <span class="summary-sig-arg">include_hrefs</span>,
         <span class="summary-sig-arg">skip_tag</span>=<span class="summary-sig-default">False</span>)</span><br />
       Takes an lxml element el, and generates all the text chunks for
-that tag.</td>
+that tag.  Each start tag is a chunk, each word is a chunk, and each
+end tag is a chunk.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#flatten_el">source&nbsp;code</a></span>
             
@@ -585,8 +628,9 @@ that tag.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#split_words" class="summary-sig-name" onclick="show_private();">split_words</a>(<span class="summary-sig-arg">text</span>)</span><br />
-      Splits some text into words.</td>
+          <td><span class="summary-sig"><a name="split_words"></a><span class="summary-sig-name">split_words</span>(<span class="summary-sig-arg">text</span>)</span><br />
+      Splits some text into words. Includes trailing whitespace
+on each word when appropriate.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#split_words">source&nbsp;code</a></span>
             
@@ -619,8 +663,9 @@ that tag.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#end_tag" class="summary-sig-name" onclick="show_private();">end_tag</a>(<span class="summary-sig-arg">el</span>)</span><br />
-      The text representation of an end tag for a tag.</td>
+          <td><span class="summary-sig"><a name="end_tag"></a><span class="summary-sig-name">end_tag</span>(<span class="summary-sig-arg">el</span>)</span><br />
+      The text representation of an end tag for a tag.  Includes
+trailing whitespace when appropriate.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#end_tag">source&nbsp;code</a></span>
             
@@ -684,9 +729,10 @@ that tag.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.diff-module.html#fixup_ins_del_tags" class="summary-sig-name" onclick="show_private();">fixup_ins_del_tags</a>(<span class="summary-sig-arg">html</span>)</span><br />
+          <td><span class="summary-sig"><a name="fixup_ins_del_tags"></a><span class="summary-sig-name">fixup_ins_del_tags</span>(<span class="summary-sig-arg">html</span>)</span><br />
       Given an html string, move any &lt;ins&gt; or &lt;del&gt; tags inside of any
-block-level elements, e.g.</td>
+block-level elements, e.g. transform &lt;ins&gt;&lt;p&gt;word&lt;/p&gt;&lt;/ins&gt; to
+&lt;p&gt;&lt;ins&gt;word&lt;/ins&gt;&lt;/p&gt;</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#fixup_ins_del_tags">source&nbsp;code</a></span>
             
@@ -704,7 +750,8 @@ block-level elements, e.g.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.diff-module.html#serialize_html_fragment" class="summary-sig-name" onclick="show_private();">serialize_html_fragment</a>(<span class="summary-sig-arg">el</span>,
         <span class="summary-sig-arg">skip_outer</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Serialize a single lxml element as HTML.</td>
+      Serialize a single lxml element as HTML.  The serialized form
+includes the elements tail.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.diff-pysrc.html#serialize_html_fragment">source&nbsp;code</a></span>
             
@@ -881,7 +928,21 @@ given &lt;p&gt;Hi &lt;i&gt;there!&lt;/i&gt;&lt;/p&gt;, if you remove the &lt;i&g
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="split_words_re"></a><span class="summary-name">split_words_re</span> = <code title="re.compile(r'(?u)\S+(?:\s+|$)')">re.compile(r'<code class="re-flags">(?u)</code>\S<code class="re-op">+</code><code class="re-group">(?:</code>\s<code class="re-op">+</code><code class="re-op">|</code>$<code class="re-group">)</code>')</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="start_whitespace_re"></a><span class="summary-name">start_whitespace_re</span> = <code title="re.compile(r'^[ \t\n\r]')">re.compile(r'^<code class="re-group">[</code> \t\n\r<code class="re-group">]</code>')</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'lxml.html'"><code class="variable-quote">'</code><code class="variable-string">lxml.html</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>
@@ -911,7 +972,7 @@ given &lt;p&gt;Hi &lt;i&gt;there!&lt;/i&gt;&lt;/p&gt;, if you remove the &lt;i&g
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">html_annotate</span>(<span class="sig-arg">doclist</span>,
-        <span class="sig-arg">markup</span>=<span class="sig-default">&lt;function default_markup at 0xa876374&gt;</span>)</span>
+        <span class="sig-arg">markup</span>=<span class="sig-default">&lt;function default_markup at 0x2b9efb4670c8&gt;</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="lxml.html.diff-pysrc.html#html_annotate">source&nbsp;code</a></span>&nbsp;
@@ -971,28 +1032,6 @@ are noted inside the tag itself when there are changes.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="merge_delete"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">merge_delete</span>(<span class="sig-arg">del_chunks</span>,
-        <span class="sig-arg">doc</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#merge_delete">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Adds the text chunks in del_chunks to the document doc (another
-list of text chunks) with marker to show it is a delete.
-cleanup_delete later resolves these markers into &lt;del&gt; tags.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="cleanup_delete"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -1038,28 +1077,6 @@ a list of text and tag chunks.</p>
 not closed in this span.  Similarly, unbalanced_end is a list of
 tags that are closed but were not opened.  Extracting these might
 mean some reordering of the chunks.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="split_delete"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">split_delete</span>(<span class="sig-arg">chunks</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#split_delete">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Returns (stuff_before_DEL_START, stuff_inside_DEL_START_END,
-stuff_after_DEL_END).  Returns the first case found (there may be
-more DEL_STARTs in stuff_after_DEL_END).  Raises NoDeletes if
-there's no DEL_START found.
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1155,23 +1172,24 @@ rid of any &lt;ins&gt; and &lt;del&gt; tags.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="cleanup_html"></a>
+<a name="split_trailing_whitespace"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cleanup_html</span>(<span class="sig-arg">html</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">split_trailing_whitespace</span>(<span class="sig-arg">word</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#cleanup_html">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#split_trailing_whitespace">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  This 'cleans' the HTML, meaning that any page structure is removed
-(only the contents of &lt;body&gt; are used, if there is any &lt;body).
-Also &lt;ins&gt; and &lt;del&gt; tags are removed.
+  <blockquote>
+This function takes a word, such as 'test</blockquote>
+<p>' and returns ('test','</p>
+<p>')</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1197,67 +1215,6 @@ that tag.  Each start tag is a chunk, each word is a chunk, and each
 end tag is a chunk.</p>
 <p>If skip_tag is true, then the outermost container tag is
 not returned (just its contents).</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="split_words"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">split_words</span>(<span class="sig-arg">text</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#split_words">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Splits some text into words. Includes trailing whitespace (one
-space) on each word when appropriate.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="end_tag"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">end_tag</span>(<span class="sig-arg">el</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#end_tag">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  The text representation of an end tag for a tag.  Includes
-trailing whitespace when appropriate.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="fixup_ins_del_tags"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">fixup_ins_del_tags</span>(<span class="sig-arg">html</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.diff-pysrc.html#fixup_ins_del_tags">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Given an html string, move any &lt;ins&gt; or &lt;del&gt; tags inside of any
-block-level elements, e.g. transform &lt;ins&gt;&lt;p&gt;word&lt;/p&gt;&lt;/ins&gt; to
-&lt;p&gt;&lt;ins&gt;word&lt;/ins&gt;&lt;/p&gt;
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1406,14 +1363,14 @@ includes the elements tail.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

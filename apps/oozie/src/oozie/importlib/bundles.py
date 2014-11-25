@@ -19,6 +19,7 @@ import json
 import logging
 from lxml import etree
 
+from defusedxml.lxml import fromstring
 from django.utils.translation import ugettext as _
 
 from oozie.models import Coordinator, BundledCoordinator
@@ -120,7 +121,7 @@ def import_bundle_root(bundle, bundle_definition_root, metadata=None):
 
 def import_bundle(bundle, bundle_definition, metadata=None):
   # Parse Bundle Definition
-  bundle_definition_root = etree.fromstring(bundle_definition)
+  bundle_definition_root = fromstring(bundle_definition)
   if bundle_definition_root is None:
     raise RuntimeError(_("Could not find any nodes in Bundle definition. Maybe it's malformed?"))
 

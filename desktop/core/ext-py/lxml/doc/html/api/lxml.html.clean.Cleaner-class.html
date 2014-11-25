@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -74,57 +74,66 @@ object --+
 elements.  The cleaning is controlled by attributes; you can
 override attributes in a subclass, or set them in the constructor.</p>
 <dl class="rst-docutils">
-<dt><tt class="rst-docutils literal"><span class="pre">scripts</span></tt>:</dt>
-<dd>Removes any <tt class="rst-docutils literal"><span class="pre">&lt;script&gt;</span></tt> tags.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">javascript</span></tt>:</dt>
-<dd>Removes any Javascript, like an <tt class="rst-docutils literal"><span class="pre">onclick</span></tt> attribute.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">comments</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">scripts</tt>:</dt>
+<dd>Removes any <tt class="rst-docutils literal">&lt;script&gt;</tt> tags.</dd>
+<dt><tt class="rst-docutils literal">javascript</tt>:</dt>
+<dd>Removes any Javascript, like an <tt class="rst-docutils literal">onclick</tt> attribute. Also removes stylesheets
+as they could contain Javascript.</dd>
+<dt><tt class="rst-docutils literal">comments</tt>:</dt>
 <dd>Removes any comments.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">style</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">style</tt>:</dt>
 <dd>Removes any style tags or attributes.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">links</span></tt>:</dt>
-<dd>Removes any <tt class="rst-docutils literal"><span class="pre">&lt;link&gt;</span></tt> tags</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">meta</span></tt>:</dt>
-<dd>Removes any <tt class="rst-docutils literal"><span class="pre">&lt;meta&gt;</span></tt> tags</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">page_structure</span></tt>:</dt>
-<dd>Structural parts of a page: <tt class="rst-docutils literal"><span class="pre">&lt;head&gt;</span></tt>, <tt class="rst-docutils literal"><span class="pre">&lt;html&gt;</span></tt>, <tt class="rst-docutils literal"><span class="pre">&lt;title&gt;</span></tt>.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">processing_instructions</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">links</tt>:</dt>
+<dd>Removes any <tt class="rst-docutils literal">&lt;link&gt;</tt> tags</dd>
+<dt><tt class="rst-docutils literal">meta</tt>:</dt>
+<dd>Removes any <tt class="rst-docutils literal">&lt;meta&gt;</tt> tags</dd>
+<dt><tt class="rst-docutils literal">page_structure</tt>:</dt>
+<dd>Structural parts of a page: <tt class="rst-docutils literal">&lt;head&gt;</tt>, <tt class="rst-docutils literal">&lt;html&gt;</tt>, <tt class="rst-docutils literal">&lt;title&gt;</tt>.</dd>
+<dt><tt class="rst-docutils literal">processing_instructions</tt>:</dt>
 <dd>Removes any processing instructions.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">embedded</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">embedded</tt>:</dt>
 <dd>Removes any embedded objects (flash, iframes)</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">frames</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">frames</tt>:</dt>
 <dd>Removes any frame-related tags</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">forms</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">forms</tt>:</dt>
 <dd>Removes any form tags</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">annoying_tags</span></tt>:</dt>
-<dd>Tags that aren't <em>wrong</em>, but are annoying.  <tt class="rst-docutils literal"><span class="pre">&lt;blink&gt;</span></tt> and <tt class="rst-docutils literal"><span class="pre">&lt;marque&gt;</span></tt></dd>
-<dt><tt class="rst-docutils literal"><span class="pre">remove_tags</span></tt>:</dt>
-<dd>A list of tags to remove.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">allow_tags</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">annoying_tags</tt>:</dt>
+<dd>Tags that aren't <em>wrong</em>, but are annoying.  <tt class="rst-docutils literal">&lt;blink&gt;</tt> and <tt class="rst-docutils literal">&lt;marquee&gt;</tt></dd>
+<dt><tt class="rst-docutils literal">remove_tags</tt>:</dt>
+<dd>A list of tags to remove.  Only the tags will be removed,
+their content will get pulled up into the parent tag.</dd>
+<dt><tt class="rst-docutils literal">kill_tags</tt>:</dt>
+<dd>A list of tags to kill.  Killing also removes the tag's content,
+i.e. the whole subtree, not just the tag itself.</dd>
+<dt><tt class="rst-docutils literal">allow_tags</tt>:</dt>
 <dd>A list of tags to include (default include all).</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">remove_unknown_tags</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">remove_unknown_tags</tt>:</dt>
 <dd>Remove any tags that aren't standard parts of HTML.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">safe_attrs_only</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">safe_attrs_only</tt>:</dt>
 <dd>If true, only include 'safe' attributes (specifically the list
-from <a class="rst-reference external" href="http://feedparser.org/docs/html-sanitization.html" target="_top">feedparser</a>).</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">add_nofollow</span></tt>:</dt>
+from the feedparser HTML sanitisation web site).</dd>
+<dt><tt class="rst-docutils literal">safe_attrs</tt>:</dt>
+<dd>A set of attribute names to override the default list of attributes
+considered 'safe' (when safe_attrs_only=True).</dd>
+<dt><tt class="rst-docutils literal">add_nofollow</tt>:</dt>
 <dd>If true, then any &lt;a&gt; tags will have <tt class="rst-docutils literal"><span class="pre">rel=&quot;nofollow&quot;</span></tt> added to them.</dd>
-<dt><tt class="rst-docutils literal"><span class="pre">host_whitelist</span></tt>:</dt>
+<dt><tt class="rst-docutils literal">host_whitelist</tt>:</dt>
 <dd><p class="rst-first">A list or set of hosts that you can use for embedded content
-(for content like <tt class="rst-docutils literal"><span class="pre">&lt;object&gt;</span></tt>, <tt class="rst-docutils literal"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;stylesheet&quot;&gt;</span></tt>, etc).
+(for content like <tt class="rst-docutils literal">&lt;object&gt;</tt>, <tt class="rst-docutils literal">&lt;link <span class="pre">rel=&quot;stylesheet&quot;&gt;</span></tt>, etc).
 You can also implement/override the method
-<tt class="rst-docutils literal"><span class="pre">allow_embedded_url(el,</span> <span class="pre">url)</span></tt> or <tt class="rst-docutils literal"><span class="pre">allow_element(el)</span></tt> to
+<tt class="rst-docutils literal">allow_embedded_url(el, url)</tt> or <tt class="rst-docutils literal">allow_element(el)</tt> to
 implement more complex rules for what can be embedded.
 Anything that passes this test will be shown, regardless of
-the value of (for instance) <tt class="rst-docutils literal"><span class="pre">embedded</span></tt>.</p>
-<p class="rst-last">Note that this parameter might not work as intended if you do not
+the value of (for instance) <tt class="rst-docutils literal">embedded</tt>.</p>
+<p>Note that this parameter might not work as intended if you do not
 make the links absolute before doing the cleaning.</p>
+<p class="rst-last">Note that you may also need to set <tt class="rst-docutils literal">whitelist_tags</tt>.</p>
 </dd>
-<dt><tt class="rst-docutils literal"><span class="pre">whitelist_tags</span></tt>:</dt>
-<dd>A set of tags that can be included with <tt class="rst-docutils literal"><span class="pre">host_whitelist</span></tt>.
-The default is <tt class="rst-docutils literal"><span class="pre">iframe</span></tt> and <tt class="rst-docutils literal"><span class="pre">embed</span></tt>; you may wish to
-include other tags like <tt class="rst-docutils literal"><span class="pre">script</span></tt>, or you may want to
-implement <tt class="rst-docutils literal"><span class="pre">allow_embedded_url</span></tt> for more control.  Set to None to
+<dt><tt class="rst-docutils literal">whitelist_tags</tt>:</dt>
+<dd>A set of tags that can be included with <tt class="rst-docutils literal">host_whitelist</tt>.
+The default is <tt class="rst-docutils literal">iframe</tt> and <tt class="rst-docutils literal">embed</tt>; you may wish to
+include other tags like <tt class="rst-docutils literal">script</tt>, or you may want to
+implement <tt class="rst-docutils literal">allow_embedded_url</tt> for more control.  Set to None to
 include all tags.</dd>
 </dl>
 <p>This modifies the document <em>in place</em>.</p>
@@ -154,7 +163,7 @@ include all tags.</dd>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.clean.Cleaner-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">**kw</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.clean-pysrc.html#Cleaner.__init__">source&nbsp;code</a></span>
             
@@ -241,10 +250,11 @@ include all tags.</dd>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.clean.Cleaner-class.html#kill_conditional_comments" class="summary-sig-name">kill_conditional_comments</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="kill_conditional_comments"></a><span class="summary-sig-name">kill_conditional_comments</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">doc</span>)</span><br />
       IE conditional comments basically embed HTML that the parser
-doesn't normally see.</td>
+doesn't normally see.  We can't allow anything like that, so
+we'll kill any comments that could be conditional.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.clean-pysrc.html#Cleaner.kill_conditional_comments">source&nbsp;code</a></span>
             
@@ -317,8 +327,9 @@ occurrences of pattern in string by the replacement repl.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.html.clean.Cleaner-class.html#_has_sneaky_javascript" class="summary-sig-name" onclick="show_private();">_has_sneaky_javascript</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">style</span>)</span><br />
-      Depending on the browser, stuff like <tt class="rst-docutils literal"><span class="pre">e</span> <span class="pre">x</span> <span class="pre">p</span> <span class="pre">r</span> <span class="pre">e</span> <span class="pre">s</span> <span class="pre">s</span> <span class="pre">i</span> <span class="pre">o</span> <span class="pre">n(...)</span></tt>
-can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre/*</span> <span class="pre">stuff</span> <span class="pre">*/ssion(...)</span></tt>.</td>
+      Depending on the browser, stuff like <tt class="rst-docutils literal">e x p r e s s i o <span class="pre">n(...)</span></tt>
+can get interpreted, or <tt class="rst-docutils literal">expre/* stuff <span class="pre">*/ssion(...)</span></tt>.  This
+checks for attempt to do stuff like this.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.clean-pysrc.html#Cleaner._has_sneaky_javascript">source&nbsp;code</a></span>
             
@@ -349,6 +360,7 @@ can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
@@ -356,7 +368,9 @@ can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -466,14 +480,24 @@ can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="remove_tags"></a><span class="summary-name">remove_tags</span> = <code title="None">None</code>
+        <a name="remove_tags"></a><span class="summary-name">remove_tags</span> = <code title="None">None</code><br />
+      hash(x)
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="allow_tags"></a><span class="summary-name">allow_tags</span> = <code title="None">None</code>
+        <a name="allow_tags"></a><span class="summary-name">allow_tags</span> = <code title="None">None</code><br />
+      hash(x)
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="kill_tags"></a><span class="summary-name">kill_tags</span> = <code title="None">None</code><br />
+      hash(x)
     </td>
   </tr>
 <tr>
@@ -488,6 +512,21 @@ can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="safe_attrs_only"></a><span class="summary-name">safe_attrs_only</span> = <code title="True">True</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="lxml.html.clean.Cleaner-class.html#safe_attrs" class="summary-name">safe_attrs</a> = <code title="frozenset(['abbr',
+           'accept',
+           'accept-charset',
+           'accesskey',
+           'action',
+           'align',
+           'alt',
+           'axis',
+..."><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">abbr</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">accept</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">accept-charset</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">a</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -584,34 +623,12 @@ can get interpreted, or <tt class="rst-docutils literal"><span class="pre">expre
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+  x.__init__(...) initializes x; see help(type(x)) for signature
   <dl class="fields">
     <dt>Overrides:
         object.__init__
         <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="kill_conditional_comments"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">kill_conditional_comments</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">doc</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.clean-pysrc.html#Cleaner.kill_conditional_comments">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  IE conditional comments basically embed HTML that the parser
-doesn't normally see.  We can't allow anything like that, so
-we'll kill any comments that could be conditional.
-  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -630,8 +647,8 @@ we'll kill any comments that could be conditional.
     </td>
   </tr></table>
   
-  <p>Depending on the browser, stuff like <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">e</span> <span class="pre">x</span> <span class="pre">p</span> <span class="pre">r</span> <span class="pre">e</span> <span class="pre">s</span> <span class="pre">s</span> <span class="pre">i</span> <span class="pre">o</span> <span class="pre">n(...)</span></tt>
-can get interpreted, or <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">expre/*</span> <span class="pre">stuff</span> <span class="pre">*/ssion(...)</span></tt>.  This
+  <p>Depending on the browser, stuff like <tt class="rst-rst-docutils literal rst-docutils literal">e x p r e s s i o <span class="pre">n(...)</span></tt>
+can get interpreted, or <tt class="rst-rst-docutils literal rst-docutils literal">expre/* stuff <span class="pre">*/ssion(...)</span></tt>.  This
 checks for attempt to do stuff like this.</p>
 <p>Typically the response will be to kill the entire style; if you
 have just a bit of Javascript in the style another rule will catch
@@ -660,6 +677,32 @@ more sneaky attempts.</p>
   </td>
 </tr>
 </table>
+<a name="safe_attrs"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">safe_attrs</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">abbr</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">accept</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">accept-charset</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">accesskey</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">action</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">align</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">alt</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">axis</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="_tag_link_attrs"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -709,14 +752,14 @@ more sneaky attempts.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:39 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

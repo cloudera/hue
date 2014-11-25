@@ -1,28 +1,19 @@
-import sys, os
+import os
+import re
+import sys
+import fnmatch
 
-extra_options = {}
+# for command line options and supported environment variables, please
+# see the end of 'setupinfo.py'
+
+if sys.version_info < (2, 6) or sys.version_info[:2] in [(3, 0), (3, 1)]:
+    print("This lxml version requires Python 2.6, 2.7, 3.2 or later.")
+    sys.exit(1)
 
 try:
-    import Cython
-    # may need to work around setuptools bug by providing a fake Pyrex
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "fake_pyrex"))
-except ImportError:
-    pass
-
-try:
-    import pkg_resources
-    try:
-        pkg_resources.require("setuptools>=0.6c5")
-    except pkg_resources.VersionConflict:
-        from ez_setup import use_setuptools
-        use_setuptools(version="0.6c5")
-    #pkg_resources.require("Cython==0.9.6.10")
     from setuptools import setup
-    extra_options["zip_safe"] = False
 except ImportError:
-    # no setuptools installed
     from distutils.core import setup
-
 
 import versioninfo
 import setupinfo
@@ -43,11 +34,14 @@ print("Building lxml version %s." % svn_version)
 OPTION_RUN_TESTS = setupinfo.has_option('run-tests')
 
 branch_link = """
-After an official release of a new stable series, current bug fixes become
-available at http://codespeak.net/svn/lxml/branch/lxml-%(branch_version)s .
-Running ``easy_install lxml==%(branch_version)sbugfix`` will install this
-version from
-http://codespeak.net/svn/lxml/branch/lxml-%(branch_version)s#egg=lxml-%(branch_version)sbugfix
+After an official release of a new stable series, bug fixes may become
+available at
+https://github.com/lxml/lxml/tree/lxml-%(branch_version)s .
+Running ``easy_install lxml==%(branch_version)sbugfix`` will install
+the unreleased branch state from
+https://github.com/lxml/lxml/tarball/lxml-%(branch_version)s#egg=lxml-%(branch_version)sbugfix
+as soon as a maintenance branch has been established.  Note that this
+requires Cython to be installed at an appropriate version for the build.
 
 """
 
@@ -55,17 +49,138 @@ if versioninfo.is_pre_release():
     branch_link = ""
 
 
+extra_options = {}
+if 'setuptools' in sys.modules:
+    extra_options['zip_safe'] = False
+
+    try:
+        import pkg_resources
+    except ImportError:
+        pass
+    else:
+        f = open("requirements.txt", "r")
+        try:
+            deps = [str(req) for req in pkg_resources.parse_requirements(f)]
+        finally:
+            f.close()
+        extra_options['extras_require'] = {
+            'source': deps,
+            'cssselect': 'cssselect>=0.7',
+            'html5': 'html5lib',
+            'htmlsoup': 'BeautifulSoup4',
+        }
+
 extra_options.update(setupinfo.extra_setup_args())
+
+extra_options['package_data'] = {
+    'lxml': [
+        'lxml.etree.h',
+        'lxml.etree_api.h',
+    ],
+    'lxml.includes': [
+        '*.pxd', '*.h'
+        ],
+    'lxml.isoschematron':  [
+        'resources/rng/iso-schematron.rng',
+        'resources/xsl/*.xsl',
+        'resources/xsl/iso-schematron-xslt1/*.xsl',
+        'resources/xsl/iso-schematron-xslt1/readme.txt'
+        ],
+    }
+
+extra_options['package_dir'] = {
+        '': 'src'
+    }
+
+extra_options['packages'] = [
+        'lxml', 'lxml.includes', 'lxml.html', 'lxml.isoschematron'
+    ]
+
+
+def setup_extra_options():
+    is_interesting_package = re.compile('^(libxml|libxslt|libexslt)$').match
+    def extract_files(directories, pattern='*'):
+        def get_files(root, dir_path, files):
+            return [ (root, dir_path, filename)
+                     for filename in fnmatch.filter(files, pattern) ]
+
+        file_list = []
+        for dir_path in directories:
+            dir_path = os.path.realpath(dir_path)
+            for root, dirs, files in os.walk(dir_path):
+                rel_dir = root[len(dir_path)+1:]
+                if is_interesting_package(rel_dir):
+                    file_list.extend(get_files(root, rel_dir, files))
+        return file_list
+
+    def build_packages(files):
+        packages = {}
+        seen = set()
+        for root_path, rel_path, filename in files:
+            if filename in seen:
+                # libxml2/libxslt header filenames are unique
+                continue
+            seen.add(filename)
+            package_path = '.'.join(rel_path.split(os.sep))
+            if package_path in packages:
+                root, package_files = packages[package_path]
+                if root != root_path:
+                    print("conflicting directories found for include package '%s': %s and %s"
+                          % (package_path, root_path, root))
+                    continue
+            else:
+                package_files = []
+                packages[package_path] = (root_path, package_files)
+            package_files.append(filename)
+
+        return packages
+
+    # Copy Global Extra Options
+    extra_opts = dict(extra_options)
+
+    # Build ext modules
+    ext_modules = setupinfo.ext_modules(
+                    STATIC_INCLUDE_DIRS, STATIC_LIBRARY_DIRS,
+                    STATIC_CFLAGS, STATIC_BINARIES)
+    extra_opts['ext_modules'] = ext_modules
+
+    packages = extra_opts.get('packages', list())
+    package_dir = extra_opts.get('package_dir', dict())
+    package_data = extra_opts.get('package_data', dict())
+
+    # Add lxml.include with (lxml, libxslt headers...)
+    #   python setup.py build --static --static-deps install
+    #   python setup.py bdist_wininst --static
+    if setupinfo.OPTION_STATIC:
+        include_dirs = [] # keep them in order
+        for extension in ext_modules:
+            for inc_dir in extension.include_dirs:
+                if inc_dir not in include_dirs:
+                    include_dirs.append(inc_dir)
+
+        header_packages = build_packages(extract_files(include_dirs))
+
+        for package_path, (root_path, filenames) in header_packages.items():
+            if package_path:
+                package = 'lxml.includes.' + package_path
+                packages.append(package)
+            else:
+                package = 'lxml.includes'
+            package_data[package] = filenames
+            package_dir[package] = root_path
+
+    return extra_opts
 
 setup(
     name = "lxml",
     version = versioninfo.version(),
     author="lxml dev team",
-    author_email="lxml-dev@codespeak.net",
+    author_email="lxml-dev@lxml.de",
     maintainer="lxml dev team",
-    maintainer_email="lxml-dev@codespeak.net",
-    url="http://codespeak.net/lxml",
+    maintainer_email="lxml-dev@lxml.de",
+    url="http://lxml.de/",
     download_url="http://pypi.python.org/packages/source/l/lxml/lxml-%s.tar.gz" % versioninfo.version(),
+    bugtrack_url="https://bugs.launchpad.net/lxml",
 
     description="Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API.",
 
@@ -78,13 +193,17 @@ It extends the ElementTree API significantly to offer support for XPath,
 RelaxNG, XML Schema, XSLT, C14N and much more.
 
 To contact the project, go to the `project home page
-<http://codespeak.net>`_ or see our bug tracker at
+<http://lxml.de/>`_ or see our bug tracker at
 https://launchpad.net/lxml
 
-In case you want to use the current in-development version of lxml, you can
-get it from the subversion repository at http://codespeak.net/svn/lxml/trunk .
-Running ``easy_install lxml==dev`` will install it from
-http://codespeak.net/svn/lxml/trunk#egg=lxml-dev
+In case you want to use the current in-development version of lxml,
+you can get it from the github repository at
+https://github.com/lxml/lxml .  Note that this requires Cython to
+build the sources, see the build instructions on the project home
+page.  To the same end, running ``easy_install lxml==dev`` will
+install lxml from
+https://github.com/lxml/lxml/tarball/master#egg=lxml-dev if you have
+an appropriate version of Cython installed.
 
 """ + branch_link) % { "branch_version" : versioninfo.branch_version() }) +
                       versioninfo.changes()),
@@ -95,12 +214,12 @@ http://codespeak.net/svn/lxml/trunk#egg=lxml-dev
     'License :: OSI Approved :: BSD License',
     'Programming Language :: Cython',
     'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.3',
-    'Programming Language :: Python :: 2.4',
-    'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.0',
+    'Programming Language :: Python :: 3.2',
+    'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
     'Programming Language :: C',
     'Operating System :: OS Independent',
     'Topic :: Text Processing :: Markup :: HTML',
@@ -108,12 +227,7 @@ http://codespeak.net/svn/lxml/trunk#egg=lxml-dev
     'Topic :: Software Development :: Libraries :: Python Modules'
     ],
 
-    package_dir = {'': 'src'},
-    packages = ['lxml', 'lxml.html'],
-    ext_modules = setupinfo.ext_modules(
-        STATIC_INCLUDE_DIRS, STATIC_LIBRARY_DIRS,
-        STATIC_CFLAGS, STATIC_BINARIES),
-    **extra_options
+    **setup_extra_options()
 )
 
 if OPTION_RUN_TESTS:

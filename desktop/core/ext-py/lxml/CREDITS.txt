@@ -15,10 +15,10 @@ Ian Bicking
        creator and maintainer of lxml.html
 
 Holger Joukl
-       bug reports, feedback and development on lxml.objectify
+       ISO-Schematron support, development on lxml.objectify, bug reports, feedback
 
-Sidnei da Silva
-       official MS Windows builds
+Simon Sapin
+       external maintenance and development of the cssselect package
 
 Marc-Antoine Parent
        XPath extension function help and patches
@@ -54,6 +54,12 @@ David Sankel
 Marcin Kasperski
        PDF documentation generation
 
+Sidnei da Silva
+       official MS Windows builds
+
+Pascal Oberndörfer
+       official Mac-OS builds
+
 ... and lots of other people who contributed to lxml by reporting
 bugs, discussing its functionality or blaming the docs for the bugs in
 their code.  Thank you all, user feedback and discussions form a very
@@ -68,8 +74,10 @@ Special thanks goes to:
 * Fredrik Lundh for ElementTree, its API, and the competition through
   cElementTree.
 
-* Greg Ewing (Pyrex) and Robert Bradshaw (Cython) for the binding
-  technology.
+* Greg Ewing (Pyrex) and Robert Bradshaw et al. (Cython) for the
+  binding technology.
+
+* Jonathan Stoppani for hosting the new mailing list on lxml.de.
 
 * the codespeak crew, in particular Philipp von Weitershausen and
-  Holger Krekel for hosting lxml on codespeak.net
+  Holger Krekel for originally hosting lxml on codespeak.net

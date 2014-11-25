@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -63,11 +63,9 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class ElementDepthFirstIterator</h1><p class="nomargin-top"></p>
 <pre class="base-tree">
-        object --+    
-                 |    
-<a href="lxml.etree._ElementTagMatcher-class.html" onclick="show_private();">_ElementTagMatcher</a> --+
-                     |
-                    <strong class="uidshort">ElementDepthFirstIterator</strong>
+object --+
+         |
+        <strong class="uidshort">ElementDepthFirstIterator</strong>
 </pre>
 
 <hr />
@@ -75,11 +73,11 @@
 Iterates over an element and its sub-elements in document order (depth
 first pre-order).</p>
 <p>Note that this also includes comments, entities and processing
-instructions.  To filter them out, check if the <tt class="rst-docutils literal"><span class="pre">tag</span></tt> property
+instructions.  To filter them out, check if the <tt class="rst-docutils literal">tag</tt> property
 of the returned element is a string (i.e. not None and not a
-factory function), or pass the <tt class="rst-docutils literal"><span class="pre">Element</span></tt> factory for the <tt class="rst-docutils literal"><span class="pre">tag</span></tt>
-keyword.</p>
-<p>If the optional <tt class="rst-docutils literal"><span class="pre">tag</span></tt> argument is not None, the iterator returns only
+factory function), or pass the <tt class="rst-docutils literal">Element</tt> factory for the <tt class="rst-docutils literal">tag</tt>
+argument to receive only Elements.</p>
+<p>If the optional <tt class="rst-docutils literal">tag</tt> argument is not None, the iterator returns only
 the elements that match the respective name and namespace.</p>
 <p>The optional boolean argument 'inclusive' defaults to True and can be set
 to False to exclude the start element itself.</p>
@@ -109,27 +107,8 @@ tree it traverses is modified during iteration.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree.ElementDepthFirstIterator-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">node</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">inclusive</span>=<span class="summary-sig-default">True</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      iter(x)</td>
           <td align="right" valign="top">
             
             
@@ -193,13 +172,17 @@ tree it traverses is modified during iteration.</p>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -247,32 +230,6 @@ tree it traverses is modified during iteration.</p>
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">node</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">inclusive</span>=<span class="sig-default">True</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
-  <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -323,14 +280,14 @@ tree it traverses is modified during iteration.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -12,11 +12,11 @@ if this_dir not in sys.path:
     sys.path.insert(0, this_dir) # needed for Py3
 
 from common_imports import etree, StringIO, BytesIO, fileInTestDir, _bytes, _str
-from common_imports import SillyFileLike, HelperTestCase
+from common_imports import SillyFileLike, HelperTestCase, write_to_file, next
 
 try:
-    unicode = __builtins__["unicode"]
-except (NameError, KeyError):
+    unicode
+except NameError:
     unicode = str
 
 class HtmlParserTestCase(HelperTestCase):
@@ -31,8 +31,11 @@ class HtmlParserTestCase(HelperTestCase):
 <body><h1>page title</h1></body>
 </html>
 """)
-    broken_html_str = _bytes("<html><head><title>test<body><h1>page title</h3></p></html>")
-    uhtml_str = _str("<html><head><title>test Ã¡\uF8D2</title></head><body><h1>page Ã¡\uF8D2 title</h1></body></html>")
+    broken_html_str = _bytes("<html><head><title>test"
+                             "<body><h1>page title</h3></p></html>")
+    uhtml_str = _bytes(
+        "<html><head><title>test Ã¡</title></head>"
+        "<body><h1>page Ã¡ title</h1></body></html>").decode('utf8')
 
     def tearDown(self):
         super(HtmlParserTestCase, self).tearDown()
@@ -45,9 +48,22 @@ class HtmlParserTestCase(HelperTestCase):
 
     def test_module_HTML_unicode(self):
         element = self.etree.HTML(self.uhtml_str)
-        self.assertEqual(unicode(self.etree.tostring(element, method="html",
-                                                     encoding='UTF8'), 'UTF8'),
-                         unicode(self.uhtml_str.encode('UTF8'), 'UTF8'))
+        self.assertEqual(
+            self.etree.tostring(element, method="html", encoding='unicode'),
+            self.uhtml_str)
+        self.assertEqual(element.findtext('.//h1'),
+                         _bytes("page Ã¡ title").decode('utf8'))
+
+    def test_wide_unicode_xml(self):
+        if sys.maxunicode < 1114111:
+            return  # skip test
+        element = self.etree.HTML(_bytes(
+            '<html><body><p>\\U00026007</p></body></html>'
+        ).decode('unicode_escape'))
+        p_text = element.findtext('.//p')
+        self.assertEqual(1, len(p_text))
+        self.assertEqual(_bytes('\\U00026007').decode('unicode_escape'),
+                         p_text)
 
     def test_module_HTML_pretty_print(self):
         element = self.etree.HTML(self.html_str)
@@ -77,14 +93,14 @@ class HtmlParserTestCase(HelperTestCase):
         Element = parser.makeelement
 
         pname = Element('p:name')
-        self.assertEquals(pname.tag, 'p:name')
+        self.assertEqual(pname.tag, 'p:name')
 
         pname = Element('{test}p:name')
-        self.assertEquals(pname.tag, '{test}p:name')
+        self.assertEqual(pname.tag, '{test}p:name')
 
         pname = Element('name')
         pname.tag = 'p:name'
-        self.assertEquals(pname.tag, 'p:name')
+        self.assertEqual(pname.tag, 'p:name')
 
     def test_html_element_name_quote(self):
         parser = self.etree.HTMLParser()
@@ -98,7 +114,7 @@ class HtmlParserTestCase(HelperTestCase):
         el = Element('name')
         self.assertRaises(ValueError, setattr, el, 'tag', "pname'")
         self.assertRaises(ValueError, setattr, el, 'tag', '"pname')
-        self.assertEquals(el.tag, "name")
+        self.assertEqual(el.tag, "name")
 
     def test_html_element_name_space(self):
         parser = self.etree.HTMLParser()
@@ -110,7 +126,7 @@ class HtmlParserTestCase(HelperTestCase):
 
         el = Element('name')
         self.assertRaises(ValueError, setattr, el, 'tag', ' name ')
-        self.assertEquals(el.tag, "name")
+        self.assertEqual(el.tag, "name")
 
     def test_html_subelement_name_empty(self):
         parser = self.etree.HTMLParser()
@@ -129,10 +145,10 @@ class HtmlParserTestCase(HelperTestCase):
 
         el = Element('name')
         pname = SubElement(el, 'p:name')
-        self.assertEquals(pname.tag, 'p:name')
+        self.assertEqual(pname.tag, 'p:name')
 
         pname = SubElement(el, '{test}p:name')
-        self.assertEquals(pname.tag, '{test}p:name')
+        self.assertEqual(pname.tag, '{test}p:name')
 
     def test_html_subelement_name_quote(self):
         parser = self.etree.HTMLParser()
@@ -170,7 +186,7 @@ class HtmlParserTestCase(HelperTestCase):
             BytesIO(html_latin1),
             self.etree.HTMLParser(encoding="iso-8859-1"))
         p = tree.find("//p")
-        self.assertEquals(p.text, text)
+        self.assertEqual(p.text, text)
 
     def test_parse_encoding_8bit_override(self):
         text = _str('Søk på nettet')
@@ -191,7 +207,7 @@ class HtmlParserTestCase(HelperTestCase):
             BytesIO(html_latin1),
             self.etree.HTMLParser(encoding="iso-8859-1"))
         p = tree.find("//p")
-        self.assertEquals(p.text, text)
+        self.assertEqual(p.text, text)
 
     def test_module_HTML_broken(self):
         element = self.etree.HTML(self.broken_html_str)
@@ -202,7 +218,7 @@ class HtmlParserTestCase(HelperTestCase):
         # by default, libxml2 generates CDATA nodes for <script> content
         html = _bytes('<html><head><style>foo</style></head></html>')
         element = self.etree.HTML(html)
-        self.assertEquals(element[0][0].text, "foo")
+        self.assertEqual(element[0][0].text, "foo")
 
     def test_module_HTML_access(self):
         element = self.etree.HTML(self.html_str)
@@ -211,7 +227,7 @@ class HtmlParserTestCase(HelperTestCase):
     def test_module_parse_html(self):
         parser = self.etree.HTMLParser()
         filename = tempfile.mktemp(suffix=".html")
-        open(filename, 'wb').write(self.html_str)
+        write_to_file(filename, self.html_str, 'wb')
         try:
             f = open(filename, 'rb')
             tree = self.etree.parse(f, parser)
@@ -264,29 +280,232 @@ class HtmlParserTestCase(HelperTestCase):
             '<html><head><title>TITLE</title><body><p>P</p></body></html>')
 
         iterator = iterparse(f, html=True)
-        self.assertEquals(None, iterator.root)
+        self.assertEqual(None, iterator.root)
 
         events = list(iterator)
         root = iterator.root
-        self.assert_(root is not None)
-        self.assertEquals(
+        self.assertTrue(root is not None)
+        self.assertEqual(
             [('end', root[0][0]), ('end', root[0]), ('end', root[1][0]),
              ('end', root[1]), ('end', root)],
             events)
 
-    def test_html_iterparse_file(self):
+    def test_html_iterparse_stop_short(self):
         iterparse = self.etree.iterparse
-        iterator = iterparse(fileInTestDir("css_shakespear.html"),
-                             html=True)
+        f = BytesIO(
+            '<html><head><title>TITLE</title><body><p>P</p></body></html>')
 
-        self.assertEquals(None, iterator.root)
+        iterator = iterparse(f, html=True)
+        self.assertEqual(None, iterator.root)
+
+        event, element = next(iterator)
+        self.assertEqual('end', event)
+        self.assertEqual('title', element.tag)
+        self.assertEqual(None, iterator.root)
+        del element
+
+        event, element = next(iterator)
+        self.assertEqual('end', event)
+        self.assertEqual('head', element.tag)
+        self.assertEqual(None, iterator.root)
+        del element
+        del iterator
+
+    def test_html_iterparse_broken(self):
+        iterparse = self.etree.iterparse
+        f = BytesIO('<head><title>TEST></head><p>P<br></div>')
+
+        iterator = iterparse(f, html=True)
+        self.assertEqual(None, iterator.root)
+
         events = list(iterator)
         root = iterator.root
-        self.assert_(root is not None)
-        self.assertEquals(249, len(events))
-        self.assertEquals(
-            [],
-            [ event for (event, element) in events if event != 'end' ])
+        self.assertTrue(root is not None)
+        self.assertEqual('html', root.tag)
+        self.assertEqual('head', root[0].tag)
+        self.assertEqual('body', root[1].tag)
+        self.assertEqual('p', root[1][0].tag)
+        self.assertEqual('br', root[1][0][0].tag)
+        self.assertEqual(
+            [('end', root[0][0]), ('end', root[0]), ('end', root[1][0][0]),
+             ('end', root[1][0]), ('end', root[1]), ('end', root)],
+            events)
+
+    def test_html_iterparse_broken_no_recover(self):
+        iterparse = self.etree.iterparse
+        f = BytesIO('<p>P<br></div>')
+        iterator = iterparse(f, html=True, recover=False)
+        self.assertRaises(self.etree.XMLSyntaxError, list, iterator)
+
+    def test_html_iterparse_file(self):
+        iterparse = self.etree.iterparse
+        iterator = iterparse(fileInTestDir("shakespeare.html"),
+                             html=True)
+
+        self.assertEqual(None, iterator.root)
+        events = list(iterator)
+        root = iterator.root
+        self.assertTrue(root is not None)
+        self.assertEqual(249, len(events))
+        self.assertFalse(
+            [event for (event, element) in events if event != 'end'])
+
+    def test_html_iterparse_start(self):
+        iterparse = self.etree.iterparse
+        f = BytesIO(
+            '<html><head><title>TITLE</title><body><p>P</p></body></html>')
+
+        iterator = iterparse(f, html=True, events=('start',))
+        self.assertEqual(None, iterator.root)
+
+        events = list(iterator)
+        root = iterator.root
+        self.assertNotEqual(None, root)
+        self.assertEqual(
+            [('start', root), ('start', root[0]), ('start', root[0][0]),
+                ('start', root[1]), ('start', root[1][0])],
+            events)
+
+    def test_html_feed_parser(self):
+        parser = self.etree.HTMLParser()
+        parser.feed("<html><body></")
+        parser.feed("body></html>")
+        root = parser.close()
+
+        self.assertEqual('html', root.tag)
+        # test that we find all names in the parser dict
+        self.assertEqual([root], list(root.iter('html')))
+        self.assertEqual([root[0]], list(root.iter('body')))
+
+    def test_html_feed_parser_chunky(self):
+        parser = self.etree.HTMLParser()
+        parser.feed("<htm")
+        parser.feed("l><body")
+        parser.feed("><")
+        parser.feed("p><")
+        parser.feed("strong")
+        parser.feed(">some ")
+        parser.feed("text</strong></p><")
+        parser.feed("/body></html>")
+        root = parser.close()
+
+        self.assertEqual('html', root.tag)
+        # test that we find all names in the parser dict
+        self.assertEqual([root], list(root.iter('html')))
+        self.assertEqual([root[0]], list(root.iter('body')))
+        self.assertEqual([root[0][0]], list(root.iter('p')))
+        self.assertEqual([root[0][0][0]], list(root.iter('strong')))
+
+    def test_html_feed_parser_more_tags(self):
+        parser = self.etree.HTMLParser()
+        parser.feed('<html><head>')
+        parser.feed('<title>TITLE</title><body><p>P</p></body><')
+        parser.feed("/html>")
+        root = parser.close()
+
+        self.assertEqual('html', root.tag)
+        # test that we find all names in the parser dict
+        self.assertEqual([root], list(root.iter('html')))
+        self.assertEqual([root[0]], list(root.iter('head')))
+        self.assertEqual([root[0][0]], list(root.iter('title')))
+        self.assertEqual([root[1]], list(root.iter('body')))
+        self.assertEqual([root[1][0]], list(root.iter('p')))
+
+    def test_html_parser_target_tag(self):
+        assertFalse  = self.assertFalse
+        events = []
+        class Target(object):
+            def start(self, tag, attrib):
+                events.append(("start", tag))
+                assertFalse(attrib)
+            def end(self, tag):
+                events.append(("end", tag))
+            def close(self):
+                return "DONE"
+
+        parser = self.etree.HTMLParser(target=Target())
+
+        parser.feed("<html><body></body></html>")
+        done = parser.close()
+
+        self.assertEqual("DONE", done)
+        self.assertEqual([
+            ("start", "html"), ("start", "body"),
+            ("end", "body"), ("end", "html")], events)
+
+    def test_html_parser_target_doctype_empty(self):
+        assertFalse  = self.assertFalse
+        events = []
+        class Target(object):
+            def start(self, tag, attrib):
+                events.append(("start", tag))
+                assertFalse(attrib)
+            def end(self, tag):
+                events.append(("end", tag))
+            def doctype(self, *args):
+                events.append(("doctype", args))
+            def close(self):
+                return "DONE"
+
+        parser = self.etree.HTMLParser(target=Target())
+        parser.feed("<!DOCTYPE><html><body></body></html>")
+        done = parser.close()
+
+        self.assertEqual("DONE", done)
+        self.assertEqual([
+            ("doctype", (None, None, None)),
+            ("start", "html"), ("start", "body"),
+            ("end", "body"), ("end", "html")], events)
+
+    def test_html_parser_target_doctype_html(self):
+        assertFalse  = self.assertFalse
+        events = []
+        class Target(object):
+            def start(self, tag, attrib):
+                events.append(("start", tag))
+                assertFalse(attrib)
+            def end(self, tag):
+                events.append(("end", tag))
+            def doctype(self, *args):
+                events.append(("doctype", args))
+            def close(self):
+                return "DONE"
+
+        parser = self.etree.HTMLParser(target=Target())
+        parser.feed("<!DOCTYPE html><html><body></body></html>")
+        done = parser.close()
+
+        self.assertEqual("DONE", done)
+        self.assertEqual([
+            ("doctype", ("html", None, None)),
+            ("start", "html"), ("start", "body"),
+            ("end", "body"), ("end", "html")], events)
+
+    def test_html_parser_target_doctype_html_full(self):
+        assertFalse  = self.assertFalse
+        events = []
+        class Target(object):
+            def start(self, tag, attrib):
+                events.append(("start", tag))
+                assertFalse(attrib)
+            def end(self, tag):
+                events.append(("end", tag))
+            def doctype(self, *args):
+                events.append(("doctype", args))
+            def close(self):
+                return "DONE"
+
+        parser = self.etree.HTMLParser(target=Target())
+        parser.feed('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "sys.dtd">'
+                    '<html><body></body></html>')
+        done = parser.close()
+
+        self.assertEqual("DONE", done)
+        self.assertEqual([
+            ("doctype", ("html", "-//W3C//DTD HTML 4.01//EN", "sys.dtd")),
+            ("start", "html"), ("start", "body"),
+            ("end", "body"), ("end", "html")], events)
+
 
 def test_suite():
     suite = unittest.TestSuite()

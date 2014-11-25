@@ -1,6 +1,19 @@
-import unittest
+import os
 import os.path
-import re, gc, sys
+import re
+import gc
+import sys
+import unittest
+
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse 
+
+try:
+    from urllib import pathname2url
+except:
+    from urllib.request import pathname2url
 
 from lxml import etree
 
@@ -13,31 +26,47 @@ def make_version_tuple(version_string):
             l.append(part)
     return tuple(l)
 
+IS_PYPY = (getattr(sys, 'implementation', None) == 'pypy' or
+           getattr(sys, 'pypy_version_info', None) is not None)
+
+IS_PYTHON3 = sys.version_info[0] >= 3
+
 try:
-    from elementtree import ElementTree # standard ET
+    from xml.etree import ElementTree # Python 2.5+
 except ImportError:
     try:
-        from xml.etree import ElementTree # Python 2.5+
+        from elementtree import ElementTree # standard ET
     except ImportError:
         ElementTree = None
 
 if hasattr(ElementTree, 'VERSION'):
-    if make_version_tuple(ElementTree.VERSION)[:2] < (1,3):
-        # compatibility tests require ET 1.3+
-        ElementTree = None
+    ET_VERSION = make_version_tuple(ElementTree.VERSION)
+else:
+    ET_VERSION = (0,0,0)
 
 try:
-    import cElementTree # standard ET
+    from xml.etree import cElementTree # Python 2.5+
 except ImportError:
     try:
-        from xml.etree import cElementTree # Python 2.5+
+        import cElementTree # standard ET
     except ImportError:
         cElementTree = None
 
 if hasattr(cElementTree, 'VERSION'):
-    if make_version_tuple(cElementTree.VERSION)[:2] <= (1,0):
-        # compatibility tests do not run with cET 1.0.7
-        cElementTree = None
+    CET_VERSION = make_version_tuple(cElementTree.VERSION)
+else:
+    CET_VERSION = (0,0,0)
+
+def filter_by_version(test_class, version_dict, current_version):
+    """Remove test methods that do not work with the current lib version.
+    """
+    find_required_version = version_dict.get
+    def dummy_test_method(self):
+        pass
+    for name in dir(test_class):
+        expected_version = find_required_version(name, (0,0,0))
+        if expected_version > current_version:
+            setattr(test_class, name, dummy_test_method)
 
 try:
     import doctest
@@ -60,19 +89,41 @@ except NameError:
 else:
     locals()['sorted'] = sorted
 
+
+try:
+    next
+except NameError:
+    def next(it):
+        return it.next()
+else:
+    locals()['next'] = next
+
+
+try:
+    import pytest
+except ImportError:
+    class skipif(object):
+        "Using a class because a function would bind into a method when used in classes"
+        def __init__(self, *args): pass
+        def __call__(self, func, *args): return func
+else:
+    skipif = pytest.mark.skipif
+
 def _get_caller_relative_path(filename, frame_depth=2):
     module = sys.modules[sys._getframe(frame_depth).f_globals['__name__']]
     return os.path.normpath(os.path.join(
             os.path.dirname(getattr(module, '__file__', '')), filename))
 
+from io import StringIO
+
 if sys.version_info[0] >= 3:
     # Python 3
-    unicode = str
+    from builtins import str as unicode
     def _str(s, encoding="UTF-8"):
         return s
     def _bytes(s, encoding="UTF-8"):
         return s.encode(encoding)
-    from io import StringIO, BytesIO as _BytesIO
+    from io import BytesIO as _BytesIO
     def BytesIO(*args):
         if args and isinstance(args[0], str):
             args = (args[0].encode("UTF-8"),)
@@ -83,7 +134,7 @@ if sys.version_info[0] >= 3:
     _fix_exceptions = re.compile(r'(.*except [^(]*),\s*(.*:)').sub
     def make_doctest(filename):
         filename = _get_caller_relative_path(filename)
-        doctests = open(filename).read()
+        doctests = read_file(filename)
         doctests = _fix_unicode(r'\1\2', doctests)
         doctests = _fix_exceptions(r'\1 as \2', doctests)
         return doctest.DocTestCase(
@@ -91,12 +142,12 @@ if sys.version_info[0] >= 3:
                 doctests, {}, os.path.basename(filename), filename, 0))
 else:
     # Python 2
+    from __builtin__ import unicode
     def _str(s, encoding="UTF-8"):
         return unicode(s, encoding=encoding)
     def _bytes(s, encoding="UTF-8"):
         return s
-    from StringIO import StringIO
-    BytesIO = StringIO
+    from io import BytesIO
 
     doctest_parser = doctest.DocTestParser()
     _fix_traceback = re.compile(r'^(\s*)(?:\w+\.)+(\w*(?:Error|Exception|Invalid):)', re.M).sub
@@ -104,7 +155,7 @@ else:
     _fix_bytes = re.compile(r'(\s+)b(["\'])').sub
     def make_doctest(filename):
         filename = _get_caller_relative_path(filename)
-        doctests = open(filename).read()
+        doctests = read_file(filename)
         doctests = _fix_traceback(r'\1\2', doctests)
         doctests = _fix_exceptions(r'\1, \2', doctests)
         doctests = _fix_bytes(r'\1\2', doctests)
@@ -112,12 +163,23 @@ else:
             doctest_parser.get_doctest(
                 doctests, {}, os.path.basename(filename), filename, 0))
 
+try:
+    skipIf = unittest.skipIf
+except AttributeError:
+    def skipIf(condition, why,
+               _skip=lambda test_method: None,
+               _keep=lambda test_method: test_method):
+        if condition:
+            return _skip
+        return _keep
+
+
 class HelperTestCase(unittest.TestCase):
     def tearDown(self):
         gc.collect()
 
     def parse(self, text, parser=None):
-        f = BytesIO(text)
+        f = BytesIO(text) if isinstance(text, bytes) else StringIO(text)
         return etree.parse(f, parser=parser)
     
     def _rootstring(self, tree):
@@ -129,7 +191,8 @@ class HelperTestCase(unittest.TestCase):
         unittest.TestCase.assertFalse
     except AttributeError:
         assertFalse = unittest.TestCase.failIf
-        
+
+
 class SillyFileLike:
     def __init__(self, xml_data=_bytes('<foo><bar/></foo>')):
         self.xml_data = xml_data
@@ -206,9 +269,33 @@ def fileInTestDir(name):
     _testdir = os.path.dirname(__file__)
     return os.path.join(_testdir, name)
 
+def path2url(path):
+    return urlparse.urljoin(
+        'file:', pathname2url(path))
+
+def fileUrlInTestDir(name):
+    return path2url(fileInTestDir(name))
+
+def read_file(name, mode='r'):
+    f = open(name, mode)
+    try:
+        data = f.read()
+    finally:
+        f.close()
+    return data
+
+def write_to_file(name, data, mode='w'):
+    f = open(name, mode)
+    try:
+        data = f.write(data)
+    finally:
+        f.close()
+
+def readFileInTestDir(name, mode='r'):
+    return read_file(fileInTestDir(name), mode)
+
 def canonicalize(xml):
-    f = BytesIO(xml)
-    tree = etree.parse(f)
+    tree = etree.parse(BytesIO(xml) if isinstance(xml, bytes) else StringIO(xml))
     f = BytesIO()
     tree.write_c14n(f)
     return f.getvalue()

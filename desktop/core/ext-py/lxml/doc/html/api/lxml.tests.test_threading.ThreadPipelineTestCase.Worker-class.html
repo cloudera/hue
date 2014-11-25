@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -108,7 +108,7 @@ threading._Verbose --+
         <span class="summary-sig-arg">in_queue</span>,
         <span class="summary-sig-arg">in_count</span>,
         <span class="summary-sig-arg">**kwargs</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+      This constructor should always be called with keyword arguments. Arguments are:</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.tests.test_threading-pysrc.html#ThreadPipelineTestCase.Worker.__init__">source&nbsp;code</a></span>
             
@@ -124,7 +124,8 @@ threading._Verbose --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.tests.test_threading.ThreadPipelineTestCase.Worker-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a href="lxml.tests.test_threading.ThreadPipelineTestCase.Worker-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Method representing the thread's activity.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.tests.test_threading-pysrc.html#ThreadPipelineTestCase.Worker.run">source&nbsp;code</a></span>
             
@@ -141,26 +142,32 @@ threading._Verbose --+
       <code>getName</code>,
       <code>isAlive</code>,
       <code>isDaemon</code>,
+      <code>is_alive</code>,
       <code>join</code>,
       <code>setDaemon</code>,
       <code>setName</code>,
       <code>start</code>
       </p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
-      <code>_set_daemon</code>
+      <code>_reset_internal_locks</code>,
+      <code>_set_daemon</code>,
+      <code>_set_ident</code>
       </p></div>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading._Verbose</code></b> (private):
       <code>_note</code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -184,6 +191,14 @@ threading._Verbose --+
 </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b>:
+      <code>daemon</code>,
+      <code>ident</code>,
+      <code>name</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
+      <code>_block</code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -226,7 +241,19 @@ threading._Verbose --+
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+  <p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form &quot;Thread-N&quot; where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
   <dl class="fields">
     <dt>Overrides:
         object.__init__
@@ -249,10 +276,15 @@ threading._Verbose --+
     </td>
   </tr></table>
   
-  
+  <p>Method representing the thread's activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object's constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
   <dl class="fields">
     <dt>Overrides:
         threading.Thread.run
+        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -282,14 +314,14 @@ threading._Verbose --+
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:41 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -123,7 +123,8 @@ This is the base class of all resolvers.
         <span class="summary-sig-arg">public_id</span>,
         <span class="summary-sig-arg">context</span>)</span><br />
       Override this method to resolve an external source by
-<tt class="rst-docutils literal"><span class="pre">system_url</span></tt> and <tt class="rst-docutils literal"><span class="pre">public_id</span></tt>.</td>
+<tt class="rst-docutils literal">system_url</tt> and <tt class="rst-docutils literal">public_id</tt>.  The third argument is an
+opaque context object.</td>
           <td align="right" valign="top">
             
             
@@ -160,7 +161,8 @@ This is the base class of all resolvers.
           <td><span class="summary-sig"><a href="lxml.etree.Resolver-class.html#resolve_file" class="summary-sig-name">resolve_file</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">f</span>,
         <span class="summary-sig-arg">context</span>,
-        <span class="summary-sig-arg">base_url</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">base_url</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">close</span>=<span class="summary-sig-default">True</span>)</span><br />
       Return an open file-like object as input document.</td>
           <td align="right" valign="top">
             
@@ -214,6 +216,7 @@ This is the base class of all resolvers.
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__init__</code>,
@@ -221,7 +224,9 @@ This is the base class of all resolvers.
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -312,7 +317,7 @@ This is the base class of all resolvers.
   </tr></table>
   
   <p>Override this method to resolve an external source by
-<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">system_url</span></tt> and <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">public_id</span></tt>.  The third argument is an
+<tt class="rst-rst-docutils literal rst-docutils literal">system_url</tt> and <tt class="rst-rst-docutils literal rst-docutils literal">public_id</tt>.  The third argument is an
 opaque context object.</p>
 <p>Return the result of one of the <tt class="rst-docutils literal"><span class="pre">resolve_*()</span></tt> methods.</p>
   <dl class="fields">
@@ -350,7 +355,8 @@ opaque context object.</p>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">resolve_file</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">f</span>,
         <span class="sig-arg">context</span>,
-        <span class="sig-arg">base_url</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">base_url</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">close</span>=<span class="sig-default">True</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -359,9 +365,10 @@ opaque context object.</p>
   
   <p>Return an open file-like object as input document.</p>
 <p>Pass open file and context as parameters.  You can pass the
-base URL or filename of the file through the <tt class="rst-docutils literal"><span class="pre">base_url</span></tt>
-keyword argument.</p>
-<p>Note that using <tt class="rst-docutils literal"><span class="pre">.resolve_filename()</span></tt> is more efficient,
+base URL or filename of the file through the <tt class="rst-docutils literal">base_url</tt>
+keyword argument.  If the <tt class="rst-docutils literal">close</tt> flag is True (the
+default), the file will be closed after reading.</p>
+<p>Note that using <tt class="rst-docutils literal">.resolve_filename()</tt> is more efficient,
 especially in threaded environments.</p>
   <dl class="fields">
   </dl>
@@ -409,7 +416,7 @@ URL with an HTTP, FTP or file target.</p>
   
   <p>Return a parsable string as input document.</p>
 <p>Pass data string and context as parameters.  You can pass the
-source URL or filename through the <tt class="rst-docutils literal"><span class="pre">base_url</span></tt> keyword
+source URL or filename through the <tt class="rst-docutils literal">base_url</tt> keyword
 argument.</p>
   <dl class="fields">
   </dl>
@@ -440,14 +447,14 @@ argument.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

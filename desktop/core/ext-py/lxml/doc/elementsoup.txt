@@ -23,6 +23,13 @@ parse a string or file using BeautifulSoup into an ``lxml.html``
 document, and ``convert_tree()`` to convert an existing BeautifulSoup
 tree into a list of top-level Elements.
 
+.. contents::
+..
+   1  Parsing with the soupparser
+   2  Entity handling
+   3  Using soupparser as a fallback
+   4  Using only the encoding detection
+
 
 Parsing with the soupparser
 ===========================
@@ -40,7 +47,7 @@ Here is a document full of tag soup, similar to, but not quite like, HTML:
 
 .. sourcecode:: pycon
 
-    >>> tag_soup = '<meta><head><title>Hello</head<body onload=crash()>Hi all<p>'
+    >>> tag_soup = '<meta><head><title>Hello</head><body onload=crash()>Hi all<p>'
 
 all you need to do is pass it to the ``fromstring()`` function:
 
@@ -54,7 +61,7 @@ To see what we have here, you can serialise it:
 .. sourcecode:: pycon
 
     >>> from lxml.etree import tostring
-    >>> print tostring(root, pretty_print=True),
+    >>> print(tostring(root, pretty_print=True).strip())
     <html>
       <meta/>
       <head>
@@ -69,6 +76,25 @@ already, right?  BeautifulSoup did its best, and so now it's a tree.
 To control which Element implementation is used, you can pass a
 ``makeelement`` factory function to ``parse()`` and ``fromstring()``.
 By default, this is based on the HTML parser defined in ``lxml.html``.
+
+For a quick comparison, libxml2 2.6.32 parses the same tag soup as
+follows.  The main difference is that libxml2 tries harder to adhere
+to the structure of an HTML document and moves misplaced tags where
+they (likely) belong.  Note, however, that the result can vary between
+parser versions.
+
+.. sourcecode:: html
+
+    <html>
+      <head>
+        <meta/>
+        <title>Hello</title>
+      </head>
+      <body>
+        <p>Hi all</p>
+        <p/>
+      </body>
+    </html>
 
 
 Entity handling
@@ -105,10 +131,10 @@ Any other encoding will output the respective byte sequences.
     >>> tostring(body, method="html", encoding="utf-8")
     '<body>\xc2\xa9\xe2\x82\xac-\xc3\xb5\xc6\xbd<p></p></body>'
 
-    >>> tostring(body, encoding=unicode)
+    >>> tostring(body, encoding='unicode')
     u'<body>\xa9\u20ac-\xf5\u01bd<p/></body>'
 
-    >>> tostring(body, method="html", encoding=unicode)
+    >>> tostring(body, method="html", encoding='unicode')
     u'<body>\xa9\u20ac-\xf5\u01bd<p></p></body>'
 
 
@@ -146,6 +172,30 @@ better.
 
     >>> root = lxml.html.fromstring(tag_soup)
     >>> try:
-    ...     ignore = tostring(root, encoding=unicode)
+    ...     ignore = tostring(root, encoding='unicode')
     ... except UnicodeDecodeError:
     ...     root = lxml.html.soupparser.fromstring(tag_soup)
+
+
+Using only the encoding detection
+=================================
+
+If you prefer a 'real' (and fast) HTML parser instead of the regular
+expression based one in BeautifulSoup, you can still benefit from
+BeautifulSoup's `support for encoding detection`_ in the
+``UnicodeDammit`` class.
+
+.. sourcecode:: pycon
+
+    >>> from BeautifulSoup import UnicodeDammit
+
+    >>> def decode_html(html_string):
+    ...     converted = UnicodeDammit(html_string, isHTML=True)
+    ...     if not converted.unicode:
+    ...         raise UnicodeDecodeError(
+    ...             "Failed to detect encoding, tried [%s]",
+    ...             ', '.join(converted.triedEncodings))
+    ...     # print converted.originalEncoding
+    ...     return converted.unicode
+
+    >>> root = lxml.html.fromstring(decode_html(tag_soup))

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -42,8 +42,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="lxml-module.html">Package&nbsp;lxml</a> ::
-        <a href="lxml.html-module.html">Package&nbsp;html</a> ::
+        lxml ::
+        html ::
+        SelectElement ::
         Class&nbsp;SelectElement
       </span>
     </td>
@@ -65,7 +66,7 @@
 <pre class="base-tree">
             object --+    
                      |    
-            <a href="lxml.html.InputMixin-class.html" onclick="show_private();">InputMixin</a> --+
+            <a href="lxml.html.InputMixin-class.html">InputMixin</a> --+
                          |
     object --+           |
              |           |
@@ -75,20 +76,20 @@
                      |   |
         object --+   |   |
                  |   |   |
-         <a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a> --+   |
+         <a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a> --+   |
                      |   |
-           <a href="lxml.html.HtmlElement-class.html" onclick="show_private();">HtmlElement</a> --+
+           <a href="lxml.html.HtmlElement-class.html">HtmlElement</a> --+
                          |
                         <strong class="uidshort">SelectElement</strong>
 </pre>
 
 <hr />
-<p><tt class="rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;select&gt;</span></tt> element.  You can get the name with <tt class="rst-docutils literal"><span class="pre">.name</span></tt>.</p>
-<p><tt class="rst-docutils literal"><span class="pre">.value</span></tt> will be the value of the selected option, unless this
-is a multi-select element (<tt class="rst-docutils literal"><span class="pre">&lt;select</span> <span class="pre">multiple&gt;</span></tt>), in which case
-it will be a set-like object.  In either case <tt class="rst-docutils literal"><span class="pre">.value_options</span></tt>
+<p><tt class="rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;select&gt;</tt> element.  You can get the name with <tt class="rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">.name</tt>.</p>
+<p><tt class="rst-docutils literal">.value</tt> will be the value of the selected option, unless this
+is a multi-select element (<tt class="rst-docutils literal">&lt;select multiple&gt;</tt>), in which case
+it will be a set-like object.  In either case <tt class="rst-docutils literal">.value_options</tt>
 gives the possible values.</p>
-<p>The boolean attribute <tt class="rst-docutils literal"><span class="pre">.multiple</span></tt> shows if this is a
+<p>The boolean attribute <tt class="rst-docutils literal">.multiple</tt> shows if this is a
 multi-select.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
@@ -165,7 +166,7 @@ multi-select.</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="_multiple__get"></a><span class="summary-sig-name">_multiple__get</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Boolean attribute: is there a <tt class="rst-docutils literal"><span class="pre">multiple</span></tt> attribute on this element.</td>
+      Boolean attribute: is there a <tt class="rst-docutils literal">multiple</tt> attribute on this element.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#SelectElement._multiple__get">source&nbsp;code</a></span>
             
@@ -194,10 +195,10 @@ multi-select.</p>
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html" onclick="show_private();">InputMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html">InputMixin</a></code></b>:
       <code><a href="lxml.html.InputMixin-class.html#__repr__">__repr__</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html" onclick="show_private();">InputMixin</a></code></b> (private):
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html">InputMixin</a></code></b> (private):
       <code><a href="lxml.html.InputMixin-class.html#_name__del" onclick="show_private();">_name__del</a></code>,
       <code><a href="lxml.html.InputMixin-class.html#_name__get" onclick="show_private();">_name__get</a></code>,
       <code><a href="lxml.html.InputMixin-class.html#_name__set" onclick="show_private();">_name__set</a></code>
@@ -253,7 +254,7 @@ multi-select.</p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a></code></b> (private):
       <code><a href="lxml.etree._Element-class.html#_init" onclick="show_private();">_init</a></code>
       </p></div>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b>:
       <code><a href="lxml.html.HtmlMixin-class.html#cssselect">cssselect</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#drop_tag">drop_tag</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#drop_tree">drop_tree</a></code>,
@@ -266,19 +267,22 @@ multi-select.</p>
       <code><a href="lxml.html.HtmlMixin-class.html#rewrite_links">rewrite_links</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#text_content">text_content</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b> (private):
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b> (private):
       <code><a href="lxml.html.HtmlMixin-class.html#_label__del" onclick="show_private();">_label__del</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#_label__get" onclick="show_private();">_label__get</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#_label__set" onclick="show_private();">_label__set</a></code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -313,8 +317,8 @@ multi-select.</p>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.SelectElement-class.html#value_options" class="summary-name">value_options</a><br />
-      All the possible values this select can have (the <tt class="rst-docutils literal"><span class="pre">value</span></tt>
-attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;option&gt;</span></tt> elements.
+      All the possible values this select can have (the <tt class="rst-docutils literal">value</tt>
+attribute of all the <tt class="rst-docutils literal">&lt;option&gt;</tt> elements.
     </td>
   </tr>
 <tr>
@@ -322,12 +326,12 @@ attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;opti
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.SelectElement-class.html#multiple" class="summary-name">multiple</a><br />
-      Boolean attribute: is there a <tt class="rst-docutils literal"><span class="pre">multiple</span></tt> attribute on this element.
+      Boolean attribute: is there a <tt class="rst-docutils literal">multiple</tt> attribute on this element.
     </td>
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html" onclick="show_private();">InputMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.InputMixin-class.html">InputMixin</a></code></b>:
       <code><a href="lxml.html.InputMixin-class.html#name">name</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a></code></b>:
@@ -340,7 +344,7 @@ attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;opti
       <code><a href="lxml.etree._Element-class.html#tail">tail</a></code>,
       <code><a href="lxml.etree._Element-class.html#text">text</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b>:
       <code><a href="lxml.html.HtmlMixin-class.html#base_url">base_url</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#body">body</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#forms">forms</a></code>,
@@ -441,13 +445,13 @@ represents all the selected options.</p>
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <h3 class="epydoc">value_options</h3>
-  All the possible values this select can have (the <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">value</span></tt>
-attribute of all the <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;option&gt;</span></tt> elements.
+  All the possible values this select can have (the <tt class="rst-rst-docutils literal rst-docutils literal">value</tt>
+attribute of all the <tt class="rst-rst-docutils literal rst-docutils literal">&lt;option&gt;</tt> elements.
   <dl class="fields">
     <dt>Get Method:</dt>
     <dd class="value"><span class="summary-sig"><i>unreachable</i>.value_options(<span class="summary-sig-arg">self</span>)</span>
-        - All the possible values this select can have (the <tt class="rst-docutils literal"><span class="pre">value</span></tt>
-attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;option&gt;</span></tt> elements.
+        - All the possible values this select can have (the <tt class="rst-docutils literal">value</tt>
+attribute of all the <tt class="rst-docutils literal">&lt;option&gt;</tt> elements.
     </dd>
   </dl>
 </td></tr></table>
@@ -458,11 +462,11 @@ attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;opti
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <h3 class="epydoc">multiple</h3>
-  Boolean attribute: is there a <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">multiple</span></tt> attribute on this element.
+  Boolean attribute: is there a <tt class="rst-rst-docutils literal rst-docutils literal">multiple</tt> attribute on this element.
   <dl class="fields">
     <dt>Get Method:</dt>
     <dd class="value"><span class="summary-sig"><a href="lxml.html.SelectElement-class.html#_multiple__get" class="summary-sig-name" onclick="show_private();">_multiple__get</a>(<span class="summary-sig-arg">self</span>)</span>
-        - Boolean attribute: is there a <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">multiple</span></tt> attribute on this element.
+        - Boolean attribute: is there a <tt class="rst-rst-docutils literal rst-docutils literal">multiple</tt> attribute on this element.
     </dd>
     <dt>Set Method:</dt>
     <dd class="value"><span class="summary-sig"><a href="lxml.html.SelectElement-class.html#_multiple__set" class="summary-sig-name" onclick="show_private();">_multiple__set</a>(<span class="summary-sig-arg">self</span>,
@@ -496,14 +500,14 @@ attribute of all the <tt class="rst-docutils literal"><span class="pre">&lt;opti
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:39 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

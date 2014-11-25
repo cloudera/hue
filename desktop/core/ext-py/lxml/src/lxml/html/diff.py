@@ -1,19 +1,22 @@
 import difflib
 from lxml import etree
 from lxml.html import fragment_fromstring
-import cgi
 import re
 
 __all__ = ['html_annotate', 'htmldiff']
 
+try:
+    from html import escape as html_escape
+except ImportError:
+    from cgi import escape as html_escape
 try:
     _unicode = unicode
 except NameError:
     # Python 3
     _unicode = str
 try:
-    basestring = __builtins__["basestring"]
-except (KeyError, NameError):
+    basestring
+except NameError:
     # Python 3
     basestring = str
 
@@ -23,7 +26,7 @@ except (KeyError, NameError):
 
 def default_markup(text, version):
     return '<span title="%s">%s</span>' % (
-        cgi.escape(_unicode(version), 1), text)
+        html_escape(_unicode(version), 1), text)
 
 def html_annotate(doclist, markup=default_markup):
     """
@@ -118,7 +121,7 @@ def compress_merge_back(tokens, tok):
     else:
         text = _unicode(last)
         if last.trailing_whitespace:
-            text += ' '
+            text += last.trailing_whitespace
         text += tok
         merged = token(text,
                        pre_tags=last.pre_tags,
@@ -138,7 +141,7 @@ def markup_serialize_tokens(tokens, markup_func):
         html = token.html()
         html = markup_func(html, token.annotation)
         if token.trailing_whitespace:
-            html += ' '
+            html += token.trailing_whitespace
         yield html
         for post in token.post_tags:
             yield post
@@ -218,7 +221,7 @@ def expand_tokens(tokens, equal=False):
             yield pre
         if not equal or not token.hide_when_equal:
             if token.trailing_whitespace:
-                yield token.html() + ' '
+                yield token.html() + token.trailing_whitespace
             else:
                 yield token.html()
         for post in token.post_tags:
@@ -448,7 +451,7 @@ class token(_unicode):
     # displayed diff if no change has occurred:
     hide_when_equal = False
 
-    def __new__(cls, text, pre_tags=None, post_tags=None, trailing_whitespace=False):
+    def __new__(cls, text, pre_tags=None, post_tags=None, trailing_whitespace=""):
         obj = _unicode.__new__(cls, text)
 
         if pre_tags is not None:
@@ -466,7 +469,8 @@ class token(_unicode):
         return obj
 
     def __repr__(self):
-        return 'token(%s, %r, %r)' % (_unicode.__repr__(self), self.pre_tags, self.post_tags)
+        return 'token(%s, %r, %r, %r)' % (_unicode.__repr__(self), self.pre_tags,
+                                          self.post_tags, self.trailing_whitespace)
 
     def html(self):
         return _unicode(self)
@@ -478,7 +482,7 @@ class tag_token(token):
     is only represented in a document by a tag.  """
 
     def __new__(cls, tag, data, html_repr, pre_tags=None, 
-                post_tags=None, trailing_whitespace=False):
+                post_tags=None, trailing_whitespace=""):
         obj = token.__new__(cls, "%s: %s" % (type, data), 
                             pre_tags=pre_tags, 
                             post_tags=post_tags, 
@@ -489,7 +493,7 @@ class tag_token(token):
         return obj
 
     def __repr__(self):
-        return 'tag_token(%s, %s, html_repr=%s, post_tags=%r, pre_tags=%r, trailing_whitespace=%s)' % (
+        return 'tag_token(%s, %s, html_repr=%s, post_tags=%r, pre_tags=%r, trailing_whitespace=%r)' % (
             self.tag, 
             self.data, 
             self.html_repr, 
@@ -566,6 +570,14 @@ def cleanup_html(html):
 
 end_whitespace_re = re.compile(r'[ \t\n\r]$')
 
+def split_trailing_whitespace(word):
+    """
+    This function takes a word, such as 'test\n\n' and returns ('test','\n\n')
+    """
+    stripped_length = len(word.rstrip())
+    return word[0:stripped_length], word[stripped_length:]
+
+
 def fixup_chunks(chunks):
     """
     This function takes a list of chunks and produces a list of tokens.
@@ -577,34 +589,29 @@ def fixup_chunks(chunks):
         if isinstance(chunk, tuple):
             if chunk[0] == 'img':
                 src = chunk[1]
-                tag = chunk[2]
-                if tag.endswith(' '):
-                    tag = tag[:-1]
-                    trailing_whitespace = True
-                else:
-                    trailing_whitespace = False
+                tag, trailing_whitespace = split_trailing_whitespace(chunk[2])
                 cur_word = tag_token('img', src, html_repr=tag,
                                      pre_tags=tag_accum,
                                      trailing_whitespace=trailing_whitespace)
                 tag_accum = []
                 result.append(cur_word)
+
             elif chunk[0] == 'href':
                 href = chunk[1]
-                cur_word = href_token(href, pre_tags=tag_accum, trailing_whitespace=True)
+                cur_word = href_token(href, pre_tags=tag_accum, trailing_whitespace=" ")
                 tag_accum = []
                 result.append(cur_word)
             continue
+
         if is_word(chunk):
-            if chunk.endswith(' '):
-                chunk = chunk[:-1]
-                trailing_whitespace = True
-            else:
-                trailing_whitespace = False
+            chunk, trailing_whitespace = split_trailing_whitespace(chunk)
             cur_word = token(chunk, pre_tags=tag_accum, trailing_whitespace=trailing_whitespace)
             tag_accum = []
             result.append(cur_word)
+
         elif is_start_tag(chunk):
             tag_accum.append(chunk)
+
         elif is_end_tag(chunk):
             if tag_accum:
                 tag_accum.append(chunk)
@@ -679,33 +686,34 @@ def flatten_el(el, include_hrefs, skip_tag=False):
     not returned (just its contents)."""
     if not skip_tag:
         if el.tag == 'img':
-            yield ('img', el.attrib['src'], start_tag(el))
+            yield ('img', el.get('src'), start_tag(el))
         else:
             yield start_tag(el)
     if el.tag in empty_tags and not el.text and not len(el) and not el.tail:
         return
     start_words = split_words(el.text)
     for word in start_words:
-        yield cgi.escape(word)
+        yield html_escape(word)
     for child in el:
         for item in flatten_el(child, include_hrefs=include_hrefs):
             yield item
-    if el.tag == 'a' and el.attrib.get('href') and include_hrefs:
-        yield ('href', el.attrib['href'])
+    if el.tag == 'a' and el.get('href') and include_hrefs:
+        yield ('href', el.get('href'))
     if not skip_tag:
         yield end_tag(el)
         end_words = split_words(el.tail)
         for word in end_words:
-            yield cgi.escape(word)
+            yield html_escape(word)
+
+split_words_re = re.compile(r'\S+(?:\s+|$)', re.U)
 
 def split_words(text):
-    """ Splits some text into words. Includes trailing whitespace (one
-    space) on each word when appropriate.  """
+    """ Splits some text into words. Includes trailing whitespace
+    on each word when appropriate.  """
     if not text or not text.strip():
         return []
-    words = [w + ' ' for w in text.strip().split()]
-    if not end_whitespace_re.search(text):
-        words[-1] = words[-1][:-1]
+
+    words = split_words_re.findall(text)
     return words
 
 start_whitespace_re = re.compile(r'^[ \t\n\r]')
@@ -715,7 +723,7 @@ def start_tag(el):
     The text representation of the start tag for a tag.
     """
     return '<%s%s>' % (
-        el.tag, ''.join([' %s="%s"' % (name, cgi.escape(value, True))
+        el.tag, ''.join([' %s="%s"' % (name, html_escape(value, True))
                          for name, value in el.attrib.items()]))
 
 def end_tag(el):

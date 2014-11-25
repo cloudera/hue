@@ -2,10 +2,11 @@ lxml.html adds a find_class method to elements::
 
     >>> from lxml.etree import Comment
     >>> from lxml.html import document_fromstring, fragment_fromstring, tostring
+    >>> from lxml.html import fragments_fromstring, fromstring
     >>> from lxml.html.clean import clean, clean_html
     >>> from lxml.html import usedoctest
-    >>> try: unicode = __builtins__["unicode"]
-    ... except (KeyError, NameError): unicode = str
+    >>> try: unicode = unicode
+    ... except NameError: unicode = str
 
     >>> h = document_fromstring('''
     ... <html><head></head>
@@ -99,3 +100,80 @@ drop the comment.  Here, ``drop_tag()`` behaves exactly like ``drop_tree()``:
       <div>footer</div>
      </body>
     </html>
+
+In Python3 it should be possible to parse strings given as bytes objects, at
+least if an encoding is given.
+
+    >>> from lxml.html import HTMLParser
+    >>> enc = 'utf-8'
+    >>> html_parser = HTMLParser(encoding=enc)
+    >>> src = '<html><body>Test</body></html>'.encode(enc)
+
+    >>> doc = fromstring(src, parser=html_parser)
+    >>> print(tostring(doc, encoding=unicode))
+    <html><body>Test</body></html>
+
+    >>> docs = fragments_fromstring(src, parser=html_parser)
+    >>> len(docs)
+    1
+    >>> print(docs[0])
+    Test
+
+Bug 599318: Call fromstring with a frameset fragment should not raise an error,
+the whole document is returned.
+
+    >>> import lxml.html
+    >>> content='''
+    ... <frameset>
+    ...  <frame src="main.php" name="srcpg">
+    ... </frameset>'''
+    >>> etree_document = lxml.html.fromstring(content)
+    >>> print(tostring(etree_document, encoding=unicode))
+    <html><frameset><frame src="main.php" name="srcpg"></frameset></html>
+
+Bug 599318: Call fromstring with a div fragment should not raise an error,
+only the element is returned
+
+    >>> import lxml.html
+    >>> content='<div></div>'
+    >>> etree_document = lxml.html.fromstring(content)
+    >>> print(tostring(etree_document, encoding=unicode))
+    <div></div>
+
+Bug 599318: Call fromstring with a head fragment should not raise an error,
+the whole document is returned.
+
+    >>> import lxml.html
+    >>> content='<head></head>'
+    >>> etree_document = lxml.html.fromstring(content)
+    >>> print(tostring(etree_document, encoding=unicode))
+    <html><head></head></html>
+
+Bug 690319: Leading whitespace before doctype declaration should not raise an error.
+
+    >>> import lxml.html
+    >>> content='''
+    ...     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    ...     <html>
+    ...     </html>'''
+    >>> etree_document = lxml.html.fromstring(content)
+    >>> print(tostring(etree_document, encoding=unicode))
+    <html></html>
+
+Feature https://github.com/lxml/lxml/pull/140: ensure_head_body option:
+
+    >>> from lxml.html import document_fromstring, tostring
+    >>> from functools import partial
+    >>> tos = partial(tostring, encoding=unicode)
+    >>> print(tos(document_fromstring('<p>test</p>')))
+    <html><body><p>test</p></body></html>
+    >>> print(tos(document_fromstring('<p>test</p>', ensure_head_body=True)))
+    <html><head></head><body><p>test</p></body></html>
+    >>> print(tos(document_fromstring('<meta>')))
+    <html><head><meta></head></html>
+    >>> print(tos(document_fromstring('<meta>', ensure_head_body=True)))
+    <html><head><meta></head><body></body></html>
+    >>> print(tos(document_fromstring('<html></html>')))
+    <html></html>
+    >>> print(tos(document_fromstring('<html></html>', ensure_head_body=True)))
+    <html><head></head><body></body></html>

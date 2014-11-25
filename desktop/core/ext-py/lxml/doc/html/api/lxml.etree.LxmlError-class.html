@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -77,7 +77,7 @@ exceptions.BaseException --+
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li><a href="lxml.sax.SaxError-class.html">sax.SaxError</a></li><li>, <a href="lxml.etree.LxmlSyntaxError-class.html">LxmlSyntaxError</a></li><li>, <a href="lxml.etree.C14NError-class.html">C14NError</a></li><li>, <a href="lxml.etree.DTDError-class.html">DTDError</a></li><li>, <a href="lxml.etree.DocumentInvalid-class.html">DocumentInvalid</a></li><li>, <a href="lxml.etree.LxmlRegistryError-class.html">LxmlRegistryError</a></li><li>, <a href="lxml.etree.ParserError-class.html">ParserError</a></li><li>, <a href="lxml.etree.RelaxNGError-class.html">RelaxNGError</a></li><li>, <a href="lxml.etree.SchematronError-class.html">SchematronError</a></li><li>, <a href="lxml.etree.SerialisationError-class.html">SerialisationError</a></li><li>, <a href="lxml.etree.XIncludeError-class.html">XIncludeError</a></li><li>, <a href="lxml.etree.XMLSchemaError-class.html">XMLSchemaError</a></li><li>, <a href="lxml.etree.XPathError-class.html">XPathError</a></li><li>, <a href="lxml.etree.XSLTError-class.html">XSLTError</a></li>  </ul>
+<li><a href="lxml.etree.C14NError-class.html">C14NError</a></li><li>, <a href="lxml.etree.DTDError-class.html">DTDError</a></li><li>, <a href="lxml.etree.DocumentInvalid-class.html">DocumentInvalid</a></li><li>, <a href="lxml.etree.LxmlRegistryError-class.html">LxmlRegistryError</a></li><li>, <a href="lxml.etree.LxmlSyntaxError-class.html">LxmlSyntaxError</a></li><li>, <a href="lxml.etree.ParserError-class.html">ParserError</a></li><li>, <a href="lxml.etree.RelaxNGError-class.html">RelaxNGError</a></li><li>, <a href="lxml.etree.SchematronError-class.html">SchematronError</a></li><li>, <a href="lxml.etree.SerialisationError-class.html">SerialisationError</a></li><li>, <a href="lxml.etree.XIncludeError-class.html">XIncludeError</a></li><li>, <a href="lxml.etree.XMLSchemaError-class.html">XMLSchemaError</a></li><li>, <a href="lxml.etree.XPathError-class.html">XPathError</a></li><li>, <a href="lxml.etree.XSLTError-class.html">XSLTError</a></li><li>, <a href="lxml.sax.SaxError-class.html">sax.SaxError</a></li>  </ul>
 </dd></dl>
 
 <hr />
@@ -108,7 +108,7 @@ this one.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree.LxmlError-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             
             
@@ -132,12 +132,41 @@ this one.
       <code>__repr__</code>,
       <code>__setattr__</code>,
       <code>__setstate__</code>,
-      <code>__str__</code>
+      <code>__str__</code>,
+      <code>__unicode__</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__format__</code>,
       <code>__hash__</code>,
-      <code>__reduce_ex__</code>
+      <code>__reduce_ex__</code>,
+      <code>__sizeof__</code>,
+      <code>__subclasshook__</code>
       </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__qualname__"></a><span class="summary-name">__qualname__</span> = <code title="'LxmlError'"><code class="variable-quote">'</code><code class="variable-string">LxmlError</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>
@@ -203,7 +232,7 @@ this one.
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+  x.__init__(...) initializes x; see help(type(x)) for signature
   <dl class="fields">
     <dt>Overrides:
         object.__init__
@@ -237,14 +266,14 @@ this one.
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

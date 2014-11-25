@@ -1,7 +1,7 @@
 cdef object _find_id_attributes
 
-def XMLID(text):
-    u"""XMLID(text)
+def XMLID(text, parser=None, *, base_url=None):
+    u"""XMLID(text, parser=None, base_url=None)
 
     Parse the text and return a tuple (root node, ID dictionary).  The root
     node is the same as returned by the XML() function.  The dictionary
@@ -15,14 +15,14 @@ def XMLID(text):
         _find_id_attributes = XPath(u'//*[string(@id)]')
 
     # ElementTree compatible implementation: parse and look for 'id' attributes
-    root = XML(text)
+    root = XML(text, parser, base_url=base_url)
     dic = {}
     for elem in _find_id_attributes(root):
         dic[elem.get(u'id')] = elem
     return (root, dic)
 
-def XMLDTDID(text):
-    u"""XMLDTDID(text)
+def XMLDTDID(text, parser=None, *, base_url=None):
+    u"""XMLDTDID(text, parser=None, base_url=None)
 
     Parse the text and return a tuple (root node, ID dictionary).  The root
     node is the same as returned by the XML() function.  The dictionary
@@ -34,7 +34,7 @@ def XMLDTDID(text):
     The results are undefined.
     """
     cdef _Element root
-    root = XML(text)
+    root = XML(text, parser, base_url=base_url)
     # xml:id spec compatible implementation: use DTD ID attributes from libxml2
     if root._doc._c_doc.ids is NULL:
         return (root, {})
@@ -66,7 +66,7 @@ cdef class _IDDict:
     cdef _Document _doc
     cdef object _keys
     cdef object _items
-    def __init__(self, etree):
+    def __cinit__(self, etree):
         cdef _Document doc
         doc = _documentOrRaise(etree)
         if doc._c_doc.ids is NULL:
@@ -84,7 +84,7 @@ cdef class _IDDict:
         cdef xmlAttr* c_attr
         c_ids = self._doc._c_doc.ids
         id_utf = _utf8(id_name)
-        c_id = <tree.xmlID*>tree.xmlHashLookup(c_ids, _cstr(id_utf))
+        c_id = <tree.xmlID*>tree.xmlHashLookup(c_ids, _xcstr(id_utf))
         if c_id is NULL:
             raise KeyError, u"key not found."
         c_attr = c_id.attr
@@ -99,7 +99,7 @@ cdef class _IDDict:
         cdef tree.xmlID* c_id
         id_utf = _utf8(id_name)
         c_id = <tree.xmlID*>tree.xmlHashLookup(
-            self._doc._c_doc.ids, _cstr(id_utf))
+            self._doc._c_doc.ids, _xcstr(id_utf))
         return c_id is not NULL
 
     def has_key(self, id_name):
@@ -152,29 +152,18 @@ cdef class _IDDict:
     cdef object _build_keys(self):
         keys = []
         tree.xmlHashScan(<tree.xmlHashTable*>self._doc._c_doc.ids,
-                         _collectIdHashKeys, <python.PyObject*>keys)
+                         <tree.xmlHashScanner>_collectIdHashKeys, <python.PyObject*>keys)
         return keys
 
     cdef object _build_items(self):
         items = []
         context = (items, self._doc)
         tree.xmlHashScan(<tree.xmlHashTable*>self._doc._c_doc.ids,
-                         _collectIdHashItemList, <python.PyObject*>context)
+                         <tree.xmlHashScanner>_collectIdHashItemList, <python.PyObject*>context)
         return items
 
-cdef void _collectIdHashItemDict(void* payload, void* context, char* name):
+cdef void _collectIdHashItemList(void* payload, void* context, xmlChar* name):
     # collect elements from ID attribute hash table
-    cdef tree.xmlID* c_id
-    c_id = <tree.xmlID*>payload
-    if c_id is NULL or c_id.attr is NULL or c_id.attr.parent is NULL:
-        return
-    dic, doc = <tuple>context
-    element = _elementFactory(doc, c_id.attr.parent)
-    dic[funicode(name)] = element
-
-cdef void _collectIdHashItemList(void* payload, void* context, char* name):
-    # collect elements from ID attribute hash table
-    cdef tree.xmlID* c_id
     cdef list lst
     c_id = <tree.xmlID*>payload
     if c_id is NULL or c_id.attr is NULL or c_id.attr.parent is NULL:
@@ -183,8 +172,7 @@ cdef void _collectIdHashItemList(void* payload, void* context, char* name):
     element = _elementFactory(doc, c_id.attr.parent)
     lst.append( (funicode(name), element) )
 
-cdef void _collectIdHashKeys(void* payload, void* collect_list, char* name):
-    cdef tree.xmlID* c_id
+cdef void _collectIdHashKeys(void* payload, void* collect_list, xmlChar* name):
     c_id = <tree.xmlID*>payload
     if c_id is NULL or c_id.attr is NULL or c_id.attr.parent is NULL:
         return

@@ -45,20 +45,22 @@ cdef public class ElementBase(_Element) [ type LxmlElementBaseType,
         cdef bint is_html = 0
         cdef _BaseParser parser
         cdef _Element last_child
+        # don't use normal attribute access as it might be overridden
+        _getattr = object.__getattribute__
         try:
-            namespace = _utf8(self.NAMESPACE)
+            namespace = _utf8(_getattr(self, 'NAMESPACE'))
         except AttributeError:
             namespace = None
         try:
-            ns, tag = _getNsTag(self.TAG)
+            ns, tag = _getNsTag(_getattr(self, 'TAG'))
             if ns is not None:
                 namespace = ns
         except AttributeError:
-            tag = _utf8(self.__class__.__name__)
-            if '.' in tag:
-                tag = tag.split('.')[-1]
+            tag = _utf8(_getattr(_getattr(self, '__class__'), '__name__'))
+            if b'.' in tag:
+                tag = tag.split(b'.')[-1]
         try:
-            parser = self.PARSER
+            parser = _getattr(self, 'PARSER')
         except AttributeError:
             parser = None
             for child in children:
@@ -69,7 +71,7 @@ cdef public class ElementBase(_Element) [ type LxmlElementBaseType,
             is_html = 1
         if namespace is None:
             try:
-                is_html = self.HTML
+                is_html = _getattr(self, 'HTML')
             except AttributeError:
                 pass
         _initNewElement(self, is_html, tag, namespace, parser,
@@ -78,15 +80,11 @@ cdef public class ElementBase(_Element) [ type LxmlElementBaseType,
         for child in children:
             if _isString(child):
                 if last_child is None:
-                    if _hasText(self._c_node):
-                        self.text += child
-                    else:
-                        self.text = child
+                    _setNodeText(self._c_node,
+                                 (_collectText(self._c_node.children) or '') + child)
                 else:
-                    if _hasTail(last_child._c_node):
-                        last_child.tail += child
-                    else:
-                        last_child.tail = child
+                    _setTailText(last_child._c_node,
+                                 (_collectText(last_child._c_node.next) or '') + child)
             elif isinstance(child, _Element):
                 last_child = child
                 _appendChild(self, last_child)
@@ -99,8 +97,7 @@ cdef public class ElementBase(_Element) [ type LxmlElementBaseType,
 cdef class CommentBase(_Comment):
     u"""All custom Comment classes must inherit from this one.
 
-    Note that you cannot (and must not) instantiate this class or its
-    subclasses.
+    To create an XML Comment instance, use the ``Comment()`` factory.
 
     Subclasses *must not* override __init__ or __new__ as it is
     absolutely undefined when these objects will be created or
@@ -109,12 +106,28 @@ cdef class CommentBase(_Comment):
     creation, you can implement an ``_init(self)`` method that will be
     called after object creation.
     """
+    def __init__(self, text):
+        # copied from Comment() factory
+        cdef _Document doc
+        cdef xmlDoc*   c_doc
+        if text is None:
+            text = b''
+        else:
+            text = _utf8(text)
+        c_doc = _newXMLDoc()
+        doc = _documentFactory(c_doc, None)
+        self._c_node = _createComment(c_doc, _xcstr(text))
+        if self._c_node is NULL:
+            raise MemoryError()
+        tree.xmlAddChild(<xmlNode*>c_doc, self._c_node)
+        _registerProxy(self, doc, self._c_node)
+        self._init()
 
 cdef class PIBase(_ProcessingInstruction):
     u"""All custom Processing Instruction classes must inherit from this one.
 
-    Note that you cannot (and must not) instantiate this class or its
-    subclasses.
+    To create an XML ProcessingInstruction instance, use the ``PI()``
+    factory.
 
     Subclasses *must not* override __init__ or __new__ as it is
     absolutely undefined when these objects will be created or
@@ -123,12 +136,28 @@ cdef class PIBase(_ProcessingInstruction):
     creation, you can implement an ``_init(self)`` method that will be
     called after object creation.
     """
+    def __init__(self, target, text=None):
+        # copied from PI() factory
+        cdef _Document doc
+        cdef xmlDoc*   c_doc
+        target = _utf8(target)
+        if text is None:
+            text = b''
+        else:
+            text = _utf8(text)
+        c_doc = _newXMLDoc()
+        doc = _documentFactory(c_doc, None)
+        self._c_node = _createPI(c_doc, _xcstr(target), _xcstr(text))
+        if self._c_node is NULL:
+            raise MemoryError()
+        tree.xmlAddChild(<xmlNode*>c_doc, self._c_node)
+        _registerProxy(self, doc, self._c_node)
+        self._init()
 
 cdef class EntityBase(_Entity):
     u"""All custom Entity classes must inherit from this one.
 
-    Note that you cannot (and must not) instantiate this class or its
-    subclasses.
+    To create an XML Entity instance, use the ``Entity()`` factory.
 
     Subclasses *must not* override __init__ or __new__ as it is
     absolutely undefined when these objects will be created or
@@ -137,7 +166,44 @@ cdef class EntityBase(_Entity):
     creation, you can implement an ``_init(self)`` method that will be
     called after object creation.
     """
-    
+    def __init__(self, name):
+        cdef _Document doc
+        cdef xmlDoc*   c_doc
+        name_utf = _utf8(name)
+        c_name = _xcstr(name_utf)
+        if c_name[0] == c'#':
+            if not _characterReferenceIsValid(c_name + 1):
+                raise ValueError, u"Invalid character reference: '%s'" % name
+        elif not _xmlNameIsValid(c_name):
+            raise ValueError, u"Invalid entity reference: '%s'" % name
+        c_doc = _newXMLDoc()
+        doc = _documentFactory(c_doc, None)
+        self._c_node = _createEntity(c_doc, c_name)
+        if self._c_node is NULL:
+            raise MemoryError()
+        tree.xmlAddChild(<xmlNode*>c_doc, self._c_node)
+        _registerProxy(self, doc, self._c_node)
+        self._init()
+
+
+cdef int _validateNodeClass(xmlNode* c_node, cls) except -1:
+    if c_node.type == tree.XML_ELEMENT_NODE:
+        expected = ElementBase
+    elif c_node.type == tree.XML_COMMENT_NODE:
+        expected = CommentBase
+    elif c_node.type == tree.XML_ENTITY_REF_NODE:
+        expected = EntityBase
+    elif c_node.type == tree.XML_PI_NODE:
+        expected = PIBase
+    else:
+        assert 0, u"Unknown node type: %s" % c_node.type
+
+    if not (isinstance(cls, type) and issubclass(cls, expected)):
+        raise TypeError(
+            "result of class lookup must be subclass of %s, got %s"
+            % (type(expected), type(cls)))
+    return 0
+
 
 ################################################################################
 # Element class lookup
@@ -258,18 +324,16 @@ cdef object _lookupDefaultElementClass(state, _Document _doc, xmlNode* c_node):
         else:
             return _Entity
     elif c_node.type == tree.XML_PI_NODE:
-        if state is not None:
-            cls = (<ElementDefaultClassLookup>state).pi_class
-        if cls is None:
+        if state is None or (<ElementDefaultClassLookup>state).pi_class is None:
             # special case XSLT-PI
             if c_node.name is not NULL and c_node.content is not NULL:
-                if cstd.strcmp(c_node.name, "xml-stylesheet") == 0:
-                    if cstd.strstr(c_node.content, "text/xsl") is not NULL or \
-                           cstd.strstr(c_node.content, "text/xml") is not NULL:
+                if tree.xmlStrcmp(c_node.name, <unsigned char*>"xml-stylesheet") == 0:
+                    if tree.xmlStrstr(c_node.content, <unsigned char*>"text/xsl") is not NULL or \
+                           tree.xmlStrstr(c_node.content, <unsigned char*>"text/xml") is not NULL:
                         return _XSLTProcessingInstruction
             return _ProcessingInstruction
         else:
-            return cls
+            return (<ElementDefaultClassLookup>state).pi_class
     else:
         assert 0, u"Unknown node type: %s" % c_node.type
 
@@ -291,9 +355,9 @@ cdef class AttributeBasedElementClassLookup(FallbackElementClassLookup):
     missing.
     """
     cdef object _class_mapping
-    cdef object _pytag
-    cdef char* _c_ns
-    cdef char* _c_name
+    cdef tuple _pytag
+    cdef const_xmlChar* _c_ns
+    cdef const_xmlChar* _c_name
     def __cinit__(self):
         self._lookup_function = _attribute_class_lookup
 
@@ -304,8 +368,8 @@ cdef class AttributeBasedElementClassLookup(FallbackElementClassLookup):
         if ns is None:
             self._c_ns = NULL
         else:
-            self._c_ns = _cstr(ns)
-        self._c_name = _cstr(name)
+            self._c_ns = _xcstr(ns)
+        self._c_name = _xcstr(name)
         self._class_mapping = dict(class_mapping)
 
         FallbackElementClassLookup.__init__(self, fallback)
@@ -320,7 +384,9 @@ cdef object _attribute_class_lookup(state, _Document doc, xmlNode* c_node):
             c_node, lookup._c_ns, lookup._c_name)
         dict_result = python.PyDict_GetItem(lookup._class_mapping, value)
         if dict_result is not NULL:
-            return <object>dict_result
+            cls = <object>dict_result
+            _validateNodeClass(c_node, cls)
+            return cls
     return _callLookupFallback(lookup, doc, c_node)
 
 
@@ -369,7 +435,6 @@ cdef class CustomElementClassLookup(FallbackElementClassLookup):
 
 cdef object _custom_class_lookup(state, _Document doc, xmlNode* c_node):
     cdef CustomElementClassLookup lookup
-    cdef char* c_str
 
     lookup = <CustomElementClassLookup>state
 
@@ -388,13 +453,11 @@ cdef object _custom_class_lookup(state, _Document doc, xmlNode* c_node):
     else:
         name = funicode(c_node.name)
     c_str = tree._getNs(c_node)
-    if c_str is NULL:
-        ns = None
-    else:
-        ns = funicode(c_str)
+    ns = funicode(c_str) if c_str is not NULL else None
 
     cls = lookup.lookup(element_type, doc, ns, name)
     if cls is not None:
+        _validateNodeClass(c_node, cls)
         return cls
     return _callLookupFallback(lookup, doc, c_node)
 
@@ -410,21 +473,21 @@ cdef class PythonElementClassLookup(FallbackElementClassLookup):
     read-only mode.  To use it, re-implement the ``lookup(self, doc,
     root)`` method in a subclass::
 
-        >>> from lxml import etree, pyclasslookup
-        >>>
-        >>> class MyElementClass(etree.ElementBase):
-        ...     honkey = True
-        ...
-        >>> class MyLookup(pyclasslookup.PythonElementClassLookup):
-        ...     def lookup(self, doc, root):
-        ...         if root.tag == "sometag":
-        ...             return MyElementClass
-        ...         else:
-        ...             for child in root:
-        ...                 if child.tag == "someothertag":
-        ...                     return MyElementClass
-        ...         # delegate to default
-        ...         return None
+        from lxml import etree, pyclasslookup
+
+        class MyElementClass(etree.ElementBase):
+            honkey = True
+
+        class MyLookup(pyclasslookup.PythonElementClassLookup):
+            def lookup(self, doc, root):
+                if root.tag == "sometag":
+                    return MyElementClass
+                else:
+                    for child in root:
+                        if child.tag == "someothertag":
+                            return MyElementClass
+                # delegate to default
+                return None
 
     If you return None from this method, the fallback will be called.
 
@@ -465,6 +528,7 @@ cdef object _python_class_lookup(state, _Document doc, tree.xmlNode* c_node):
     _freeReadOnlyProxies(proxy)
 
     if cls is not None:
+        _validateNodeClass(c_node, cls)
         return cls
     return _callLookupFallback(lookup, doc, c_node)
 

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -63,32 +63,32 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class PIBase</h1><p class="nomargin-top"></p>
 <pre class="base-tree">
-      object --+            
-               |            
-        <a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a> --+        
-                   |        
-<a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a> --+    
-                       |    
-  <a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">_ProcessingInstruction</a> --+
-                           |
-                          <strong class="uidshort">PIBase</strong>
+         object --+            
+                  |            
+           <a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a> --+        
+                      |        
+??.__ContentOnlyElement --+    
+                          |    
+     <a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">_ProcessingInstruction</a> --+
+                              |
+                             <strong class="uidshort">PIBase</strong>
 </pre>
 
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li class="private"><a href="lxml.etree._XSLTProcessingInstruction-class.html" onclick="show_private();">_XSLTProcessingInstruction</a></li><li class="private">, <a href="lxml.html.HtmlProcessingInstruction-class.html" onclick="show_private();">html.HtmlProcessingInstruction</a></li>  </ul>
+<li class="private"><a href="lxml.etree._XSLTProcessingInstruction-class.html" onclick="show_private();">_XSLTProcessingInstruction</a></li><li>, <a href="lxml.html.HtmlProcessingInstruction-class.html">html.HtmlProcessingInstruction</a></li>  </ul>
 </dd></dl>
 
 <hr />
 <p>All custom Processing Instruction classes must inherit from this one.</p>
-<p>Note that you cannot (and must not) instantiate this class or its
-subclasses.</p>
+<p>To create an XML ProcessingInstruction instance, use the <tt class="rst-docutils literal">PI()</tt>
+factory.</p>
 <p>Subclasses <em>must not</em> override __init__ or __new__ as it is
 absolutely undefined when these objects will be created or
 destroyed.  All persistent state of PIs must be stored in the
 underlying XML.  If you really need to initialize the object after
-creation, you can implement an <tt class="rst-docutils literal"><span class="pre">_init(self)</span></tt> method that will be
+creation, you can implement an <tt class="rst-docutils literal">_init(self)</tt> method that will be
 called after object creation.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
@@ -110,6 +110,23 @@ called after object creation.</p>
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lxml.etree.PIBase-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">a new object with type S, a subtype of T</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -129,20 +146,20 @@ called after object creation.</p>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">_ProcessingInstruction</a></code></b>:
-      <code><a href="lxml.etree._ProcessingInstruction-class.html#__repr__">__repr__</a></code>
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#__repr__">__repr__</a></code>,
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#get">get</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__delitem__">__delitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__getitem__">__getitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__len__">__len__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__setitem__">__setitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#append">append</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#get">get</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#insert">insert</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#items">items</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#keys">keys</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#set">set</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#values">values</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>__delitem__</code>,
+      <code>__getitem__</code>,
+      <code>__len__</code>,
+      <code>__setitem__</code>,
+      <code>append</code>,
+      <code>insert</code>,
+      <code>items</code>,
+      <code>keys</code>,
+      <code>set</code>,
+      <code>values</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#__contains__">__contains__</a></code>,
@@ -182,13 +199,15 @@ called after object creation.</p>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
-      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -213,12 +232,12 @@ called after object creation.</p>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">_ProcessingInstruction</a></code></b>:
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#attrib">attrib</a></code>,
       <code><a href="lxml.etree._ProcessingInstruction-class.html#tag">tag</a></code>,
       <code><a href="lxml.etree._ProcessingInstruction-class.html#target">target</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#attrib">attrib</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#text">text</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>text</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#base">base</a></code>,
@@ -251,6 +270,29 @@ called after object creation.</p>
   </td>
 </tr>
 </table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">...</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  x.__init__(...) initializes x; see help(type(x)) for signature
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
 <a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -301,14 +343,14 @@ called after object creation.</p>
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

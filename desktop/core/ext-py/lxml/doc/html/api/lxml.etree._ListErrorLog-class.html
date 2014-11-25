@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -120,7 +120,9 @@ Immutable base version of a list based error log.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__getitem__"></a><span class="summary-sig-name">__getitem__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="__getitem__"></a><span class="summary-sig-name">__getitem__</span>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>)</span><br />
+      x[y]</td>
           <td align="right" valign="top">
             
             
@@ -137,7 +139,7 @@ Immutable base version of a list based error log.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ListErrorLog-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             
             
@@ -153,7 +155,8 @@ Immutable base version of a list based error log.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      iter(x)</td>
           <td align="right" valign="top">
             
             
@@ -221,7 +224,7 @@ Immutable base version of a list based error log.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._ListErrorLog-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._ListErrorLog-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">x</span>)</span><br />
       repr(x)</td>
           <td align="right" valign="top">
             
@@ -239,7 +242,8 @@ Immutable base version of a list based error log.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ListErrorLog-class.html#copy" class="summary-sig-name">copy</a>(<span class="summary-sig-arg">...</span>)</span><br />
-      Creates a shallow copy of this error log.</td>
+      Creates a shallow copy of this error log.  Reuses the list of
+entries.</td>
           <td align="right" valign="top">
             
             
@@ -376,14 +380,20 @@ log containing the matches.</td>
   </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._BaseErrorLog-class.html" onclick="show_private();">_BaseErrorLog</a></code></b>:
+      <code><a href="lxml.etree._BaseErrorLog-class.html#receive">receive</a></code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -449,7 +459,7 @@ log containing the matches.</td>
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+  x.__init__(...) initializes x; see help(type(x)) for signature
   <dl class="fields">
     <dt>Overrides:
         object.__init__
@@ -489,7 +499,7 @@ log containing the matches.</td>
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">...</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">x</span>)</span>
     <br /><em class="fname">(Representation operator)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -501,7 +511,6 @@ log containing the matches.</td>
   <dl class="fields">
     <dt>Overrides:
         object.__repr__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -554,14 +563,14 @@ entries.
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

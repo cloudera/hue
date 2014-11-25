@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -42,8 +42,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="lxml-module.html">Package&nbsp;lxml</a> ::
-        <a href="lxml.html-module.html">Package&nbsp;html</a> ::
+        lxml ::
+        html ::
+        HtmlProcessingInstruction ::
         Class&nbsp;HtmlProcessingInstruction
       </span>
     </td>
@@ -63,21 +64,21 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class HtmlProcessingInstruction</h1><p class="nomargin-top"><span class="codelink"><a href="lxml.html-pysrc.html#HtmlProcessingInstruction">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-            object --+                
-                     |                
-        <a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a> --+            
-                         |            
-<a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">etree.__ContentOnlyElement</a> --+        
-                             |        
-  <a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">etree._ProcessingInstruction</a> --+    
-                                 |    
-                      <a href="lxml.etree.PIBase-class.html">etree.PIBase</a> --+
-                                     |
-                        object --+   |
-                                 |   |
-                         <a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a> --+
-                                     |
-                                    <strong class="uidshort">HtmlProcessingInstruction</strong>
+          object --+                
+                   |                
+      <a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a> --+            
+                       |            
+ ??.__ContentOnlyElement --+        
+                           |        
+<a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">etree._ProcessingInstruction</a> --+    
+                               |    
+                    <a href="lxml.etree.PIBase-class.html">etree.PIBase</a> --+
+                                   |
+                      object --+   |
+                               |   |
+                       <a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a> --+
+                                   |
+                                  <strong class="uidshort">HtmlProcessingInstruction</strong>
 </pre>
 
 <hr />
@@ -101,23 +102,24 @@
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.PIBase-class.html">etree.PIBase</a></code></b>:
+      <code><a href="lxml.etree.PIBase-class.html#__init__">__init__</a></code>,
       <code><a href="lxml.etree.PIBase-class.html#__new__">__new__</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">etree._ProcessingInstruction</a></code></b>:
-      <code><a href="lxml.etree._ProcessingInstruction-class.html#__repr__">__repr__</a></code>
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#__repr__">__repr__</a></code>,
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#get">get</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">etree.__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__delitem__">__delitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__getitem__">__getitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__len__">__len__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__setitem__">__setitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#append">append</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#get">get</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#insert">insert</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#items">items</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#keys">keys</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#set">set</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#values">values</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>__delitem__</code>,
+      <code>__getitem__</code>,
+      <code>__len__</code>,
+      <code>__setitem__</code>,
+      <code>append</code>,
+      <code>insert</code>,
+      <code>items</code>,
+      <code>keys</code>,
+      <code>set</code>,
+      <code>values</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#__contains__">__contains__</a></code>,
@@ -155,7 +157,7 @@
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a></code></b> (private):
       <code><a href="lxml.etree._Element-class.html#_init" onclick="show_private();">_init</a></code>
       </p></div>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b>:
       <code><a href="lxml.html.HtmlMixin-class.html#cssselect">cssselect</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#drop_tag">drop_tag</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#drop_tree">drop_tree</a></code>,
@@ -168,20 +170,22 @@
       <code><a href="lxml.html.HtmlMixin-class.html#rewrite_links">rewrite_links</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#text_content">text_content</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b> (private):
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b> (private):
       <code><a href="lxml.html.HtmlMixin-class.html#_label__del" onclick="show_private();">_label__del</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#_label__get" onclick="show_private();">_label__get</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#_label__set" onclick="show_private();">_label__set</a></code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
-      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -206,12 +210,12 @@
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ProcessingInstruction-class.html" onclick="show_private();">etree._ProcessingInstruction</a></code></b>:
+      <code><a href="lxml.etree._ProcessingInstruction-class.html#attrib">attrib</a></code>,
       <code><a href="lxml.etree._ProcessingInstruction-class.html#tag">tag</a></code>,
       <code><a href="lxml.etree._ProcessingInstruction-class.html#target">target</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">etree.__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#attrib">attrib</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#text">text</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>text</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">etree._Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#base">base</a></code>,
@@ -220,7 +224,7 @@
       <code><a href="lxml.etree._Element-class.html#sourceline">sourceline</a></code>,
       <code><a href="lxml.etree._Element-class.html#tail">tail</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html" onclick="show_private();">HtmlMixin</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.html.HtmlMixin-class.html">HtmlMixin</a></code></b>:
       <code><a href="lxml.html.HtmlMixin-class.html#base_url">base_url</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#body">body</a></code>,
       <code><a href="lxml.html.HtmlMixin-class.html#forms">forms</a></code>,
@@ -257,14 +261,14 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:39 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

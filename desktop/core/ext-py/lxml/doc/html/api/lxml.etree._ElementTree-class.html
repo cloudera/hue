@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -167,8 +167,10 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#find" class="summary-sig-name">find</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
-      Finds the first toplevel element with given tag.</td>
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Finds the first toplevel element with given tag.  Same as
+<tt class="rst-docutils literal"><span class="pre">tree.getroot().find(path)</span></tt>.</td>
           <td align="right" valign="top">
             
             
@@ -185,8 +187,10 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#findall" class="summary-sig-name">findall</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
-      Finds all elements matching the ElementPath expression.</td>
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Finds all elements matching the ElementPath expression.  Same as
+getroot().findall(path).</td>
           <td align="right" valign="top">
             
             
@@ -204,9 +208,31 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#findtext" class="summary-sig-name">findtext</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">path</span>,
-        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
       Finds the text for the first element matching the ElementPath
-expression.</td>
+expression.  Same as getroot().findtext(path)</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#getelementpath" class="summary-sig-name">getelementpath</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Returns a structural, absolute ElementPath expression to find the
+element.  This path can be used in the .find() method to look up
+the element, provided that the elements along the path and their
+list of immediate children were not modified in between.</td>
           <td align="right" valign="top">
             
             
@@ -223,7 +249,8 @@ expression.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#getiterator" class="summary-sig-name">getiterator</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Returns a sequence or iterator of all elements in document order
 (depth first pre-order), starting with the root element.</td>
           <td align="right" valign="top">
@@ -241,9 +268,9 @@ expression.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getpath"></a><span class="summary-sig-name">getpath</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#getpath" class="summary-sig-name">getpath</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">element</span>)</span><br />
-      Returns a structural, absolute XPath expression to find that element.</td>
+      Returns a structural, absolute XPath expression to find the element.</td>
           <td align="right" valign="top">
             
             
@@ -277,8 +304,10 @@ expression.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#iter" class="summary-sig-name">iter</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Creates an iterator for the root element.</td>
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
+      Creates an iterator for the root element.  The iterator loops over
+all elements in this tree, in document order.</td>
           <td align="right" valign="top">
             
             
@@ -295,8 +324,10 @@ expression.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._ElementTree-class.html#iterfind" class="summary-sig-name">iterfind</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
-      Iterates over all elements matching the ElementPath expression.</td>
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Iterates over all elements matching the ElementPath expression.
+Same as getroot().iterfind(path).</td>
           <td align="right" valign="top">
             
             
@@ -358,7 +389,10 @@ expression.</td>
         <span class="summary-sig-arg">xml_declaration</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">with_tail</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">standalone</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">compression</span>=<span class="summary-sig-default">0</span>)</span><br />
+        <span class="summary-sig-arg">compression</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">exclusive</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">with_comments</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">inclusive_ns_prefixes</span>=<span class="summary-sig-default">None</span>)</span><br />
       Write the tree to a filename, file or file-like object.</td>
           <td align="right" valign="top">
             
@@ -379,8 +413,9 @@ expression.</td>
         <span class="summary-sig-arg">file</span>,
         <span class="summary-sig-arg">exclusive</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">with_comments</span>=<span class="summary-sig-default">True</span>,
-        <span class="summary-sig-arg">compression</span>=<span class="summary-sig-default">0</span>)</span><br />
-      C14N write of document.</td>
+        <span class="summary-sig-arg">compression</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">inclusive_ns_prefixes</span>=<span class="summary-sig-default">None</span>)</span><br />
+      C14N write of document. Always writes UTF-8.</td>
           <td align="right" valign="top">
             
             
@@ -473,6 +508,7 @@ referenced XML fragments.</td>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__init__</code>,
@@ -480,7 +516,9 @@ referenced XML fragments.</td>
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -506,8 +544,11 @@ referenced XML fragments.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.etree._ElementTree-class.html#docinfo" class="summary-name">docinfo</a><br />
-      Information about the document provided by parser and DTD.
+        <a name="docinfo"></a><span class="summary-name">docinfo</span><br />
+      Information about the document provided by parser and DTD.  This
+value is only defined for ElementTree objects based on the root node
+of a parsed document (e.g.  those returned by the parse functions),
+not for trees that were built manually.
     </td>
   </tr>
 <tr>
@@ -577,15 +618,19 @@ referenced XML fragments.</td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">find</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">path</span>)</span>
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Finds the first toplevel element with given tag.  Same as
-<tt class="rst-docutils literal"><span class="pre">tree.getroot().find(path)</span></tt>.
+  <p>Finds the first toplevel element with given tag.  Same as
+<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">tree.getroot().find(path)</span></tt>.</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -598,15 +643,19 @@ referenced XML fragments.</td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">findall</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">path</span>)</span>
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Finds all elements matching the ElementPath expression.  Same as
-getroot().findall(path).
+  <p>Finds all elements matching the ElementPath expression.  Same as
+getroot().findall(path).</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -620,15 +669,45 @@ getroot().findall(path).
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">findtext</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">path</span>,
-        <span class="sig-arg">default</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">default</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Finds the text for the first element matching the ElementPath
-expression.  Same as getroot().findtext(path)
+  <p>Finds the text for the first element matching the ElementPath
+expression.  Same as getroot().findtext(path)</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getelementpath"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getelementpath</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a structural, absolute ElementPath expression to find the
+element.  This path can be used in the .find() method to look up
+the element, provided that the elements along the path and their
+list of immediate children were not modified in between.</p>
+<p>ElementPath has the advantage over an XPath expression (as returned
+by the .getpath() method) that it does not require additional prefix
+declarations.  It is always self-contained.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -641,7 +720,8 @@ expression.  Same as getroot().findtext(path)
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">getiterator</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -650,11 +730,8 @@ expression.  Same as getroot().findtext(path)
   
   <p>Returns a sequence or iterator of all elements in document order
 (depth first pre-order), starting with the root element.</p>
-<p>Can be restricted to find only elements with a specific tag
-(pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;xyz&quot;</span></tt> or <tt class="rst-docutils literal"><span class="pre">tag=&quot;{ns}xyz&quot;</span></tt>) or from a namespace
-(pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;{ns}*&quot;</span></tt>).</p>
-<p>You can also pass the Element, Comment, ProcessingInstruction and
-Entity factory functions to look only for the specific element type.</p>
+<p>Can be restricted to find only elements with a specific tag,
+see <a href="lxml.etree._Element-class.html#iter" class="link">_Element.iter</a>.</p>
   <dl class="fields">
   </dl>
 <div class="fields">      <p><strong>Deprecated:</strong>
@@ -662,11 +739,36 @@ Entity factory functions to look only for the specific element type.</p>
 ElementTree 1.3 and lxml 2.0.  It returns an iterator in
 lxml, which diverges from the original ElementTree
 behaviour.  If you want an efficient iterator, use the
-<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">tree.iter()</span></tt> method instead.  You should only use this
+<tt class="rst-rst-docutils literal rst-docutils literal">tree.iter()</tt> method instead.  You should only use this
 method in new code if you require backwards compatibility
 with older versions of lxml or ElementTree.
       </p>
 </div></td></tr></table>
+</div>
+<a name="getpath"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getpath</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a structural, absolute XPath expression to find the element.</p>
+<p>For namespaced elements, the expression uses prefixes from the
+document, which therefore need to be provided in order to make any
+use of the expression in XPath.</p>
+<p>Also see the method getelementpath(self, element), which returns a
+self-contained ElementPath expression.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
 </div>
 <a name="iter"></a>
 <div>
@@ -676,15 +778,18 @@ with older versions of lxml or ElementTree.
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iter</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Creates an iterator for the root element.  The iterator loops over
-all elements in this tree, in document order.
+  <p>Creates an iterator for the root element.  The iterator loops over
+all elements in this tree, in document order.</p>
+<p>Can be restricted to find only elements with a specific tag,
+see <a href="lxml.etree._Element-class.html#iter" class="link">_Element.iter</a>.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -697,15 +802,19 @@ all elements in this tree, in document order.
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iterfind</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">path</span>)</span>
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Iterates over all elements matching the ElementPath expression.
-Same as getroot().finditer(path).
+  <p>Iterates over all elements matching the ElementPath expression.
+Same as getroot().iterfind(path).</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -751,7 +860,10 @@ class directly.</p>
         <span class="sig-arg">xml_declaration</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">with_tail</span>=<span class="sig-default">True</span>,
         <span class="sig-arg">standalone</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">compression</span>=<span class="sig-default">0</span>)</span>
+        <span class="sig-arg">compression</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">exclusive</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">with_comments</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">inclusive_ns_prefixes</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -760,12 +872,23 @@ class directly.</p>
   
   <p>Write the tree to a filename, file or file-like object.</p>
 <p>Defaults to ASCII encoding and writing a declaration as needed.</p>
-<p>The keyword argument 'method' selects the output method: 'xml' or
-'html'.</p>
-<p>Passing a boolean value to the <tt class="rst-docutils literal"><span class="pre">standalone</span></tt> option will
+<p>The keyword argument 'method' selects the output method:
+'xml', 'html', 'text' or 'c14n'.  Default is 'xml'.</p>
+<p>The <tt class="rst-docutils literal">exclusive</tt> and <tt class="rst-docutils literal">with_comments</tt> arguments are only
+used with C14N output, where they request exclusive and
+uncommented C14N serialisation respectively.</p>
+<p>Passing a boolean value to the <tt class="rst-docutils literal">standalone</tt> option will
 output an XML declaration with the corresponding
-<tt class="rst-docutils literal"><span class="pre">standalone</span></tt> flag.</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">compression</span></tt> option enables GZip compression level 1-9.</p>
+<tt class="rst-docutils literal">standalone</tt> flag.</p>
+<p>The <tt class="rst-docutils literal">compression</tt> option enables GZip compression level 1-9.</p>
+<p>The <tt class="rst-docutils literal">inclusive_ns_prefixes</tt> should be a list of namespace strings
+(i.e. ['xs', 'xsi']) that will be promoted to the top-level element
+during exclusive C14N serialisation.  This parameter is ignored if
+exclusive mode=False.</p>
+<p>If exclusive=True and no list is provided, a namespace will only be
+rendered if it is used by the immediate parent or one of its attributes
+and its prefix and values have not already been rendered by an ancestor
+of the namespace node's parent element.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -781,7 +904,8 @@ output an XML declaration with the corresponding
         <span class="sig-arg">file</span>,
         <span class="sig-arg">exclusive</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">with_comments</span>=<span class="sig-default">True</span>,
-        <span class="sig-arg">compression</span>=<span class="sig-default">0</span>)</span>
+        <span class="sig-arg">compression</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">inclusive_ns_prefixes</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -789,7 +913,15 @@ output an XML declaration with the corresponding
   </tr></table>
   
   <p>C14N write of document. Always writes UTF-8.</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">compression</span></tt> option enables GZip compression level 1-9.</p>
+<p>The <tt class="rst-docutils literal">compression</tt> option enables GZip compression level 1-9.</p>
+<p>The <tt class="rst-docutils literal">inclusive_ns_prefixes</tt> should be a list of namespace strings
+(i.e. ['xs', 'xsi']) that will be promoted to the top-level element
+during exclusive C14N serialisation.  This parameter is ignored if
+exclusive mode=False.</p>
+<p>If exclusive=True and no list is provided, a namespace will only be
+rendered if it is used by the immediate parent or one of its attributes
+and its prefix and values have not already been rendered by an ancestor
+of the namespace node's parent element.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -864,8 +996,8 @@ class directly.</p>
   </tr></table>
   
   <p>XPath evaluate in context of document.</p>
-<p><tt class="rst-docutils literal"><span class="pre">namespaces</span></tt> is an optional dictionary with prefix to namespace URI
-mappings, used by XPath.  <tt class="rst-docutils literal"><span class="pre">extensions</span></tt> defines additional extension
+<p><tt class="rst-docutils literal">namespaces</tt> is an optional dictionary with prefix to namespace URI
+mappings, used by XPath.  <tt class="rst-docutils literal">extensions</tt> defines additional extension
 functions.</p>
 <p>Returns a list (nodeset), or bool, float or string.</p>
 <p>In case of a list result, return Element for element nodes,
@@ -907,39 +1039,6 @@ class directly.</p>
 </td></tr></table>
 </div>
 <br />
-<!-- ==================== PROPERTY DETAILS ==================== -->
-<a name="section-PropertyDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Property Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-PropertyDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="docinfo"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">docinfo</h3>
-  Information about the document provided by parser and DTD.  This
-value is only defined for ElementTree objects based on the root node
-of a parsed document (e.g.  those returned by the parse functions),
-not for trees that were built manually.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -964,14 +1063,14 @@ not for trees that were built manually.
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
