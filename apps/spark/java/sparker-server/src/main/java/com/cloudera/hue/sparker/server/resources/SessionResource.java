@@ -1,7 +1,12 @@
-package com.cloudera.hue.sparker.server;
+package com.cloudera.hue.sparker.server.resources;
 
+import com.cloudera.hue.sparker.server.sessions.Cell;
+import com.cloudera.hue.sparker.server.sessions.ClosedSessionException;
+import com.cloudera.hue.sparker.server.sessions.Session;
+import com.cloudera.hue.sparker.server.sessions.SessionManager;
 import com.codahale.metrics.annotation.Timed;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -93,5 +98,14 @@ public class SessionResource {
     public Response closeSession(@PathParam("id") String id) throws InterruptedException, TimeoutException, IOException, SessionManager.SessionNotFound {
         sessionManager.close(id);
         return Response.noContent().build();
+    }
+
+    private class ExecuteStatementRequest {
+        @NotEmpty
+        private String statement;
+
+        public String getStatement() {
+            return statement;
+        }
     }
 }

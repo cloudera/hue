@@ -1,5 +1,7 @@
 package com.cloudera.hue.sparker.server;
 
+import com.cloudera.hue.sparker.server.resources.SessionResource;
+import com.cloudera.hue.sparker.server.sessions.SessionManager;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
