@@ -379,3 +379,11 @@ em {
 .card-column-disabled {
   background-color: #f1f1f1;
 }
+
+.widget-icon {
+  color: #338bb8;
+  height: 16px;
+  width: 16px;
+  margin-left: 3px;
+  margin-right: 3px;
+}

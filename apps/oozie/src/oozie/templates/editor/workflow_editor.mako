@@ -323,6 +323,61 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
         &nbsp;
       </span>
+
+
+      <!-- ko if: widgetType() == 'hive-widget' -->
+      <img src="/oozie/static/art/icon_beeswax_48.png" class="widget-icon">
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'hive2-widget' -->
+      <img src="/oozie/static/art/icon_beeswax_48.png" class="widget-icon"><sup>2</sup>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'pig-widget' -->
+      <img src="/oozie/static/art/icon_pig_48.png" class="widget-icon">
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'java-widget' -->
+      <a class="widget-icon"><i class="fa fa-file-code-o"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'sqoop-widget' -->
+      <img src="/oozie/static/art/icon_sqoop_48.png" class="widget-icon">
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'mapreduce-widget' -->
+      <a class="widget-icon"><i class="fa fa-file-archive-o"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'subworkflow-widget' -->
+      <a class="widget-icon"><i class="fa fa-code-fork"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'shell-widget' -->
+      <a class="widget-icon"><i class="fa fa-terminal"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'ssh-widget' -->
+      <a class="widget-icon"><i class="fa fa-tty"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'fs-widget' -->
+      <a class="widget-icon"><i class="fa fa-file-o"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'email-widget' -->
+      <a class="widget-icon"><i class="fa fa-envelope-o"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'streaming-widget' -->
+      <a class="widget-icon"><i class="fa fa-exchange"></i></a>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'distcp-widget' -->
+      <a class="widget-icon"><i class="fa fa-files-o"></i></a>
+      <!-- /ko -->
+
+
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
       <span data-bind="with: $root.collection.getFacetById(id())">
         <span data-bind="editable: label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
@@ -608,9 +663,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+        <input type="text" data-bind="value: properties.script_path" />
+        <br/>
+        <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Hive') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -620,18 +682,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
-
           <span data-bind="text: $root.workflow_properties.script_path.label"></span>
           <input type="text" data-bind="value: properties.script_path" />                    
-          </br>
+          <br/>
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
-          </br>
+          <br/>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -658,9 +718,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+        <input type="text" data-bind="value: properties.script_path" />
+        <br/>
+        <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Hive') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -670,24 +737,22 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
-
           <span data-bind="text: $root.workflow_properties.script_path.label"></span>
           <input type="text" data-bind="value: properties.script_path" />                    
-          </br>
+          <br/>
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url" />                    
-          </br>
+          <br/>
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password" />                    
-          </br>        
+          <br/>        
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
-          </br>
+          <br/>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -714,9 +779,19 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+        <input type="text" data-bind="value: properties.script_path" />
+        <br/>
+
+	      <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+	      <br/>
+	      <span data-bind="template: { name: 'common-properties-files' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Pig') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -726,11 +801,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <img src="/oozie/static/art/icon_pig_48.png" class="app-icon">
-
           <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-          <input type="text" data-bind="value: properties.script_path" />          
-          </br>
+          <input type="text" data-bind="value: properties.script_path" />
+          <br/>
 
 	      <span data-bind="template: { name: 'common-properties-parameters' }"></span>
 	      <br/>
@@ -767,9 +840,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.jar_path.label"></span>          
+          <input type="text" data-bind="value: properties.jar_path" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.main_class.label"></span>
+          <input type="text" data-bind="value: properties.main_class" />
+          <br/>
+
+          <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+          <br/>
+          <span data-bind="template: { name: 'common-properties-files' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Java') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -779,14 +864,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <i class="fa fa-file-code-o"></i>
-          
+
           <span data-bind="text: $root.workflow_properties.jar_path.label"></span>          
           <input type="text" data-bind="value: properties.jar_path" />
           <br/>
           <span data-bind="text: $root.workflow_properties.main_class.label"></span>
           <input type="text" data-bind="value: properties.main_class" />
-          </br>
+          <br/>
 
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
           <br/>
@@ -806,10 +890,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           <button data-bind="click: function(){ properties.java_opts.push({'value': ''}); }">
             <i class="fa fa-plus"></i>
           </button>        
-          </br>
+          <br/>
           <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
           <input type="text" data-bind="value: properties.capture_output" />
-          </br>
+          <br/>
 
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
@@ -839,9 +923,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.command.label"></span>
+          <input type="text" data-bind="value: properties.command" />
+          <br/>
+          <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Sqoop') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -853,8 +943,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
 
           <span data-bind="text: $root.workflow_properties.command.label"></span>
-          <input type="text" data-bind="value: properties.command" />                    
-          </br>
+          <input type="text" data-bind="value: properties.command" />
+          <br/>
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
         </div>
 
@@ -886,9 +976,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
+          <input type="text" data-bind="value: properties.jar_path" />
+          <br/>
+          <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('MapReduce') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -900,7 +996,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
           <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
           <input type="text" data-bind="value: properties.jar_path" />                    
-          </br>
+          <br/>
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
         </div>
 
@@ -932,9 +1028,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.workflow.label"></span>
+          <input type="text" data-bind="value: properties.workflow" />
+          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Sub Workflow') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -977,9 +1078,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
+          <input type="text" data-bind="value: properties.jar_path" />
+          <br/>
+          <span data-bind="template: { name: 'common-properties-parameters' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('MapReduce') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -992,7 +1099,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
           <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
           <input type="text" data-bind="value: properties.jar_path" />                    
-          </br>
+          <br/>
           <span data-bind="template: { name: 'common-properties-parameters' }"></span>
         </div>
 
@@ -1024,9 +1131,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.shell_command.label"></span>
+          <input type="text" data-bind="value: properties.shell_command" />
+          <br/>
+          <span data-bind="template: { name: 'common-properties-arguments' }"></span>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Shell') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1036,7 +1149,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <i class="fa fa-terminal"></i>
           <span data-bind="text: $root.workflow_properties.shell_command.label"></span>
           <input type="text" data-bind="value: properties.shell_command" />
           <br/>
@@ -1087,9 +1199,29 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.host.label"></span>
+          <input type="text" data-bind="value: properties.host" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.ssh_command.label"></span>
+          <input type="text" data-bind="value: properties.ssh_command" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.arguments.label"></span>
+          <ul data-bind="foreach: properties.arguments">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Ssh') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1099,7 +1231,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <i class="fa fa-tty"></i>
           <span data-bind="text: $root.workflow_properties.host.label"></span>
           <input type="text" data-bind="value: properties.host" />
           <br/>
@@ -1149,9 +1280,114 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.deletes.label"></span>
+          <ul data-bind="foreach: properties.deletes">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.deletes.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+
+          <br/>
+
+          <span data-bind="text: $root.workflow_properties.mkdirs.label"></span>
+          <ul data-bind="foreach: properties.mkdirs">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.mkdirs.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+
+          <br/>
+
+          <span data-bind="text: $root.workflow_properties.touchzs.label"></span>
+          <ul data-bind="foreach: properties.touchzs">
+            <li>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.touchzs.push({'value': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+
+          <br/>
+
+          <span data-bind="text: $root.workflow_properties.moves.label"></span>
+          <ul data-bind="foreach: properties.moves">
+            <li>
+              <input data-bind="value: source"/>
+              <input data-bind="value: target"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.moves.push({'source': '', 'target': ''}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+
+          <br/>
+
+          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
+          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
+          <ul data-bind="foreach: properties.chmods">
+            <li>
+              ${ _('Path') }
+              <input data-bind="value: value"/>
+              ${ _('Permissions') }
+              <input data-bind="value: permissions"/>
+              ${ _('Also apply to files') }
+              <input type="checkbox" data-bind="value: dir_files"/>
+              ${ _('Recursive') }
+              <input type="checkbox" data-bind="value: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'permissions': '600', 'dir_files': true, 'recursive': false}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+
+          <br/>
+
+          <span data-bind="text: $root.workflow_properties.chgrps.label"></span>
+          <ul data-bind="foreach: properties.chgrps">
+            <li>
+              ${ _('Path') }
+              <input data-bind="value: value"/>
+              ${ _('Group') }
+              <input data-bind="value: group"/>
+              ${ _('Also apply to files') }
+              <input type="checkbox" data-bind="value: dir_files"/>
+              ${ _('Recursive') }
+              <input type="checkbox" data-bind="value: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'group': 'mygroup', 'dir_files': false, 'recursive': false}); }">
+            <i class="fa fa-plus"></i>
+          </button>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Fs') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1293,9 +1529,19 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+          <span data-bind="text: $root.workflow_properties.to.label"></span>
+          <input type="text" data-bind="value: properties.to" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.subject.label"></span>
+          <input type="text" data-bind="value: properties.subject" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.body.label"></span>
+          <input type="text" data-bind="value: properties.body" />
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Email') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1305,8 +1551,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
-          <i class="fa fa-envelope-o"></i>
-          
           <span data-bind="text: $root.workflow_properties.to.label"></span>
           <input type="text" data-bind="value: properties.to" />
           <br/>
@@ -1346,9 +1590,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.mapper.label"></span>
+          <input type="text" data-bind="value: properties.mapper" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.reducer.label"></span>
+          <input type="text" data-bind="value: properties.reducer" />
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Streaming') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1393,9 +1644,23 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <input type="text" data-bind="value: id" />
       <input type="text" data-bind="value: name" />
+      <div data-bind="visible: ! $parent.oozieExpanded()">
+        <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span>
+		  <ul data-bind="foreach: properties.distcp_parameters">
+		    <li>
+		      <input data-bind="value: value"/>
+		      <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this); }">
+		        <i class="fa fa-minus"></i>
+		      </a>
+		    </li>
+		  </ul>
+		  <button data-bind="click: function(){ properties.distcp_parameters.push({'value': ''}); }">
+		    <i class="fa fa-plus"></i>
+		  </button>
+      </div>
     </div>
 
-    <div class="prop-editor">
+    <div data-bind="visible: $parent.oozieExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Dist Cp') }</a></li>
         <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
