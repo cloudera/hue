@@ -226,7 +226,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </div>
 
 <script type="text/html" id="column-template">
-  <div data-bind="css: klass" style="min-height: 50px !important;">
+  <div data-bind="css: klass() + (!$root.isEditing()?' card-column-disabled':'')" style="min-height: 50px !important;">
     <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
@@ -246,7 +246,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <script type="text/html" id="internal-column-template">
-  <div data-bind="css: klass" style="min-height: 50px !important;">
+  <div data-bind="css: klass() + (!$root.isEditing()?' card-column-disabled':'')" style="min-height: 50px !important;">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
@@ -269,7 +269,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
           sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && widgets().length < 1, isEnabled: $root.isEditing() && widgets().length < 1,
           options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
               'stop': function(event, ui){},
-              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+              'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
               dragged: function(widget){widgetDraggedAdditionalHandler(widget)}}">
         </div>
       </div>
@@ -1554,10 +1554,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <div id="exposeOverlay"></div>
 
-<link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
 
 
 ${ dashboard.import_layout() }
@@ -1671,7 +1671,7 @@ ${ dashboard.import_bindings() }
       p2y: _toCenter.y,
       lineWidth: 2,
       size: 10,
-      strokeStyle: '#e5e5e5'
+      strokeStyle: viewModel.isEditing()?'#e5e5e5':'#dddddd'
     });
 
   }
