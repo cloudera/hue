@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.sparker.server;
+package com.cloudera.hue.sparker.server.sessions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
