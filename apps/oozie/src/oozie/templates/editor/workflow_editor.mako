@@ -318,6 +318,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (oozieExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded()">
+        <a href="javascript:void(0)" data-bind="visible: $root.isEditing() && ! oozieExpanded() && oozieMovable(), click: toggleProperties"><i class="fa fa-cogs"></i></a>
+        &nbsp;
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
         <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
@@ -386,6 +388,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
+
+      &nbsp;&nbsp;&nbsp;<span style="font-weight: normal; font-style: italic" data-bind="text: id"></span>
+
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded()">
           <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
@@ -403,9 +408,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
       <!-- /ko -->
     </h2>
     <div class="card-body" style="padding: 5px;">
-      <span data-bind="visible: $root.isEditing() && ! oozieExpanded() && oozieMovable()">
-        <a class="btn" data-bind="click: toggleProperties"><i class="fa fa-cogs"></i></a>
-      </span>
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
@@ -416,8 +418,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
 
     <div>
@@ -436,8 +436,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
 
     <div>
@@ -454,8 +452,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
     
     <div data-bind="visible: $root.isEditing">
@@ -479,8 +475,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
 
     <div>
@@ -495,8 +489,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
 
     <div data-bind="visible: $root.isEditing">
@@ -513,8 +505,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
     </div>
 
     <div>
@@ -531,15 +521,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <li>
       <span data-bind="text: type"></span>
       <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
+  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''});$(document).trigger('drawArrows') }">
     ${ _('Directory') } <i class="fa fa-plus"></i>
   </button>
-  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
+  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''});$(document).trigger('drawArrows') }">
     ${ _('Delete') } <i class="fa fa-plus"></i>
   </button>
   <br/>
@@ -550,12 +540,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
     <li>
       <input data-bind="value: name"/>
       <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); }">
+  <button data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">
     <i class="fa fa-plus"></i>
   </button>
   <br/>
@@ -563,12 +553,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <ul data-bind="foreach: properties.archives">
     <li>
       <input data-bind="value: name"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.archives.push({'name': ''}); }">
+  <button data-bind="click: function(){ properties.archives.push({'name': ''});$(document).trigger('drawArrows') }">
     <i class="fa fa-plus"></i>
   </button>
 </script>
@@ -579,12 +569,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <ul data-bind="foreach: properties.arguments">
     <li>
       <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.arguments.push({'value': ''}); }">
+  <button data-bind="click: function(){ properties.arguments.push({'value': ''});$(document).trigger('drawArrows') }">
     <i class="fa fa-plus"></i>
   </button> 
 </script>
@@ -595,12 +585,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <ul data-bind="foreach: properties.files">
     <li>
       <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.files.push({'value': ''}); }">
+  <button data-bind="click: function(){ properties.files.push({'value': ''});$(document).trigger('drawArrows') }">
     <i class="fa fa-plus"></i>
   </button>
 </script>
@@ -611,12 +601,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <ul data-bind="foreach: properties.parameters">
     <li>
       <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); }">
+      <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
-  <button data-bind="click: function(){ properties.parameters.push({'value': ''}); }">
+  <button data-bind="click: function(){ properties.parameters.push({'value': ''}); $(document).trigger('drawArrows')}">
     <i class="fa fa-plus"></i>
   </button>
 </script>
@@ -661,8 +651,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
         <input type="text" data-bind="value: properties.script_path" />
@@ -716,8 +704,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
         <input type="text" data-bind="value: properties.script_path" />
@@ -776,10 +762,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <script type="text/html" id="pig-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
 
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+      <strong data-bind="text: properties.script_path"></strong>
+    </div>
+
+    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
         <input type="text" data-bind="value: properties.script_path" />
@@ -838,8 +827,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.jar_path.label"></span>          
           <input type="text" data-bind="value: properties.jar_path" />
@@ -921,8 +908,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.command.label"></span>
           <input type="text" data-bind="value: properties.command" />
@@ -974,8 +959,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
           <input type="text" data-bind="value: properties.jar_path" />
@@ -1026,8 +1009,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.workflow.label"></span>
           <input type="text" data-bind="value: properties.workflow" />
@@ -1076,8 +1057,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
           <input type="text" data-bind="value: properties.jar_path" />
@@ -1129,8 +1108,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.shell_command.label"></span>
           <input type="text" data-bind="value: properties.shell_command" />
@@ -1278,8 +1255,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.deletes.label"></span>
           <ul data-bind="foreach: properties.deletes">
@@ -1527,8 +1502,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
           <span data-bind="text: $root.workflow_properties.to.label"></span>
           <input type="text" data-bind="value: properties.to" />
@@ -1588,8 +1561,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.mapper.label"></span>
           <input type="text" data-bind="value: properties.mapper" />
@@ -1642,8 +1613,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
       <div data-bind="visible: ! $parent.oozieExpanded()">
         <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span>
 		  <ul data-bind="foreach: properties.distcp_parameters">
@@ -2033,6 +2002,7 @@ ${ dashboard.import_bindings() }
         lastExpandedWidget.oozieExpanded(false);
       }
       $("#exposeOverlay").fadeOut(300);
+      $(document).trigger("drawArrows");
     });
 
     $(document).keyup(function(e) {

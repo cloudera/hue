@@ -43,7 +43,7 @@ function loadColumns(viewModel, json_layout) {
     $(json_col.rows).each(function (rcnt, json_row) {
       var row = new Row([], viewModel);
       $(json_row.widgets).each(function (wcnt, widget) {
-        row.addWidget(new Widget({
+        var _w = new Widget({
           size: widget.size,
           id: widget.id,
           name: widget.name,
@@ -52,7 +52,8 @@ function loadColumns(viewModel, json_layout) {
           offset: widget.offset,
           loading: true,
           vm: viewModel
-        }));
+        });
+        row.addWidget(_w);
       });
       row.columns(loadColumns(viewModel, json_row.columns));
       _rows.push(row);
