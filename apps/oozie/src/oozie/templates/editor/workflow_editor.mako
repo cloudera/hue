@@ -121,7 +121,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableDistCpAction(), isEnabled: true,
-                    options: {'start': function(event, ui){}}}"
+                    options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableDistCpAction());}}}"
          title="${_('Distcp')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>    
@@ -1397,26 +1397,74 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
     <div>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#action" data-toggle="tab">${ _('Dist Cp') }</a></li>
-        <li><a href="#properties" data-toggle="tab">${ _('Files') }</a></li>
-        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
-        <li><a href="#credentials" data-toggle="tab">${ _('Credentials') }</a></li>
-        <li><a href="#transitions" data-toggle="tab">${ _('Transitions') }</a></li>
+        <li class="active"><a data-bind="attr: { href: '#action-' + id()}" data-toggle="tab">${ _('Dist Cp') }</a></li>
+        <li><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="action">
-          <img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon">
+        <div class="tab-pane active" data-bind="attr: { id: 'action-' + id() }">
+		  <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span>
+		  <ul data-bind="foreach: properties.distcp_parameters">
+		    <li>
+		      <input data-bind="value: value"/>
+		      <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this); }">
+		        <i class="fa fa-minus"></i>
+		      </a>
+		    </li>
+		  </ul>
+		  <button data-bind="click: function(){ properties.distcp_parameters.push({'value': ''}); }">
+		    <i class="fa fa-plus"></i>
+		  </button> 
         </div>
-        <div class="tab-pane" id="properties">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
+
+        <div class="tab-pane" data-bind="attr: { id: 'properties-' + id() }">
+		  ${ _('Prepare') }
+		  <ul data-bind="foreach: properties.prepares">
+		    <li>
+		      <span data-bind="text: type"></span>
+		      <input data-bind="value: value"/>
+		      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
+		        <i class="fa fa-minus"></i>
+		      </a>
+		    </li>
+		  </ul>
+		  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
+		    ${ _('Directory') } <i class="fa fa-plus"></i>
+		  </button>
+		  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
+		    ${ _('Delete') } <i class="fa fa-plus"></i>
+		  </button>
+		  <br/>
+		  ${ _('Properties') }
+		  <ul data-bind="foreach: properties.job_properties">
+		    <li>
+		      <input data-bind="value: name"/>
+		      <input data-bind="value: value"/>
+		      <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); }">
+		        <i class="fa fa-minus"></i>
+		      </a>
+		    </li>
+		  </ul>
+		  <button data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); }">
+		    <i class="fa fa-plus"></i>
+		  </button>
+		  <br/>
+          <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
+          <input type="text" data-bind="value: properties.java_opts" />
         </div>
-        <div class="tab-pane" id="sla">
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
-        <div class="tab-pane" id="credentials">
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
         </div>
-        <div class="tab-pane" id="transitions">
-          OK --> []
-          KO --> []
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
         </div>
       </div>
     </div>
