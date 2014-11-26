@@ -8,6 +8,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,10 +18,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -46,7 +49,8 @@ public class SessionResource {
 
     @POST
     @Timed
-    public String createSession(@QueryParam("lang") String language) throws IOException, InterruptedException {
+    public Response createSession(@QueryParam("lang") String language,
+                                  @Context HttpServletRequest request) throws IOException, InterruptedException, URISyntaxException {
         int sessionType;
 
         if (language == null) {
@@ -65,7 +69,8 @@ public class SessionResource {
 
         Session session = sessionManager.create(sessionType);
 
-        return session.getId();
+        URI location = new URI("/" + session.getId());
+        return Response.created(location).build();
     }
 
     @Path("/{id}")
@@ -95,14 +100,16 @@ public class SessionResource {
     @Path("/{id}")
     @POST
     @Timed
-    public Response executeStatement(@PathParam("id") String id, @Valid ExecuteStatementRequest request) throws Exception, ClosedSessionException, SessionManager.SessionNotFound {
+    public Response executeStatement(@PathParam("id") String id,
+                                     @Valid ExecuteStatementRequest body,
+                                     @Context HttpServletRequest request) throws Exception, ClosedSessionException, SessionManager.SessionNotFound {
         Session session = sessionManager.get(id);
 
         // The cell is evaluated inline, but eventually it'll be turned into an asynchronous call.
-        Cell cell = session.executeStatement(request.getStatement());
+        Cell cell = session.executeStatement(body.getStatement());
 
-        URI location = new URI("/sessions/" + session.getId() + "/cells/" + cell.getId());
-        return new ResponseBuilderImpl().status(Response.Status.SEE_OTHER).contentLocation(location).build();
+        URI location = new URI("/cells/" + cell.getId());
+        return Response.created(location).build();
     }
 
     @Path("/{id}")
@@ -111,18 +118,5 @@ public class SessionResource {
     public Response closeSession(@PathParam("id") String id) throws InterruptedException, TimeoutException, IOException, SessionManager.SessionNotFound {
         sessionManager.close(id);
         return Response.noContent().build();
-    }
-
-    private class ExecuteStatementRequest {
-        @NotEmpty
-        private String statement;
-
-        public ExecuteStatementRequest(String statement) {
-            this.statement = statement;
-        }
-
-        public String getStatement() {
-            return statement;
-        }
     }
 }
