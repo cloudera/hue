@@ -67,7 +67,7 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
   }
 
   override def loop(): Unit = {
-    println(compact(render(Map("state" -> "ready"))))
+    //println(compact(render(Map("state" -> "ready"))))
 
     def readOneLine() = {
       out.flush()
