@@ -93,7 +93,7 @@ public class SessionManager {
 
         protected SessionManager manager;
 
-        protected long period = 60000; // Time in milliseconds; TODO: make configurable
+        protected long period = 600000; // Time in milliseconds; TODO: make configurable
 
         public SessionManagerGarbageCollector(SessionManager manager) {
             super();
