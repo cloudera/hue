@@ -347,15 +347,6 @@ em {
   width: 4.5%;
 }
 
-.prop-editor {
-  display: none;
-}
-
-.prop-editor .tab-pane {
-  overflow-y: auto;
-  max-height: 350px;
-}
-
 .card-widget {
   position:relative;
 }
@@ -386,4 +377,30 @@ em {
   width: 16px;
   margin-left: 3px;
   margin-right: 3px;
+}
+
+.advanced-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent #338bb8 transparent transparent;
+  cursor: pointer;
+}
+
+.advanced-triangle a {
+  color: #FFFFFF;
+  padding-left: 20px;
+  padding-top: 4px;
+}
+
+.card-widget h6 {
+  text-transform: uppercase;
+  color: #338bb8;
+}
+
+.widget-main-section {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 350px;
 }
