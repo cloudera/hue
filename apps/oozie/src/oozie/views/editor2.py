@@ -35,7 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Workflow, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
+from oozie.models2 import Workflow, Coordinator, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
 
 
 LOG = logging.getLogger(__name__)
@@ -230,4 +230,79 @@ def import_hue_3_7_workflows(request):
     response['message'] = str(e)
     
   return HttpResponse(json.dumps(response), mimetype="application/json") 
+
+
+
+def list_editor_coordinators(request):
+  coordinators = Document2.objects.filter(type='oozie-coordinator2', owner=request.user)
+
+  return render('editor/list_editor_coordinators.mako', request, {
+      'coordinators': coordinators
+  })
+
+
+def edit_coordinator(request):
+
+  coordinator_id = request.GET.get('coordinator')
   
+  if coordinator_id:
+    coordinator = Coordinator(document=Document2.objects.get(id=coordinator_id)) # Todo perms
+  else:
+    coordinator = Coordinator()
+  
+  coordinator_data = coordinator.get_data()
+
+  api = get_oozie(request.user)
+  credentials = Credentials()
+  
+  try:  
+    credentials.fetch(api)
+  except Exception, e:
+    LOG.error(smart_str(e))
+
+  return render('editor/coordinator_editor.mako', request, {
+      'coordinator_json': json.dumps(coordinator_data['coordinator']),
+      'credentials_json': json.dumps(credentials.credentials.keys()),
+  })
+
+
+def new_coordinator(request):
+  return edit_coordinator(request)
+
+
+def save_coordinator(request):
+  response = {'status': -1}
+
+  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+  layout = json.loads(request.POST.get('layout', '{}'))
+
+  name = 'test'
+
+  if workflow.get('id'):
+    workflow_doc = Document2.objects.get(id=workflow['id'])
+  else:      
+    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=request.user)
+
+  subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
+  if subworkflows:
+    dependencies = Document2.objects.filter(uuid__in=subworkflows)
+    workflow_doc.dependencies = dependencies
+
+  workflow_doc.update_data({'workflow': workflow})
+  workflow_doc.update_data({'layout': layout})
+  workflow_doc.name = name
+  workflow_doc.save()
+  
+  workflow_instance = Workflow(document=workflow_doc)
+  workflow_instance.check_workspace(request.fs)
+  
+  response['status'] = 0
+  response['id'] = workflow_doc.id
+  response['message'] = _('Page saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+
+def submit_coordinator(request, doc_id):
+  pass
