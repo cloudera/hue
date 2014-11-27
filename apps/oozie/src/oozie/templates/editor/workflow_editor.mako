@@ -387,8 +387,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
       <!-- /ko -->
 
-      &nbsp;&nbsp;&nbsp;<span style="font-weight: normal; font-style: italic" data-bind="text: id"></span>
-
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded()">
           <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
