@@ -42,7 +42,9 @@ LOG = logging.getLogger(__name__)
 
 @view_error_handler
 def editor(request):
-  return render('editor.mako', request, {})
+  return render('editor.mako', request, {
+      'notebooks_json': json.dumps([{'snippets': [{'type': 'table', 'result': {}}]}])
+  })
 
 @view_error_handler
 def list_jobs(request):

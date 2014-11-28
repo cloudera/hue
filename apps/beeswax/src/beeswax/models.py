@@ -409,7 +409,7 @@ class Session(models.Model):
 
 
 class QueryHandle(object):
-  def __init__(self, secret, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None):
+  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None):
     self.secret = secret
     self.guid = guid
     self.operation_type = operation_type

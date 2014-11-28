@@ -36,8 +36,11 @@ urlpatterns = patterns('spark.views',
 
 # APIs
 urlpatterns += patterns('spark.api',
-  url(r'^api/jars$', 'jars', name='jars'),
   url(r'^api/execute$', 'execute', name='execute'),
+  url(r'^api/check_status', 'check_status', name='check_status'),
+  url(r'^api/fetch_result$', 'fetch_result', name='fetch_result'),
+                        
+  url(r'^api/jars$', 'jars', name='jars'),  
   url(r'^api/contexts$', 'contexts', name='contexts'),
   url(r'^api/job/(?P<job_id>.+)$', 'job', name='job'),
   url(r'^api/create_context$', 'create_context', name='create_context'),
