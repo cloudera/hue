@@ -41,26 +41,8 @@ LOG = logging.getLogger(__name__)
 
 
 @view_error_handler
-def editor(request, design_id=None, query_history_id=None):
-  api = get_api(request.user)
-  jobs = api.jobs()
-  if design_id is not None and not design_id.isdigit():
-    job_id, design_id = design_id, None
-  else:
-    job_id = None
-
-  action = request.path
-  app_name = get_app_name(request)
-  query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
-  design = safe_get_design(request, query_type, design_id)
-
-  return render('editor.mako', request, {
-    'action': action,
-    'design': design,
-    'design_json': json.dumps(design_to_dict(design)),
-    'can_edit_name': design.id and not design.is_auto,
-    'job_id': job_id,
-  })
+def editor(request):
+  return render('editor.mako', request, {})
 
 @view_error_handler
 def list_jobs(request):
