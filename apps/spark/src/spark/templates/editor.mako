@@ -30,6 +30,15 @@ ${ common.navbar('editor') }
     <div class="span12">
 
       <div class="card card-home">
+      
+        <li>
+          <ul data-bind="template: { name: 'notebook', foreach: notebooks }"></ul>
+          
+           <a href="javascript: void(0)" data-bind="click: newNotebook">
+             <i class="fa fa-plus" title="${ _('Add') }"></i>
+           </a>          
+        </li>
+      
         <div id="snippets"></div>
 
         <div class="question">
@@ -48,6 +57,36 @@ ${ common.navbar('editor') }
   </div>
 </div>
 
+
+<script type="text/html" id="notebook">
+  <strong data-bind="text: id"></strong>
+  <li>
+    <ul data-bind="template: { name: 'snippet', foreach: snippets }"></ul>
+  </li>
+  
+  <a href="javascript: void(0)" data-bind="click: newSnippet">
+    <i class="fa fa-plus" title="${ _('Add') }"></i>
+  </a>
+</script>
+
+
+<script type="text/html" id="snippet">
+  <strong data-bind="text: id"></strong>
+  <strong data-bind="text: type"></strong>
+  <textarea data-bind="value: statement"></textarea>
+  
+  <a href="javascript: void(0)" data-bind="click: execute">
+    <i class="fa fa-play" title="${ _('Go') }"></i>
+  </a>
+  
+  <strong data-bind="text: ko.mapping.toJSON(result.meta)"></strong>
+  <li data-bind="foreach: result.data">
+    <ul data-bind="text: ko.mapping.toJSON($data)"></ul>
+  </li>  
+</script>
+
+
+
 <textarea id="tempEditor"></textarea>
 
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
@@ -60,7 +99,18 @@ ${ common.navbar('editor') }
 <script src="/static/ext/js/codemirror-markdown.js"></script>
 <script src="/static/ext/js/markdown.min.js"></script>
 
+
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
+
+
 <script type="text/javascript" charset="utf-8">
+
+  viewModel = new EditorViewModel(${ notebooks_json | n,unicode });
+  ko.applyBindings(viewModel);
+  viewModel.init();
+
 
   var mainCodeMirror, tempCodeMirror, tempCodeMirrorUpdateFn;
 
