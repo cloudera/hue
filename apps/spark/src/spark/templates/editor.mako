@@ -18,40 +18,42 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="common" file="common.mako" />
 
-${ commonheader(_('Query'), app_name, user) | n,unicode }
+${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
-${ common.navbar('editor') }
+<div class="card card-toolbar">
+  <div style="float: left; margin-left: 20px">
+    <div class="toolbar-label">${_('WIDGETS')}</div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
+         title="${_('Hive Query')}" rel="tooltip" data-placement="bottom">
+         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
+                       <img src="/beeswax/static/art/icon_beeswax_48.png" class="app-icon" />
+         </a>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+</div>
 
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
 
-      <div class="card card-home">
-      
-        <li>
-          <ul data-bind="template: { name: 'notebook', foreach: notebooks }"></ul>
-          
-           <a href="javascript: void(0)" data-bind="click: newNotebook">
-             <i class="fa fa-plus" title="${ _('Add') }"></i>
-           </a>          
-        </li>
-      
-        <div id="snippets"></div>
+        <ul class="nav nav-tabs">
+          <!-- ko foreach: notebooks -->
+            <li class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }">
+              <a href="javascript:void(0)" data-bind="text: id, click: $parent.selectedNotebook.bind(null, $data)"></a>
+            </li>
+          <!-- /ko -->
+          <li class="tab-pane">
+            <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
+          </li>
+        </ul>
 
-        <div class="question">
-          ${ _('What would you like to type?') }
-          <select id="codeMode">
-            <option value="markdown">Markdown</option>
-            <option value="text/x-impalaql">Impala</option>
-            <option value="text/x-hiveql">Hive</option>
-            <option value="text/x-pig">Pig</option>
-          </select>
+        <div class="tab-content" data-bind="foreach: notebooks">
+          <div class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
+          </div>
         </div>
-        <textarea id="mainEditor"></textarea>
-      </div>
 
     </div>
   </div>
@@ -59,36 +61,50 @@ ${ common.navbar('editor') }
 
 
 <script type="text/html" id="notebook">
-  <strong data-bind="text: id"></strong>
-  <li>
-    <ul data-bind="template: { name: 'snippet', foreach: snippets }"></ul>
-  </li>
-  
-  <a href="javascript: void(0)" data-bind="click: newSnippet">
-    <i class="fa fa-plus" title="${ _('Add') }"></i>
-  </a>
+  <span data-bind="template: { name: 'snippet', foreach: snippets }"></span>
+
+  <div style="margin: 20px">
+    <a href="javascript: void(0)" data-bind="click: newSnippet">
+      <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
+    </a>
+  </div>
 </script>
 
 
 <script type="text/html" id="snippet">
-  <strong data-bind="text: id"></strong>
-  <strong data-bind="text: type"></strong>
-  <textarea data-bind="value: statement"></textarea>
-  
-  <a href="javascript: void(0)" data-bind="click: execute">
-    <i class="fa fa-play" title="${ _('Go') }"></i>
-  </a>
-  
-  <strong data-bind="text: ko.mapping.toJSON(result.meta)"></strong>
-  <li data-bind="foreach: result.data">
-    <ul data-bind="text: ko.mapping.toJSON($data)"></ul>
-  </li>  
+
+  <div class="snippet">
+    <span class="muted" data-bind="text: id"></span>
+
+    <div class="pull-right">
+      <strong class="muted" data-bind="text: type"></strong>
+    </div>
+    <br/>
+    <br/>
+    <textarea data-bind="value: statement, codemirror: { 'lineNumbers': true, 'matchBrackets': true, 'mode': 'text/x-hiveql', 'enter': execute }"></textarea>
+    <a href="javascript:void(0)" data-bind="click: execute" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
+
+    <div data-bind="css: klass">
+      <table class="table table-condensed">
+        <thead>
+          <tr data-bind="foreach: result.meta">
+            <th data-bind="text: $data.name"></th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: result.data">
+          <tr data-bind="foreach: $data">
+            <td data-bind="text: $data"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </script>
 
 
 
-<textarea id="tempEditor"></textarea>
-
+<link rel="stylesheet" href="/static/css/common_dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/spark/static/css/spark.css">
 
@@ -107,85 +123,40 @@ ${ common.navbar('editor') }
 
 <script type="text/javascript" charset="utf-8">
 
+  ko.bindingHandlers.codemirror = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var options = $.extend(valueAccessor(), {
+        extraKeys: {
+          "Ctrl-Enter": function () {
+            valueAccessor().enter();
+          }
+        }
+      });
+      var editor = CodeMirror.fromTextArea(element, options);
+      element.editor = editor;
+      editor.setValue(allBindingsAccessor().value());
+      window.setTimeout(function () {
+        editor.refresh();
+      }, 100);
+      editor.setSize("100%", "100px");
+      var wrapperElement = $(editor.getWrapperElement());
+
+      editor.on("change", function () {
+        allBindingsAccessor().value(editor.getValue());
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        wrapperElement.remove();
+      });
+    }
+  };
+
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode });
   ko.applyBindings(viewModel);
   viewModel.init();
 
 
-  var mainCodeMirror, tempCodeMirror, tempCodeMirrorUpdateFn;
-
-
   $(document).ready(function(){
-
-    $("#codeMode").on("change", function(){
-      mainCodeMirror.setOption("mode", $("#codeMode").val());
-    });
-
-    function replaceWithEditor(snippet) {
-      snippet.html("");
-      snippet.off("click");
-      $(tempCodeMirror.getWrapperElement()).appendTo(snippet);
-      $(tempCodeMirror.getWrapperElement()).show();
-      tempCodeMirror.setOption("mode", snippet.data("mode"));
-      tempCodeMirror.setValue(snippet.data("source"))
-      tempCodeMirror.setSize("100%", "50px");
-      tempCodeMirrorUpdateFn = function(){
-        var _source = tempCodeMirror.getValue();
-        snippet.html(markdown.toHTML(_source)).data("source", _source);
-        snippet.on("click", function(){
-          replaceWithEditor($(this));
-        });
-      }
-    }
-
-    function addSnippet(value, mode) {
-      var _snippet = $("<div>").addClass("snippet").html(markdown.toHTML(value)).appendTo($("#snippets")).data("source", value).data("mode", mode);
-      _snippet.on("click", function(){
-        replaceWithEditor($(this));
-      });
-      mainCodeMirror.setValue("");
-    }
-
-    var mainEditor = $("#mainEditor")[0];
-    var tempEditor = $("#tempEditor")[0];
-
-    mainCodeMirror = CodeMirror(function (elt) {
-      mainEditor.parentNode.replaceChild(elt, mainEditor);
-    }, {
-      value: mainEditor.value,
-      readOnly: false,
-      lineNumbers: true,
-      mode: "markdown",
-      extraKeys: {
-        "Ctrl-Enter": function () {
-          addSnippet(mainCodeMirror.getValue(), mainCodeMirror.getOption("mode"));
-        }
-      },
-      onKeyEvent: function (e, s) {
-        if (s.type == "keyup") {
-        }
-      }
-    });
-
-    tempCodeMirror = CodeMirror(function (elt) {
-      tempEditor.parentNode.replaceChild(elt, tempEditor);
-    }, {
-      value: tempEditor.value,
-      readOnly: false,
-      lineNumbers: true,
-      mode: "markdown",
-      extraKeys: {
-        "Ctrl-Enter": function () {
-          tempCodeMirrorUpdateFn();
-        }
-      },
-      onKeyEvent: function (e, s) {
-        if (s.type == "keyup") {
-        }
-      }
-    });
-
-    $(tempCodeMirror.getWrapperElement()).hide();
 
   });
 
