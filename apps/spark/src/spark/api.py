@@ -83,7 +83,7 @@ class HS2Api():
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     handle = HiveServerQueryHandle(**snippet['result']['handle'])
     status =  db.get_state(handle)
-    return {'query_status': 'running' if status in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'finished'}
+    return {'status': 'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'finished'}
 
   def fetch_result(self, notebook, snippet):
     db = dbms.get(self.user)

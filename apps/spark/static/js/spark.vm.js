@@ -91,7 +91,7 @@ var Snippet = function (notebook, snippet) {
        snippet: ko.mapping.toJSON(self)
 	  }, function (data) {
 	    if (data.status == 0) {
-          self.status(data.query_status);
+          self.status(data.query_status.status);
             
           if (self.status() == 'running') {
             setTimeout(self.checkStatus, 1000);            	
