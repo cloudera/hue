@@ -24,3 +24,24 @@
   border-bottom: 2px solid #F0F0F0;
   margin: 10px;
 }
+
+.snippet.sql {
+  max-height: 200px;
+  overflow: auto;
+}
+
+#summernote {
+  height: 200px;
+}
+
+.codeMirror-overlaybtn {
+  position: absolute;
+  margin-top: -40px;
+  margin-left: 35px;
+  z-index: 3;
+  opacity: 0.5;
+}
+
+.codeMirror-overlaybtn:hover {
+  opacity: 1;
+}
