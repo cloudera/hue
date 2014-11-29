@@ -49,6 +49,9 @@ var Snippet = function (notebook, snippet) {
   self.type = ko.observable('hive-sql');
   self.statement = ko.observable('');
   self.status = ko.observable('finished');
+  self.klass = ko.computed(function(){
+    return 'results '+ self.type();
+  });
   
   self.result = new Result(snippet, snippet.result);
   
@@ -142,7 +145,7 @@ var Notebook = function (vm, notebook) {
   self.snippets = ko.observableArray();
 
   self.addSnippet = function(snippet) {
-	self.snippets.push(new Snippet(self, snippet));
+	  self.snippets.push(new Snippet(self, snippet));
   }  
 
   self.newSnippet = function() {
@@ -161,11 +164,31 @@ function EditorViewModel(notebooks) {
   var self = this;
 
   self.notebooks = ko.observableArray();
-  
+  self.selectedNotebook = ko.observable();
+
+  self.isEditing = ko.observable(false);
+  self.toggleEditing = function () {
+    self.isEditing(! self.isEditing());
+  };
+
+//  function bareWidgetBuilder(name, type){
+//    return new Widget({
+//      size: 12,
+//      id: UUID(),
+//      name: name,
+//      widgetType: type
+//    });
+//  }
+//
+//  self.draggableHive = ko.observable(bareWidgetBuilder("Hive Query", "hive-widget"));
+
   self.init = function() {
-	$.each(notebooks, function(index, notebook) {
-	  self.loadNotebook(notebook);
-	});
+    $.each(notebooks, function(index, notebook) {
+      self.loadNotebook(notebook);
+      if (self.selectedNotebook() == null){
+        self.selectedNotebook(self.notebooks()[0]);
+      }
+    });
   }
 
   self.loadNotebook = function(notebook) {
@@ -173,7 +196,8 @@ function EditorViewModel(notebooks) {
   }
 
   self.newNotebook = function() {
-	self.notebooks.push(new Notebook(self, {}));
+	  self.notebooks.push(new Notebook(self, {}));
+    self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
   }
   
   self.save = function() {

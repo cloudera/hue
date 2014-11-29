@@ -25,13 +25,9 @@
   margin: 10px;
 }
 
-.snippet.sql {
+.results.hive-sql {
   max-height: 200px;
   overflow: auto;
-}
-
-#summernote {
-  height: 200px;
 }
 
 .codeMirror-overlaybtn {
@@ -44,4 +40,20 @@
 
 .codeMirror-overlaybtn:hover {
   opacity: 1;
+}
+
+.nav {
+  margin-bottom: 0;
+}
+
+.nav i {
+  line-height: 20px!important;
+}
+
+.card-toolbar {
+  top: 27px;
+}
+
+.tab-content {
+  background-color: #FFFFFF;
 }
