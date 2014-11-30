@@ -23,13 +23,32 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
 <div class="card card-toolbar">
   <div style="float: left; margin-left: 20px">
-    <div class="toolbar-label">${_('WIDGETS')}</div>
+    <div class="toolbar-label">${_('SPARK')}</div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
+         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
+         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
+           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
+         </a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
+         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
+         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
+           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
+         </a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
+         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
+         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
+           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
+         </a>
+    </div>    
+    <div class="toolbar-label">${_('SPARK')}</div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
          title="${_('Hive Query')}" rel="tooltip" data-placement="bottom">
          <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-                       <img src="/beeswax/static/art/icon_beeswax_48.png" class="app-icon" />
+           <img src="/beeswax/static/art/icon_beeswax_48.png" class="app-icon" />
          </a>
-    </div>
+    </div>    
   </div>
   <div class="clearfix"></div>
 </div>
@@ -67,6 +86,8 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
     <a href="javascript: void(0)" data-bind="click: newSnippet">
       <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
     </a>
+    <select data-bind="options: availableSnippets, value: selectedSnippet">
+    </select>    
   </div>
 </script>
 
@@ -78,6 +99,7 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
     <div class="pull-right">
       <strong class="muted" data-bind="text: type"></strong>
+      <strong class="muted" data-bind="text: status"></strong>
     </div>
     <br/>
     <br/>

@@ -46,24 +46,44 @@ var Snippet = function (notebook, snippet) {
   var self = this;
   
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
-  self.type = ko.observable('hive-sql');
+  self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
   self.statement = ko.observable('');
-  self.status = ko.observable('finished');
+  self.status = ko.observable('loading');
   self.klass = ko.computed(function(){
-    return 'results '+ self.type();
+    return 'results ' + self.type();
   });
   
   self.result = new Result(snippet, snippet.result);
   
   // init()
   // checkStatus()
-  
+
+  self.create_session = function() {
+
+    $.post("/spark/api/create_session", {
+    	notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self)
+	  }, function (data) {
+	    if (data.status == 0) {
+		  notebook.sessions.push(ko.mapping.fromJS(data.session));
+	      self.status('ready');
+	    }
+	    else {
+	      $(document).trigger("error", data.message);
+	    }
+	}).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+    
+    
+  };
   
   self.execute = function() {
 	$(".jHueNotify").hide();
 	logGA('/execute/' + self.type());	  
     
 	self.result.clear();
+	self.status('running');
     
     $.post("/spark/api/execute", {
         notebook: ko.mapping.toJSON(notebook),
@@ -74,7 +94,6 @@ var Snippet = function (notebook, snippet) {
         	 self.result.handle()[key] = val;
           });
 
-          self.status('running');
           self.checkStatus();
         }
         else {
@@ -124,12 +143,12 @@ var Snippet = function (notebook, snippet) {
  	    }
  	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
-     });
+    });
   };
 
   self.fetchResultMetadata = function() {
 	  
-  }
+  };
   
   self.cancel = function() {
 
@@ -143,20 +162,44 @@ var Notebook = function (vm, notebook) {
 
   self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : UUID());
   self.snippets = ko.observableArray();
+  self.selectedSnippet = ko.observable('scala');
+  self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
+  self.sessions = ko.observableArray(); // {'hive': ..., scala: ...}
 
+  self.getSession = function(session_type) {
+    var _s = null;
+    $.each(self.sessions(), function (index, s) {
+      if (s.type() == session_type) {
+        _s = s;
+        return false;
+      }
+    });
+    return _s;
+  };
+  
   self.addSnippet = function(snippet) {
-	  self.snippets.push(new Snippet(self, snippet));
+	var _snippet = new Snippet(self, snippet);
+	self.snippets.push(_snippet);
+	
+	if (self.getSession(self.selectedSnippet()) == null) {
+	  _snippet.create_session();
+    }	
   }  
 
   self.newSnippet = function() {
-    self.snippets.push(new Snippet(self, {}));
+	var snippet = new Snippet(self, {type: self.selectedSnippet()});	  
+	self.snippets.push(snippet);
+	  
+	if (self.getSession(self.selectedSnippet()) == null) {
+	  snippet.create_session();
+	}
   }  
   
   if (notebook.snippets) {
     $.each(notebook.snippets, function(index, snippet) {
       self.addSnippet(snippet);
     });
-  }
+  }  
 }
 
 
@@ -196,7 +239,7 @@ function EditorViewModel(notebooks) {
   }
 
   self.newNotebook = function() {
-	  self.notebooks.push(new Notebook(self, {}));
+	self.notebooks.push(new Notebook(self, {}));
     self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
   }
   
