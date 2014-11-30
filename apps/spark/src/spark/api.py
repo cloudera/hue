@@ -32,7 +32,7 @@ from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
 from beeswax.views import safe_get_design, save_design
 from beeswax.server import dbms
 
-from spark.job_server_api import get_api
+from spark.job_server_api import get_api as get_spark_api
 from spark.forms import SparkForm, QueryForm
 from desktop.lib.i18n import smart_str
 from spark.design import SparkDesign
@@ -44,10 +44,28 @@ from spark.decorators import json_error_handler
 LOG = logging.getLogger(__name__)
 
 
+def get_api(user, snippet):
+  if snippet['type'] == 'hive':
+    return HS2Api(user)
+  else:
+    return SparkApi(user)
+
+
+def _get_snippet_session(notebook, snippet):
+  return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0] 
+
+
+
 class HS2Api():
   
   def __init__(self, user):
     self.user = user
+    
+  def create_session(self, lang):
+    return {
+        'type': lang,
+        'id': None # Real one at some point
+    }
   
   def execute(self, notebook, snippet):
     db = dbms.get(self.user)
@@ -115,22 +133,62 @@ class HS2Api():
     pass  
 
 
-class SparkApi(): # Pig, DBquery, Phoenix... 
+class SparkApi():  # Pig, DBquery, Phoenix... 
   
   def __init__(self, user):
-    pass
+    self.user = user
   
-  def execute(self):
-    pass
+  def create_session(self, lang='scala'):
+    api = get_spark_api(self.user)
+    return {
+        'type': lang,
+        'id': api.create_session(lang=lang)
+    } 
+  
+  def execute(self, notebook, snippet):    
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+    
+    return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
 
-  def check_status(self):
-    pass
+  def check_status(self, notebook, snippet):
+    return {'status': 'finished'}
 
-  def fetch_result(self):
-    pass
+  def fetch_result(self, notebook, snippet):
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+    cell = snippet['result']['handle']['id']  
+    
+    data = api.fetch_data(session['id'], cell)
+      
+    return {
+        'data': [data['output']],
+        'meta': [{
+          'name': column.name,
+          'type': column.type,
+          'comment': column.comment
+        } for column in []]
+    }
 
   def cancel(self):
     pass
+
+
+
+def create_session(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
+    response['status'] = 0
+  except Exception, e:
+    raise PopupException(e, title=_('Error while accessing query server'))
+    response['error'] = force_unicode(str(e))
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def execute(request):
@@ -140,7 +198,7 @@ def execute(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['handle'] = HS2Api(request.user).execute(notebook, snippet)
+    response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
     response['status'] = 0
   except Exception, e:
     raise PopupException(e, title=_('Error while accessing query server'))
@@ -156,7 +214,7 @@ def check_status(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['query_status'] = HS2Api(request.user).check_status(notebook, snippet)
+    response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
     response['status'] = 0
   except Exception, e:
     raise PopupException(e, title=_('Error while accessing query server'))
@@ -172,7 +230,7 @@ def fetch_result(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = HS2Api(request.user).fetch_result(notebook, snippet)
+    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet)
     response['status'] = 0
   except Exception, e:
     raise PopupException(e, title=_('Error while accessing query server'))

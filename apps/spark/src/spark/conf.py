@@ -26,7 +26,7 @@ from spark.settings import NICE_NAME
 JOB_SERVER_URL = Config(
   key="server_url",
   help=_t("URL of the Spark Job Server."),
-  default="http://localhost:8090/"
+  default="http://localhost:8080/"
 )
 
 

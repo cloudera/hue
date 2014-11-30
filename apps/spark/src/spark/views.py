@@ -43,7 +43,7 @@ LOG = logging.getLogger(__name__)
 @view_error_handler
 def editor(request):
   return render('editor.mako', request, {
-      'notebooks_json': json.dumps([{'snippets': [{'type': 'table', 'result': {}}]}])
+      'notebooks_json': json.dumps([{'snippets': [{'type': 'scala', 'result': {}}]}])
   })
 
 @view_error_handler

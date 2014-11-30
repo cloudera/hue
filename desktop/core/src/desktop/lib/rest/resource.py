@@ -50,6 +50,9 @@ class Resource(object):
     Decide whether the body should be a json dict or string
     """
 
+    if resp.headers.get('location') and resp.headers.get('location').startswith('http://localhost:8080/'):
+      return resp.headers.get('location').split('sessions/')[1]
+
     if len(resp.content) != 0 and resp.headers.get('content-type') and \
           'application/json' in resp.headers.get('content-type'):
       try:

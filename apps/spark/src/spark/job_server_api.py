@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import posixpath
 import threading
 
@@ -80,32 +81,38 @@ class JobServerApi(object):
     else:
       self._thread_local.user = user
 
-  def get_status(self, **kwargs):
-    return self._root.get('healthz', params=kwargs, headers={'Accept': _TEXT_CONTENT_TYPE})
+  def create_session(self, **kwargs):
+    a = self._root.post('sessions', params=kwargs)
+    print a
+    return a
 
-  def submit_job(self, appName, classPath, data, context=None, sync=False):
-    params = {'appName': appName, 'classPath': classPath, 'sync': sync}
-    if context:
-      params['context'] = context
-    return self._root.post('jobs' % params, params=params, data=data, contenttype=_BINARY_CONTENT_TYPE)
+  def submit_statement(self, uuid, statement):
+    data = {'statement': statement}
+    return self._root.post('sessions/%s' % uuid, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
-  def job(self, job_id):
-    return self._root.get('jobs/%s' % job_id, headers={'Accept': _JSON_CONTENT_TYPE})
+  def fetch_data(self, session, cell):
+    return self._root.get('sessions/%s/cells/%s' % (session, cell))
 
-  def jobs(self, **kwargs):
-    return self._root.get('jobs', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+#curl http://localhost:8080/sessions/87576bf4-f22c-4681-8f33-d3a329577ec9/cells/0
+#{"id":0,"state":"COMPLETE","input":["1+2"],"output":["res0: Int = 3"],"error":[]}
 
-  def create_context(self, name, **kwargs):
-    return self._root.post('contexts/%s' % name, params=kwargs, contenttype=_BINARY_CONTENT_TYPE)
-
-  def contexts(self, **kwargs):
-    return self._root.get('contexts', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
-
-  def delete_context(self, name, **kwargs):
-    return self._root.delete('contexts/%s' % name)
-
-  def upload_jar(self, app_name, data):
-    return self._root.post('jars/%s' % app_name, data=data, contenttype=_BINARY_CONTENT_TYPE)
+#  def job(self, job_id):
+#    return self._root.get('jobs/%s' % job_id, headers={'Accept': _JSON_CONTENT_TYPE})
+#
+#  def jobs(self, **kwargs):
+#    return self._root.get('jobs', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+#
+#  def create_context(self, name, **kwargs):
+#    return self._root.post('contexts/%s' % name, params=kwargs, contenttype=_BINARY_CONTENT_TYPE)
+#
+#  def contexts(self, **kwargs):
+#    return self._root.get('contexts', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+#
+#  def delete_context(self, name, **kwargs):
+#    return self._root.delete('contexts/%s' % name)
+#
+#  def upload_jar(self, app_name, data):
+#    return self._root.post('jars/%s' % app_name, data=data, contenttype=_BINARY_CONTENT_TYPE)
 
   def jars(self, **kwargs):
     return self._root.get('jars', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
