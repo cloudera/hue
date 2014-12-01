@@ -94,7 +94,7 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
 <script type="text/html" id="snippet">
 
-  <div class="snippet">
+  <div class="snippet" data-bind="attr: {'id': 'snippet_' + id()}">
     <span class="muted" data-bind="text: id"></span>
 
     <div class="pull-right">
@@ -103,7 +103,7 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
     </div>
     <br/>
     <br/>
-    <textarea data-bind="value: statement, codemirror: { 'lineNumbers': true, 'matchBrackets': true, 'mode': 'text/x-hiveql', 'enter': execute }"></textarea>
+    <textarea data-bind="value: statement, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
     <a href="javascript:void(0)" data-bind="click: execute" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
 
     <div data-bind="css: klass">
@@ -133,8 +133,17 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/js/codemirror-pig.js"></script>
 <script src="/static/js/codemirror-hql.js"></script>
-<script src="/static/ext/js/codemirror-sql.js"></script>
-<script src="/static/ext/js/codemirror-markdown.js"></script>
+<script src="/static/js/codemirror-python.js"></script>
+<script src="/static/js/codemirror-clike.js"></script>
+
+<script src="/static/js/codemirror-show-hint.js"></script>
+
+<script src="/static/js/codemirror-isql-hint.js"></script>
+<script src="/static/js/codemirror-hql-hint.js"></script>
+<script src="/static/js/codemirror-pig-hint.js"></script>
+<script src="/static/js/codemirror-python-hint.js"></script>
+<script src="/static/js/codemirror-clike-hint.js"></script>
+
 <script src="/static/ext/js/markdown.min.js"></script>
 
 
@@ -145,17 +154,38 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
 
+  // text/x-pig
+  // text/x-scala
+  // text/x-python
+  // text/x-impalaql
+  // text/x-hiveql
+
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var options = $.extend(valueAccessor(), {
         extraKeys: {
+          "Ctrl-Space": function (cm) {
+            switch (valueAccessor().mode) {
+              case "text/x-pig":
+                CodeMirror.availableVariables = [];
+                CodeMirror.showHint(cm, CodeMirror.pigHint);
+                break;
+              case "text/x-python":
+                CodeMirror.showHint(cm, CodeMirror.pythonHint);
+                break;
+              default:
+                break;
+            }
+          },
           "Ctrl-Enter": function () {
             valueAccessor().enter();
           }
         }
       });
       var editor = CodeMirror.fromTextArea(element, options);
+
       element.editor = editor;
+      $("#snippet_"+options.id).data("editor", editor);
       editor.setValue(allBindingsAccessor().value());
       window.setTimeout(function () {
         editor.refresh();
