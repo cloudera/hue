@@ -194,6 +194,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
 
