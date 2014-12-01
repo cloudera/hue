@@ -32,7 +32,7 @@ from spark.models import get_api, Notebook
 LOG = logging.getLogger(__name__)
 
 
-@json_error_handler
+
 def create_session(request):
   response = {'status': -1}
 
@@ -43,12 +43,11 @@ def create_session(request):
     response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
     response['status'] = 0
   except Exception, e:
-    raise PopupException(e, title=_('Error while accessing query server'))
     response['error'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-@json_error_handler
+
 def execute(request):
   response = {'status': -1}
 
@@ -59,13 +58,15 @@ def execute(request):
     response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
     response['status'] = 0
   except Exception, e:
-    raise PopupException(e, title=_('Error while accessing query server'))
-    response['error'] = force_unicode(str(e))
+    message = force_unicode(str(e))
+    if 'session not found' in message:
+      response['status'] = -2
+    else:
+      response['error'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@json_error_handler
 def check_status(request):
   response = {'status': -1}
 
@@ -76,13 +77,15 @@ def check_status(request):
     response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
     response['status'] = 0
   except Exception, e:
-    raise PopupException(e, title=_('Error while accessing query server'))
-    response['error'] = force_unicode(str(e))
+    message = force_unicode(str(e))
+    if 'session not found' in message:
+      response['status'] = -2
+    else:
+      response['error'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@json_error_handler
 def fetch_result(request):
   response = {'status': -1}
 
@@ -93,8 +96,12 @@ def fetch_result(request):
     response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet)
     response['status'] = 0
   except Exception, e:
-    raise PopupException(e, title=_('Error while accessing query server'))
-    response['error'] = force_unicode(str(e))
+    message = force_unicode(str(e))
+    if 'session not found' in message:
+      response['status'] = -2
+    else:
+      response['error'] = force_unicode(str(e))
+
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
