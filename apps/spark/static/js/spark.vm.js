@@ -14,28 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-}
-
-function UUID() {
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
-
 
 var Result = function (snippet, result) {
   var self = this;
 
-  self.id = ko.observable(typeof result != "undefined" && result.id != "undefined" && result.id != null ? result.id : UUID());
-  self.type = ko.observable('table');
+  self.id = ko.observable(typeof result.id != "undefined" && result.id != "undefined" && result.id != null ? result.id : UUID());
+  self.type = ko.observable(typeof result.type != "undefined" && result.type != "undefined" && result.type != null ? result.type : 'table');
   self.handle = ko.observable({});
-  self.meta = ko.observableArray();
-  self.data = ko.observableArray();
+  self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+  self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
+  
+  if (typeof result.handle!= "undefined" && result.handle != null) {
+    $.each(result.handle, function(key, val) {
+      self.handle()[key] = val;
+    });
+  }
   
   self.clear = function() {
-	//self.handle = ko.observable({});
+    $.each(self.handle, function(key, val) {
+      delete self.handle()[key];
+    });
     self.meta.removeAll();
     self.data.removeAll();
   };  
@@ -212,7 +210,7 @@ var Notebook = function (vm, notebook) {
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable('scala');
   self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
-  self.sessions = ko.observableArray(); // [{'hive': {...}, 'scala': {...}]
+  self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {
     var _s = null;
@@ -229,7 +227,7 @@ var Notebook = function (vm, notebook) {
 	var _snippet = new Snippet(self, snippet);
 	self.snippets.push(_snippet);
 	
-	if (self.getSession(self.selectedSnippet()) == null) {
+	if (self.getSession(_snippet.type()) == null) {
 	  _snippet.create_session();
     }	
   };  
