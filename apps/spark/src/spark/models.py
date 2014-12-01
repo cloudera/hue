@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from beeswax import models as beeswax_models
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
@@ -25,6 +27,27 @@ from spark.job_server_api import get_api as get_spark_api
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 
+
+class Notebook():
+  
+  def __init__(self, document=None):
+    if document is not None:
+      self.data = document.data
+    else:    
+      self.data = json.dumps({
+          'name': 'My Notebook', 
+          'snippets': [{'type': 'scala', 'result': {}}]
+      })
+
+  def get_json(self):
+    _data = self.get_data()
+    
+    return json.dumps(_data)
+ 
+  def get_data(self):
+    _data = json.loads(self.data)
+  
+    return _data
 
 
 def get_api(user, snippet):

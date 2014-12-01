@@ -19,14 +19,31 @@ import json
 import logging
 
 from desktop.lib.django_util import render
-from spark.decorators import view_error_handler
+from desktop.models import Document2
 
+from spark.decorators import view_error_handler
+from spark.models import Notebook
 
 LOG = logging.getLogger(__name__)
 
 
 @view_error_handler
 def editor(request):
+  notebook_id = request.GET.get('notebook')
+  
+  if notebook_id:
+    notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+  else:
+    notebook = Notebook()
+    
   return render('editor.mako', request, {
-      'notebooks_json': json.dumps([{'snippets': [{'type': 'scala', 'result': {}}]}])
+      'notebooks_json': json.dumps([notebook.get_data()])
+  })
+
+
+def list_notebooks(request):
+  notebooks = Document2.objects.filter(type='notebook', owner=request.user)
+
+  return render('list_notebooks.mako', request, {
+      'notebooks': notebooks
   })

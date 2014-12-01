@@ -21,13 +21,18 @@ from django.conf.urls.defaults import patterns, url
 # Views
 urlpatterns = patterns('spark.views',
   url(r'^$', 'editor', name='index'),
+  url(r'^editor$', 'editor', name='editor'),
+  url(r'^list_notebooks$', 'list_notebooks', name='list_notebooks'),  
 )
 
 # APIs
 urlpatterns += patterns('spark.api',
   url(r'^api/create_session$', 'create_session', name='create_session'),
   url(r'^api/execute$', 'execute', name='execute'),
-  url(r'^api/check_status', 'check_status', name='check_status'),
+  url(r'^api/check_status$', 'check_status', name='check_status'),
   url(r'^api/fetch_result$', 'fetch_result', name='fetch_result'),
+
+  url(r'^api/notebook/save$', 'save_notebook', name='save_notebook'),
+  url(r'^api/notebook/open$', 'open_notebook', name='open_notebook'),
 )
 

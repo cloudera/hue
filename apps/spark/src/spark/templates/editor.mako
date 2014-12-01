@@ -32,15 +32,21 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
+          data-bind="click: saveNotebook, css: {'btn': true}">
         <i class="fa fa-save"></i>
       </button>
       &nbsp;&nbsp;&nbsp;
-      <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <button type="button" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
+          data-bind="click: newNotebook, css: {'btn': true}">
         <i class="fa fa-file-o"></i>
-      </a>
-      <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-tags"></i>
+      </button>
+      <button type="button" title="${ _('Open') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
+          data-bind="click: newNotebook, css: {'btn': true}">
+        <i class="fa fa-folder-open-o"></i>
+      </button>      
+      <a class="btn" href="${ url('spark:list_notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-terminal"></i>
       </a>
     % endif
   </div>
@@ -49,7 +55,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <ul class="nav nav-tabs">
     <!-- ko foreach: notebooks -->
       <li data-bind="css: { active: $parent.selectedNotebook() === $data }">
-        <a href="javascript:void(0)" data-bind="text: id, click: $parent.selectedNotebook.bind(null, $data)"></a>
+        <a href="javascript:void(0)" data-bind="text: name, click: $parent.selectedNotebook.bind(null, $data)"></a>
       </li>
     <!-- /ko -->
     <li>
@@ -87,7 +93,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
 <script type="text/html" id="snippet">
-
   <div class="snippet" data-bind="attr: {'id': 'snippet_' + id()}">
     <span class="muted" data-bind="text: id"></span>
 
@@ -115,7 +120,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </table>
     </div>
   </div>
-
 </script>
 
 
