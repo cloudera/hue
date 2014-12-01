@@ -68,19 +68,23 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-
         <div class="tab-content" data-bind="foreach: notebooks">
           <div class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
           </div>
         </div>
-
     </div>
   </div>
 </div>
 
 
 <script type="text/html" id="notebook">
-  <span data-bind="template: { name: 'snippet', foreach: snippets }"></span>
+      <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
+        sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
+        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
+            'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
+            'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
+            dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}">
+  </div>
 
   <div style="margin: 20px">
     <a href="javascript: void(0)" data-bind="click: newSnippet">
@@ -93,31 +97,71 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
 <script type="text/html" id="snippet">
-  <div class="snippet" data-bind="attr: {'id': 'snippet_' + id()}">
-    <span class="muted" data-bind="text: id"></span>
+  <div class="row-fluid">
+    <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
-    <div class="pull-right">
-      <strong class="muted" data-bind="text: type"></strong>
-      <strong class="muted" data-bind="text: status"></strong>
-    </div>
-    <br/>
-    <br/>
-    <textarea data-bind="value: statement, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
-    <a href="javascript:void(0)" data-bind="click: execute" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
+      <h2 class="card-heading simple">
 
-    <div data-bind="css: klass">
-      <table class="table table-condensed">
-        <thead>
-          <tr data-bind="foreach: result.meta">
-            <th data-bind="text: $data.name"></th>
-          </tr>
-        </thead>
-        <tbody data-bind="foreach: result.data">
-          <tr data-bind="foreach: $data">
-            <td data-bind="text: $data"></td>
-          </tr>
-        </tbody>
-      </table>
+        <span data-bind="visible: $root.isEditing">
+          <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
+          <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
+          <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
+          &nbsp;
+        </span>
+
+        <!-- ko if: type() == 'hive' -->
+        <img src="/beeswax/static/art/icon_beeswax_48.png" class="snippet-icon">
+        <!-- /ko -->
+
+        <!-- ko if: type() == 'impala' -->
+        <img src="/impala/static/art/icon_impala_48.png" class="snippet-icon">
+        <!-- /ko -->
+
+        <!-- ko if: type() == 'scala' -->
+        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
+        <!-- /ko -->
+
+        <!-- ko if: type() == 'python' -->
+        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
+        <!-- /ko -->
+
+        <!-- ko if: type() == 'sql' -->
+        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
+        <!-- /ko -->
+
+        <!-- ko if: type() == 'pig' -->
+        <img src="/pig/static/art/icon_pig_48.png" class="snippet-icon">
+        <!-- /ko -->
+
+
+        <span data-bind="editable: id, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+        <div class="inline pull-right">
+          <strong class="muted" data-bind="text: status"></strong> &nbsp;
+          <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
+        </div>
+      </h2>
+
+      <div class="row-fluid">
+        <div data-bind="css: editorKlass">
+          <textarea data-bind="value: statement, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
+          <a href="javascript:void(0)" data-bind="click: execute" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
+        </div>
+      </div>
+
+      <div data-bind="css: resultsKlass">
+        <table class="table table-condensed">
+          <thead>
+            <tr data-bind="foreach: result.meta">
+              <th data-bind="text: $data.name"></th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: result.data">
+            <tr data-bind="foreach: $data">
+              <td data-bind="text: $data"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </script>
@@ -126,6 +170,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <link rel="stylesheet" href="/static/css/common_dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/spark/static/css/spark.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/js/codemirror-pig.js"></script>
@@ -143,9 +188,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script src="/static/ext/js/markdown.min.js"></script>
 
-
+<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
 
