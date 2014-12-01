@@ -24,7 +24,7 @@ var Result = function (snippet, result) {
   self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
   
-  if (typeof result.handle!= "undefined" && result.handle != null) {
+  if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
       self.handle()[key] = val;
     });
@@ -54,8 +54,11 @@ var Snippet = function (notebook, snippet) {
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement = ko.observable(typeof snippet.statement != "undefined" && snippet.statement != null ? snippet.statement : '');
-  self.statement = ko.observable("");
-  self.status = ko.observable("loading");
+  self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
+  self.variables = ko.computed(function() {
+	return self.statement().match(/\$[^\d'"](\w*)/g);  
+  });
+  self.result = new Result(snippet, snippet.result);
 
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
   self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
@@ -95,21 +98,17 @@ var Snippet = function (notebook, snippet) {
   self.remove = function (notebook, snippet) {
     notebook.snippets.remove(snippet);
   }
-
-
-  self.result = new Result(snippet, snippet.result);
   
   // init()
   // checkStatus()
 
   self.create_session = function() {
-
     $.post("/spark/api/create_session", {
     	notebook: ko.mapping.toJSON(notebook),
         snippet: ko.mapping.toJSON(self)
 	  }, function (data) {
 	    if (data.status == 0) {
-		  notebook.sessions.push(ko.mapping.fromJS(data.session));
+		  notebook.addSession(ko.mapping.fromJS(data.session));
 	      self.status('ready');
 	    }
 	    else {
@@ -117,9 +116,7 @@ var Snippet = function (notebook, snippet) {
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
-    });
-    
-    
+    }); 
   };
   
   self.execute = function() {
@@ -140,7 +137,9 @@ var Snippet = function (notebook, snippet) {
 
           self.checkStatus();
         }
-        else {
+        else if (data.status == -2) {
+          self.create_session();          
+        } else {
           $(document).trigger("error", data.message);
         }
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -161,8 +160,9 @@ var Snippet = function (notebook, snippet) {
           } else {
         	self.fetchResult();
           }
-	    }
-	    else {
+	    } else if (data.status == -2) {
+	      self.create_session();  
+	    } else {
 	      $(document).trigger("error", data.message);
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {
@@ -181,8 +181,9 @@ var Snippet = function (notebook, snippet) {
 
           // move resultsets to n rows
           // check if N rows fetched...
- 	    }
- 	    else {
+ 	    } else if (data.status == -2) {
+ 	      self.create_session();  
+ 	    } else {
  	      $(document).trigger("error", data.message);
  	    }
  	}).fail(function (xhr, textStatus, errorThrown) {
@@ -209,7 +210,7 @@ var Notebook = function (vm, notebook) {
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable('scala');
-  self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
+  self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'text', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {
@@ -222,6 +223,21 @@ var Notebook = function (vm, notebook) {
     });
     return _s;
   };
+  
+  self.addSession = function(session) {
+	var toRemove = []
+    $.each(self.sessions(), function (index, s) {
+      if (s.type() == session.type()) {
+    	toRemove.push(s);
+      }
+    });
+	
+	$.each(toRemove, function (index, s) {
+	  self.sessions.remove(s);
+	});
+	
+    self.sessions.push(session);
+  };  
   
   self.addSnippet = function(snippet) {
 	var _snippet = new Snippet(self, snippet);
