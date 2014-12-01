@@ -19,55 +19,49 @@
 %>
 
 
-${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
+${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
-<div class="card card-toolbar">
-  <div style="float: left; margin-left: 20px">
-    <div class="toolbar-label">${_('SPARK')}</div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
-         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
-         </a>
-    </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
-         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
-         </a>
-    </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
-         title="${_('Spark Scala')}" rel="tooltip" data-placement="bottom">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-           <img src="/spark/static/art/icon_spark_48.png" class="app-icon" />
-         </a>
-    </div>    
-    <div class="toolbar-label">${_('SPARK')}</div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false }"
-         title="${_('Hive Query')}" rel="tooltip" data-placement="bottom">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-           <img src="/beeswax/static/art/icon_beeswax_48.png" class="app-icon" />
-         </a>
-    </div>    
+
+<div class="search-bar">
+  <div class="pull-right" style="padding-right:50px">
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: true, css: {'btn': true}">
+      <i class="fa fa-play"></i>
+    </a>
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+      <i class="fa fa-pencil"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;
+    % if user.is_superuser:
+      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
+        <i class="fa fa-save"></i>
+      </button>
+      &nbsp;&nbsp;&nbsp;
+      <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-file-o"></i>
+      </a>
+      <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-tags"></i>
+      </a>
+    % endif
   </div>
-  <div class="clearfix"></div>
+
+
+  <ul class="nav nav-tabs">
+    <!-- ko foreach: notebooks -->
+      <li data-bind="css: { active: $parent.selectedNotebook() === $data }">
+        <a href="javascript:void(0)" data-bind="text: id, click: $parent.selectedNotebook.bind(null, $data)"></a>
+      </li>
+    <!-- /ko -->
+    <li>
+      <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
+    </li>
+  </ul>
 </div>
 
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-
-        <ul class="nav nav-tabs">
-          <!-- ko foreach: notebooks -->
-            <li class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }">
-              <a href="javascript:void(0)" data-bind="text: id, click: $parent.selectedNotebook.bind(null, $data)"></a>
-            </li>
-          <!-- /ko -->
-          <li class="tab-pane">
-            <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
-          </li>
-        </ul>
 
         <div class="tab-content" data-bind="foreach: notebooks">
           <div class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
@@ -125,7 +119,6 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 </script>
 
 
-
 <link rel="stylesheet" href="/static/css/common_dashboard.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/spark/static/css/spark.css">
@@ -149,6 +142,7 @@ ${ commonheader(_('Query'), app_name, user, "100px") | n,unicode }
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
 
 

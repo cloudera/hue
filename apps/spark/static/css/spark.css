@@ -50,10 +50,40 @@
   line-height: 20px!important;
 }
 
-.card-toolbar {
-  top: 27px;
+.dropdown-menu li {
+  font-size: 14px;
+}
+
+.dropdown a.dropdown-toggle {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.search-bar {
+  background-color: #F5F5F5;
+  margin: 0;
+  padding-bottom: 0;
+  padding-top: 4px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+  width: 100%;
+  position: fixed;
+  top: 28px;
+  z-index: 1000;
+}
+
+.search-bar input {
+  margin-left: 10px;
+  padding-right: 20px;
+}
+
+.search-bar ul li {
+  text-align: right;
 }
 
 .tab-content {
   background-color: #FFFFFF;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
 }
