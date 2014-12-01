@@ -41,12 +41,20 @@ var Result = function (snippet, result) {
   };  
 }
 
+var TYPE_EDITOR_MAP = {
+  'hive': 'text/x-hiveql',
+  'impala': 'text/x-impalaql',
+  'python': 'text/x-python',
+  'scala': 'text/x-scala',
+  'pig': 'text/x-pig'
+}
 
 var Snippet = function (notebook, snippet) {
   var self = this;
   
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
+  self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement = ko.observable('');
   self.status = ko.observable('loading');
   self.klass = ko.computed(function(){

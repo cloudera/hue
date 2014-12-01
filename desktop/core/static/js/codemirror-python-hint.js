@@ -65,7 +65,7 @@
   function getCompletions(token, context) {
     var found = [], start = token.string;
     function maybeAdd(str) {
-      if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+      if ((start == "" || str.indexOf(start) == 0) && !arrayContains(found, str)) found.push(str);
     }
 
     function gatherCompletions(_obj) {
@@ -87,7 +87,7 @@
 
       while (base != null && context.length)
         base = base[context.pop().string];
-      if (base != null) gatherCompletions(base);
+      if (base != null || typeof base == "undefined") gatherCompletions(base);
     }
     return found;
   }
