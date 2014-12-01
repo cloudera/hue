@@ -57,7 +57,6 @@ class JobServerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = False
-    # To store user info
     self._thread_local = threading.local()
 
   def __str__(self):
@@ -82,9 +81,7 @@ class JobServerApi(object):
       self._thread_local.user = user
 
   def create_session(self, **kwargs):
-    a = self._root.post('sessions', params=kwargs)
-    print a
-    return a
+    return self._root.post('sessions', params=kwargs)
 
   def submit_statement(self, uuid, statement):
     data = {'statement': statement}
@@ -92,27 +89,3 @@ class JobServerApi(object):
 
   def fetch_data(self, session, cell):
     return self._root.get('sessions/%s/cells/%s' % (session, cell))
-
-#curl http://localhost:8080/sessions/87576bf4-f22c-4681-8f33-d3a329577ec9/cells/0
-#{"id":0,"state":"COMPLETE","input":["1+2"],"output":["res0: Int = 3"],"error":[]}
-
-#  def job(self, job_id):
-#    return self._root.get('jobs/%s' % job_id, headers={'Accept': _JSON_CONTENT_TYPE})
-#
-#  def jobs(self, **kwargs):
-#    return self._root.get('jobs', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
-#
-#  def create_context(self, name, **kwargs):
-#    return self._root.post('contexts/%s' % name, params=kwargs, contenttype=_BINARY_CONTENT_TYPE)
-#
-#  def contexts(self, **kwargs):
-#    return self._root.get('contexts', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
-#
-#  def delete_context(self, name, **kwargs):
-#    return self._root.delete('contexts/%s' % name)
-#
-#  def upload_jar(self, app_name, data):
-#    return self._root.post('jars/%s' % app_name, data=data, contenttype=_BINARY_CONTENT_TYPE)
-
-  def jars(self, **kwargs):
-    return self._root.get('jars', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
