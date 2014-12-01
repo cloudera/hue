@@ -53,14 +53,52 @@ var Snippet = function (notebook, snippet) {
   var self = this;
   
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
-  self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
+  self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement = ko.observable(typeof snippet.statement != "undefined" && snippet.statement != null ? snippet.statement : '');
-  self.status = ko.observable('loading');
-  self.klass = ko.computed(function(){
-    return 'results ' + self.type();
+  self.statement = ko.observable("");
+  self.status = ko.observable("loading");
+
+  self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
+  self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
+  self.isLoading = ko.computed(function(){
+    return self.status() == "loading";
   });
-  
+  self.klass = ko.computed(function () {
+    return "snippet card card-widget";
+  });
+
+  self.editorKlass = ko.computed(function(){
+    return "editor span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
+  });
+
+  self.resultsKlass = ko.computed(function(){
+    return "results " + self.type();
+  });
+
+  self.expand = function () {
+    self.size(self.size() + 1);
+    $("#snippet_" + self.id()).trigger("resize");
+  }
+
+  self.compress = function () {
+    self.size(self.size() - 1);
+    $("#snippet_" + self.id()).trigger("resize");
+  }
+
+  self.moveLeft = function () {
+    self.offset(self.offset() - 1);
+  }
+
+  self.moveRight = function () {
+    self.offset(self.offset() + 1);
+  }
+
+  self.remove = function (notebook, snippet) {
+    notebook.snippets.remove(snippet);
+  }
+
+
   self.result = new Result(snippet, snippet.result);
   
   // init()
@@ -247,17 +285,6 @@ function EditorViewModel(notebooks) {
   };
 
 
-//  function bareWidgetBuilder(name, type){
-//    return new Widget({
-//      size: 12,
-//      id: UUID(),
-//      name: name,
-//      widgetType: type
-//    });
-//  }
-//
-//  self.draggableHive = ko.observable(bareWidgetBuilder("Hive Query", "hive-widget"));
-
   self.init = function() {
     $.each(notebooks, function(index, notebook) {
       self.loadNotebook(notebook);
@@ -279,6 +306,7 @@ function EditorViewModel(notebooks) {
   self.saveNotebook = function() {
     self.selectedNotebook().save();
   };
+
 }
 
 

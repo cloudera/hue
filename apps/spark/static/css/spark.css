@@ -30,6 +30,11 @@
   overflow: auto;
 }
 
+.CodeMirror {
+  border: 1px solid #DDD;
+  border-top: none;
+}
+
 .codeMirror-overlaybtn {
   position: absolute;
   margin-top: -40px;
@@ -47,7 +52,7 @@
 }
 
 .nav i {
-  line-height: 20px!important;
+  line-height: 20px !important;
 }
 
 .dropdown-menu li {
@@ -86,4 +91,21 @@
   background-color: #FFFFFF;
   border-left: 1px solid #dddddd;
   border-right: 1px solid #dddddd;
+}
+
+.snippet-icon {
+  color: #338bb8;
+  height: 16px;
+  width: 16px;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.row-container.is-editing {
+  border: none;
+}
+
+.ui-sortable {
+  background-color: #FFF;
+  min-height: 100px;
 }
