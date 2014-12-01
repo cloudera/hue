@@ -23,9 +23,10 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from desktop.models import Document2
 
 from spark.decorators import json_error_handler
-from spark.models import get_api
+from spark.models import get_api, Notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -94,5 +95,39 @@ def fetch_result(request):
   except Exception, e:
     raise PopupException(e, title=_('Error while accessing query server'))
     response['error'] = force_unicode(str(e))
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def save_notebook(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}')) # TODO perms
+
+  if notebook.get('id'):
+    notebook_doc = Document2.objects.get(id=notebook['id'])
+  else:      
+    notebook_doc = Document2.objects.create(name=notebook['name'], type='notebook', owner=request.user)
+
+  notebook_doc.update_data(notebook)
+  notebook_doc.name = notebook['name']
+  notebook_doc.save()
+  
+  response['status'] = 0
+  response['id'] = notebook_doc.id
+  response['message'] = _('Notebook saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def open_notebook(request):
+  response = {'status': -1}
+
+  notebook_id = request.GET.get('notebook')
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+  
+  response['status'] = 0
+  response['notebook'] = notebook.get_json()
+  response['message'] = _('Notebook saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")

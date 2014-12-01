@@ -55,7 +55,7 @@ var Snippet = function (notebook, snippet) {
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
-  self.statement = ko.observable('');
+  self.statement = ko.observable(typeof snippet.statement != "undefined" && snippet.statement != null ? snippet.statement : '');
   self.status = ko.observable('loading');
   self.klass = ko.computed(function(){
     return 'results ' + self.type();
@@ -168,11 +168,13 @@ var Snippet = function (notebook, snippet) {
 var Notebook = function (vm, notebook) {
   var self = this;
 
-  self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : UUID());
+  self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : null);
+  self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
+  self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable('scala');
   self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
-  self.sessions = ko.observableArray(); // {'hive': ..., scala: ...}
+  self.sessions = ko.observableArray(); // [{'hive': {...}, 'scala': {...}]
 
   self.getSession = function(session_type) {
     var _s = null;
@@ -192,7 +194,7 @@ var Notebook = function (vm, notebook) {
 	if (self.getSession(self.selectedSnippet()) == null) {
 	  _snippet.create_session();
     }	
-  }  
+  };  
 
   self.newSnippet = function() {
 	var snippet = new Snippet(self, {type: self.selectedSnippet()});	  
@@ -201,13 +203,32 @@ var Notebook = function (vm, notebook) {
 	if (self.getSession(self.selectedSnippet()) == null) {
 	  snippet.create_session();
 	}
-  }  
+  };  
   
   if (notebook.snippets) {
     $.each(notebook.snippets, function(index, snippet) {
       self.addSnippet(snippet);
     });
-  }  
+  } 
+  
+  self.save = function () {
+    $.post("/spark/api/notebook/save", {
+        "notebook": ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        self.id(data.id);
+        $(document).trigger("info", data.message);
+        if (window.location.search.indexOf("notebook") == -1) {
+          window.location.hash = '#notebook=' + data.id;
+        }
+      }
+      else {
+        $(document).trigger("error", data.message);
+     }
+   }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
 }
 
 
@@ -244,19 +265,19 @@ function EditorViewModel(notebooks) {
         self.selectedNotebook(self.notebooks()[0]);
       }
     });
-  }
+  };
 
   self.loadNotebook = function(notebook) {
     self.notebooks.push(new Notebook(self, notebook));
-  }
+  };
 
   self.newNotebook = function() {
 	self.notebooks.push(new Notebook(self, {}));
     self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
-  }
-  
-  self.save = function() {
+  };
 
+  self.saveNotebook = function() {
+    self.selectedNotebook().save();
   };
 }
 
