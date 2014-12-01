@@ -217,10 +217,14 @@ function EditorViewModel(notebooks) {
   self.notebooks = ko.observableArray();
   self.selectedNotebook = ko.observable();
 
-  self.isEditing = ko.observable(false);
+  self.isEditing = ko.observable(true);
+  self.isEditing.subscribe(function(newVal){
+    $(document).trigger("editingToggled");
+  });
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
   };
+
 
 //  function bareWidgetBuilder(name, type){
 //    return new Widget({
