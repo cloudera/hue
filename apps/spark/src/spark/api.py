@@ -61,7 +61,7 @@ def execute(request):
     if 'session not found' in message:
       response['status'] = -2
     else:
-      response['error'] = force_unicode(str(e))
+      response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -80,7 +80,7 @@ def check_status(request):
     if 'session not found' in message:
       response['status'] = -2
     else:
-      response['error'] = force_unicode(str(e))
+      response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -99,8 +99,26 @@ def fetch_result(request):
     if 'session not found' in message:
       response['status'] = -2
     else:
-      response['error'] = force_unicode(str(e))
+      response['message'] = force_unicode(str(e))
 
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def cancel_statement(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
+    response['status'] = 0
+  except Exception, e:
+    message = force_unicode(str(e))
+    if 'session not found' in message:
+      response['status'] = -2
+    else:
+      response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

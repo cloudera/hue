@@ -126,7 +126,13 @@ class HS2Api():
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     handle = HiveServerQueryHandle(**snippet['result']['handle'])
     status =  db.get_state(handle)
-    return {'status': 'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'finished'}
+
+    return {
+        'status':
+          'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
+          else ('failed' if QueryHistory.STATE.failed.index
+          else 'ready')
+    }
 
   def fetch_result(self, notebook, snippet):
     db = dbms.get(self.user)
@@ -148,8 +154,13 @@ class HS2Api():
   def fetch_result_metadata(self):
     pass 
 
-  def cancel(self):
-    pass
+  def cancel(self, notebook, snippet):
+    db = dbms.get(self.user)
+      
+    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    handle = HiveServerQueryHandle(**snippet['result']['handle'])
+    db.cancel_operation(handle)
+    return {'status': 'canceled'}    
 
   def get_log(self):
     pass
@@ -177,7 +188,7 @@ class SparkApi():  # Pig, DBquery, Phoenix...
     return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
 
   def check_status(self, notebook, snippet):
-    return {'status': 'finished'}
+    return {'status': 'ready'}
 
   def fetch_result(self, notebook, snippet):
     api = get_spark_api(self.user)
@@ -195,5 +206,5 @@ class SparkApi():  # Pig, DBquery, Phoenix...
         } for column in []]
     }
 
-  def cancel(self):
+  def cancel(self, notebook, snippet):
     pass
