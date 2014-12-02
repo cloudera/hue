@@ -114,3 +114,7 @@
   padding: 4px;
   position: fixed;
 }
+
+.assist-main {
+  overflow-y: scroll;
+}

@@ -94,7 +94,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <select data-bind="options: $root.assistContent().mainObjects, chosen: {}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
           <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
-          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled">
+          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
             <li>
               <a href="javascript:void(0)" class="pull-right" style="padding-right:5px"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><i class="fa fa-table"></i> <span data-bind="text: $data"></span></a>
@@ -189,7 +189,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="foreach: variables">
             <div>
               <span data-bind="text: name"></span>
-              <input data-bind="value: value"></input>
+              <input type="text" data-bind="value: value" />
             </div>
           </div>
           <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
@@ -625,6 +625,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       assist.getData(viewModel.assistContent().selectedMainObject() + "/" + first);
     }
     viewModel.assistContent().firstLevelObjects()[first].open(! viewModel.assistContent().firstLevelObjects()[first].open());
+    window.setTimeout(resizeAssist, 100);
   }
 
   function loadAssistFirstLevel() {
@@ -687,10 +688,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return escapeString(level.name + " (" + level.type + ")");
   }
 
-$(document).ready(function(){
-  $(".assist").width($(".assist").parents(".span2").width());
-  $(".assist").parents(".span2").height($(".assist").height() + 100);
-});
+  function resizeAssist() {
+    $(".assist").width($(".assist").parents(".span2").width());
+    $(".assist").parents(".span2").height($(".assist").height() + 100);
+    $(".assist-main").height($(window).height() - 230);
+  }
+
+  $(document).ready(function(){
+    resizeAssist();
+  });
 
 </script>
 
