@@ -183,7 +183,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <div class="row-fluid">
         <div data-bind="css: editorKlass">
-          <textarea data-bind="value: statement, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
+          <div data-bind="foreach: variables">
+            <div>
+              <span data-bind="text: name"></span>
+              <input data-bind="value: value"></input>
+            </div>
+          </div>
+          <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
           <a href="javascript:void(0)" data-bind="click: execute" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
         </div>
       </div>

@@ -18,8 +18,8 @@
 var Result = function (snippet, result) {
   var self = this;
 
-  self.id = ko.observable(typeof result.id != "undefined" && result.id != "undefined" && result.id != null ? result.id : UUID());
-  self.type = ko.observable(typeof result.type != "undefined" && result.type != "undefined" && result.type != null ? result.type : 'table');
+  self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
+  self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
   self.handle = ko.observable({});
   self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
@@ -53,10 +53,60 @@ var Snippet = function (notebook, snippet) {
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
-  self.statement = ko.observable(typeof snippet.statement != "undefined" && snippet.statement != null ? snippet.statement : '');
+  self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
-  self.variables = ko.computed(function() {
-	return self.statement().match(/\$[^\d'"](\w*)/g);  
+  self.variables = ko.observableArray([]);
+  self.variableNames = ko.computed(function() {
+	var matches = [];
+	var myRegexp = /(?:[^\\]\$)([^\d'" ]\w*)/g;
+	var match = myRegexp.exec(self.statement_raw());
+
+	while (match != null) {
+	  matches.push(match[1]);
+	  match = myRegexp.exec(self.statement());
+	}
+	return matches;  
+  });
+  self.variableNames.subscribe(function(newVal){
+	var toDelete = [];
+	var toAdd = [];
+	
+	$.each(newVal, function(key, name) {
+	  var match = ko.utils.arrayFirst(self.variables(), function(_var) {
+		return _var.name() == name;
+      });	  
+	  if (! match) {
+		toAdd.push(name);
+	  }
+	});
+	$.each(self.variables(), function(key, _var) {
+	  var match = ko.utils.arrayFirst(newVal, function(name) {
+		return _var.name() == name;
+      });	  
+	  if (! match) {
+		toDelete.push(_var);
+	  }
+	});
+	
+	$.each(toDelete, function(index, item) {
+      self.variables.remove(item);
+	});
+	$.each(toAdd, function(index, item) {
+      self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
+	});
+	
+	self.variables.sort(function(left, right) { 
+	  var leftIndex = newVal.indexOf(left.name());
+	  var rightIndex = newVal.indexOf(right.name());
+	  return leftIndex == rightIndex ? 0 : (leftIndex  < rightIndex  ? -1 : 1); 
+	});
+  });
+  self.statement = ko.computed(function() {
+    var statement = self.statement_raw();
+	$.each(self.variables(), function(index, variable) {
+	  statement = statement.replace(RegExp("([^\\\\])\\$" + variable.name(), "g"), "$1" + variable.value());
+	});
+	return statement;
   });
   self.result = new Result(snippet, snippet.result);
 
