@@ -21,6 +21,14 @@
 
 ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
+<script type="text/javascript">
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("notebook") > -1) {
+      location.href = "/spark/editor?" + window.location.hash.substr(1);
+    }
+  }
+</script>
+
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
@@ -221,6 +229,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <link rel="stylesheet" href="/spark/static/css/spark.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
+<link rel="stylesheet" href="/static/ext/css/leaflet.css">
+<link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
+<link rel="stylesheet" href="/static/css/nv.d3.css">
+
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/js/codemirror-pig.js"></script>
@@ -249,6 +262,31 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+
+<script src="/static/js/hue.geo.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/hue.colors.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
 
 
 
