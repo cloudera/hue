@@ -31,8 +31,11 @@ from desktop.lib.rest.http_client import RestException
 class Notebook():
   
   def __init__(self, document=None):
+    self.document = None
+    
     if document is not None:
       self.data = document.data
+      self.document = document
     else:    
       self.data = json.dumps({
           'name': 'My Notebook', 
@@ -47,12 +50,17 @@ class Notebook():
   def get_data(self):
     _data = json.loads(self.data)
   
+    if self.document is not None:
+      _data['id'] = self.document.id 
+  
     return _data
 
 
 def get_api(user, snippet):
   if snippet['type'] == 'hive':
     return HS2Api(user)
+  if snippet['type'] == 'text':
+    return TextApi(user)  
   else:
     return SparkApi(user)
 
@@ -61,6 +69,17 @@ def _get_snippet_session(notebook, snippet):
   return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0] 
 
 
+class TextApi():
+  
+  def __init__(self, user):
+    self.user = user
+    
+  def create_session(self, lang):
+    return {
+        'type': lang,
+        'id': None
+    }
+  
 
 class HS2Api():
   

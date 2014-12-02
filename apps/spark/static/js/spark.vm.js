@@ -299,7 +299,7 @@ var Notebook = function (vm, notebook) {
   };  
 
   self.newSnippet = function() {
-	var snippet = new Snippet(self, {type: self.selectedSnippet()});	  
+	var snippet = new Snippet(self, {type: self.selectedSnippet(), result: {}});	  
 	self.snippets.push(snippet);
 	  
 	if (self.getSession(self.selectedSnippet()) == null) {
