@@ -78,21 +78,61 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
 <script type="text/html" id="notebook">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="assist">
+        <h1 class="assist-heading"><i class="fa fa-compass"></i> ${_('Assist')}</h1>
+        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
+          <i class="fa fa-question-circle"></i>
+        </a>
+        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
+          <i class="fa fa-refresh"></i>
+        </a>
+        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
+          <li class="nav-header">${_('database')}</li>
+        </ul>
+        <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
+          <select data-bind="options: $root.assistContent().mainObjects, chosen: {}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+          <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
+          <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
+          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled">
+            <li>
+              <a href="javascript:void(0)" class="pull-right" style="padding-right:5px"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><i class="fa fa-table"></i> <span data-bind="text: $data"></span></a>
+
+              <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
+                <ul data-bind="visible: $root.assistContent().firstLevelObjects()[$data].items().length > 0, foreach: $root.assistContent().firstLevelObjects()[$data].items()" class="unstyled">
+                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><i class="fa fa-columns"></i> <span data-bind="html: truncateSecondLevel($data)"></span></a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        <!-- /ko -->
+
+        <div id="navigatorLoader" class="center" data-bind="visible: $root.assistContent().isLoading">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+          <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        </div>
+      </div>
+    </div>
+    <div class="span10">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
             dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}">
+      </div>
+      <div style="margin: 20px">
+        <a href="javascript: void(0)" data-bind="click: newSnippet">
+          <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
+        </a>
+        <select data-bind="options: availableSnippets, value: selectedSnippet">
+        </select>
+      </div>
+    </div>
   </div>
 
-  <div style="margin: 20px">
-    <a href="javascript: void(0)" data-bind="click: newSnippet">
-      <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
-    </a>
-    <select data-bind="options: availableSnippets, value: selectedSnippet">
-    </select>    
-  </div>
 </script>
 
 
@@ -171,6 +211,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/spark/static/css/spark.css">
 <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/js/codemirror-pig.js"></script>
@@ -196,19 +237,49 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
+<script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
 
 
 <script type="text/javascript" charset="utf-8">
 
-  // text/x-pig
-  // text/x-scala
-  // text/x-python
-  // text/x-impalaql
-  // text/x-hiveql
+  var assist = new Assist({
+    app: "beeswax",
+    user: "${user}",
+    failsQuietlyOn: [500], // error codes from beeswax/views.py - autocomplete
+    baseURL: "${url('beeswax:api_autocomplete_databases')}"
+  });
+
+  ko.bindingHandlers.chosen = {
+    init: function (element) {
+      $(element).chosen({
+        disable_search_threshold: 5,
+        width: "100%"
+      }).change(function(e, obj){
+        viewModel.assistContent().selectedMainObject(obj.selected);
+        loadAssistFirstLevel();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      $(element).trigger('chosen:updated');
+    }
+  };
+
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+
+      $(document).on("error.autocomplete", function(){
+        $(".CodeMirror-spinner").remove();
+      });
+
+      function hiveImpalaAutocomplete(cm, autocompleteSet) {
+
+
+      }
+
       var options = $.extend(valueAccessor(), {
         extraKeys: {
           "Ctrl-Space": function (cm) {
@@ -219,6 +290,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 break;
               case "text/x-python":
                 CodeMirror.showHint(cm, CodeMirror.pythonHint);
+                break;
+              case "text/x-scala":
+                CodeMirror.showHint(cm, CodeMirror.scalaHint);
+                break;
+              case "text/x-hiveql":
+                HIVE_AUTOCOMPLETE_APP = "beeswax";
+                hiveImpalaAutocomplete(cm, CodeMirror.hiveQLHint);
+                break;
+              case "text/x-impalaql":
+                HIVE_AUTOCOMPLETE_APP = "impala";
+                hiveImpalaAutocomplete(cm, CodeMirror.impalaSQLHint);
                 break;
               default:
                 break;
@@ -251,14 +333,85 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   };
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode });
+  viewModel.assistContent(assist);
   ko.applyBindings(viewModel);
   viewModel.init();
 
+  function loadAssistSecondLevel(first){
+    if (! viewModel.assistContent().firstLevelObjects()[first].loaded()){
+      viewModel.assistContent().isLoading(true);
+      assist.options.onDataReceived = function(data){
+        if (data.columns){
+          var _cols = data.extended_columns?data.extended_columns:data.columns;
+          viewModel.assistContent().firstLevelObjects()[first].items(_cols);
+          viewModel.assistContent().firstLevelObjects()[first].loaded(true);
+        }
+        viewModel.assistContent().isLoading(false);
+      }
+      assist.getData(viewModel.assistContent().selectedMainObject() + "/" + first);
+    }
+    viewModel.assistContent().firstLevelObjects()[first].open(! viewModel.assistContent().firstLevelObjects()[first].open());
+  }
 
-  $(document).ready(function(){
+  function loadAssistFirstLevel() {
+    assist.options.onDataReceived = function(data){
+      if (data.tables){
+        var _obj = {};
+        data.tables.forEach(function(item){
+          _obj[item] = {
+            items: ko.observableArray([]),
+            open: ko.observable(false),
+            loaded: ko.observable(false)
+          }
+        });
+        viewModel.assistContent().firstLevelObjects(_obj);
+      }
+      viewModel.assistContent().isLoading(false);
+    }
+    assist.getData(viewModel.assistContent().selectedMainObject());
+  }
 
-  });
+  function loadAssistMain() {
+    assist.options.onDataReceived = function(data){
+      if (data.databases){
+        viewModel.assistContent().mainObjects(data.databases);
+        if (viewModel.assistContent().mainObjects().length > 0 && ! viewModel.assistContent().selectedMainObject()){
+          viewModel.assistContent().selectedMainObject(viewModel.assistContent().mainObjects()[0]);
+          loadAssistFirstLevel();
+        }
+      }
+    }
+    assist.getData();
+  }
 
+  loadAssistMain();
+
+  function needsTruncation(level) {
+    return (level.name.length + level.type.length) > 20;
+  }
+
+  function secondLevelTitle(level) {
+    var _title = "";
+
+    if (level.comment && needsTruncation(level)) {
+      _title = level.name + " (" + level.type + "): " + level.comment;
+    } else if (needsTruncation(level)) {
+      _title = level.name + " (" + level.type + ")";
+    } else if (level.comment) {
+      _title = level.comment;
+    }
+    return _title;
+  }
+
+  function truncateSecondLevel(level) {
+    var escapeString = function (str) {
+      return $("<span>").text(str).html().trim()
+    }
+    if (needsTruncation(level)) {
+      return escapeString(level.name + " (" + level.type + ")").substr(0, 20) + "&hellip;";
+    }
+    return escapeString(level.name + " (" + level.type + ")");
+  }
 
 </script>
 
