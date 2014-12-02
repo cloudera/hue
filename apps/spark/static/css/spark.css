@@ -111,13 +111,6 @@
 }
 
 .assist {
-  /*position: fixed;*/
-}
-
-.assist-heading {
-  font-size: 16px;
-  font-weight: 300;
-  color: #777;
-  border-bottom: 1px solid #e5e5e5;
-  padding-left: 10px;
+  padding: 4px;
+  position: fixed;
 }

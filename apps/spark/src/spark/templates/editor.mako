@@ -81,7 +81,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <div class="row-fluid">
     <div class="span2">
       <div class="assist">
-        <h1 class="assist-heading"><i class="fa fa-compass"></i> ${_('Assist')}</h1>
         <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
           <i class="fa fa-question-circle"></i>
         </a>
@@ -279,20 +278,271 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
   ko.bindingHandlers.codemirror = {
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    init: function (element, valueAccessor, allBindingsAccessor, vm) {
 
-      $(document).on("error.autocomplete", function(){
+      $(document).on("error.autocomplete", function () {
         $(".CodeMirror-spinner").remove();
       });
 
-      function hiveImpalaAutocomplete(cm, autocompleteSet) {
+      function hiveImpalaAutocomplete(cm, autocompleteSet, comingFromKeyEvent) {
+        CodeMirror.fromDot = false;
+
+        CodeMirror.onAutocomplete = function (data, from, to) {
+          if (data.indexOf("(") > -1) {
+            cm.setCursor({line: from.line, ch: from.ch + data.length - 1});
+            hiveImpalaAutocomplete(cm, autocompleteSet);
+          }
+          if (CodeMirror.tableFieldMagic) {
+            cm.replaceRange(" ", from, from);
+            cm.setCursor(from);
+            hiveImpalaAutocomplete(cm, autocompleteSet);
+          }
+        };
+
+        function splitStatements(hql) {
+          var statements = [];
+          var current = "";
+          var betweenQuotes = null;
+          for (var i = 0, len = hql.length; i < len; i++) {
+            var c = hql[i];
+            current += c;
+            if ($.inArray(c, ['"', "'"]) > -1) {
+              if (betweenQuotes == c) {
+                betweenQuotes = null;
+              }
+              else if (betweenQuotes == null) {
+                betweenQuotes = c;
+              }
+            }
+            else if (c == ";") {
+              if (betweenQuotes == null) {
+                statements.push(current);
+                current = "";
+              }
+            }
+          }
+
+          if (current != "" && current != ";") {
+            statements.push(current);
+          }
+          return statements;
+        }
+
+        function getStatementAtCursor(cm) {
+          var _pos = cm.indexFromPos(cm.getCursor());
+          var _statements = splitStatements(cm.getValue());
+          var _cumulativePos = 0;
+          var _statementAtCursor = "";
+          var _relativePos = 0;
+          for (var i = 0; i < _statements.length; i++) {
+            if (_cumulativePos + _statements[i].length >= _pos && _statementAtCursor == "") {
+              _statementAtCursor = _statements[i].split("\n").join(" ");
+              _relativePos = _pos - _cumulativePos;
+            }
+            _cumulativePos += _statements[i].length;
+          }
+          return {
+            statement: _statementAtCursor,
+            relativeIndex: _relativePos
+          };
+        }
+
+        function getTableAliases(textScanned) {
+          var _aliases = {};
+          var _val = textScanned.split("\n").join(" ");
+          var _from = _val.toUpperCase().indexOf("FROM ");
+          if (_from > -1) {
+            var _match = _val.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
+            var _to = _val.length;
+            if (_match) {
+              _to = _match.index;
+            }
+            var _found = _val.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+            for (var i = 0; i < _found.length; i++) {
+              var _tablealias = $.trim(_found[i]).split(" ");
+              if (_tablealias.length > 1) {
+                _aliases[_tablealias[1]] = _tablealias[0];
+              }
+            }
+          }
+          return _aliases;
+        }
+
+        function tableHasAlias(tableName, textScanned) {
+          var _aliases = getTableAliases(textScanned);
+          for (var alias in _aliases) {
+            if (_aliases[alias] == tableName) {
+              return true;
+            }
+          }
+          return false;
+        }
 
 
+        function fieldsAutocomplete(cm) {
+          CodeMirror.possibleSoloField = true;
+          try {
+            var _statement = getStatementAtCursor(cm).statement;
+            var _from = _statement.toUpperCase().indexOf("FROM");
+            if (_from > -1) {
+              var _match = _statement.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
+              var _to = _statement.length;
+              if (_match) {
+                _to = _match.index;
+              }
+              var _found = _statement.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+            }
+
+            var _foundTable = "";
+            for (var i = 0; i < _found.length; i++) {
+              if ($.trim(_found[i]) != "" && _foundTable == "") {
+                _foundTable = $.trim(_found[i]).split(" ")[0];
+              }
+            }
+            if (_foundTable != "") {
+              if (tableHasAlias(_foundTable, _statement)) {
+                CodeMirror.possibleSoloField = false;
+                CodeMirror.showHint(cm, autocompleteSet);
+              }
+              else {
+                assist.options.onDataReceived = function (data) {
+                  if (data.columns) {
+                    CodeMirror.catalogFields = data.columns.join(" ");
+                    CodeMirror.showHint(cm, autocompleteSet);
+                  }
+                }
+
+                if (_foundTable.indexOf("(") > -1) {
+                  _foundTable = _foundTable.substr(_foundTable.indexOf("(") + 1);
+                }
+
+                var _aliases = getTableAliases(_statement);
+                if (_aliases[_foundTable]) {
+                  _foundTable = _aliases[_foundTable];
+                }
+
+                assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _foundTable);
+              }
+            }
+          }
+          catch (e) {
+          }
+        }
+
+        var pos = cm.cursorCoords();
+        if ($(".CodeMirror-spinner").length == 0) {
+          $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").appendTo($("body"));
+        }
+        $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
+
+        if (comingFromKeyEvent) {
+
+          var _statement = getStatementAtCursor(cm).statement;
+          var _line = cm.getLine(cm.getCursor().line);
+          var _partial = _line.substring(0, cm.getCursor().ch);
+          var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+          if (_statement.indexOf("FROM") > -1) {
+
+            assist.options.onDataReceived = function (data) {
+              if (data.columns) {
+                var _cols = data.columns;
+                for (var col in _cols) {
+                  _cols[col] = "." + _cols[col];
+                }
+                CodeMirror.catalogFields = _cols.join(" ");
+                CodeMirror.fromDot = true;
+                CodeMirror.showHint(cm, autocompleteSet);
+              }
+            }
+
+            if (_table.indexOf("(") > -1) {
+              _table = _table.substr(_table.indexOf("(") + 1);
+            }
+
+            var _aliases = getTableAliases(_statement);
+            if (_aliases[_table]) {
+              _table = _aliases[_table];
+            }
+
+            assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _table);
+
+          }
+
+        }
+        else {
+          assist.options.onDataReceived = function (data) {
+            if (data.tables) {
+              CodeMirror.catalogTables = data.tables.join(" ");
+              var _statementAtCursor = getStatementAtCursor(cm);
+              var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
+              var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
+              if ($.trim(_before).substr(-1) == ".") {
+                var _statement = _statementAtCursor.statement;
+                var _line = cm.getLine(cm.getCursor().line);
+                var _partial = _line.substring(0, cm.getCursor().ch);
+                var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+                if (_statement.indexOf("FROM") > -1) {
+                  assist.options.onDataReceived = function (data) {
+                    if (data.columns) {
+                      var _cols = data.columns;
+                      for (var col in _cols) {
+                        _cols[col] = "." + _cols[col];
+                      }
+                      CodeMirror.catalogFields = _cols.join(" ");
+                      CodeMirror.showHint(cm, autocompleteSet);
+                    }
+                  }
+
+                  if (_table.indexOf("(") > -1) {
+                    _table = _table.substr(_table.indexOf("(") + 1);
+                  }
+
+                  var _aliases = getTableAliases(_statement);
+                  if (_aliases[_table]) {
+                    _table = _aliases[_table];
+                  }
+
+                  assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _table);
+                }
+              }
+              else {
+                CodeMirror.possibleTable = false;
+                CodeMirror.tableFieldMagic = false;
+                if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" ORDER BY ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
+                    _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
+                  CodeMirror.possibleTable = true;
+                }
+                CodeMirror.possibleSoloField = false;
+                if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+                  if (_after.toUpperCase().indexOf("FROM ") > -1 || $.trim(_before).substr(-1) == "(") {
+                    fieldsAutocomplete(cm);
+                  }
+                  else {
+                    CodeMirror.tableFieldMagic = true;
+                    CodeMirror.showHint(cm, autocompleteSet);
+                  }
+                }
+                else {
+                  if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
+                    fieldsAutocomplete(cm);
+                  }
+                  else {
+                    CodeMirror.showHint(cm, autocompleteSet);
+                  }
+                }
+              }
+            }
+          }
+          assist.getData(viewModel.assistContent().selectedMainObject());
+        }
       }
 
       var options = $.extend(valueAccessor(), {
         extraKeys: {
           "Ctrl-Space": function (cm) {
+            $(document.body).on("contextmenu", function (e) {
+              e.preventDefault(); // prevents native menu on FF for Mac from being shown
+            });
             switch (valueAccessor().mode) {
               case "text/x-pig":
                 CodeMirror.availableVariables = [];
@@ -305,11 +555,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 CodeMirror.showHint(cm, CodeMirror.scalaHint);
                 break;
               case "text/x-hiveql":
-                HIVE_AUTOCOMPLETE_APP = "beeswax";
                 hiveImpalaAutocomplete(cm, CodeMirror.hiveQLHint);
                 break;
               case "text/x-impalaql":
-                HIVE_AUTOCOMPLETE_APP = "impala";
                 hiveImpalaAutocomplete(cm, CodeMirror.impalaSQLHint);
                 break;
               default:
@@ -319,12 +567,28 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           "Ctrl-Enter": function () {
             valueAccessor().enter();
           }
+        },
+        onKeyEvent: function (cm, e) {
+          switch (valueAccessor().mode) {
+            case "text/x-hiveql":
+              if (e.type == "keyup" && e.keyCode == 190) {
+                hiveImpalaAutocomplete(cm, CodeMirror.hiveQLHint, true);
+              }
+              break;
+            case "text/x-impalaql":
+              if (e.type == "keyup" && e.keyCode == 190) {
+                hiveImpalaAutocomplete(cm, CodeMirror.impalaSQLHint, true);
+              }
+              break;
+            default:
+              break;
+          }
         }
       });
       var editor = CodeMirror.fromTextArea(element, options);
 
       element.editor = editor;
-      $("#snippet_"+options.id).data("editor", editor);
+      $("#snippet_" + options.id).data("editor", editor);
       editor.setValue(allBindingsAccessor().value());
       window.setTimeout(function () {
         editor.refresh();
@@ -422,6 +686,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
     return escapeString(level.name + " (" + level.type + ")");
   }
+
+$(document).ready(function(){
+  $(".assist").width($(".assist").parents(".span2").width());
+  $(".assist").parents(".span2").height($(".assist").height() + 100);
+});
 
 </script>
 
