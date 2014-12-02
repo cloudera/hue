@@ -149,6 +149,8 @@ var Snippet = function (notebook, snippet) {
     notebook.snippets.remove(snippet);
   }
   
+  self.checkStatusTimeout = null;
+  
   // init()
   // checkStatus()
 
@@ -198,16 +200,19 @@ var Snippet = function (notebook, snippet) {
   };
 
   self.checkStatus = function() {
+	  
     $.post("/spark/api/check_status", {
        notebook: ko.mapping.toJSON(notebook),
        snippet: ko.mapping.toJSON(self)
 	  }, function (data) {
 	    if (data.status == 0) {
+
           self.status(data.query_status.status);
-            
+
           if (self.status() == 'running') {
-            setTimeout(self.checkStatus, 1000);            	
-          } else {
+        	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
+          } 
+           else if (self.status() == 'ready') {
         	self.fetchResult();
           }
 	    } else if (data.status == -2) {
@@ -246,7 +251,23 @@ var Snippet = function (notebook, snippet) {
   };
   
   self.cancel = function() {
-
+	if (self.checkStatusTimeout != null) {
+	  clearTimeout(self.checkStatusTimeout);
+	  self.checkStatusTimeout = null;
+	}
+	
+    $.post("/spark/api/cancel_statement", {
+        notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self)
+ 	  }, function (data) {
+ 	    if (data.status == 0) {
+ 	      self.status('canceled'); 
+ 	    } else {
+ 	      $(document).trigger("error", data.message);
+ 	    }
+ 	}).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
 }
 
