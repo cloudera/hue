@@ -51,7 +51,7 @@ public class SessionResource {
     @Timed
     public Response createSession(@QueryParam("lang") String language,
                                   @Context HttpServletRequest request) throws IOException, InterruptedException, URISyntaxException {
-        int sessionType;
+        SessionManager.SessionType sessionType;
 
         if (language == null) {
             Response resp = new ResponseBuilderImpl().status(400).entity("missing language").build();
@@ -59,9 +59,9 @@ public class SessionResource {
         }
 
         if (language.equals(SCALA)) {
-            sessionType = SessionManager.SCALA;
+            sessionType = SessionManager.SessionType.SCALA;
         } else if (language.equals(PYTHON)) {
-            sessionType = SessionManager.PYTHON;
+            sessionType = SessionManager.SessionType.PYTHON;
         } else {
             Response resp = new ResponseBuilderImpl().status(400).entity("invalid language").build();
             throw new WebApplicationException(resp);
