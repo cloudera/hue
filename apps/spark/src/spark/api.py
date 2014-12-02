@@ -25,7 +25,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 
-from spark.decorators import json_error_handler
 from spark.models import get_api, Notebook
 
 

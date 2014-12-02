@@ -149,6 +149,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           &nbsp;
         </span>
 
+        <!-- ko if: type() == 'text' -->
+        <i class="fa fa-header snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">${ _('Text') }</sup>
+        <!-- /ko -->
+
         <!-- ko if: type() == 'hive' -->
         <img src="/beeswax/static/art/icon_beeswax_48.png" class="snippet-icon">
         <!-- /ko -->
