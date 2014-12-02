@@ -281,7 +281,7 @@ var Notebook = function (vm, notebook) {
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable('scala');
-  self.availableSnippets = ko.observableArray(['hive', 'scala', 'sql', 'python', 'text', 'pig', 'impala']); // presto, mysql, oracle, sqlite, postgres, phoenix
+  self.availableSnippets = ko.observableArray(['impala', 'hive', 'scala', 'spark sql', 'python', 'text', 'pig']); // presto, mysql, oracle, sqlite, postgres, phoenix
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {

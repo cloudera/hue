@@ -57,9 +57,9 @@ class Notebook():
 
 
 def get_api(user, snippet):
-  if snippet['type'] == 'hive':
+  if snippet['type'] in ('hive', 'impala', 'spark-sql'):
     return HS2Api(user)
-  if snippet['type'] == 'text':
+  elif snippet['type'] == 'text':
     return TextApi(user)  
   else:
     return SparkApi(user)
@@ -130,8 +130,10 @@ class HS2Api():
     return {
         'status':
           'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
-          else ('failed' if QueryHistory.STATE.failed.index
-          else 'ready')
+          else (
+             'failed' if status.index == QueryHistory.STATE.failed.index
+              else 'ready'
+          )
     }
 
   def fetch_result(self, notebook, snippet):
