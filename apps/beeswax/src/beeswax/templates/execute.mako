@@ -997,13 +997,14 @@ var truncateOutput = function (obj) {
     name = obj.name || '',
     type = obj.type || '',
     output = name.length + type.length,
+    suffix = '',
     trim;
-
   if (output > chars) {
     trim = Math.abs((output + 4) - chars); // 4 accounts for ellipsis, spaces, parenthesis
     type = type.slice(0, Math.abs(type.length - trim));
+    suffix = '&hellip;';
   }
-  return escapeOutput(type) + '&hellip;';
+  return escapeOutput(type) + suffix;
 };
 
 function placeResizePanelHandle() {
