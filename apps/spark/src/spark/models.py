@@ -36,7 +36,7 @@ class Notebook():
     else:    
       self.data = json.dumps({
           'name': 'My Notebook', 
-          'snippets': [{'type': 'scala', 'result': {}}]
+          'snippets': [{'type': 'hive', 'result': {}}]
       })
 
   def get_json(self):

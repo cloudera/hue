@@ -298,6 +298,7 @@ function EditorViewModel(notebooks) {
     self.isEditing(! self.isEditing());
   };
 
+  self.assistContent = ko.observable();
 
   self.init = function() {
     $.each(notebooks, function(index, notebook) {

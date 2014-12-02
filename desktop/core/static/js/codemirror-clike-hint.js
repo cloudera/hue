@@ -115,7 +115,7 @@
         base = obj.string;
       while (base != null && context.length)
         base = base[context.pop().string];
-      if (base != null) gatherCompletions(base);
+      if (typeof base == "undefined" || base != null) gatherCompletions(base);
     }
     return found;
   }
