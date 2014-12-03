@@ -55,6 +55,10 @@
   line-height: 20px !important;
 }
 
+.nav-list > li > a, .nav-list .nav-header {
+  padding-left: 0;
+}
+
 .dropdown-menu li {
   font-size: 14px;
 }
