@@ -159,12 +159,27 @@
 
   };
 
-  function drawHeader(_this) {
-    $("#" + $(_this.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
-    var clonedTable = $(_this.element).clone();
+  function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+  }
+
+
+  function UUID() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  }
+
+
+  function drawHeader(plugin) {
+    if (!$(plugin.element).attr("id")){
+      $(plugin.element).attr("id", "eT" + UUID());
+    }
+    $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
+    var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
     clonedTable.removeAttr("id").removeClass("resultTable").find("tbody").remove();
-    $(_this.element).find("thead>tr th").each(function (i) {
+    $(plugin.element).find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");
       clonedTable.find("thead>tr th:eq(" + i + ")").click(function () {
@@ -173,37 +188,37 @@
         $(this).attr("class", originalTh.attr("class"));
       });
     });
-    var clonedTableContainer = $("<div>").width($(_this.element).outerWidth());
+    var clonedTableContainer = $("<div>").width($(plugin.element).outerWidth());
     clonedTable.appendTo(clonedTableContainer);
 
-    var clonedTableVisibleContainer = $("<div>").attr("id", $(_this.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(_this.element).parent().width()).css("overflow-x", "hidden").css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
+    var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
     clonedTableVisibleContainer.css("position", "fixed");
 
     clonedTableContainer.appendTo(clonedTableVisibleContainer);
-    clonedTableVisibleContainer.prependTo($(_this.element).parent());
+    clonedTableVisibleContainer.prependTo($(plugin.element).parent());
 
-    $(_this.element).parent().scroll(function () {
+    $(plugin.element).parent().scroll(function () {
       clonedTableVisibleContainer.scrollLeft($(this).scrollLeft());
     });
 
-    $(_this.element).parent().data("w", clonedTableVisibleContainer.width());
+    $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
 
     window.setInterval(function () {
-      if ($(_this.element).parent().width() != $(_this.element).parent().data("w")) {
-        clonedTableVisibleContainer.width($(_this.element).parent().width());
-        $(_this.element).parent().data("w", clonedTableVisibleContainer.width());
-        $(_this.element).find("thead>tr th").each(function (i) {
+      if ($(plugin.element).parent().width() != $(plugin.element).parent().data("w")) {
+        clonedTableVisibleContainer.width($(plugin.element).parent().width());
+        $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
+        $(plugin.element).find("thead>tr th").each(function (i) {
           clonedTable.find("thead>tr th:eq(" + i + ")").width($(this).width()).css("background-color", "#FFFFFF");
         });
       }
     }, 250);
 
-    $(_this.element).parent().resize(function () {
+    $(plugin.element).parent().resize(function () {
       clonedTableVisibleContainer.width($(this).width());
     });
 
     $(window).scroll(function () {
-      clonedTableVisibleContainer.css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
+      clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
     });
   }
 
