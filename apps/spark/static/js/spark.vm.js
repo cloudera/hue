@@ -23,7 +23,7 @@ var Result = function (snippet, result) {
   self.handle = ko.observable({});
   self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
-  self.logs = ko.observable('log');
+  self.logs = ko.observable('');
   
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
@@ -216,8 +216,8 @@ var Snippet = function (notebook, snippet) {
           if (self.status() == 'running') {
         	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
           } 
-          else if (self.status() == 'ready') {
-        	self.fetchResult();
+          else if (self.status() == 'available') {
+        	self.fetchResult(100);
           }
 	    } else if (data.status == -2) {
 	      self.create_session();  
@@ -229,23 +229,28 @@ var Snippet = function (notebook, snippet) {
     });
   };
 
-  self.fetchResult = function() {
+  self.fetchResult = function(rows) {
     $.post("/spark/api/fetch_result", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
- 	  }, function (data) {
- 	    if (data.status == 0) {
- 	      self.result.meta(data.result.meta);           
-          self.result.data(data.result.data);
-
-          // move resultsets to n rows
-          // check if N rows fetched...
- 	    } else if (data.status == -2) {
- 	      self.create_session();  
- 	    } else {
- 	      $(document).trigger("error", data.message);
- 	    }
- 	}).fail(function (xhr, textStatus, errorThrown) {
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self),
+      rows: rows
+    }, function (data) {
+ 	  if (data.status == 0) {
+ 	    rows -= data.result.data.length;
+ 	    self.result.meta(data.result.meta);
+ 	    $.each(data.result.data, function(index, row) {
+ 	      self.result.data.push(row);  
+ 	    });
+         
+        if (data.result.hasMore && rows > 0) {
+          setTimeout(function(){ self.fetchResult(rows); }, 500);
+        }
+      } else if (data.status == -2) {
+        self.create_session();  
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -280,7 +285,7 @@ var Snippet = function (notebook, snippet) {
         snippet: ko.mapping.toJSON(self)
  	  }, function (data) {
  	    if (data.status == 0) {
- 	      self.status('canceled'); 
+ 	      self.result.logs(data.log); // todo smarter? 
  	    } else {
  	      $(document).trigger("error", data.message);
  	    }

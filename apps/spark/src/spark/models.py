@@ -134,16 +134,16 @@ class HS2Api():
         'status':
           'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
           else (
-             'failed' if status.index == QueryHistory.STATE.failed.index
-              else 'ready'
+             'failed' if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index)
+              else 'available'
           )
     }
 
-  def fetch_result(self, notebook, snippet):
+  def fetch_result(self, notebook, snippet, rows):
     db = dbms.get(self.user)
       
     handle = self._get_handle(snippet)
-    results = db.fetch(handle, start_over=False, rows=10)
+    results = db.fetch(handle, start_over=False, rows=rows)
     
     # no escaping...
     return {
@@ -196,7 +196,7 @@ class SparkApi():  # Pig, DBquery, Phoenix...
   def check_status(self, notebook, snippet):
     return {'status': 'ready'}
 
-  def fetch_result(self, notebook, snippet):
+  def fetch_result(self, notebook, snippet, rows):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']  

@@ -238,6 +238,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 </tr>
               </tbody>
             </table>
+            
+            <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100); }" class="btn">${ _('Next') }</a>            
           </div>
         </div>
       </div>

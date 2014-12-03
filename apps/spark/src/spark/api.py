@@ -77,7 +77,7 @@ def check_status(request):
     response['status'] = 0
   except Exception, e:
     message = force_unicode(str(e))
-    if 'session not found' in message:
+    if 'session not found' in message: # if 'Invalid OperationHandle' in message --> expired
       response['status'] = -2
     else:
       response['message'] = force_unicode(str(e))
@@ -90,9 +90,10 @@ def fetch_result(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  rows = json.loads(request.POST.get('rows', 100))
 
   try:
-    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet)
+    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows)
     response['status'] = 0
   except Exception, e:
     message = force_unicode(str(e))
