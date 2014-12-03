@@ -314,7 +314,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   var assist = new Assist({
     app: "beeswax",
     user: "${user}",
-    failsQuietlyOn: [500], // error codes from beeswax/views.py - autocomplete
+    failsSilentlyOn: [500], // error codes from beeswax/views.py - autocomplete
     baseURL: "${url('beeswax:api_autocomplete_databases')}"
   });
 
