@@ -185,7 +185,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <!-- /ko -->
 
 
-        <span data-bind="editable: id, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+        <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="inline pull-right">
           <strong class="muted" data-bind="text: status"></strong> &nbsp;
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
@@ -203,7 +203,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
           <a href="javascript:void(0)" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
           <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
+          <a href="javascript:void(0)" data-bind="click: function() { $data.showLogs(! $data.showLogs()); }" class="btn">${ _('Logs') }</a>         
         </div>
+      </div>
+
+      <div data-bind="visible: showLogs, css: resultsKlass">
+        <span data-bind="text: result.logs"></span>
       </div>
 
       <div data-bind="css: resultsKlass">

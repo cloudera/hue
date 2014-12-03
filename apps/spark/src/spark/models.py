@@ -86,6 +86,10 @@ class HS2Api():
   def __init__(self, user):
     self.user = user
     
+  def _get_handle(self, snippet):
+    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    return HiveServerQueryHandle(**snippet['result']['handle'])
+    
   def create_session(self, lang):
     return {
         'type': lang,
@@ -123,8 +127,7 @@ class HS2Api():
   def check_status(self, notebook, snippet):
     db = dbms.get(self.user)
       
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    handle = HiveServerQueryHandle(**snippet['result']['handle'])
+    handle = self._get_handle(snippet)
     status =  db.get_state(handle)
 
     return {
@@ -139,8 +142,7 @@ class HS2Api():
   def fetch_result(self, notebook, snippet):
     db = dbms.get(self.user)
       
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    handle = HiveServerQueryHandle(**snippet['result']['handle'])
+    handle = self._get_handle(snippet)
     results = db.fetch(handle, start_over=False, rows=10)
     
     # no escaping...
@@ -159,13 +161,15 @@ class HS2Api():
   def cancel(self, notebook, snippet):
     db = dbms.get(self.user)
       
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    handle = HiveServerQueryHandle(**snippet['result']['handle'])
+    handle = self._get_handle(snippet)
     db.cancel_operation(handle)
     return {'status': 'canceled'}    
 
-  def get_log(self):
-    pass
+  def get_log(self, snippet):
+    db = dbms.get(self.user)
+      
+    handle = self._get_handle(snippet)    
+    return db.get_log(self, handle)
   
   def progress(self):
     pass  
