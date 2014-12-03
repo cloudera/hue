@@ -184,12 +184,6 @@ var Snippet = function (notebook, snippet) {
   
   self.checkStatusTimeout = null;
   
-  self.init = function() {
-	if (self.status() == 'running') {
-	  self.checkStatus();	
-	}
-  };
-
   self.create_session = function() {
     $.post("/spark/api/create_session", {
     	notebook: ko.mapping.toJSON(notebook),
@@ -206,15 +200,15 @@ var Snippet = function (notebook, snippet) {
       $(document).trigger("error", xhr.responseText);
     }); 
   };
-  
+
   self.execute = function() {
     $(document).trigger("executeStarted", self);
-	  $(".jHueNotify").hide();
-	  logGA('/execute/' + self.type());
+    $(".jHueNotify").hide();
+	logGA('/execute/' + self.type());
     
-	  self.result.clear();
-	  self.status('running');
-    
+	self.result.clear();
+	self.status('running');
+
     $.post("/spark/api/execute", {
         notebook: ko.mapping.toJSON(notebook),
         snippet: ko.mapping.toJSON(self)
@@ -234,6 +228,56 @@ var Snippet = function (notebook, snippet) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });    
+  };
+  
+  self.fetchResult = function(rows) {
+    self.fetchResultData(rows);
+    //self.fetchResultMetadata(rows); 
+  };
+
+  self.fetchResultData = function(rows) {
+    $.post("/spark/api/fetch_result_data", {
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self),
+      rows: rows
+    }, function (data) {
+ 	  if (data.status == 0) {
+ 	    rows -= data.result.data.length;
+      data.result.meta.unshift({ type:"INT_TYPE", name:"", comment:null});
+ 	    self.result.meta(data.result.meta);
+ 	    $.each(data.result.data, function(index, row) {
+        row.unshift(index);
+ 	      self.result.data.push(row);
+ 	    });
+         
+        if (data.result.hasMore && rows > 0) {
+          setTimeout(function(){ self.fetchResultData(rows); }, 500);
+        }
+      } else if (data.status == -2) {
+        self.create_session();  
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
+  self.fetchResultMetadata = function() {
+    $.post("/spark/api/fetch_result_metadata", {
+        notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self),
+      }, function (data) {
+   	  if (data.status == 0) {
+   	    self.result.meta(data.result.meta);
+        } else if (data.status == -2) {
+          self.create_session();  
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });	  
   };
 
   self.checkStatus = function() {	  
@@ -258,38 +302,6 @@ var Snippet = function (notebook, snippet) {
 	}).fail(function (xhr, textStatus, errorThrown) {
      $(document).trigger("error", xhr.responseText);
     });
-  };
-
-  self.fetchResult = function(rows) {
-    $.post("/spark/api/fetch_result", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self),
-      rows: rows
-    }, function (data) {
- 	  if (data.status == 0) {
- 	    rows -= data.result.data.length;
-      data.result.meta.unshift({ type:"INT_TYPE", name:"", comment:null});
- 	    self.result.meta(data.result.meta);
- 	    $.each(data.result.data, function(index, row) {
-        row.unshift(index);
- 	      self.result.data.push(row);
- 	    });
-         
-        if (data.result.hasMore && rows > 0) {
-          setTimeout(function(){ self.fetchResult(rows); }, 500);
-        }
-      } else if (data.status == -2) {
-        self.create_session();  
-      } else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
-  };
-
-  self.fetchResultMetadata = function() {
-	  
   };
   
   self.cancel = function() {
@@ -325,6 +337,12 @@ var Snippet = function (notebook, snippet) {
  	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
+  };
+  
+  self.init = function() {
+	if (self.status() == 'running') {
+	  self.checkStatus();	
+	}
   };
 }
 
