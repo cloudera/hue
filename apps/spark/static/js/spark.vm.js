@@ -111,7 +111,27 @@ var Snippet = function (notebook, snippet) {
 	return statement;
   });
   self.result = new Result(snippet, snippet.result);
+  self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
+  self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
+  self.showGrid.subscribe(function (val){
+    if (val){
+      self.showChart(false);
+      self.showLogs(false);
+    }
+  });
+  self.showChart.subscribe(function (val){
+    if (val){
+      self.showGrid(false);
+      self.showLogs(false);
+    }
+  });
+  self.showLogs.subscribe(function (val){
+    if (val){
+      self.showGrid(false);
+      self.showChart(false);
+    }
+  });
 
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
   self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });

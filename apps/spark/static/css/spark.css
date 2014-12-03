@@ -122,3 +122,7 @@
 .assist-main {
   overflow-y: scroll;
 }
+
+.editable-empty, .editable-empty:hover {
+  color: #DDD!important;
+}
