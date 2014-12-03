@@ -63,14 +63,24 @@ var Assist = function (options) {
       type: "GET",
       url: _url + "?" + Math.random(),
       success: function (data) {
-        var _obj = {
-          data: data,
-          timestamp: (new Date()).getTime()
+        if (data.error){
+          if (typeof options.failsSilentlyOn == "undefined" || (data.code != null && options.failsSilentlyOn.indexOf(data.code) == -1)){
+            $.jHueNotify.error(data.error);
+          }
         }
-        $.totalStorage(_cachePath, _obj);
-        if (!_returnCached) {
-          options.onDataReceived($.totalStorage(_cachePath).data);
+        else {
+          var _obj = {
+            data: data,
+            timestamp: (new Date()).getTime()
+          }
+          $.totalStorage(_cachePath, _obj);
+          if (!_returnCached) {
+            options.onDataReceived($.totalStorage(_cachePath).data);
+          }
         }
+      },
+      error: function (error) {
+        $(document).trigger('error', error);
       },
       async: options.sync == "undefined"
     });
