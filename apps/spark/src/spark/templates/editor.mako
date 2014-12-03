@@ -215,10 +215,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="text: result.logs"></span>
       </div>
 
-      <div class="row-fluid">
+      <div class="row-fluid" data-bind="visible: result.meta().length > 0">
         <div class="span2">
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('columns')}</li>
+          </ul>
           <ul class="unstyled" data-bind="foreach: result.meta">
-            <li><a class="pointer" data-bind="text: $data.name, click: function(){ toggleColumn($element, $index()); }"></a></li>
+            <li><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
           </ul>
         </div>
         <div class="span10">
@@ -231,7 +234,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </thead>
               <tbody data-bind="foreach: {data: result.data, afterAdd: waitForDatatable}">
                 <tr data-bind="foreach: $data">
-                  <td data-bind="text: $data"></td>
+                  <td data-bind="text: $data" class="nowrap"></td>
                 </tr>
               </tbody>
             </table>
@@ -880,6 +883,22 @@ function sinAndCos() {
   function toggleColumn(linkElement, index){
     var _dt = $(linkElement).parents(".snippet").find("table:eq(1)").dataTable();
     _dt.fnSetColumnVis( index, !_dt.fnSettings().aoColumns[index].bVisible);
+  }
+
+  function scrollToColumn(linkElement) {
+    var _t = $(linkElement).parents(".snippet").find("table:eq(1)");
+    var _text = $.trim($(linkElement).text().split("(")[0]);
+    var _col = _t.find("th").filter(function () {
+      return $.trim($(this).text()) == _text;
+    });
+    _t.find(".columnSelected").removeClass("columnSelected");
+    var _colSel = _t.find("tr td:nth-child(" + (_col.index() + 1) + ")");
+    if (_colSel.length > 0) {
+      _colSel.addClass("columnSelected");
+      _t.parent().animate({
+        scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+      }, 300);
+    }
   }
 
 </script>
