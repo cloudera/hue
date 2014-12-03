@@ -23,6 +23,7 @@ var Result = function (snippet, result) {
   self.handle = ko.observable({});
   self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
+  self.logs = ko.observable('log');
   
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
@@ -51,6 +52,7 @@ var Snippet = function (notebook, snippet) {
   var self = this;
   
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
+  self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
@@ -109,6 +111,7 @@ var Snippet = function (notebook, snippet) {
 	return statement;
   });
   self.result = new Result(snippet, snippet.result);
+  self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
 
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
   self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
@@ -151,8 +154,11 @@ var Snippet = function (notebook, snippet) {
   
   self.checkStatusTimeout = null;
   
-  // init()
-  // checkStatus()
+  self.init = function() {
+	if (self.status() == 'running') {
+	  self.checkStatus();	
+	}
+  };
 
   self.create_session = function() {
     $.post("/spark/api/create_session", {
@@ -199,20 +205,18 @@ var Snippet = function (notebook, snippet) {
     });    
   };
 
-  self.checkStatus = function() {
-	  
+  self.checkStatus = function() {	  
     $.post("/spark/api/check_status", {
        notebook: ko.mapping.toJSON(notebook),
        snippet: ko.mapping.toJSON(self)
 	  }, function (data) {
 	    if (data.status == 0) {
-
           self.status(data.query_status.status);
 
           if (self.status() == 'running') {
         	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
           } 
-           else if (self.status() == 'ready') {
+          else if (self.status() == 'ready') {
         	self.fetchResult();
           }
 	    } else if (data.status == -2) {
@@ -257,6 +261,21 @@ var Snippet = function (notebook, snippet) {
 	}
 	
     $.post("/spark/api/cancel_statement", {
+        notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self)
+ 	  }, function (data) {
+ 	    if (data.status == 0) {
+ 	      self.status('canceled'); 
+ 	    } else {
+ 	      $(document).trigger("error", data.message);
+ 	    }
+ 	}).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+  
+  self.get_log = function() {
+    $.post("/spark/api/get_log", {
         notebook: ko.mapping.toJSON(notebook),
         snippet: ko.mapping.toJSON(self)
  	  }, function (data) {
@@ -315,8 +334,10 @@ var Notebook = function (vm, notebook) {
 	self.snippets.push(_snippet);
 	
 	if (self.getSession(_snippet.type()) == null) {
-	  _snippet.create_session();
-    }	
+	  _snippet.create_session();	  
+    }
+	
+	_snippet.init();
   };  
 
   self.newSnippet = function() {

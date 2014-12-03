@@ -123,6 +123,25 @@ def cancel_statement(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+def get_log(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    response['logs'] = get_api(request.user, snippet).get_log(snippet)
+    response['status'] = 0
+  except Exception, e:
+    message = force_unicode(str(e))
+    if 'session not found' in message:
+      response['status'] = -2
+    else:
+      response['message'] = force_unicode(str(e))
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def save_notebook(request):
   response = {'status': -1}
 
