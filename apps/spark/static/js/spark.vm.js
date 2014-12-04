@@ -27,14 +27,6 @@ var Result = function (snippet, result) {
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
 
-  self.meta.subscribe(function(val){
-    $(document).trigger("renderMeta", {data: val, snippet: snippet});
-  });
-
-  self.data.subscribe(function(val){
-    $(document).trigger("renderData", {data: val, snippet: snippet});
-  });
-  
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
       self.handle()[key] = val;
@@ -239,26 +231,33 @@ var Snippet = function (notebook, snippet) {
     //self.fetchResultMetadata(rows); 
   };
 
-  self.fetchResultData = function(rows) {
+  self.fetchResultData = function (rows) {
     $.post("/spark/api/fetch_result_data", {
       notebook: ko.mapping.toJSON(notebook),
       snippet: ko.mapping.toJSON(self),
       rows: rows
     }, function (data) {
- 	  if (data.status == 0) {
- 	    rows -= data.result.data.length;
-      data.result.meta.unshift({ type:"INT_TYPE", name:"", comment:null});
- 	    self.result.meta(data.result.meta);
- 	    $.each(data.result.data, function(index, row) {
-        row.unshift(index);
- 	      self.result.data.push(row);
- 	    });
-         
+      if (data.status == 0) {
+        rows -= data.result.data.length;
+        data.result.meta.unshift({ type: "INT_TYPE", name: "", comment: null});
+        self.result.meta(data.result.meta);
+        var _initialIndex = self.result.data().length;
+        var _tempData = [];
+        $.each(data.result.data, function (index, row) {
+          row.unshift(_initialIndex + index);
+          self.result.data.push(row);
+          _tempData.push(row);
+        });
+
+        $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
+
         if (data.result.hasMore && rows > 0) {
-          setTimeout(function(){ self.fetchResultData(rows); }, 500);
+          setTimeout(function () {
+            self.fetchResultData(rows);
+          }, 500);
         }
       } else if (data.status == -2) {
-        self.create_session();  
+        self.create_session();
       } else {
         $(document).trigger("error", data.message);
       }

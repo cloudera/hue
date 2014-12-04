@@ -865,12 +865,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     });
 
     $(document).on("renderData", function (e, options) {
-      var _el = $("#snippet_" + options.snippet.id).find(".resultTable");
+      var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
       if (options.data.length > 0) {
         window.setTimeout(function () {
-          var _dt = createDatatable(_el, options.snippet);
+          var _dt;
+          if (options.initial){
+            _dt = createDatatable(_el, options.snippet);
+          }
+          else {
+            _dt = _el.dataTable();
+          }
           _dt.fnAddData(options.data)
-        }, 10);
+        }, 200);
       }
     });
 
