@@ -218,7 +218,7 @@ class SparkApi():  # Pig, DBquery, Phoenix...
     return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
 
   def check_status(self, notebook, snippet):
-    return {'status': 'ready'}
+    return {'status': 'available'}
 
   def fetch_result(self, notebook, snippet, rows):
     api = get_spark_api(self.user)
@@ -229,12 +229,14 @@ class SparkApi():  # Pig, DBquery, Phoenix...
       
     return {
         'data': [data['output']],
-        'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in []]
+        'meta': [{'name': 'Header', 'type': 'String', 'comment': ''}]
     }
 
   def cancel(self, notebook, snippet):
     pass
+
+  def get_log(self, snippet):
+    return 'Not available'
+  
+  def _progress(self, snippet, logs):  
+    return 50

@@ -143,6 +143,7 @@ var Snippet = function (notebook, snippet) {
     if (val){
       self.showGrid(false);
       self.showChart(false);
+      self.getLogs();
     }
   });
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
