@@ -210,8 +210,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
 
       <div style="padding-top: 10px;">
-        <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(! $data.showGrid()); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
-        <a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(! $data.showChart()); }, css: {'active': $data.showChart}" href="javascript:void(0)" class="btn" title="${ _('Chart') }"><i class="fa fa-line-chart"></i></a>
+        <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
+        <a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(true); }, css: {'active': $data.showChart}" href="javascript:void(0)" class="btn" title="${ _('Chart') }"><i class="fa fa-line-chart"></i></a>
+        &nbsp;
         <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
       </div>
 
@@ -249,11 +250,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <div data-bind="visible: showChart">
         The chart is gonna be here
-      </div>
-
-      <div data-bind="visible: showLogs, css: resultsKlass">
-        Here are the logs. <br/>
-        <span data-bind="text: result.logs"></span>
       </div>
     </div>
   </div>

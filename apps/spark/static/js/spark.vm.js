@@ -134,19 +134,15 @@ var Snippet = function (notebook, snippet) {
   self.showGrid.subscribe(function (val){
     if (val){
       self.showChart(false);
-      self.showLogs(false);
     }
   });
   self.showChart.subscribe(function (val){
     if (val){
       self.showGrid(false);
-      self.showLogs(false);
     }
   });
   self.showLogs.subscribe(function (val){
     if (val){
-      self.showGrid(false);
-      self.showChart(false);
       self.getLogs();
     }
   });
