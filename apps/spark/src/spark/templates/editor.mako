@@ -233,7 +233,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
         <div class="span10">
           <div data-bind="css: resultsKlass">
-            <table class="table table-condensed resultTable">
+            <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360">
               <thead>
                 <tr data-bind="foreach: result.meta">
                   <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
@@ -336,7 +336,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       $(element).chosen({
         disable_search_threshold: 5,
         width: "100%"
-      }).change(function(e, obj){
+      }).change(function (e, obj) {
         viewModel.assistContent().selectedMainObject(obj.selected);
         loadAssistFirstLevel();
       });
@@ -681,12 +681,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   ko.applyBindings(viewModel);
   viewModel.init();
 
-  function loadAssistSecondLevel(first){
-    if (! viewModel.assistContent().firstLevelObjects()[first].loaded()){
+  function loadAssistSecondLevel(first) {
+    if (!viewModel.assistContent().firstLevelObjects()[first].loaded()) {
       viewModel.assistContent().isLoading(true);
-      assist.options.onDataReceived = function(data){
-        if (data.columns){
-          var _cols = data.extended_columns?data.extended_columns:data.columns;
+      assist.options.onDataReceived = function (data) {
+        if (data.columns) {
+          var _cols = data.extended_columns ? data.extended_columns : data.columns;
           viewModel.assistContent().firstLevelObjects()[first].items(_cols);
           viewModel.assistContent().firstLevelObjects()[first].loaded(true);
         }
@@ -694,15 +694,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
       assist.getData(viewModel.assistContent().selectedMainObject() + "/" + first);
     }
-    viewModel.assistContent().firstLevelObjects()[first].open(! viewModel.assistContent().firstLevelObjects()[first].open());
+    viewModel.assistContent().firstLevelObjects()[first].open(!viewModel.assistContent().firstLevelObjects()[first].open());
     window.setTimeout(resizeAssist, 100);
   }
 
   function loadAssistFirstLevel() {
-    assist.options.onDataReceived = function(data){
-      if (data.tables){
+    assist.options.onDataReceived = function (data) {
+      if (data.tables) {
         var _obj = {};
-        data.tables.forEach(function(item){
+        data.tables.forEach(function (item) {
           _obj[item] = {
             items: ko.observableArray([]),
             open: ko.observable(false),
@@ -717,10 +717,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   }
 
   function loadAssistMain() {
-    assist.options.onDataReceived = function(data){
-      if (data.databases){
+    assist.options.onDataReceived = function (data) {
+      if (data.databases) {
         viewModel.assistContent().mainObjects(data.databases);
-        if (viewModel.assistContent().mainObjects().length > 0 && ! viewModel.assistContent().selectedMainObject()){
+        if (viewModel.assistContent().mainObjects().length > 0 && !viewModel.assistContent().selectedMainObject()) {
           viewModel.assistContent().selectedMainObject(viewModel.assistContent().mainObjects()[0]);
           loadAssistFirstLevel();
         }
@@ -765,44 +765,19 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   }
 
   function createDatatable(el, snippet) {
-        $(el).addClass("dt");
-        var _dt = $(el).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bInfo": false,
-        "bDestroy": true,
-        "bAutoWidth": false,
-        "oLanguage": {
-          "sEmptyTable": "${_('No data available')}",
-          "sZeroRecords": "${_('No matching records')}"
-        },
-        "fnDrawCallback": function (oSettings) {
-          $(el).parents(".dataTables_wrapper").jHueTableScroller({
-            minHeight: $(window).height() - 400,
-            heightAfterCorrection: 0
-          });
-
-          $(el).jHueTableExtender({
-            fixedHeader: true,
-            includeNavigator: false
-          });
-        },
-        "aoColumnDefs": [
-          {
-            "sType": "numeric",
-            "aTargets": [ "sort-numeric" ]
-          },
-          {
-            "sType": "string",
-            "aTargets": [ "sort-string" ]
-          },
-          {
-            "sType": "date",
-            "aTargets": [ "sort-date" ]
-          }
-        ]
-      });
-      $(el).parents(".dataTables_wrapper").jHueTableScroller({
+    $(el).addClass("dt");
+    var _dt = $(el).dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bDestroy": true,
+      "bAutoWidth": false,
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}"
+      },
+      "fnDrawCallback": function (oSettings) {
+        $(el).parents(".dataTables_wrapper").jHueTableScroller({
           minHeight: $(window).height() - 400,
           heightAfterCorrection: 0
         });
@@ -811,13 +786,38 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           fixedHeader: true,
           includeNavigator: false
         });
-        $(".dataTables_filter").hide();
+      },
+      "aoColumnDefs": [
+        {
+          "sType": "numeric",
+          "aTargets": [ "sort-numeric" ]
+        },
+        {
+          "sType": "string",
+          "aTargets": [ "sort-string" ]
+        },
+        {
+          "sType": "date",
+          "aTargets": [ "sort-date" ]
+        }
+      ]
+    });
+    $(el).parents(".dataTables_wrapper").jHueTableScroller({
+      minHeight: $(window).height() - 400,
+      heightAfterCorrection: 0
+    });
+
+    $(el).jHueTableExtender({
+      fixedHeader: true,
+      includeNavigator: false
+    });
+    $(".dataTables_filter").hide();
     return _dt;
   }
 
-  function toggleColumn(linkElement, index){
+  function toggleColumn(linkElement, index) {
     var _dt = $(linkElement).parents(".snippet").find("table:eq(1)").dataTable();
-    _dt.fnSetColumnVis( index, !_dt.fnSettings().aoColumns[index].bVisible);
+    _dt.fnSetColumnVis(index, !_dt.fnSettings().aoColumns[index].bVisible);
   }
 
   function scrollToColumn(linkElement) {
@@ -848,11 +848,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
 
-  $(document).ready(function(){
+  $(document).ready(function () {
     resizeAssist();
-    $(document).on("executeStarted", function(e, snippet){
-      var _el = $("#snippet_"+snippet.id()).find(".resultTable");
-      if (_el.hasClass("dt")){
+    $(document).on("executeStarted", function (e, snippet) {
+      var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+      if (_el.hasClass("dt")) {
         _el.removeClass("dt");
         $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
         _el.dataTable().fnClearTable();
@@ -861,19 +861,19 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
     });
 
-    $(document).on("renderData", function(e, options){
-      var _el = $("#snippet_"+options.snippet.id).find(".resultTable");
-      if (options.data.length > 0){
-        window.setTimeout(function(){
+    $(document).on("renderData", function (e, options) {
+      var _el = $("#snippet_" + options.snippet.id).find(".resultTable");
+      if (options.data.length > 0) {
+        window.setTimeout(function () {
           var _dt = createDatatable(_el, options.snippet);
           _dt.fnAddData(options.data)
         }, 10);
       }
     });
 
-    $(document).on("progress", function(e, options){
-      if (options.data == 100){
-        window.setTimeout(function(){
+    $(document).on("progress", function (e, options) {
+      if (options.data == 100) {
+        window.setTimeout(function () {
           options.snippet.progress(0);
         }, 2000);
       }
