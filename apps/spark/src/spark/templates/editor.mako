@@ -210,8 +210,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
 
       <div style="padding-top: 10px;">
+        <span>
         <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
         <a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(true); }, css: {'active': $data.showChart}" href="javascript:void(0)" class="btn" title="${ _('Chart') }"><i class="fa fa-line-chart"></i></a>
+        </span>
         &nbsp;
         <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
       </div>
@@ -243,7 +245,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </tbody>
             </table>
             
-            <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100); }" class="btn">${ _('Next') }</a>            
+            <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100, false); }" class="btn">${ _('Next') }</a>            
           </div>
         </div>
       </div>

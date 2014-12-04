@@ -226,21 +226,29 @@ var Snippet = function (notebook, snippet) {
     });    
   };
   
-  self.fetchResult = function(rows) {
-    self.fetchResultData(rows);
+  self.fetchResult = function(rows, startOver) {
+	if (typeof startOver == "undefined") {
+	  startOver = true;
+	}
+    self.fetchResultData(rows, startOver);
     //self.fetchResultMetadata(rows); 
   };
 
-  self.fetchResultData = function (rows) {
+  self.fetchResultData = function(rows, startOver) {
     $.post("/spark/api/fetch_result_data", {
       notebook: ko.mapping.toJSON(notebook),
       snippet: ko.mapping.toJSON(self),
-      rows: rows
+      rows: rows,
+      startOver: startOver
     }, function (data) {
       if (data.status == 0) {
         rows -= data.result.data.length;
-        data.result.meta.unshift({ type: "INT_TYPE", name: "", comment: null});
-        self.result.meta(data.result.meta);
+
+        if (self.result.meta().length == 0) {
+   	      data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
+   	      self.result.meta(data.result.meta);
+        }
+
         var _initialIndex = self.result.data().length;
         var _tempData = [];
         $.each(data.result.data, function (index, row) {
@@ -253,7 +261,7 @@ var Snippet = function (notebook, snippet) {
 
         if (data.result.hasMore && rows > 0) {
           setTimeout(function () {
-            self.fetchResultData(rows);
+            self.fetchResultData(rows, false);
           }, 500);
         }
       } else if (data.status == -2) {

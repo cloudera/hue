@@ -91,9 +91,10 @@ def fetch_result_data(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   rows = json.loads(request.POST.get('rows', 100))
+  start_over = json.loads(request.POST.get('startOver', False))
 
   try:
-    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows)
+    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
     response['status'] = 0
   except Exception, e:
     message = force_unicode(str(e))
