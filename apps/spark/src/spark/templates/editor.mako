@@ -30,6 +30,72 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </script>
 
 
+<link rel="stylesheet" href="/static/css/common_dashboard.css">
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<link rel="stylesheet" href="/spark/static/css/spark.css">
+<link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
+<link rel="stylesheet" href="/static/ext/css/leaflet.css">
+<link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
+<link rel="stylesheet" href="/static/css/nv.d3.css">
+
+
+<script src="/static/ext/js/codemirror-3.11.js"></script>
+<script src="/static/js/codemirror-pig.js"></script>
+<script src="/static/js/codemirror-hql.js"></script>
+<script src="/static/js/codemirror-python.js"></script>
+<script src="/static/js/codemirror-clike.js"></script>
+
+<script src="/static/js/codemirror-show-hint.js"></script>
+
+<script src="/static/js/codemirror-isql-hint.js"></script>
+<script src="/static/js/codemirror-hql-hint.js"></script>
+<script src="/static/js/codemirror-pig-hint.js"></script>
+<script src="/static/js/codemirror-python-hint.js"></script>
+<script src="/static/js/codemirror-clike-hint.js"></script>
+
+<script src="/static/ext/js/markdown.min.js"></script>
+
+<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/hue.utils.js"></script>
+<script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
+<script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
+<script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+
+<script src="/static/js/hue.geo.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/hue.colors.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
+
+
+
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: true, css: {'btn': true}">
@@ -225,7 +291,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="text: result.logs"></span>
       </div>
 
-      <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()">
+      <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()" style="height: 400px">
         <div class="span2">
           <ul class="nav nav-list" style="border: none; background-color: #FFF">
             <li class="nav-header">${_('columns')}</li>
@@ -245,84 +311,66 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <tbody>
               </tbody>
             </table>
-            
-            <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100, false); }" class="btn">${ _('Next') }</a>            
+            <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100, false); }" class="btn">${ _('Next') }</a>
           </div>
         </div>
       </div>
 
-      <div data-bind="visible: showChart">
-        The chart is gonna be here
+      <div class="row-fluid" data-bind="visible: showChart" style="height: 400px">
+        <div class="span2">
+
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('type')}</li>
+          </ul>
+
+          <a rel="tooltip" data-placement="top" title="${_('Bars')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"><i class="hcha hcha-bar-chart"></i></a>
+          <a rel="tooltip" data-placement="top" title="${_('Lines')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.LINECHART); }"><i class="hcha hcha-line-chart"></i></a>
+          <a rel="tooltip" data-placement="top" title="${_('Pie')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.PIECHART); }"><i class="hcha hcha-pie-chart"></i></a>
+          <a rel="tooltip" data-placement="top" title="${_('Map')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.MAP); }"><i class="hcha hcha-map-chart"></i></a>
+
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('x-axis')}</li>
+          </ul>
+          <select data-bind="options: result.cleanedMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', chosen: {}" class="input-medium"></select>
+
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('y-axis')}</li>
+          </ul>
+          <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART">
+            <ul class="unstyled" data-bind="foreach: result.cleanedMeta">
+              <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
+            </ul>
+          </div>
+          <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART">
+            <select data-bind="options: result.cleanedMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', chosen: {}" class="input-medium"></select>
+          </div>
+
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('sorting')}</li>
+          </ul>
+          <div class="btn-group" data-toggle="buttons-radio">
+            <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
+            <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+            <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+          </div>
+        </div>
+        <div class="span10">
+          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+                transformer: pieChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></div>
+
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></div>
+
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></div>
+
+          <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                transformer: leafletMapChartDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></div>
+        </div>
       </div>
     </div>
   </div>
 </script>
-
-
-<link rel="stylesheet" href="/static/css/common_dashboard.css">
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<link rel="stylesheet" href="/spark/static/css/spark.css">
-<link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/static/ext/css/leaflet.css">
-<link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
-<link rel="stylesheet" href="/static/css/nv.d3.css">
-
-
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/js/codemirror-pig.js"></script>
-<script src="/static/js/codemirror-hql.js"></script>
-<script src="/static/js/codemirror-python.js"></script>
-<script src="/static/js/codemirror-clike.js"></script>
-
-<script src="/static/js/codemirror-show-hint.js"></script>
-
-<script src="/static/js/codemirror-isql-hint.js"></script>
-<script src="/static/js/codemirror-hql-hint.js"></script>
-<script src="/static/js/codemirror-pig-hint.js"></script>
-<script src="/static/js/codemirror-python-hint.js"></script>
-<script src="/static/js/codemirror-clike-hint.js"></script>
-
-<script src="/static/ext/js/markdown.min.js"></script>
-
-<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.utils.js"></script>
-<script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
-<script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
-<script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
-
-
-<script src="/static/js/hue.geo.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.colors.js" type="text/javascript" charset="utf-8"></script>
-
-<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
-
-<script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
-
-<script src="/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
-
-<script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
-
 
 
 <script type="text/javascript" charset="utf-8">
@@ -665,7 +713,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       editor.setValue(allBindingsAccessor().value());
       window.setTimeout(function () {
         editor.refresh();
-      }, 100);
+      }, 200);
       editor.setSize("100%", "100px");
       var wrapperElement = $(editor.getWrapperElement());
 
@@ -874,6 +922,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         window.setTimeout(function () {
           var _dt;
           if (options.initial){
+            options.snippet.result.meta.notifySubscribers();
+            $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
             _dt = createDatatable(_el, options.snippet);
           }
           else {
@@ -896,6 +946,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
     });
 
+    $(document).on("forceChartDraw", function(e, snippet) {
+      window.setTimeout(function(){
+        snippet.chartX.notifySubscribers();
+      }, 100);
+    });
+
     viewModel.notebooks().forEach(function(notebook){
       notebook.snippets().forEach(function(snippet){
         if (snippet.result.data().length > 0) {
@@ -903,11 +959,103 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           window.setTimeout(function () {
             var _dt = createDatatable(_el, snippet);
             _dt.fnAddData(snippet.result.data());
+            $(document).trigger("forceChartDraw", snippet);
           }, 100);
         }
       });
     });
   });
+
+
+function pieChartDataTransformer(rawDatum) {
+  var _data = [];
+
+  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null){
+    var _idxValue = -1;
+    var _idxLabel = -1;
+    rawDatum.snippet.result.meta().forEach(function(col, idx){
+      if (col.name == rawDatum.snippet.chartX()){
+        _idxLabel = idx;
+      }
+      if (col.name == rawDatum.snippet.chartYSingle()){
+        _idxValue = idx;
+      }
+    });
+    $(rawDatum.counts()).each(function (cnt, item) {
+      _data.push({
+        label: item[_idxLabel],
+        value: item[_idxValue],
+        obj: item
+      });
+    });
+  }
+
+  if (rawDatum.sorting == "asc"){
+    _data.sort(function(a, b){
+      return a.value > b.value
+    });
+  }
+  if (rawDatum.sorting == "desc"){
+    _data.sort(function(a, b){
+      return b.value > a.value
+    });
+  }
+
+  return _data;
+}
+
+function leafletMapChartDataTransformer(data) {
+  if (data != null && data.counts != null) return data.counts();
+}
+
+function multiSerieDataTransformer(rawDatum) {
+  var _datum = [];
+
+  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0){
+    var _plottedSerie = 0;
+    rawDatum.snippet.chartYMulti().forEach(function(col){
+      var _idxValue = -1;
+      var _idxLabel = -1;
+      rawDatum.snippet.result.meta().forEach(function(icol, idx){
+        if (icol.name == rawDatum.snippet.chartX()){
+          _idxLabel = idx;
+        }
+        if (icol.name == col){
+          _idxValue = idx;
+        }
+      });
+
+      if (_idxValue > -1) {
+        var _data = [];
+        $(rawDatum.counts()).each(function (cnt, item) {
+          _data.push({
+            series: _plottedSerie,
+            x: item[_idxLabel],
+            y: item[_idxValue],
+            obj: item
+          });
+        });
+        if (rawDatum.sorting == "asc") {
+          _data.sort(function (a, b) {
+            return a.y > b.y
+          });
+        }
+        if (rawDatum.sorting == "desc") {
+          _data.sort(function (a, b) {
+            return b.y > a.y
+          });
+        }
+        _datum.push({
+          key: col,
+          values: _data
+        });
+        _plottedSerie++;
+      }
+    });
+  }
+  return _datum;
+}
+
 
 </script>
 
