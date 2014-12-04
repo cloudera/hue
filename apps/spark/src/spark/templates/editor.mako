@@ -850,6 +850,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   $(document).ready(function () {
     resizeAssist();
+
     $(document).on("executeStarted", function (e, snippet) {
       var _el = $("#snippet_" + snippet.id()).find(".resultTable");
       $("#snippet_" + snippet.id()).find(".progress").animate({
@@ -875,8 +876,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           else {
             _dt = _el.dataTable();
           }
-          _dt.fnAddData(options.data)
-        }, 200);
+          _dt.fnAddData(options.data);
+        }, 100);
       }
     });
 
@@ -890,6 +891,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           });
         }, 2000);
       }
+    });
+
+    viewModel.notebooks().forEach(function(notebook){
+      notebook.snippets().forEach(function(snippet){
+        if (snippet.result.data().length > 0) {
+          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+          window.setTimeout(function () {
+            var _dt = createDatatable(_el, snippet);
+            _dt.fnAddData(snippet.result.data());
+          }, 100);
+        }
+      });
     });
   });
 
