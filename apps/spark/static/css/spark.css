@@ -33,6 +33,7 @@
 .CodeMirror {
   border: 1px solid #DDD;
   border-top: none;
+  border-bottom: none;
 }
 
 .codeMirror-overlaybtn {
@@ -130,3 +131,8 @@
 .results table tr td {
   white-space: nowrap;
 }
+
+.progress, .progress-neutral .bar {
+  background-color: #DDD;
+}
+

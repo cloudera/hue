@@ -188,7 +188,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="inline pull-right">
           <strong class="muted" data-bind="text: status"></strong> &nbsp;
-          <strong class="muted" data-bind="text: progress"></strong>% &nbsp;
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -204,6 +203,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
           <a href="javascript:void(0)" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
           <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
+          <div class="progress" data-bind="css:{'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
+            <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+          </div>
         </div>
       </div>
 
@@ -212,6 +214,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(! $data.showChart()); }, css: {'active': $data.showChart}" href="javascript:void(0)" class="btn" title="${ _('Chart') }"><i class="fa fa-line-chart"></i></a>
         <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
       </div>
+
 
       <div data-bind="visible: showLogs, css: resultsKlass">
         <span data-bind="visible: result.logs().length == 0">${ _('Loading...') }</span>
@@ -869,6 +872,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           var _dt = createDatatable(_el, options.snippet);
           _dt.fnAddData(options.data)
         }, 10);
+      }
+    });
+
+    $(document).on("progress", function(e, options){
+      if (options.data == 100){
+        window.setTimeout(function(){
+          options.snippet.progress(0);
+        }, 2000);
       }
     });
   });

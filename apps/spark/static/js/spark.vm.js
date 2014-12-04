@@ -126,6 +126,10 @@ var Snippet = function (notebook, snippet) {
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
   self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
+
+  self.progress.subscribe(function (val){
+    $(document).trigger("progress", {data: val, snippet: self});
+  });
   
   self.showGrid.subscribe(function (val){
     if (val){
