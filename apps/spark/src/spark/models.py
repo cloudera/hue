@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import re
 
 from beeswax import models as beeswax_models
 from beeswax.design import hql_query
@@ -169,10 +170,22 @@ class HS2Api():
     db = dbms.get(self.user)
       
     handle = self._get_handle(snippet)    
-    return db.get_log(self, handle)
+    return db.get_log(handle)
   
-  def progress(self):
-    pass  
+  def _progress(self, snippet, logs):
+    if snippet['type'] == 'hive':
+      match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
+      total = (int(match.group(1)) if match else 1) * 2
+      
+      started = logs.count('Starting Job')
+      ended = logs.count('Ended Job')
+      
+      return int((started + ended) * 100 / total)
+    elif snippet['type'] == 'impala':
+      match = re.search('(\d+)% Complete', logs, re.MULTILINE)
+      return int(match.group(1)) if match else 0
+    else: #'spark-sql'
+      return 50
 
 
 class SparkApi():  # Pig, DBquery, Phoenix... 

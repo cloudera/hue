@@ -188,6 +188,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="inline pull-right">
           <strong class="muted" data-bind="text: status"></strong> &nbsp;
+          <strong class="muted" data-bind="text: progress"></strong>% &nbsp;
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -210,6 +211,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(! $data.showGrid()); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
         <a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(! $data.showChart()); }, css: {'active': $data.showChart}" href="javascript:void(0)" class="btn" title="${ _('Chart') }"><i class="fa fa-line-chart"></i></a>
         <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
+      </div>
+
+      <div data-bind="visible: showLogs, css: resultsKlass">
+        <span data-bind="visible: result.logs().length == 0">${ _('Loading...') }</span>
+        <span data-bind="text: result.logs"></span>
       </div>
 
       <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()">
