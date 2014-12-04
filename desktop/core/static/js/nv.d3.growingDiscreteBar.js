@@ -204,6 +204,9 @@ nv.models.growingDiscreteBar = function() {
       barsEnter.append('rect')
           .attr('height', 0)
           .attr('width', x.rangeBand() * .9 / data.length )
+          .attr('x', function(d,i,j) {
+              return (j * x.rangeBand() / data.length )
+          })
 
       if (showValues) {
         barsEnter.append('text')
@@ -213,7 +216,9 @@ nv.models.growingDiscreteBar = function() {
         bars.select('text')
           .text(function(d,i) { return valueFormat(getY(d,i)) })
           .transition()
-          .attr('x', x.rangeBand() * .9 / 2)
+          .attr('x', function(d,i,j) {
+			      return (j * x.rangeBand() / data.length ) + (x.rangeBand() * .9 / data.length)/2
+          })
           .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
 
           ;

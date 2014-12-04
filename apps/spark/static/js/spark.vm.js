@@ -23,6 +23,11 @@ var Result = function (snippet, result) {
   self.handle = ko.observable({});
   self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.meta.extend({ rateLimit: 50 });
+  self.cleanedMeta = ko.computed(function(){
+    return ko.utils.arrayFilter(self.meta(), function(item) {
+      return item.name != ''
+    });
+  });
   self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
@@ -155,6 +160,17 @@ var Snippet = function (notebook, snippet) {
     return "results " + self.type();
   });
 
+  self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : '');
+  self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
+  self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
+  self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
+  self.chartYMulti = ko.observableArray(typeof snippet.chartYMulti != "undefined" && snippet.chartYMulti != null ? snippet.chartYMulti : []);
+  self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
+
+  self.chartType.subscribe(function(){
+    $(document).trigger("forceChartDraw", self);
+  });
+
   self.expand = function () {
     self.size(self.size() + 1);
     $("#snippet_" + self.id()).trigger("resize");
@@ -276,21 +292,21 @@ var Snippet = function (notebook, snippet) {
     });
   };
 
-  self.fetchResultMetadata = function() {
+  self.fetchResultMetadata = function () {
     $.post("/spark/api/fetch_result_metadata", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self),
-      }, function (data) {
-   	  if (data.status == 0) {
-   	    self.result.meta(data.result.meta);
-        } else if (data.status == -2) {
-          self.create_session();  
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });	  
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        self.result.meta(data.result.meta);
+      } else if (data.status == -2) {
+        self.create_session();
+      } else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
 
   self.checkStatus = function() {	  
