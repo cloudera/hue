@@ -33,7 +33,7 @@ urlpatterns += patterns('spark.api',
   url(r'^api/fetch_result_data$', 'fetch_result_data', name='fetch_result_data'),
   url(r'^api/fetch_result_metadata$', 'fetch_result_metadata', name='fetch_result_metadata'),
   url(r'^api/cancel_statement', 'cancel_statement', name='cancel_statement'),
-  url(r'^api/get_log', 'get_log', name='get_log'),
+  url(r'^api/get_logs', 'get_logs', name='get_logs'),
 
   url(r'^api/notebook/save$', 'save_notebook', name='save_notebook'),
   url(r'^api/notebook/open$', 'open_notebook', name='open_notebook'),

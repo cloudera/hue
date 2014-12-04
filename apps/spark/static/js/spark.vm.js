@@ -47,6 +47,7 @@ var Result = function (snippet, result) {
     });
     self.meta.removeAll();
     self.data.removeAll();
+    self.logs('');
   };  
 }
 
@@ -124,6 +125,8 @@ var Snippet = function (notebook, snippet) {
   self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
+  self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
+  
   self.showGrid.subscribe(function (val){
     if (val){
       self.showChart(false);
@@ -142,7 +145,6 @@ var Snippet = function (notebook, snippet) {
       self.showChart(false);
     }
   });
-
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
   self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
   self.isLoading = ko.computed(function(){
@@ -207,6 +209,7 @@ var Snippet = function (notebook, snippet) {
 	logGA('/execute/' + self.type());
     
 	self.result.clear();
+	self.progress(0);
 	self.status('running');
 
     $.post("/spark/api/execute", {
@@ -290,9 +293,11 @@ var Snippet = function (notebook, snippet) {
 
           if (self.status() == 'running') {
         	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
+        	self.getLogs();
           } 
           else if (self.status() == 'available') {
         	self.fetchResult(100);
+        	self.progress(100);
           }
 	    } else if (data.status == -2) {
 	      self.create_session();  
@@ -324,13 +329,14 @@ var Snippet = function (notebook, snippet) {
     });
   };
   
-  self.get_log = function() {
-    $.post("/spark/api/get_log", {
+  self.getLogs = function() {
+    $.post("/spark/api/get_logs", {
         notebook: ko.mapping.toJSON(notebook),
         snippet: ko.mapping.toJSON(self)
  	  }, function (data) {
  	    if (data.status == 0) {
- 	      self.result.logs(data.log); // todo smarter? 
+ 	      self.result.logs(data.logs); // Way to append?
+ 	      self.progress(data.progress);
  	    } else {
  	      $(document).trigger("error", data.message);
  	    }
@@ -341,7 +347,11 @@ var Snippet = function (notebook, snippet) {
   
   self.init = function() {
 	if (self.status() == 'running') {
-	  self.checkStatus();	
+	  self.checkStatus();
+	} 
+	
+	if (self.status() != 'loading' && self.status() != 'ready') {
+	  self.getLogs();	
 	}
   };
 }

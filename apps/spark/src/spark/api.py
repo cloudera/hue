@@ -143,14 +143,16 @@ def cancel_statement(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def get_log(request):
+def get_logs(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['logs'] = get_api(request.user, snippet).get_log(snippet)
+    db = get_api(request.user, snippet)
+    response['logs'] = db.get_log(snippet)
+    response['progress'] = db._progress(snippet, response['logs'])
     response['status'] = 0
   except Exception, e:
     message = force_unicode(str(e))
