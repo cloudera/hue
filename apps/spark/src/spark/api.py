@@ -152,7 +152,7 @@ def get_logs(request):
   try:
     db = get_api(request.user, snippet)
     response['logs'] = db.get_log(snippet)
-    response['progress'] = db._progress(snippet, response['logs'])
+    response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
     response['status'] = 0
   except Exception, e:
     message = force_unicode(str(e))
