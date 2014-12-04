@@ -126,3 +126,7 @@
 .editable-empty, .editable-empty:hover {
   color: #DDD!important;
 }
+
+.results table tr td {
+  white-space: nowrap;
+}

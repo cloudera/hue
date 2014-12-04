@@ -21,9 +21,19 @@ var Result = function (snippet, result) {
   self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
   self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
   self.handle = ko.observable({});
-  self.meta = ko.mapping.fromJS(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
-  self.data = ko.mapping.fromJS(typeof result.data != "undefined" && result.data != null ? result.data : []);
+  self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+  self.meta.extend({ rateLimit: 50 });
+  self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
+  self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
+
+  self.meta.subscribe(function(val){
+    $(document).trigger("renderMeta", {data: val, snippet: snippet});
+  });
+
+  self.data.subscribe(function(val){
+    $(document).trigger("renderData", {data: val, snippet: snippet});
+  });
   
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
@@ -198,11 +208,12 @@ var Snippet = function (notebook, snippet) {
   };
   
   self.execute = function() {
-	$(".jHueNotify").hide();
-	logGA('/execute/' + self.type());	  
+    $(document).trigger("executeStarted", self);
+	  $(".jHueNotify").hide();
+	  logGA('/execute/' + self.type());
     
-	self.result.clear();
-	self.status('running');
+	  self.result.clear();
+	  self.status('running');
     
     $.post("/spark/api/execute", {
         notebook: ko.mapping.toJSON(notebook),
@@ -257,9 +268,11 @@ var Snippet = function (notebook, snippet) {
     }, function (data) {
  	  if (data.status == 0) {
  	    rows -= data.result.data.length;
+      data.result.meta.unshift({ type:"INT_TYPE", name:"", comment:null});
  	    self.result.meta(data.result.meta);
  	    $.each(data.result.data, function(index, row) {
- 	      self.result.data.push(row);  
+        row.unshift(index);
+ 	      self.result.data.push(row);
  	    });
          
         if (data.result.hasMore && rows > 0) {
