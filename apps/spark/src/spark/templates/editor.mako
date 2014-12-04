@@ -218,21 +218,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <li class="nav-header">${_('columns')}</li>
           </ul>
           <ul class="unstyled" data-bind="foreach: result.meta">
-            <li><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
+            <li data-bind="visible: name != ''"><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
           </ul>
         </div>
         <div class="span10">
           <div data-bind="css: resultsKlass">
-            <table class="table table-condensed">
+            <table class="table table-condensed resultTable">
               <thead>
-                <tr data-bind="foreach: {data: result.meta, afterAdd: waitForDatatable}">
-                  <th data-bind="text: $data.name"></th>
+                <tr data-bind="foreach: result.meta">
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
                 </tr>
               </thead>
-              <tbody data-bind="foreach: {data: result.data, afterAdd: waitForDatatable}">
-                <tr data-bind="foreach: $data">
-                  <td data-bind="text: $data" class="nowrap"></td>
-                </tr>
+              <tbody>
               </tbody>
             </table>
             
@@ -762,12 +759,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(".assist-main").height($(window).height() - 230);
   }
 
-  var _datatableCreationTimeout = -1;
-  function waitForDatatable(el) {
-    if ($(el).is("tr") && $(el).parents("table").length > 0){
-      window.clearTimeout(_datatableCreationTimeout);
-      _datatableCreationTimeout = window.setTimeout(function(){
-        $(el).parents("table").dataTable({
+  function createDatatable(el, snippet) {
+        $(el).addClass("dt");
+        var _dt = $(el).dataTable({
         "bPaginate": false,
         "bLengthChange": false,
         "bInfo": false,
@@ -778,12 +772,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           "sZeroRecords": "${_('No matching records')}"
         },
         "fnDrawCallback": function (oSettings) {
-          $(el).parents("table").find(".dataTables_wrapper").jHueTableScroller({
+          $(el).parents(".dataTables_wrapper").jHueTableScroller({
             minHeight: $(window).height() - 400,
             heightAfterCorrection: 0
           });
 
-          $(el).parents("table").jHueTableExtender({
+          $(el).jHueTableExtender({
             fixedHeader: true,
             includeNavigator: false
           });
@@ -808,13 +802,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           heightAfterCorrection: 0
         });
 
-        $(el).parents("table").jHueTableExtender({
+        $(el).jHueTableExtender({
           fixedHeader: true,
           includeNavigator: false
         });
         $(".dataTables_filter").hide();
-      }, 100);
-    }
+    return _dt;
   }
 
   function toggleColumn(linkElement, index){
@@ -838,8 +831,40 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
   }
 
+  function isNumericColumn(type) {
+    return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  }
+
+  function isDateTimeColumn(type) {
+    return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  }
+
+  function isStringColumn(type) {
+    return !isNumericColumn(type) && !isDateTimeColumn(type);
+  }
+
   $(document).ready(function(){
     resizeAssist();
+    $(document).on("executeStarted", function(e, snippet){
+      var _el = $("#snippet_"+snippet.id()).find(".resultTable");
+      if (_el.hasClass("dt")){
+        _el.removeClass("dt");
+        $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
+        _el.dataTable().fnClearTable();
+        _el.dataTable().fnDestroy();
+        _el.find("thead tr").empty();
+      }
+    });
+
+    $(document).on("renderData", function(e, options){
+      var _el = $("#snippet_"+options.snippet.id).find(".resultTable");
+      if (options.data.length > 0){
+        window.setTimeout(function(){
+          var _dt = createDatatable(_el, options.snippet);
+          _dt.fnAddData(options.data)
+        }, 10);
+      }
+    });
   });
 
 </script>
