@@ -226,7 +226,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <table class="table table-condensed resultTable">
               <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
                 </tr>
               </thead>
               <tbody>
