@@ -25,7 +25,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 
-from spark.models import get_api, Notebook
+from spark.models import get_api, Notebook, QueryExpired, SessionExpired
 
 
 LOG = logging.getLogger(__name__)
@@ -56,12 +56,12 @@ def execute(request):
   try:
     response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message:
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -75,12 +75,12 @@ def check_status(request):
   try:
     response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message: # if 'Invalid OperationHandle' in message --> expired
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -96,12 +96,12 @@ def fetch_result_data(request):
   try:
     response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message:
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -115,12 +115,12 @@ def fetch_result_metadata(request):
   try:
     response['result'] = get_api(request.user, snippet).fetch_result_metadata(notebook, snippet)
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message:
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -134,12 +134,12 @@ def cancel_statement(request):
   try:
     response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message:
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -155,12 +155,12 @@ def get_logs(request):
     response['logs'] = db.get_log(snippet)
     response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
     response['status'] = 0
+  except SessionExpired, e:
+    response['status'] = -2    
+  except QueryExpired, e:
+    response['status'] = -3    
   except Exception, e:
-    message = force_unicode(str(e))
-    if 'session not found' in message:
-      response['status'] = -2
-    else:
-      response['message'] = force_unicode(str(e))
+    response['message'] = force_unicode(str(e))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

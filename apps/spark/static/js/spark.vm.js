@@ -266,6 +266,8 @@ var Snippet = function (notebook, snippet) {
         }
       } else if (data.status == -2) {
         self.create_session();
+      } else if (data.status == -3) {
+        self.status('expired');
       } else {
         $(document).trigger("error", data.message);
       }
