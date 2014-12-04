@@ -18,6 +18,9 @@
 import json
 import re
 
+from desktop.lib.i18n import smart_str, force_unicode
+from desktop.lib.rest.http_client import RestException
+
 from beeswax import models as beeswax_models
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
@@ -26,8 +29,16 @@ from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 
 from spark.job_server_api import get_api as get_spark_api
-from desktop.lib.i18n import smart_str
-from desktop.lib.rest.http_client import RestException
+
+
+# To move to Editor API
+class SessionExpired(Exception):
+  pass
+
+
+class QueryExpired(Exception):
+  pass
+
 
 
 class Notebook():
@@ -140,7 +151,15 @@ class HS2Api():
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-    status =  db.get_state(handle)
+
+    try:
+      status =  db.get_state(handle)
+    except Exception, e:
+      message = force_unicode(str(e))
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+        raise QueryExpired(e)
+      else:
+        raise e
 
     return {
         'status':
@@ -155,7 +174,15 @@ class HS2Api():
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-    results = db.fetch(handle, start_over=start_over, rows=rows)
+    
+    try:
+      results = db.fetch(handle, start_over=start_over, rows=rows)
+    except Exception, e:
+      message = force_unicode(str(e))
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+        raise QueryExpired(e)
+      else:
+        raise e
     
     # no escaping...
     return {
@@ -195,7 +222,7 @@ class HS2Api():
     elif snippet['type'] == 'impala':
       match = re.search('(\d+)% Complete', logs, re.MULTILINE)
       return int(match.group(1)) if match else 0
-    else: #'spark-sql'
+    else:
       return 50
 
 
@@ -215,20 +242,42 @@ class SparkApi():  # Pig, DBquery, Phoenix...
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
     
-    return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
+    try:
+      return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
+    except Exception, e:
+      message = force_unicode(str(e))
+      if 'session not found' in message:
+        raise SessionExpired(e)
+      else:
+        raise e
 
   def check_status(self, notebook, snippet):
-    return {'status': 'available'}
+    try:
+      return {'status': 'available'}
+    except Exception, e:
+      message = force_unicode(str(e))
+      if 'session not found' in message:
+        raise SessionExpired(e)
+      else:
+        raise e
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']  
     
-    data = api.fetch_data(session['id'], cell)
+
+    try:
+      data = api.fetch_data(session['id'], cell)
+    except Exception, e:
+      message = force_unicode(str(e))
+      if 'session not found' in message:
+        raise SessionExpired(e)
+      else:
+        raise e
       
     return {
-        'data': [data['output']],
+        'data': [data['output']] if start_over else [], # start_over not supported
         'meta': [{'name': 'Header', 'type': 'String', 'comment': ''}]
     }
 
