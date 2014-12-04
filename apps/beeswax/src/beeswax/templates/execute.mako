@@ -403,7 +403,9 @@ ${layout.menubar(section='query')}
                 </tr>
                 </thead>
               </table>
+              % if app_name == 'impala':
               <a class="pointer" data-bind="visible: $root.scrollNotWorking() && $root.hasMoreResults(), click: manualFetch" style="padding: 10px">${ _('Show more results...') }</a>
+              % endif
             </div>
 
             <div data-bind="css: {'hide': !$root.design.results.empty() || $root.design.results.expired()}" id="resultEmpty">
@@ -2020,6 +2022,12 @@ function addResults(viewModel, dataTable, startRow, nextRow) {
     firstFnDrawcallback = true;
   }
   dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(startRow, nextRow), startRow));
+
+  % if app_name == 'impala':
+  if (startRow == 0 && viewModel.scrollNotWorking() && viewModel.hasMoreResults()){
+    manualFetch();
+  }
+  %endif
 }
 
 function resultsTable(e, data) {
