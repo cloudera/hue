@@ -852,6 +852,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     resizeAssist();
     $(document).on("executeStarted", function (e, snippet) {
       var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+      $("#snippet_" + snippet.id()).find(".progress").animate({
+        height: "4px"
+      }, 100);
       if (_el.hasClass("dt")) {
         _el.removeClass("dt");
         $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
@@ -874,7 +877,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(document).on("progress", function (e, options) {
       if (options.data == 100) {
         window.setTimeout(function () {
-          options.snippet.progress(0);
+          $("#snippet_" + options.snippet.id()).find(".progress").animate({
+            height: "1px"
+          }, 100, function(){
+            options.snippet.progress(0);
+          });
         }, 2000);
       }
     });
