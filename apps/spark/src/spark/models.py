@@ -151,11 +151,11 @@ class HS2Api():
           )
     }
 
-  def fetch_result(self, notebook, snippet, rows):
+  def fetch_result(self, notebook, snippet, rows, start_over):
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-    results = db.fetch(handle, start_over=False, rows=rows)
+    results = db.fetch(handle, start_over=start_over, rows=rows)
     
     # no escaping...
     return {
@@ -220,7 +220,7 @@ class SparkApi():  # Pig, DBquery, Phoenix...
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
 
-  def fetch_result(self, notebook, snippet, rows):
+  def fetch_result(self, notebook, snippet, rows, start_over):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']  
