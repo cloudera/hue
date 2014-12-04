@@ -85,6 +85,8 @@
       heightCondition = true;
     }
 
+    var fixedHeight = $(_this.element).find("table").eq(0).data("tablescroller-fixed-height") || -1;
+
     if (heightCondition) {
       var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
       var minHeightVal = _this.options.minHeight;
@@ -94,12 +96,12 @@
       var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
       if (disableMinHeight != null && disableMinHeight == true) {
         if (heightCondition) {
-          $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
+          $(el).css("overflow-y", "auto").height(fixedHeight > -1 ? fixedHeight : $(window).height() - $(el).offset().top - heightAfter);
         }
       }
       else {
         if (($(window).height() - $(el).offset().top - heightAfter) > minHeightVal){
-          $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
+          $(el).css("overflow-y", "auto").height(fixedHeight > -1 ? fixedHeight : $(window).height() - $(el).offset().top - heightAfter);
         }
         else {
           if ($(el).data("original-height") > minHeightVal){
