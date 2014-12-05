@@ -1755,6 +1755,13 @@ class BundledCoordinator(models.Model):
   def get_parameters(self):
     return json.loads(self.parameters)
 
+  @property
+  def parameters_escapejs(self):
+    return self._escapejs_parameters_list(self.parameters)
+
+  def _escapejs_parameters_list(self, parameters):
+    return json.dumps(json.loads(parameters), cls=JSONEncoderForHTML)
+
 
 class Bundle(Job):
   kick_off_time = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
