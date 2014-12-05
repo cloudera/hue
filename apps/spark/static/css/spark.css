@@ -136,3 +136,11 @@
   background-color: #DDD;
 }
 
+[contenteditable] {
+  min-height: 200px;
+  border: 1px solid #DDD;
+}
+
+[contenteditable]:focus {
+  outline:none;
+}
