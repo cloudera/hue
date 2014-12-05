@@ -259,7 +259,7 @@ var Snippet = function (notebook, snippet) {
 
         $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
-        if (data.result.hasMore && rows > 0) {
+        if (data.result.has_more && rows > 0) {
           setTimeout(function () {
             self.fetchResultData(rows, false);
           }, 500);

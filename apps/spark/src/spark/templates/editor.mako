@@ -188,6 +188,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="inline pull-right">
           <strong class="muted" data-bind="text: status"></strong> &nbsp;
+          <strong class="muted">Took 1s</strong> &nbsp;
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>

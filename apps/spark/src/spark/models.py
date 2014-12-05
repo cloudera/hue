@@ -184,8 +184,9 @@ class HS2Api():
       else:
         raise e
     
-    # no escaping...
+    # No escaping...
     return {
+        'has_more': results.has_more,
         'data': list(results.rows()),
         'meta': [{
           'name': column.name,
