@@ -154,13 +154,17 @@ ko.bindingHandlers.leafletMapChart = {
       }
     });
 
-    if ($(element).parents(".tab-pane").length > 0) {
-      $(element).height($(element).parents(".tab-pane").height() - 100);
+    if (_options.height != null){
+      $(element).height(_options.height*1);
     }
     else {
-      $(element).height(300);
+      if ($(element).parents(".tab-pane").length > 0) {
+        $(element).height($(element).parents(".tab-pane").height() - 100);
+      }
+      else {
+        $(element).height(300);
+      }
     }
-
     if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
       $(element).show();
     }
@@ -176,6 +180,7 @@ ko.bindingHandlers.leafletMapChart = {
 
     if (_lats.length > 0 && _lngs.length > 0) {
       try {
+
         if (_map == null) {
           _map = L.map(element);
           L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
