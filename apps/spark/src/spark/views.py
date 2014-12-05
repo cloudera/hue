@@ -21,13 +21,11 @@ import logging
 from desktop.lib.django_util import render
 from desktop.models import Document2
 
-from spark.decorators import view_error_handler
 from spark.models import Notebook
 
 LOG = logging.getLogger(__name__)
 
 
-@view_error_handler
 def editor(request):
   notebook_id = request.GET.get('notebook')
   

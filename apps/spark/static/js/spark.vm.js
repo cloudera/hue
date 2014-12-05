@@ -31,6 +31,7 @@ var Result = function (snippet, result) {
   self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
+  self.errors = ko.observable('');
 
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
@@ -45,6 +46,7 @@ var Result = function (snippet, result) {
     self.meta.removeAll();
     self.data.removeAll();
     self.logs('');
+    self.errors('');
   };  
 }
 
@@ -195,6 +197,22 @@ var Snippet = function (notebook, snippet) {
   
   self.checkStatusTimeout = null;
   
+  self._ajax_error = function(data) {
+       if (data.status == -2) {
+          self.create_session();
+        }
+        else if (data.status == -3) {
+          self.status('expired');
+        } 
+        else if (data.status == 1) {
+          self.status('failed');
+          self.result.errors(data.message);
+        } else {
+          $(document).trigger("error", data.message);
+          self.status('failed');
+        }
+  };
+  
   self.create_session = function() {
     $.post("/spark/api/create_session", {
     	notebook: ko.mapping.toJSON(notebook),
@@ -231,14 +249,12 @@ var Snippet = function (notebook, snippet) {
           });
 
           self.checkStatus();
-        }
-        else if (data.status == -2) {
-          self.create_session();          
         } else {
-          $(document).trigger("error", data.message);
+          self._ajax_error(data);
         }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+      self.status('failed');
     });    
   };
   
@@ -280,12 +296,8 @@ var Snippet = function (notebook, snippet) {
             self.fetchResultData(rows, false);
           }, 500);
         }
-      } else if (data.status == -2) {
-        self.create_session();
-      } else if (data.status == -3) {
-        self.status('expired');
       } else {
-        $(document).trigger("error", data.message);
+    	self._ajax_error(data);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
@@ -294,18 +306,17 @@ var Snippet = function (notebook, snippet) {
 
   self.fetchResultMetadata = function () {
     $.post("/spark/api/fetch_result_metadata", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
-    }, function (data) {
-      if (data.status == 0) {
-        self.result.meta(data.result.meta);
-      } else if (data.status == -2) {
-        self.create_session();
-      } else {
-        $(document).trigger("error", data.message);
-      }
+        notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self),
+      }, function (data) {
+   	    if (data.status == 0) {
+   	      self.result.meta(data.result.meta);  
+        } else {
+          $(document).trigger("error", data.message);
+        }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+      self.status('failed');
     });
   };
 
@@ -325,13 +336,12 @@ var Snippet = function (notebook, snippet) {
         	self.fetchResult(100);
         	self.progress(100);
           }
-	    } else if (data.status == -2) {
-	      self.create_session();  
 	    } else {
-	      $(document).trigger("error", data.message);
+	      self._ajax_error(data);
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {
      $(document).trigger("error", xhr.responseText);
+     self.status('failed');
     });
   };
   
@@ -348,10 +358,11 @@ var Snippet = function (notebook, snippet) {
  	    if (data.status == 0) {
  	      self.status('canceled'); 
  	    } else {
- 	      $(document).trigger("error", data.message);
+ 	      self._ajax_error(data);
  	    }
  	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+      self.status('failed');
     });
   };
   
@@ -364,10 +375,11 @@ var Snippet = function (notebook, snippet) {
  	      self.result.logs(data.logs); // Way to append?
  	      self.progress(data.progress);
  	    } else {
- 	      $(document).trigger("error", data.message);
+ 	    	self._ajax_error(data);
  	    }
  	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+      self.status('failed');
     });
   };
   

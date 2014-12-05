@@ -25,66 +25,53 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 
-from spark.models import get_api, Notebook, QueryExpired, SessionExpired
+from spark.models import get_api, Notebook
+from spark.decorators import api_error_handler
 
 
 LOG = logging.getLogger(__name__)
 
 
-
+@api_error_handler
 def create_session(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
-    response['status'] = 0
-  except Exception, e:
-    response['error'] = force_unicode(str(e))
+  response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def execute(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def check_status(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def fetch_result_data(request):
   response = {'status': -1}
 
@@ -93,74 +80,49 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', 100))
   start_over = json.loads(request.POST.get('startOver', False))
 
-  try:
-    response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def fetch_result_metadata(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    response['result'] = get_api(request.user, snippet).fetch_result_metadata(notebook, snippet)
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  response['result'] = get_api(request.user, snippet).fetch_result_metadata(notebook, snippet)
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def cancel_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@api_error_handler
 def get_logs(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    db = get_api(request.user, snippet)
-    response['logs'] = db.get_log(snippet)
-    response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
-    response['status'] = 0
-  except SessionExpired, e:
-    response['status'] = -2    
-  except QueryExpired, e:
-    response['status'] = -3    
-  except Exception, e:
-    response['message'] = force_unicode(str(e))
+  db = get_api(request.user, snippet)
+  response['logs'] = db.get_log(snippet)
+  response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
