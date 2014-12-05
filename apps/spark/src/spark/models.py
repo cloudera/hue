@@ -26,7 +26,7 @@ from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
 from beeswax.views import safe_get_design, save_design
 from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config
+from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 from spark.job_server_api import get_api as get_spark_api
 
@@ -39,6 +39,13 @@ class SessionExpired(Exception):
 class QueryExpired(Exception):
   pass
 
+
+class QueryError(Exception):
+  def __init__(self, message):
+    self.message = message
+
+  def __str__(self):
+    return force_unicode(str(self.message))
 
 
 class Notebook():
@@ -94,6 +101,21 @@ class TextApi():
     }
   
 
+# HS2
+
+def query_error_handler(func):
+  def decorator(*args, **kwargs):
+    try:
+      return func(*args, **kwargs)
+    except QueryServerException, e:
+      message = force_unicode(str(e))
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+        raise QueryExpired(e)
+      else:
+        raise QueryError(message)
+  return decorator  
+  
+
 class HS2Api():
   
   def __init__(self, user):
@@ -122,19 +144,11 @@ class HS2Api():
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
     query = hql_query(snippet['statement'], QUERY_TYPES[0])
-    handle = db.client.query(query)
     
-#    if not handle.is_valid():
-#        msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % {'id': query_history.id, 'query': query[:40]}
-#        raise QueryServerException(msg)
-#    except QueryServerException, ex:
-#      LOG.exception(ex)
-#      # Kind of expected (hql compile/syntax error, etc.)
-#      if hasattr(ex, 'handle') and ex.handle:
-#        query_history.server_id, query_history.server_guid = ex.handle.id, ex.handle.id
-#        query_history.log_context = ex.handle.log_context
-#      query_history.save_state(QueryHistory.STATE.failed)
-#      raise ex
+    try:
+      handle = db.client.query(query)
+    except QueryServerException, ex:      
+      raise QueryError(ex.message)
 
     # All good
     server_id, server_guid  = handle.get()
@@ -147,19 +161,12 @@ class HS2Api():
         'log_context': handle.log_context
     }    
 
+  @query_error_handler
   def check_status(self, notebook, snippet):
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-
-    try:
-      status =  db.get_state(handle)
-    except Exception, e:
-      message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
-        raise QueryExpired(e)
-      else:
-        raise e
+    status =  db.get_state(handle)      
 
     return {
         'status':
@@ -170,19 +177,12 @@ class HS2Api():
           )
     }
 
+  @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-    
-    try:
-      results = db.fetch(handle, start_over=start_over, rows=rows)
-    except Exception, e:
-      message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
-        raise QueryExpired(e)
-      else:
-        raise e
+    results = db.fetch(handle, start_over=start_over, rows=rows)
     
     # No escaping...
     return {
@@ -195,16 +195,19 @@ class HS2Api():
         } for column in results.data_table.cols()]
     }
 
+  @query_error_handler
   def fetch_result_metadata(self):
     pass 
 
+  @query_error_handler
   def cancel(self, notebook, snippet):
     db = self._get_db(snippet)
-      
+
     handle = self._get_handle(snippet)
     db.cancel_operation(handle)
     return {'status': 'canceled'}    
 
+  @query_error_handler
   def get_log(self, snippet):
     db = self._get_db(snippet)
       
@@ -227,7 +230,10 @@ class HS2Api():
       return 50
 
 
-class SparkApi():  # Pig, DBquery, Phoenix... 
+# Spark
+
+
+class SparkApi(): 
   
   def __init__(self, user):
     self.user = user

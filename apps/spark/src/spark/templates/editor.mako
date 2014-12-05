@@ -291,6 +291,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="text: result.logs"></span>
       </div>
 
+      <div data-bind="visible: result.errors().length > 0, css: resultsKlass">
+        <span data-bind="text: result.errors"></span>
+      </div>
+
       <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()" style="height: 400px">
         <div class="span2">
           <ul class="nav nav-list" style="border: none; background-color: #FFF">

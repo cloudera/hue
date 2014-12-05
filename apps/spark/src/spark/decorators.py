@@ -20,18 +20,36 @@ import logging
 
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import force_unicode
+
+from spark.models import QueryExpired, QueryError, SessionExpired
+
 
 LOG = logging.getLogger(__name__)
 
-def view_error_handler(view_fn):
+
+def api_error_handler(func):
   def decorator(*args, **kwargs):
+    response = {}
+    
     try:
-      return view_fn(*args, **kwargs)
-    except Http404, e:
-      raise e
+      return func(*args, **kwargs)
+    except SessionExpired, e:
+      response['status'] = -2    
+    except QueryExpired, e:
+      response['status'] = -3
+    except QueryError, e:
+      response['status'] = 1
+      response['message'] = force_unicode(str(e))
     except Exception, e:
-      raise PopupException(_('An error happened with the Spark Server'), detail=e)
+      response['status'] = -1
+      response['message'] = force_unicode(str(e))
+    finally:
+      if response:
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+    
   return decorator
 
 
