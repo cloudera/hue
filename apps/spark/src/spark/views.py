@@ -21,7 +21,7 @@ import logging
 from desktop.lib.django_util import render
 from desktop.models import Document2
 
-from spark.models import Notebook
+from spark.models import Notebook, get_api
 
 LOG = logging.getLogger(__name__)
 
@@ -45,3 +45,13 @@ def list_notebooks(request):
   return render('list_notebooks.mako', request, {
       'notebooks': notebooks
   })
+
+
+def download(request):
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  
+  file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
+
+  return get_api(request.user, snippet).download(notebook, snippet, file_format)
+

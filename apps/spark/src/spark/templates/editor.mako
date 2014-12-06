@@ -286,8 +286,22 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </span>
           &nbsp;
           <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
+          &nbsp;
+          <a data-bind="visible: status() == 'available', click: function() { $data.showDownload(! $data.showDownload()); }" href="javascript:void(0)" class="btn" title="${ _('Logs') }">
+            <i class="fa fa-arrow-circle-o-down"></i>
+          </a>
+          
+          <span data-bind="visible: showDownload">
+		    <form method="POST" action="${ url('spark:download') }">
+		      ${ csrf_token(request) | n,unicode }
+		      <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
+		      <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
+		
+		      <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
+		      <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
+		    </form>
+          </span>          
         </div>
-
 
         <div data-bind="visible: showLogs, css: resultsKlass">
           <span data-bind="visible: result.logs().length == 0">${ _('Loading...') }</span>

@@ -18,10 +18,11 @@
 import json
 import re
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.rest.http_client import RestException
 
-from beeswax import models as beeswax_models
+from beeswax import models as beeswax_models, data_export
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
 from beeswax.views import safe_get_design, save_design
@@ -214,6 +215,18 @@ class HS2Api():
     handle = self._get_handle(snippet)    
     return db.get_log(handle)
   
+  def download(self, notebook, snippet, format):
+    try:
+      db = self._get_db(snippet)
+      handle = self._get_handle(snippet)  
+      return data_export.download(handle, format, db)
+    except Exception, e:
+      if not hasattr(e, 'message') or not e.message:
+        message = e
+      else:
+        message = e.message
+      raise PopupException(message, detail='')  
+  
   def _progress(self, snippet, logs):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
@@ -228,6 +241,7 @@ class HS2Api():
       return int(match.group(1)) if match else 0
     else:
       return 50
+
 
 
 # Spark
