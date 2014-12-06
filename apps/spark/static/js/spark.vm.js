@@ -124,6 +124,7 @@ var Snippet = function (notebook, snippet) {
   self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
+  self.showDownload = ko.observable(typeof snippet.showDownload != "undefined" && snippet.showDownload != null ? snippet.showDownload : false);
   self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
 
   self.progress.subscribe(function (val){
@@ -199,19 +200,19 @@ var Snippet = function (notebook, snippet) {
   self.checkStatusTimeout = null;
   
   self._ajax_error = function(data) {
-       if (data.status == -2) {
-          self.create_session();
-        }
-        else if (data.status == -3) {
-          self.status('expired');
-        } 
-        else if (data.status == 1) {
-          self.status('failed');
-          self.result.errors(data.message);
-        } else {
-          $(document).trigger("error", data.message);
-          self.status('failed');
-        }
+    if (data.status == -2) {
+      self.create_session();
+    }
+    else if (data.status == -3) {
+      self.status('expired');
+    } 
+    else if (data.status == 1) {
+      self.status('failed');
+      self.result.errors(data.message);
+    } else {
+      $(document).trigger("error", data.message);
+      self.status('failed');
+    }
   };
   
   self.create_session = function() {
