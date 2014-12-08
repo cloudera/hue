@@ -67,6 +67,7 @@ var Snippet = function (notebook, snippet) {
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
+  self.settings = ko.mapping.fromJS(typeof snippet.settings != "undefined" && snippet.settings != null ? snippet.settings : {});
   self.variables = ko.observableArray([]);
   self.variableNames = ko.computed(function() {
 	var matches = [];
