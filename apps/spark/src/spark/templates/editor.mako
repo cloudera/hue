@@ -100,7 +100,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: true, css: {'btn': true}">
+    <a title="${ _('Execute all') }" rel="tooltip" data-placement="bottom" data-bind="click: true, css: {'btn': true}">
       <i class="fa fa-play"></i>
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
@@ -816,10 +816,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       var wrapperElement = $(editor.getWrapperElement());
 
       editor.on("change", function () {
-        if (editor.lineCount() > 7 && editor.lineCount() < 21) {
+        if (editor.lineCount() <= 7) {
+          editor.setSize("100%", "100px");
+        }
+        else if (editor.lineCount() > 7 && editor.lineCount() < 21) {
           editor.setSize("100%", "auto");
         }
-        if (editor.lineCount() >= 21) {
+        else {
           editor.setSize("100%", "270px");
         }
 
@@ -1040,9 +1043,21 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             _dt = _el.dataTable();
           }
           _dt.fnAddData(options.data);
+          redrawFixedHeaders();
         }, 100);
       }
     });
+
+    function redrawFixedHeaders() {
+      viewModel.notebooks().forEach(function(notebook) {
+        notebook.snippets().forEach(function (snippet) {
+          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+            fixedHeader: true,
+            includeNavigator: false
+          });
+        });
+      });
+    }
 
     $(document).on("progress", function (e, options) {
       if (options.data == 100) {
