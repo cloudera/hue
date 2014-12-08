@@ -270,7 +270,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <input type="text" data-bind="value: value" />
               </div>
             </div>
-            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
+            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
             <a href="javascript:void(0)" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
             <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
             <div class="progress" data-bind="css:{'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
@@ -484,7 +484,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
   ko.bindingHandlers.codemirror = {
-    init: function (element, valueAccessor, allBindingsAccessor, vm) {
+    init: function (element, valueAccessor, allBindingsAccessor, snippet) {
 
       $(document).on("error.autocomplete", function () {
         $(".CodeMirror-spinner").remove();
@@ -800,6 +800,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       var wrapperElement = $(editor.getWrapperElement());
 
       editor.on("change", function () {
+        if (editor.lineCount() > 7 && editor.lineCount() < 21) {
+          editor.setSize("100%", "auto");
+        }
+        if (editor.lineCount() >= 21) {
+          editor.setSize("100%", "270px");
+        }
+
+        $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+          fixedHeader: true,
+          includeNavigator: false
+        });
+
         allBindingsAccessor().value(editor.getValue());
       });
 
