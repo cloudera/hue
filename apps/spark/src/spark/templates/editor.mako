@@ -167,7 +167,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <li class="nav-header">${_('database')}</li>
         </ul>
         <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
-          <select data-bind="options: $root.assistContent().mainObjects, chosen: {}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+          <select data-bind="options: $root.assistContent().mainObjects, chosen: {isAssist: true}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
           <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
@@ -482,13 +482,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   };
 
   ko.bindingHandlers.chosen = {
-    init: function (element) {
+    init: function (element, valueAccessor) {
       $(element).chosen({
         disable_search_threshold: 5,
         width: "100%"
       }).change(function (e, obj) {
-        viewModel.assistContent().selectedMainObject(obj.selected);
-        loadAssistFirstLevel();
+        if (typeof valueAccessor().isAssist != "undefined" && valueAccessor().isAssist){
+          viewModel.assistContent().selectedMainObject(obj.selected);
+          loadAssistFirstLevel();
+        }
       });
     },
     update: function (element, valueAccessor, allBindings) {
