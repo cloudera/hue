@@ -141,6 +141,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </div>
 
 
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible(), click: $root.toggleAssist">
+  <i class="fa fa-chevron-right"></i>
+</a>
+
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
@@ -155,12 +160,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script type="text/html" id="notebook">
   <div class="row-fluid">
-    <div class="span2">
+    <div class="span2" data-bind="visible: $root.isAssistVisible, css:{'span2': $root.isAssistVisible, 'hidden': !$root.isAssistVisible()}">
       <div class="assist">
-        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
-          <i class="fa fa-question-circle"></i>
+        <a title="${_('Toggle Assist')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: $root.toggleAssist">
+          <i class="fa fa-chevron-left"></i>
         </a>
-        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
+        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:9px">
           <i class="fa fa-refresh"></i>
         </a>
         <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
@@ -190,7 +195,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': !$root.isAssistVisible()}">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -841,7 +846,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
   };
 
-  viewModel = new EditorViewModel(${ notebooks_json | n,unicode });
+  var _opts = {
+    assistVisible: $.totalStorage("sparkAssistVisible") != null ? $.totalStorage("sparkAssistVisible") : true
+  }
+
+  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, _opts);
   viewModel.assistContent(assist);
   ko.applyBindings(viewModel);
   viewModel.init();
@@ -1164,6 +1173,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   $(document).ready(function () {
     resizeAssist();
+
+    $(document).on("toggleAssist", function(){
+      $.totalStorage("sparkAssistVisible", viewModel.isAssistVisible());
+      resizeAssist();
+    });
 
     $(document).on("executeStarted", function (e, snippet) {
       var _el = $("#snippet_" + snippet.id()).find(".resultTable");

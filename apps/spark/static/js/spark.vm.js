@@ -483,7 +483,7 @@ var Notebook = function (vm, notebook) {
 }
 
 
-function EditorViewModel(notebooks) {
+function EditorViewModel(notebooks, options) {
   var self = this;
 
   self.notebooks = ko.observableArray();
@@ -495,6 +495,12 @@ function EditorViewModel(notebooks) {
   });
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
+  };
+
+  self.isAssistVisible = ko.observable(options.assistVisible);
+  self.toggleAssist = function () {
+    self.isAssistVisible(! self.isAssistVisible());
+    $(document).trigger("toggleAssist");
   };
 
   self.assistContent = ko.observable();
