@@ -796,9 +796,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       element.editor = editor;
       $("#snippet_" + options.id).data("editor", editor);
       editor.setValue(allBindingsAccessor().value());
-      window.setTimeout(function () {
-        editor.refresh();
-      }, 200);
       editor.setSize("100%", "100px");
       var wrapperElement = $(editor.getWrapperElement());
 
@@ -1048,6 +1045,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           }, 100);
         }
       });
+    });
+
+    $(".CodeMirror").each(function(){
+      $(this)[0].CodeMirror.refresh();
     });
   });
 
