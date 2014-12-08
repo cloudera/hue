@@ -21,13 +21,7 @@
 }
 
 .snippet {
-  border-bottom: 2px solid #F0F0F0;
   margin: 10px;
-}
-
-.results.hive-sql {
-  max-height: 200px;
-  overflow: auto;
 }
 
 .CodeMirror {

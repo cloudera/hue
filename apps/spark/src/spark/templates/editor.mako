@@ -198,6 +198,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
             dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}">
       </div>
+
+
       <div style="margin: 20px">
         <a href="javascript: void(0)" data-bind="click: newSnippet">
           <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
@@ -292,14 +294,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </a>
           
           <span data-bind="visible: showDownload">
-		    <form method="POST" action="${ url('spark:download') }">
-		      ${ csrf_token(request) | n,unicode }
-		      <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
-		      <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
-		
-		      <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
-		      <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
-		    </form>
+            <form method="POST" action="${ url('spark:download') }">
+              ${ csrf_token(request) | n,unicode }
+              <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
+              <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
+
+              <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
+              <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
+            </form>
           </span>          
         </div>
 
@@ -467,8 +469,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     init: function (element, valueAccessor, allBindings) {
       $(element).wysiwyg();
       $(element).on("paste", function () {
-        window.setTimeout(function(){
-          if (markdown.toHTML($(element).text().trim()) != "<p>" + $(element).text().trim() + "</p>"){
+        window.setTimeout(function () {
+          if (markdown.toHTML($(element).text().trim()) != "<p>" + $(element).text().trim() + "</p>") {
             allBindings().html(markdown.toHTML($(element).text().trim()));
           }
         }, 200);
@@ -486,7 +488,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         disable_search_threshold: 5,
         width: "100%"
       }).change(function (e, obj) {
-        if (typeof valueAccessor().isAssist != "undefined" && valueAccessor().isAssist){
+        if (typeof valueAccessor().isAssist != "undefined" && valueAccessor().isAssist) {
           viewModel.assistContent().selectedMainObject(obj.selected);
           loadAssistFirstLevel();
         }
@@ -980,18 +982,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
     dataTableEl.bind('mousewheel DOMMouseScroll', function (e) {
       var _e = e.originalEvent,
-          _delta = _e.wheelDelta || -_e.detail;
+          _delta = _e.wheelDelta || -_e.detail*20;
       this.scrollTop += -_delta / 2;
       e.preventDefault();
     });
 
-    dataTableEl.on("scroll", function(){
+    dataTableEl.on("scroll", function () {
 
-     var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
+      var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
-      _scrollTimeout = window.setTimeout(function(){
+      _scrollTimeout = window.setTimeout(function () {
         dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
-        if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt) {
+        if (_lastScrollPosition != dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt) {
           dataTableEl.animate({opacity: '0.55'}, 200);
           snippet.fetchResult(100, false);
         }
@@ -1033,6 +1035,133 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
 
+
+  function pieChartDataTransformer(rawDatum) {
+    var _data = [];
+
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
+      var _idxValue = -1;
+      var _idxLabel = -1;
+      rawDatum.snippet.result.meta().forEach(function (col, idx) {
+        if (col.name == rawDatum.snippet.chartX()) {
+          _idxLabel = idx;
+        }
+        if (col.name == rawDatum.snippet.chartYSingle()) {
+          _idxValue = idx;
+        }
+      });
+      $(rawDatum.counts()).each(function (cnt, item) {
+        _data.push({
+          label: item[_idxLabel],
+          value: item[_idxValue],
+          obj: item
+        });
+      });
+    }
+
+    if (rawDatum.sorting == "asc") {
+      _data.sort(function (a, b) {
+        return a.value > b.value
+      });
+    }
+    if (rawDatum.sorting == "desc") {
+      _data.sort(function (a, b) {
+        return b.value > a.value
+      });
+    }
+
+    return _data;
+  }
+
+  function leafletMapChartDataTransformer(rawDatum) {
+    var _data = [];
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
+      var _idxLat = -1;
+      var _idxLng = -1;
+      var _idxLabel = -1;
+      rawDatum.snippet.result.meta().forEach(function (col, idx) {
+        if (col.name == rawDatum.snippet.chartX()) {
+          _idxLat = idx;
+        }
+        if (col.name == rawDatum.snippet.chartYSingle()) {
+          _idxLng = idx;
+        }
+        if (col.name == rawDatum.snippet.chartMapLabel()) {
+          _idxLabel = idx;
+        }
+      });
+      if (rawDatum.snippet.chartMapLabel() != null) {
+        $(rawDatum.counts()).each(function (cnt, item) {
+          _data.push({
+            lat: item[_idxLat],
+            lng: item[_idxLng],
+            label: item[_idxLabel],
+            obj: item
+          });
+        });
+      }
+      else {
+        $(rawDatum.counts()).each(function (cnt, item) {
+          _data.push({
+            lat: item[_idxLat],
+            lng: item[_idxLng],
+            obj: item
+          });
+        });
+      }
+    }
+    return _data;
+  }
+
+  function multiSerieDataTransformer(rawDatum) {
+    var _datum = [];
+
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
+      var _plottedSerie = 0;
+      rawDatum.snippet.chartYMulti().forEach(function (col) {
+        var _idxValue = -1;
+        var _idxLabel = -1;
+        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+          if (icol.name == rawDatum.snippet.chartX()) {
+            _idxLabel = idx;
+          }
+          if (icol.name == col) {
+            _idxValue = idx;
+          }
+        });
+
+        if (_idxValue > -1) {
+          var _data = [];
+          $(rawDatum.counts()).each(function (cnt, item) {
+            _data.push({
+              series: _plottedSerie,
+              x: item[_idxLabel],
+              y: item[_idxValue],
+              obj: item
+            });
+          });
+          if (rawDatum.sorting == "asc") {
+            _data.sort(function (a, b) {
+              return a.y > b.y
+            });
+          }
+          if (rawDatum.sorting == "desc") {
+            _data.sort(function (a, b) {
+              return b.y > a.y
+            });
+          }
+          _datum.push({
+            key: col,
+            values: _data
+          });
+          _plottedSerie++;
+        }
+      });
+    }
+    return _datum;
+  }
+
+
   $(document).ready(function () {
     resizeAssist();
 
@@ -1055,7 +1184,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       if (options.data.length > 0) {
         window.setTimeout(function () {
           var _dt;
-          if (options.initial){
+          if (options.initial) {
             options.snippet.result.meta.notifySubscribers();
             $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
             _dt = createDatatable(_el, options.snippet);
@@ -1073,7 +1202,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     });
 
     function redrawFixedHeaders() {
-      viewModel.notebooks().forEach(function(notebook) {
+      viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
           $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
             fixedHeader: true,
@@ -1088,21 +1217,21 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         window.setTimeout(function () {
           $("#snippet_" + options.snippet.id()).find(".progress").animate({
             height: "1px"
-          }, 100, function(){
+          }, 100, function () {
             options.snippet.progress(0);
           });
         }, 2000);
       }
     });
 
-    $(document).on("forceChartDraw", function(e, snippet) {
-      window.setTimeout(function(){
+    $(document).on("forceChartDraw", function (e, snippet) {
+      window.setTimeout(function () {
         snippet.chartX.notifySubscribers();
       }, 100);
     });
 
-    viewModel.notebooks().forEach(function(notebook){
-      notebook.snippets().forEach(function(snippet){
+    viewModel.notebooks().forEach(function (notebook) {
+      notebook.snippets().forEach(function (snippet) {
         if (snippet.result.data().length > 0) {
           var _el = $("#snippet_" + snippet.id()).find(".resultTable");
           window.setTimeout(function () {
@@ -1114,137 +1243,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       });
     });
 
-    $(".CodeMirror").each(function(){
+    $(".CodeMirror").each(function () {
       $(this)[0].CodeMirror.refresh();
     });
   });
-
-
-function pieChartDataTransformer(rawDatum) {
-  var _data = [];
-
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null){
-    var _idxValue = -1;
-    var _idxLabel = -1;
-    rawDatum.snippet.result.meta().forEach(function(col, idx){
-      if (col.name == rawDatum.snippet.chartX()){
-        _idxLabel = idx;
-      }
-      if (col.name == rawDatum.snippet.chartYSingle()){
-        _idxValue = idx;
-      }
-    });
-    $(rawDatum.counts()).each(function (cnt, item) {
-      _data.push({
-        label: item[_idxLabel],
-        value: item[_idxValue],
-        obj: item
-      });
-    });
-  }
-
-  if (rawDatum.sorting == "asc"){
-    _data.sort(function(a, b){
-      return a.value > b.value
-    });
-  }
-  if (rawDatum.sorting == "desc"){
-    _data.sort(function(a, b){
-      return b.value > a.value
-    });
-  }
-
-  return _data;
-}
-
-function leafletMapChartDataTransformer(rawDatum) {
-  var _data = [];
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null){
-    var _idxLat = -1;
-    var _idxLng = -1;
-    var _idxLabel = -1;
-    rawDatum.snippet.result.meta().forEach(function(col, idx){
-      if (col.name == rawDatum.snippet.chartX()){
-        _idxLat = idx;
-      }
-      if (col.name == rawDatum.snippet.chartYSingle()){
-        _idxLng = idx;
-      }
-      if (col.name == rawDatum.snippet.chartMapLabel()){
-        _idxLabel = idx;
-      }
-    });
-    if (rawDatum.snippet.chartMapLabel() != null){
-      $(rawDatum.counts()).each(function (cnt, item) {
-        _data.push({
-          lat: item[_idxLat],
-          lng: item[_idxLng],
-          label: item[_idxLabel],
-          obj: item
-        });
-      });
-    }
-    else {
-      $(rawDatum.counts()).each(function (cnt, item) {
-        _data.push({
-          lat: item[_idxLat],
-          lng: item[_idxLng],
-          obj: item
-        });
-      });
-    }
-  }
-  return _data;
-}
-
-function multiSerieDataTransformer(rawDatum) {
-  var _datum = [];
-
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0){
-    var _plottedSerie = 0;
-    rawDatum.snippet.chartYMulti().forEach(function(col){
-      var _idxValue = -1;
-      var _idxLabel = -1;
-      rawDatum.snippet.result.meta().forEach(function(icol, idx){
-        if (icol.name == rawDatum.snippet.chartX()){
-          _idxLabel = idx;
-        }
-        if (icol.name == col){
-          _idxValue = idx;
-        }
-      });
-
-      if (_idxValue > -1) {
-        var _data = [];
-        $(rawDatum.counts()).each(function (cnt, item) {
-          _data.push({
-            series: _plottedSerie,
-            x: item[_idxLabel],
-            y: item[_idxValue],
-            obj: item
-          });
-        });
-        if (rawDatum.sorting == "asc") {
-          _data.sort(function (a, b) {
-            return a.y > b.y
-          });
-        }
-        if (rawDatum.sorting == "desc") {
-          _data.sort(function (a, b) {
-            return b.y > a.y
-          });
-        }
-        _datum.push({
-          key: col,
-          values: _data
-        });
-        _plottedSerie++;
-      }
-    });
-  }
-  return _datum;
-}
-
 
 </script>
 
