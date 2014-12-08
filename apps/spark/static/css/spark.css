@@ -53,6 +53,11 @@
 
 .nav-list > li > a, .nav-list .nav-header {
   padding-left: 0;
+  margin-left: 0;
+}
+
+.nav-list {
+  padding-left: 0;
 }
 
 .dropdown-menu li {
@@ -138,4 +143,29 @@
 
 [contenteditable]:focus {
   outline:none;
+}
+
+.span12.nomargin {
+  margin-left: 0;
+}
+
+.show-assist {
+  position: fixed;
+  top: 80px;
+  background-color: #FFF;
+  width: 16px;
+  height: 24px;
+  line-height: 24px;
+  margin-left: -2px;
+  text-align: center;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-topright: 3px;
+  -moz-border-radius-bottomright: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.show-assist:hover {
+  margin-left: 0;
 }
