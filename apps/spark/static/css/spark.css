@@ -34,6 +34,7 @@
   border: 1px solid #DDD;
   border-top: none;
   border-bottom: none;
+  height: auto;
 }
 
 .codeMirror-overlaybtn {
