@@ -20,6 +20,7 @@ var Result = function (snippet, result) {
 
   self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
   self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
+  self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true);
   self.handle = ko.observable({});
   self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.meta.extend({ rateLimit: 50 });
@@ -32,7 +33,10 @@ var Result = function (snippet, result) {
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
   self.errors = ko.observable('');
-
+  self.hasSomeResults = ko.computed(function(){
+    return self.hasResultset() && self.data().length > 0; // status() == 'available'
+  });
+  
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function(key, val) {
       self.handle()[key] = val;
@@ -167,7 +171,7 @@ var Snippet = function (notebook, snippet) {
     return "results " + self.type();
   });
 
-  self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : '');
+  self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
   self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
   self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
   self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
@@ -181,7 +185,7 @@ var Snippet = function (notebook, snippet) {
 
   self.tempChartOptions = {};
 
-  self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : true);
+  self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : false);
   self.toggleLeftPanel = function () {
     self.isLeftPanelVisible(! self.isLeftPanelVisible());
     $(document).trigger("toggleLeftPanel", self);
@@ -262,6 +266,7 @@ var Snippet = function (notebook, snippet) {
           self.result.handle()[key] = val;
         });
 
+        self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
       } else {
         self._ajax_error(data);
@@ -500,7 +505,7 @@ function EditorViewModel(notebooks, options) {
   self.notebooks = ko.observableArray();
   self.selectedNotebook = ko.observable();
 
-  self.isEditing = ko.observable(true);
+  self.isEditing = ko.observable(false);
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
   });

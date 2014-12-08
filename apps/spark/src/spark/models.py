@@ -264,7 +264,10 @@ class SparkApi():
     session = _get_snippet_session(notebook, snippet)
     
     try:
-      return {'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1]}
+      return {
+          'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1],
+          'has_result_set': True,
+      }
     except Exception, e:
       message = force_unicode(str(e))
       if 'session not found' in message:
