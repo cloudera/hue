@@ -332,7 +332,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <tbody>
                 </tbody>
               </table>
-              <a href="javascript:void(0)" data-bind="click: function() { $data.fetchResult(100, false); }" class="btn">${ _('Next') }</a>
             </div>
           </div>
         </div>
@@ -976,6 +975,28 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       includeNavigator: false
     });
     $(".dataTables_filter").hide();
+    var _scrollTimeout = -1;
+    var dataTableEl = $(el).parents(".dataTables_wrapper");
+
+    dataTableEl.bind('mousewheel DOMMouseScroll', function (e) {
+      var _e = e.originalEvent,
+          _delta = _e.wheelDelta || -_e.detail;
+      this.scrollTop += -_delta / 2;
+      e.preventDefault();
+    });
+
+    dataTableEl.on("scroll", function(){
+
+     var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
+      window.clearTimeout(_scrollTimeout);
+      _scrollTimeout = window.setTimeout(function(){
+        dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
+        if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt) {
+          dataTableEl.animate({opacity: '0.55'}, 200);
+          snippet.fetchResult(100, false);
+        }
+      }, 100);
+    });
     return _dt;
   }
 
@@ -1043,6 +1064,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             _dt = _el.dataTable();
           }
           _dt.fnAddData(options.data);
+          var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+          _dtElement.animate({opacity: '1'}, 50);
+          _dtElement.scrollTop(_dtElement.data("scrollPosition"));
           redrawFixedHeaders();
         }, 100);
       }
