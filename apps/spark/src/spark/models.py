@@ -24,7 +24,7 @@ from desktop.lib.rest.http_client import RestException
 
 from beeswax import models as beeswax_models, data_export
 from beeswax.design import hql_query
-from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory
+from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
 from beeswax.views import safe_get_design, save_design
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -164,19 +164,19 @@ class HS2Api():
 
   @query_error_handler
   def check_status(self, notebook, snippet):
+    response = {}
     db = self._get_db(snippet)
       
     handle = self._get_handle(snippet)
-    status =  db.get_state(handle)      
+    operation =  db.get_operation_status(handle)
+    status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
 
-    return {
-        'status':
-          'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
-          else (
-             'failed' if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index)
-              else 'available'
-          )
-    }
+    if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index):
+      raise QueryError(operation.errorMessage)
+
+    response['status'] = 'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'available'
+    
+    return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
