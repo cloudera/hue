@@ -522,7 +522,8 @@ from django.utils.translation import ugettext as _
             }
             _dragged = ko.utils.unwrapObservable(valueAccessor().value);
           },
-          cursor: 'default'
+          cursor: "move",
+          delay: 300
         };
         dragElement.draggable(dragOptions).disableSelection();
       }
@@ -1012,35 +1013,44 @@ from django.utils.translation import ugettext as _
       self.move = function (mode) {
         var paths = [];
 
+        var isMoveOnSelf = false;
         $(self.selectedFiles()).each(function (index, file) {
+          if (file.path == $('#moveDestination').val()){
+            isMoveOnSelf = true;
+          }
           paths.push(file.path);
         });
 
-        hiddenFields($("#moveForm"), "src_path", paths);
+        if (!isMoveOnSelf){
+          hiddenFields($("#moveForm"), "src_path", paths);
 
-        $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
 
-        if (mode === 'nomodal') {
-          $.jHueNotify.info('Items moving to "' + $('#moveDestination').val() + '"');
-          $("#moveForm").submit();
-        } else {
-          $("#moveModal").modal({
-            keyboard: true,
-            show: true
-          });
-
-          $("#moveModal").on("shown", function () {
-            $("#moveModal .modal-footer div").show();
-            $("#moveHdfsTree").remove();
-            $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
-            $("#moveHdfsTree").jHueHdfsTree({
-              home: viewModel.currentPath(),
-              onPathChange: function (path) {
-                $("#moveDestination").val(path);
-                $("#moveNameRequiredAlert").hide();
-              }
+          if (mode === 'nomodal') {
+            $.jHueNotify.info('${ _('Items moving to') } "' + $('#moveDestination').val() + '"');
+            $("#moveForm").submit();
+          } else {
+            $("#moveModal").modal({
+              keyboard: true,
+              show: true
             });
-          });
+
+            $("#moveModal").on("shown", function () {
+              $("#moveModal .modal-footer div").show();
+              $("#moveHdfsTree").remove();
+              $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
+              $("#moveHdfsTree").jHueHdfsTree({
+                home: viewModel.currentPath(),
+                onPathChange: function (path) {
+                  $("#moveDestination").val(path);
+                  $("#moveNameRequiredAlert").hide();
+                }
+              });
+            });
+          }
+        }
+        else {
+          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
         }
       };
 
