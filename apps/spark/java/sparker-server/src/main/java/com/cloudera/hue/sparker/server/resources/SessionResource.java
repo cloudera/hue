@@ -118,4 +118,13 @@ public class SessionResource {
         sessionManager.close(id);
         return Response.noContent().build();
     }
+
+
+    @Path("/{id}/interrupt")
+    @POST
+    @Timed
+    public Response interruptStatement(@PathParam("id") String id) throws SessionManager.SessionNotFound, Session.StatementNotFound {
+        Session session = sessionManager.get(id);
+        session.interrupt();
+    }
 }
