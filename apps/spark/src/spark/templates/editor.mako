@@ -221,6 +221,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             dragged: function(widget){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}">
       </div>
 
+      <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
       <div class="add-snippet">
         <textarea id="shadowEditor">
@@ -312,7 +313,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         <div style="padding-top: 10px;">
 
           <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
-          <div class="btn-group">
+          <div class="btn-group" data-bind="visible: result.meta().length > 0">
             <button class="btn dropdown-toggle" style="height: 31px" data-bind="css: {'active': $data.showChart}" data-toggle="dropdown"><i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i><i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i><i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i><i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i> <i class="fa fa-caret-down"></i></button>
             <ul class="dropdown-menu">
               <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"><i class="hcha hcha-bar-chart"></i> ${_('Bars')}</a></li>
