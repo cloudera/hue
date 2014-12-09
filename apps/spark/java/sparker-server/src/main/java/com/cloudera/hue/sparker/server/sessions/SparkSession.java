@@ -157,6 +157,12 @@ public class SparkSession implements Session {
         process.destroy();
     }
 
+    @Override
+    public void interrupt() throws Exception {
+        // FIXME: is there a better way to do this?
+        throw new Exception("not implemented");
+    }
+
     private void touchLastActivity() {
         this.lastActivity = System.currentTimeMillis();
     }

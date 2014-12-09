@@ -43,6 +43,8 @@ public interface Session {
 
     public void close() throws IOException, InterruptedException, TimeoutException;
 
+    void interrupt() throws Exception;
+
     public static class StatementNotFound extends Throwable {
 
     }
