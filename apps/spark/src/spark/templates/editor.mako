@@ -1029,7 +1029,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    var _bodyScrollTimeout = -1;
     dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
       var _e = e.originalEvent,
           _deltaX = _e.wheelDeltaX || -_e.deltaX,
@@ -1307,6 +1306,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           redrawFixedHeaders();
         }, 100);
       }
+      else {
+        var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+        _dtElement.animate({opacity: '1'}, 50);
+        _dtElement.off("scroll");
+      }
     });
 
     $(document).on("progress", function (e, options) {
@@ -1316,6 +1320,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             height: "1px"
           }, 100, function () {
             options.snippet.progress(0);
+            redrawFixedHeaders();
           });
         }, 2000);
       }
@@ -1345,10 +1350,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     });
   });
 
-
-function getTime(){
-  return (new Date()).getTime();
-}
 </script>
 
 ${ commonfooter(messages) | n,unicode }
