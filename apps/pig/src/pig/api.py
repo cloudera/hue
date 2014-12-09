@@ -106,8 +106,12 @@ class OozieApi:
         params=json.dumps(pig_params),
         files=json.dumps(files),
         archives=json.dumps(archives),
-        job_properties=json.dumps(job_properties),
+        job_properties=json.dumps(job_properties)
     )
+
+    if pig_script.use_hcatalog and get_oozie(self.user).security_enabled:
+      action.credentials = [{'name': 'hcat', 'value': True}]
+      action.save()
 
     action.add_node(workflow.end)
 
