@@ -142,6 +142,7 @@ var Snippet = function (notebook, snippet) {
   self.showChart.subscribe(function (val){
     if (val){
       self.showGrid(false);
+      $(document).trigger("forceChartDraw", self);
     }
   });
   self.showLogs.subscribe(function (val){
@@ -174,9 +175,11 @@ var Snippet = function (notebook, snippet) {
   self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
   self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
 
-  self.chartType.subscribe(function(){
+  self.chartType.subscribe(function(val){
     $(document).trigger("forceChartDraw", self);
   });
+
+  self.tempChartOptions = {};
 
   self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : true);
   self.toggleLeftPanel = function () {

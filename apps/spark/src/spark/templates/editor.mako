@@ -366,7 +366,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
         </div>
 
-        <div class="row-fluid" data-bind="visible: showChart" style="max-height: 400px">
+        <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showChart()" style="max-height: 400px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
 
             <a title="${_('Toggle settings')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
@@ -1284,6 +1284,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         _el.dataTable().fnDestroy();
         _el.find("thead tr").empty();
       }
+      snippet.tempChartOptions = {
+        x: snippet.chartX(),
+        yS: snippet.chartYSingle(),
+        yM: snippet.chartYMulti(),
+        label: snippet.chartMapLabel()
+      }
     });
 
     $(document).on("renderData", function (e, options) {
@@ -1311,6 +1317,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         _dtElement.animate({opacity: '1'}, 50);
         _dtElement.off("scroll");
       }
+      options.snippet.chartX(options.snippet.tempChartOptions.x);
+      options.snippet.chartX(options.snippet.tempChartOptions.x);
+      options.snippet.chartYSingle(options.snippet.tempChartOptions.yS);
+      options.snippet.chartMapLabel(options.snippet.tempChartOptions.label);
+      $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
     });
 
     $(document).on("progress", function (e, options) {
