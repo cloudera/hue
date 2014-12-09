@@ -311,16 +311,19 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
         <div style="padding-top: 10px;">
 
+          <a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
           <div class="btn-group">
-            <button class="btn dropdown-toggle" data-toggle="dropdown"><i data-bind="visible: $data.showGrid" class="fa fa-th"></i><i data-bind="visible: $data.showChart" class="fa fa-line-chart"></i> <i class="fa fa-caret-down"></i></button>
+            <button class="btn dropdown-toggle" style="height: 31px" data-bind="css: {'active': $data.showChart}" data-toggle="dropdown"><i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i><i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i><i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i><i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i> <i class="fa fa-caret-down"></i></button>
             <ul class="dropdown-menu">
-              <li><a data-bind="visible: result.meta().length > 0, click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)"><i class="fa fa-th"></i> ${ _('Grid') }</a></li>
-              <li><a data-bind="visible: result.meta().length > 0, click: function() { $data.showChart(true); }, css: {'active': $data.showChart}" href="javascript:void(0)"><i class="fa fa-line-chart"></i> ${ _('Chart') }</a></li>
+              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"><i class="hcha hcha-bar-chart"></i> ${_('Bars')}</a></li>
+              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }"><i class="hcha hcha-line-chart"></i> ${_('Lines')}</a></li>
+              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }"><i class="hcha hcha-pie-chart"></i> ${_('Pie')}</a></li>
+              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }"><i class="hcha hcha-map-chart"></i> ${_('Map')}</a></li>
             </ul>
           </div>
 
           <div class="pull-right">
-              <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
+              <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }"><i class="fa fa-file-text-o"></i></a>
               &nbsp;
               <a data-bind="visible: status() == 'available', click: function() { $data.showDownload(! $data.showDownload()); }" href="javascript:void(0)" class="btn" title="${ _('Logs') }">
                 <i class="fa fa-arrow-circle-o-down"></i>
@@ -339,9 +342,9 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           </div>
         </div>
 
-        <div data-bind="visible: showLogs, css: resultsKlass">
-          <span data-bind="visible: result.logs().length == 0">${ _('Loading...') }</span>
-          <span data-bind="text: result.logs"></span>
+        <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
+          <pre data-bind="visible: result.logs().length == 0" class="logs">${ _('Loading...') }</pre>
+          <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs"></pre>
         </div>
 
         <div data-bind="visible: result.errors().length > 0, css: resultsKlass">
@@ -384,15 +387,6 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
             <a title="${_('Toggle settings')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
               <i class="fa fa-chevron-left"></i>
             </a>
-
-            <ul class="nav nav-list" style="border: none; background-color: #FFF">
-              <li class="nav-header">${_('type')}</li>
-            </ul>
-
-            <a rel="tooltip" data-placement="top" title="${_('Bars')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"><i class="hcha hcha-bar-chart"></i></a>
-            <a rel="tooltip" data-placement="top" title="${_('Lines')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.LINECHART); }"><i class="hcha hcha-line-chart"></i></a>
-            <a rel="tooltip" data-placement="top" title="${_('Pie')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.PIECHART); }"><i class="hcha hcha-pie-chart"></i></a>
-            <a rel="tooltip" data-placement="top" title="${_('Map')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ chartType(ko.HUE_CHARTS.TYPES.MAP); }"><i class="hcha hcha-map-chart"></i></a>
 
             <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
               <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('x-axis')}</li>
