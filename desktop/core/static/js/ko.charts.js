@@ -73,6 +73,11 @@ ko.bindingHandlers.pieChart = {
         }
 
         nv.utils.windowResize(_chart.update);
+
+        $(element).on("forceUpdate", function(){
+          _chart.update();
+        });
+
         $(element).height($(element).width());
         $(element).parents(".card-widget").on("resize", function () {
           if (typeof _options.maxWidth != "undefined") {
@@ -411,6 +416,10 @@ function lineChartBuilder(element, options) {
 
       nv.utils.windowResize(_chart.update);
 
+      $(element).on("forceUpdate", function(){
+        _chart.update();
+      });
+
       return _chart;
     }, function () {
       var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
@@ -568,6 +577,10 @@ function barChartBuilder(element, options, isTimeline) {
       }
 
       nv.utils.windowResize(_chart.update);
+
+      $(element).on("forceUpdate", function(){
+        _chart.update();
+      });
 
       return _chart;
     }, function () {

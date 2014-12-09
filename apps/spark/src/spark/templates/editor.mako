@@ -160,12 +160,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <div id="assistQuickLook" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-##      % if has_metastore:
-##      <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
-##        <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
-##      </a>
-##      % endif
-
       <h3>${_('Data sample for')} <span class="tableName"></span></h3>
     </div>
     <div class="modal-body" style="min-height: 100px">
@@ -343,7 +337,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()" style="height: 400px">
-          <div class="span2">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
+            <a title="${_('Toggle columns')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
+              <i class="fa fa-chevron-left"></i>
+            </a>
             <ul class="nav nav-list" style="border: none; background-color: #FFF">
               <li class="nav-header">${_('columns')}</li>
             </ul>
@@ -351,7 +348,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <li data-bind="visible: name != ''"><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
             </ul>
           </div>
-          <div class="span10">
+          <div data-bind="css:{'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
+            <a title="${_('Toggle columns')}" class="pointer" style="position:absolute; margin-left: -10px; margin-top: 10px" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
+              <i class="fa fa-chevron-right"></i>
+            </a>
             <div data-bind="css: resultsKlass">
               <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360">
                 <thead>
@@ -367,7 +367,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <div class="row-fluid" data-bind="visible: showChart" style="height: 400px">
-          <div class="span2">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
+
+            <a title="${_('Toggle settings')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
+              <i class="fa fa-chevron-left"></i>
+            </a>
 
             <ul class="nav nav-list" style="border: none; background-color: #FFF">
               <li class="nav-header">${_('type')}</li>
@@ -416,18 +420,22 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
             </div>
           </div>
-          <div class="span10">
+          <div data-bind="css:{'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
+            <a title="${_('Toggle settings')}" class="pointer" style="position:absolute; margin-left: -10px; margin-top: 10px" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
+              <i class="fa fa-chevron-right"></i>
+            </a>
+
             <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                  transformer: pieChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></div>
+                  transformer: pieChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
             <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                  transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></div>
+                  transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
             <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></div>
+                  transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
             <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP}"></div>
+                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP}" class="chart"></div>
           </div>
         </div>
       </div>
@@ -1221,12 +1229,28 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $("#assistQuickLook").modal("show");
   }
 
+  function redrawFixedHeaders() {
+      viewModel.notebooks().forEach(function (notebook) {
+        notebook.snippets().forEach(function (snippet) {
+          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+            fixedHeader: true,
+            includeNavigator: false
+          });
+        });
+      });
+    }
+
   $(document).ready(function () {
     resizeAssist();
 
     $(document).on("toggleAssist", function(){
       $.totalStorage("sparkAssistVisible", viewModel.isAssistVisible());
       resizeAssist();
+    });
+
+    $(document).on("toggleLeftPanel", function(e, snippet){
+      $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
+      redrawFixedHeaders();
     });
 
     $(document).on("executeStarted", function (e, snippet) {
@@ -1264,17 +1288,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         }, 100);
       }
     });
-
-    function redrawFixedHeaders() {
-      viewModel.notebooks().forEach(function (notebook) {
-        notebook.snippets().forEach(function (snippet) {
-          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
-            fixedHeader: true,
-            includeNavigator: false
-          });
-        });
-      });
-    }
 
     $(document).on("progress", function (e, options) {
       if (options.data == 100) {
