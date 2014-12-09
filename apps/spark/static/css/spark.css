@@ -204,3 +204,10 @@
 .show-assist:hover {
   margin-left: 0;
 }
+
+.logs {
+  padding: 3px;
+  font-size: 11px;
+  height: 80px;
+  overflow-y: auto;
+}
