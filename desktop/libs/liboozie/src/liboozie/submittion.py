@@ -141,6 +141,10 @@ class Submission(object):
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
 
+    if self.api.security_enabled:
+      jt_address = cluster.get_cluster_addr_for_job_submission()
+      self._update_properties(jt_address) # Needed for coordinator deploying workflows
+
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
