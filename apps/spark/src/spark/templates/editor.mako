@@ -336,7 +336,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <span data-bind="text: result.errors"></span>
         </div>
 
-        <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()" style="height: 400px">
+        <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showGrid()" style="max-height: 400px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
             <a title="${_('Toggle columns')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
               <i class="fa fa-chevron-left"></i>
@@ -366,7 +366,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
         </div>
 
-        <div class="row-fluid" data-bind="visible: showChart" style="height: 400px">
+        <div class="row-fluid" data-bind="visible: showChart" style="max-height: 400px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
 
             <a title="${_('Toggle settings')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
