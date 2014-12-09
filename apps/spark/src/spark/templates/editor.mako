@@ -1020,10 +1020,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     var _scrollTimeout = -1;
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    dataTableEl.bind('mousewheel DOMMouseScroll', function (e) {
+    dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
       var _e = e.originalEvent,
-          _delta = _e.wheelDelta || -_e.detail*20;
-      this.scrollTop += -_delta / 2;
+          _deltaX = _e.wheelDeltaX || -_e.deltaX,
+          _deltaY = _e.wheelDeltaY || -_e.deltaY;
+      this.scrollTop += -_deltaY / 2;
+      this.scrollLeft += -_deltaX / 2;
       e.preventDefault();
     });
 
@@ -1232,7 +1234,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   function redrawFixedHeaders() {
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
-          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+          _el.jHueTableExtender({
             fixedHeader: true,
             includeNavigator: false
           });
