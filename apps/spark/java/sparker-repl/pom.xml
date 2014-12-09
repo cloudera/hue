@@ -18,6 +18,7 @@
         <scala.binary.version>2.10</scala.binary.version>
         <scala.macros.version>2.0.1</scala.macros.version>
         <spark.version>1.1.0-cdh5.2.0-SNAPSHOT</spark.version>
+        <scalatra.version>2.2.1</scalatra.version>
         <PermGen>64m</PermGen>
         <MaxPermGen>512m</MaxPermGen>
     </properties>
@@ -36,10 +37,65 @@
             <version>3.2.11</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra_2.10</artifactId>
+            <version>${scalatra.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra_2.10</artifactId>
+            <version>${scalatra.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.cloudera.hue.sparker.repl.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.0.2.v20130417</version>
+            </plugin>
 
             <plugin>
                 <groupId>org.scala-tools</groupId>
@@ -51,54 +107,8 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
-                    <!--
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile-first</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>attach-scaladocs</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>doc-jar</goal>
-                        </goals>
-                    </execution>
-                    -->
                 </executions>
                 <configuration>
-                    <!--
-                    <scalaVersion>${scala.version}</scalaVersion>
-                    <recompileMode>incremental</recompileMode>
-                    <useZincServer>true</useZincServer>
-                    <args>
-                        <arg>-unchecked</arg>
-                        <arg>-deprecation</arg>
-                        <arg>-feature</arg>
-                        <arg>-language:postfixOps</arg>
-                    </args>
-                    <jvmArgs>
-                        <jvmArg>-Xms1024m</jvmArg>
-                        <jvmArg>-Xmx1024m</jvmArg>
-                        <jvmArg>-XX:PermSize=${PermGen}</jvmArg>
-                        <jvmArg>-XX:MaxPermSize=${MaxPermGen}</jvmArg>
-                    </jvmArgs>
-                    <javacArgs>
-                        <javacArg>-source</javacArg>
-                        <javacArg>${java.version}</javacArg>
-                        <javacArg>-target</javacArg>
-                        <javacArg>${java.version}</javacArg>
-                    </javacArgs>
-                    -->
                     <!-- The following plugin is required to use quasiquotes in Scala 2.10 and is used
                          by Spark SQL for code generation. -->
                     <compilerPlugins>
@@ -111,6 +121,7 @@
                 </configuration>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -143,6 +154,7 @@
                     </archive>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 
