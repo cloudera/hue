@@ -123,8 +123,12 @@ public class SessionResource {
     @Path("/{id}/interrupt")
     @POST
     @Timed
-    public Response interruptStatement(@PathParam("id") String id) throws SessionManager.SessionNotFound, Session.StatementNotFound {
+    public Response interruptStatement(@PathParam("id") String id) throws SessionManager.SessionNotFound, Session.StatementNotFound, Exception, ClosedSessionException {
         Session session = sessionManager.get(id);
-        session.interrupt();
+
+        // FIXME: don't actually do anything for now as it doesn't work yet.
+        //  session.interrupt();
+
+        return Response.ok().build();
     }
 }
