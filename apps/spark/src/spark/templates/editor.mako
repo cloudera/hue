@@ -1372,6 +1372,12 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
       readOnly: true,
       mode: "text/x-hiveql"
     });
+
+    var _resizeTimeout = -1;
+    $(window).on("resize", function(){
+      window.clearTimeout(_resizeTimeout);
+      _resizeTimeout = window.setTimeout(resizeAssist, 200);
+    });
   });
 
 </script>
