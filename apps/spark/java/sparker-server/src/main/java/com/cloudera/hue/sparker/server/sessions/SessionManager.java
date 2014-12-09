@@ -112,7 +112,7 @@ public class SessionManager {
 
     private class SessionManagerGarbageCollector extends Thread {
 
-        protected long period = 600000; // Time in milliseconds; TODO: make configurable
+        protected long period = 1000 * 60 * 60; // Time in milliseconds; TODO: make configurable
 
         public SessionManagerGarbageCollector() {
             super();

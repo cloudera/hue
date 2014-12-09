@@ -2,8 +2,7 @@
 
 cd `dirname $0`
 
-	#-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006 \
-
 exec java \
+	-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006 \
 	-cp "java/sparker-repl/target/lib/*:java/sparker-repl/target/sparker-repl-3.7.0-SNAPSHOT.jar" \
-	com.cloudera.hue.sparker.repl.Main -usejavacp "$@" 2>/dev/null
+	com.cloudera.hue.sparker.repl.Main #-usejavacp "$@" 2>/dev/null
