@@ -1,12 +1,11 @@
 package com.cloudera.hue.sparker.server.resources;
 
-import com.cloudera.hue.sparker.server.sessions.Cell;
+import com.cloudera.hue.sparker.server.sessions.Statement;
 import com.cloudera.hue.sparker.server.sessions.ClosedSessionException;
 import com.cloudera.hue.sparker.server.sessions.Session;
 import com.cloudera.hue.sparker.server.sessions.SessionManager;
 import com.codahale.metrics.annotation.Timed;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -76,11 +75,11 @@ public class SessionResource {
     @Path("/{id}")
     @GET
     @Timed
-    public List<Cell> getSession(@PathParam("id") String id,
+    public List<Statement> getSession(@PathParam("id") String id,
                                  @QueryParam("from") Integer fromCell,
                                  @QueryParam("limit") Integer limit) throws SessionManager.SessionNotFound {
         Session session = sessionManager.get(id);
-        List<Cell> cells = session.getCells();
+        List<Statement> statements = session.getStatements();
 
         if (fromCell != null || limit != null) {
             if (fromCell == null) {
@@ -88,13 +87,13 @@ public class SessionResource {
             }
 
             if (limit == null) {
-                limit = cells.size();
+                limit = statements.size();
             }
 
-            cells = cells.subList(fromCell, fromCell + limit);
+            statements = statements.subList(fromCell, fromCell + limit);
         }
 
-        return cells;
+        return statements;
     }
 
     @Path("/{id}")
@@ -106,9 +105,9 @@ public class SessionResource {
         Session session = sessionManager.get(id);
 
         // The cell is evaluated inline, but eventually it'll be turned into an asynchronous call.
-        Cell cell = session.executeStatement(body.getStatement());
+        Statement statement = session.executeStatement(body.getStatement());
 
-        URI location = new URI("/cells/" + cell.getId());
+        URI location = new URI("/cells/" + statement.getId());
         return Response.created(location).build();
     }
 

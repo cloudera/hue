@@ -30,17 +30,21 @@ public interface Session {
     String getId();
 
     @JsonProperty
-    List<Cell> getCells();
+    List<Statement> getStatements();
 
-    List<Cell> getCellRange(int fromIndex, int toIndex);
+    List<Statement> getStatementRange(Integer fromIndex, Integer toIndex);
 
-    Cell getCell(int cellId);
+    Statement getStatement(int statementId) throws StatementNotFound;
 
     @JsonProperty
     public long getLastActivity();
 
-    public Cell executeStatement(String statement) throws Exception, ClosedSessionException;
+    public Statement executeStatement(String statement) throws Exception, ClosedSessionException;
 
     public void close() throws IOException, InterruptedException, TimeoutException;
+
+    public static class StatementNotFound extends Throwable {
+
+    }
 }
 
