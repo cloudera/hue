@@ -34,6 +34,7 @@
 .add-snippet {
   margin: 10px;
   margin-top: 60px;
+  margin-bottom: 60px;
   background-color: #F1F1F1;
   cursor: default;
 }
