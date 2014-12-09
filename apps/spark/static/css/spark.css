@@ -25,10 +25,44 @@
 }
 
 .CodeMirror {
-  border: 1px solid #DDD;
+  border: 1px solid #EEE;
   border-top: none;
   border-bottom: none;
   height: auto;
+}
+
+.add-snippet {
+  margin: 10px;
+  margin-top: 60px;
+  background-color: #F1F1F1;
+  cursor: default;
+}
+
+.add-snippet .CodeMirror {
+  opacity: .30;
+  border: 1px solid #DDD;
+  cursor: default;
+}
+
+.add-snippet .CodeMirror-lines {
+  cursor: default;
+}
+
+.add-snippet .overlay {
+  position: absolute;
+  margin-top: -60px;
+  z-index: 300;
+  left: 50%;
+}
+
+.add-snippet .overlay i {
+  font-size: 28px;
+  color: #CCC;
+  cursor: pointer;
+}
+
+.add-snippet .overlay i:hover {
+  color: #666;
 }
 
 .codeMirror-overlaybtn {
