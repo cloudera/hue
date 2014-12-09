@@ -55,6 +55,7 @@ public class SparkSession implements Session {
     private static final String SPARKER_SHELL = SPARKER_HOME + "/sparker-shell";
 
     private final String id;
+    private State state = State.READY;
     private final Process process;
     private final Writer writer;
     private final BufferedReader reader;
@@ -85,6 +86,11 @@ public class SparkSession implements Session {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public State getState() {
+        return state;
     }
 
     @Override
@@ -124,21 +130,14 @@ public class SparkSession implements Session {
         request.put("type", "stdin");
         request.put("statement", statementStr);
 
-        writer.write(request.toString());
-        writer.write("\n");
-        writer.flush();
+        state = State.EXECUTING_STATEMENT;
 
-        String line = reader.readLine();
-
-        if (line == null) {
-            // The process must have shutdown on us!
-            process.waitFor();
-            throw new ClosedSessionException();
+        JsonNode response;
+        try {
+            response = doRequest(request);
+        } finally {
+            state = State.READY;
         }
-
-        LOG.info("[" + id + "] spark stdout: " + line);
-
-        JsonNode response = objectMapper.readTree(line);
 
         if (response.has("stdout")) {
             statement.addOutput(response.get("stdout").asText());
@@ -158,12 +157,35 @@ public class SparkSession implements Session {
     }
 
     @Override
-    public void interrupt() throws Exception {
+    public void interrupt() throws Exception, ClosedSessionException {
         // FIXME: is there a better way to do this?
-        throw new Exception("not implemented");
+        if (this.state == State.EXECUTING_STATEMENT) {
+            ObjectNode request = objectMapper.createObjectNode();
+            request.put("type", "interrupt");
+
+            JsonNode response = doRequest(request);
+        }
     }
 
     private void touchLastActivity() {
         this.lastActivity = System.currentTimeMillis();
+    }
+
+    private JsonNode doRequest(ObjectNode request) throws IOException, InterruptedException, ClosedSessionException {
+        writer.write(request.toString());
+        writer.write("\n");
+        writer.flush();
+
+        String line = reader.readLine();
+
+        if (line == null) {
+            // The process must have shutdown on us!
+            process.waitFor();
+            throw new ClosedSessionException();
+        }
+
+        LOG.info("[" + id + "] spark stdout: " + line);
+
+        return objectMapper.readTree(line);
     }
 }

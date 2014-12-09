@@ -26,8 +26,16 @@ import java.util.concurrent.TimeoutException;
 
 public interface Session {
 
+    public enum State {
+        EXECUTING_STATEMENT,
+        READY
+    }
+
     @JsonProperty
     String getId();
+
+    @JsonProperty
+    State getState();
 
     @JsonProperty
     List<Statement> getStatements();
@@ -43,7 +51,7 @@ public interface Session {
 
     public void close() throws IOException, InterruptedException, TimeoutException;
 
-    void interrupt() throws Exception;
+    void interrupt() throws Exception, ClosedSessionException;
 
     public static class StatementNotFound extends Throwable {
 
