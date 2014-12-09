@@ -1017,20 +1017,25 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       includeNavigator: false
     });
     $(".dataTables_filter").hide();
-    var _scrollTimeout = -1;
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
+    var _bodyScrollTimeout = -1;
     dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
       var _e = e.originalEvent,
           _deltaX = _e.wheelDeltaX || -_e.deltaX,
           _deltaY = _e.wheelDeltaY || -_e.deltaY;
       this.scrollTop += -_deltaY / 2;
       this.scrollLeft += -_deltaX / 2;
+
+      if (this.scrollTop == 0){
+        $("body")[0].scrollTop += -_deltaY / 3;
+        $("html")[0].scrollTop += -_deltaY / 3; // for firefox
+      }
       e.preventDefault();
     });
 
+    var _scrollTimeout = -1;
     dataTableEl.on("scroll", function () {
-
       var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
       _scrollTimeout = window.setTimeout(function () {
@@ -1041,6 +1046,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         }
       }, 100);
     });
+
     return _dt;
   }
 
