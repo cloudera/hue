@@ -54,6 +54,7 @@
   margin-top: -60px;
   z-index: 300;
   left: 50%;
+  margin-left: -60px;
 }
 
 .add-snippet .overlay i {
@@ -147,7 +148,7 @@
 
 .ui-sortable {
   background-color: #FFF;
-  min-height: 100px;
+  min-height: 0px;
 }
 
 .assist {
@@ -210,4 +211,10 @@
   font-size: 11px;
   height: 80px;
   overflow-y: auto;
+}
+
+h1.empty {
+  margin-top: 50px;
+  text-align: center;
+  color: #DDD;
 }
