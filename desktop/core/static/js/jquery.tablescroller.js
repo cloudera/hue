@@ -108,7 +108,7 @@
             $(el).css("overflow-y", "auto").height(minHeightVal);
           }
           if (fixedHeight > -1){
-            $(el).css("overflow-y", "auto").height(fixedHeight);
+            $(el).css("overflow-y", "auto").css("maxHeight", fixedHeight);
           }
         }
       }
