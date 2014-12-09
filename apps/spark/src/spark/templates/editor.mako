@@ -852,23 +852,31 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       editor.setSize("100%", "100px");
       var wrapperElement = $(editor.getWrapperElement());
 
+      var _changeTimeout = -1;
+      var _previousLineCount = 7;
       editor.on("change", function () {
-        if (editor.lineCount() <= 7) {
+        var _redraw = false;
+        if (editor.lineCount() <= 7 && _previousLineCount > 7) {
           editor.setSize("100%", "100px");
         }
-        else if (editor.lineCount() > 7 && editor.lineCount() < 21) {
+        else if (editor.lineCount() > 7 && editor.lineCount() < 21 && (_previousLineCount <=7 || _previousLineCount >= 20)) {
           editor.setSize("100%", "auto");
         }
-        else {
+        else if (_previousLineCount >= 20) {
           editor.setSize("100%", "270px");
         }
-
-        $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
-          fixedHeader: true,
-          includeNavigator: false
-        });
-
-        allBindingsAccessor().value(editor.getValue());
+        if (_previousLineCount != editor.lineCount()){
+          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+            fixedHeader: true,
+            includeNavigator: false,
+            parentId: snippet.id()
+          });
+        }
+        _previousLineCount = editor.lineCount();
+        window.clearTimeout(_changeTimeout);
+        _changeTimeout = window.setTimeout(function(){
+          allBindingsAccessor().value(editor.getValue());
+        }, 600);
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
@@ -989,7 +997,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
         $(el).jHueTableExtender({
           fixedHeader: true,
-          includeNavigator: false
+          includeNavigator: false,
+          parentId: snippet.id()
         });
       },
       "aoColumnDefs": [
@@ -1014,7 +1023,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
     $(el).jHueTableExtender({
       fixedHeader: true,
-      includeNavigator: false
+      includeNavigator: false,
+      parentId: snippet.id()
     });
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
@@ -1243,7 +1253,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           var _el = $("#snippet_" + snippet.id()).find(".resultTable");
           _el.jHueTableExtender({
             fixedHeader: true,
-            includeNavigator: false
+            includeNavigator: false,
+            parentId: snippet.id()
           });
         });
       });
@@ -1334,6 +1345,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     });
   });
 
+
+function getTime(){
+  return (new Date()).getTime();
+}
 </script>
 
 ${ commonfooter(messages) | n,unicode }

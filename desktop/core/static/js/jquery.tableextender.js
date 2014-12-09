@@ -172,8 +172,8 @@
 
 
   function drawHeader(plugin) {
-    if (!$(plugin.element).attr("id")){
-      $(plugin.element).attr("id", "eT" + UUID());
+    if (!$(plugin.element).attr("id") && plugin.options.parentId){
+      $(plugin.element).attr("id", "eT" + plugin.options.parentId);
     }
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $(plugin.element).clone();
