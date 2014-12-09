@@ -148,8 +148,10 @@ from django.template.defaultfilters import escape, escapejs
     }
   });
 
-  // hides all the nvd3 logs
-  nv.log = function() {};
+  if (typeof nv != "undefined"){
+    // hides all the nvd3 logs
+    nv.log = function() {};
+  }
 
 
     %if collect_usage:

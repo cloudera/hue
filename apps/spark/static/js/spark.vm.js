@@ -176,6 +176,12 @@ var Snippet = function (notebook, snippet) {
     $(document).trigger("forceChartDraw", self);
   });
 
+  self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : true);
+  self.toggleLeftPanel = function () {
+    self.isLeftPanelVisible(! self.isLeftPanelVisible());
+    $(document).trigger("toggleLeftPanel", self);
+  };
+
   self.expand = function () {
     self.size(self.size() + 1);
     $("#snippet_" + self.id()).trigger("resize");
@@ -233,38 +239,38 @@ var Snippet = function (notebook, snippet) {
     }); 
   };
 
-  self.execute = function() {
+  self.execute = function () {
     $(document).trigger("executeStarted", self);
     $(".jHueNotify").hide();
-	logGA('/execute/' + self.type());
-    
-	self.result.clear();
-	self.progress(0);
-	self.status('running');
+    logGA('/execute/' + self.type());
+
+    self.result.clear();
+    self.progress(0);
+    self.status('running');
 
     $.post("/spark/api/execute", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
-      }, function (data) {
-        if (data.status == 0) {
-          $.each(data.handle, function(key, val) {
-        	 self.result.handle()[key] = val;
-          });
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        $.each(data.handle, function (key, val) {
+          self.result.handle()[key] = val;
+        });
 
-          self.checkStatus();
-        } else {
-          self._ajax_error(data);
-        }
+        self.checkStatus();
+      } else {
+        self._ajax_error(data);
+      }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
       self.status('failed');
-    });    
+    });
   };
   
   self.fetchResult = function(rows, startOver) {
-	if (typeof startOver == "undefined") {
-	  startOver = true;
-	}
+    if (typeof startOver == "undefined") {
+      startOver = true;
+    }
     self.fetchResultData(rows, startOver);
     //self.fetchResultMetadata(rows); 
   };
