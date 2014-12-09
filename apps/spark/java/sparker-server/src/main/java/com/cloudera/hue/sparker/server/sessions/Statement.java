@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cell {
+public class Statement {
 
     public enum State {
         NOT_READY,
@@ -22,7 +22,7 @@ public class Cell {
 
     final List<String> error = new ArrayList<String>();
 
-    public Cell(int id) {
+    public Statement(int id) {
         this.id = id;
         this.state = State.COMPLETE;
     }

@@ -58,7 +58,7 @@ public class SparkSession implements Session {
     private final Process process;
     private final Writer writer;
     private final BufferedReader reader;
-    private final List<Cell> cells = new ArrayList<Cell>();
+    private final List<Statement> statements = new ArrayList<Statement>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private boolean isClosed = false;
@@ -93,36 +93,36 @@ public class SparkSession implements Session {
     }
 
     @Override
-    synchronized public List<Cell> getCells() {
-        return Lists.newArrayList(cells);
+    synchronized public List<Statement> getStatements() {
+        return Lists.newArrayList(statements);
     }
 
     @Override
-    synchronized public List<Cell> getCellRange(int fromIndex, int toIndex) {
-        return cells.subList(fromIndex, toIndex);
+    synchronized public List<Statement> getStatementRange(Integer fromIndex, Integer toIndex) {
+        return statements.subList(fromIndex, toIndex);
     }
 
     @Override
-    synchronized public Cell getCell(int index) {
-        return cells.get(index);
+    synchronized public Statement getStatement(int index) {
+        return statements.get(index);
     }
 
     @Override
-    synchronized public Cell executeStatement(String statement) throws IOException, ClosedSessionException, InterruptedException {
+    synchronized public Statement executeStatement(String statementStr) throws IOException, ClosedSessionException, InterruptedException {
         if (isClosed) {
             throw new ClosedSessionException();
         }
 
         touchLastActivity();
 
-        Cell cell = new Cell(cells.size());
-        cells.add(cell);
+        Statement statement = new Statement(statements.size());
+        statements.add(statement);
 
-        cell.addInput(statement);
+        statement.addInput(statementStr);
 
         ObjectNode request = objectMapper.createObjectNode();
         request.put("type", "stdin");
-        request.put("statement", statement);
+        request.put("statement", statementStr);
 
         writer.write(request.toString());
         writer.write("\n");
@@ -141,14 +141,14 @@ public class SparkSession implements Session {
         JsonNode response = objectMapper.readTree(line);
 
         if (response.has("stdout")) {
-            cell.addOutput(response.get("stdout").asText());
+            statement.addOutput(response.get("stdout").asText());
         }
 
         if (response.has("stderr")) {
-            cell.addOutput(response.get("stderr").asText());
+            statement.addOutput(response.get("stderr").asText());
         }
 
-        return cell;
+        return statement;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.cloudera.hue.sparker.server;
 
-import com.cloudera.hue.sparker.server.resources.CellResource;
+import com.cloudera.hue.sparker.server.resources.StatementResource;
 import com.cloudera.hue.sparker.server.resources.SessionResource;
 import com.cloudera.hue.sparker.server.sessions.SessionManager;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
@@ -26,7 +26,7 @@ public class SparkerApp extends Application<SparkerConfiguration> {
     public void run(SparkerConfiguration sparkerConfiguration, Environment environment) throws Exception {
         final SessionManager sessionManager = new SessionManager();
         environment.jersey().register(new SessionResource(sessionManager));
-        environment.jersey().register(new CellResource(sessionManager));
+        environment.jersey().register(new StatementResource(sessionManager));
         environment.jersey().register(new SessionManagerExceptionMapper());
     }
 
