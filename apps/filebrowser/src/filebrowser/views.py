@@ -1229,13 +1229,13 @@ def _upload_archive(request):
         try:
             # Extract if necessary
             # Make sure dest path is without the extension
-            if dest.endswith('.zip'):
+            if dest.lower().endswith('.zip'):
                 temp_path = archive_factory(uploaded_file, 'zip').extract()
                 if not temp_path:
                     raise PopupException(_('Could not extract contents of file.'))
                 # Move the file to where it belongs
                 dest = dest[:-4]
-            elif dest.endswith('.tar.gz') or dest.endswith('.tgz'):
+            elif dest.lower().endswith('.tar.gz') or dest.lower().endswith('.tgz'):
                 print uploaded_file
                 temp_path = archive_factory(uploaded_file, 'tgz').extract()
                 if not temp_path:
