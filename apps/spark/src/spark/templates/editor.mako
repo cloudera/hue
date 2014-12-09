@@ -157,6 +157,29 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 </div>
 
+<div id="assistQuickLook" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+##      % if has_metastore:
+##      <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
+##        <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
+##      </a>
+##      % endif
+
+      <h3>${_('Data sample for')} <span class="tableName"></span></h3>
+    </div>
+    <div class="modal-body" style="min-height: 100px">
+      <div class="loader">
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
+        <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+      </div>
+      <div class="sample"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
+    </div>
+  </div>
+
 
 <script type="text/html" id="notebook">
   <div class="row-fluid">
@@ -177,12 +200,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
             <li>
-              <a href="javascript:void(0)" class="pull-right" style="padding-right:5px"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
-              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><i class="fa fa-table"></i> <span data-bind="text: $data"></span></a>
+              <a href="javascript:void(0)" class="pull-right" style="padding-right:5px" data-bind="click: showTablePreview"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
                 <ul data-bind="visible: $root.assistContent().firstLevelObjects()[$data].items().length > 0, foreach: $root.assistContent().firstLevelObjects()[$data].items()" class="unstyled">
-                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><i class="fa fa-columns"></i> <span data-bind="html: truncateSecondLevel($data)"></span></a></li>
+                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: truncateSecondLevel($data)"></span></a></li>
                 </ul>
               </div>
             </li>
@@ -1170,6 +1193,33 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return _datum;
   }
 
+
+  function showTablePreview(table) {
+    var tableUrl = "/beeswax/api/table/" + viewModel.assistContent().selectedMainObject() + "/" + table;
+    $("#assistQuickLook").find(".tableName").text(table);
+    $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.assistContent().selectedMainObject() + "/" + table);
+    $("#assistQuickLook").find(".sample").empty("");
+    $("#assistQuickLook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
+    $.ajax({
+      url: tableUrl,
+      data: {"sample": true},
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-Requested-With", "Hue");
+      },
+      dataType: "html",
+      success: function (data) {
+        $("#assistQuickLook").find(".loader").hide();
+        $("#assistQuickLook").find(".sample").html(data);
+      },
+      error: function (e) {
+        if (e.status == 500) {
+          $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
+          $("#assistQuickLook").modal("hide");
+        }
+      }
+    });
+    $("#assistQuickLook").modal("show");
+  }
 
   $(document).ready(function () {
     resizeAssist();
