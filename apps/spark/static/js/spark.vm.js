@@ -526,11 +526,15 @@ function EditorViewModel(notebooks, options) {
   };
 
   self.loadNotebook = function(notebook) {
-    self.notebooks.push(new Notebook(self, notebook));
+    var _n = new Notebook(self, notebook);
+    self.notebooks.push(_n);
+    if (_n.snippets().length > 0){
+      _n.selectedSnippet(_n.snippets()[_n.snippets().length - 1].type());
+    }
   };
 
   self.newNotebook = function() {
-	self.notebooks.push(new Notebook(self, {}));
+	  self.notebooks.push(new Notebook(self, {}));
     self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
   };
 

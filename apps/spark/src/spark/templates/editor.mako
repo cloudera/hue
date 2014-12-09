@@ -222,12 +222,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
 
 
-      <div style="margin: 20px">
-        <a href="javascript: void(0)" data-bind="click: newSnippet">
-          <i class="fa fa-plus" title="${ _('Add') }"></i> ${ _('Add a new snippet') }
-        </a>
-        <select data-bind="options: availableSnippets, value: selectedSnippet">
-        </select>
+      <div class="add-snippet">
+        <textarea id="shadowEditor">
+${_('Example: SELECT * FROM tablename, or press CTRL + space')}
+
+
+
+
+        </textarea>
+        <div class="overlay">
+          <select data-bind="options: availableSnippets, value: selectedSnippet"></select>
+          <i class="fa fa-plus-circle" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
+        </div>
       </div>
     </div>
   </div>
@@ -1358,6 +1364,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
     $(".CodeMirror").each(function () {
       $(this)[0].CodeMirror.refresh();
+    });
+
+    var shadowEditor = CodeMirror.fromTextArea($("#shadowEditor")[0], {
+      lineNumbers: true,
+      readOnly: true,
+      mode: "text/x-hiveql"
     });
   });
 
