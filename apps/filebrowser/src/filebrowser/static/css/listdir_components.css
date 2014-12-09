@@ -233,10 +233,6 @@
   border-right: 3px solid #338bb8;
 }
 
-[draggable]:hover {
-  cursor: move;
-}
-
 .progress .bar-upload {
   background-color: #338BB8;
 }
