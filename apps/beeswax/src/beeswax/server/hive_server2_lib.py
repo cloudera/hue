@@ -353,7 +353,7 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=username,
-					                                password=password,
+                                          password=password,
                                           timeout_seconds=timeout,
                                           use_ssl=ssl_enabled,
                                           ca_certs=ca_certs,
