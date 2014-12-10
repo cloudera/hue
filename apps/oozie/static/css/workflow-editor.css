@@ -211,7 +211,7 @@ em {
   min-height: 40px;
   line-height: 40px;
   background-color: #F3F3F3;
-  border: 2px dashed #DDD;
+  border: 2px dotted #DDD;
 }
 
 .tmpl {
@@ -297,7 +297,7 @@ em {
 .drop-target {
   background-color: #F6F6F6;
   min-height: 20px;
-  border: 2px dashed #DDD;
+  border: 2px dotted #DDD;
   text-align: center;
   padding: 4px;
 }
@@ -315,7 +315,6 @@ em {
   background-color: #FFFFFF;
   border-color: #FFFFFF;
 }
-
 
 .drop-target-side {
   min-height: 100px;
@@ -363,10 +362,6 @@ em {
   z-index:1031;
 }
 
-.ui-sortable-disabled {
-  background-color: #f1f1f1!important;
-}
-
 .card-column-disabled {
   background-color: #f1f1f1;
 }
@@ -403,4 +398,35 @@ em {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 350px;
+}
+
+.row-fluid .offset3andhalf:first-child {
+  margin-left: 29%;
+}
+
+.row-container.is-editing {
+  border: none!important;
+}
+
+.card-widget {
+  border: 1px solid #d8d8d8!important;
+}
+
+.row-fluid .span4 {
+  width: 33%;
+}
+
+.dashboard {
+  margin-top: 50px;
+}
+
+.dashboard.readonly {
+  margin-top: 0;
+}
+
+.big-icon {
+  color: #DDD;
+  font-size: 40px;
+  text-align: center;
+  padding: 5px;
 }

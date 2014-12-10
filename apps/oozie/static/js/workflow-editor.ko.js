@@ -15,11 +15,11 @@
 // limitations under the License.
 
 ko.bindingHandlers.droppable = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     var _dropElement = $(element);
     var _options = valueAccessor();
 
-    if (_options.enabled){
+    if (_options.enabled) {
       var _dropOptions = {
         hoverClass: 'drop-target-highlight',
         drop: _options.onDrop
@@ -69,7 +69,6 @@ function loadLayout(viewModel, json_layout) {
 }
 
 
-
 // End dashboard lib
 
 var Node = function (node) {
@@ -84,9 +83,9 @@ var Node = function (node) {
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
-  self.get_link = function(name) {
+  self.get_link = function (name) {
     var _link = null;
-    $.each(self.children(), function(index, link) {
+    $.each(self.children(), function (index, link) {
       if (name in link) {
         _link = link;
         return false;
@@ -95,20 +94,20 @@ var Node = function (node) {
     return _link;
   }
 
-  self.set_link = function(name, node_id) {
-	var _link = self.get_link(name);
+  self.set_link = function (name, node_id) {
+    var _link = self.get_link(name);
 
     if (_link == null) {
       _link = {}
       self.children.push(_link);
     }
     _link[name] = node_id;
-    self.children.valueHasMutated(); 
+    self.children.valueHasMutated();
   }
 
-  self.remove_link = function(name, child) {
+  self.remove_link = function (name, child) {
     var _link = null;
-    $.each(self.children(), function(index, link) {
+    $.each(self.children(), function (index, link) {
       var _l = ko.mapping.toJS(link);
       if (name in _l && _l[name] == child) {
         _link = link;
@@ -118,7 +117,7 @@ var Node = function (node) {
     if (_link != null) {
       self.children.remove(_link);
     }
-  }  
+  }
 }
 
 
@@ -132,31 +131,31 @@ var Workflow = function (vm, workflow) {
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
   self.movedNode = null;
-  
-  self.nodeIds = ko.computed(function() {
+
+  self.nodeIds = ko.computed(function () {
     var mapping = [];
-    
-    $.each(self.nodes(), function(index, node) {
+
+    $.each(self.nodes(), function (index, node) {
       mapping.push(node.id());
     });
 
     return mapping;
   });
-  self.nodeNamesMapping = ko.computed(function() {
+  self.nodeNamesMapping = ko.computed(function () {
     var mapping = {};
-    
-    $.each(self.nodes(), function(index, node) {
+
+    $.each(self.nodes(), function (index, node) {
       mapping[node.id()] = node.name();
     });
 
     return mapping;
   });
-  self.linkMapping = ko.computed(function() {
-	var mapping = {};
-    
-	$.each(self.nodes(), function(index, node) {
+  self.linkMapping = ko.computed(function () {
+    var mapping = {};
+
+    $.each(self.nodes(), function (index, node) {
       var links = []
-      $.each(node.children(), function(index, link) {
+      $.each(node.children(), function (index, link) {
         if ('to' in link) {
           links.push(link['to']);
         }
@@ -167,20 +166,20 @@ var Workflow = function (vm, workflow) {
     return mapping;
   });
 
-  self.linkMapping.subscribe(function(newVal){
+  self.linkMapping.subscribe(function (newVal) {
     $(document).trigger("drawArrows");
   });
 
-  self.loadNodes = function(workflow) {
+  self.loadNodes = function (workflow) {
     var nodes = []
-    $.each(workflow.nodes, function(index, node) {
+    $.each(workflow.nodes, function (index, node) {
       var _node = new Node(node);
       nodes.push(_node);
     });
     self.nodes(nodes)
   }
 
-  self.newNode = function(widget, callback) {
+  self.newNode = function (widget, callback) {
     $.ajax({
       type: "POST",
       url: "/oozie/editor/workflow/new_node/",
@@ -192,7 +191,7 @@ var Workflow = function (vm, workflow) {
         if (data.status == 0) {
           viewModel.addActionProperties(data.properties);
           viewModel.addActionWorkflows(data.workflows);
-          if (callback){
+          if (callback) {
             callback(widget);
           }
         }
@@ -201,14 +200,14 @@ var Workflow = function (vm, workflow) {
     });
   };
 
-  self.addNode = function(widget) {
+  self.addNode = function (widget) {
     // Todo get parent cell, link nodes... when we have the new layout
     $.post("/oozie/editor/workflow/add_node/", {
-        "workflow": ko.mapping.toJSON(workflow),
-        "node": ko.mapping.toJSON(widget),
-        "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
-        "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}',
-      }, function (data) {
+      "workflow": ko.mapping.toJSON(workflow),
+      "node": ko.mapping.toJSON(widget),
+      "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
+      "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}'
+    }, function (data) {
       if (data.status == 0) {
         var _node = ko.mapping.toJS(widget);
         _node.properties = data.properties;
@@ -229,138 +228,138 @@ var Workflow = function (vm, workflow) {
 
           if (self.getNodeById(parentWidget.id()) == null) { // New fork
 
-        	vm.currentlyCreatedJoin.properties['fork_id'] = vm.currentlyCreatedFork.id;
+            vm.currentlyCreatedJoin.properties['fork_id'] = vm.currentlyCreatedFork.id;
             vm.currentlyCreatedFork.properties['join_id'] = vm.currentlyCreatedJoin.id;
-        	  
+
             var fork = new Node(vm.currentlyCreatedFork);
             var join = new Node(vm.currentlyCreatedJoin);
-            
-	        self.nodes.push(fork);
-	        self.nodes.push(join);
-            
+
+            self.nodes.push(fork);
+            self.nodes.push(join);
+
             var forkParent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
-            
+
             var afterParentId = ko.mapping.toJS(forkParent.get_link('to')).to;
             var afterParent = self.getNodeById(afterParentId);
             fork.children.push({'to': afterParentId, 'condition': ''});
             fork.children.push({'to': node.id(), 'condition': ''});
-            
+
             forkParent.get_link('to')['to'] = fork.id();
-            
+
             var belowJoin = vm.getWidgetSuccessor(join.id());
             join.set_link('to', belowJoin.id());
-          
+
             if (afterParent.type() == 'fork-widget') {
               self.getNodeById(afterParent.properties.join_id()).set_link('to', join.id());
             } else {
               afterParent.set_link('to', join.id());
             }
-            
-	        node.set_link('to', join.id());
-	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');   
+
+            node.set_link('to', join.id());
+            node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else {
             // Just add to existing fork
-        	var join = vm.getWidgetSuccessor(node.id()); 
+            var join = vm.getWidgetSuccessor(node.id());
             node.set_link('to', join.id());
-    	    node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+            node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
 
-    	    parent.children.push({'to': node.id(), 'condition': ''});          	  
+            parent.children.push({'to': node.id(), 'condition': ''});
           }
         } else {
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
           if (widget.widgetType() == 'kill-widget') {
-        	parent.set_link('to', node.id());
+            parent.set_link('to', node.id());
           } else if (parentWidget.widgetType() == 'fork-widget') {
             var child = vm.getWidgetSuccessor(node.id());
-            parent.remove_link('to', child.id());            
+            parent.remove_link('to', child.id());
             parent.children.push({'to': node.id(), 'condition': ''});
 
-  	        node.set_link('to', child.id());
-  	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+            node.set_link('to', child.id());
+            node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else {
             // Parent is regular node        	
-  	        node.set_link('to', parent.get_link('to')['to']);
-  	        node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
-  	
-  	        parent.set_link('to', node.id());
+            node.set_link('to', parent.get_link('to')['to']);
+            node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
+
+            parent.set_link('to', node.id());
           }
         }
 
         vm.currentlyCreatingFork = false;
-        
+
       } else {
         $(document).trigger("error", data.message);
-       }
-     }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-     });
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
-  
-  self.removeNode = function(node_id) {
-	var node = self.getNodeById(node_id);
-	var parents = self.getParents(node_id);
-	var parent = null;
+
+  self.removeNode = function (node_id) {
+    var node = self.getNodeById(node_id);
+    var parents = self.getParents(node_id);
+    var parent = null;
 
     var childLink = node.get_link('to');
     var childId = ko.mapping.toJS(childLink)['to'];
 
-    $.each(parents, function(index, _parent) {
+    $.each(parents, function (index, _parent) {
       _parent.remove_link('to', node_id);
       _parent.children.unshift({'to': childId});
       parent = _parent;
     });
-    
+
     self.nodes.remove(node);
-    
+
     // If need to remove fork
     if (parent.type() == 'fork-widget') {
       var fork = parent;
       var join = self.getNodeById(childId);
 
       if (join.type() == 'join-widget') {
-    	if (fork.children().length == 2) {    	  
+        if (fork.children().length == 2) {
           // Link top to above and delete fork
-    	  fork.remove_link('to', childId);
-    	  var forkParent = self.getParents(fork.id())[0];
-    	  forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
+          fork.remove_link('to', childId);
+          var forkParent = self.getParents(fork.id())[0];
+          forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
 
-    	  self.nodes.remove(fork);
+          self.nodes.remove(fork);
 
-    	  // Link bottom to child of join
-    	  var beboreJoin = self.getParents(childId)[0];
-    	  var joinChildId = ko.mapping.toJS(join.get_link('to'))['to'];
-    	  beboreJoin.set_link('to', joinChildId);
+          // Link bottom to child of join
+          var beboreJoin = self.getParents(childId)[0];
+          var joinChildId = ko.mapping.toJS(join.get_link('to'))['to'];
+          beboreJoin.set_link('to', joinChildId);
 
-    	  self.nodes.remove(join); 
-    	} else {
-    	  parent.remove_link('to', childId);
-    	}
+          self.nodes.remove(join);
+        } else {
+          parent.remove_link('to', childId);
+        }
       }
     } else if (parent.type() == 'decision-widget') {
       parent.remove_link('to', childId);
     }
   };
 
-  self.moveNode = function(widget) {
+  self.moveNode = function (widget) {
     var node = self.getNodeById(widget.id());
     self.movedNode = node;
-      
+
     self.removeNode(node.id());
     self.addNode(widget);
-      
+
     self.movedNode = null;
   };
-  
-  self.getParents = function(node_id) { // Join nodes can have multiple parents
+
+  self.getParents = function (node_id) { // Join nodes can have multiple parents
     var _nodes = [];
     $.each(self.nodes(), function (index, node) {
-      $.each(node.children(), function(index, link) {
-    	var _link = ko.mapping.toJS(link);
+      $.each(node.children(), function (index, link) {
+        var _link = ko.mapping.toJS(link);
         if ('to' in _link && _link.to == node_id) {
           _nodes.push(node);
-        }  
+        }
       })
     });
     return _nodes;
@@ -385,11 +384,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.isNested = ko.observable(true);
 
   self.isEditing = ko.observable(true);
-  self.isEditing.subscribe(function(newVal){
+  self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });
   self.toggleEditing = function () {
-    self.isEditing(! self.isEditing());
+    self.isEditing(!self.isEditing());
   };
 
   self.columns = ko.observable([]);
@@ -398,8 +397,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.credentials = ko.mapping.fromJSON(credentials_json);
 
   self.inited = ko.observable(self.columns().length > 0);
-  self.init = function(callback) {
-	self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
+  self.init = function (callback) {
+    self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
   }
@@ -519,7 +518,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         vm: self
       });
 
-      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move"){
+      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move") {
         self.removeWidgetById(self.currentlyDraggedWidget().id());
         _w = self.currentlyDraggedWidget();
       }
@@ -570,7 +569,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         vm: self
       });
 
-      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move"){
+      if (self.currentlyDraggedWidget().id() != "" && self.currentlyDraggedOp() == "move") {
         self.removeWidgetById(self.currentlyDraggedWidget().id());
         _w = self.currentlyDraggedWidget();
       }
@@ -623,24 +622,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
-  self.getWidgetById = function (widget_id) {
-    var _widget = null;
-    $.each(self.columns(), function (i, col) {
-      $.each(col.rows(), function (j, row) {
-        $.each(row.widgets(), function (z, widget) {
-          if (widget.id() == widget_id){
-            _widget = widget;
-            return false;
-          }
-        });
-      });
-    });
-    return _widget;
-  }
+//  self.getWidgetById = function (widget_id) {
+//    var _widget = null;
+//    $.each(self.columns(), function (i, col) {
+//      $.each(col.rows(), function (j, row) {
+//        $.each(row.widgets(), function (z, widget) {
+//          if (widget.id() == widget_id) {
+//            _widget = widget;
+//            return false;
+//          }
+//        });
+//      });
+//    });
+//    return _widget;
+//  }
 
   self.removeWidget = function (widget_json) {
-	self.workflow.removeNode(widget_json.id());
-    self.removeWidgetById(widget_json.id());    
+    self.workflow.removeNode(widget_json.id());
+    self.removeWidgetById(widget_json.id());
   }
 
   self.removeWidgetById = function (widget_id) {
@@ -652,14 +651,14 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.deeplyRemoveWidgetById = function (widget_id, col, parent) {
     if (col) {
       $.each(col.rows(), function (j, row) {
-        if (row && row.widgets()){
+        if (row && row.widgets()) {
           $.each(row.widgets(), function (z, widget) {
             if (widget.id() == widget_id) {
               row.widgets.remove(widget);
               col.rows.remove(row);
             }
           });
-          }
+        }
         if (row && row.columns()) {
           $.each(row.columns(), function (i, icol) {
             self.deeplyRemoveWidgetById(widget_id, icol, row);
@@ -685,13 +684,13 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             _prevRowIdx = i;
           }
 
-          if (_prevRowIdx > -1 && _parentRows()[_prevRowIdx].widgets().length > 0 && _parentRows()[_prevRowIdx].widgets()[0].widgetType() == "fork-widget"){
+          if (_prevRowIdx > -1 && _parentRows()[_prevRowIdx].widgets().length > 0 && _parentRows()[_prevRowIdx].widgets()[0].widgetType() == "fork-widget") {
             _parentRows.remove(_parentRows()[_prevRowIdx]);
-            _parentRows.remove(_parentRows()[_prevRowIdx+1]);
+            _parentRows.remove(_parentRows()[_prevRowIdx + 1]);
           }
 
-          for (var i=0;i<_rows.length;i++){
-            if (i==0){
+          for (var i = 0; i < _rows.length; i++) {
+            if (i == 0) {
               parent.widgets(_rows[i].widgets());
             }
             else {
@@ -755,12 +754,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     var _prevRow = null;
     for (var i = 0; i < _parentColumn.rows().length; i++) {
       var _currentRow = _parentColumn.rows()[i];
-      if (_currentRow.id() == row.id()){
+      if (_currentRow.id() == row.id()) {
         break;
       }
       _prevRow = _currentRow;
     }
-    if (_prevRow != null){
+    if (_prevRow != null) {
       return _prevRow.widgets().length > 0 && (_prevRow.widgets()[0].widgetType() == "fork-widget" || _prevRow.widgets()[0].widgetType() == "decision-widget");
     }
     return false;
@@ -812,22 +811,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.getRowParentColumn = function (row_id) {
-    var _column = null;
-    for (var i = 0; i < self.columns().length; i++) {
-      _column = self.traverseColumnForColumn(row_id, self.columns()[i]);
-    }
-    return _column;
+    return self.traverseColumnForColumn(row_id, self.columns()[0], 0);
   }
 
   self.getColumnParentRow = function (col_id) {
-    var _row = null;
-    for (var i = 0; i < self.columns().length; i++) {
-      _row = self.traverseColumnForRow(col_id, self.columns()[i]);
-      if (_row != null) {
-        break;
-      }
-    }
-    return _row;
+    return self.traverseColumnForRow(col_id, self.columns()[0], 0);
   }
 
   self.getRowParentRow = function (row_id) {
@@ -843,17 +831,18 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       for (var j = 0; j < col.rows().length; j++) {
         var row = col.rows()[j];
 
-        if (row.id() == row_id) {
-          _column = col;
-          break;
-        }
-
         for (var z = 0; z < row.columns().length; z++) {
           _column = self.traverseColumnForColumn(row_id, row.columns()[z]);
           if (_column != null) {
-            break;
+            return _column;
           }
         }
+
+        if (row.id() == row_id) {
+          _column = col;
+          return _column;
+        }
+
       }
     }
     return _column;
@@ -873,7 +862,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             _row = self.traverseColumnForRow(col_id, _col);
           }
           if (_row != null) {
-            break;
+            return _row;
           }
         }
       }
@@ -908,17 +897,17 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.convertToDecision = function (widget, node) {
-    if (widget.widgetType() == "fork-widget"){
+    if (widget.widgetType() == "fork-widget") {
       var _row = self.getWidgetParentRow(widget.id());
       var _next = self.getNextRow(_row);
-      while (_next.widgets().length == 0){
+      while (_next.widgets().length == 0) {
         _next = self.getNextRow(_next);
       }
 
       // Remove the join
       self.workflow.removeNode(_next.widgets()[0].id());
       self.removeWidgetById(_next.widgets()[0].id());
-      
+
       node.children.push({'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a', 'condition': 'default'});
 
       widget.widgetType("decision-widget");
@@ -932,8 +921,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.save = function () {
     $.post("/oozie/editor/workflow/save/", {
-        "layout": ko.mapping.toJSON(self.columns),
-        "workflow": ko.mapping.toJSON(self.workflow)
+      "layout": ko.mapping.toJSON(self.columns),
+      "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
         self.workflow.id(data.id);
@@ -944,24 +933,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
       else {
         $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
 
   self.gen_xml = function () {
     $.post("/oozie/editor/workflow/gen_xml/", {
-        "layout": ko.mapping.toJSON(self.columns),
-        "workflow": ko.mapping.toJSON(self.workflow)
+      "layout": ko.mapping.toJSON(self.columns),
+      "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
         console.log(data.xml);
       }
       else {
         $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -974,24 +963,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
       else {
         $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
-  
+
   self.showSubmitPopup = function () {
     // If self.workflow.id() == null, need to save wf for now
 
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
-      }, function (data) {
-        $(document).trigger("showSubmitPopup", data);
+    }, function (data) {
+      $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+      $(document).trigger("error", xhr.responseText);
     });
   };
 
-  function bareWidgetBuilder(name, type){
+  function bareWidgetBuilder(name, type) {
     return new Widget({
       size: 12,
       id: "",
