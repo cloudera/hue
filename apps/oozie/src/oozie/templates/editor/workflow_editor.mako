@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
+${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/javascript">
   if (window.location.hash != "") {
@@ -217,7 +217,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
   </div>
 </div>
 
-<div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing(), 'readonly': ! isEditing()}">
+<div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
@@ -226,18 +226,22 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 </div>
 
 <script type="text/html" id="column-template">
-  <div data-bind="css: klass() + (!$root.isEditing()?' card-column-disabled':'')" style="min-height: 50px !important;">
-    <div data-bind="template: { name: 'row-template', data: oozieStartRow }"></div>
+  <div data-bind="css: klass()" style="min-height: 50px !important;">
+    <div data-bind="template: { name: 'row-template', data: oozieStartRow }" style="margin-top: 50px"></div>
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
-      <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
-      <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(x, y){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+      <div class="row-fluid">
+        <div data-bind="visible: enableOozieDropOnBefore, css: {'span4 offset4': true, 'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(x, y){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
+      </div>
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
-      <div data-bind="visible: ! enableOozieDropOnAfter(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
-      <div data-bind="visible: enableOozieDropOnAfter, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
+      <div class="row-fluid">
+        <div data-bind="visible: enableOozieDropOnAfter, css: {'span4 offset4': true, 'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: ! enableOozieDropOnAfter(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
+      </div>
     </div>
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
@@ -246,7 +250,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 
 <script type="text/html" id="internal-column-template">
-  <div data-bind="css: klass() + (!$root.isEditing()?' card-column-disabled':'')" style="min-height: 50px !important;">
+  <div data-bind="css: klass()" style="min-height: 50px !important;">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
@@ -264,7 +268,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <script type="text/html" id="row-template">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span12">
+      <div class="span4 offset4">
         <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: $root.isEditing() && widgets().length < 1, isEnabled: $root.isEditing() && widgets().length < 1,
           options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -280,18 +284,18 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 <script type="text/html" id="internal-row-template">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: $index() > 0 && $root.isEditing() && ! $root.isRowBeforeJoin($data) && ! $root.isRowAfterFork($data)" style="margin-bottom: 10px">
-      <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
-      <div data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
+      <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}"></div>
+      <div data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
         <div style="text-align: left" data-bind="visible: $root.isEditing() && enableOozieDropOnBefore(), css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
     </div>
     <div class="row-fluid">
-      <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}">
+      <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && ['join-widget', 'decision-widget'].indexOf($data.widgets()[0].widgetType()) > -1), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
-      <div  data-bind="css: {'span10': true, 'readonly': ! $root.isEditing()}">
+      <div  data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
           options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -417,7 +421,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="fork-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     </div>
 
@@ -435,7 +439,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="join-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     </div>
 
@@ -451,7 +455,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="decision-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     </div>
     
@@ -474,7 +478,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="kill-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     </div>
 
@@ -488,15 +492,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="start-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <!-- ko if: children().length == 1 -->
-      Start --> <input type="text" data-bind="value: children()[0]['to']" />
-      <!-- /ko -->
-    </div>
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px;">
+    <div class="big-icon"><i class="fa fa-caret-square-o-down"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -504,13 +501,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user) | n,unicode }
 
 <script type="text/html" id="end-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    </div>
-
-    <div>
-      End
-    </div>
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
+    <div class="big-icon"><i class="fa fa-check-square"></i></div>
   </div>
   <!-- /ko -->
 </script>
