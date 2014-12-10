@@ -128,7 +128,8 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ClusterMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
-    'django.middleware.csrf.CsrfViewMiddleware'
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
 ]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
