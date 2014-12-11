@@ -1,17 +1,17 @@
 package com.cloudera.hue.sparker.repl
 
 import java.io.{BufferedReader, StringWriter}
+import java.util.concurrent.BlockingQueue
 
 import org.apache.spark.repl.SparkILoop
 import org.json4s.DefaultFormats
-import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
 import scala.tools.nsc.SparkHelper
 import scala.tools.nsc.interpreter.{Formatting, _}
 import scala.tools.nsc.util.ClassPath
 
-class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
+class SparkerILoop(queue: BlockingQueue[Map[String, String]], in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
 
   class SparkerILoopInterpreter extends SparkILoopInterpreter {
     outer =>
@@ -20,14 +20,6 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       def prompt = SparkerILoop.this.prompt
     }
     override protected def parentClassLoader = SparkHelper.explicitParentLoader(settings).getOrElse(classOf[SparkILoop].getClassLoader)
-
-    /*
-    override def interpret(line: String, synthetic: Boolean): IR.Result = {
-      val result = super.interpret(line, synthetic)
-      print("interpret: " + result + "\n")
-      result
-    }
-    */
   }
 
   /** Create a new interpreter. */
@@ -67,8 +59,6 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
   }
 
   override def loop(): Unit = {
-    //println(compact(render(Map("state" -> "ready"))))
-
     def readOneLine() = {
       out.flush()
       in readLine prompt
@@ -87,7 +77,8 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       val request = parseOpt(line) match {
         case Some(request) => request;
         case None => {
-          println(compact(render(Map("type" -> "error", "msg" -> "invalid json"))))
+          queue.put(Map("type" -> "error", "msg" -> "invalid json"))
+          //println(compact(render(Map("type" -> "error", "msg" -> "invalid json"))))
           return true
         }
       }
@@ -110,20 +101,23 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
                   var output: String = outString.getBuffer.toString
                   output = output.substring("scala> ".length + 1, output.length - 1)
                   outString.getBuffer.setLength(0)
-                  println(compact(render(Map("type" -> "stdout", "stdout" -> output))))
+                  queue.put(Map("type" -> "stdout", "stdout" -> output))
+                  //println(compact(render(Map("type" -> "stdout", "stdout" -> output))))
 
                   true
                 }
               }
             }
             case _ => {
-              println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
+              queue.put(Map("type" -> "error", "msg" -> "missing statement"))
+              //println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
               true
             }
           }
         }
         case _ => {
-          println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
+          queue.put(Map("type" -> "error", "msg" -> "unknown type"))
+          //println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
           true
         }
       }
@@ -136,10 +130,10 @@ class SparkerILoop(in0: BufferedReader, outString: StringWriter) extends SparkIL
       if (shouldContinue)
         innerLoop()
       else {
-        println(compact(render(Map("state" -> "quit"))))
+        queue.put(Map("state" -> "quit"))
+        //println(compact(render(Map("state" -> "quit"))))
       }
     }
     innerLoop()
   }
-
 }

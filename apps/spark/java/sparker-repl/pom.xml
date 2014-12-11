@@ -29,24 +29,7 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-repl_2.10</artifactId>
             <version>${spark.version}</version>
-
-            <!--
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils</artifactId>
-                </exclusion>
-            </exclusions>
-            -->
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>org.json4s</groupId>
@@ -59,72 +42,12 @@
             <artifactId>scalatra_2.10</artifactId>
             <version>${scalatra.version}</version>
             <scope>compile</scope>
-            <!--
-            <exclusions>
-                <exclusion>
-                    <groupId>com.typesafe.akka</groupId>
-                    <artifactId>akka-actor_2.10</artifactId>
-                </exclusion>
-            </exclusions>
-            -->
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.scalatra</groupId>
-            <artifactId>scalatra_2.10</artifactId>
-            <version>${scalatra.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        -->
 
     </dependencies>
 
     <build>
         <plugins>
-
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <createDependencyReducedPom>true</createDependencyReducedPom>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.cloudera.hue.sparker.repl.Main</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.0.2.v20130417</version>
-            </plugin>
 
             <plugin>
                 <groupId>org.scala-tools</groupId>
