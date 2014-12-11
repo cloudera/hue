@@ -120,8 +120,8 @@ class SampleTable(object):
       raise ValueError(msg)
 
   def install(self, django_user):
-    self.create(django_user)
-    self.load(django_user)
+    if self.create(django_user):
+      self.load(django_user)
 
   def create(self, django_user):
     """
@@ -135,6 +135,7 @@ class SampleTable(object):
       db.get_table('default', self.name)
       msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
+      return False
     except Exception:
       query = hql_query(self.hql)
       try:
@@ -143,6 +144,7 @@ class SampleTable(object):
           msg = _('Error creating table %(table)s: Operation timeout.') % {'table': self.name}
           LOG.error(msg)
           raise InstallException(msg)
+        return True
       except Exception, ex:
         msg = _('Error creating table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
         LOG.error(msg)
