@@ -19,6 +19,35 @@
 
 // End dashboard lib
 
+
+
+var Dataset = function (vm, dataset) {
+  var self = this;
+
+}
+
+
+var InputDataset = function (vm, input_dataset) {
+  var self = this;
+  
+  
+}
+
+
+var OutputDataset = function (vm, output_dataset) {
+  var self = this;
+  
+  
+}
+
+
+var Workflow = function (vm, workflow_json) {
+  var self = this;
+  
+  
+}
+
+
 var Coordinator = function (vm, coordinator) {
   var self = this;
 
@@ -27,13 +56,48 @@ var Coordinator = function (vm, coordinator) {
   self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "");
 
   self.properties = ko.mapping.fromJS(typeof coordinator.properties != "undefined" && coordinator.properties != null ? coordinator.properties : {});
-  self.datasets = ko.observableArray([]);
-  self.inputDatasets = ko.observableArray([]);
-  self.outputDatasets = ko.observableArray([]);
+
+  self.variables = ko.observableArray([]);
+  self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
+
+  
+  self.properties.workflow.subscribe(function(newVal) {
+    if (newVal) {
+	  $.get("/desktop/api2/doc/get", {
+		  "uuid":  self.properties.workflow().uuid()
+	   }, function (data) {
+	     // set wf
+	  }).fail(function (xhr, textStatus, errorThrown) {
+	     $(document).trigger("error", xhr.responseText);
+	  });
+	}
+  });
+  
+  self.addVariable = function() {
+    var _var = {
+       'workflow_variable': '',
+       'dataset_type': 'parameter',
+       'dataset_variable': '',
+       'show_advanced': false,
+       
+       'done_flag': '',
+       'timzone': 'America/Los_Angeles',
+       'range': 'single',
+       'frequency_number': 1,
+       'frequency_unit': 'DAYS',
+       'start': null,
+       'name': '',
+    };
+	self.variables.push(ko.mapping.fromJS(_var));	  
+  };
+  
+  self.init = function() {
+    // load
+  };
 }
 
 
-var CoordinatorEditorViewModel = function (coordinator_json, credentials_json) {
+var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, workflows_json) {
   var self = this;
 
   self.isEditing = ko.observable(true);
@@ -45,8 +109,9 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json) {
   };
 
   self.coordinator = new Coordinator(self, coordinator_json);
-  self.credentials = ko.mapping.fromJSON(credentials_json);
-
+  self.credentials = ko.mapping.fromJS(credentials_json);
+  self.workflows = ko.mapping.fromJS(workflows_json);
+  
   self.save = function () {
     $.post("/oozie/editor/coodinator/save/", {
         "coordinator": ko.mapping.toJSON(self.coordinator)

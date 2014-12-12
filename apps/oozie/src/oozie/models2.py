@@ -21,6 +21,7 @@ import re
 import time
 import uuid
 
+from datetime import datetime, timedelta
 from string import Template
 
 from django.utils.encoding import force_unicode
@@ -1203,6 +1204,16 @@ class Coordinator():
               "uuid": None,
               "name": "My Coordinator",
               "properties": {
+                  "frequency_number": 1,
+                  "frequency_unit": "days",
+                  "cron_frequency": "0 0 * * *",
+                  "timezone": "America/Los_Angeles",
+                  "start": datetime.today().strftime('%s'),
+                  "end": (datetime.today() + timedelta(days=3)).strftime('%s'),
+                  "workflow": None,
+                  "concurrency": None,
+                  "execution": None,
+                  "throttle": None,
                   "job_xml": "",
                   "sla_enabled": False,
                   "sla_workflow_enabled": False,
@@ -1222,39 +1233,3 @@ class Coordinator():
     _data = json.loads(self.data)
 
     return _data
-
-
-#frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
-#                                              help_text=_t('The number of units of the rate at which '
-#                                                           'data is periodically created.')) # unused
-#  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
-#                                    help_text=_t('The unit of the rate at which data is periodically created.')) # unused
-#  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-#                              help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
-#  start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
-#                               help_text=_t('When to start the first workflow.'))
-#  end = models.DateTimeField(default=datetime.today() + timedelta(days=3), verbose_name=_t('End'),
-#                             help_text=_t('When to start the last workflow.'))
-#  workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
-#                               help_text=_t('The workflow to schedule repeatedly.'))
-#  timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
-#                                     help_text=_t('Number of minutes the coordinator action will be in '
-#                                                  'WAITING or READY status before giving up on its execution.'))
-#  concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Concurrency'),
-#                                 help_text=_t('The number of coordinator actions that are allowed to run concurrently (RUNNING status) '
-#                                              'before the coordinator engine starts throttling them.'))
-#  execution = models.CharField(max_length=10, null=True, blank=True, verbose_name=_t('Execution'),
-#                               choices=(('FIFO', _t('FIFO (oldest first) default')),
-#                                        ('LIFO', _t('LIFO (newest first)')),
-#                                        ('LAST_ONLY', _t('LAST_ONLY (discards all older materializations)'))),
-#                                 help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
-#                                              'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
-#                                              '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
-#                                              'input data, concurrency control or because manual re-runs of coordinator jobs.'))
-#  throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
-#                                 help_text=_t('The materialization or creation throttle value for its coordinator actions. '
-#                                              'Number of maximum coordinator actions that are allowed to be in WAITING state concurrently.'))
-#  job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
-#                                    help_text=_t('Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
-
-

@@ -263,6 +263,7 @@ def edit_coordinator(request):
   return render('editor/coordinator_editor.mako', request, {
       'coordinator_json': json.dumps(coordinator_data['coordinator']),
       'credentials_json': json.dumps(credentials.credentials.keys()),
+      'workflows_json': json.dumps(list(Document2.objects.filter(type='oozie-workflow2', owner=request.user).values('uuid', 'name')))
   })
 
 
