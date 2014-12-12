@@ -578,7 +578,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <h6><a class="pointer" data-bind="click: function(){ properties.files.push({'value': ''});$(document).trigger('drawArrows') }">${ _('Files') } <i class="fa fa-plus"></i></a></h6>
   <ul class="unstyled" data-bind="foreach: properties.files">
     <li style="margin-bottom: 3px">
-      <input type="text" class="span11" data-bind="value: value"/>
+      <input type="text" class="span9" data-bind="filechooser: value"/>
       <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
@@ -1521,6 +1521,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <div id="submit-wf-modal" class="modal hide"></div>
+
+<div id="chooseFile" class="modal hide fade">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+      <div id="filechooser">
+      </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
+
 
 <div id="exposeOverlay"></div>
 
