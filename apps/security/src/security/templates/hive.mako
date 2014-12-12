@@ -532,7 +532,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
-<script src="/security/static/js/common.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
