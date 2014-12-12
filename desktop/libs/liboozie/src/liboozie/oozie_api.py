@@ -160,6 +160,7 @@ class OozieApi(object):
   def get_coordinator(self, jobid):
     params = self._get_params()
     params.update({'len': -1})
+    params.update({'order': 'desc'})
     resp = self._root.get('job/%s' % (jobid,), params)
     return Coordinator(self, resp)
 
