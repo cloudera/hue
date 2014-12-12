@@ -270,10 +270,12 @@
       <label class="checkbox" style="text-align: left"><span class="control-label"></span> <input type="checkbox" data-bind="checked: value"/></label>
       <!-- /ko -->
       <!-- ko if:  key() != 'enabled' -->
+      <span data-bind="visible: ko.utils.arrayFilter($parent.sla(), function(item) { return item.key() == 'enabled' && item.value()==true }).length == 1">
       <label class="control-label" style="text-align: left"></label>
       <div class="controls">
         <input type="text" data-bind="value: value" class="span7">
       </div>
+      </span>
       <!-- /ko -->
     </div>
   </div>
