@@ -666,10 +666,10 @@ class PartitionKeyCompatible:
 
   def __init__(self, partition):
     # Parses: ['name:datehour, type:int, comment:null']
-    name, type, comment = partition.split(', ')
-    self.name = name.split(':')[1]
-    self.type = type.split(':')[1]
-    self.comment = comment.split(':')[1]
+    name, type, comment = partition.split(', ', 2)
+    self.name = name.split(':', 1)[1]
+    self.type = type.split(':', 1)[1]
+    self.comment = comment.split(':', 1)[1]
 
 
 class PartitionValueCompatible:
