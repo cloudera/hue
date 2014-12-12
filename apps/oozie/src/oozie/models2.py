@@ -36,6 +36,7 @@ from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.models import Workflow as OldWorflows
+from oozie.utils import utc_datetime_format
 
 
 LOG = logging.getLogger(__name__)
@@ -1190,46 +1191,193 @@ class Coordinator():
   XML_FILE_NAME = 'coordinator.xml'
   PROPERTY_APP_PATH = 'oozie.coord.application.path'
 
-  def __init__(self, data=None, document=None):
+  def __init__(self, data=None, json_data=None, document=None):
     self.document = document
 
     if document is not None:
-      self.data = document.data
+      self._data = json.loads(document.data)
+    elif json_data is not None:
+      self._data = json.loads(json_data)
     elif data is not None:
-      self.data = data
+      self._data = data
     else:
-      self.data = json.dumps({
-          'coordinator': {
-              "id": None, 
-              "uuid": None,
-              "name": "My Coordinator",
-              "properties": {
-                  "frequency_number": 1,
-                  "frequency_unit": "days",
-                  "cron_frequency": "0 0 * * *",
-                  "timezone": "America/Los_Angeles",
-                  "start": datetime.today().strftime('%s'),
-                  "end": (datetime.today() + timedelta(days=3)).strftime('%s'),
-                  "workflow": None,
-                  "concurrency": None,
-                  "execution": None,
-                  "throttle": None,
-                  "job_xml": "",
-                  "sla_enabled": False,
-                  "sla_workflow_enabled": False,
-                  "credentials": [],
-                  "properties": [],
-                  "sla": Workflow.SLA_DEFAULT
-              }
+      self._data = {
+          "id": None, 
+          "uuid": None,
+          "name": "My Coordinator",
+          "variables": [],
+          "properties": {
+              "schema_version": "uri:oozie:coordinator:0.2",
+              "frequency_number": 1,
+              "frequency_unit": "days",
+              "cron_frequency": "0 0 * * *",
+              "cron_advanced": False,
+              "timezone": "America/Los_Angeles",
+              "start": datetime.today(),
+              "end": datetime.today() + timedelta(days=3),
+              "workflow": None,
+              "timeout": None,
+              "concurrency": None,
+              "execution": None,
+              "throttle": None,
+              "job_xml": "",
+              "sla_enabled": False,
+              "sla_workflow_enabled": False,
+              "credentials": [],
+              "properties": [],
+              "sla": Workflow.SLA_DEFAULT
           }
-      })
+      }
 
-  def get_json(self):
-    _data = self.get_data()
+  @property
+  def json(self):
+    _data = self.data.copy()
+
+    _data['properties']['start'] = _data['properties']['start'].strftime('%Y-%m-%dT%H:%M:%S')
+    _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return json.dumps(_data)
  
-  def get_data(self):
-    _data = json.loads(self.data)
+  @property
+  def data(self):
+    self._data['properties']['start'] = datetime.today()
+    self._data['properties']['end'] = datetime.today() + timedelta(days=3)    
+    
+    return self._data
+  
+  @property
+  def datasets(self):
+    return self.inputDatasets + self.outputDatasets
+  
+  @property
+  def inputDatasets(self):    
+    return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'input_path']
+    
+  @property
+  def outputDatasets(self):
+    return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'output_path']
 
-    return _data
+  @property
+  def start_utc(self):
+    return utc_datetime_format(self.data['properties']['start'])
+
+  @property
+  def end_utc(self):
+    return utc_datetime_format(self.data['properties']['end'])
+
+  @property
+  def frequency(self):
+    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['properties']['frequency_unit'], 'number': self.data['properties']['frequency_number']}
+
+  @property
+  def cron_frequency(self):
+    data_dict = self.data['properties']
+    
+    if 'cron_frequency' in data_dict:
+      return data_dict['cron_frequency']
+    else:
+      # Backward compatibility
+      freq = '0 0 * * *'
+      if data_dict['frequency_number'] == 1:
+        if data_dict['frequency_number'] == 'MINUTES':
+          freq = '* * * * *'
+        elif data_dict['frequency_number'] == 'HOURS':
+          freq = '0 * * * *'
+        elif data_dict['frequency_number'] == 'DAYS':
+          freq = '0 0 * * *'
+        elif data_dict['frequency_number'] == 'MONTH':
+          freq = '0 0 * * *'
+      return {'frequency': freq, 'isAdvancedCron': False}
+
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+
+    tmpl = "editor/gen2/coordinator.xml.mako"
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace') 
+  
+#  def get_properties(self):
+#    props = self.properties.copy()
+#    index = [prop['name'] for prop in props]
+#
+#    for prop in self.workflow.find_all_parameters():
+#      if not prop['name'] in index:
+#        props.append(prop)
+#        index.append(prop['name'])
+#
+#    # Remove DataInputs and DataOutputs
+#    removable_names = [dataset.workflow_variable for dataset in self.datasets]
+#    props = filter(lambda prop: prop['name'] not in removable_names, props)
+#
+#    return props
+  
+  
+  
+class Dataset():
+
+  def __init__(self, data=None, json_data=None):
+    if json_data is not None:
+      self.data = json.loads(json_data)
+    elif data is not None:
+      self.data = data
+    else:
+      self.data = {
+          'name': 'dataset',
+          'frequency_number': 1,
+          'frequency_unit': 'days',
+          'start': datetime.today(),
+          'uri': '',
+          'done_flag': '',
+          'instance_choice': 'default',
+          'advanced_start_instance': '0',
+          'advanced_end_instance': '0',
+          
+          'workflow_variable': ''
+      }  
+      
+  @property
+  def data(self):
+    return self.data      
+      
+  @property
+  def frequency(self):
+    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['frequency_unit'], 'number': self.data['frequency_number']}
+      
+  @property
+  def start_utc(self):
+    return utc_datetime_format(self.data['start'])
+
+  @property
+  def start_instance(self):
+    if not self.is_advanced_start_instance:
+      return int(self.data['advanced_start_instance'])
+    else:
+      return 0
+
+  @property
+  def is_advanced_start_instance(self):
+    return not self.is_int(self.data['advanced_start_instance'])
+
+  def is_int(self, text):
+    try:
+      int(text)
+      return True
+    except ValueError:
+      return False
+
+  @property
+  def end_instance(self):
+    if not self.is_advanced_end_instance:
+      return int(self.data['advanced_end_instance'])
+    else:
+      return 0
+
+  @property
+  def is_advanced_end_instance(self):
+    return not self.is_int(self.data['advanced_end_instance'])
+
+
+
+      
+      
+      

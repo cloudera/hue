@@ -24,9 +24,9 @@
 
 
 <%def name="render_dataset_instance(dataset)">
-  % if dataset.instance_choice == 'default':
+  % if dataset.data['instance_choice'] == 'default':
     <instance>${ '${'}coord:current(0)}</instance>
-  % elif dataset.instance_choice == 'single':
+  % elif dataset.data['instance_choice'] == 'single':
     % if not dataset.is_advanced_start_instance:
       <instance>${ '${'}coord:current(${ dataset.start_instance })}</instance>
     % else:
@@ -51,59 +51,61 @@
 </%def>
 
 
-<coordinator-app name="${ coord.name }"
+<coordinator-app name="${ coord.data['name'] | x }"
   % if ENABLE_CRON_SCHEDULING.get():
-  frequency="${ coord.cron_frequency['frequency'] }"
+  frequency="${ coord.cron_frequency }"
   % else:
   frequency="${ coord.frequency }"
   % endif
-  start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
-  xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.schema_version | n,unicode }"
-  ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>
-  % if coord.timeout is not None or coord.concurrency is not None or coord.execution or coord.throttle is not None:
+  start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.data['properties']['timezone'] }"
+  xmlns="${ 'uri:oozie:coordinator:0.4' if coord.data['properties']['sla_enabled'] else coord.data['properties']['schema_version'] | n,unicode }"
+  ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.data['properties']['sla_enabled'] else '' | n,unicode }>
+  % if coord.data['properties']['timeout'] or coord.data['properties']['concurrency'] or coord.data['properties']['execution'] or coord.data['properties']['throttle']:
   <controls>
-    % if coord.timeout is not None:
-    <timeout>${ coord.timeout }</timeout>
+    % if coord.data['properties']['timeout']:
+    <timeout>${ coord.data['properties']['timeout'] }</timeout>
     % endif
-    % if coord.concurrency is not None:
-    <concurrency>${ coord.concurrency }</concurrency>
+    % if coord.data['properties']['concurrency']:
+    <concurrency>${ coord.data['properties']['concurrency'] }</concurrency>
     % endif
-    % if coord.execution:
-    <execution>${ coord.execution }</execution>
+    % if coord.data['properties']['execution']:
+    <execution>${ coord.data['properties']['execution'] }</execution>
     % endif
-    % if coord.throttle is not None:
-    <throttle>${ coord.throttle }</throttle>
+    % if coord.data['properties']['throttle']:
+    <throttle>${ coord.data['properties']['throttle'] }</throttle>
     % endif
   </controls>
   % endif
 
-  % if coord.dataset_set.exists():
+  % if coord.datasets:
   <datasets>
-    % for dataset in coord.dataset_set.all():
-    <dataset name="${ dataset.name }" frequency="${ dataset.frequency }"
-             initial-instance="${ dataset.start_utc }" timezone="${ dataset.timezone }">
-      <uri-template>${ smart_path(dataset.uri, mapping) }</uri-template>
-      <done-flag>${ dataset.done_flag }</done-flag>
+    % for dataset in coord.datasets:
+    <dataset name="${ dataset['name'] }" frequency="${ dataset.data['frequency'] }"
+             initial-instance="${ dataset.start_utc }" timezone="${ dataset.data['timezone'] }">
+      <uri-template>${ smart_path(dataset.data['uri'], mapping) }</uri-template>
+      % if dataset.data['done_flag'] is not None:
+      <done-flag>${ dataset.data['done_flag'] }</done-flag>
+      % endif
     </dataset>
     % endfor
   </datasets>
   % endif
 
-  % if coord.datainput_set.exists():
+  % if coord.inputDatasets:
   <input-events>
-    % for input in coord.datainput_set.all():
-    <data-in name="${ input.name }" dataset="${ input.dataset.name }">
-      ${ render_dataset_instance(input.dataset) }
+    % for dataset in coord.inputDatasets:
+    <data-in name="${ dataset.data['workflow_variable'] }" dataset="${ dataset.data['name'] }">
+      ${ render_dataset_instance(dataset) }
     </data-in>
     % endfor
   </input-events>
   % endif
 
-  % if coord.dataoutput_set.exists():
+  % if coord.outputDatasets:
   <output-events>
-    % for output in coord.dataoutput_set.all():
-    <data-out name="${ output.name }" dataset="${ output.dataset.name }">
-      ${ render_dataset_instance(output.dataset) }
+    % for dataset in coord.outputDatasets:
+    <data-out name="${ dataset.data['workflow_variable'] }" dataset="${ dataset.data['name'] }">
+      ${ render_dataset_instance(dataset) }
     </data-out>
     % endfor
   </output-events>
@@ -112,21 +114,21 @@
   <action>
     <workflow>
       <app-path>${'${'}wf_application_path}</app-path>
-      % if coord.datainput_set.exists() or coord.dataoutput_set.exists() or coord.get_properties():
+      % if coord.inputDatasets or coord.outputDatasets or coord.data['properties']['properties']:
       <configuration>
-        % for input in coord.datainput_set.all():
+        % for dataset in coord.inputDatasets:
           <property>
-            <name>${ input.name }</name>
-            <value>${'${'}coord:dataIn('${ input.name }')}</value>
+            <name>${ dataset.data['name'] }</name>
+            <value>${'${'}coord:dataIn('${ dataset.data['name'] }')}</value>
           </property>
         % endfor
-        % for output in coord.dataoutput_set.all():
+        % for dataset in coord.outputDatasets:
         <property>
-          <name>${ output.name }</name>
-          <value>${'${'}coord:dataOut('${ output.name }')}</value>
+          <name>${ dataset.data['name'] }</name>
+          <value>${'${'}coord:dataOut('${ dataset.data['name'] }')}</value>
         </property>
         % endfor
-        % for property in coord.get_properties():
+        % for property in coord.data['properties']['properties']:
         <property>
           <name>${ property['name'] }</name>
           <value>${ property['value'] }</value>
@@ -135,6 +137,6 @@
       </configuration>
       % endif
    </workflow>
-   ${ common.sla(coord) }
+   ${ common.sla(coord.data) }
   </action>
 </coordinator-app>

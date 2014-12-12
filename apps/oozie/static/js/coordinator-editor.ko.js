@@ -56,38 +56,41 @@ var Coordinator = function (vm, coordinator) {
   self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "");
 
   self.properties = ko.mapping.fromJS(typeof coordinator.properties != "undefined" && coordinator.properties != null ? coordinator.properties : {});
-
+  
   self.variables = ko.observableArray([]);
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
 
-  
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
 	  $.get("/desktop/api2/doc/get", {
-		  "uuid":  self.properties.workflow().uuid()
+        "uuid": self.properties.workflow()
 	   }, function (data) {
-	     // set wf
+	    // set wf
 	  }).fail(function (xhr, textStatus, errorThrown) {
-	     $(document).trigger("error", xhr.responseText);
+	    $(document).trigger("error", xhr.responseText);
 	  });
 	}
   });
   
   self.addVariable = function() {
-    var _var = {
+    var _var = {       
        'workflow_variable': '',
-       'dataset_type': 'parameter',
-       'dataset_variable': '',
-       'show_advanced': false,
        
+       'dataset_type': 'parameter',
+       
+       'uuid': UUID(),
+       'dataset_variable': '',       
+       'show_advanced': false,       
        'done_flag': '',
-       'timzone': 'America/Los_Angeles',
-       'range': 'single',
+       'timezone': 'America/Los_Angeles',
+       'instance_choice': 'default', // is_advanced_start_instance, start_instance, is_advanced_end_instance, end_instance
        'frequency_number': 1,
        'frequency_unit': 'DAYS',
        'start': null,
        'name': '',
+       'shared_dataset_uuid': '' // If reusing a shared dataset
     };
+
 	self.variables.push(ko.mapping.fromJS(_var));	  
   };
   
@@ -108,12 +111,13 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
     self.isEditing(! self.isEditing());
   };
 
+  self.workflows = ko.mapping.fromJS(workflows_json);
   self.coordinator = new Coordinator(self, coordinator_json);
   self.credentials = ko.mapping.fromJS(credentials_json);
-  self.workflows = ko.mapping.fromJS(workflows_json);
+  
   
   self.save = function () {
-    $.post("/oozie/editor/coodinator/save/", {
+    $.post("/oozie/editor/coordinator/save/", {
         "coordinator": ko.mapping.toJSON(self.coordinator)
     }, function (data) {
       if (data.status == 0) {
@@ -132,7 +136,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   };
 
   self.gen_xml = function () {
-    $.post("/oozie/editor/coodinator/gen_xml/", {
+    $.post("/oozie/editor/coordinator/gen_xml/", {
         "coordinator": ko.mapping.toJSON(self.coordinator)
     }, function (data) {
       if (data.status == 0) {
@@ -147,7 +151,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   };
 
   self.import_coordinators = function () {
-    $.post("/oozie/editor/coodinator/import_coordinators/", {
+    $.post("/oozie/editor/coordinator/import_coordinators/", {
     }, function (data) {
       if (data.status == 0) {
         console.log(data.json);

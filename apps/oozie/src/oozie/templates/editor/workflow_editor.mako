@@ -484,7 +484,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
     <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548'"><i class="fa fa-stop"></i></div>
 
-    <div data-bind="visible: $root.isEditing()" style="padding: 10px">
+    <div data-bind="visible: $root.isEditing" style="padding: 10px">
       <h6 class="field-title">${ _('Message') }</h6>
       <textarea class="span12" data-bind="value: properties.message" />
     </div>

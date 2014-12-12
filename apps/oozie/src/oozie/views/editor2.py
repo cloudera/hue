@@ -242,15 +242,12 @@ def list_editor_coordinators(request):
 
 
 def edit_coordinator(request):
-
   coordinator_id = request.GET.get('coordinator')
   
   if coordinator_id:
     coordinator = Coordinator(document=Document2.objects.get(id=coordinator_id)) # Todo perms
   else:
     coordinator = Coordinator()
-  
-  coordinator_data = coordinator.get_data()
 
   api = get_oozie(request.user)
   credentials = Credentials()
@@ -261,7 +258,7 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   return render('editor/coordinator_editor.mako', request, {
-      'coordinator_json': json.dumps(coordinator_data['coordinator']),
+      'coordinator_json': coordinator.json,
       'credentials_json': json.dumps(credentials.credentials.keys()),
       'workflows_json': json.dumps(list(Document2.objects.filter(type='oozie-workflow2', owner=request.user).values('uuid', 'name')))
   })
@@ -274,36 +271,85 @@ def new_coordinator(request):
 def save_coordinator(request):
   response = {'status': -1}
 
-  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
-  layout = json.loads(request.POST.get('layout', '{}'))
+  coordinator_data = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
 
   name = 'test'
 
-  if workflow.get('id'):
-    workflow_doc = Document2.objects.get(id=workflow['id'])
+  if coordinator_data.get('id'):
+    coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:      
-    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=request.user)
+    coordinator_doc = Document2.objects.create(name=name, type='oozie-coordinator2', owner=request.user)
 
-  subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
-  if subworkflows:
-    dependencies = Document2.objects.filter(uuid__in=subworkflows)
-    workflow_doc.dependencies = dependencies
+  if coordinator_data['properties']['workflow']:
+    dependencies = Document2.objects.filter(uuid=coordinator_data['properties']['workflow'])
+    coordinator_doc.dependencies = dependencies
 
-  workflow_doc.update_data({'workflow': workflow})
-  workflow_doc.update_data({'layout': layout})
-  workflow_doc.name = name
-  workflow_doc.save()
-  
-  workflow_instance = Workflow(document=workflow_doc)
-  workflow_instance.check_workspace(request.fs)
+  coordinator_doc.update_data(coordinator_data)
+  coordinator_doc.name = name
+  coordinator_doc.save()
   
   response['status'] = 0
-  response['id'] = workflow_doc.id
-  response['message'] = _('Page saved !')
+  response['id'] = coordinator_doc.id
+  response['message'] = _('Saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+def gen_xml_coordinator(request):
+  response = {'status': -1}
 
-def submit_coordinator(request, doc_id):
-  pass
+#  try:
+  coordinator_dict = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
+
+  coordinator = Coordinator(data=coordinator_dict)
+
+  response['status'] = 0
+  response['xml'] = coordinator.to_xml()
+#  except Exception, e:
+#    response['message'] = str(e)
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json") 
+
+
+def submit_coordinator(request, coordinator):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      job_id = _submit_coordinator(request, coordinator, mapping)
+
+      request.info(_('Coordinator submitted.'))
+      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = coordinator.find_all_parameters()
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                 'params_form': params_form,
+                 'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
+                }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _submit_coordinator(request, coordinator, mapping):
+  try:
+    wf_dir = Submission(request.user, coordinator.workflow, request.fs, request.jt, mapping).deploy()
+
+    properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
+    properties.update(mapping)
+
+    submission = Submission(request.user, coordinator, request.fs, request.jt, properties=properties)
+    job_id = submission.run()
+
+    History.objects.create_from_submission(submission)
+
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
+                         detail=ex._headers.get('oozie-error-message', ex))
