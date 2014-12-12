@@ -88,6 +88,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
     <select data-bind="options: workflows,
                        optionsText: 'name',
+                       optionsValue: 'uuid',
                        value: coordinator.properties.workflow,
                        optionsCaption: 'Choose...'">
     </select>
@@ -147,7 +148,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
           
           <span data-bind="visible: show_advanced">            
             Done flag <input data-bind="value: done_flag"/>
-            Range <input data-bind="value: range"/>
+            Range <input data-bind="value: instance_choice"/>
             ...
           </span>          
         <!-- /ko -->
@@ -176,16 +177,16 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       <br/>
 
       ${ _('Oozie Parameters') }
-      <ul data-bind="foreach: $root.coordinator.properties.parameters">
+      <ul data-bind="foreach: coordinator.properties.properties">
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
-          <a href="#" data-bind="click: function(){ $root.coordinator.properties.parameters.remove(this); }">
+          <a href="#" data-bind="click: function(){ $root.coordinator.properties.properties.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
         </li>
       </ul>
-      <button data-bind="click: function(){ $root.coordinator.properties.parameters.push({'name': '', 'value': ''}); }">
+      <button data-bind="click: function(){ $root.coordinator.properties.properties.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i>
       </button>
 

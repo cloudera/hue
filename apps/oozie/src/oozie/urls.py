@@ -84,6 +84,8 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/list/$', 'list_editor_coordinators', name='list_editor_coordinators'),
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^editor/coordinator/new/$', 'new_coordinator', name='new_coordinator'),
+  url(r'^editor/coordinator/save/$', 'save_coordinator', name='save_coordinator'),
+  url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'), # Temporary
 )
 
 
