@@ -266,15 +266,15 @@
 <%def name="slaForm()">
   <div data-bind="foreach: { 'data': sla, 'afterRender': addSLATextAndPlaceholder }">
     <div class="control-group control-row" style="margin-bottom: 2px">
+      <!-- ko if:  key() == 'enabled' -->
+      <label class="checkbox" style="text-align: left"><span class="control-label"></span> <input type="checkbox" data-bind="checked: value"/></label>
+      <!-- /ko -->
+      <!-- ko if:  key() != 'enabled' -->
       <label class="control-label" style="text-align: left"></label>
       <div class="controls">
-        <!-- ko if:  key() == 'enabled' -->
-        <input type="checkbox" data-bind="checked: value"/>
-        <!-- /ko -->
-        <!-- ko if:  key() != 'enabled' -->
         <input type="text" data-bind="value: value" class="span7">
-        <!-- /ko -->
       </div>
+      <!-- /ko -->
     </div>
   </div>
 </%def>

@@ -66,7 +66,11 @@
   %endif
   %if hasattr(caller, "widgets"):
   <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
-    <div class="toolbar-label">${_('WIDGETS')}</div>
+    %if hasattr(caller, "widgetSectionName"):
+      <div class="toolbar-label">${caller.widgetSectionName()}</div>
+    %else:
+      <div class="toolbar-label">${_('WIDGETS')}</div>
+    %endif
     ${caller.widgets()}
   </div>
   %endif

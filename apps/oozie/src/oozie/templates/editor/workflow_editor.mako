@@ -34,6 +34,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <%dashboard:layout_toolbar>
   <%def name="skipLayout()"></%def>
+  <%def name="widgetSectionName()">${ _('ACTIONS') }</%def>
   <%def name="widgets()">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
@@ -46,7 +47,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                     draggable: {data: draggableHive2Action(), isEnabled: true,
                     options: {'refreshPositions': true, 'start': function(event, ui){$root.currentlyDraggedWidget(draggableHive2Action());}}}"
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>
+         <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true},
@@ -126,9 +127,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>    
 
-    <div data-bind="css: { 'draggable-widget': true }" rel="tooltip" data-placement="top">
-    </div>
-
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableKillNode());}}}"
@@ -156,7 +154,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
+      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
         <i class="fa fa-cog"></i>
       </button>
       <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
@@ -290,7 +288,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: $index() > 0 && $root.isEditing() && ! $root.isRowBeforeJoin($data) && ! $root.isRowAfterFork($data)" style="margin-bottom: 10px">
       <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}"></div>
-      <div data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
+      <div data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3andhalf': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
         <div style="text-align: left" data-bind="visible: $root.isEditing() && enableOozieDropOnBefore(), css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
@@ -300,7 +298,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && ['join-widget', 'decision-widget'].indexOf($data.widgets()[0].widgetType()) > -1), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
-      <div  data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
+      <div  data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3andhalf': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
           options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -578,7 +576,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <h6><a class="pointer" data-bind="click: function(){ properties.files.push({'value': ''});$(document).trigger('drawArrows') }">${ _('Files') } <i class="fa fa-plus"></i></a></h6>
   <ul class="unstyled" data-bind="foreach: properties.files">
     <li style="margin-bottom: 3px">
-      <input type="text" class="span9" data-bind="filechooser: value"/>
+      <input type="text" class="span9 filechooser-input" data-bind="filechooser: value"/>
       <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
@@ -1465,14 +1463,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 </div>
 
-
-<div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="settingsModal" class="modal fade hide" data-backdrop="false">
+  <div class="modal-header" style="padding-bottom: 2px">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">${ _('Workflow Settings') }</h3>
+  </div>
   <div class="modal-body">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
-
-      ${ _('Oozie Parameters') }
-      <ul data-bind="foreach: $root.workflow.properties.parameters">
+      <h4>${ _('Oozie Parameters') }</h4>
+      <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
@@ -1481,41 +1479,34 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </a>
         </li>
       </ul>
-      <button data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
-        <i class="fa fa-plus"></i>
-      </button>
+      <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
+        <i class="fa fa-plus"></i> ${ _('Add parameter') }
+      </a>
 
-      <br/>
-      ${_("Workspace")}
-      <input data-bind="value: $root.workflow.properties.deployment_dir"/>
+      <h4>${_("Workspace")}</h4>
+      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.deployment_dir"/>
 
-	  <br/>
-	  ${ _('Hadoop Properties') }
-	  <ul data-bind="foreach: $root.workflow.properties.properties">
-	    <li>
-	      <input data-bind="value: name"/>
-	      <input data-bind="value: value"/>
-	      <a href="#" data-bind="click: function(){ $root.workflow.properties.properties.remove(this); }">
-	        <i class="fa fa-minus"></i>
-	      </a>
-	    </li>
-	  </ul>
-	  <button data-bind="click: function(){ $root.workflow.properties.properties.push({'name': '', 'value': ''}); }">
-	    <i class="fa fa-plus"></i>
-	  </button>
+	    <h4>${ _('Hadoop Properties') }</h4>
+      <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
+        <li>
+          <input data-bind="value: name"/>
+          <input data-bind="value: value"/>
+          <a href="#" data-bind="click: function(){ $root.workflow.properties.properties.remove(this); }">
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+      </ul>
+      <a class="pointer"  data-bind="click: function(){ $root.workflow.properties.properties.push({'name': '', 'value': ''}); }">
+        <i class="fa fa-plus"></i> ${ _('Add property') }
+      </a>
 
-      <br/>
-      ${ _("Job XML") }
-      <input data-bind="value: $root.workflow.properties.job_xml"/>
+      <h4>${ _("Job XML") }</h4>
+      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.job_xml"/>
 
-      <br/>
-      <div class="control-group">
-        <label class="control-label">${ _('SLA Configuration') }</label>
-        <div class="controls" data-bind="with: $root.workflow.properties">
-          ${ utils.slaForm() }
-        </div>
+      <h4>${ _('SLA Configuration') }</h4>
+      <div class="sla-form" data-bind="with: $root.workflow.properties">
+        ${ utils.slaForm() }
       </div>
-    </div>
   </div>
 </div>
 
