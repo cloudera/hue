@@ -60,7 +60,7 @@ from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
-  PartitionValueCompatible, HiveServerTable
+  PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswax.hive_site import get_metastore
 
@@ -1788,6 +1788,19 @@ class MockHiveServerTable(HiveServerTable):
 
 
 class TestHiveServer2API():
+
+  def test_partition_keys(self):
+    table = MockHiveServerTable({'path_location': '/my/table'})
+
+    key = PartitionKeyCompatible('name:a_name, type:int, comment:null')
+    assert_equal('a_name', key.name)
+    assert_equal('int', key.type)
+    assert_equal('null', key.comment)
+
+    key = PartitionKeyCompatible('name:a_name, type:int, comment:this, has extra: sigils')
+    assert_equal('a_name', key.name)
+    assert_equal('int', key.type)
+    assert_equal('this, has extra: sigils', key.comment)
 
   def test_partition_values(self):
     table = MockHiveServerTable({'path_location': '/my/table'})
