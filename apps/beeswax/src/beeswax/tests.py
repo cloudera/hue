@@ -1792,8 +1792,11 @@ class TestHiveServer2API():
   def test_parsing_partition_values(self):
     table = MockHiveServerTable({'path_location': '/my/table'})
 
-    assert_equal(['2013022516'], PartitionValueCompatible(['datehour=2013022516'], table).values)
-    assert_equal(['2011-07', '2011-07-01', '12'], PartitionValueCompatible(['month=2011-07/dt=2011-07-01/hr=12'], table).values)
+    value = PartitionValueCompatible(['datehour=2013022516'], table)
+    assert_equal(['2013022516'], value.values)
+
+    value = PartitionValueCompatible(['month=2011-07/dt=2011-07-01/hr=12'], table)
+    assert_equal(['2011-07', '2011-07-01', '12'], value.values)
 
   def test_table_properties(self):
     table = MockHiveServerTable({})
