@@ -128,7 +128,7 @@
   text-align: left !important;
 }
 
-.nowrap {
+.nowrap, .no-wrap {
   white-space: nowrap;
 }
 
@@ -1622,26 +1622,32 @@ body.modal-open {
   border: 1px solid rgba(0, 0, 0, 0.3);
   *border: 1px solid #999;
   -webkit-border-bottom-right-radius: 0px;
--webkit-border-bottom-left-radius: 0px;
--moz-border-radius-bottomright: 0px;
--moz-border-radius-bottomleft: 0px;
-border-bottom-right-radius: 0px;
-border-bottom-left-radius: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  -moz-border-radius-bottomright: 0px;
+  -moz-border-radius-bottomleft: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
   outline: none;
   -webkit-box-shadow: none;
-     -moz-box-shadow: none;
-          box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
   -webkit-background-clip: padding-box;
-     -moz-background-clip: padding-box;
-          background-clip: padding-box;
+  -moz-background-clip: padding-box;
+  background-clip: padding-box;
+}
+
+.demi-modal-half {
+  width: 500px;
+  left: 50%;
+  margin-left: -250px;
 }
 
 .demi-modal.fade {
   top: -25%;
   -webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
-     -moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-       -o-transition: opacity 0.3s linear, top 0.3s ease-out;
-          transition: opacity 0.3s linear, top 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, top 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, top 0.3s ease-out;
+  transition: opacity 0.3s linear, top 0.3s ease-out;
 }
 
 .demi-modal.fade.in {
@@ -1669,7 +1675,7 @@ border-bottom-left-radius: 0px;
 }
 
 .control-group.error .input-prepend .add-on i, .control-group.error .input-append .add-on i {
-    color: #fff;
+  color: #fff;
 }
 
 .app-icon {

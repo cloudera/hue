@@ -489,7 +489,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             _newRow = _parentCol.addEmptyRow(false, 1);
           }
           else {
-            _newRow = _parentCol.addEmptyRow(false, _parentCol.rows().length - 1);
+            _newRow = _parentCol.addEmptyRow(false, _parentCol.rows().length - 2);
           }
         }
         else {
@@ -621,21 +621,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       return _w;
     }
   }
-
-//  self.getWidgetById = function (widget_id) {
-//    var _widget = null;
-//    $.each(self.columns(), function (i, col) {
-//      $.each(col.rows(), function (j, row) {
-//        $.each(row.widgets(), function (z, widget) {
-//          if (widget.id() == widget_id) {
-//            _widget = widget;
-//            return false;
-//          }
-//        });
-//      });
-//    });
-//    return _widget;
-//  }
 
   self.removeWidget = function (widget_json) {
     self.workflow.removeNode(widget_json.id());

@@ -225,6 +225,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 </div>
 
+
 <script type="text/html" id="column-template">
   <div data-bind="css: klass()" style="min-height: 50px !important;">
     <div data-bind="template: { name: 'row-template', data: oozieStartRow }" style="margin-top: 50px"></div>
@@ -239,12 +240,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
       <div class="row-fluid">
-        <div data-bind="visible: enableOozieDropOnAfter, css: {'span4 offset4': true, 'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }"></div>
+        <div data-bind="visible: enableOozieDropOnAfter, css: {'span4 offset4': true, 'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }">
+          <span data-bind="visible: oozieRows().length == 0">${ _('Drop your action here.') }</span>
+        </div>
         <div data-bind="visible: ! enableOozieDropOnAfter(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       </div>
     </div>
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
+
+    <div data-bind="template: { name: 'row-template', data: oozieKillRow }" style="margin-top: 60px"></div>
   </div>
 </script>
 
@@ -320,7 +325,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="widget-template">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (oozieExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
-    <h2 class="card-heading simple">
+    <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget'  && id() != '17c9c895-5a16-7443-bb81-f34b30b21548'">
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded()">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
@@ -478,12 +483,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="kill-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    </div>
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
+    <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548'"><i class="fa fa-thumbs-o-down"></i></div>
 
     <div>
-      <input type="text" data-bind="value: properties.message" />
+      <input type="text" class="input-xxlarge" data-bind="value: properties.message" />
     </div>
   </div>
   <!-- /ko -->
@@ -1439,24 +1443,24 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </script>
 
 
-<div id="addActionDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="addActionDemiModal" class="demi-modal demi-modal-half hide fade" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
 
-    <ul data-bind="foreach: addActionProperties">
-      <li>
-        <span data-bind="text: label"></span>
-        <input data-bind="value: value"/>
-      </li>
-    </ul>
+    <table data-bind="foreach: addActionProperties">
+      <tr>
+        <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
+        <td><input data-bind="value: value"/></td>
+      </tr>
+    </table>
 
     <!-- ko if: addActionWorkflows().length > 0 -->
       <select data-bind="options: addActionWorkflows, optionsText: 'name', value: selectedSubWorkflow"></select>
     <!-- /ko -->
 
     <br/>
-    <a data-bind="click: addActionDemiModalFieldPreview">
-      Add
+    <a class="btn btn-primary disable-feedback" data-bind="click: addActionDemiModalFieldPreview">
+      ${ _('Add') }
     </a>
   </div>
 </div>
@@ -1581,6 +1585,8 @@ ${ dashboard.import_bindings() }
 
   function showAddActionDemiModal(widget) {
     newAction = widget;
+    $("#exposeOverlay").fadeIn(300);
+    $("#wdg_" + widget.id()).css("zIndex", "1032");
     $("#addActionDemiModal").modal("show");
   }
 
@@ -1588,10 +1594,13 @@ ${ dashboard.import_bindings() }
     if (newAction != null) {
       viewModel.workflow.addNode(newAction);
       $("#addActionDemiModal").modal("hide");
+      $("#wdg_" + newAction.id()).css("zIndex", "0");
+      $("#exposeOverlay").fadeOut(300);
     }
   }
 
   function addActionDemiModalFieldCancel() {
+    $("#exposeOverlay").fadeOut(300);
     viewModel.removeWidgetById(newAction.id());
   }
 
@@ -1644,14 +1653,16 @@ ${ dashboard.import_bindings() }
 
   function drawArrows(){
     $("canvas").remove();
-    var _links = viewModel.workflow.linkMapping();
-    Object.keys(_links).forEach(function(id){
-      if (_links[id].length > 0){
-        _links[id].forEach(function(nextId){
-          linkWidgets(id, nextId);
-        });
-      }
-    });
+    if (viewModel.columns()[0].rows().length > 3){
+      var _links = viewModel.workflow.linkMapping();
+      Object.keys(_links).forEach(function(id){
+        if (_links[id].length > 0){
+          _links[id].forEach(function(nextId){
+            linkWidgets(id, nextId);
+          });
+        }
+      });
+    }
   }
 
   var _linkMappingTimeout = -1;
@@ -1740,6 +1751,8 @@ ${ dashboard.import_bindings() }
     $(document).keyup(function(e) {
       if (e.keyCode == 27) {
         $("#exposeOverlay").click();
+        addActionDemiModalFieldCancel();
+        $("#addActionDemiModal").modal("hide");
       }
     });
 
