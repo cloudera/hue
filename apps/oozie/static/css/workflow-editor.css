@@ -282,8 +282,9 @@ em {
   background-color: #DDD;
 }
 
-.draggable-icon {
+.draggable-widget, .draggable-icon {
   cursor: move;
+  background-color: #FFF;
 }
 
 .chosen-container .chosen-results li {
@@ -337,6 +338,7 @@ em {
 .row-fluid [class*="span"] {
   margin-left: 0.5%;
 }
+
 
 .row-fluid .span10 {
   width: 90%;
@@ -441,4 +443,21 @@ body {
 
 .row-container {
  min-height: 10px!important;;
+}
+
+input[type="text"].filechooser-input {
+  border-right: none;
+  margin-bottom: 0;
+}
+
+.fileChooserBtn {
+  height: 31px;
+}
+
+#settingsModal h4 {
+  margin-top: 30px;
+}
+
+#settingsModal ul.unstyled li {
+  margin-bottom: 4px;
 }
