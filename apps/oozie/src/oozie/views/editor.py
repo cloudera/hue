@@ -237,7 +237,14 @@ def import_coordinator(request):
 
 @check_job_access_permission()
 def export_workflow(request, workflow):
-  zip_file = workflow.compress(mapping=dict([(param['name'], param['value']) for param in workflow.find_all_parameters()]))
+  mapping = dict([(param['name'], param['value']) for param in workflow.find_all_parameters()])
+
+  api = get_oozie(request.user)
+  credentials = Credentials()
+  credentials.fetch(api)
+  mapping['credentials'] = credentials.get_properties()
+
+  zip_file = workflow.compress(mapping=mapping)
 
   response = HttpResponse(mimetype="application/zip")
   response["Last-Modified"] = http_date(time.time())
