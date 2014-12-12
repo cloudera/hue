@@ -72,15 +72,96 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <form class="form-search" style="margin: 0">
     <strong>${_("Name")}</strong>
     <input data-bind="value: $root.coordinator.name"/>
+    
+    &nbsp;&nbsp;&nbsp;
+    1
+    2
+    3
+    4
+    Scrollspy?
   </form>
 </div>
 
 <div>
-  <div class="span6">
-    ss
+  <div>     
+    <h1>1 Which workflow to schedule?</h1> 
+
+    <select data-bind="options: workflows,
+                       optionsText: 'name',
+                       value: coordinator.properties.workflow,
+                       optionsCaption: 'Choose...'">
+    </select>
   </div>
-  <div class="span6">
-    Datasets
+  
+  <div data-bind="visible: coordinator.properties.workflow">
+    <h1>2 How often?</h1>
+    
+    [hourly] [daily] [weekly] [monthly]
+    <input data-bind="value: coordinator.properties.cron_frequency"/>
+    
+  </div>
+  
+  <div data-bind="visible: coordinator.properties.workflow">
+    <h1>3 Workflow Parameters</h1>    
+
+    <ul data-bind="foreach: coordinator.variables">
+      <li>
+        <input data-bind="value: workflow_variable"/>
+		<div class="btn-group">
+		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+		      <!-- ko if: dataset_type() == 'parameter' -->
+              ${ _('Parameter') }
+              <!-- /ko -->
+              <!-- ko if: dataset_type() == 'input_path' -->
+              ${ _('Input Path') }
+              <!-- /ko -->
+              <!-- ko if: dataset_type() == 'output_path' -->
+              ${ _('Output Path') }
+              <!-- /ko --> <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" role="menu" data-bind="foreach: $parent.coordinator.variablesUI">
+		    <!-- ko if: $data != $parent.dataset_type() -->
+		    <li>
+		      <a href="#" data-bind="click: function() { $parent.dataset_type($data) } ">
+		      <!-- ko if: $data == 'parameter' -->
+		      ${ _('Parameter') }
+		      <!-- /ko -->
+              <!-- ko if: $data == 'input_path' -->
+              ${ _('Input Path') }
+              <!-- /ko -->
+              <!-- ko if: $data == 'output_path' -->
+              ${ _('Output Path') }
+              <!-- /ko -->
+		      </a>
+		    </li>
+		    <!-- /ko -->
+		  </ul>
+		</div>        
+        <input data-bind="value: dataset_variable"/>
+        
+        <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
+          [hourly] [daily] [weekly] [monthly]
+          <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
+            <i class="fa fa-sliders"></i>
+          </a>
+          
+          <span data-bind="visible: show_advanced">            
+            Done flag <input data-bind="value: done_flag"/>
+            Range <input data-bind="value: range"/>
+            ...
+          </span>          
+        <!-- /ko -->
+                
+        <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+
+    <button data-bind="click: coordinator.addVariable">
+      <i class="fa fa-plus"></i>
+    </button>
+
   </div>
 </div>
 
@@ -89,6 +170,10 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
+
+      ${ _('Throttle') }
+      <input data-bind="value: coordinator.properties.throttle"/>
+      <br/>
 
       ${ _('Oozie Parameters') }
       <ul data-bind="foreach: $root.coordinator.properties.parameters">
@@ -103,25 +188,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       <button data-bind="click: function(){ $root.coordinator.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i>
       </button>
-
-	  <br/>
-	  ${ _('Hadoop Properties') }
-	  <ul data-bind="foreach: $root.coordinator.properties.properties">
-	    <li>
-	      <input data-bind="value: name"/>
-	      <input data-bind="value: value"/>
-	      <a href="#" data-bind="click: function(){ $root.coordinator.properties.properties.remove(this); }">
-	        <i class="fa fa-minus"></i>
-	      </a>
-	    </li>
-	  </ul>
-	  <button data-bind="click: function(){ $root.coordinator.properties.properties.push({'name': '', 'value': ''}); }">
-	    <i class="fa fa-plus"></i>
-	  </button>
-
-      <br/>
-      ${ _("Job XML") }
-      <input data-bind="value: $root.coordinator.properties.job_xml"/>
 
       <br/>
       <div class="control-group">
@@ -161,7 +227,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode });
+  var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode });
   ko.applyBindings(viewModel);
 
   function showAddActionDemiModal(widget) {

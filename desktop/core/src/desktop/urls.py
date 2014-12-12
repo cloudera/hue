@@ -90,6 +90,10 @@ dynamic_patterns += patterns('desktop.api',
   (r'^desktop/api/doc/update_permissions', 'update_permissions'),
 )
 
+dynamic_patterns += patterns('desktop.api2',
+  (r'^desktop/api2/doc/get$', 'get_document'),
+)
+
 dynamic_patterns += patterns('useradmin.views',
   (r'^desktop/api/users/autocomplete', 'list_for_autocomplete'),
 )
