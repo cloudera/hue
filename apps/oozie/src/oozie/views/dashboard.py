@@ -740,7 +740,10 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
       'missingDependencies': action.missingDependencies
     }
 
-    actions.insert(0, massaged_action)
+    actions.append(massaged_action)
+
+  # sorting for oozie old versions backward compatibility
+  actions.sort(key=lambda k: k['number'],reverse=True)
 
   return actions
 
