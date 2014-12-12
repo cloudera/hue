@@ -32,7 +32,7 @@ var Column = function (size, rows) {
   self.oozieStartRow = ko.computed(function () {
     var _row = null;
     ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "start-widget")) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "3f107997-04cc-8733-60a9-a4bb62cebffc")) {
         _row = row;
       }
     });
@@ -42,7 +42,17 @@ var Column = function (size, rows) {
   self.oozieEndRow = ko.computed(function () {
     var _row = null;
     ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() == "end-widget")) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "33430f0f-ebfa-c3ec-f237-3e77efa03d0a")) {
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+  self.oozieKillRow = ko.computed(function () {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "17c9c895-5a16-7443-bb81-f34b30b21548")) {
         _row = row;
       }
     });
@@ -53,7 +63,7 @@ var Column = function (size, rows) {
   self.oozieRows = ko.computed(function () {
     var _rows = [];
     ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].widgetType() != "start-widget" && row.widgets()[0].widgetType() != "end-widget") || row.widgets().length == 0) {
+      if ((row.widgets().length > 0 && ["3f107997-04cc-8733-60a9-a4bb62cebffc", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "17c9c895-5a16-7443-bb81-f34b30b21548"].indexOf(row.widgets()[0].id()) == -1) || row.widgets().length == 0) {
         _rows.push(row);
       }
     });

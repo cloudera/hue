@@ -430,3 +430,15 @@ em {
   text-align: center;
   padding: 5px;
 }
+
+body {
+  background-color: #FFFFFF;
+}
+
+.ui-sortable {
+ min-height: 10px!important;
+}
+
+.row-container {
+ min-height: 10px!important;;
+}
