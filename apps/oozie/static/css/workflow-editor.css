@@ -292,7 +292,7 @@ em {
 }
 
 #emptyDashboard {
-  right: 70px!important;
+  right: 70px !important;
 }
 
 .drop-target {
@@ -332,13 +332,12 @@ em {
 }
 
 .readonly .card-widget {
-  border: 1px solid #d8d8d8!important;
+  border: 1px solid #d8d8d8 !important;
 }
 
 .row-fluid [class*="span"] {
   margin-left: 0.5%;
 }
-
 
 .row-fluid .span10 {
   width: 90%;
@@ -349,19 +348,19 @@ em {
 }
 
 .card-widget {
-  position:relative;
+  position: relative;
 }
 
 #exposeOverlay {
-  background-color:#000;
+  background-color: #000;
   opacity: 0.3;
-  display:none;
-  width:100%;
-  height:100%;
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:1031;
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1031;
 }
 
 .card-column-disabled {
@@ -396,6 +395,11 @@ em {
   color: #338bb8;
 }
 
+.card-widget h6.field-title {
+  margin-bottom: 0;
+  padding-left: 4px;
+}
+
 .widget-main-section {
   overflow-y: auto;
   overflow-x: hidden;
@@ -407,11 +411,11 @@ em {
 }
 
 .row-container.is-editing {
-  border: none!important;
+  border: none !important;
 }
 
 .card-widget {
-  border: 1px solid #d8d8d8!important;
+  border: 1px solid #d8d8d8 !important;
 }
 
 .row-fluid .span4 {
@@ -438,11 +442,11 @@ body {
 }
 
 .ui-sortable {
- min-height: 10px!important;
+  min-height: 10px !important;
 }
 
 .row-container {
- min-height: 10px!important;;
+  min-height: 10px !important;;
 }
 
 input[type="text"].filechooser-input {
@@ -460,4 +464,16 @@ input[type="text"].filechooser-input {
 
 #settingsModal ul.unstyled li {
   margin-bottom: 4px;
+}
+
+.readonly .card {
+  margin-bottom: 15px;
+}
+
+textarea {
+  resize: none;
+}
+
+.span4.readonly {
+  margin-left: 1px;
 }
