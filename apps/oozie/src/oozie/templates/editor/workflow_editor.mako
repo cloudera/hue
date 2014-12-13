@@ -482,10 +482,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="kill-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
-    <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548'"><i class="fa fa-thumbs-o-down"></i></div>
+    <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548'"><i class="fa fa-stop"></i></div>
 
-    <div>
-      <input type="text" class="input-xxlarge" data-bind="value: properties.message" />
+    <div data-bind="visible: $root.isEditing()" style="padding: 10px">
+      <h6 class="field-title">${ _('Message') }</h6>
+      <textarea class="span12" data-bind="value: properties.message" />
     </div>
   </div>
   <!-- /ko -->
@@ -623,9 +624,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-action-sla">
-  <div class="control-group">
-    <label class="control-label">${ _('SLA Configuration') }</label>
-    <div class="controls" data-bind="with: properties">
+    <div data-bind="with: properties">
       ${ utils.slaForm() }
     </div>
   </div>
@@ -942,8 +941,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <div data-bind="visible: ! $parent.oozieExpanded()">
-        <span data-bind="text: $root.workflow_properties.workflow.label"></span>
-        <input type="text" data-bind="value: properties.workflow" />
         <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
       </div>
     </div>
