@@ -1,44 +1,43 @@
 package com.cloudera.hue.sparker.repl
 
 import java.io._
-import java.util.concurrent.{ArrayBlockingQueue, SynchronousQueue, TimeUnit}
+import java.util.concurrent.SynchronousQueue
 
-import akka.actor.{Actor, ActorRef, ActorSystem}
-import akka.pattern.ask
+import akka.actor.{Actor, ActorSystem}
 import akka.util.Timeout
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
-import org.scalatra.{Accepted, FutureSupport, ScalatraFilter}
+import org.scalatra.{ScalatraServlet, AsyncResult, FutureSupport, ScalatraFilter}
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{ExecutionContextExecutor, ExecutionContext}
 
-class HelloWorldApp(system: ActorSystem, sparkActor: ActorRef) extends ScalatraFilter with FutureSupport {
+class HelloWorldApp(interpreter: SparkerInterpreter) extends ScalatraServlet with FutureSupport {
 
-  protected implicit def executor: ExecutionContext = system.dispatcher
-
-  implicit val defaultTimeout = Timeout(10)
+  implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+  implicit def defaultTimeout: Timeout = Timeout(10)
 
   get("/") {
     <h1>Hello {params("name")}</h1>
   }
 
   get("/async") {
-    val future = ask(sparkActor, "1 + 1")
-
-    implicit val timeout = akka.util.Timeout(60, TimeUnit.SECONDS)
-    Await.result(future, Duration.Inf)
+    new AsyncResult { val is =
+      interpreter.execute("1 + 1")
+    }
   }
 
+  /*
   get("/fire-forget") {
     sparkActor ! "wee"
     Accepted()
   }
+  */
 }
 
+/*
 class SparkActor extends Actor {
 
-  protected def queue = new SynchronousQueue[Map[String, String]]
+  val queue = new SynchronousQueue[Map[String, String]]
 
   val inWriter = new PipedWriter()
   val inReader = new PipedReader(inWriter)
@@ -71,3 +70,4 @@ class SparkActor extends Actor {
     }
   }
 }
+*/

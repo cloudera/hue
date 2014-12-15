@@ -1,32 +1,20 @@
 import javax.servlet.ServletContext
 
-import akka.actor.{ActorSystem, Props}
-import com.cloudera.hue.sparker.repl.{HelloWorldApp, SparkActor}
+import _root_.akka.actor.ActorSystem
+import com.cloudera.hue.sparker.repl.{HelloWorldApp, SparkerInterpreter}
 import org.scalatra.LifeCycle
 
-trait SparkerILoopInit {
-  def configureSparkerILoop() {
-    /*
-    org.apache.spark.repl.Main.interp = new SparkerILoop(Console.in, new StringWriter)
-
-    val args = Array("-usejavacp")
-    org.apache.spark.repl.Main.interp.process(args)
-    */
-  }
-}
-
-class ScalatraBootstrap extends LifeCycle with SparkerILoopInit {
+class ScalatraBootstrap extends LifeCycle {
 
   val system = ActorSystem()
+  val sparkerInterpreter = new SparkerInterpreter
 
   override def init(context: ServletContext): Unit = {
-    val myActor = system.actorOf(Props[SparkActor])
-
-    configureSparkerILoop()
-    context.mount(new HelloWorldApp(system, myActor), "/*")
+    context.mount(new HelloWorldApp(sparkerInterpreter), "/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
+    sparkerInterpreter.close()
     system.shutdown()
   }
 }

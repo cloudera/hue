@@ -1,17 +1,55 @@
 package com.cloudera.hue.sparker.repl
 
-import java.io.{BufferedReader, StringWriter}
-import java.util.concurrent.BlockingQueue
+import java.io.{BufferedReader, PipedReader, PipedWriter, StringWriter}
+import java.util.concurrent.{BlockingQueue, SynchronousQueue}
 
 import org.apache.spark.repl.SparkILoop
 import org.json4s.DefaultFormats
+import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
+import scala.concurrent._
 import scala.tools.nsc.SparkHelper
 import scala.tools.nsc.interpreter.{Formatting, _}
 import scala.tools.nsc.util.ClassPath
 
-class SparkerILoop(queue: BlockingQueue[Map[String, String]], in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
+class SparkerInterpreter {
+  private implicit def executor: ExecutionContext = ExecutionContext.global
+
+  private val inQueue = new SynchronousQueue[Request]
+
+  private val inWriter = new PipedWriter()
+
+  // Launch the real interpreter thread.
+  private val thread = new Thread {
+    override def run(): Unit = {
+      org.apache.spark.repl.Main.interp = new SparkerILoop(
+        inQueue,
+        new BufferedReader(new PipedReader(inWriter)),
+        new StringWriter)
+      val args = Array("-usejavacp")
+      org.apache.spark.repl.Main.interp.process(args)
+    }
+  }
+  thread.start()
+
+  def execute(statement: String): Future[String] = {
+    val promise = Promise[Map[String, String]]()
+    inQueue.put(ExecuteRequest(statement, promise))
+    promise.future.map {
+      case(response) => {
+        compact(render(response))
+      }
+    }
+  }
+
+  def close(): Unit = {
+    inQueue.put(ShutdownRequest())
+    thread.join()
+  }
+}
+
+class SparkerILoop(inQueue: BlockingQueue[Request], in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
 
   class SparkerILoopInterpreter extends SparkILoopInterpreter {
     outer =>
@@ -58,82 +96,59 @@ class SparkerILoop(queue: BlockingQueue[Map[String, String]], in0: BufferedReade
     true
   }
 
+  override def prompt = ""
+
   override def loop(): Unit = {
     def readOneLine() = {
-      out.flush()
-      in readLine prompt
+      inQueue.take()
     }
     // return false if repl should exit
-    def processLine(line: String): Boolean = {
+    def processLine(request: Request): Boolean = {
       if (isAsync) {
         if (!awaitInitialized()) return false
         runThunks()
       }
 
-      if (line eq null) {
-        return false                // assume null means EOF
-      }
-
-      val request = parseOpt(line) match {
-        case Some(request) => request;
-        case None => {
-          queue.put(Map("type" -> "error", "msg" -> "invalid json"))
-          //println(compact(render(Map("type" -> "error", "msg" -> "invalid json"))))
-          return true
-        }
-      }
-
-      implicit val formats = DefaultFormats
-      val type_ = (request \ "type").extract[Option[String]]
-
-      type_ match {
-        case Some("stdin") => {
-          (request \ "statement").extract[Option[String]] match {
-            case Some(statement) => {
-              command(statement) match {
-                case Result(false, _) => false
-                case Result(true, finalLine) => {
-                  finalLine match {
-                    case Some(line) => addReplay(line)
-                    case _ =>
-                  }
-
-                  var output: String = outString.getBuffer.toString
-                  output = output.substring("scala> ".length + 1, output.length - 1)
-                  outString.getBuffer.setLength(0)
-                  queue.put(Map("type" -> "stdout", "stdout" -> output))
-                  //println(compact(render(Map("type" -> "stdout", "stdout" -> output))))
-
-                  true
-                }
+      request match {
+        case ExecuteRequest(statement, promise) => {
+          command(statement) match {
+            case Result(false, _) => false
+            case Result(true, finalLine) => {
+              finalLine match {
+                case Some(line) => addReplay(line)
+                case _ =>
               }
-            }
-            case _ => {
-              queue.put(Map("type" -> "error", "msg" -> "missing statement"))
-              //println(compact(render(Map("type" -> "error", "msg" -> "missing statement"))))
+
+              var output: String = outString.getBuffer.toString
+              output = output.substring(0, output.length - 1)
+              outString.getBuffer.setLength(0)
+
+              promise.success(Map("type" -> "stdout", "stdout" -> output))
+
               true
             }
           }
         }
-        case _ => {
-          queue.put(Map("type" -> "error", "msg" -> "unknown type"))
-          //println(compact(render(Map("type" -> "error", "msg" -> "unknown type"))))
-          true
-        }
+        case ShutdownRequest() => false
       }
     }
     def innerLoop() {
       outString.getBuffer.setLength(0)
+
       val shouldContinue = try {
         processLine(readOneLine())
-      } catch {case t: Throwable => crashRecovery(t)}
-      if (shouldContinue)
+      } catch {
+        case t: Throwable => crashRecovery(t)
+      }
+
+      if (shouldContinue) {
         innerLoop()
-      else {
-        queue.put(Map("state" -> "quit"))
-        //println(compact(render(Map("state" -> "quit"))))
       }
     }
     innerLoop()
   }
 }
+
+sealed trait Request
+case class ExecuteRequest(statement: String, promise: Promise[Map[String, String]]) extends Request
+case class ShutdownRequest() extends Request
