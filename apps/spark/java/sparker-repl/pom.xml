@@ -33,13 +33,20 @@
 
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-core_2.10</artifactId>
+            <artifactId>json4s-jackson_2.10</artifactId>
             <version>3.2.11</version>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
             <artifactId>scalatra_2.10</artifactId>
+            <version>${scalatra.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra-json_2.10</artifactId>
             <version>${scalatra.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -1,7 +1,8 @@
 import javax.servlet.ServletContext
 
 import _root_.akka.actor.ActorSystem
-import com.cloudera.hue.sparker.repl.{HelloWorldApp, SparkerInterpreter}
+import com.cloudera.hue.sparker.repl.interpreter.SparkerInterpreter
+import com.cloudera.hue.sparker.repl.webapp.HelloWorldApp
 import org.scalatra.LifeCycle
 
 class ScalatraBootstrap extends LifeCycle {

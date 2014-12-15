@@ -1,4 +1,4 @@
-package com.cloudera.hue.sparker.repl
+package com.cloudera.hue.sparker.repl.interpreter
 
 import java.io.{BufferedReader, PipedReader, PipedWriter, StringWriter}
 import java.util.concurrent.{BlockingQueue, SynchronousQueue}
