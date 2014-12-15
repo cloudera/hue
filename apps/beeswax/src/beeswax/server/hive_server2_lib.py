@@ -44,6 +44,7 @@ LOG = logging.getLogger(__name__)
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
 DEFAULT_USER = DEFAULT_USER.get()
 
+
 class HiveServerTable(Table):
   """
   We are parsing DESCRIBE EXTENDED text as the metastore API like GetColumns() misses most of the information.
@@ -107,8 +108,16 @@ class HiveServerTable(Table):
       end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
       return cols[0:end_cols_index]
     except:
-      # Impala use non extended describe and 'col' instead of 'col_name'
-      return cols
+      try:
+        # Spark SQL: does not have an empty line in extended describe
+        try:
+          end_cols_index = map(itemgetter('col_name'), cols).index('# Partition Information')
+        except:
+          end_cols_index = map(itemgetter('col_name'), cols).index('Detailed Table Information')
+        return cols[0:end_cols_index]
+      except:
+        # Impala: uses non extended describe and 'col' instead of 'col_name'
+        return cols
 
   @property
   def comment(self):
@@ -651,7 +660,7 @@ class HiveServerTableCompatible(HiveServerTable):
   def cols(self):
     return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
                                     'type': col.get('data_type', col.get('col_type', '')).strip(), # Impala is col_type
-                                    'comment': col.get('comment', '').strip(), }) for col in HiveServerTable.cols.fget(self)]
+                                    'comment': col.get('comment', '').strip() if col.get('comment') else '', }) for col in HiveServerTable.cols.fget(self)]
 
 
 class ResultCompatible:
