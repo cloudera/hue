@@ -4,8 +4,6 @@ import java.io.{BufferedReader, PipedReader, PipedWriter, StringWriter}
 import java.util.concurrent.{BlockingQueue, SynchronousQueue}
 
 import org.apache.spark.repl.SparkILoop
-import org.json4s.DefaultFormats
-import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent._
@@ -33,14 +31,10 @@ class SparkerInterpreter {
   }
   thread.start()
 
-  def execute(statement: String): Future[String] = {
+  def execute(statement: String): Future[Map[String, String]] = {
     val promise = Promise[Map[String, String]]()
     inQueue.put(ExecuteRequest(statement, promise))
-    promise.future.map {
-      case(response) => {
-        compact(render(response))
-      }
-    }
+    promise.future
   }
 
   def close(): Unit = {

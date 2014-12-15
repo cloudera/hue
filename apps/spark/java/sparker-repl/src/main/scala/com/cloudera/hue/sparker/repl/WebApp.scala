@@ -23,9 +23,9 @@ class HelloWorldApp(interpreter: SparkerInterpreter) extends ScalatraServlet wit
   }
 
   post("/statement") {
-    val request = parsedBody.extract[ExecuteRequest]
-    val statement = request.statement
-    new AsyncResult { def is = interpreter.execute(statement) }
+    val req = parsedBody.extract[ExecuteRequest]
+    val statement = req.statement
+    new AsyncResult { val is = interpreter.execute(statement) }
   }
 }
 
