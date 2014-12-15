@@ -39,9 +39,6 @@ from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistor
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
 
-from impala import conf as impala_conf
-
-
 LOG = logging.getLogger(__name__)
 
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
@@ -314,6 +311,8 @@ class HiveServerClient:
     self.impersonation_enabled = impersonation_enabled
 
     if self.query_server['server_name'] == 'impala':
+      from impala import conf as impala_conf
+
       ssl_enabled = impala_conf.SSL.ENABLED.get()
       ca_certs = impala_conf.SSL.CACERTS.get()
       keyfile = impala_conf.SSL.KEY.get()

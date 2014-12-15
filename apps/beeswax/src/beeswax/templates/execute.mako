@@ -17,7 +17,6 @@
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter, commonshare
   from beeswax import conf as beeswax_conf
-  from impala import conf as impala_conf
   from django.utils.translation import ugettext as _
 
 %>
@@ -2427,6 +2426,10 @@ $(document).ready(function () {
 });
 % endif
 
+<%
+  if app_name == 'impala':
+    from impala import conf as impala_conf
+%>
 % if ( app_name == 'beeswax' and beeswax_conf.CLOSE_QUERIES.get() ) or ( app_name == 'impala' and impala_conf.CLOSE_QUERIES.get() ):
 $(document).ready(function () {
   $(document).on('explain.query', function() {
