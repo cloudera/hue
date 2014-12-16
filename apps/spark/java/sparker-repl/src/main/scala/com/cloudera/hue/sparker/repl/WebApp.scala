@@ -4,67 +4,55 @@ import akka.util.Timeout
 import com.cloudera.hue.sparker.repl.interpreter.SparkerInterpreter
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
-import org.scalatra.{AsyncResult, FutureSupport, ScalatraServlet}
+import org.scalatra.{Accepted, AsyncResult, FutureSupport, ScalatraServlet}
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
 
-class HelloWorldApp(interpreter: SparkerInterpreter) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
+class SparkerApp(interpreter: SparkerInterpreter) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def defaultTimeout: Timeout = Timeout(10)
   protected implicit val jsonFormats: Formats = DefaultFormats
 
+  sealed trait State
+  case class Starting() extends State
+  case class Running() extends State
+  case class ShuttingDown() extends State
+
+  var state: State = Starting()
+
   before() {
     contentType = formats("json")
+
+    state match {
+      case ShuttingDown() => halt(500, "Shutting down")
+      case _ => {}
+    }
   }
 
   get("/") {
-    <h1>Hello {params("name")}</h1>
+    Map("state" -> state)
   }
 
-  post("/statement") {
+  get("/statements") {
+    interpreter.statements
+  }
+
+  post("/statements") {
     val req = parsedBody.extract[ExecuteRequest]
     val statement = req.statement
     new AsyncResult { val is = interpreter.execute(statement) }
   }
+
+  delete("/") {
+    Future {
+      state = ShuttingDown()
+      interpreter.close()
+      Thread.sleep(1000)
+      System.exit(0)
+    }
+    Accepted()
+  }
 }
 
 case class ExecuteRequest(statement: String)
-
-/*
-class SparkActor extends Actor {
-
-  val queue = new SynchronousQueue[Map[String, String]]
-
-  val inWriter = new PipedWriter()
-  val inReader = new PipedReader(inWriter)
-
-  /*
-  protected def inWriter = new PipedWriter()
-  protected def inReader = new PipedReader(inWriter)
-  */
-
-  protected def out = new StringWriter
-
-  val thread = new Thread {
-    override def run(): Unit = {
-      org.apache.spark.repl.Main.interp = new SparkerILoop(
-        queue,
-        new BufferedReader(inReader),
-        out)
-      val args = Array("-usejavacp")
-      org.apache.spark.repl.Main.interp.process(args)
-    }
-  }
-  thread.start()
-
-  def receive = {
-    case msg : String => {
-      inWriter.write(msg)
-      val response = queue.take()
-      val s = compact(render(response))
-      sender ! s
-    }
-  }
-}
-*/

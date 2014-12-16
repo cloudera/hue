@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val port = 8087
+    val port = sys.env.getOrElse("PORT", "8999").toInt
     val server = new Server(port)
     val context = new WebAppContext()
 
