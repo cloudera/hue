@@ -4,7 +4,6 @@ import java.io.{BufferedReader, PipedReader, PipedWriter, StringWriter}
 import java.util.concurrent.{BlockingQueue, SynchronousQueue}
 
 import org.apache.spark.repl.SparkILoop
-import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent._
 import scala.tools.nsc.SparkHelper
@@ -14,22 +13,28 @@ import scala.tools.nsc.util.ClassPath
 class SparkerInterpreter {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
+  private var running = false;
   private val inQueue = new SynchronousQueue[Request]
-
   private val inWriter = new PipedWriter()
+
+  org.apache.spark.repl.Main.interp = new SparkerILoop(
+    this,
+    inQueue,
+    new BufferedReader(new PipedReader(inWriter)),
+    new StringWriter)
 
   // Launch the real interpreter thread.
   private val thread = new Thread {
     override def run(): Unit = {
-      org.apache.spark.repl.Main.interp = new SparkerILoop(
-        inQueue,
-        new BufferedReader(new PipedReader(inWriter)),
-        new StringWriter)
       val args = Array("-usejavacp")
       org.apache.spark.repl.Main.interp.process(args)
     }
   }
   thread.start()
+
+  def statements = {
+    org.apache.spark.repl.Main.interp.history.asStrings
+  }
 
   def execute(statement: String): Future[Map[String, String]] = {
     val promise = Promise[Map[String, String]]()
@@ -43,7 +48,7 @@ class SparkerInterpreter {
   }
 }
 
-class SparkerILoop(inQueue: BlockingQueue[Request], in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
+class SparkerILoop(parent: SparkerInterpreter, inQueue: BlockingQueue[Request], in0: BufferedReader, outString: StringWriter) extends SparkILoop(in0, new JPrintWriter(outString)) {
 
   class SparkerILoopInterpreter extends SparkILoopInterpreter {
     outer =>
