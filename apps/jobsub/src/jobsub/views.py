@@ -69,19 +69,20 @@ def _list_designs(request, owner, name, order_by='-last_modified'):
   for doc in data[:MAX_DESIGNS]:
     design = doc.content_object
 
-    ko_design = {
-      'id': design.id,
-      'owner': design.owner.username,
-      # Design name is validated by workflow and node forms.
-      'name': design.name,
-      'description': design.description,
-      'node_type': design.start.get_child('to').node_type,
-      'last_modified': py_time.mktime(design.last_modified.timetuple()),
-      'editable': design.owner.id == request.user.id,
-      'is_shared': design.is_shared,
-      'is_trashed': doc.is_trashed()
-    }
-    designs.append(ko_design)
+    if design is not None:
+      ko_design = {
+       'id': design.id,
+       'owner': design.owner.username,
+       # Design name is validated by workflow and node forms.
+       'name': design.name,
+       'description': design.description,
+       'node_type': design.start.get_child('to').node_type,
+       'last_modified': py_time.mktime(design.last_modified.timetuple()),
+       'editable': design.owner.id == request.user.id,
+       'is_shared': design.is_shared,
+       'is_trashed': doc.is_trashed()
+      }
+      designs.append(ko_design)
 
   return designs
 
