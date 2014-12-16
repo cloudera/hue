@@ -731,13 +731,14 @@ ${ dashboard.layout_skeleton() }
       <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
-
+    <!-- ko if: $root.collection.getFacetById($parent.id()) -->
     <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: (typeof extraSeries != 'undefined' ? extraSeries : []), widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
       fqs: $root.query.fqs,
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 </script>
