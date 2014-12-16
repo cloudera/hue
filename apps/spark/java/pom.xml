@@ -52,8 +52,9 @@
     </properties>
 
     <modules>
-        <module>sparker-server</module>
         <module>sparker-repl</module>
+        <module>sparker-server</module>
+        <module>sparker-yarn</module>
     </modules>
 
     <repositories>

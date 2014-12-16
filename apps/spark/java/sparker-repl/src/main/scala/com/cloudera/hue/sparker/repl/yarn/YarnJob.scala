@@ -1,8 +1,9 @@
-package com.cloudera.hue.sparker.repl.yarn
+package com.cloudera.hue.sparker.yarn
 
-/**
- * Created by erickt on 12/16/14.
- */
-class YarnJob {
+import org.apache.hadoop.conf.Configuration
+
+class YarnJob(config: Configuration) {
+
+  val client = new Client()
 
 }
