@@ -393,6 +393,7 @@ em {
 .card-widget h6 {
   text-transform: uppercase;
   color: #338bb8;
+  margin-bottom: 1px;
 }
 
 .card-widget h6.field-title {
@@ -476,4 +477,25 @@ textarea {
 
 .span4.readonly {
   margin-left: 1px;
+}
+
+em {
+  font-weight: normal;
+  background-color: #FFFFFF;
+}
+
+.properties ul li {
+  margin-bottom: 3px;
+}
+
+.widget-main-section .nav-tabs {
+  margin-bottom: 10px;
+}
+
+.widget-main-section .tab-content {
+  min-height: 200px;
+}
+
+.widget-main-section .tab-content h6:first-child {
+  margin-top: 0;
 }
