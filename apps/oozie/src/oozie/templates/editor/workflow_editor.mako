@@ -512,64 +512,60 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-action-properties">
-  <h6>${ _('Prepare') }</h6>
-  <ul data-bind="foreach: properties.prepares">
-    <li>
-      <span data-bind="text: type"></span>
-      <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this);$(document).trigger('drawArrows') }">
-        <i class="fa fa-minus"></i>
-      </a>
-    </li>
-  </ul>
-  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''});$(document).trigger('drawArrows') }">
-    ${ _('Directory') } <i class="fa fa-plus"></i>
-  </button>
-  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''});$(document).trigger('drawArrows') }">
-    ${ _('Delete') } <i class="fa fa-plus"></i>
-  </button>
-  <br/>
-  ${ _('Job XML') } <input type="text" data-bind="value: properties.job_xml" />
-  <br/>
-  <h6>${ _('Properties') }</h6>
-  <ul data-bind="foreach: properties.job_properties">
-    <li>
-      <input data-bind="value: name"/>
-      <input data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this);$(document).trigger('drawArrows') }">
-        <i class="fa fa-minus"></i>
-      </a>
-    </li>
-  </ul>
-  <button data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">
-    <i class="fa fa-plus"></i>
-  </button>
-  <br/>
-  <h6>${ _('Archives') }</h6>
-  <ul data-bind="foreach: properties.archives">
-    <li>
-      <input data-bind="value: name"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this);$(document).trigger('drawArrows') }">
-        <i class="fa fa-minus"></i>
-      </a>
-    </li>
-  </ul>
-  <button data-bind="click: function(){ properties.archives.push({'name': ''});$(document).trigger('drawArrows') }">
-    <i class="fa fa-plus"></i>
-  </button>
+  <div class="properties">
+    <h6>${ _('Prepare') }</h6>
+    <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
+      <li>
+        <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
+        <input type="text" data-bind="value: value"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this);$(document).trigger('drawArrows') }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''});$(document).trigger('drawArrows') }">${ _('Directory') } <i class="fa fa-plus"></i></a>
+    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''});$(document).trigger('drawArrows') }">${ _('Delete') } <i class="fa fa-plus"></i></a>
+
+    <h6>${ _('Job XML') }</h6>
+    <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml"/>
+
+    <h6><a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">${ _('Properties') } <i class="fa fa-plus"></i></a></h6>
+    <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+      <li>
+        <input data-bind="value: name"/>
+        <input data-bind="value: value"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this);$(document).trigger('drawArrows') }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+    <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+
+    <h6><a class="pointer" data-bind="click: function(){ properties.archives.push({'name': ''});$(document).trigger('drawArrows') }">${ _('Archives') } <i class="fa fa-plus"></i></a></h6>
+    <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
+      <li>
+        <input data-bind="value: name"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this);$(document).trigger('drawArrows') }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+    <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
+  </div>
 </script>
 
 
 <script type="text/html" id="common-properties-arguments">
   <h6><a class="pointer" data-bind="click: function(){ properties.arguments.push({'value': ''});$(document).trigger('drawArrows') }">${ _('Arguments') } <i class="fa fa-plus"></i></a></h6>
-  <ul class="unstyled" data-bind="foreach: properties.arguments">
-    <li style="margin-bottom: 3px">
+  <ul class="unstyled" data-bind="visible: properties.arguments().length > 0, foreach: properties.arguments">
+    <li>
       <input type="text" class="span11" data-bind="value: value"/>
       <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this);$(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
   </ul>
+  <em data-bind="visible: properties.arguments().length == 0">${ _('No arguments defined.') }</em>
 </script>
 
 
@@ -619,7 +615,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-action-credentials">
-  <select data-bind="options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
+  <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
+  <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
 </script>
 
 
