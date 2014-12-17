@@ -298,20 +298,18 @@ def save_coordinator(request):
 def gen_xml_coordinator(request):
   response = {'status': -1}
 
-#  try:
   coordinator_dict = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
 
   coordinator = Coordinator(data=coordinator_dict)
 
   response['status'] = 0
   response['xml'] = coordinator.to_xml()
-#  except Exception, e:
-#    response['message'] = str(e)
     
   return HttpResponse(json.dumps(response), mimetype="application/json") 
 
 
-def submit_coordinator(request, coordinator):
+def submit_coordinator(request, doc_id):
+  coordinator = Coordinator(document=Document2.objects.get(id=doc_id)) # Todo perms  
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -332,14 +330,15 @@ def submit_coordinator(request, coordinator):
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
-                 'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
+                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
                 }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_dir = Submission(request.user, coordinator.workflow, request.fs, request.jt, mapping).deploy()
+    wf_doc = Document2.objects.get(uuid=coordinator.data['properties']['workflow'])
+    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)
@@ -347,9 +346,9 @@ def _submit_coordinator(request, coordinator, mapping):
     submission = Submission(request.user, coordinator, request.fs, request.jt, properties=properties)
     job_id = submission.run()
 
-    History.objects.create_from_submission(submission)
-
     return job_id
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
                          detail=ex._headers.get('oozie-error-message', ex))
+    
+    

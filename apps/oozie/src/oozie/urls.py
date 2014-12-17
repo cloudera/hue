@@ -85,6 +85,7 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^editor/coordinator/new/$', 'new_coordinator', name='new_coordinator'),
   url(r'^editor/coordinator/save/$', 'save_coordinator', name='save_coordinator'),
+  url(r'^editor/coordinator/submit/(?P<doc_id>\d+)$', 'submit_coordinator', name='editor_submit_coordinator'),
   url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'), # Temporary
 )
 

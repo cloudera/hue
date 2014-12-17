@@ -243,7 +243,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 </div>
 
 
-<div id="submit-wf-modal" class="modal hide"></div>
+<div id="submit-coord-modal" class="modal hide"></div>
 
 <div id="exposeOverlay"></div>
 
@@ -287,6 +287,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   function addActionDemiModalFieldCancel() {
     viewModel.removeWidgetById(newAction.id());
   }
+  
+  $(document).on("showSubmitPopup", function(event, data){
+    $('#submit-coord-modal').html(data);
+    $('#submit-coord-modal').modal('show');
+  });  
 </script>
 
 ${ commonfooter(messages) | n,unicode }
