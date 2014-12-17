@@ -52,7 +52,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal" data-bind="css: {'btn': true}">
+      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
         <i class="fa fa-cog"></i>
       </button>
       &nbsp;&nbsp;&nbsp;
@@ -72,153 +72,169 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <form class="form-search" style="margin: 0">
     <strong>${_("Name")}</strong>
     <input data-bind="value: $root.coordinator.name"/>
-    
-    &nbsp;&nbsp;&nbsp;
-    1
-    2
-    3
-    4
-    Scrollspy?
   </form>
 </div>
 
-<div>
-  <div>     
-    <h1>1 Which workflow to schedule?</h1> 
 
-    <select data-bind="options: workflows,
-                       optionsText: 'name',
-                       optionsValue: 'uuid',
-                       value: coordinator.properties.workflow,
-                       optionsCaption: 'Choose...'">
-    </select>
-  </div>
-  
-  <div data-bind="visible: coordinator.properties.workflow">
-    <h1>2 How often?</h1>
-    
-    [hourly] [daily] [weekly] [monthly]
-    <input data-bind="value: coordinator.properties.cron_frequency"/>
-    
-  </div>
-  
-  <div data-bind="visible: coordinator.properties.workflow">
-    <h1>3 Workflow Parameters</h1>    
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 coordinator">
 
-    <ul data-bind="foreach: coordinator.variables">
-      <li>
-        <input data-bind="value: workflow_variable"/>
-		<div class="btn-group">
-		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-		      <!-- ko if: dataset_type() == 'parameter' -->
-              ${ _('Parameter') }
-              <!-- /ko -->
-              <!-- ko if: dataset_type() == 'input_path' -->
-              ${ _('Input Path') }
-              <!-- /ko -->
-              <!-- ko if: dataset_type() == 'output_path' -->
-              ${ _('Output Path') }
-              <!-- /ko --> <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu" role="menu" data-bind="foreach: $parent.coordinator.variablesUI">
-		    <!-- ko if: $data != $parent.dataset_type() -->
-		    <li>
-		      <a href="#" data-bind="click: function() { $parent.dataset_type($data) } ">
-		      <!-- ko if: $data == 'parameter' -->
-		      ${ _('Parameter') }
-		      <!-- /ko -->
-              <!-- ko if: $data == 'input_path' -->
-              ${ _('Input Path') }
-              <!-- /ko -->
-              <!-- ko if: $data == 'output_path' -->
-              ${ _('Output Path') }
-              <!-- /ko -->
-		      </a>
-		    </li>
-		    <!-- /ko -->
-		  </ul>
-		</div>        
-        <input data-bind="value: dataset_variable"/>
-        
-        <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
+      <div class="card card-home">
+        <h1 class="card-heading simple">${ _('Which workflow to schedule?') }</h1>
+
+        <div class="card-body">
+          <select data-bind="options: workflows,
+                         optionsText: 'name',
+                         optionsValue: 'uuid',
+                         value: coordinator.properties.workflow,
+                         optionsCaption: 'Choose...'">
+          </select>
+        </div>
+      </div>
+
+      <div class="card card-home" data-bind="visible: coordinator.properties.workflow">
+        <h1 class="card-heading simple">${ _('How often?') }</h1>
+
+        <div class="card-body">
           [hourly] [daily] [weekly] [monthly]
-          <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
-            <i class="fa fa-sliders"></i>
+          <input data-bind="value: coordinator.properties.cron_frequency" />
+        </div>
+      </div>
+
+      <div class="card card-home" data-bind="visible: coordinator.properties.workflow">
+        <h1 class="card-heading simple">${ _('Workflow Parameters') }</h1>
+
+        <div class="card-body">
+          <ul data-bind="foreach: coordinator.variables" class="unstyled">
+            <li>
+              <input data-bind="value: workflow_variable"/>
+
+              <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-expanded="false">
+                  <!-- ko if: dataset_type() == 'parameter' -->
+                  ${ _('Parameter') }
+                  <!-- /ko -->
+                  <!-- ko if: dataset_type() == 'input_path' -->
+                  ${ _('Input Path') }
+                  <!-- /ko -->
+                  <!-- ko if: dataset_type() == 'output_path' -->
+                  ${ _('Output Path') }
+                  <!-- /ko --> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" data-bind="foreach: $parent.coordinator.variablesUI">
+                  <!-- ko if: $data != $parent.dataset_type() -->
+                  <li>
+                    <a href="#" data-bind="click: function() { $parent.dataset_type($data) } ">
+                      <!-- ko if: $data == 'parameter' -->
+                      ${ _('Parameter') }
+                      <!-- /ko -->
+                      <!-- ko if: $data == 'input_path' -->
+                      ${ _('Input Path') }
+                      <!-- /ko -->
+                      <!-- ko if: $data == 'output_path' -->
+                      ${ _('Output Path') }
+                      <!-- /ko -->
+                    </a>
+                  </li>
+                  <!-- /ko -->
+                </ul>
+              </div>
+              <input data-bind="value: dataset_variable"/>
+
+              <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
+              [hourly] [daily] [weekly] [monthly]
+
+              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+              <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
+                <i class="fa fa-sliders"></i>
+              </a>
+
+              <div data-bind="visible: show_advanced" style="padding-left: 20px">
+                Done flag <input data-bind="value: done_flag"/>
+                Range
+
+                <div class="control-group">
+                  <label class="control-label">${ _('Instance') }</label>
+
+                  <div class="controls">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                      <button id="default-btn" type="button" class="btn"
+                              data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
+                        ${ _('Default') }
+                      </button>
+                      <button id="single-btn" type="button" class="btn"
+                              data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
+                        ${ _('Single') }
+                      </button>
+                      <button id="range-btn" type="button" class="btn"
+                              data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
+                        ${ _('Range') }
+                      </button>
+                    </div>
+                    <span class="help-block">instance_choice.help_text</span>
+
+                    <div data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
+                      <span class="span1">${ _('Start') }</span>
+                      <input name="instance_start" type="number"
+                             data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
+                      <label style="display: inline">
+                        &nbsp;
+                        <input type="checkbox" data-bind="checked: is_advanced_start_instance">
+                        ${ _('(advanced)') }
+                      </label>
+                      <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"
+                             class="span4"/>
+                      <span class="help-block">advanced_start_instance.help_text </span>
+                    </div>
+                    <div data-bind="visible: instance_choice() == 'range'">
+                      <span class="span1">${ _('End') }</span>
+                      <input name="instance_end" type="number"
+                             data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
+                      <label style="display: inline">
+                        &nbsp;
+                        <input type="checkbox" data-bind="checked: is_advanced_end_instance">
+                        ${ _('(advanced)') }
+                      </label>
+                      <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"
+                             class="span4"/>
+                      <span class="help-block">advanced_end_instance.help_text</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!-- /ko -->
+            </li>
+          </ul>
+
+          <a class="pointer" data-bind="click: coordinator.addVariable">
+            <i class="fa fa-plus"></i> ${ _('Add a parameter') }
           </a>
-          
-          <span data-bind="visible: show_advanced">            
-            Done flag <input data-bind="value: done_flag"/>
-            Range
+        </div>
+      </div>
 
-			<div class="control-group">
-			  <label class="control-label">${ _('Instance') }</label>
-			  <div class="controls">
-			      <div class="btn-group" data-toggle="buttons-radio">
-			          <button id="default-btn" type="button" class="btn" data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
-			            ${ _('Default') }
-			          </button>
-			          <button id="single-btn" type="button" class="btn" data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
-			            ${ _('Single') }
-			          </button>
-			          <button id="range-btn" type="button" class="btn" data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
-			            ${ _('Range') }
-			          </button>
-			      </div>
-			      <span class="help-block">instance_choice.help_text</span>
-			
-			      <div data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
-			          <span class="span1">${ _('Start') }</span>
-			          <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
-			          <label style="display: inline">
-			              &nbsp;
-			              <input type="checkbox" data-bind="checked: is_advanced_start_instance">
-			              ${ _('(advanced)') }
-			          </label>
-			          <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()" class="span4"/>
-			          <span class="help-block">advanced_start_instance.help_text </span>
-			      </div>
-			      <div data-bind="visible: instance_choice() == 'range'">
-			          <span class="span1">${ _('End') }</span>
-			          <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()" />
-			          <label style="display: inline">
-			              &nbsp;
-			              <input type="checkbox" data-bind="checked: is_advanced_end_instance">
-			              ${ _('(advanced)') }
-			          </label>
-			          <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()" class="span4"/>
-			          <span class="help-block">advanced_end_instance.help_text</span>
-			      </div>
-			  </div>
-			</div
 
-          </span>          
-        <!-- /ko -->
-                
-        <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
-          <i class="fa fa-minus"></i>
-        </a>
-      </li>
-    </ul>
-
-    <button data-bind="click: coordinator.addVariable">
-      <i class="fa fa-plus"></i>
-    </button>
-
+    </div>
   </div>
 </div>
 
 
-<div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="settingsModal" class="modal hide fade" data-backdrop="false">
+  <div class="modal-header" style="padding-bottom: 2px">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">${ _('Coordinator Settings') }</h3>
+  </div>
   <div class="modal-body">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
 
-      ${ _('Throttle') }
+      <h4>${ _('Throttle') }</h4>
       <input data-bind="value: coordinator.properties.throttle"/>
-      <br/>
 
-      ${ _('Oozie Parameters') }
-      <ul data-bind="foreach: coordinator.properties.properties">
+      <h4>${ _('Oozie Parameters') }</h4>
+      <ul data-bind="foreach: coordinator.properties.properties" class="unstyled">
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
@@ -227,18 +243,14 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
           </a>
         </li>
       </ul>
-      <button data-bind="click: function(){ $root.coordinator.properties.properties.push({'name': '', 'value': ''}); }">
-        <i class="fa fa-plus"></i>
-      </button>
+      <a class="pointer" data-bind="click: function(){ $root.coordinator.properties.properties.push({'name': '', 'value': ''}); }">
+        <i class="fa fa-plus"></i> ${ _('Add parameter') }
+      </a>
 
-      <br/>
-      <div class="control-group">
-        <label class="control-label">${ _('SLA Configuration') }</label>
-        <div class="controls" data-bind="with: $root.coordinator.properties">
-          ${ utils.slaForm() }
-        </div>
+      <h4>${ _('SLA Configuration') }</h4>
+      <div class="sla-form" data-bind="with: $root.coordinator.properties">
+        ${ utils.slaForm() }
       </div>
-    </div>
   </div>
 </div>
 
@@ -259,6 +271,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
+<script src="/static/js/ko.hue-bindings.js"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
