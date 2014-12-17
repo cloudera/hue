@@ -195,26 +195,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 
 
-  <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
-  <div class="container-fluid">
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneSixthLeft'">
-      <div class="span2 preview-row"></div>
-      <div class="span10 preview-row"></div>
-    </div>
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
-      <div class="span12 preview-row">
-      </div>
-    </div>
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
-      <div class="span12 preview-row">
-        <div style="text-align: center; color:#EEE; font-size: 180px; margin-top: 80px">
-          <i class="fa fa-magic"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
@@ -253,7 +233,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="internal-column-template">
-  <div data-bind="css: klass()" style="min-height: 50px !important;">
+  <div data-bind="css: klass(), style: {'minHeight': '50px !important', 'width': percWidth() + '%' }">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="visible: ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       <div data-bind="visible: enableOozieDropOnBefore, css: {'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
@@ -294,7 +274,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </div>
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
     </div>
-    <div class="row-fluid">
+    <div class="row-fluid" data-bind="style: {'width': columns().length < 5 ? '100%' : (columns().length * 25)+'%' }">
       <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && ['join-widget', 'decision-widget'].indexOf($data.widgets()[0].widgetType()) > -1), css: {'drop-target drop-target-side': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
@@ -424,17 +404,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="fork-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
+    <div class="big-icon"><i class="fa fa-sitemap"></i></div>
+    <div data-bind="visible: $root.isEditing" style="padding: 10px">
+      <a class="pointer" data-bind="click: function() { $root.convertToDecision($parent, $data) }"><i class="fa fa-magic"></i> ${_('Convert to Decision')}</a>
     </div>
-
-    <div>
-      To:
-      <span data-bind="foreach: children">
-        <span data-bind="text: $data['to']" /></span>
-      </span>
-    </div>
-    <a class="pointer" data-bind="click: function() { $root.convertToDecision($parent, $data) }">Convert to Decision</a>
   </div>
   <!-- /ko -->
 </script>
@@ -442,15 +416,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="join-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    </div>
-
-    <div>
-      <!-- ko if: children().length == 1 -->
-      Then --> <span data-bind="text: children()[0]['to']"></span>
-      <!-- /ko -->
-    </div>
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
+    <div class="big-icon"><i class="fa fa-sitemap fa-rotate-180"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -458,21 +425,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="decision-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
-  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 80px">
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    </div>
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
+    <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
     
     <div data-bind="visible: $root.isEditing">
-      To:
-      <span data-bind="foreach: children">
+      <ul data-bind="foreach: children" class="unstyled">
+        <li>${ _('To') }
         <select data-bind="options: $root.workflow.nodeIds,
                      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
                      value: $data['to']
                      ">
         </select>      
-        if <input data-bind="value: $data['condition']" />
-      </span>
-      <a>${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
+        ${ _('if') } <input data-bind="value: $data['condition']" />
+        </li>
+      </ul>
+      <a data-bind="click: function(){  children.push({'to': '', 'condition': ''});}">${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
     </div>
   </div>
   <!-- /ko -->
@@ -1607,48 +1574,48 @@ ${ dashboard.import_bindings() }
   function linkWidgets(fromId, toId) {
     var _from = $("#wdg_" + (typeof fromId == "function" ? fromId() : fromId));
     var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));
+    if (_from.length > 0 && _to.length > 0){
+      var _fromCenter = {
+        x: _from.position().left + _from.outerWidth() / 2,
+        y: _from.position().top + _from.outerHeight() + 3
+      }
 
-    var _fromCenter = {
-      x: _from.position().left + _from.outerWidth() / 2,
-      y: _from.position().top + _from.outerHeight() + 3
-    }
+      var _toCenter = {
+        x: _to.position().left + _to.outerWidth() / 2,
+        y: _to.position().top - 5
+      }
 
-    var _toCenter = {
-      x: _to.position().left + _to.outerWidth() / 2,
-      y: _to.position().top - 5
-    }
+      var _curveCoords = {};
 
-    var _curveCoords = {};
-
-    if (_fromCenter.x == _toCenter.x) {
-      _curveCoords.x = _fromCenter.x;
-      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
-    }
-    else {
-      if (_fromCenter.x > _toCenter.x) {
-        _fromCenter.x = _fromCenter.x - 5;
-        _toCenter.x = _toCenter.x + 5;
+      if (_fromCenter.x == _toCenter.x) {
+        _curveCoords.x = _fromCenter.x;
+        _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
       }
       else {
-        _fromCenter.x = _fromCenter.x + 5;
-        _toCenter.x = _toCenter.x - 5;
+        if (_fromCenter.x > _toCenter.x) {
+          _fromCenter.x = _fromCenter.x - 5;
+          _toCenter.x = _toCenter.x + 5;
+        }
+        else {
+          _fromCenter.x = _fromCenter.x + 5;
+          _toCenter.x = _toCenter.x - 5;
+        }
+        _curveCoords.x = _fromCenter.x - (_fromCenter.x - _toCenter.x) / 4;
+        _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
       }
-      _curveCoords.x = _fromCenter.x - (_fromCenter.x - _toCenter.x) / 4;
-      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
+
+      $(document.body).curvedArrow({
+        p0x: _fromCenter.x,
+        p0y: _fromCenter.y,
+        p1x: _curveCoords.x,
+        p1y: _curveCoords.y,
+        p2x: _toCenter.x,
+        p2y: _toCenter.y,
+        lineWidth: 2,
+        size: 10,
+        strokeStyle: viewModel.isEditing()?'#e5e5e5':'#dddddd'
+      });
     }
-
-    $(document.body).curvedArrow({
-      p0x: _fromCenter.x,
-      p0y: _fromCenter.y,
-      p1x: _curveCoords.x,
-      p1y: _curveCoords.y,
-      p2x: _toCenter.x,
-      p2y: _toCenter.y,
-      lineWidth: 2,
-      size: 10,
-      strokeStyle: viewModel.isEditing()?'#e5e5e5':'#dddddd'
-    });
-
   }
 
   function drawArrows(){

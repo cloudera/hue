@@ -27,7 +27,7 @@
 
 <%def name="import_layout()">
   <link rel="stylesheet" href="/static/css/common_dashboard.css">
-  <script src="/static/js/ko.layout.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/js/ko.common-dashboard.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
