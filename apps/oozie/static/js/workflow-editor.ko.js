@@ -990,3 +990,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
+
+
+function logGA(page) {
+  if (typeof trackOnGA == 'function') {
+    trackOnGA('oozie/editor/workflow' + page);
+  }
+}

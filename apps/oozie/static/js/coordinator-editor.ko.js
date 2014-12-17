@@ -41,9 +41,8 @@ var Coordinator = function (vm, coordinator) {
   self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "");
 
   self.properties = ko.mapping.fromJS(typeof coordinator.properties != "undefined" && coordinator.properties != null ? coordinator.properties : {});
-  
   self.variables = ko.mapping.fromJS(typeof coordinator.variables != "undefined" && coordinator.variables != null ? coordinator.variables : []);
-  //self.variables = ko.observableArray([]);
+
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
 
   self.properties.workflow.subscribe(function(newVal) {
@@ -72,8 +71,8 @@ var Coordinator = function (vm, coordinator) {
        'instance_choice': 'default', // is_advanced_start_instance, start_instance, is_advanced_end_instance, end_instance
        'frequency_number': 1,
        'frequency_unit': 'DAYS',
-       'start': null,
-       'name': '',
+       'start': new Date(),
+
        'shared_dataset_uuid': '' // If reusing a shared dataset
     };
 
@@ -122,6 +121,9 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   };
 
   self.gen_xml = function () {
+	$(".jHueNotify").hide();
+	logGA('gen_xml');
+
     $.post("/oozie/editor/coordinator/gen_xml/", {
         "coordinator": ko.mapping.toJSON(self.coordinator)
     }, function (data) {
@@ -161,3 +163,10 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
     });
   };
 };
+
+
+function logGA(page) {
+  if (typeof trackOnGA == 'function') {
+    trackOnGA('oozie/editor/coordinator/' + page);
+  }
+}
