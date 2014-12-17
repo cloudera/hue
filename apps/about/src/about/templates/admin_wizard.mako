@@ -321,7 +321,11 @@ $(document).ready(function(){
     var button = $(this);
     $(button).button('loading');
     var calls = jQuery.map($("[data-sample-url]"), function(app) {
-      return $.post($(app).data("sample-url"));
+      return $.post($(app).data("sample-url"), function(data) {
+        if (data.status != 0) {
+          $(document).trigger('error', data.message);
+        }
+      });
     });
     $.when.apply(this, calls)
       .then(function() {
