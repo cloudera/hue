@@ -14,24 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Dataset = function (vm, dataset) {
-  var self = this;
-
-}
-
-
-var InputDataset = function (vm, input_dataset) {
-  var self = this;
-  
-  
-}
-
-
-var OutputDataset = function (vm, output_dataset) {
-  var self = this;
-  
-  
-}
 
 var Coordinator = function (vm, coordinator) {
   var self = this;
@@ -49,7 +31,8 @@ var Coordinator = function (vm, coordinator) {
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
 	  $.get("/desktop/api2/doc/get", {
-        "uuid": self.properties.workflow()
+        "uuid": self.properties.workflow(),
+        "with_data": true
 	   }, function (data) {
 	    // set wf
 	  }).fail(function (xhr, textStatus, errorThrown) {
@@ -60,11 +43,11 @@ var Coordinator = function (vm, coordinator) {
   
   self.addVariable = function() {
     var _var = {       
-       'workflow_variable': '',
+       'workflow_variable': '', // Variable we want to fill in the workflow
        
        'dataset_type': 'parameter',
        
-       'uuid': UUID(),
+       'uuid': UUID(), // Dataset
        'dataset_variable': '',       
        'show_advanced': false,
        'use_done_flag': false,
@@ -140,20 +123,6 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
     }, function (data) {
       if (data.status == 0) {
         console.log(data.xml);
-      }
-      else {
-        $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
-  };
-
-  self.import_coordinators = function () {
-    $.post("/oozie/editor/coordinator/import_coordinators/", {
-    }, function (data) {
-      if (data.status == 0) {
-        console.log(data.json);
       }
       else {
         $(document).trigger("error", data.message);

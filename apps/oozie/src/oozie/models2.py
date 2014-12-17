@@ -101,17 +101,7 @@ class Workflow():
       
   @property
   def id(self):
-    return self.document.id
-
-  @property      
-  def deployment_dir(self):
-    _data = json.loads(self.data)
-    return _data['workflow']['properties']['deployment_dir']
-  
-  @property      
-  def parameters(self):
-    _data = json.loads(self.data)
-    return _data['workflow']['properties']['parameters']  
+    return self.document.id  
   
   def get_json(self):
     _data = self.get_data()
@@ -127,11 +117,11 @@ class Workflow():
     else:
       _data['workflow']['dependencies'] = []
 
-    if 'properties' not in _data['workflow']:
-      _data['workflow']['properties'] = {}
-      
-    if 'properties' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['properties'] = []      
+#    if 'properties' not in _data['workflow']:
+#      _data['workflow']['properties'] = {}
+#      
+#    if 'properties' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['properties'] = []      
     if 'deployment_dir' not in _data['workflow']['properties']:
       default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too
       _data['workflow']['properties']['deployment_dir'] = default_dir
@@ -140,18 +130,18 @@ class Workflow():
           {'name': 'oozie.use.system.libpath', 'value': True},
       ]
 
-    if 'sla_workflow_enabled' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['sla_workflow_enabled'] = False
-    if 'sla_enabled' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['sla_enabled'] = False            
-    
-    if 'schema_version' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['schema_version'] = 'uri:oozie:workflow:0.4'
-    if 'job_xml' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['job_xml'] = ''
-
-    if 'credentials' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['credentials'] = []
+#    if 'sla_workflow_enabled' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['sla_workflow_enabled'] = False
+#    if 'sla_enabled' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['sla_enabled'] = False            
+#    
+#    if 'schema_version' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['schema_version'] = 'uri:oozie:workflow:0.4'
+#    if 'job_xml' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['job_xml'] = ''
+#
+#    if 'credentials' not in _data['workflow']['properties']:
+#      _data['workflow']['properties']['credentials'] = []
 
     return _data
   
@@ -161,8 +151,7 @@ class Workflow():
     tmpl = 'editor/gen2/workflow.xml.mako'
 
     data = self.get_data()
-    nodes = [Node(node) for node in data['workflow']['nodes'] if node['name'] != 'End'] + [
-                Node(node) for node in data['workflow']['nodes'] if node['name'] == 'End'] # End at the end
+    nodes = [node for node in self.nodes if node['name'] != 'End'] + [node for node in self.nodes if node['name'] == 'End'] # End at the end
     node_mapping = dict([(node.id, node) for node in nodes])
     
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
@@ -177,26 +166,45 @@ class Workflow():
           }))
     return force_unicode(xml)  
 
+  @property      
+  def deployment_dir(self):
+    _data = self.get_data()
+    return _data['workflow']['properties']['deployment_dir']
+  
+  @property      
+  def parameters(self):
+    _data = self.get_data()
+    return _data['workflow']['properties']['parameters']
+
+  @property      
+  def sla_enabled(self):
+    _data = self.get_data()
+    return _data['workflow']['properties']['sla_enabled']
+
+  @property      
+  def sla(self):
+    _data = self.get_data()
+    return _data['workflow']['properties']['sla']
+
+  @property      
+  def nodes(self):
+    _data = self.get_data()
+    return [Node(node) for node in _data['workflow']['nodes']]
+
   def find_parameters(self):
     params = set()
 
-#    if self.sla_enabled:
-#      for param in find_json_parameters(self.sla):
-#        params.add(param)
+    if self.sla_enabled:
+      for param in find_json_parameters(self.sla):
+        params.add(param)
 
-#    for node in self.node_list:
-#      if hasattr(node, 'find_parameters'):
-#        params.update(node.find_parameters())
+    for node in self.nodes:
+      params.update(node.find_parameters())
 
     return dict([(param, '') for param in list(params)])
 
   def find_all_parameters(self):
     params = self.find_parameters()
-
-#    if hasattr(self, 'sla') and self.sla_enabled:
-#      for param in find_json_parameters(self.sla):
-#        if param not in params:
-#          params[param] = ''
 
     for param in self.parameters:
       params[param['name'].strip()] = param['value']
@@ -237,12 +245,17 @@ class Node():
     return django_mako.render_to_string(self.get_template_name(), data)
 
   @property      
-  def name(self):
-    return self.data['name']
+  def id(self):
+    return self.data['id']
   
   @property      
-  def id(self):
-    return self.data['id']    
+  def name(self):
+    return self.data['name']
+
+  @property      
+  def sla_enabled(self):
+    _data = self.get_data()
+    return _data['workflow']['properties']['sla_enabled']
 
   def _augment_data(self):
     self.data['type'] = self.data['type'].replace('-widget', '')
@@ -270,6 +283,9 @@ class Node():
     
   def get_template_name(self):
     return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']    
+
+  def find_parameters(self):
+    return find_parameters(self.data)    
 
 
 class Action(object):
@@ -1011,7 +1027,8 @@ for node in NODES.itervalues():
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:
-    fields = [field.name for field in instance._meta.fields]
+    fields = NODES[self.data['type']].FIELDS.keys()
+    #fields = [field.name for field in instance._meta.fields]
 
   params = []
   for field in fields:
