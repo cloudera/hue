@@ -44,6 +44,7 @@ var Coordinator = function (vm, coordinator) {
   self.variables = ko.mapping.fromJS(typeof coordinator.variables != "undefined" && coordinator.variables != null ? coordinator.variables : []);
 
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
+  self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
 
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
@@ -65,9 +66,11 @@ var Coordinator = function (vm, coordinator) {
        
        'uuid': UUID(),
        'dataset_variable': '',       
-       'show_advanced': false,       
-       'done_flag': '',
+       'show_advanced': false,
+       'use_done_flag': false,
+       'done_flag': '_SUCCESS',
        'timezone': 'America/Los_Angeles',
+       'same_timezone': true,
        'instance_choice': 'default',
        'is_advanced_start_instance': false,
        'start_instance': '0',
@@ -75,9 +78,11 @@ var Coordinator = function (vm, coordinator) {
        'is_advanced_end_instance': false,
        'advanced_end_instance': '${coord:current(0)}',
        'end_instance': '0',
+       'cron_frequency': '0 0 * * *',
        'frequency_number': 1,
        'frequency_unit': 'days',
        'start': new Date(),
+       'same_start': true,
 
        'shared_dataset_uuid': '' // If reusing a shared dataset
     };

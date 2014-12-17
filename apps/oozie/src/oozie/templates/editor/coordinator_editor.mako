@@ -99,6 +99,19 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         <div class="card-body">
           [hourly] [daily] [weekly] [monthly]
           <input data-bind="value: coordinator.properties.cron_frequency" />
+          
+          <div data-bind="visible: coordinator.showAdvancedFrequencyUI" style="padding-left: 20px">
+            Start
+            <input data-bind="value: coordinator.properties.start" />
+            End
+            <input data-bind="value: coordinator.properties.end" />
+            Timezone
+            <input data-bind="value: coordinator.properties.timezone" />  
+          </div>
+          
+          <a href="#" data-bind="click: function() { $root.coordinator.showAdvancedFrequencyUI(! $root.coordinator.showAdvancedFrequencyUI()) }">
+            <i class="fa fa-sliders"></i>
+          </a>          
         </div>
       </div>
 
@@ -143,20 +156,29 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               </div>
               <input data-bind="value: dataset_variable"/>
 
-              <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
-              [hourly] [daily] [weekly] [monthly]
+              <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->              
+              [hourly] [daily] [weekly] [monthly] <input data-bind="value: cron_frequency" />
 
-              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
               <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
                 <i class="fa fa-sliders"></i>
               </a>
+              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
 
               <div data-bind="visible: show_advanced" style="padding-left: 20px">
-                Done flag <input data-bind="value: done_flag"/>
-                Range
-
+                Done flag 
+                <input type="checkbox" data-bind="checked: use_done_flag" />
+                <input data-bind="value: done_flag, visible: use_done_flag"/>
+                
+                Same start
+                <input type="checkbox" data-bind="checked: same_start" />                
+                <input data-bind="value: start, visible: ! same_start()" />
+                
+                Same timezone
+                <input type="checkbox" data-bind="checked: same_timezone" />
+                <input data-bind="value: timezone, visible: ! same_timezone()" />
+                
                 <div class="control-group">
                   <label class="control-label">${ _('Instance') }</label>
 
@@ -229,6 +251,15 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <h3 id="myModalLabel">${ _('Coordinator Settings') }</h3>
   </div>
   <div class="modal-body">
+
+      <h4>${ _('Timeout') }</h4>
+      <input data-bind="value: coordinator.properties.timeout"/>
+
+      <h4>${ _('Concurrency') }</h4>
+      <input data-bind="value: coordinator.properties.concurrency"/>
+      
+      <h4>${ _('Execution') }</h4>
+      <input data-bind="value: coordinator.properties.execution"/>
 
       <h4>${ _('Throttle') }</h4>
       <input data-bind="value: coordinator.properties.throttle"/>

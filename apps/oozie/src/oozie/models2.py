@@ -1204,31 +1204,31 @@ class Coordinator():
       self._data = data
     else:
       self._data = {
-          "id": None, 
-          "uuid": None,
-          "name": "My Coordinator",
-          "variables": [],
-          "properties": {
-              "deployment_dir": "",
-              "schema_version": "uri:oozie:coordinator:0.2",
-              "frequency_number": 1,
-              "frequency_unit": "days",
-              "cron_frequency": "0 0 * * *",
-              "cron_advanced": False,
-              "timezone": "America/Los_Angeles",
-              "start": datetime.today(),
-              "end": datetime.today() + timedelta(days=3),
-              "workflow": None,
-              "timeout": None,
-              "concurrency": None,
-              "execution": None,
-              "throttle": None,
-              "job_xml": "",
-              "sla_enabled": False,
-              "sla_workflow_enabled": False,
-              "credentials": [],
-              "properties": [],
-              "sla": Workflow.SLA_DEFAULT
+          'id': None, 
+          'uuid': None,
+          'name': 'My Coordinator',
+          'variables': [],
+          'properties': {
+              'deployment_dir': '',
+              'schema_version': 'uri:oozie:coordinator:0.2',
+              'frequency_number': 1,
+              'frequency_unit': 'days',
+              'cron_frequency': '0 0 * * *',
+              'cron_advanced': False,
+              'timezone': 'America/Los_Angeles',
+              'start': datetime.today(),
+              'end': datetime.today() + timedelta(days=3),
+              'workflow': None,
+              'timeout': None,
+              'concurrency': None,
+              'execution': None,
+              'throttle': None,
+              'job_xml': '',
+              'sla_enabled': False,
+              'sla_workflow_enabled': False,
+              'credentials': [],
+              'properties': [],
+              'sla': Workflow.SLA_DEFAULT
           }
       }
 
