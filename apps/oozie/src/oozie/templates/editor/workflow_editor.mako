@@ -428,7 +428,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
     
-    <div data-bind="visible: $root.isEditing">
+    <div data-bind="visible: $root.isEditing" style="padding: 10px">
       <ul data-bind="foreach: children" class="unstyled">
         <li>${ _('To') }
         <select data-bind="options: $root.workflow.nodeIds,

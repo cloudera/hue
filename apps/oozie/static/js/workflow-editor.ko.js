@@ -299,46 +299,52 @@ var Workflow = function (vm, workflow) {
 
   self.removeNode = function (node_id) {
     var node = self.getNodeById(node_id);
+
     var parents = self.getParents(node_id);
     var parent = null;
 
     var childLink = node.get_link('to');
-    var childId = ko.mapping.toJS(childLink)['to'];
+    if (childLink) {
+      var childId = ko.mapping.toJS(childLink)['to'];
 
-    $.each(parents, function (index, _parent) {
-      _parent.remove_link('to', node_id);
-      _parent.children.unshift({'to': childId});
-      parent = _parent;
-    });
+      $.each(parents, function (index, _parent) {
+        _parent.remove_link('to', node_id);
+        _parent.children.unshift({'to': childId});
+        parent = _parent;
+      });
 
-    self.nodes.remove(node);
+      self.nodes.remove(node);
 
-    // If need to remove fork
-    if (parent.type() == 'fork-widget') {
-      var fork = parent;
-      var join = self.getNodeById(childId);
+      // If need to remove fork
+      if (parent.type() == 'fork-widget') {
+        var fork = parent;
+        var join = self.getNodeById(childId);
 
-      if (join.type() == 'join-widget') {
-        if (fork.children().length == 2) {
-          // Link top to above and delete fork
-          fork.remove_link('to', childId);
-          var forkParent = self.getParents(fork.id())[0];
-          forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
+        if (join.type() == 'join-widget') {
+          if (fork.children().length == 2) {
+            // Link top to above and delete fork
+            fork.remove_link('to', childId);
+            var forkParent = self.getParents(fork.id())[0];
+            forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
 
-          self.nodes.remove(fork);
+            self.nodes.remove(fork);
 
-          // Link bottom to child of join
-          var beboreJoin = self.getParents(childId)[0];
-          var joinChildId = ko.mapping.toJS(join.get_link('to'))['to'];
-          beboreJoin.set_link('to', joinChildId);
+            // Link bottom to child of join
+            var beboreJoin = self.getParents(childId)[0];
+            var joinChildId = ko.mapping.toJS(join.get_link('to'))['to'];
+            beboreJoin.set_link('to', joinChildId);
 
-          self.nodes.remove(join);
-        } else {
-          parent.remove_link('to', childId);
+            self.nodes.remove(join);
+          } else {
+            parent.remove_link('to', childId);
+          }
         }
+      } else if (parent.type() == 'decision-widget') {
+        parent.remove_link('to', childId);
       }
-    } else if (parent.type() == 'decision-widget') {
-      parent.remove_link('to', childId);
+    }
+    else {
+      self.nodes.remove(node);
     }
   };
 
