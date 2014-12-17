@@ -27,24 +27,24 @@
   % if dataset.data['instance_choice'] == 'default':
     <instance>${ '${'}coord:current(0)}</instance>
   % elif dataset.data['instance_choice'] == 'single':
-    % if not dataset.is_advanced_start_instance:
-      <instance>${ '${'}coord:current(${ dataset.start_instance })}</instance>
+    % if not dataset.data['is_advanced_start_instance']:
+      <instance>${ '${'}coord:current(${ dataset.data['start_instance'] })}</instance>
     % else:
-      <instance>${ dataset.advanced_start_instance }</instance>
+      <instance>${ dataset.data['advanced_start_instance'] }</instance>
     % endif
   % else:
     <start-instance>
-      % if not dataset.is_advanced_start_instance:
-        ${ '${'}coord:current(${ dataset.start_instance })}
+      % if not dataset.data['is_advanced_start_instance']:
+        ${ '${'}coord:current(${ dataset.data['start_instance'] })}
       % else:
-        ${ dataset.advanced_start_instance }
+        ${ dataset.data['advanced_start_instance'] }
       % endif
     </start-instance>
     <end-instance>
-      % if not dataset.is_advanced_end_instance:
-        ${ '${'}coord:current(${ dataset.end_instance })}
+      % if not dataset.data['is_advanced_end_instance']:
+        ${ '${'}coord:current(${ dataset.data['end_instance'] })}
       % else:
-        ${ dataset.advanced_end_instance }
+        ${ dataset.data['advanced_end_instance'] }
       % endif
     </end-instance>
   % endif
