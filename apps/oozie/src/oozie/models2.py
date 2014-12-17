@@ -113,35 +113,18 @@ class Workflow():
     
     if self.document is not None:
       _data['workflow']['id'] = self.document.id
-      _data['workflow']['dependencies'] = list(self.document.dependencies.values())
+      _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid',))
     else:
       _data['workflow']['dependencies'] = []
-
-#    if 'properties' not in _data['workflow']:
-#      _data['workflow']['properties'] = {}
-#      
-#    if 'properties' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['properties'] = []      
+      
     if 'deployment_dir' not in _data['workflow']['properties']:
       default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too
       _data['workflow']['properties']['deployment_dir'] = default_dir
+
     if 'parameters' not in _data['workflow']['properties']:
       _data['workflow']['properties']['parameters'] = [
           {'name': 'oozie.use.system.libpath', 'value': True},
       ]
-
-#    if 'sla_workflow_enabled' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['sla_workflow_enabled'] = False
-#    if 'sla_enabled' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['sla_enabled'] = False            
-#    
-#    if 'schema_version' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['schema_version'] = 'uri:oozie:workflow:0.4'
-#    if 'job_xml' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['job_xml'] = ''
-#
-#    if 'credentials' not in _data['workflow']['properties']:
-#      _data['workflow']['properties']['credentials'] = []
 
     return _data
   
@@ -151,7 +134,7 @@ class Workflow():
     tmpl = 'editor/gen2/workflow.xml.mako'
 
     data = self.get_data()
-    nodes = [node for node in self.nodes if node['name'] != 'End'] + [node for node in self.nodes if node['name'] == 'End'] # End at the end
+    nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if node.name == 'End'] # End at the end
     node_mapping = dict([(node.id, node) for node in nodes])
     
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
@@ -203,13 +186,13 @@ class Workflow():
 
     return dict([(param, '') for param in list(params)])
 
-  def find_all_parameters(self):
+  def find_all_parameters(self, with_lib_path=True):
     params = self.find_parameters()
 
     for param in self.parameters:
       params[param['name'].strip()] = param['value']
 
-    return  [{'name': name, 'value': value} for name, value in params.iteritems()]
+    return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']
 
   def check_workspace(self, fs):
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
@@ -285,7 +268,7 @@ class Node():
     return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']    
 
   def find_parameters(self):
-    return find_parameters(self.data)    
+    return find_parameters(self)    
 
 
 class Action(object):
@@ -293,6 +276,16 @@ class Action(object):
   @classmethod
   def get_fields(cls):
     return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', [])]
+
+
+class StartNode(Action):
+  TYPE = 'start'
+  FIELDS = {}
+
+
+class EndNode(Action):
+  TYPE = 'end'
+  FIELDS = {}
 
 
 class PigAction(Action):
@@ -999,7 +992,27 @@ class JoinAction(Action):
     return []
 
 
+class ForkNode(Action):
+  TYPE = 'fork'
+  FIELDS = {}
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return []
+
+
+class DecisionNode(Action):
+  TYPE = 'decision'
+  FIELDS = {}
+  
+  @classmethod
+  def get_mandatory_fields(cls):
+    return []
+  
+
 NODES = {
+  'start-widget': StartNode,
+  'end-widget': EndNode,
   'pig-widget': PigAction,
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
@@ -1015,6 +1028,8 @@ NODES = {
   'distcp-widget': DistCpAction,  
   'kill-widget': KillAction,
   'join-widget': JoinAction,
+  'fork-widget': ForkNode,
+  'decision-widget': DecisionNode,  
 }
 
 
@@ -1027,12 +1042,11 @@ for node in NODES.itervalues():
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:
-    fields = NODES[self.data['type']].FIELDS.keys()
-    #fields = [field.name for field in instance._meta.fields]
+    fields = NODES['%s-widget' % instance.data['type']].FIELDS.keys()
 
   params = []
   for field in fields:
-    data = getattr(instance, field)
+    data = instance.data['properties'][field]
     if field == 'sla' and not instance.sla_enabled:
       continue
     if isinstance(data, list):
@@ -1046,7 +1060,6 @@ def find_parameters(instance, fields=None):
   return params
 
 def find_json_parameters(fields):
-  # To make smarter
   # Input is list of json dict
   params = []
 
@@ -1244,7 +1257,8 @@ class Coordinator():
               'sla_enabled': False,
               'sla_workflow_enabled': False,
               'credentials': [],
-              'properties': [],
+              'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}],
+              'properties': [], # Aka workflow paramters
               'sla': Workflow.SLA_DEFAULT
           }
       }
@@ -1367,7 +1381,7 @@ class Dataset():
     if type(self._data['start']) == unicode: 
       self._data['start'] = parse(self._data['start'])
 
-    self._data['name'] = self._data['workflow_variable'] # Harmonize name for Oozie
+    self._data['name'] = self._data['workflow_variable'] # Todo Harmonize name for Oozie XML
 
     return self._data      
       
