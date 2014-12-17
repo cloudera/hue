@@ -27,14 +27,14 @@ var Coordinator = function (vm, coordinator) {
 
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
   self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
+  self.workflowParameters = ko.mapping.fromJS(typeof coordinator.workflowParameters != "undefined" && coordinator.workflowParameters != null ? coordinator.workflowParameters : []);
 
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
-	  $.get("/desktop/api2/doc/get", {
-        "uuid": self.properties.workflow(),
-        "with_data": true
+	  $.get("/oozie/editor/workflow/parameters/", {
+		"uuid": self.properties.workflow(),
 	   }, function (data) {
-	    // set wf
+		 self.workflowParameters(data.parameters);
 	  }).fail(function (xhr, textStatus, errorThrown) {
 	    $(document).trigger("error", xhr.responseText);
 	  });

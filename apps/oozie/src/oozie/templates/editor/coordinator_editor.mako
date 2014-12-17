@@ -121,6 +121,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
           <ul data-bind="foreach: coordinator.variables" class="unstyled">
             <li>
               <input data-bind="value: workflow_variable"/>
+              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name'"></select>
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -264,16 +265,16 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       <input data-bind="value: coordinator.properties.throttle"/>
 
       <h4>${ _('Oozie Parameters') }</h4>
-      <ul data-bind="foreach: coordinator.properties.properties" class="unstyled">
+      <ul data-bind="foreach: coordinator.properties.parameters" class="unstyled">
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
-          <a href="#" data-bind="click: function(){ $root.coordinator.properties.properties.remove(this); }">
+          <a href="#" data-bind="click: function(){ $root.coordinator.properties.parameters.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
         </li>
       </ul>
-      <a class="pointer" data-bind="click: function(){ $root.coordinator.properties.properties.push({'name': '', 'value': ''}); }">
+      <a class="pointer" data-bind="click: function(){ $root.coordinator.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
       </a>
 

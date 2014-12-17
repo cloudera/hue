@@ -55,7 +55,7 @@ def edit_workflow(request):
   workflow_id = request.GET.get('workflow')
   
   if workflow_id:
-    workflow = Workflow(document=Document2.objects.get(id=workflow_id)) # Todo perms
+    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', id=workflow_id)) # Todo perms
   else:
     workflow = Workflow()
   
@@ -87,12 +87,10 @@ def save_workflow(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   layout = json.loads(request.POST.get('layout', '{}'))
 
-  name = 'test'
-
   if workflow.get('id'):
     workflow_doc = Document2.objects.get(id=workflow['id'])
   else:      
-    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=request.user)
+    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user)
 
   subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
   if subworkflows:
@@ -101,7 +99,7 @@ def save_workflow(request):
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
-  workflow_doc.name = name
+  workflow_doc.name = workflow['name']
   workflow_doc.save()
   
   workflow_instance = Workflow(document=workflow_doc)
@@ -161,6 +159,20 @@ def add_node(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+def workflow_parameters(request):
+  response = {'status': -1}
+
+  try:
+    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', owner=request.user, uuid=request.GET.get('uuid'))) # TODO perms 
+
+    response['status'] = 0
+    response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
+  except Exception, e:
+    response['message'] = str(e)
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def gen_xml_workflow(request):
   response = {'status': -1}
 
@@ -174,7 +186,7 @@ def gen_xml_workflow(request):
   except Exception, e:
     response['message'] = str(e)
     
-  return HttpResponse(json.dumps(response), mimetype="application/json") 
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def submit_workflow(request, doc_id):
@@ -198,11 +210,11 @@ def submit_workflow(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor/submit_job_popup.mako', request, {
-                   'params_form': params_form,
-                   'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
-                 }, force_template=True).content
-  return HttpResponse(json.dumps(popup), mimetype="application/json")
+    popup = render('editor/submit_job_popup.mako', request, {
+                     'params_form': params_form,
+                     'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
+                   }, force_template=True).content
+    return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
 def _submit_workflow(user, fs, jt, workflow, mapping):
@@ -260,7 +272,7 @@ def edit_coordinator(request):
   return render('editor/coordinator_editor.mako', request, {
       'coordinator_json': coordinator.json,
       'credentials_json': json.dumps(credentials.credentials.keys()),
-      'workflows_json': json.dumps(list(Document2.objects.filter(type='oozie-workflow2', owner=request.user).values('uuid', 'name')))
+      'workflows_json': json.dumps(list(Document2.objects.filter(type='oozie-workflow2', owner=request.user).values('uuid', 'name'))) # Todo perms
   })
 
 
@@ -278,10 +290,10 @@ def save_coordinator(request):
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:      
-    coordinator_doc = Document2.objects.create(name=name, type='oozie-coordinator2', owner=request.user)
+    coordinator_doc = Document2.objects.create(name=name, uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
 
   if coordinator_data['properties']['workflow']:
-    dependencies = Document2.objects.filter(uuid=coordinator_data['properties']['workflow'])
+    dependencies = Document2.objects.filter(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
     coordinator_doc.dependencies = dependencies
 
   coordinator_doc.update_data(coordinator_data)
