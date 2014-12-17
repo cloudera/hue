@@ -148,8 +148,49 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
           
           <span data-bind="visible: show_advanced">            
             Done flag <input data-bind="value: done_flag"/>
-            Range <input data-bind="value: instance_choice"/>
-            ...
+            Range
+
+			<div class="control-group">
+			  <label class="control-label">${ _('Instance') }</label>
+			  <div class="controls">
+			      <div class="btn-group" data-toggle="buttons-radio">
+			          <button id="default-btn" type="button" class="btn" data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
+			            ${ _('Default') }
+			          </button>
+			          <button id="single-btn" type="button" class="btn" data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
+			            ${ _('Single') }
+			          </button>
+			          <button id="range-btn" type="button" class="btn" data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
+			            ${ _('Range') }
+			          </button>
+			      </div>
+			      <span class="help-block">instance_choice.help_text</span>
+			
+			      <div data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
+			          <span class="span1">${ _('Start') }</span>
+			          <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
+			          <label style="display: inline">
+			              &nbsp;
+			              <input type="checkbox" data-bind="checked: is_advanced_start_instance">
+			              ${ _('(advanced)') }
+			          </label>
+			          <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()" class="span4"/>
+			          <span class="help-block">advanced_start_instance.help_text </span>
+			      </div>
+			      <div data-bind="visible: instance_choice() == 'range'">
+			          <span class="span1">${ _('End') }</span>
+			          <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()" />
+			          <label style="display: inline">
+			              &nbsp;
+			              <input type="checkbox" data-bind="checked: is_advanced_end_instance">
+			              ${ _('(advanced)') }
+			          </label>
+			          <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()" class="span4"/>
+			          <span class="help-block">advanced_end_instance.help_text</span>
+			      </div>
+			  </div>
+			</div
+
           </span>          
         <!-- /ko -->
                 

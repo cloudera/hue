@@ -22,6 +22,7 @@ import time
 import uuid
 
 from datetime import datetime, timedelta
+from dateutil.parser import parse
 from string import Template
 
 from django.utils.encoding import force_unicode
@@ -1330,9 +1331,10 @@ class Dataset():
       
   @property
   def data(self):
-    
-    self._data['start'] = datetime.today() # TODO
-    self._data['name'] = self._data['workflow_variable'] # Clean-up
+    if type(self._data['start']) == unicode: 
+      self._data['start'] = parse(self._data['start'])
+
+    self._data['name'] = self._data['workflow_variable'] # Harmonize name for Oozie
 
     return self._data      
       
