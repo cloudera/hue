@@ -80,9 +80,9 @@
   % if coord.datasets:
   <datasets>
     % for dataset in coord.datasets:
-    <dataset name="${ dataset['name'] }" frequency="${ dataset.data['frequency'] }"
+    <dataset name="${ dataset.data['name'] }" frequency="${ dataset.frequency }"
              initial-instance="${ dataset.start_utc }" timezone="${ dataset.data['timezone'] }">
-      <uri-template>${ smart_path(dataset.data['uri'], mapping) }</uri-template>
+      <uri-template>${ smart_path(dataset.data['dataset_variable'], mapping) }</uri-template>
       % if dataset.data['done_flag'] is not None:
       <done-flag>${ dataset.data['done_flag'] }</done-flag>
       % endif

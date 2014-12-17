@@ -1240,7 +1240,7 @@ class Coordinator():
  
   @property
   def data(self):
-    self._data['properties']['start'] = datetime.today()
+    self._data['properties']['start'] = datetime.today() # TODO
     self._data['properties']['end'] = datetime.today() + timedelta(days=3)    
 
     if self.document is not None:
@@ -1310,11 +1310,11 @@ class Dataset():
 
   def __init__(self, data=None, json_data=None):
     if json_data is not None:
-      self.data = json.loads(json_data)
+      self._data = json.loads(json_data)
     elif data is not None:
-      self.data = data
+      self._data = data
     else:
-      self.data = {
+      self._data = {
           'name': 'dataset',
           'frequency_number': 1,
           'frequency_unit': 'days',
@@ -1330,7 +1330,11 @@ class Dataset():
       
   @property
   def data(self):
-    return self.data      
+    
+    self._data['start'] = datetime.today() # TODO
+    self._data['name'] = self._data['workflow_variable'] # Clean-up
+
+    return self._data      
       
   @property
   def frequency(self):
@@ -1369,8 +1373,3 @@ class Dataset():
   def is_advanced_end_instance(self):
     return not self.is_int(self.data['advanced_end_instance'])
 
-
-
-      
-      
-      
