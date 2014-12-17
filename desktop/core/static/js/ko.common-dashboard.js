@@ -77,6 +77,7 @@ var Column = function (size, rows) {
   self.klass = ko.computed(function () {
     return "card card-home card-column span" + self.size();
   });
+  self.percWidth = ko.observable();
   self.addEmptyRow = function (atBeginning, atIndex) {
     return self.addRow(null, atBeginning, atIndex);
   };
@@ -105,6 +106,11 @@ var Row = function (widgets, vm, columns) {
   self.id = ko.observable(UUID());
   self.widgets = ko.observableArray(widgets);
   self.columns = ko.observableArray(columns ? columns : []);
+  self.columns.subscribe(function(val){
+    self.columns().forEach(function(col){
+      col.percWidth((100 - self.columns().length * 0.5) / self.columns().length);
+    });
+  });
 
   self.enableOozieDrop = ko.computed(function(){
     return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
