@@ -40,9 +40,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
       <i class="fa fa-file-code-o"></i>
     </a>
-    <a title="${ _('Import coordinators') }" rel="tooltip" data-placement="bottom" data-bind="click: import_coordinators, css: {'btn': true}">
-      <i class="fa fa fa-download"></i>
-    </a>
     &nbsp;&nbsp;&nbsp;
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-play"></i>
@@ -72,6 +69,8 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <form class="form-search" style="margin: 0">
     <strong>${_("Name")}</strong>
     <input data-bind="value: $root.coordinator.name"/>
+    &nbsp;&nbsp;&nbsp;
+    Scrollspy?
   </form>
 </div>
 
