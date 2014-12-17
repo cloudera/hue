@@ -14,13 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
-
-// End dashboard lib
-
-
-
 var Dataset = function (vm, dataset) {
   var self = this;
 
@@ -40,14 +33,6 @@ var OutputDataset = function (vm, output_dataset) {
   
 }
 
-
-var Workflow = function (vm, workflow_json) {
-  var self = this;
-  
-  
-}
-
-
 var Coordinator = function (vm, coordinator) {
   var self = this;
 
@@ -57,7 +42,8 @@ var Coordinator = function (vm, coordinator) {
 
   self.properties = ko.mapping.fromJS(typeof coordinator.properties != "undefined" && coordinator.properties != null ? coordinator.properties : {});
   
-  self.variables = ko.observableArray([]);
+  self.variables = ko.mapping.fromJS(typeof coordinator.variables != "undefined" && coordinator.variables != null ? coordinator.variables : []);
+  //self.variables = ko.observableArray([]);
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
 
   self.properties.workflow.subscribe(function(newVal) {
