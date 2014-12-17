@@ -114,7 +114,7 @@
   <action>
     <workflow>
       <app-path>${'${'}wf_application_path}</app-path>
-      % if coord.inputDatasets or coord.outputDatasets or coord.data['properties']['properties']:
+      % if coord.inputDatasets or coord.outputDatasets or coord.properties:
       <configuration>
         % for dataset in coord.inputDatasets:
           <property>
@@ -128,7 +128,7 @@
           <value>${'${'}coord:dataOut('${ dataset.data['name'] }')}</value>
         </property>
         % endfor
-        % for property in coord.data['properties']['properties']:
+        % for property in coord.properties:
         <property>
           <name>${ property['name'] }</name>
           <value>${ property['value'] }</value>

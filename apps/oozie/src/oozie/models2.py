@@ -1242,7 +1242,10 @@ class Coordinator():
   def data(self):
     self._data['properties']['start'] = datetime.today()
     self._data['properties']['end'] = datetime.today() + timedelta(days=3)    
-    
+
+    if self.document is not None:
+      self._data['id'] = self.document.id
+
     return self._data
   
   @property
@@ -1296,23 +1299,13 @@ class Coordinator():
     tmpl = "editor/gen2/coordinator.xml.mako"
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace') 
   
-#  def get_properties(self):
-#    props = self.properties.copy()
-#    index = [prop['name'] for prop in props]
-#
-#    for prop in self.workflow.find_all_parameters():
-#      if not prop['name'] in index:
-#        props.append(prop)
-#        index.append(prop['name'])
-#
-#    # Remove DataInputs and DataOutputs
-#    removable_names = [dataset.workflow_variable for dataset in self.datasets]
-#    props = filter(lambda prop: prop['name'] not in removable_names, props)
-#
-#    return props
-  
-  
-  
+  @property
+  def properties(self):    
+    props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
+    props += self.data['properties']['properties']
+    return props
+
+
 class Dataset():
 
   def __init__(self, data=None, json_data=None):
