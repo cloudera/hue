@@ -1191,6 +1191,7 @@ def import_workflow_from_hue_3_7(old_wf):
 class Coordinator():
   XML_FILE_NAME = 'coordinator.xml'
   PROPERTY_APP_PATH = 'oozie.coord.application.path'
+  HUE_ID = 'hue-id-c'
 
   def __init__(self, data=None, json_data=None, document=None):
     self.document = document
@@ -1208,6 +1209,7 @@ class Coordinator():
           "name": "My Coordinator",
           "variables": [],
           "properties": {
+              "deployment_dir": "",
               "schema_version": "uri:oozie:coordinator:0.2",
               "frequency_number": 1,
               "frequency_unit": "days",
@@ -1231,6 +1233,10 @@ class Coordinator():
       }
 
   @property
+  def id(self):
+    return self.document.id
+
+  @property
   def json(self):
     _data = self.data.copy()
 
@@ -1248,6 +1254,16 @@ class Coordinator():
       self._data['id'] = self.document.id
 
     return self._data
+  
+  @property      
+  def deployment_dir(self):
+    if not self.data['properties'].get('deployment_dir'):
+      self.data['properties']['deployment_dir'] = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too    
+    return self.data['properties']['deployment_dir']
+  
+  def find_all_parameters(self):
+    # TODO
+    return []
   
   @property
   def datasets(self):

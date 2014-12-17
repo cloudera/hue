@@ -76,7 +76,7 @@ var Coordinator = function (vm, coordinator) {
        'advanced_end_instance': '${coord:current(0)}',
        'end_instance': '0',
        'frequency_number': 1,
-       'frequency_unit': 'DAYS',
+       'frequency_unit': 'days',
        'start': new Date(),
 
        'shared_dataset_uuid': '' // If reusing a shared dataset
