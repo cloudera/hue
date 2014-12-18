@@ -92,8 +92,7 @@ urlpatterns += patterns(
   url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),
   url(r'^editor/bundle/new/$', 'new_bundle', name='new_bundle'),
   url(r'^editor/bundle/save/$', 'save_bundle', name='save_bundle'),
-  url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle'),
-  url(r'^editor/bundle/gen_xml/$', 'gen_xml_bundle', name='gen_xml_bundle'), # Temporary  
+  url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle')
 )
 
 

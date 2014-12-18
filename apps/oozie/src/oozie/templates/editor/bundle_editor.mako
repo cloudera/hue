@@ -34,10 +34,6 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
-      <i class="fa fa-file-code-o"></i>
-    </a>
-    &nbsp;&nbsp;&nbsp;
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-play"></i>
     </a>

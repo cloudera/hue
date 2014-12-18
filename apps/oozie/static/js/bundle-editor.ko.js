@@ -77,27 +77,11 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json) {
       $(document).trigger("error", xhr.responseText);
     });
   };
-
-  self.gen_xml = function () {
-	$(".jHueNotify").hide();
-	logGA('gen_xml');
-
-    $.post("/oozie/editor/bundle/gen_xml/", {
-        "bundle": ko.mapping.toJSON(self.bundle)
-    }, function (data) {
-      if (data.status == 0) {
-        console.log(data.xml);
-      }
-      else {
-        $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
-  };
   
   self.showSubmitPopup = function () {
     // If self.bundle.id() == null, need to save wf for now
+	$(".jHueNotify").hide();
+	logGA('submit');
 
     $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
       }, function (data) {

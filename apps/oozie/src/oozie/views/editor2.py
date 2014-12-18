@@ -401,7 +401,7 @@ def save_bundle(request):
     bundle_doc = Document2.objects.create(name=bundle_data['name'], uuid=bundle_data['uuid'], type='oozie-bundle2', owner=request.user)
 
   if bundle_data['coordinators']:
-    dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=bundle_data['coordinators']) # TODO perms
+    dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']]) # TODO perms
     bundle_doc.dependencies = dependencies
 
   bundle_doc.update_data(bundle_data)
@@ -413,19 +413,6 @@ def save_bundle(request):
   response['message'] = _('Saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def gen_xml_bundle(request):
-  response = {'status': -1}
-
-  bundle_dict = json.loads(request.POST.get('bundle', '{}')) # TODO perms
-
-  bundle = Bundle(data=bundle_dict)
-
-  response['status'] = 0
-  response['xml'] = bundle.to_xml()
-    
-  return HttpResponse(json.dumps(response), mimetype="application/json") 
 
 
 def submit_bundle(request, doc_id):
@@ -455,18 +442,27 @@ def submit_bundle(request, doc_id):
   return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
-def _submit_bundle(request, bundle, mapping):
+def _submit_bundle(request, bundle, properties):
   try:
-    wf_doc = Document2.objects.get(uuid=bundle.data['properties']['workflow'])
-    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping).deploy()
+    deployment_mapping = {}
 
-    properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
-    properties.update(mapping)
+    for coord in bundle.document.dependencies.all():
+      workflow = Workflow(document=coord.dependencies.all()[0])
+      wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()      
+      deployment_mapping['wf_%s_dir' % coord.uuid] = request.fs.get_hdfs_path(wf_dir)
+      deployment_mapping[workflow.uuid] = workflow.document.name
+      
+      coordinator = Coordinator(document=coord)
+      coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
+      deployment_mapping['coord_%s_dir' % coord.uuid] = coord_dir
+      deployment_mapping[coord.uuid] = coord.name
 
+    properties.update(deployment_mapping)
+    
     submission = Submission(request.user, bundle, request.fs, request.jt, properties=properties)
     job_id = submission.run()
 
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error submitting bundle %s") % (bundle,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+    raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
+
