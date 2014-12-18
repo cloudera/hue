@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import time
+from datetime import datetime
 
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
@@ -788,6 +789,12 @@ def format_time(st_time):
   else:
     return st_time
 
+def catch_unicode_time(u_time):
+  if type(u_time) == time.struct_time:
+    return u_time
+  else:
+    return datetime.timetuple(datetime.strptime(u_time, '%a, %d %b %Y %H:%M:%S %Z'))
+
 
 def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   jobs = []
@@ -797,13 +804,18 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
       massaged_job = {
         'id': job.id,
         'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
+        'lastModTimeInMillis': hasattr(job, 'lastModTime') and job.lastModTime and time.mktime(job.lastModTime) or 0,
         'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime and format_time(job.kickoffTime) or '',
+        'kickoffTimeInMillis': hasattr(job, 'kickoffTime') and job.kickoffTime and time.mktime(catch_unicode_time(job.kickoffTime)) or 0,
         'nextMaterializedTime': hasattr(job, 'nextMaterializedTime') and job.nextMaterializedTime and format_time(job.nextMaterializedTime) or '',
+        'nextMaterializedTimeInMillis': hasattr(job, 'nextMaterializedTime') and job.nextMaterializedTime and time.mktime(job.nextMaterializedTime) or 0,
         'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
         'endTime': job.endTime and format_time(job.endTime) or None,
+        'endTimeInMillis': job.endTime and time.mktime(job.endTime) or 0,
         'status': job.status,
         'isRunning': job.is_running(),
         'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
+        'durationInMillis': job.endTime and job.startTime and ((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or 0,
         'appName': job.appName,
         'progress': job.get_progress(),
         'user': job.user,
@@ -812,8 +824,10 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
         'suspendUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'suspend'}),
         'resumeUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'resume'}),
-        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+        'created': hasattr(job, 'createdTime') and job.createdTime and format_time(job.createdTime) or '',
+        'createdInMillis': hasattr(job, 'createdTime') and job.createdTime and time.mktime(catch_unicode_time(job.createdTime)) or 0,
         'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
+        'startTimeInMillis': hasattr(job, 'startTime') and job.startTime and time.mktime(job.startTime) or 0,
         'run': hasattr(job, 'run') and job.run or 0,
         'frequency': hasattr(job, 'frequency') and Coordinator.CRON_MAPPING.get(job.frequency, job.frequency) or None,
         'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,

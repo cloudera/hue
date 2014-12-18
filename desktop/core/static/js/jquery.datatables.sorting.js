@@ -16,8 +16,20 @@
 
 $.fn.dataTableExt.afnSortData['dom-sort-value'] = function (oSettings, iColumn) {
   var aData = [];
-  $( 'td:eq('+iColumn+')', oSettings.oApi._fnGetTrNodes(oSettings) ).each( function () {
-    aData.push( $(this).attr('data-sort-value') );
-  } );
+  oSettings.oApi._fnGetTrNodes(oSettings).forEach(function (nRow) {
+    var oElem = $('td:eq(' + iColumn + ')', nRow);
+    var _val = oElem.text();
+    if (typeof oElem.attr('data-sort-value') == 'undefined') {
+      if (typeof oElem.find('span').attr('data-sort-value') != 'undefined') {
+        _val = parseInt(oElem.find('span').attr('data-sort-value'));
+      }
+    }
+    else {
+      _val = parseInt(oElem.attr('data-sort-value'));
+    }
+    aData.push(_val);
+  });
+
   return aData;
 };
+

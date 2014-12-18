@@ -164,11 +164,14 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     return {
       id: c.id,
       endTime: c.endTime,
+      endTimeInMillis: c.endTimeInMillis,
       nextMaterializedTime: c.nextMaterializedTime,
+      nextMaterializedTimeInMillis: c.nextMaterializedTimeInMillis,
       status: c.status,
       statusClass: "label " + getStatusClass(c.status),
       isRunning: c.isRunning,
       duration: c.duration,
+      durationInMillis: c.durationInMillis,
       appName: decodeURIComponent(c.appName),
       progress: c.progress,
       progressClass: "bar " + getStatusClass(c.status, "bar-"),
@@ -180,7 +183,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       resumeUrl: c.resumeUrl,
       frequency: c.frequency,
       timeUnit: c.timeUnit,
-      startTime: c.startTime
+      startTime: c.startTime,
+      startTimeInMillis: c.startTimeInMillis
     }
   }
 
@@ -194,7 +198,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
         { "bSortable":false },
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
@@ -233,16 +237,16 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
-        null,
         % if not enable_cron_scheduling:
-        null,
+          null,
         % endif
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null
       ],
       "aaSorting":[
@@ -412,7 +416,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                 try {
                   runningTable.fnAddData([
                     coord.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
-                    emptyStringIfNull(coord.nextMaterializedTime),
+                    '<span data-sort-value="'+ coord.nextMaterializedTimeInMillis +'">' + emptyStringIfNull(coord.nextMaterializedTime) + '</span>',
                     '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
                     coord.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
@@ -423,7 +427,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                     emptyStringIfNull(coord.frequency),
                     emptyStringIfNull(coord.timeUnit),
                     % endif
-                    emptyStringIfNull(coord.startTime),
+                    '<span data-sort-value="'+ coord.startTimeInMillis +'">' + emptyStringIfNull(coord.startTime) + '</span>',
                     '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'
                   ]);
                 }
@@ -456,10 +460,10 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           var coord = new Coordinator(item);
           try {
             completedTable.fnAddData([
-              emptyStringIfNull(coord.endTime),
+              '<span data-sort-value="'+ coord.endTimeInMillis +'">' + emptyStringIfNull(coord.endTime) + '</span>',
               '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
               coord.appName,
-              emptyStringIfNull(coord.duration),
+              '<span data-sort-value="'+ coord.durationInMillis +'">' + emptyStringIfNull(coord.duration) + '</span>',
               coord.user,
               % if enable_cron_scheduling:
                 emptyStringIfNull(coord.frequency),
@@ -467,7 +471,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                 emptyStringIfNull(coord.frequency),
                 emptyStringIfNull(coord.timeUnit),
               % endif
-              emptyStringIfNull(coord.startTime),
+              '<span data-sort-value="'+ coord.startTimeInMillis +'">' + emptyStringIfNull(coord.startTime) + '</span>',
               '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'
             ], false);
           }
