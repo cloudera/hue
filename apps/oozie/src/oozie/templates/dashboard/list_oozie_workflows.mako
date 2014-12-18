@@ -144,11 +144,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     return {
       id: wf.id,
       lastModTime: wf.lastModTime,
+      lastModTimeInMillis: wf.lastModTimeInMillis,
       endTime: wf.endTime,
+      endTimeInMillis: wf.endTimeInMillis,
       status: wf.status,
       statusClass: "label " + getStatusClass(wf.status),
       isRunning: wf.isRunning,
       duration: wf.duration,
+      durationInMillis: wf.durationInMillis,
       appName: wf.appName,
       progress: wf.progress,
       progressClass: "bar " + getStatusClass(wf.status, "bar-"),
@@ -159,6 +162,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       suspendUrl: wf.suspendUrl,
       resumeUrl: wf.resumeUrl,
       created: wf.created,
+      createdInMillis: wf.createdInMillis,
       run: wf.run
     }
   }
@@ -173,7 +177,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
         { "bSortable":false },
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         null,
@@ -208,10 +212,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
-        null,
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null
@@ -365,12 +369,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                 try {
                   runningTable.fnAddData([
                     wf.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>':'',
-                    emptyStringIfNull(wf.lastModTime),
+                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
                     '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
                     wf.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
-                    emptyStringIfNull(wf.lastModTime),
+                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
                   ]);
                 }
@@ -404,11 +408,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           var wf = new Workflow(item);
           try {
             completedTable.fnAddData([
-              emptyStringIfNull(wf.endTime),
+              '<span data-sort-value="'+ wf.endTimeInMillis +'">' + emptyStringIfNull(wf.endTime) + '</span>',
               '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
-              emptyStringIfNull(wf.duration),
+              '<span data-sort-value="'+ wf.durationInMillis +'">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
-              emptyStringIfNull(wf.lastModTime),
+              '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
               '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
             ], false);
           }
