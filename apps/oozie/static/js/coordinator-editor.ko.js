@@ -48,7 +48,7 @@ var Coordinator = function (vm, coordinator) {
        'dataset_type': 'parameter',
        
        'uuid': UUID(), // Dataset
-       'dataset_variable': '',       
+       'dataset_variable': '', // Aka property or URI       
        'show_advanced': false,
        'use_done_flag': false,
        'done_flag': '_SUCCESS',
