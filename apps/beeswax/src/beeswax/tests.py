@@ -1789,19 +1789,6 @@ class MockHiveServerTable(HiveServerTable):
 
 class TestHiveServer2API():
 
-  def test_partition_keys(self):
-    table = MockHiveServerTable({'path_location': '/my/table'})
-
-    key = PartitionKeyCompatible('name:a_name, type:int, comment:null')
-    assert_equal('a_name', key.name)
-    assert_equal('int', key.type)
-    assert_equal('null', key.comment)
-
-    key = PartitionKeyCompatible('name:a_name, type:int, comment:this, has extra: sigils')
-    assert_equal('a_name', key.name)
-    assert_equal('int', key.type)
-    assert_equal('this, has extra: sigils', key.comment)
-
   def test_partition_values(self):
     table = MockHiveServerTable({'path_location': '/my/table'})
 
@@ -1856,7 +1843,9 @@ class TestHiveServer2API():
           '), '
           'partitionKeys:['
             'FieldSchema(name:dt, type:string, comment:null), '
-            'FieldSchema(name:country, type:string, comment:null)'
+            'FieldSchema(name:country, type:string, comment:null), '
+            'FieldSchema(name:decimal, type:decimal(9, 7), comment:this, has extra: sigils), '
+            'FieldSchema(name:complex, type:UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>, comment:null), '
           '], '
           'parameters:{'
             'numPartitions=0, '
@@ -1897,7 +1886,16 @@ class TestHiveServer2API():
                     ['comment', 'null)'],
                     ['FieldSchema(name', 'country'],
                     ['type', 'string'],
-                    ['comment', 'null)]'],
+                    ['comment', 'null)'],
+                    ['FieldSchema(name', 'decimal'],
+                    ['type', 'decimal(9'],
+                    #['7)'],
+                    ['comment', 'this'],
+                    ['has extra', ' sigils)'],
+                    ['FieldSchema(name', 'complex'],
+                    ['type', 'UNIONTYPE<int'],
+                    ['struct<a:int,b', 'string>>'],
+                    ['comment', 'null)'],
                     ['parameters', '{numPartitions=0'],
                     ['numFiles', '1'],
                     ['transient_lastDdlTime', '1360732885'],
@@ -1907,6 +1905,12 @@ class TestHiveServer2API():
                     ['tableType', 'MANAGED_TABLE']
                   ],
                   table.properties)
+
+      assert_equal([PartitionKeyCompatible('dt', 'string', 'null'),
+                    PartitionKeyCompatible('country', 'string', 'null'),
+                    PartitionKeyCompatible('decimal', 'decimal(9, 7)', 'this, has extra: sigils'),
+                    PartitionKeyCompatible('complex', 'UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>', 'null'),
+                   ], table.partition_keys)
     finally:
       setattr(table, 'extended_describe', prev_extended_describe)
 
