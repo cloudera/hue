@@ -270,6 +270,9 @@ class PseudoHdfs4(object):
     self._nm_proc = self._start_daemon('nodemanager', self.hadoop_conf_dir, self.mr2_env, self._get_yarn_bin(self.mr2_env))
     self._hs_proc = self._start_daemon('historyserver', self.hadoop_conf_dir, self.mr2_env, self._get_mapred_bin(self.mr2_env))
 
+    # Give them a moment to actually start
+    time.sleep(1)
+
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
     while not self._is_mr2_ready(self.mr2_env):
@@ -455,7 +458,7 @@ class PseudoHdfs4(object):
       'yarn.nodemanager.localizer.address' : '%s:%s' % (self._fqdn, self._nm_port,),
       'yarn.nodemanager.aux-services': 'mapreduce_shuffle',
       'yarn.nodemanager.aux-services.mapreduce.shuffle.class': 'org.apache.hadoop.mapred.ShuffleHandler',
-      'yarn.nodemanager.webapp.address': self._nm_webapp_port,
+      'yarn.nodemanager.webapp.address': '%s:%s' % (self._fqdn, self._nm_webapp_port,),
 
       'yarn.app.mapreduce.am.staging-dir': '/tmp/hadoop-yarn/staging',
 
