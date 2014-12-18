@@ -219,6 +219,7 @@ var Widget = function (params) {
   });
 
   self.oozieExpanded = ko.observable(false);
+  self.ooziePropertiesExpanded = ko.observable(false);
 
   self.klass = ko.computed(function () {
     return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");

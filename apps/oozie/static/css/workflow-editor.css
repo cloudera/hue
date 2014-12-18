@@ -349,7 +349,14 @@ em {
 
 .card-widget {
   position: relative;
+  overflow-x: auto;
+  border: 1px solid #d8d8d8 !important;
 }
+
+.card-widget h2, .card-widget .card-body {
+  min-width: 240px;
+}
+
 
 #exposeOverlay {
   background-color: #000;
@@ -413,10 +420,6 @@ em {
 
 .row-container.is-editing {
   border: none !important;
-}
-
-.card-widget {
-  border: 1px solid #d8d8d8 !important;
 }
 
 .row-fluid .span4 {
