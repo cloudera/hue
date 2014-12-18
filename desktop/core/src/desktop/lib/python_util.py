@@ -90,11 +90,14 @@ def find_unused_port():
   Unfortunately, this port may not be available by the time
   the subprocess uses it, but this generally works.
   """
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
-  sock.bind(('127.0.0.1', 0))
-  sock.listen(socket.SOMAXCONN)
-  _, port = sock.getsockname()
-  sock.close()
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  try:
+    sock.bind(('127.0.0.1', 0))
+    sock.listen(socket.SOMAXCONN)
+    _, port = sock.getsockname()
+  finally:
+    sock.close()
+
   return port
 
 
