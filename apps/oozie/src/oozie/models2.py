@@ -1279,8 +1279,11 @@ class Coordinator(Job):
  
   @property
   def data(self):
-    self._data['properties']['start'] = datetime.today() # TODO
-    self._data['properties']['end'] = datetime.today() + timedelta(days=3)    
+    if type(self._data['properties']['start']) == unicode:
+      self._data['properties']['start'] = parse(self._data['properties']['start'])
+      
+    if type(self._data['properties']['end']) == unicode:
+      self._data['properties']['end'] = parse(self._data['properties']['end'])    
 
     if self.document is not None:
       self._data['id'] = self.document.id
@@ -1439,3 +1442,74 @@ class Dataset():
   def is_advanced_end_instance(self):
     return not self.is_int(self.data['advanced_end_instance'])
 
+
+
+class Bundle(Job):
+  XML_FILE_NAME = 'bundle.xml'
+  PROPERTY_APP_PATH = 'oozie.bundle.application.path'
+  HUE_ID = 'hue-id-b'
+
+  def __init__(self, data=None, json_data=None, document=None):
+    self.document = document
+
+    if document is not None:
+      self._data = json.loads(document.data)
+    elif json_data is not None:
+      self._data = json.loads(json_data)
+    elif data is not None:
+      self._data = data
+    else:
+      self._data = {
+          'id': None, 
+          'uuid': None,
+          'name': 'My Bundle',
+          'coordinators': [],
+          'properties': {
+              'deployment_dir': '',
+              'schema_version': 'uri:oozie:coordinator:0.2',
+              'kickoff': datetime.today(),
+              'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}]
+          }
+      }
+
+  @property
+  def id(self):
+    return self.document.id
+
+  @property
+  def json(self):
+    _data = self.data.copy()
+
+    _data['properties']['kickoff'] = _data['properties']['kickoff'].strftime('%Y-%m-%dT%H:%M:%S')
+
+    return json.dumps(_data)
+ 
+  @property
+  def data(self):
+    if type(self._data['properties']['kickoff']) == unicode:
+      self._data['properties']['kickoff'] = parse(self._data['properties']['kickoff'])
+
+    if self.document is not None:
+      self._data['id'] = self.document.id
+
+    return self._data
+ 
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+
+    tmpl = "editor/gen2/bundle.xml.mako"
+    return force_unicode(
+              re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+                'bundle': self,
+                'mapping': mapping
+           })))
+  
+  @property      
+  def deployment_dir(self):
+    if not self.data['properties'].get('deployment_dir'):
+      self.data['properties']['deployment_dir'] = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too    
+    return self.data['properties']['deployment_dir']
+  
+  def find_parameters(self):
+    return {}

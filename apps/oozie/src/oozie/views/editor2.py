@@ -35,7 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Workflow, Coordinator, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
+from oozie.models2 import Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
 
 
 LOG = logging.getLogger(__name__)
@@ -285,19 +285,17 @@ def save_coordinator(request):
 
   coordinator_data = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
 
-  name = 'test'
-
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:      
-    coordinator_doc = Document2.objects.create(name=name, uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
+    coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
 
   if coordinator_data['properties']['workflow']:
     dependencies = Document2.objects.filter(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
     coordinator_doc.dependencies = dependencies
 
   coordinator_doc.update_data(coordinator_data)
-  coordinator_doc.name = name
+  coordinator_doc.name = coordinator_data['name']
   coordinator_doc.save()
   
   response['status'] = 0
@@ -364,3 +362,111 @@ def _submit_coordinator(request, coordinator, mapping):
                          detail=ex._headers.get('oozie-error-message', ex))
     
     
+    
+
+def list_editor_bundles(request):
+  bundles = Document2.objects.filter(type='oozie-bundle2', owner=request.user)
+
+  return render('editor/list_editor_bundles.mako', request, {
+      'bundles': bundles
+  })
+
+
+def edit_bundle(request):
+  bundle_id = request.GET.get('bundle')
+  
+  if bundle_id:
+    bundle = Bundle(document=Document2.objects.get(id=bundle_id)) # Todo perms
+  else:
+    bundle = Bundle()
+
+  return render('editor/bundle_editor.mako', request, {
+      'bundle_json': bundle.json,
+      'coordinators_json': json.dumps(list(Document2.objects.filter(type='oozie-coordinator2', owner=request.user).values('uuid', 'name'))) # Todo perms
+  })
+
+
+def new_bundle(request):
+  return edit_bundle(request)
+
+
+def save_bundle(request):
+  response = {'status': -1}
+
+  bundle_data = json.loads(request.POST.get('bundle', '{}')) # TODO perms
+
+  if bundle_data.get('id'):
+    bundle_doc = Document2.objects.get(id=bundle_data['id'])
+  else:      
+    bundle_doc = Document2.objects.create(name=bundle_data['name'], uuid=bundle_data['uuid'], type='oozie-bundle2', owner=request.user)
+
+  if bundle_data['coordinators']:
+    dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=bundle_data['coordinators']) # TODO perms
+    bundle_doc.dependencies = dependencies
+
+  bundle_doc.update_data(bundle_data)
+  bundle_doc.name = bundle_data['name']
+  bundle_doc.save()
+  
+  response['status'] = 0
+  response['id'] = bundle_doc.id
+  response['message'] = _('Saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def gen_xml_bundle(request):
+  response = {'status': -1}
+
+  bundle_dict = json.loads(request.POST.get('bundle', '{}')) # TODO perms
+
+  bundle = Bundle(data=bundle_dict)
+
+  response['status'] = 0
+  response['xml'] = bundle.to_xml()
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json") 
+
+
+def submit_bundle(request, doc_id):
+  bundle = Bundle(document=Document2.objects.get(id=doc_id)) # Todo perms  
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      job_id = _submit_bundle(request, bundle, mapping)
+
+      request.info(_('Bundle submitted.'))
+      return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = bundle.find_all_parameters()
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                 'params_form': params_form,
+                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
+                }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _submit_bundle(request, bundle, mapping):
+  try:
+    wf_doc = Document2.objects.get(uuid=bundle.data['properties']['workflow'])
+    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping).deploy()
+
+    properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
+    properties.update(mapping)
+
+    submission = Submission(request.user, bundle, request.fs, request.jt, properties=properties)
+    job_id = submission.run()
+
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error submitting bundle %s") % (bundle,),
+                         detail=ex._headers.get('oozie-error-message', ex))

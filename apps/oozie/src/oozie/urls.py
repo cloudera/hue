@@ -77,8 +77,7 @@ urlpatterns += patterns(
   url(r'^editor/workflow/submit/(?P<doc_id>\d+)$', 'submit_workflow', name='editor_submit_workflow'),
   url(r'^editor/workflow/new_node/$', 'new_node', name='new_node'),
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
-  url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
-  
+  url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),  
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'), # Temporary
   url(r'^editor/workflow/import_workflows/$', 'import_hue_3_7_workflows', name='import_hue_3_7_workflows'), # Temporary
   
@@ -88,6 +87,13 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/save/$', 'save_coordinator', name='save_coordinator'),
   url(r'^editor/coordinator/submit/(?P<doc_id>\d+)$', 'submit_coordinator', name='editor_submit_coordinator'),
   url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'), # Temporary
+  
+  url(r'^editor/bundle/list/$', 'list_editor_bundles', name='list_editor_bundles'),
+  url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),
+  url(r'^editor/bundle/new/$', 'new_bundle', name='new_bundle'),
+  url(r'^editor/bundle/save/$', 'save_bundle', name='save_bundle'),
+  url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle'),
+  url(r'^editor/bundle/gen_xml/$', 'gen_xml_bundle', name='gen_xml_bundle'), # Temporary  
 )
 
 
