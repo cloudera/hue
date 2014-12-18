@@ -4,6 +4,6 @@ import org.apache.hadoop.conf.Configuration
 
 class YarnJob(config: Configuration) {
 
-  val client = new Client()
+  //val client = new Client
 
 }
