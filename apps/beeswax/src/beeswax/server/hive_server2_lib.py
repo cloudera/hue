@@ -74,8 +74,8 @@ class HiveServerTable(Table):
     match = re.search('partitionKeys:\[([^\]]+)\]', describe)
     if match is not None:
       match = match.group(1)
-      return [PartitionKeyCompatible(partition)
-              for partition in re.findall('FieldSchema\((.+?)\)', match)]
+      return [PartitionKeyCompatible(*partition)
+          for partition in re.findall('FieldSchema\(name:(.+?), type:(.+?), comment:(.+?)\)', match)]
     else:
       return []
 
@@ -664,12 +664,20 @@ class ResultCompatible:
 
 class PartitionKeyCompatible:
 
-  def __init__(self, partition):
+  def __init__(self, name, type, comment):
     # Parses: ['name:datehour, type:int, comment:null']
-    name, type, comment = partition.split(', ', 2)
-    self.name = name.split(':', 1)[1]
-    self.type = type.split(':', 1)[1]
-    self.comment = comment.split(':', 1)[1]
+    self.name = name
+    self.type = type
+    self.comment = comment
+
+  def __eq__(self, other):
+    return isinstance(other, PartitionKeyCompatible) and \
+        self.name == other.name and \
+        self.type == other.type and \
+        self.comment == other.comment
+
+  def __repr__(self):
+    return 'PartitionKey(name:%s, type:%s, comment:%s)' % (self.name, self.type, self.comment)
 
 
 class PartitionValueCompatible:
