@@ -140,10 +140,12 @@ ${layout.menubar(section='bundles', dashboard=True)}
     return {
       id: bundle.id,
       endTime: bundle.endTime,
+      endTimeInMillis: bundle.endTimeInMillis,
       status: bundle.status,
       statusClass: "label " + getStatusClass(bundle.status),
       isRunning: bundle.isRunning,
       kickoffTime: bundle.kickoffTime,
+      kickoffTimeInMillis: bundle.kickoffTimeInMillis,
       timeOut: bundle.timeOut,
       appName: decodeURIComponent(bundle.appName),
       progress: bundle.progress,
@@ -154,7 +156,8 @@ ${layout.menubar(section='bundles', dashboard=True)}
       killUrl: bundle.killUrl,
       suspendUrl: bundle.suspendUrl,
       resumeUrl: bundle.resumeUrl,
-      created: bundle.created
+      created: bundle.created,
+      createdInMillis: bundle.createdInMillis
     }
   }
 
@@ -168,12 +171,12 @@ ${layout.menubar(section='bundles', dashboard=True)}
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
         { "bSortable":false },
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        null,
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null
       ],
       "aaSorting":[
@@ -203,11 +206,11 @@ ${layout.menubar(section='bundles', dashboard=True)}
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
-        { "sType":"date" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         null,
-        null,
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null
       ],
       "aaSorting":[
@@ -366,12 +369,12 @@ ${layout.menubar(section='bundles', dashboard=True)}
                 try {
                   runningTable.fnAddData([
                     bundle.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
-                    emptyStringIfNull(bundle.kickoffTime),
+                    '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
                     '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
                     bundle.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width:1%"></div></div>',
                     bundle.user,
-                    emptyStringIfNull(bundle.created),
+                    '<span data-sort-value="'+ bundle.createdInMillis +'">' + emptyStringIfNull(bundle.created) + '</span>',
                     '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>'
                   ]);
                 }
@@ -406,11 +409,11 @@ ${layout.menubar(section='bundles', dashboard=True)}
           var bundle = new Bundle(item);
           try {
             completedTable.fnAddData([
-              emptyStringIfNull(bundle.kickoffTime),
+              '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
               '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
               bundle.appName,
               bundle.user,
-              emptyStringIfNull(bundle.created),
+              '<span data-sort-value="'+ bundle.createdInMillis +'">' + emptyStringIfNull(bundle.created) + '</span>',
               '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>'
             ], false);
           }
