@@ -1686,11 +1686,7 @@ ${ dashboard.import_bindings() }
         });
         _el.animate({
           "width": _width < $(window).width()/2 ? $(window).width()/2 : _width
-        }, 200, function () {
-          if ($(document).width() > $(window).width()) {
-            $(document).scrollLeft($(document).width() - $(window).width());
-          }
-        });
+        }, 200);
         _el.find(".prop-editor").show();
 
         $("#exposeOverlay").fadeIn(300);
