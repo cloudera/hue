@@ -502,3 +502,10 @@ em {
 .widget-main-section .tab-content h6:first-child {
   margin-top: 0;
 }
+
+#addActionDemiModal {
+  position: absolute;
+  margin-left: 0;
+  border: 1px solid #d8d8d8;
+  border-top: none;
+}

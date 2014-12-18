@@ -307,13 +307,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="widget-template">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (ooziePropertiesExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
     <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget'  && id() != '17c9c895-5a16-7443-bb81-f34b30b21548'">
-      <span data-bind="visible: oozieMovable() && ! oozieExpanded()">
+      <span data-bind="visible: oozieMovable() && ! oozieExpanded() && $root.newAction() == null">
         <a class="pointer" data-bind="click: toggleHighlight"><i class="fa fa-search-plus"></i></a>&nbsp;
       </span>
-      <span data-bind="visible: oozieMovable() && oozieExpanded()">
+      <span data-bind="visible: oozieMovable() && oozieExpanded() && $root.newAction() == null">
         <a class="pointer" data-bind="click: toggleHighlight"><i class="fa fa-search-minus"></i></a>&nbsp;
       </span>
-      <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded()">
+      <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && $root.newAction() == null">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
         <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
@@ -385,12 +385,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! ooziePropertiesExpanded()">
-          <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
       <!-- ko if: widgetType() != 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1) && ! ooziePropertiesExpanded()">
-          <a href="javascript:void(0)" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
       <!-- ko if: ooziePropertiesExpanded() -->
@@ -1411,10 +1411,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </script>
 
 
-<div id="addActionDemiModal" class="demi-modal demi-modal-half hide fade" data-backdrop="false">
+<div id="addActionDemiModal" class="demi-modal demi-modal-half hide" data-backdrop="false">
   <div class="modal-body">
-    <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addActionDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
-
     <table data-bind="foreach: addActionProperties">
       <tr>
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
@@ -1557,27 +1555,41 @@ ${ dashboard.import_bindings() }
   });
 
 
-  var newAction = null;
-
   function showAddActionDemiModal(widget) {
-    newAction = widget;
+    viewModel.newAction(widget);
     $("#exposeOverlay").fadeIn(300);
-    $("#wdg_" + widget.id()).css("zIndex", "1032");
-    $("#addActionDemiModal").modal("show");
+    var _el = $("#wdg_" + widget.id());
+    _el.css("zIndex", "1032");
+    var lastSeenPosition = _el.position();
+    var _width = _el.width();
+
+    _el.css("position", "absolute");
+    _el.css({
+      "top": (lastSeenPosition.top) + "px",
+      "left": lastSeenPosition.left + "px",
+      "width": 450
+    });
+    $("#addActionDemiModal").width(_el.width()).css("top", _el.offset().top + 25).css("left", _el.offset().left).modal("show");
   }
 
   function addActionDemiModalFieldPreview(field) {
-    if (newAction != null) {
-      viewModel.workflow.addNode(newAction);
+    if (viewModel.newAction() != null) {
+      var _el = $("#wdg_" + viewModel.newAction().id());
+      _el.css("position", "static");
+      _el.css("width", "");
+      viewModel.workflow.addNode(viewModel.newAction());
       $("#addActionDemiModal").modal("hide");
-      $("#wdg_" + newAction.id()).css("zIndex", "0");
+      $("#wdg_" + viewModel.newAction().id()).css("zIndex", "0");
       $("#exposeOverlay").fadeOut(300);
+      viewModel.newAction(null);
     }
   }
 
   function addActionDemiModalFieldCancel() {
     $("#exposeOverlay").fadeOut(300);
-    viewModel.removeWidgetById(newAction.id());
+    $("#addActionDemiModal").modal("hide");
+    viewModel.removeWidgetById(viewModel.newAction().id());
+    viewModel.newAction(null);
   }
 
   function linkWidgets(fromId, toId) {
@@ -1739,6 +1751,7 @@ ${ dashboard.import_bindings() }
         lastExpandedWidget.ooziePropertiesExpanded(false);
         lastExpandedWidget.oozieExpanded(false);
       }
+      addActionDemiModalFieldCancel();
       $("#exposeOverlay").fadeOut(300);
       $(document).trigger("drawArrows");
     });
