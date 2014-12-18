@@ -130,7 +130,7 @@ build_oozie() {
 
   mkdir -p $OOZIE_HOME/libext
   tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*.tar.gz
-  HADOOP_LIB=`echo "${CDH_VERSION}" | sed -r 's/hadoop/hadooplib/g'`
+  HADOOP_LIB=`echo "${CDH_VERSION}" | sed 's/hadoop/hadooplib/g'`
   cp $OOZIE_HOME/libext/oozie-*/hadooplibs/${HADOOP_LIB}*/*jar $OOZIE_HOME/libext/
   tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
   cp  $OOZIE_HOME/oozie-sharelib-*-yarn.tar.gz $OOZIE_HOME/oozie-sharelib.tar.gz
