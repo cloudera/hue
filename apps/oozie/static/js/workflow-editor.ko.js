@@ -302,8 +302,10 @@ var Workflow = function (vm, workflow) {
 
     var parents = self.getParents(node_id);
     var parent = null;
-
-    var childLink = node.get_link('to');
+    var childLink = null;
+    if (node) {
+      childLink = node.get_link('to');
+    }
     if (childLink) {
       var childId = ko.mapping.toJS(childLink)['to'];
 
@@ -409,6 +411,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.toggleArrows = function () {
     self.hasArrows(!self.hasArrows());
   };
+
+  self.newAction = ko.observable();
 
   self.columns = ko.observable([]);
   self.previewColumns = ko.observable("");
