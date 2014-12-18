@@ -1430,7 +1430,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <h3 id="myModalLabel">${ _('Workflow Settings') }</h3>
   </div>
   <div class="modal-body">
-      <h4>${ _('Oozie Parameters') }</h4>
+      <h4>${ _('Submission Parameters') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
         <li>
           <input data-bind="value: name"/>

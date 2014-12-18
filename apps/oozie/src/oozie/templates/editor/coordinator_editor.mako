@@ -227,9 +227,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                     </div>
                   </div>
                 </div>
-
               </div>
               <!-- /ko -->
+              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>              
             </li>
           </ul>
 
@@ -251,20 +253,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <h3 id="myModalLabel">${ _('Coordinator Settings') }</h3>
   </div>
   <div class="modal-body">
-
-      <h4>${ _('Timeout') }</h4>
-      <input data-bind="value: coordinator.properties.timeout"/>
-
-      <h4>${ _('Concurrency') }</h4>
-      <input data-bind="value: coordinator.properties.concurrency"/>
-      
-      <h4>${ _('Execution') }</h4>
-      <input data-bind="value: coordinator.properties.execution"/>
-
-      <h4>${ _('Throttle') }</h4>
-      <input data-bind="value: coordinator.properties.throttle"/>
-
-      <h4>${ _('Oozie Parameters') }</h4>
+      <h4>${ _('Submission Parameters') }</h4>
       <ul data-bind="foreach: coordinator.properties.parameters" class="unstyled">
         <li>
           <input data-bind="value: name"/>
@@ -277,6 +266,18 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       <a class="pointer" data-bind="click: function(){ $root.coordinator.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
       </a>
+
+      <h4>${ _('Timeout') }</h4>
+      <input data-bind="value: coordinator.properties.timeout"/>
+
+      <h4>${ _('Concurrency') }</h4>
+      <input data-bind="value: coordinator.properties.concurrency"/>
+      
+      <h4>${ _('Execution') }</h4>
+      <input data-bind="value: coordinator.properties.execution"/>
+
+      <h4>${ _('Throttle') }</h4>
+      <input data-bind="value: coordinator.properties.throttle"/>
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.coordinator.properties">

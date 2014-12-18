@@ -43,8 +43,17 @@ from oozie.utils import utc_datetime_format
 LOG = logging.getLogger(__name__)
 
 
+class Job(object):
+  def find_all_parameters(self, with_lib_path=True):
+    params = self.find_parameters()
 
-class Workflow():
+    for param in self.parameters:
+      params[param['name'].strip()] = param['value']
+
+    return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']  
+
+
+class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'
   PROPERTY_APP_PATH = 'oozie.wf.application.path'
   SLA_DEFAULT = [
@@ -185,14 +194,6 @@ class Workflow():
       params.update(node.find_parameters())
 
     return dict([(param, '') for param in list(params)])
-
-  def find_all_parameters(self, with_lib_path=True):
-    params = self.find_parameters()
-
-    for param in self.parameters:
-      params[param['name'].strip()] = param['value']
-
-    return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']
 
   def check_workspace(self, fs):
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
@@ -1218,7 +1219,7 @@ def import_workflow_from_hue_3_7(old_wf):
 
 
 
-class Coordinator():
+class Coordinator(Job):
   XML_FILE_NAME = 'coordinator.xml'
   PROPERTY_APP_PATH = 'oozie.coord.application.path'
   HUE_ID = 'hue-id-c'
@@ -1258,7 +1259,7 @@ class Coordinator():
               'sla_workflow_enabled': False,
               'credentials': [],
               'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}],
-              'properties': [], # Aka workflow paramters
+              'properties': [], # Aka workflow parameters
               'sla': Workflow.SLA_DEFAULT
           }
       }
@@ -1292,9 +1293,42 @@ class Coordinator():
       self.data['properties']['deployment_dir'] = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too    
     return self.data['properties']['deployment_dir']
   
-  def find_all_parameters(self):
-    # TODO
-    return []
+  def find_parameters(self):
+    params = set()
+
+    if self.sla_enabled:
+      for param in find_json_parameters(self.sla):
+        params.add(param)
+
+# get missed params from wf
+
+#    for prop in self.workflow.get_parameters():
+#      if not prop['name'] in index:
+#        props.append(prop)
+#        index.append(prop['name'])
+#
+#    # Remove DataInputs and DataOutputs
+#    datainput_names = [_input.name for _input in self.datainput_set.all()]
+#    dataoutput_names = [_output.name for _output in self.dataoutput_set.all()]
+#    removable_names = datainput_names + dataoutput_names
+#    props = filter(lambda prop: prop['name'] not in removable_names, props)
+
+# get $params in wf properties
+# [{'name': parameter['workflow_variable'], 'value': parameter['dataset_variable']} for parameter in self.data['variables'] if parameter['dataset_type'] == 'parameter']
+
+    return dict([(param, '') for param in list(params)])
+  
+  @property      
+  def sla_enabled(self):
+    return self.data['properties']['sla_enabled']
+
+  @property      
+  def sla(self):
+    return self.data['properties']['sla']
+  
+  @property      
+  def parameters(self):
+    return self.data['properties']['parameters']
   
   @property
   def datasets(self):
@@ -1356,26 +1390,9 @@ class Coordinator():
 
 class Dataset():
 
-  def __init__(self, data=None, json_data=None):
-    if json_data is not None:
-      self._data = json.loads(json_data)
-    elif data is not None:
-      self._data = data
-    else:
-      self._data = {
-          'name': 'dataset',
-          'frequency_number': 1,
-          'frequency_unit': 'days',
-          'start': datetime.today(),
-          'uri': '',
-          'done_flag': '',
-          'instance_choice': 'default',
-          'advanced_start_instance': '0',
-          'advanced_end_instance': '0',
-          
-          'workflow_variable': ''
-      }  
-      
+  def __init__(self, data):
+    self._data = data
+
   @property
   def data(self):
     if type(self._data['start']) == unicode: 
