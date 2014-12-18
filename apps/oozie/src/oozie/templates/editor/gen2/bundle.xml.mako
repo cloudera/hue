@@ -16,18 +16,19 @@
 ## limitations under the License.
 
 <%!
+  import json
   from oozie.models import BundledCoordinator
 %>
 
-<bundle-app name="${ bundle.name }"
-  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xmlns="${ bundle.schema_version }">
-  % if bundle.get_parameters():
+<bundle-app name="${ bundle.data['name'] }"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="${ bundle.data['properties']['schema_version'] }">
+  % if bundle.data['properties']['parameters']:
   <parameters>
-    % for p in bundle.get_parameters():
+    % for p in bundle.data['properties']['parameters']:
     <property>
         <name>${ p['name'] }</name>
-        <value>${ p['value'] }</value>
+        <value>${ json.dumps(p['value']) }</value>
     </property>
     % endfor
   </parameters>
@@ -38,21 +39,21 @@
   </controls>
 
 
-  % for bundled in BundledCoordinator.objects.filter(bundle=bundle):
-  <coordinator name='${ bundled.coordinator.name }-${ bundled.id }' >
-     <app-path>${'${'}nameNode}${ mapping['coord_%s_dir' % bundled.coordinator.id] }</app-path>
-       <configuration>
-         <property>
-            <name>wf_application_path</name>
-            <value>${ mapping['wf_%s_dir' % bundled.coordinator.workflow.id] }</value>
-        </property>
-         % for param in bundled.get_parameters():
-         <property>
-            <name>${ param['name'] }</name>
-            <value>${ param['value'] }</value>
-        </property>
-        % endfor
-      </configuration>
+  % for bundled in bundle.data['coordinators']:
+  <coordinator name="${ mapping[bundled['coordinator']] }-${ bundled['coordinator'][0:4] }">
+     <app-path>${'${'}nameNode}${ mapping['coord_%s_dir' % bundled['coordinator'] ] }</app-path>
+     <configuration>
+       <property>
+          <name>wf_application_path</name>
+          <value>${ mapping['wf_%s_dir' % bundled['coordinator']] }</value>
+      </property>
+      % for param in bundled['properties']:
+      <property>
+          <name>${ param['name'] }</name>
+          <value>${ param['value'] }</value>
+     </property>
+     % endfor
+    </configuration>
   </coordinator>
   % endfor
 </bundle-app>

@@ -32,8 +32,8 @@ ${ layout.menubar(section='Bundles') }
 
   % for bundle in bundles:
     <div>
-      <a href="${ url('oozie:edit_bundle') }?coordinator=${ bundle.id }">
-        ${ coordinator.name }
+      <a href="${ url('oozie:edit_bundle') }?bundle=${ bundle.id }">
+        ${ bundle.name }
       </a>
     </div>
   % endfor

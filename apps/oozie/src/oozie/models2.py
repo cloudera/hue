@@ -112,6 +112,10 @@ class Workflow(Job):
   def id(self):
     return self.document.id  
   
+  @property
+  def uuid(self):
+    return self.document.uuid   
+  
   def get_json(self):
     _data = self.get_data()
 
@@ -1269,6 +1273,10 @@ class Coordinator(Job):
     return self.document.id
 
   @property
+  def uuid(self):
+    return self.document.uuid
+
+  @property
   def json(self):
     _data = self.data.copy()
 
@@ -1466,7 +1474,7 @@ class Bundle(Job):
           'coordinators': [],
           'properties': {
               'deployment_dir': '',
-              'schema_version': 'uri:oozie:coordinator:0.2',
+              'schema_version': 'uri:oozie:bundle:0.2',
               'kickoff': datetime.today(),
               'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}]
           }
@@ -1475,6 +1483,10 @@ class Bundle(Job):
   @property
   def id(self):
     return self.document.id
+
+  @property
+  def uuid(self):
+    return self.document.uuid
 
   @property
   def json(self):
@@ -1498,12 +1510,21 @@ class Bundle(Job):
     if mapping is None:
       mapping = {}
 
+    mapping.update(dict(list(Document2.objects.filter(type='oozie-coordinator2', uuid__in=self.data['coordinators']).values('uuid', 'name')))) # TODO perms
     tmpl = "editor/gen2/bundle.xml.mako"
     return force_unicode(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping
            })))
+  
+  @property      
+  def parameters(self):
+    return self.data['properties']['parameters']  
+  
+  @property
+  def kick_off_time_utc(self):
+    return utc_datetime_format(self.data['properties']['kickoff'])  
   
   @property      
   def deployment_dir(self):
