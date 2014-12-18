@@ -397,6 +397,19 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.isEditing(!self.isEditing());
   };
 
+  self.hasArrows = ko.observable(true);
+  self.hasArrows.subscribe(function (newVal) {
+    if (newVal){
+      $(document).trigger("drawArrows");
+    }
+    else {
+      $(document).trigger("removeArrows");
+    }
+  });
+  self.toggleArrows = function () {
+    self.hasArrows(!self.hasArrows());
+  };
+
   self.columns = ko.observable([]);
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);

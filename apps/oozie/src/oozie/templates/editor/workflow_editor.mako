@@ -140,38 +140,41 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
-      <i class="fa fa-file-code-o"></i>
+      <i class="fa fa-fw fa-file-code-o"></i>
     </a>
     <a title="${ _('Import workflows') }" rel="tooltip" data-placement="bottom" data-bind="click: import_workflows, css: {'btn': true}">
-      <i class="fa fa fa-download"></i>
+      <i class="fa fa-fw fa-download"></i>
     </a>
     &nbsp;&nbsp;&nbsp;
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
-      <i class="fa fa-play"></i>
+      <i class="fa fa-fw fa-play"></i>
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-      <i class="fa fa-pencil"></i>
+      <i class="fa fa-fw fa-pencil"></i>
+    </a>
+    <a title="${ _('Toggle arrows') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleArrows, css: {'btn': true, 'btn-inverse': hasArrows}">
+      <i class="fa fa-fw fa-long-arrow-down"></i>
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
       <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
-        <i class="fa fa-cog"></i>
+        <i class="fa fa-fw fa-cog"></i>
       </button>
       <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
           data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
           data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
-        <i class="fa fa-folder-open"></i>
+        <i class="fa fa-fw fa-folder-open"></i>
       </a>      
       &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
-        <i class="fa fa-save"></i>
+        <i class="fa fa-fw fa-save"></i>
       </button>
       &nbsp;&nbsp;&nbsp;
       <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-file-o"></i>
+        <i class="fa fa-fw fa-file-o"></i>
       </a>
       <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-tags"></i>
+        <i class="fa fa-fw fa-tags"></i>
       </a>
     % endif
   </div>
@@ -1638,6 +1641,10 @@ ${ dashboard.import_bindings() }
     _linkMappingTimeout = window.setTimeout(renderChangeables, 25);
   });
 
+  $(document).on("removeArrows", function(){
+    $("canvas").remove();
+  });
+
   $(document).on("editingToggled", function(){
     $("canvas").remove();
     window.setTimeout(renderChangeables, 100);
@@ -1655,7 +1662,9 @@ ${ dashboard.import_bindings() }
 
   function renderChangeables() {
     resizeDrops();
-    drawArrows();
+    if (viewModel.hasArrows()){
+      drawArrows();
+    }
   }
 
   var lastSeenPosition = null;
