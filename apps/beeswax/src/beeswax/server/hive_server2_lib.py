@@ -675,7 +675,6 @@ class ResultCompatible:
 class PartitionKeyCompatible:
 
   def __init__(self, name, type, comment):
-    # Parses: ['name:datehour, type:int, comment:null']
     self.name = name
     self.type = type
     self.comment = comment
