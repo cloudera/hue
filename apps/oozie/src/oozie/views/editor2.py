@@ -445,17 +445,18 @@ def submit_bundle(request, doc_id):
 def _submit_bundle(request, bundle, properties):
   try:
     deployment_mapping = {}
-
-    for coord in bundle.document.dependencies.all():
+    coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])])
+    
+    for i, bundled in enumerate(bundle.data['coordinators']):
+      coord = coords[bundled['coordinator']]
       workflow = Workflow(document=coord.dependencies.all()[0])
       wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()      
-      deployment_mapping['wf_%s_dir' % coord.uuid] = request.fs.get_hdfs_path(wf_dir)
-      deployment_mapping[workflow.uuid] = workflow.document.name
+      deployment_mapping['wf_%s_dir' % i] = request.fs.get_hdfs_path(wf_dir)
       
       coordinator = Coordinator(document=coord)
       coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
-      deployment_mapping['coord_%s_dir' % coord.uuid] = coord_dir
-      deployment_mapping[coord.uuid] = coord.name
+      deployment_mapping['coord_%s_dir' % i] = coord_dir
+      deployment_mapping['coord_%s' % i] = coord
 
     properties.update(deployment_mapping)
     

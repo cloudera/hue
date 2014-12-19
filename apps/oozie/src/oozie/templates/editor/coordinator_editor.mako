@@ -162,9 +162,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
                 <i class="fa fa-sliders"></i>
               </a>
-              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
 
               <div data-bind="visible: show_advanced" style="padding-left: 20px">
                 Done flag 
