@@ -1889,7 +1889,6 @@ class TestHiveServer2API():
                     ['comment', 'null)'],
                     ['FieldSchema(name', 'decimal'],
                     ['type', 'decimal(9'],
-                    #['7)'],
                     ['comment', 'this'],
                     ['has extra', ' sigils)'],
                     ['FieldSchema(name', 'complex'],
