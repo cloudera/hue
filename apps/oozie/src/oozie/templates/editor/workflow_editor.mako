@@ -193,15 +193,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 
- <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
+<div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="/static/art/hint_arrow.png" />
-  </div>
+  <img src="/static/art/hint_arrow.png" />
+</div>
 
-  <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
-    <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="/static/art/hint_arrow_horiz_flipped.png" />
-  </div>
+<div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
+  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
+  <img src="/static/art/hint_arrow_horiz_flipped.png" />
+</div>
 
 
 <div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
@@ -228,7 +228,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
       <div class="row-fluid">
         <div data-bind="visible: enableOozieDropOnAfter, css: {'span4 offset4': true, 'drop-target': true, 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }">
-          <span data-bind="visible: oozieRows().length == 0">${ _('Drop your action here.') }</span>
+          <span data-bind="visible: oozieRows().length == 0">${ _('Drop your action here') }</span>
         </div>
         <div data-bind="visible: ! enableOozieDropOnAfter(), css: {'drop-target drop-target-disabled': true, 'is-editing': $root.isEditing}"></div>
       </div>
@@ -1445,8 +1445,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <h3 id="myModalLabel">${ _('Workflow Settings') }</h3>
   </div>
   <div class="modal-body">
-      <h4>${ _('Submission Parameters') }</h4>
+      <h4>${ _('Variables') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
+        <!-- ko if: name() != 'oozie.use.system.libpath' -->
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
@@ -1454,6 +1455,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
             <i class="fa fa-minus"></i>
           </a>
         </li>
+        <!-- /ko -->
       </ul>
       <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
