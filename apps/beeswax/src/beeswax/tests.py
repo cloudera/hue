@@ -1789,7 +1789,7 @@ class MockHiveServerTable(HiveServerTable):
 
 class TestHiveServer2API():
 
-  def test_partition_values(self):
+  def test_parsing_partition_values(self):
     table = MockHiveServerTable({'path_location': '/my/table'})
 
     assert_equal(['2013022516'], PartitionValueCompatible(['datehour=2013022516'], table).values)
