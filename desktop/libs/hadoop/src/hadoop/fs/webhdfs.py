@@ -559,6 +559,7 @@ class WebHdfs(Hdfs):
 
     while True:
       data = self.read(src, offset, UPLOAD_CHUNK_SIZE.get())
+      cnt = len(data)
       if offset == 0:
         if skip_header:
           n = data.index('\n')
@@ -574,7 +575,6 @@ class WebHdfs(Hdfs):
       if offset != 0:
         self.append(dst, data)
 
-      cnt = len(data)
       if cnt < UPLOAD_CHUNK_SIZE.get():
         break
 
