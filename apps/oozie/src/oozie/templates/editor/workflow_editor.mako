@@ -139,21 +139,23 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
+    [
     <a title="${ _('Gen XML') }" rel="tooltip" data-placement="bottom" data-bind="click: gen_xml, css: {'btn': true}">
       <i class="fa fa-fw fa-file-code-o"></i>
     </a>
     <a title="${ _('Import workflows') }" rel="tooltip" data-placement="bottom" data-bind="click: import_workflows, css: {'btn': true}">
       <i class="fa fa-fw fa-download"></i>
     </a>
+    <a title="${ _('Toggle arrows') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleArrows, css: {'btn': true, 'btn-inverse': hasArrows}">
+      <i class="fa fa-fw fa-long-arrow-down"></i>
+    </a>
+    ]
     &nbsp;&nbsp;&nbsp;
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-fw fa-play"></i>
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-fw fa-pencil"></i>
-    </a>
-    <a title="${ _('Toggle arrows') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleArrows, css: {'btn': true, 'btn-inverse': hasArrows}">
-      <i class="fa fa-fw fa-long-arrow-down"></i>
     </a>
     &nbsp;&nbsp;&nbsp;
     % if user.is_superuser:
@@ -164,7 +166,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
           data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
         <i class="fa fa-fw fa-folder-open"></i>
-      </a>      
+      </a>
+      <a title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-fw fa-users"></i>
+      </a>
       &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
         <i class="fa fa-fw fa-save"></i>
@@ -182,6 +187,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <form class="form-search" style="margin: 0">
     <strong>${_("Name")}</strong>
     <input data-bind="value: $root.workflow.name"/>
+    <input data-bind="value: $root.workflow.properties.description" class="span6"/>
   </form>
 </div>
 
@@ -416,7 +422,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
     <div class="big-icon"><i class="fa fa-sitemap"></i></div>
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
-      <a class="pointer" data-bind="click: function() { $root.convertToDecision($parent, $data) }"><i class="fa fa-magic"></i> ${_('Convert to Decision')}</a>
+      <a class="pointer" data-bind="click: function() { $root.convertToDecision($parent, $data) }">${_('Convert to Decision')} <i class="fa fa-wrench"></i></a>
     </div>
   </div>
   <!-- /ko -->
@@ -472,7 +478,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="start-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px;">
-    <div class="big-icon"><i class="fa fa-caret-square-o-down"></i></div>
+    <div class="big-icon"><i class="fa fa-flag-checkered"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -481,7 +487,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="end-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
-    <div class="big-icon"><i class="fa fa-check-square"></i></div>
+    <div class="big-icon"><i class="fa fa-dot-circle-o"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -709,7 +715,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-      <strong data-bind="text: properties.script_path"></strong>
+      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
+        <strong data-bind="text: properties.script_path"></strong>
+      </a>
     </div>
 
     <div data-bind="visible: $root.isEditing">

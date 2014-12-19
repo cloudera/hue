@@ -40,12 +40,12 @@
 
 
   % for bundled in bundle.data['coordinators']:
-  <coordinator name="${ mapping[bundled['coordinator']] }-${ bundled['coordinator'][0:4] }">
-     <app-path>${'${'}nameNode}${ mapping['coord_%s_dir' % bundled['coordinator'] ] }</app-path>
+  <coordinator name="${ mapping['coord_%s' % loop.index].name }-${ loop.index }">
+     <app-path>${'${'}nameNode}${ mapping['coord_%s_dir' % loop.index ] }</app-path>
      <configuration>
        <property>
           <name>wf_application_path</name>
-          <value>${ mapping['wf_%s_dir' % bundled['coordinator']] }</value>
+          <value>${ mapping['wf_%s_dir' % loop.index] }</value>
       </property>
       % for param in bundled['properties']:
       <property>

@@ -98,7 +98,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
               <li>
                 <input data-bind="value: name"/>
                 <input data-bind="value: value"/>
-                <a href="#" data-bind="click: function(){ $data.properties.remove(this); }">
+                <a href="#" data-bind="click: function(){ $parent.properties.remove(this); }">
                   <i class="fa fa-minus"></i>
                 </a>
               </li>

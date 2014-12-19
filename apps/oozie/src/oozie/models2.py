@@ -92,6 +92,7 @@ class Workflow(Job):
               "uuid": None,
               "name": "My Workflow",
               "properties": {
+                  "description": "",
                   "job_xml": "",
                   "sla_enabled": False,
                   "schema_version": "uri:oozie:workflow:0.4",
@@ -298,7 +299,7 @@ class PigAction(Action):
   FIELDS = {
      'script_path': { 
           'name': 'script_path',
-          'label': _('Script name'),
+          'label': _('Script'),
           'value': '',
           'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
      },            
@@ -438,7 +439,7 @@ class HiveAction(Action):
   FIELDS = {
      'script_path': { 
           'name': 'script_path',
-          'label': _('Script name'),
+          'label': _('Script'),
           'value': '',
           'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
      },            
@@ -493,7 +494,7 @@ class HiveServer2Action(Action):
   FIELDS = {
      'script_path': { 
           'name': 'script_path',
-          'label': _('Script name'),
+          'label': _('Script'),
           'value': '',
           'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
      },            
