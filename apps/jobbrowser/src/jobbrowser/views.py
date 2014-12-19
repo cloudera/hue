@@ -41,7 +41,7 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 from hadoop.yarn.clients import get_log_client
 
 from jobbrowser import conf
-from jobbrowser.api import get_api, ApplicationNotRunning
+from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job
 
 import urllib2
@@ -59,8 +59,10 @@ def check_job_permission(view_func):
     except ApplicationNotRunning, e:
       # reverse() seems broken, using request.path but beware, it discards GET and POST info
       return job_not_assigned(request, jobid, request.path)
+    except JobExpired, e:
+      raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
     except Exception, e:
-       raise PopupException(_('Could not find job %s.') % jobid, detail=e)
+      raise PopupException(_('Could not find job %s.') % jobid, detail=e)
 
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
