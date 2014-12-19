@@ -23,6 +23,7 @@ from itertools import chain
 
 from django.db import models
 from django.db.models import Q
+from django.core.urlresolvers import reverse
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -605,7 +606,7 @@ class Document2(models.Model):
   type = models.CharField(default='', max_length=32, db_index=True, help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...'))
 
   data = models.TextField(default='{}')
-  extra = models.TextField(default='{}')
+  extra = models.TextField(default='')
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True) 
@@ -613,6 +614,7 @@ class Document2(models.Model):
 
   tags = models.ManyToManyField('self', db_index=True)
   dependencies = models.ManyToManyField('self', db_index=True)
+  doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
   
   objects = Document2Manager()
   unique_together = ('uuid', 'version', 'is_history')
@@ -634,3 +636,9 @@ class Document2(models.Model):
     data_dict.update(post_data)
 
     self.data = json.dumps(data_dict)
+
+  def get_absolute_url(self):
+    if self.type == 'oozie-workflow2':
+      return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    else:
+      return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)

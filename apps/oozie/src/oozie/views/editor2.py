@@ -28,7 +28,7 @@ from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
-from desktop.models import Document2
+from desktop.models import Document, Document2
 
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
@@ -58,6 +58,7 @@ def edit_workflow(request):
     workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', id=workflow_id)) # Todo perms
   else:
     workflow = Workflow()
+    workflow.create_workspace(request.fs, request.user)
   
   workflow_data = workflow.get_data()
 
@@ -91,6 +92,7 @@ def save_workflow(request):
     workflow_doc = Document2.objects.get(id=workflow['id'])
   else:      
     workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
   subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
   if subworkflows:

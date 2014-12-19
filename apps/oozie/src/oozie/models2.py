@@ -200,6 +200,15 @@ class Workflow(Job):
 
     return dict([(param, '') for param in list(params)])
 
+  def create_workspace(self, fs, user):
+    perms = 0711
+    # if shared, perms = 0755
+    Submission(user, self, fs, None, {})._create_dir(self.deployment_dir, perms=perms)
+    Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
+
+  def create_workspace2(self, fs, user):
+    pass
+
   def check_workspace(self, fs):
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
       
