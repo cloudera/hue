@@ -283,7 +283,10 @@ class YarnApi(JobBrowserApi):
     except ApplicationNotRunning, e:
       raise e
     except Exception, e:
-      raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
+      if 'NotFoundException' in str(e):
+        raise JobExpired(jobid)
+      else:
+        raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
 
     return job
 
@@ -303,4 +306,11 @@ class ApplicationNotRunning(Exception):
 
   def __init__(self, application_id, job):
     self.application_id = application_id
+    self.job = job
+
+
+class JobExpired(Exception):
+
+  def __init__(self, job):
+    super(JobExpired, self).__init__('JobExpired: %s' %job)
     self.job = job
