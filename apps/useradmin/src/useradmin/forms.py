@@ -96,6 +96,11 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     if self.instance.id:
       self.fields['username'].widget.attrs['readonly'] = True
 
+    if desktop_conf.AUTH.BACKEND.get() == 'desktop.auth.backend.LdapBackend':
+      self.fields['password1'].widget.attrs['readonly'] = True
+      self.fields['password2'].widget.attrs['readonly'] = True
+      self.fields['password_old'].widget.attrs['readonly'] = True
+
   def clean_password(self):
     return self.cleaned_data["password"]
 
