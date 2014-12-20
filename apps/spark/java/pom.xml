@@ -27,13 +27,13 @@
         <version>3.7.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.cloudera.hue.sparker</groupId>
-    <artifactId>sparker-main</artifactId>
+    <groupId>com.cloudera.hue.livy</groupId>
+    <artifactId>livy-main</artifactId>
     <packaging>pom</packaging>
     <version>3.7.0-SNAPSHOT</version>
 
-    <name>sparker-main</name>
-    <description>sparker-main</description>
+    <name>livy-main</name>
+    <description>livy-main</description>
 
     <licenses>
         <license>
@@ -52,9 +52,12 @@
     </properties>
 
     <modules>
-        <module>sparker-repl</module>
-        <module>sparker-server</module>
-        <module>sparker-yarn</module>
+        <!--
+        <module>livy-assembly</module>
+        <module>livy-repl</module>
+        <module>livy-server</module>
+        -->
+        <module>livy-yarn</module>
     </modules>
 
     <repositories>
@@ -213,14 +216,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <descriptor>src/main/assembly/dist.xml</descriptor>
-                </configuration>
-            </plugin>
-
             <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -228,7 +223,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.cloudera.sparker.SparkerMain</mainClass>
+                            <mainClass>com.cloudera.livy.LivyMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -239,6 +234,27 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+
+            <!--
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>make-bundles</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>livy-yarn/src/main/assembly/dist.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
