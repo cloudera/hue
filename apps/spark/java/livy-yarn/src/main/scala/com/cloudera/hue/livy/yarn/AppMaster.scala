@@ -6,6 +6,12 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.AMRMClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
+import org.mortbay.jetty.Server
+import org.mortbay.jetty.servlet.DefaultServlet
+import org.mortbay.jetty.webapp.WebAppContext
+import org.scalatra.servlet.{AsyncSupport, ScalatraListener}
+
+import scala.concurrent.ExecutionContext
 
 object AppMaster extends Logging {
 
@@ -29,9 +35,27 @@ object AppMaster extends Logging {
     amRMClient.start()
 
     try {
+      val server = new Server(0)
+      val context = new WebAppContext()
+
+      context.setContextPath("/")
+      context.setResourceBase("src/main/com/cloudera/hue/livy/repl")
+      context.addEventListener(new ScalatraListener)
+
+      context.addServlet(classOf[DefaultServlet], "/")
+
+      context.setAttribute(AsyncSupport.ExecutionContextKey, ExecutionContext.global)
+
+      server.setHandler(context)
+
+      server.start()
+
+      // Now that the server is up and running register it with YARN.
       val appMasterHostname = NetUtils.getHostname
       val appMasterRpcPort = -1
       val appMasterTrackingUrl = ""
+
+      val port =  server.getConnectors()(0).getLocalPort
 
       val response = amRMClient.registerApplicationMaster(appMasterHostname, appMasterRpcPort, appMasterTrackingUrl)
 
@@ -40,6 +64,10 @@ object AppMaster extends Logging {
 
       val maxVCores = response.getMaximumResourceCapability.getVirtualCores
       info("max vcore capacity on this cluster: %s" format maxMem)
+
+      // Finallay, wait for the web service to shut down.
+      server.join()
+
     } finally {
       val appStatus = FinalApplicationStatus.SUCCEEDED
       val appMessage = "wee"

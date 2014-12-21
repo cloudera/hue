@@ -54,9 +54,9 @@
     <modules>
         <!--
         <module>livy-assembly</module>
-        <module>livy-repl</module>
         <module>livy-server</module>
         -->
+        <module>livy-repl</module>
         <module>livy-yarn</module>
     </modules>
 
