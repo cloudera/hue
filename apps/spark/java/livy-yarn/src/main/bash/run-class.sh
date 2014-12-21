@@ -6,7 +6,7 @@ cd $base_dir
 base_dir=`pwd`
 cd $home_dir
 
-HADOOP_YARN_HOME="${HADOOP_YARN_HOME:-$HOME/.sparker}"
+HADOOP_YARN_HOME="${HADOOP_YARN_HOME:-$HOME/.livy}"
 HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-$HADOOP_YARN_HOME/conf}"
 CLASSPATH=$HADOOP_CONF_DIR
 

@@ -18,4 +18,4 @@
 
 [[ $JAVA_OPTS != *-server* ]] && export JAVA_OPTS="$JAVA_OPTS -server"
 
-exec $(dirname $0)/run-class.sh com.cloudera.hue.sparker.yarn.AppMaster $@
+exec $(dirname $0)/run-class.sh com.cloudera.hue.livy.yarn.AppMaster $@
