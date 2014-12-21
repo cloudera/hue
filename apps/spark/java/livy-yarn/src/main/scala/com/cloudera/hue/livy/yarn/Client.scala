@@ -20,6 +20,8 @@ object Client extends Logging {
     val packagePath = new Path(args(1))
 
     val yarnConf = new YarnConfiguration()
+    yarnConf.set("yarn.resourcemanager.am.max-attempts", "1")
+
     val client = new Client(yarnConf)
 
     try {
@@ -228,7 +230,7 @@ object Client {
       amContainer.setCommands(
         Collections.singletonList(
           "$JAVA_HOME/bin/java" +
-            " com.cloudera.hue.sparker.repl.yarn.ApplicationMaster" +
+            " com.cloudera.hue.livy.repl.yarn.ApplicationMaster" +
             " 1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout" +
             " 2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout"))
 
@@ -302,7 +304,7 @@ object Client {
       val appContext = yarnClient.createApplication.getApplicationSubmissionContext
       val appId = appContext.getApplicationId
 
-      val appName = "sparker-repl"
+      val appName = "livy-repl"
       val amPriority = 0
       val amQueue = "default"
 

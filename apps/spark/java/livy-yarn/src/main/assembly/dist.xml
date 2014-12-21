@@ -22,7 +22,13 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
-            <useProjectArtifact>false</useProjectArtifact>
+            <useProjectArtifact>true</useProjectArtifact>
+
+            <!--
+            <excludes>
+                <exclude></exclude>
+            </excludes>
+            -->
         </dependencySet>
     </dependencySets>
 
@@ -30,6 +36,15 @@
         <fileSet>
             <directory>${basedir}/src/main/bash</directory>
             <outputDirectory>/bin</outputDirectory>
+            <fileMode>0744</fileMode>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <outputDirectory>/resources</outputDirectory>
             <fileMode>0744</fileMode>
             <includes>
                 <include>*</include>
