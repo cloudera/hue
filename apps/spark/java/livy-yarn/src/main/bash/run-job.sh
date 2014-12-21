@@ -16,4 +16,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-exec $(dirname $0)/run-class.sh com.cloudera.hue.sparker.yarn.Client $@
+exec $(dirname $0)/run-class.sh com.cloudera.hue.livy.yarn.Client $@
