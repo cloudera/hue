@@ -52,7 +52,7 @@ public class SparkSession implements Session {
     private static final Logger LOG = LoggerFactory.getLogger(SparkSession.class);
 
     private static final String SPARKER_HOME = System.getenv("SPARKER_HOME");
-    private static final String SPARKER_SHELL = SPARKER_HOME + "/sparker-shell";
+    private static final String SPARKER_SHELL = SPARKER_HOME + "/livy-shell";
 
     private final String id;
     private State state = State.READY;

@@ -6,9 +6,9 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.AMRMClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
-import org.mortbay.jetty.Server
-import org.mortbay.jetty.servlet.DefaultServlet
-import org.mortbay.jetty.webapp.WebAppContext
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.{AsyncSupport, ScalatraListener}
 
 import scala.concurrent.ExecutionContext
@@ -52,10 +52,11 @@ object AppMaster extends Logging {
 
       // Now that the server is up and running register it with YARN.
       val appMasterHostname = NetUtils.getHostname
-      val appMasterRpcPort = -1
+      val appMasterRpcPort = server.getConnectors()(0).getLocalPort
       val appMasterTrackingUrl = ""
 
-      val port =  server.getConnectors()(0).getLocalPort
+      info("Starting RPC server on %s:%s" format(appMasterHostname, appMasterRpcPort))
+      info("Tracking URL: %s" format appMasterTrackingUrl)
 
       val response = amRMClient.registerApplicationMaster(appMasterHostname, appMasterRpcPort, appMasterTrackingUrl)
 
