@@ -28,7 +28,6 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>
-            <!--
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -44,16 +43,21 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-            -->
         </dependency>
 
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-yarn-client</artifactId>
             <version>${hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -69,10 +73,28 @@
         </dependency>
 
         <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra_2.10</artifactId>
+            <version>2.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-compiler</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>8.1.14.v20131031</version>
+        </dependency>
+
+        <!--
+        <dependency>
             <groupId>com.cloudera.hue.livy</groupId>
             <artifactId>livy-repl</artifactId>
             <version>${project.version}</version>
-            <!--
             <exclusions>
                 <exclusion>
                     <groupId>org.scala-lang</groupId>
@@ -83,8 +105,8 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
-            -->
         </dependency>
+        -->
 
     </dependencies>
 

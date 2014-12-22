@@ -2,12 +2,10 @@ package com.cloudera.hue.livy.yarn
 
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.yarn.api.ApplicationConstants
-import org.apache.hadoop.yarn.api.ApplicationConstants.Environment
 import org.apache.hadoop.yarn.api.records._
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.{ConverterUtils, Records}
-import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions._
 
@@ -37,9 +35,9 @@ object Client extends Logging {
 
       info("waiting for job to start")
 
-      job.waitForStatus(Running(), 500) match {
+      job.waitForStatus(Running(), 10000) match {
         case Some(Running()) => {
-          info("job started successfully")
+          info("job started successfully on %s:%s" format(job.host, job.rpcPort))
         }
         case Some(appStatus) => {
           warn("unable to start job successfully. job has status %s" format appStatus)
@@ -49,6 +47,7 @@ object Client extends Logging {
         }
       }
 
+      /*
       job.waitForFinish(100000) match {
         case Some(SuccessfulFinish()) => {
           info("job finished successfully")
@@ -60,6 +59,7 @@ object Client extends Logging {
           info("timed out")
         }
       }
+      */
 
     } finally {
       client.close()
@@ -69,7 +69,7 @@ object Client extends Logging {
 
 class Client(yarnConf: YarnConfiguration) {
 
-  import Client._
+  import com.cloudera.hue.livy.yarn.Client._
 
   val yarnClient = YarnClient.createYarnClient()
   yarnClient.init(yarnConf)
@@ -188,6 +188,16 @@ class Job(client: YarnClient, appId: ApplicationId) {
     None
   }
 
+  def host: String = {
+    val statusResponse = client.getApplicationReport(appId)
+    statusResponse.getHost
+  }
+
+  def rpcPort: Int = {
+    val statusResponse = client.getApplicationReport(appId)
+    statusResponse.getRpcPort
+  }
+
   private def getStatus(): ApplicationStatus = {
     val statusResponse = client.getApplicationReport(appId)
     convertState(statusResponse.getYarnApplicationState, statusResponse.getFinalApplicationStatus)
@@ -196,15 +206,21 @@ class Job(client: YarnClient, appId: ApplicationId) {
   private def convertState(state: YarnApplicationState, status: FinalApplicationStatus): ApplicationStatus = {
     (state, status) match {
       case (YarnApplicationState.FINISHED, FinalApplicationStatus.SUCCEEDED) => SuccessfulFinish()
-      case (YarnApplicationState.KILLED, _) | (YarnApplicationState.FAILED, _) => UnsuccessfulFinish()
-      case (YarnApplicationState.NEW, _) | (YarnApplicationState.SUBMITTED, _) => New()
-      case _ => Running()
+      case (YarnApplicationState.FINISHED, _) |
+           (YarnApplicationState.KILLED, _) |
+           (YarnApplicationState.FAILED, _) => UnsuccessfulFinish()
+      case (YarnApplicationState.NEW, _) |
+           (YarnApplicationState.NEW_SAVING, _) |
+           (YarnApplicationState.SUBMITTED, _) => New()
+      case (YarnApplicationState.RUNNING, _) => Running()
+      case (YarnApplicationState.ACCEPTED, _) => Accepted()
     }
   }
 }
 
 trait ApplicationStatus
 case class New() extends ApplicationStatus
+case class Accepted() extends ApplicationStatus
 case class Running() extends ApplicationStatus
 case class SuccessfulFinish() extends ApplicationStatus
 case class UnsuccessfulFinish() extends ApplicationStatus
