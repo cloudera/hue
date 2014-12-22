@@ -638,6 +638,7 @@ class EnsureSafeRedirectURLMiddleware(object):
     else:
       return response
 
+
 # FIXME: This was backported from Django 1.5 to work around streaming generator
 # responses incorrectly getting a length returned with the response. This can
 # be removed once we upgrade.
@@ -650,7 +651,7 @@ class ConditionalGetMiddleware(object):
     Also sets the Date and Content-Length response-headers.
     """
     def process_response(self, request, response):
-        from django.utils.http import http_date
+        from django.utils.http import http_date, parse_http_date_safe
 
         response['Date'] = http_date()
         if not getattr(response, 'streaming', False) and not response.has_header('Content-Length'):
