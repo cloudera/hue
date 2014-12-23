@@ -1,6 +1,4 @@
-package com.cloudera.hue.livy.yarn
-
-import org.slf4j.LoggerFactory
+package com.cloudera.hue.livy
 
 trait Logging {
   val loggerName = this.getClass.getName

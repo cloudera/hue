@@ -66,6 +66,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.cloudera.hue.livy</groupId>
+            <artifactId>livy-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
