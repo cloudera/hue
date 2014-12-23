@@ -13,9 +13,6 @@ import scala.collection.JavaConversions._
 object Client extends Logging {
 
   def main(args: Array[String]): Unit = {
-    println(args.length)
-    args.foreach(println(_))
-
     val packagePath = new Path(args(1))
 
     val yarnConf = new YarnConfiguration()
@@ -38,7 +35,7 @@ object Client extends Logging {
 
       job.waitForStatus(Running(), 10000) match {
         case Some(Running()) => {
-          info("job started successfully on %s:%s" format(job.host, job.rpcPort))
+          info("job started successfully on %s:%s" format(job.getHost, job.getPort))
         }
         case Some(appStatus) => {
           warn("unable to start job successfully. job has status %s" format appStatus)
@@ -47,20 +44,6 @@ object Client extends Logging {
           warn("timed out waiting for job to start")
         }
       }
-
-      /*
-      job.waitForFinish(100000) match {
-        case Some(SuccessfulFinish()) => {
-          info("job finished successfully")
-        }
-        case Some(appStatus) => {
-          info("job finished unsuccessfully %s" format appStatus)
-        }
-        case None => {
-          info("timed out")
-        }
-      }
-      */
 
     } finally {
       client.close()
@@ -170,7 +153,7 @@ class Job(client: YarnClient, appId: ApplicationId) {
     val startTimeMs = System.currentTimeMillis()
 
     while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      if (getStatus() == status) {
+      if (getStatus == status) {
         return Some(status)
       }
 
@@ -180,17 +163,17 @@ class Job(client: YarnClient, appId: ApplicationId) {
     None
   }
 
-  def host: String = {
+  def getHost: String = {
     val statusResponse = client.getApplicationReport(appId)
     statusResponse.getHost
   }
 
-  def rpcPort: Int = {
+  def getPort: Int = {
     val statusResponse = client.getApplicationReport(appId)
     statusResponse.getRpcPort
   }
 
-  private def getStatus(): ApplicationStatus = {
+  private def getStatus: ApplicationStatus = {
     val statusResponse = client.getApplicationReport(appId)
     convertState(statusResponse.getYarnApplicationState, statusResponse.getFinalApplicationStatus)
   }
