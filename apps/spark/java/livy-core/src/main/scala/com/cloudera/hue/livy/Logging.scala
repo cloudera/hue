@@ -1,8 +1,9 @@
 package com.cloudera.hue.livy
 
+import org.slf4j.LoggerFactory
+
 trait Logging {
-  val loggerName = this.getClass.getName
-  lazy val logger = LoggerFactory.getLogger(loggerName)
+  lazy val logger = LoggerFactory.getLogger(this.getClass)
 
   def debug(message: => Any) = {
     if (logger.isDebugEnabled) {
