@@ -9,7 +9,7 @@ cd $home_dir
 HADOOP_YARN_HOME="${HADOOP_YARN_HOME:-$HOME/.livy}"
 HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-$HADOOP_YARN_HOME/conf}"
 CLASSPATH="$HADOOP_CONF_DIR:$base_dir/lib/*"
-DEFAULT_LOG4J_FILE="$base_dir/resources/log4j.properties"
+DEFAULT_LOGBACK_FILE="$base_dir/resources/logback.xml"
 
 #for file in $base_dir/lib/*.[jw]ar;
 #do
@@ -33,10 +33,10 @@ function check_and_enable_64_bit_mode {
 # Check if 64 bit is set. If not - try and set it if it's supported
 [[ $JAVA_OPTS != *-d64* ]] && check_and_enable_64_bit_mode
 
-# Check if log4j configuration is specified. If not - set to lib/log4j.xml
-[[ $JAVA_OPTS != *-Dlog4j.configuration* && -f $DEFAULT_LOG4J_FILE ]] && JAVA_OPTS="$JAVA_OPTS -Dlog4j.configuration=file:$DEFAULT_LOG4J_FILE"
+# Check if logback configuration is specified. If not - set to resources/logback.xml
+[[ $JAVA_OPTS != *-Dlogback.configuration* && -f $DEFAULT_LOGBACK_FILE ]] && JAVA_OPTS="$JAVA_OPTS -Dlogback.configuration=file:$DEFAULT_LOGBACK_FILE"
 
-JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006"
+JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006"
 
 echo $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"
 exec $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"
