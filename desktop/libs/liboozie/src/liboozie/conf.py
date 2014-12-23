@@ -36,8 +36,9 @@ SECURITY_ENABLED = Config(
 
 REMOTE_DEPLOYMENT_DIR = Config(
   key="remote_deployement_dir",
-  default="/user/hue/oozie/deployments",
-  help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."))
+  default="/user/hue/oozie/deployments/_$USER_-oozie-$JOBID-$TIME",
+  help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+          " Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"))
 
 
 def get_oozie_status(user):

@@ -216,7 +216,7 @@ class Submission(object):
 
     # Case of a shared job
     if self.user != self.job.document.owner:
-      path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
+      path = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', user.username).replace('$TIME', str(time.time())).replace('$JOBID', self.job.id)
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):
         self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
@@ -306,6 +306,7 @@ class Submission(object):
   def _is_coordinator(self):
     from oozie.models2 import Coordinator
     return Coordinator.PROPERTY_APP_PATH in self.properties
+
 
 
 def create_directories(fs, directory_list=[]):

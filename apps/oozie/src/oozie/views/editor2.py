@@ -58,7 +58,8 @@ def edit_workflow(request):
     workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', id=workflow_id)) # Todo perms
   else:
     workflow = Workflow()
-    workflow.create_workspace(request.fs, request.user)
+    workflow.set_workspace(request.user)
+    workflow.check_workspace(request.fs, request.user)
   
   workflow_data = workflow.get_data()
 
@@ -105,7 +106,7 @@ def save_workflow(request):
   workflow_doc.save()
   
   workflow_instance = Workflow(document=workflow_doc)
-  workflow_instance.check_workspace(request.fs)
+  #workflow_instance.check_workspace(request.fs, request.user)
   
   response['status'] = 0
   response['id'] = workflow_doc.id

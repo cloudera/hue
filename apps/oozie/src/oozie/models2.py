@@ -44,6 +44,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Job(object):
+  
   def find_all_parameters(self, with_lib_path=True):
     params = self.find_parameters()
 
@@ -51,6 +52,10 @@ class Job(object):
       params[param['name'].strip()] = param['value']
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']  
+
+  @classmethod
+  def get_workspace(cls, user):
+    return REMOTE_SAMPLE_DIR.get().replace('$USER', user.username).replace('$TIME', str(time.time()))
 
 
 class Workflow(Job):
@@ -130,10 +135,6 @@ class Workflow(Job):
       _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid',))
     else:
       _data['workflow']['dependencies'] = []
-      
-    if 'deployment_dir' not in _data['workflow']['properties']:
-      default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too
-      _data['workflow']['properties']['deployment_dir'] = default_dir
 
     if 'parameters' not in _data['workflow']['properties']:
       _data['workflow']['properties']['parameters'] = [
@@ -200,23 +201,21 @@ class Workflow(Job):
 
     return dict([(param, '') for param in list(params)])
 
-  def create_workspace(self, fs, user):
-    perms = 0711
-    # if shared, perms = 0755
-    Submission(user, self, fs, None, {})._create_dir(self.deployment_dir, perms=perms)
+  def set_workspace(self, user):
+    _data = json.loads(self.data)
+
+    _data['workflow']['properties']['deployment_dir'] = Job.get_workspace(user)
+    
+    self.data = json.dumps(_data)
+
+  def check_workspace(self, fs, user):
+    # Create optional root workspace for the first submission    
+    root = REMOTE_SAMPLE_DIR.get().rsplit('/', 1)
+    if len(root) > 1 and '$' not in root[0]:      
+      create_directories(fs, [root[0]])
+
+    Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
     Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
-
-  def create_workspace2(self, fs, user):
-    pass
-
-  def check_workspace(self, fs):
-    create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
-      
-    perms = 0711
-    # if shared, perms = 0755
-
-    Submission(self.document.owner, self, fs, None, {})._create_dir(self.deployment_dir, perms=perms)
-    Submission(self.document.owner, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
 
 
 class Node():

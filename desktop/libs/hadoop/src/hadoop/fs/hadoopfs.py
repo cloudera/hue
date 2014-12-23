@@ -247,8 +247,7 @@ class Hdfs(object):
           self.chmod(home_path, 0755)
           self.chown(home_path, user, user)
         except IOError:
-          msg = 'Failed to create home dir ("%s") as superuser %s' %\
-                (home_path, self.superuser)
+          msg = 'Failed to create home dir ("%s") as superuser %s' % (home_path, self.superuser)
           LOG.exception(msg)
           raise
       finally:
