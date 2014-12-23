@@ -2,9 +2,11 @@ package com.cloudera.hue.livy.repl
 
 import javax.servlet.ServletContext
 
+import ch.qos.logback.access.jetty.RequestLogImpl
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.repl.interpreter.SparkInterpreter
-import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.{NCSARequestLog, Server}
+import org.eclipse.jetty.server.handler.{RequestLogHandler, HandlerCollection}
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.{AsyncSupport, ScalatraListener}
@@ -25,7 +27,17 @@ class WebServer(var port: Int) extends Logging {
 
   context.setAttribute(AsyncSupport.ExecutionContextKey, ExecutionContext.global)
 
-  server.setHandler(context)
+  val handlers = new HandlerCollection
+  handlers.addHandler(context)
+
+  // configure the access log
+  val requestLogHandler = new RequestLogHandler
+  val requestLog = new RequestLogImpl
+  requestLog.setResource("/logback-access.xml")
+  requestLogHandler.setRequestLog(requestLog)
+  handlers.addHandler(requestLogHandler)
+
+  server.setHandler(handlers)
 
   def start() = {
     server.start()
