@@ -505,13 +505,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </a>
       </li>
     </ul>
-    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''});$(document).trigger('drawArrows') }">${ _('Directory') } <i class="fa fa-plus"></i></a>
-    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''});$(document).trigger('drawArrows') }">${ _('Delete') } <i class="fa fa-plus"></i></a>
+    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''});$(document).trigger('drawArrows') }">
+      ${ _('Directory') } <i class="fa fa-plus"></i>
+    </a>
+    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''});$(document).trigger('drawArrows') }">
+      ${ _('Delete') } <i class="fa fa-plus"></i>
+    </a>
 
     <h6>${ _('Job XML') }</h6>
     <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml"/>
 
-    <h6><a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">${ _('Properties') } <i class="fa fa-plus"></i></a></h6>
+    <h6>
+      <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">
+        ${ _('Properties') } <i class="fa fa-plus"></i>
+      </a>
+    </h6>
     <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
       <li>
         <input data-bind="value: name"/>
@@ -523,7 +531,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </ul>
     <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
 
-    <h6><a class="pointer" data-bind="click: function(){ properties.archives.push({'name': ''});$(document).trigger('drawArrows') }">${ _('Archives') } <i class="fa fa-plus"></i></a></h6>
+    <h6>
+      <a class="pointer" data-bind="click: function(){ properties.archives.push({'name': ''});$(document).trigger('drawArrows') }">
+        ${ _('Archives') } <i class="fa fa-plus"></i>
+      </a>
+    </h6>
     <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
       <li>
         <input data-bind="value: name"/>
@@ -538,11 +550,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-properties-arguments">
-  <h6><a class="pointer" data-bind="click: function(){ properties.arguments.push({'value': ''});$(document).trigger('drawArrows') }">${ _('Arguments') } <i class="fa fa-plus"></i></a></h6>
+  <h6>
+    <a class="pointer" data-bind="click: function(){ properties.arguments.push({'value': ''}); $(document).trigger('drawArrows') }">
+      ${ _('Arguments') } <i class="fa fa-plus"></i>
+    </a>
+  </h6>
   <ul class="unstyled" data-bind="visible: properties.arguments().length > 0, foreach: properties.arguments">
     <li>
       <input type="text" class="span11" data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this);$(document).trigger('drawArrows') }">
+      <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
@@ -552,11 +568,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-properties-files">
-  <h6><a class="pointer" data-bind="click: function(){ properties.files.push({'value': ''});$(document).trigger('drawArrows') }">${ _('Files') } <i class="fa fa-plus"></i></a></h6>
+  <h6>
+    <a class="pointer" data-bind="click: function(){ properties.files.push({'value': ''}); $(document).trigger('drawArrows') }">
+      ${ _('Files') } <i class="fa fa-plus"></i>
+    </a>
+  </h6>
   <ul class="unstyled" data-bind="foreach: properties.files">
     <li style="margin-bottom: 3px">
       <input type="text" class="span9 filechooser-input" data-bind="filechooser: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this);$(document).trigger('drawArrows') }">
+      <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
@@ -565,11 +585,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-properties-parameters">
-  <h6><a class="pointer" data-bind="click: function(){ properties.parameters.push({'value': ''}); $(document).trigger('drawArrows')}">${ _('Parameters') } <i class="fa fa-plus"></i></a></h6>
+  <h6>
+    <a class="pointer" data-bind="click: function(){ properties.parameters.push({'value': ''}); $(document).trigger('drawArrows')}">
+      ${ _('Parameters') } <i class="fa fa-plus"></i>
+    </a>
+  </h6>
   <ul class="unstyled" data-bind="foreach: properties.parameters">
     <li style="margin-bottom: 3px">
-      <input type="text" class="span11" data-bind="value: value"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this);$(document).trigger('drawArrows') }">
+      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $parent.actionParametersUI }"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
     </li>
@@ -614,6 +638,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="hive-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+  
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
+        <strong data-bind="text: properties.script_path"></strong>
+      </a>
+    </div>
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
@@ -623,7 +654,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       </div>
     </div>
-
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -660,6 +690,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="hive2-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+  
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
+      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
+        <strong data-bind="text: properties.script_path"></strong>
+      </a>
+    </div>
     <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
@@ -719,11 +756,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <strong data-bind="text: properties.script_path"></strong>
       </a>
     </div>
-
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-        <input type="text" data-bind="value: properties.script_path" />
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path" />
 
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>

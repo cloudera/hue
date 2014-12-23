@@ -27,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 
 
-from oozie.models2 import Workflow
+from oozie.models2 import Workflow, find_dollar_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -37,6 +37,22 @@ class TestEditor():
 
   def setUp(self):
     self.wf = Workflow()
+
+  def test_parsing(self):
+    assert_equal(['input', 'LIMIT', 'out'], find_dollar_variables("""
+data = '$input';
+$out = LIMIT data $LIMIT; -- ${nah}
+$output = STORE "$out";   
+    """))
+
+    assert_equal(['max_salary', 'limit'], find_dollar_variables("""
+SELECT sample_07.description, sample_07.salary
+FROM
+  sample_07
+WHERE
+( sample_07.salary > $max_salary)
+ORDER BY sample_07.salary DESC
+LIMIT $limit"""))
 
   def test_workflow_gen_xml(self):
     assert_equal(

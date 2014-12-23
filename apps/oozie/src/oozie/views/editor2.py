@@ -35,7 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7
+from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7, find_dollar_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -159,6 +159,30 @@ def add_node(request):
   response['properties'] = _properties
   response['name'] = '%s-%s' % (node['widgetType'].split('-')[0], node['id'][:4])
 
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def action_parameters(request):
+  response = {'status': -1}
+  parameters = set()
+
+  try:
+    node_data = json.loads(request.POST.get('node', '{}'))
+    
+    script_path = node_data.get('properties', {}).get('script_path', {})
+    if script_path:
+      script_path = script_path.replace('hdfs://', '')
+      if request.fs.do_as_user(request.user, request.fs.exists, script_path):
+        data =  request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024**2)
+        parameters = parameters.union(set(find_dollar_variables(data)))
+       
+    parameters = parameters.union(set(Node(node_data).find_parameters()))
+                    
+    response['status'] = 0
+    response['parameters'] = list(parameters)
+  except Exception, e:
+    response['message'] = str(e)
+    
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 

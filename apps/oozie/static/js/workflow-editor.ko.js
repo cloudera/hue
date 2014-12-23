@@ -83,6 +83,12 @@ var Node = function (node) {
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
+  self.actionParameters = ko.observableArray([]);
+  self.actionParametersUI = ko.computed(function() { // TODO: remove truncation when autocomplete
+    return $.map(self.actionParameters().slice(0, 3), function(param) {return param + '=...'}).join();
+  });
+  self.actionParametersFetched = ko.observable(false);
+  
   self.get_link = function (name) {
     var _link = null;
     $.each(self.children(), function (index, link) {
@@ -117,6 +123,27 @@ var Node = function (node) {
     if (_link != null) {
       self.children.remove(_link);
     }
+  }
+  
+  if (typeof self.properties.parameters != "undefined") { // Fetch once the possible variable when they exist 
+    self.properties.parameters.subscribe(function(newVal) { // TODO: only fetch when first time focus on one of the parameters and showing the autocomplete.
+      if (newVal && ! self.actionParametersFetched()) {
+	    $.post("/oozie/editor/workflow/action/parameters/", {
+		  "node": ko.mapping.toJSON(self),
+	     }, function (data) {
+	       self.actionParametersFetched(true);
+  	       self.actionParameters(data.parameters);
+	    }).fail(function (xhr, textStatus, errorThrown) {
+	      $(document).trigger("error", xhr.responseText);
+	    });
+	  }
+    });  
+  }
+  
+  if (typeof self.properties.script_path != "undefined") {
+    self.properties.script_path.subscribe(function() {
+      self.actionParametersFetched(false);
+    });
   }
 }
 
