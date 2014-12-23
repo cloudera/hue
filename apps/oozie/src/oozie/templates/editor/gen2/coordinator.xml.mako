@@ -51,7 +51,7 @@
 </%def>
 
 
-<coordinator-app name="${ coord.data['name'] | x }"
+<coordinator-app name="${ coord.validated_name | x }"
   % if ENABLE_CRON_SCHEDULING.get():
   frequency="${ coord.cron_frequency }"
   % else:

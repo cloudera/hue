@@ -27,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 
 
-from oozie.models2 import Workflow, find_dollar_variables
+from oozie.models2 import Job, Workflow, find_dollar_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -61,6 +61,13 @@ LIMIT $limit"""))
         .split(),
         self.wf.to_xml({'output': '/path'}).split()
     )
+
+  def test_job_validate_xml_name(self):
+    assert_equal('a', Job.validate_name('a'))
+    assert_equal('aa', Job.validate_name('aa'))
+    assert_equal('_a', Job.validate_name('%a'))
+    assert_equal(len('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), len(Job.validate_name('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaz')))
+    assert_equal('My_______1st_Workflow__With___Bad__letter_', Job.validate_name('My <...> 1st Workflow [With] (Bad) letter$'))
 
 
 #  def test_workflow_name(self):
