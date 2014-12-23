@@ -57,6 +57,25 @@ class Job(object):
   def get_workspace(cls, user):
     return REMOTE_SAMPLE_DIR.get().replace('$USER', user.username).replace('$TIME', str(time.time()))
 
+  @property
+  def validated_name(self):
+    good_name = []
+
+    for c in self.name[:40]:
+      if not good_name:
+        if not re.match('[a-zA-Z_]', c):
+          c = '_'
+      else:
+        if not re.match('[\-_a-zA-Z0-9]', c):        
+          c = '_'
+      good_name.append(c)
+      
+    return ''.join(good_name) + '--'
+
+  
+#([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}
+#
+#([a-zA-Z][\-_a-zA-Z0-0]*){1,19}    
 
 class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'
@@ -156,13 +175,19 @@ class Workflow(Job):
     workflow_mapping = dict([(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
 
     xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+              'wf': self,
               'workflow': data['workflow'],
               'nodes': nodes,
               'mapping': mapping,
               'node_mapping': node_mapping,
               'workflow_mapping': workflow_mapping
           }))
-    return force_unicode(xml)  
+    return force_unicode(xml)
+
+  @property
+  def name(self):
+    _data = self.get_data()
+    return _data['workflow']['name']
 
   @property      
   def deployment_dir(self):
@@ -1091,6 +1116,7 @@ def find_dollar_variables(text):
   return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)  
 
 
+
 def import_workflows_from_hue_3_7():
   return import_workflow_from_hue_3_7(OldWorflows.objects.filter(managed=True).filter(is_trashed=False)[12].get_full_node())
 
@@ -1309,6 +1335,10 @@ class Coordinator(Job):
 
     return self._data
   
+  @property
+  def name(self):
+    return self.data['name']
+
   @property      
   def deployment_dir(self):
     if not self.data['properties'].get('deployment_dir'):
@@ -1528,6 +1558,11 @@ class Bundle(Job):
                 'bundle': self,
                 'mapping': mapping
            })))
+  
+  
+  @property      
+  def name(self):
+    return self.data['name']
   
   @property      
   def parameters(self):
