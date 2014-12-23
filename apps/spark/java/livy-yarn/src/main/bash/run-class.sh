@@ -36,7 +36,7 @@ function check_and_enable_64_bit_mode {
 # Check if log4j configuration is specified. If not - set to lib/log4j.xml
 [[ $JAVA_OPTS != *-Dlog4j.configuration* && -f $DEFAULT_LOG4J_FILE ]] && JAVA_OPTS="$JAVA_OPTS -Dlog4j.configuration=file:$DEFAULT_LOG4J_FILE"
 
-JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006"
+JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006"
 
 echo $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"
 exec $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"

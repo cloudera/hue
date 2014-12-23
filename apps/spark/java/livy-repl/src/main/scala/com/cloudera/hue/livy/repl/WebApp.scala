@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.repl.webapp
+package com.cloudera.hue.livy.repl
 
 import akka.util.Timeout
 import com.cloudera.hue.livy.repl.interpreter.SparkInterpreter

@@ -72,6 +72,7 @@
             <version>${scala.version}</version>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.scalatra</groupId>
             <artifactId>scalatra_2.10</artifactId>
@@ -83,6 +84,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -90,23 +92,23 @@
             <version>8.1.14.v20131031</version>
         </dependency>
 
-        <!--
         <dependency>
             <groupId>com.cloudera.hue.livy</groupId>
             <artifactId>livy-repl</artifactId>
             <version>${project.version}</version>
             <exclusions>
+                <!--
                 <exclusion>
                     <groupId>org.scala-lang</groupId>
                     <artifactId>scala-compiler</artifactId>
                 </exclusion>
+                -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        -->
 
     </dependencies>
 
