@@ -1,5 +1,6 @@
 package com.cloudera.hue.livy.yarn
 
+import com.cloudera.hue.livy.Logging
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.yarn.api.ApplicationConstants
 import org.apache.hadoop.yarn.api.records._

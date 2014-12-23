@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.yarn
 
+import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.repl.WebServer
 import org.apache.hadoop.yarn.api.ApplicationConstants
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.AMRMClient
@@ -30,7 +32,7 @@ object AppMaster extends Logging {
 }
 
 class AppMasterService(yarnConfig: YarnConfiguration, nodeHostString: String) extends Logging {
-  val webServer = new WebServer
+  val webServer = new WebServer(0)
   val amRMClient = AMRMClient.createAMRMClient()
   amRMClient.init(yarnConfig)
 
