@@ -72,10 +72,6 @@ var Coordinator = function (vm, coordinator) {
 
 	self.variables.push(ko.mapping.fromJS(_var));	  
   };
-  
-  self.init = function() {
-    // load
-  };
 }
 
 

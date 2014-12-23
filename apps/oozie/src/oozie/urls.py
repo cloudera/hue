@@ -77,7 +77,8 @@ urlpatterns += patterns(
   url(r'^editor/workflow/submit/(?P<doc_id>\d+)$', 'submit_workflow', name='editor_submit_workflow'),
   url(r'^editor/workflow/new_node/$', 'new_node', name='new_node'),
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
-  url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),  
+  url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
+  url(r'^editor/workflow/action/parameters/$', 'action_parameters', name='action_parameters'),
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'), # Temporary
   url(r'^editor/workflow/import_workflows/$', 'import_hue_3_7_workflows', name='import_hue_3_7_workflows'), # Temporary
   

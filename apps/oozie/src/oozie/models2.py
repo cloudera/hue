@@ -1087,6 +1087,8 @@ def find_json_parameters(fields):
 
   return params
 
+def find_dollar_variables(text):
+  return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)  
 
 
 def import_workflows_from_hue_3_7():
