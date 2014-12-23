@@ -135,7 +135,7 @@ class Job(client: YarnClient, appId: ApplicationId) {
     val startTimeMs = System.currentTimeMillis()
 
     while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      val status = getStatus()
+      val status = getStatus
       status match {
         case SuccessfulFinish() | UnsuccessfulFinish() => {
           return Some(status)
