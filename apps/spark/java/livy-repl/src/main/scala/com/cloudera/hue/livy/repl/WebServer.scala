@@ -70,13 +70,3 @@ class ScalatraBootstrap extends LifeCycle {
     //system.shutdown()
   }
 }
-
-class WebApp extends ScalatraServlet {
-  get("/") {
-    "hello world"
-  }
-
-  get("/hello") {
-    "hello world2"
-  }
-}
