@@ -50,6 +50,8 @@
     <properties>
         <javaVersion>1.7</javaVersion>
         <hadoop.version>2.5.0</hadoop.version>
+        <logback.version>1.1.2</logback.version>
+        <jetty.version>8.1.14.v20131031</jetty.version>
         <scala.binary.version>2.10.3</scala.binary.version>
         <scala.macros.version>2.0.1</scala.macros.version>
         <scala.version>2.10.3</scala.version>
@@ -58,12 +60,11 @@
     </properties>
 
     <modules>
-        <!--
-        <module>livy-assembly</module>
-        <module>livy-server</module>
-        -->
         <module>livy-core</module>
         <module>livy-repl</module>
+        <!--
+        <module>livy-server</module>
+        -->
         <module>livy-yarn</module>
     </modules>
 

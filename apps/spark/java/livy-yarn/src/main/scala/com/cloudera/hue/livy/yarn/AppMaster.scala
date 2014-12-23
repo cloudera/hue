@@ -1,12 +1,13 @@
 package com.cloudera.hue.livy.yarn
 
-import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.repl.WebServer
+import com.cloudera.hue.livy.repl.ScalatraBootstrap
+import com.cloudera.hue.livy.{WebServer, Logging}
 import org.apache.hadoop.yarn.api.ApplicationConstants
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.AMRMClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
+import org.scalatra.servlet.ScalatraListener
 
 object AppMaster extends Logging {
 
@@ -35,6 +36,10 @@ class AppMasterService(yarnConfig: YarnConfiguration, nodeHostString: String) ex
   val webServer = new WebServer(0)
   val amRMClient = AMRMClient.createAMRMClient()
   amRMClient.init(yarnConfig)
+
+  webServer.context.setResourceBase("src/main/com/cloudera/hue/livy/repl")
+  webServer.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
+  webServer.context.addEventListener(new ScalatraListener)
 
   def run(): Unit = {
     webServer.start()
