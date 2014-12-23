@@ -1,18 +1,18 @@
 package com.cloudera.hue.livy.repl
 
 import akka.util.Timeout
-import com.cloudera.hue.livy.repl.interpreter.SparkInterpreter
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.scalatra.{Accepted, AsyncResult, FutureSupport, ScalatraServlet}
 
-import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
-class LivyApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
+class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
-  protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+  override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+  override protected implicit val jsonFormats: Formats = DefaultFormats
+
   protected implicit def defaultTimeout: Timeout = Timeout(10)
-  protected implicit val jsonFormats: Formats = DefaultFormats
 
   sealed trait State
   case class Starting() extends State
@@ -54,5 +54,3 @@ class LivyApp(interpreter: SparkInterpreter) extends ScalatraServlet with Future
     Accepted()
   }
 }
-
-case class ExecuteRequest(statement: String)

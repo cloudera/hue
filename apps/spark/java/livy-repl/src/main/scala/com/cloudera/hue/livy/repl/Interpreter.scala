@@ -1,10 +1,12 @@
-package com.cloudera.hue.livy.repl.interpreter
+package com.cloudera.hue.livy.repl
 
 import java.io.{BufferedReader, PipedReader, PipedWriter, StringWriter}
 import java.util.concurrent.{BlockingQueue, SynchronousQueue}
 
+import com.cloudera.hue.livy.{Complete, ExecuteResponse}
 import org.apache.spark.repl.SparkILoop
 
+import scala.annotation.tailrec
 import scala.concurrent._
 import scala.tools.nsc.SparkHelper
 import scala.tools.nsc.interpreter.{Formatting, _}
@@ -13,7 +15,6 @@ import scala.tools.nsc.util.ClassPath
 class SparkInterpreter {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
-  private var running = false;
   private val inQueue = new SynchronousQueue[Request]
   private val inWriter = new PipedWriter()
 
@@ -36,8 +37,8 @@ class SparkInterpreter {
     org.apache.spark.repl.Main.interp.history.asStrings
   }
 
-  def execute(statement: String): Future[Map[String, String]] = {
-    val promise = Promise[Map[String, String]]()
+  def execute(statement: String): Future[com.cloudera.hue.livy.ExecuteResponse] = {
+    val promise = Promise[ExecuteResponse]()
     inQueue.put(ExecuteRequest(statement, promise))
     promise.future
   }
@@ -101,6 +102,7 @@ private class ILoop(parent: SparkInterpreter, inQueue: BlockingQueue[Request], i
     def readOneLine() = {
       inQueue.take()
     }
+
     // return false if repl should exit
     def processLine(request: Request): Boolean = {
       if (isAsync) {
@@ -109,10 +111,10 @@ private class ILoop(parent: SparkInterpreter, inQueue: BlockingQueue[Request], i
       }
 
       request match {
-        case ExecuteRequest(statement, promise) => {
+        case ExecuteRequest(statement, promise) =>
           command(statement) match {
             case Result(false, _) => false
-            case Result(true, finalLine) => {
+            case Result(true, finalLine) =>
               finalLine match {
                 case Some(line) => addReplay(line)
                 case _ =>
@@ -122,15 +124,16 @@ private class ILoop(parent: SparkInterpreter, inQueue: BlockingQueue[Request], i
               output = output.substring(0, output.length - 1)
               outString.getBuffer.setLength(0)
 
-              promise.success(Map("type" -> "stdout", "stdout" -> output))
+              val statement = ExecuteResponse(0, Complete(), List(), List(output))
+              promise.success(statement)
 
               true
-            }
           }
-        }
         case ShutdownRequest() => false
       }
     }
+
+    @tailrec
     def innerLoop() {
       outString.getBuffer.setLength(0)
 
@@ -144,10 +147,11 @@ private class ILoop(parent: SparkInterpreter, inQueue: BlockingQueue[Request], i
         innerLoop()
       }
     }
+
     innerLoop()
   }
 }
 
-sealed trait Request
-case class ExecuteRequest(statement: String, promise: Promise[Map[String, String]]) extends Request
-case class ShutdownRequest() extends Request
+private sealed trait Request
+private case class ExecuteRequest(statement: String, promise: Promise[ExecuteResponse]) extends Request
+private case class ShutdownRequest() extends Request

@@ -17,15 +17,11 @@
 #
 # Runs Livy server.
 
-set -o errexit
-
-LIVY_ROOT=$(dirname $0)
-LIVY_JAR=$LIVY_ROOT/java/livy-server/target/livy-server-3.7.0-SNAPSHOT.jar
+set -e
 
 export LIVY_HOME=$(dirname $0)
 
-# Note: I've had trouble running this with just "java -jar" with the classpath
-# determined with a seemingly appropriate find command.
-echo CWD=$(pwd)
-echo Executing java -jar $LIVY_JAR "$@"
-exec java -jar $LIVY_JAR "$@"
+exec java \
+	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 \
+	-cp "livy-server/target/lib/*:livy-server/target/livy-server-3.7.0-SNAPSHOT.jar" \
+	com.cloudera.hue.livy.server.Main "$@"
