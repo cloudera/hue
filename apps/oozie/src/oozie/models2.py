@@ -70,12 +70,8 @@ class Job(object):
           c = '_'
       good_name.append(c)
       
-    return ''.join(good_name) + '--'
+    return ''.join(good_name)
 
-  
-#([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}
-#
-#([a-zA-Z][\-_a-zA-Z0-0]*){1,19}    
 
 class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'

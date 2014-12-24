@@ -215,7 +215,7 @@ var Widget = function (params) {
   self.isLoading = ko.observable(typeof params.loading != "undefined" && params.loading != null ? params.loading : false);
 
   self.oozieMovable = ko.computed(function() {
-    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "kill-widget", "join-widget"].indexOf(self.widgetType()) == - 1
+    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "join-widget"].indexOf(self.widgetType()) == - 1
   });
 
   self.oozieExpanded = ko.observable(false);
