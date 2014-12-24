@@ -769,10 +769,16 @@ from django.utils.translation import ugettext as _
       self.isCurrentDirSentryManaged = ko.observable(false);
 
       self.filesSorting = function (l, r) {
-        if (l.name == ".." && r.name == "."){
+        if (l.name == "..") {
           return -1;
         }
-        else if (l.name == "." && r.name == ".."){
+        else if (r.name == "..") {
+          return 1;
+        }
+        else if (l.name == ".") {
+          return -1;
+        }
+        else if (r.name == ".") {
           return 1;
         }
         else {
