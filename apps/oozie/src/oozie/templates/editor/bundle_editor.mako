@@ -59,9 +59,10 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
     % endif
   </div>
 
-  <form class="form-search" style="margin: 0">
-    <strong>${_("Name")}</strong>
-    <input data-bind="value: $root.bundle.name"/>
+  <form class="form-search">
+    <div class="inline object-name">
+      <span data-bind="editable: $root.bundle.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+    </div>
   </form>
 </div>
 
@@ -151,18 +152,17 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
 <link rel="stylesheet" href="/oozie/static/css/coordinator-editor.css">
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-
+${ dashboard.import_layout() }
 
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
-<script src="/static/js/ko.hue-bindings.js"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
+${ dashboard.import_bindings() }
 
 <script src="/oozie/static/js/bundle-editor.ko.js" type="text/javascript" charset="utf-8"></script>
 
