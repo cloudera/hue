@@ -1628,7 +1628,9 @@ ${ dashboard.import_bindings() }
   function addActionDemiModalFieldCancel() {
     $("#exposeOverlay").fadeOut(300);
     $("#addActionDemiModal").modal("hide");
-    viewModel.removeWidgetById(viewModel.newAction().id());
+    if (viewModel.newAction()){
+      viewModel.removeWidgetById(viewModel.newAction().id());
+    }
     viewModel.newAction(null);
   }
 
