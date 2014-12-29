@@ -158,11 +158,6 @@
   text-align: left;
 }
 
-em {
-  font-weight: bold;
-  background-color: yellow;
-}
-
 .fields-chooser li {
   cursor: pointer;
   margin-bottom: 10px;
@@ -329,6 +324,7 @@ em {
 
 .dashboard .row-fluid .span1.readonly {
   width: 0;
+  height: 0;
 }
 
 .readonly .card-widget {
@@ -356,7 +352,6 @@ em {
 .card-widget h2, .card-widget .card-body {
   min-width: 240px;
 }
-
 
 #exposeOverlay {
   background-color: #000;
@@ -470,8 +465,21 @@ input[type="text"].filechooser-input {
   margin-bottom: 4px;
 }
 
+.card-column {
+  min-height: 200px !important;
+}
+
 .readonly .card {
   margin-bottom: 15px;
+}
+
+.readonly .card-column {
+  min-height: 5px !important;
+}
+
+.readonly .drop-target-side {
+  min-height: 10px!important;
+  height: 10px!important;
 }
 
 textarea {

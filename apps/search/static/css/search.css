@@ -486,3 +486,7 @@ em {
   top: 50%;
   left: 100%;
 }
+
+.card-column {
+  min-height: 400px !important;
+}

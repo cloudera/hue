@@ -293,3 +293,7 @@ em {
 #emptyDashboard {
   right: 70px!important;
 }
+
+.card-column {
+  min-height: 400px !important;
+}
