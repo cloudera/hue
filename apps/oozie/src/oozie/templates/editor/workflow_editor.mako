@@ -313,12 +313,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="widget-template">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (ooziePropertiesExpanded()?' expanded-widget':''), draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
     <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget'  && id() != '17c9c895-5a16-7443-bb81-f34b30b21548'">
-      <span data-bind="visible: oozieMovable() && ! oozieExpanded() && $root.newAction() == null">
-        <a class="pointer" data-bind="click: toggleHighlight"><i class="fa fa-search-plus"></i></a>&nbsp;
-      </span>
-      <span data-bind="visible: oozieMovable() && oozieExpanded() && $root.newAction() == null">
-        <a class="pointer" data-bind="click: toggleHighlight"><i class="fa fa-search-minus"></i></a>&nbsp;
-      </span>
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && $root.newAction() == null">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
@@ -405,7 +399,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       <!-- /ko -->
     </h2>
-    <div class="card-body" style="padding: 0;">
+    <div class="card-body" style="padding: 0;" data-bind="click: highlightWidget">
       <div class="pull-right" data-bind="visible: $root.isEditing() && ! ooziePropertiesExpanded() && oozieMovable(), click: toggleProperties">
         <div class="advanced-triangle">
           <a href="javascript:void(0)"><i class="fa fa-cogs"></i></a>
@@ -1746,9 +1740,7 @@ ${ dashboard.import_bindings() }
       "left": lastSeenPosition.left + "px",
       "width": _width
     });
-    _el.animate({
-      "width": _width < $(window).width() / 2 ? $(window).width() / 2 : _width
-    }, 200);
+    _el.width(_width < $(window).width() / 2 ? $(window).width() / 2 : _width);
     $("#exposeOverlay").fadeIn(300);
   }
 
@@ -1776,6 +1768,11 @@ ${ dashboard.import_bindings() }
     else {
       $("#exposeOverlay").click();
     }
+  }
+
+  function highlightWidget(widget) {
+    setLastExpandedWidget(widget);
+    widget.oozieExpanded(true);
   }
 
   $(document).ready(function(){
