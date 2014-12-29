@@ -1495,7 +1495,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </a>
 
       <h4>${_("Workspace")}</h4>
-      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.deployment_dir"/>
+      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: {value: $root.workflow.properties.deployment_dir, displayJustLastBit: true}" rel="tooltip"/>
 
 	    <h4>${ _('Hadoop Properties') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
