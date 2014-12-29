@@ -185,10 +185,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 
   <form class="form-search">
-    <div class="inline workflow-name">
+    <div class="inline object-name">
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
-    <div class="inline workflow-description">
+    <div class="inline object-description">
       <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
     </div>
   </form>
@@ -1544,6 +1544,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
 <link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
 
 

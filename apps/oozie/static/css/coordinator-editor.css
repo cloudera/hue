@@ -187,10 +187,6 @@ em {
   cursor: pointer;
 }
 
-.editable-click {
-  cursor: pointer;
-}
-
 .CodeMirror {
   border: 1px dotted #DDDDDD;
 }
