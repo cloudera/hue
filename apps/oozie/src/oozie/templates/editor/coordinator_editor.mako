@@ -63,7 +63,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     % endif
   </div>
 
-  <form class="form-search" style="margin: 0">
+  <form class="form-search">
     <div class="inline object-name">
       <span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
