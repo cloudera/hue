@@ -228,7 +228,6 @@ var Workflow = function (vm, workflow) {
   };
 
   self.addNode = function (widget) {
-    // Todo get parent cell, link nodes... when we have the new layout
     $.post("/oozie/editor/workflow/add_node/", {
       "workflow": ko.mapping.toJSON(workflow),
       "node": ko.mapping.toJSON(widget),
@@ -248,8 +247,8 @@ var Workflow = function (vm, workflow) {
 
         self.nodes.push(node);
 
+        // If added to the side
         if (vm.currentlyCreatingFork) {
-          // Added to the side ?
           var parentWidget = vm.getWidgetPredecessor(node.id());
           var parent = self.getNodeById(parentWidget.id());
 
@@ -413,7 +412,6 @@ var Workflow = function (vm, workflow) {
 }
 
 var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json) {
-
   var self = this;
 
   self.isNested = ko.observable(true);
@@ -960,6 +958,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
+    	if (self.workflow.id() == null) {
+    	  shareViewModel.setDocId(data.doc1_id);
+    	}
         self.workflow.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("workflow") == -1) {
