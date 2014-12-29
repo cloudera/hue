@@ -1091,7 +1091,7 @@ ${ dashboard.layout_skeleton() }
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
-    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.results()},
+    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }">
     </div>
@@ -1516,20 +1516,18 @@ function mapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformer(data) {
   var _data = [];
-
-  data.counts.forEach(function(record){
-    if (record.leafletmap) {
+  if (!$.isEmptyObject(data.counts) && data.counts.response.docs && viewModel.collection.template.leafletmap.latitudeField() != "" && viewModel.collection.template.leafletmap.longitudeField() != "") {
+    data.counts.response.docs.forEach(function (record) {
       var _obj = {
-        lat: record.leafletmap.latitude,
-        lng: record.leafletmap.longitude
+        lat: record[viewModel.collection.template.leafletmap.latitudeField()],
+        lng: record[viewModel.collection.template.leafletmap.longitudeField()]
       }
-      if (record.leafletmap.label != null && record.leafletmap.label != ""){
-        _obj.label = record.leafletmap.label;
+      if (viewModel.collection.template.leafletmap.labelField() != "") {
+        _obj.label = record[viewModel.collection.template.leafletmap.labelField()];
       }
       _data.push(_obj);
-    }
-  });
-
+    });
+  }
   return _data;
 }
 
