@@ -1923,3 +1923,7 @@ form.form-inline .modal-header .close {
 .margin-right-30 {
   margin-right: 30px;
 }
+
+.no-margin {
+  margin: 0;
+}
