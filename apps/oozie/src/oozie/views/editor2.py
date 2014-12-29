@@ -55,8 +55,10 @@ def edit_workflow(request):
   workflow_id = request.GET.get('workflow')
   
   if workflow_id:
-    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', id=workflow_id)) # Todo perms
+    doc = Document2.objects.get(type='oozie-workflow2', id=workflow_id)
+    workflow = Workflow(document=doc) # Todo perms
   else:
+    doc = None
     workflow = Workflow()
     workflow.set_workspace(request.user)
     workflow.check_workspace(request.fs, request.user)
@@ -76,6 +78,7 @@ def edit_workflow(request):
       'workflow_json': json.dumps(workflow_data['workflow']),
       'credentials_json': json.dumps(credentials.credentials.keys()),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
+      'doc1_id': doc.doc.get().id if doc else -1
   })
 
 
@@ -110,6 +113,7 @@ def save_workflow(request):
   
   response['status'] = 0
   response['id'] = workflow_doc.id
+  response['doc1_id'] = workflow_doc.doc.get().id
   response['message'] = _('Page saved !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")

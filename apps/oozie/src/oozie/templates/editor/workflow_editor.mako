@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, commonshare
 from django.utils.translation import ugettext as _
 %>
 
@@ -31,6 +31,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   }
 </script>
 
+
+<div id="editor">
 
 <%dashboard:layout_toolbar>
   <%def name="skipLayout()"></%def>
@@ -137,6 +139,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </%dashboard:layout_toolbar>
 
 
+
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     [
@@ -150,38 +153,50 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <i class="fa fa-fw fa-long-arrow-down"></i>
     </a>
     ]
+
     &nbsp;&nbsp;&nbsp;
+    
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
       <i class="fa fa-fw fa-play"></i>
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-fw fa-pencil"></i>
     </a>
+
     &nbsp;&nbsp;&nbsp;
-    % if user.is_superuser:
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
-        <i class="fa fa-fw fa-cog"></i>
-      </button>
-      <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
-          data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
-          data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
-        <i class="fa fa-fw fa-folder-open"></i>
-      </a>
-      <a title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-fw fa-users"></i>
-      </a>
-      &nbsp;&nbsp;&nbsp;
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
-        <i class="fa fa-fw fa-save"></i>
-      </button>
-      &nbsp;&nbsp;&nbsp;
-      <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-fw fa-file-o"></i>
-      </a>
-      <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-fw fa-tags"></i>
-      </a>
-    % endif
+    
+    <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
+      <i class="fa fa-fw fa-cog"></i>
+    </button>
+    
+    <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
+        data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
+        data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
+      <i class="fa fa-fw fa-folder-open"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
+      <i class="fa fa-fw fa-save"></i>
+    </button>
+
+    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
+        attr: {'data-original-title': '${ _("Share") } ' + name},
+        css: {'isShared': isShared(), 'btn': true},
+        visible: workflow.id() != null">
+      <i class="fa fa-users"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-fw fa-file-o"></i>
+    </a>
+
+    <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-fw fa-tags"></i>
+    </a>
   </div>
 
   <form class="form-search">
@@ -215,6 +230,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 </div>
 
+</div>
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass()" style="min-height: 50px !important;">
@@ -323,7 +339,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
         &nbsp;
       </span>
-
 
       <!-- ko if: widgetType() == 'hive-widget' -->
       <img src="/oozie/static/art/icon_beeswax_48.png" class="widget-icon">
@@ -1553,11 +1568,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 ${ dashboard.import_layout() }
 
+${ commonshare() | n,unicode }
 
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/share.vm.js"></script>
 
 ${ dashboard.import_bindings() }
 
@@ -1569,7 +1586,10 @@ ${ dashboard.import_bindings() }
   ${ utils.slaGlobal() }
 
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode });
-  ko.applyBindings(viewModel);
+  ko.applyBindings(viewModel, $("#editor")[0]);
+
+  var shareViewModel = setupSharing("#documentShareModal");
+  shareViewModel.setDocId(${ doc1_id });
 
   viewModel.init();
   fullLayout(viewModel);
