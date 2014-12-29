@@ -39,3 +39,7 @@
   color: #666!important;
   opacity: .55;
 }
+
+.tooltip {
+  z-index: 1051;
+}

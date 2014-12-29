@@ -961,10 +961,30 @@ ko.bindingHandlers.hivechooser = {
 ko.bindingHandlers.filechooser = {
   init: function (element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
-    if (typeof valueAccessor() == "function") {
-      self.val(valueAccessor()());
+    if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
+      self.val(valueAccessor().value ? valueAccessor().value(): valueAccessor()());
+      self.data("fullPath", self.val());
+      self.attr("data-original-title", self.val());
+      if (valueAccessor().displayJustLastBit){
+        var _val = self.val();
+        self.val(_val.split("/")[_val.split("/").length - 1]);
+      }
       self.on("blur", function () {
-        valueAccessor()(self.val());
+        if (valueAccessor().value){
+          if (valueAccessor().displayJustLastBit){
+            var _val = self.data("fullPath");
+            valueAccessor().value(_val.substr(0, _val.lastIndexOf("/")) + "/" + self.val());
+          }
+          else {
+            valueAccessor().value(self.val());
+          }
+          self.data("fullPath", valueAccessor().value());
+        }
+        else {
+          valueAccessor()(self.val());
+          self.data("fullPath", valueAccessor()());
+        }
+        self.attr("data-original-title", self.data("fullPath"));
       });
     }
     else {
@@ -974,12 +994,11 @@ ko.bindingHandlers.filechooser = {
       });
     }
 
-
-    self.after(getFileBrowseButton(self, true, valueAccessor));
+    self.after(getFileBrowseButton(self, true, valueAccessor, true));
   }
 };
 
-function getFileBrowseButton(inputElement, selectFolder, valueAccessor) {
+function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix) {
   return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
     e.preventDefault();
     // check if it's a relative path
@@ -987,6 +1006,9 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor) {
 
     function callFileChooser() {
       var _initialPath = $.trim(inputElement.val()) != "" ? inputElement.val() : "/";
+      if (inputElement.data("fullPath")){
+        _initialPath = inputElement.data("fullPath");
+      }
       if (_initialPath.indexOf("hdfs://") > -1) {
         _initialPath = _initialPath.substring(7);
       }
@@ -994,13 +1016,13 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor) {
         suppressErrors: true,
         selectFolder: (selectFolder) ? true : false,
         onFolderChoose: function (filePath) {
-          handleChoice(filePath);
+          handleChoice(filePath, stripHdfsPrefix);
           if (selectFolder) {
             $("#chooseFile").modal("hide");
           }
         },
         onFileChoose: function (filePath) {
-          handleChoice(filePath);
+          handleChoice(filePath, stripHdfsPrefix);
           $("#chooseFile").modal("hide");
         },
         createFolder: false,
@@ -1012,11 +1034,27 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor) {
       $("#chooseFile").modal("show");
     }
 
-    function handleChoice(filePath) {
-      inputElement.val("hdfs://" + filePath);
+    function handleChoice(filePath, stripHdfsPrefix) {
+      if (stripHdfsPrefix){
+        inputElement.val(filePath);
+      }
+      else {
+        inputElement.val("hdfs://" + filePath);
+      }
       inputElement.change();
-      if (typeof valueAccessor() == "function") {
-        valueAccessor()(inputElement.val());
+      if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
+        if (valueAccessor().value){
+          valueAccessor().value(inputElement.val());
+          if (valueAccessor().displayJustLastBit){
+            inputElement.data("fullPath", inputElement.val());
+            inputElement.attr("data-original-title", inputElement.val());
+            var _val = inputElement.val();
+            inputElement.val(_val.split("/")[_val.split("/").length - 1])
+          }
+        }
+        else {
+          valueAccessor()(inputElement.val());
+        }
       }
       else {
         valueAccessor(inputElement.val());
