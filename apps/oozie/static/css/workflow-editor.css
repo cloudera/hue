@@ -517,3 +517,23 @@ em {
   border: 1px solid #d8d8d8;
   border-top: none;
 }
+
+.workflow-name {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.workflow-description {
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.editable-empty, .editable-empty:hover {
+  color: #666!important;
+  opacity: .55;
+}
+
+.form-search {
+  margin: 0;
+  padding-top: 5px;
+}

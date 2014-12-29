@@ -184,10 +184,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     % endif
   </div>
 
-  <form class="form-search" style="margin: 0">
-    <strong>${_("Name")}</strong>
-    <input data-bind="value: $root.workflow.name"/>
-    <input data-bind="value: $root.workflow.properties.description" class="span6"/>
+  <form class="form-search">
+    <div class="inline workflow-name">
+      <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+    </div>
+    <div class="inline workflow-description">
+      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+    </div>
   </form>
 </div>
 
