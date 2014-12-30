@@ -219,7 +219,7 @@ var Workflow = function (vm, workflow) {
         if (data.status == 0) {
           viewModel.addActionProperties(data.properties);
           if (data.workflows.length > 0) {
-            viewModel.addActionWorkflows(data.workflows);
+            viewModel.subworfklows(data.workflows);
           }
           if (callback) {
             callback(widget);
@@ -235,7 +235,6 @@ var Workflow = function (vm, workflow) {
       "workflow": ko.mapping.toJSON(workflow),
       "node": ko.mapping.toJSON(widget),
       "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
-      "subworkflow": viewModel.selectedSubWorkflow() ? ko.mapping.toJSON(viewModel.selectedSubWorkflow()) : '{}'
     }, function (data) {
       if (data.status == 0) {
         var _node = ko.mapping.toJS(widget);
@@ -454,14 +453,18 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
-  }
-
-  self.depen = ko.observableArray(workflow_json.dependencies);
+  };
 
   self.addActionProperties = ko.observableArray([]);
-  self.addActionWorkflows = ko.observableArray(subworkflows_json);
-  self.selectedSubWorkflow = ko.observable();
-
+  self.subworfklows = ko.observableArray(subworkflows_json);
+  self.getSubWorkflow = function(uuid) {
+    var wf = $.grep(self.subworfklows(), function(wf, i) {
+        return wf.value == uuid;
+    });
+    if (wf[0]) {
+      return ko.mapping.fromJS(wf[0]);
+    }
+  };
 
   self.currentlyDraggedWidget = ko.observable(null);
   self.currentlyDraggedOp = ko.observable("move");

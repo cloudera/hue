@@ -55,7 +55,12 @@ def edit_workflow(request):
   workflow_id = request.GET.get('workflow')
   
   if workflow_id:
-    doc = Document2.objects.get(type='oozie-workflow2', id=workflow_id)
+    wid = {}
+    if workflow_id.isdigit():
+      wid['id'] = workflow_id
+    else:
+      wid['uuid'] =workflow_id
+    doc = Document2.objects.get(type='oozie-workflow2', **wid)
     workflow = Workflow(document=doc) # Todo perms
   else:
     doc = None
@@ -142,7 +147,8 @@ def _get_workflows(user):
   return [{
         'name': workflow.name,
         'owner': workflow.owner.username,
-        'value': workflow.uuid
+        'value': workflow.uuid,
+        'id': workflow.id
       } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=user)
     ]  
 
@@ -153,15 +159,9 @@ def add_node(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
   properties = json.loads(request.POST.get('properties', '{}'))
-  subworkflow = json.loads(request.POST.get('subworkflow', '{}'))
 
   _properties = dict(NODES[node['widgetType']].get_fields())
   _properties.update(dict([(_property['name'], _property['value']) for _property in properties]))
-
-  if subworkflow:
-    _properties.update({
-       'workflow': subworkflow['value']
-    })
 
   response['status'] = 0
   response['properties'] = _properties

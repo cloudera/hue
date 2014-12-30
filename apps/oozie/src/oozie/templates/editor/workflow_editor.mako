@@ -143,7 +143,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
 
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}, visible: workflow.id() != null">
       <i class="fa fa-fw fa-play"></i>
     </a>
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
@@ -604,16 +604,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <!-- ko if: children().length == 2 -->
   OK -->
   <select data-bind="options: $root.workflow.nodeIds,
-                     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
-                     value: children()[0]['to']
-                     ">
+      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
+      value: children()[0]['to']
+      ">
   </select>
   <br/>
   KO -->
   <select data-bind="options: $root.workflow.nodeIds,
-                     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
-                     value: children()[1]['error']
-                     ">
+     optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
+	 value: children()[1]['error']
+     ">
   </select>
   <!-- /ko -->
 </script>
@@ -626,9 +626,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-action-sla">
-    <div data-bind="with: properties">
-      ${ utils.slaForm() }
-    </div>
+  <div data-bind="with: properties">
+     ${ utils.slaForm() }
   </div>
 </script>
 
@@ -750,11 +749,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
       <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
         <strong data-bind="text: properties.script_path"></strong>
       </a>
     </div>
+
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.script_path.label"></span>
@@ -957,9 +956,24 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
+        <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
       </div>
+      <span data-bind="visible: properties.workflow().length > 0">
+        <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank">
+          <i class="fa fa-external-link-square"></i>
+        </a>
+      </span>
     </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
+        <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
+          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank">
+            <span data-bind="text: $data.name"></span>
+          </a>
+        </span>
+      <!-- /ko -->
+    </div>    
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1490,7 +1504,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <input data-bind="value: value" class="input-xlarge"/>
           <!-- /ko -->
           <!-- ko if: type == 'workflow' -->
-          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: $root.selectedSubWorkflow"></select>
+          <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
         </td>
       </tr>
@@ -1528,7 +1542,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <h4>${_("Workspace")}</h4>
       <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: {value: $root.workflow.properties.deployment_dir, displayJustLastBit: true}" rel="tooltip"/>
 
-	    <h4>${ _('Hadoop Properties') }</h4>
+	  <h4>${ _('Hadoop Properties') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
         <li>
           <input data-bind="value: name"/>
