@@ -373,7 +373,7 @@ class PigAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -399,14 +399,14 @@ class JavaAction(Action):
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
-          'help_text': _('Path to the script on HDFS.'),
+          'help_text': _('Path to the jar on HDFS.'),
           'type': ''
      },            
      'main_class': { 
           'name': 'main_class',
           'label': _('Main class'),
           'value': '',
-          'help_text': _('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep'),
+          'help_text': _('Java class. e.g. org.apache.hadoop.examples.Grep'),
           'type': 'text'
      },
      'arguments': { 
@@ -462,7 +462,7 @@ class JavaAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -524,7 +524,7 @@ class HiveAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -601,7 +601,7 @@ class HiveServer2Action(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -695,7 +695,7 @@ class SqoopAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -721,7 +721,7 @@ class MapReduceAction(Action):
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
-          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': TYPE},
+          'help_text': _('Path to the jar on HDFS.'),
           'type': ''
      },
      # Common
@@ -750,7 +750,7 @@ class MapReduceAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -831,7 +831,7 @@ class ShellAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'help_text': _('Paths to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -1025,7 +1025,7 @@ class StreamingAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('Paths to manipulate before starting the application.')
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -1057,7 +1057,7 @@ class DistCpAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('Paths to manipulate before starting the application.')
      },
      'job_properties': { 
           'name': 'job_properties',
