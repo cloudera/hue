@@ -1159,12 +1159,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
-      <input type="text" data-bind="value: id" />
-      <input type="text" data-bind="value: name" />
+
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.host.label"></span>
         <input type="text" data-bind="value: properties.host" />
         <br/>
+        
         <span data-bind="text: $root.workflow_properties.ssh_command.label"></span>
         <input type="text" data-bind="value: properties.ssh_command" />
         <div class="row-fluid">
@@ -1172,6 +1172,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       </div>
     </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: properties.host" />
+      <span data-bind="text: properties.ssh_command().slice(0, 75)" />
+    </div> 
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">

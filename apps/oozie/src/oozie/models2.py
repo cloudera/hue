@@ -856,7 +856,7 @@ class SshAction(Action):
           'label': _('User and Host'),
           'value': 'user@host.com',
           'help_text': _('Where the shell will be executed.'),
-          'type': ''
+          'type': 'text'
      },         
      'ssh_command': { 
           'name': 'ssh_command',
