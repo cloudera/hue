@@ -352,28 +352,28 @@ class PigAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -441,28 +441,28 @@ class JavaAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -503,28 +503,28 @@ class HiveAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -580,28 +580,28 @@ class HiveServer2Action(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -674,28 +674,28 @@ class SqoopAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -729,28 +729,28 @@ class MapReduceAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -810,28 +810,28 @@ class ShellAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'help_text': _('Files put in the running directory.'),
           'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'help_text': _('Archives uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'help_text': _('value, e.g. production'),
           'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.'),
+          'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
      'job_xml': { 
@@ -1007,25 +1007,25 @@ class StreamingAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('Files put in the running directory.')
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('Archives uncompressed into the running directory.')
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('value, e.g. production')
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.')
+          'help_text': _('Path to manipulate before starting the application.')
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -1057,13 +1057,13 @@ class DistCpAction(Action):
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Paths to manipulate before starting the application.')
+          'help_text': _('Path to manipulate before starting the application.')
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('value, e.g. production')
      },
      'java_opts': { 
           'name': 'java_opts',
