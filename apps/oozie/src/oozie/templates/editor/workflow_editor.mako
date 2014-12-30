@@ -392,15 +392,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <a class="widget-icon"><i class="fa fa-files-o"></i></a>
       <!-- /ko -->
 
-
-      <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
-      <span data-bind="with: $root.collection.getFacetById(id())">
-        <span data-bind="editable: label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-      </span>
-      <!-- /ko -->
-      <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
-        <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-      <!-- /ko -->
+      <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
 
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! ooziePropertiesExpanded()">
@@ -973,7 +965,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: properties.selectedSubWorkflow"></select>
+        <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
       </div>
     </div>
 
@@ -1494,8 +1486,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="modal-body">
     <table data-bind="foreach: addActionProperties">
       <tr>
-        <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
-        
+        <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>        
         <td>
           <!-- ko if: type == '' -->
           <input type="text" data-bind="filechooser: value, attr: { placeholder: help_text }">
@@ -1506,13 +1497,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <!-- ko if: type == 'textarea' -->
           <input data-bind="value: value" class="input-xxlarge"/>
           <!-- /ko -->
+          <!-- ko if: type == 'workflow' -->
+          <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: $root.selectedSubWorkflow"></select>
+          <!-- /ko -->
         </td>
       </tr>
     </table>
-
-    <!-- ko if: addActionWorkflows().length > 0 -->
-      <select data-bind="options: addActionWorkflows, optionsText: 'name', value: selectedSubWorkflow"></select>
-    <!-- /ko -->
 
     <br/>
     <a class="btn btn-primary disable-feedback" data-bind="click: addActionDemiModalFieldPreview">
@@ -1617,7 +1607,7 @@ ${ dashboard.import_bindings() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode });
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode });
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = setupSharing("#documentShareModal");

@@ -628,7 +628,7 @@ class SubWorkflowAction(Action):
           'label': _('Sub-workflow'),
           'value': None,
           'help_text': _('The sub-workflow application to include. You must own all the sub-workflows'),
-          'type': ''
+          'type': 'workflow'
      },
      'propagate_configuration': { 
           'name': 'propagate_configuration',
@@ -648,7 +648,7 @@ class SubWorkflowAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return []
+    return [cls.FIELDS['workflow']] 
 
 
 class SqoopAction(Action):
