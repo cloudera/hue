@@ -407,7 +407,7 @@ class JavaAction(Action):
           'label': _('Main class'),
           'value': '',
           'help_text': _('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep'),
-          'type': ''
+          'type': 'text'
      },
      'arguments': { 
           'name': 'arguments',
@@ -659,7 +659,7 @@ class SqoopAction(Action):
           'label': _('Sqoop command'),
           'value': 'import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1',
           'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE},
-          'type': 'text'
+          'type': 'textarea'
      },            
      'parameters': { 
           'name': 'parameters',
@@ -865,7 +865,7 @@ class SshAction(Action):
           'label': _('Ssh command'),
           'value': 'ls',
           'help_text': _('The path of the Shell command to execute.'),
-          'type': 'text'
+          'type': 'textarea'
      },    
      'arguments': {
           'name': 'arguments',
@@ -955,28 +955,28 @@ class EmailAction(Action):
           'label': _('To addresses'),
           'value': '',
           'help_text': _('Comma-separated values.'),
-          'type': ''
+          'type': 'text'
      },         
      'cc': { 
           'name': 'cc',
           'label': _('Cc addresses (optional)'),
           'value': '',
           'help_text': _('Comma-separated values.'),
-          'type': ''
+          'type': 'text'
      },    
      'subject': {
           'name': 'subject',
           'label': _('Subject'),
           'value': 'Subject',
           'help_text': _('Plain-text.'),
-          'type': ''
+          'type': 'text'
      },
      'body': { 
           'name': 'body',
           'label': _('Body'),
           'value': '',
           'help_text': _('Plain-text.'),
-          'type': 'text'
+          'type': 'textarea'
      },
   }
 
@@ -1050,7 +1050,7 @@ class DistCpAction(Action):
           'label': _('Arguments'),
           'value': [],
           'help_text': _('The arguments of the %(type)s command. Put options first, then source paths, then destination path.') % {'type': TYPE.title()},
-          'type': 'text'
+          'type': 'textarea'
      },
       # Common
      'prepares': { 
@@ -1088,7 +1088,7 @@ class KillAction(Action):
           'label': _('Message'),
           'value': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'),
           'help_text': _('Message to display when the workflow fails. Can contain some EL functions.'),
-          'type': 'text'
+          'type': 'textarea'
      }
   }
 
