@@ -632,21 +632,35 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </script>
 
 
+<script type="text/html" id="common-fs-link">
+  <!-- ko if: with_label -->      
+    <a data-bind="attr: {href: '/filebrowser/view' + $data.path }" target="_blank" title="${ _('Open') }">
+      <pan data-bind="text: $data.path"></span>
+    </a>
+  <!-- /ko -->  
+      
+   <!-- ko if: ! with_label -->
+     <a data-bind="attr: {href: '/filebrowser/view' + $data.path }" target="_blank" title="${ _('Open') }">
+       <i class="fa fa-external-link-square"></i>
+     </a> 
+   <!-- /ko -->
+</script>
+
+
 
 <script type="text/html" id="hive-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
   
     <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
-        <strong data-bind="text: properties.script_path"></strong>
-      </a>
+      <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true}}'></span>
     </div>
+
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-        <input type="text" data-bind="value: properties.script_path" />
+        <input type="text" data-bind="value: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>        
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: false}}'></span>
+        
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
         </div>
@@ -690,15 +704,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
-        <strong data-bind="text: properties.script_path"></strong>
-      </a>
+      <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true}}'></span>
     </div>
+
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-        <input type="text" data-bind="value: properties.script_path" />
+        <input type="text" data-bind="value: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>        
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: false}}'></span>
+        
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
         </div>
@@ -749,20 +762,24 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
-      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open script') }">
-        <strong data-bind="text: properties.script_path"></strong>
+      <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open') }">
+        <span data-bind="text: properties.script_path"></span>        
       </a>
     </div>
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.script_path.label"></span>
-        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path" />
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }" />
+
+        <a data-bind="attr: {href: '/filebrowser/view' + properties.script_path() }" target="_blank" title="${ _('Open') }">
+          <i class="fa fa-external-link-square"></i>
+        </a>
 
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
           <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
         </div>
+
       </div>
     </div>
 
@@ -959,7 +976,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
       </div>
       <span data-bind="visible: properties.workflow().length > 0">
-        <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank">
+        <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank" title="${ _('Open') }">
           <i class="fa fa-external-link-square"></i>
         </a>
       </span>
@@ -968,7 +985,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div data-bind="visible: ! $root.isEditing()">
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
-          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank">
+          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
             <span data-bind="text: $data.name"></span>
           </a>
         </span>
@@ -1494,18 +1511,29 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <tr>
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>        
         <td>
-          <!-- ko if: type == '' -->
+          <!-- ko if: type() == '' -->
           <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
-          <!-- ko if: type == 'text' -->
+          <!-- ko if: type() == 'text' -->
           <input data-bind="value: value" class="input-xlarge"/>
           <!-- /ko -->          
-          <!-- ko if: type == 'textarea' -->
+          <!-- ko if: type() == 'textarea' -->
           <input data-bind="value: value" class="input-xlarge"/>
           <!-- /ko -->
-          <!-- ko if: type == 'workflow' -->
+          <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
+          
+          <!-- ko if: name() == 'script_path' &&  value().length > 0 -->
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false}}'></span>
+          <!-- /ko -->
+          <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
+          <span data-bind="with: $root.getSubWorkflow(value())">
+            <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
+              <i class="fa fa-external-link-square"></i>
+            </a>
+          </span>
+          <!-- /ko -->          
         </td>
       </tr>
     </table>
