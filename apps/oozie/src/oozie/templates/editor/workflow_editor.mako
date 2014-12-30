@@ -1489,7 +1489,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>        
         <td>
           <!-- ko if: type == '' -->
-          <input type="text" data-bind="filechooser: value, attr: { placeholder: help_text }">
+          <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type == 'text' -->
           <input data-bind="value: value" class="input-xxlarge"/>
