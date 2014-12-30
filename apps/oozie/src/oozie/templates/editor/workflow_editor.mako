@@ -498,7 +498,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
       <li>
         <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
-        <input type="text" class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }"/>
+        <input type="text" class="filechooser-input input-xlarge"
+            data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
@@ -515,14 +516,14 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml, attr: { placeholder: $root.workflow_properties.job_xml.help_text }"/>
 
     <h6>
-      <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">
+      <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
         ${ _('Properties') } <i class="fa fa-plus"></i>
       </a>
     </h6>
     <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
       <li>
-        <input data-bind="value: name"/>
-        <input data-bind="value: value"/>
+        <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+        <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
@@ -537,8 +538,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </h6>
     <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
       <li>
-        <input data-bind="value: name"/>
-        <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this);$(document).trigger('drawArrows') }">
+        <input class="filechooser-input input-xlarge" data-bind="filechooser: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
       </li>
@@ -871,7 +872,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </h6>
           <ul class="unstyled" data-bind="foreach: properties.java_opts">
             <li>
-              <input data-bind="value: value, attr: { placeholder: $root.workflow_properties.java_opts.help_text }"/>
+              <input data-bind="value: value, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" class="input-xlarge"/>
               <a href="#" data-bind="click: function(){ $parent.properties.java_opts.remove(this); }">
                 <i class="fa fa-minus"></i>
               </a>
@@ -917,6 +918,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       </div>
     </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      <a href="javascript:void(0)">
+        <span type="text" data-bind="text: properties.command().slice(0, 70), attr: { title: properties.command() }" />...
+      </a>
+    </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -954,12 +961,29 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.jar_path.label"></span>
-        <input type="text" data-bind="value: properties.jar_path" />
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-        </div>
+        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: properties.jar_path, value: properties.jar_path" />
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.jar_path(), with_label: false}}'></span>
+
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+            ${ _('Properties') } <i class="fa fa-plus"></i>
+          </a>
+        </h6>
+        <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+          <li>
+            <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+            <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
+            <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul> 
       </div>
     </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind='template: { name: "common-fs-link", data: {path: properties.jar_path(), with_label: true} }'></span>
+    </div>    
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
