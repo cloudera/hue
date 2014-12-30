@@ -330,44 +330,51 @@ class PigAction(Action):
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
-          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+          'help_text': _('Path to the script on HDFS.'),
+          'type': ''
      },            
      'parameters': { 
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The Pig parameters of the script without -param. e.g. INPUT=${inputDir}')
+          'help_text': _('The Pig parameters of the script without -param. e.g. INPUT=${inputDir}'),
+          'type': ''
      },
      'arguments': { 
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('The Pig parameters of the script as is. e.g. -param, INPUT=${inputDir}')
+          'help_text': _('The Pig parameters of the script as is. e.g. -param, INPUT=${inputDir}'),
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -375,7 +382,8 @@ class PigAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                        'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.')
+                       'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -391,20 +399,23 @@ class JavaAction(Action):
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
-          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'Java'}
+          'help_text': _('Path to the script on HDFS.'),
+          'type': ''
      },            
      'main_class': { 
           'name': 'main_class',
           'label': _('Main class'),
           'value': '',
-          'help_text': _('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep')
+          'help_text': _('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep'),
+          'type': ''
      },
      'arguments': { 
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
           'help_text': _('Arguments of the main method. The value of each arg element is considered a single argument '
-                         'and they are passed to the main method in the same order.')
+                         'and they are passed to the main method in the same order.'),
+          'type': ''
      },
      'java_opts': { 
           'name': 'java_opts',
@@ -412,7 +423,8 @@ class JavaAction(Action):
           'value': [],
           'help_text': _('Command-line parameters used to start the JVM that will execute '
                         'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
-                        'configuration property. E.g. -Dexample-property=hue')
+                        'configuration property. E.g. -Dexample-property=hue'),
+          'type': ''
      },
      'capture_output': { 
           'name': 'capture_output',
@@ -421,32 +433,37 @@ class JavaAction(Action):
           'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
                          'command output must be in Java Properties file format and it must not exceed 2KB. '
                          'From within the workflow definition, the output of an %(program)s action node is accessible '
-                         'via the String action:output(String node, String key) function') % {'program': TYPE.title()}
+                         'via the String action:output(String node, String key) function') % {'program': TYPE.title()},
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -454,7 +471,8 @@ class JavaAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                        'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.')
+                       'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -470,38 +488,44 @@ class HiveAction(Action):
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
-          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+          'help_text': _('Path to the script on HDFS.'),
+          'type': ''
      },            
      'parameters': { 
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -509,7 +533,8 @@ class HiveAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                        'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.')
+                       'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -525,50 +550,59 @@ class HiveServer2Action(Action):
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
-          'help_text': _('Script name or path to the Pig script. E.g. my_script.pig.')
+          'help_text': _('Path to the script on HDFS.'),
+          'type': ''
      },            
      'parameters': { 
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()}
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
      },
      # Common
      'jdbc_url': { 
           'name': 'jdbc_url',
           'label': _('JDBC URL'),
           'value': 'jdbc:hive2://localhost:10000/default',
-          'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.')
+          'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.'),
+          'type': ''
      },     
      'password': { 
           'name': 'password',
           'label': _('Password'),
           'value': '',
-          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.')
+          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by '
+                         'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
+          'type': ''
      },
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -576,7 +610,8 @@ class HiveServer2Action(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                         'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.')
+                        'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -592,19 +627,22 @@ class SubWorkflowAction(Action):
           'name': 'workflow',
           'label': _('Sub-workflow'),
           'value': None,
-          'help_text': _('The sub-workflow application to include. You must own all the sub-workflows')
+          'help_text': _('The sub-workflow application to include. You must own all the sub-workflows'),
+          'type': ''
      },
      'propagate_configuration': { 
           'name': 'propagate_configuration',
           'label': _('Propagate configuration'),
           'value': True,
-          'help_text': _('If the workflow job configuration should be propagated to the child workflow.')
+          'help_text': _('If the workflow job configuration should be propagated to the child workflow.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('Can be used to specify the job properties that are required to run the child workflow job.')
+          'help_text': _('Can be used to specify the job properties that are required to run the child workflow job.'),
+          'type': ''
      }
   }
 
@@ -620,39 +658,45 @@ class SqoopAction(Action):
           'name': 'command',
           'label': _('Sqoop command'),
           'value': 'import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1',
-          'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE}
+          'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE},
+          'type': 'text'
      },            
      'parameters': { 
           'name': 'parameters',
           'label': _('Arguments'),
           'value': [],
           'help_text': _('If no command is specified, split the command by spaces and insert the %(type)s parameters '
-                         'here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ...') % {'type': TYPE}
+                         'here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ...') % {'type': TYPE},
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -660,7 +704,8 @@ class SqoopAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                         'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.')
+                        'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -676,32 +721,37 @@ class MapReduceAction(Action):
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
-          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': TYPE}
+          'help_text': _('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': TYPE},
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -709,7 +759,8 @@ class MapReduceAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                         'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.')
+                        'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -725,13 +776,15 @@ class ShellAction(Action):
           'name': 'shell_command',
           'label': _('Shell command'),
           'value': 'script.sh',
-          'help_text': _('The path of the Shell command to execute.')
+          'help_text': _('The path of the Shell command to execute.'),
+          'type': ''
      },            
      'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('The arguments of the command can then be specified using one or more argument element.')
+          'help_text': _('The arguments of the command can then be specified using one or more argument element.'),
+          'type': ''
      },    
      'env_var': { 
           'name': 'env_var',
@@ -739,7 +792,8 @@ class ShellAction(Action):
           'value': [],
           'help_text': _('Environemnt to be passed to the Shell command. env-var should contain only one pair of environment variable and value. '
                          'If the pair contains the variable such as $PATH, it should follow the Unix convention such as PATH=$PATH:mypath. '
-                         'Don\'t use ${PATH} which will be substitued by Oozie\'s EL evaluator.')
+                         'Don\'t use ${PATH} which will be substitued by Oozie\'s EL evaluator.'),
+          'type': ''
      },         
      'capture_output': { 
           'name': 'capture_output',
@@ -748,32 +802,37 @@ class ShellAction(Action):
           'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
                          'command output must be in Java Properties file format and it must not exceed 2KB. '
                          'From within the workflow definition, the output of an %(program)s action node is accessible '
-                         'via the String action:output(String node, String key) function') % {'program': TYPE}
+                         'via the String action:output(String node, String key) function') % {'program': TYPE},
+          'type': ''
      },
      # Common
      'files': { 
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.')
+          'help_text': _('List of names or paths of files to be added to the distributed cache and the task running directory.'),
+          'type': ''
      },
      'archives': { 
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('List of names or paths of the archives to be added to the distributed cache.')
+          'help_text': _('List of names or paths of the archives to be added to the distributed cache.'),
+          'type': ''
      },
      'job_properties': { 
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).')
+          'help_text': _('For the job configuration (e.g. mapred.job.queue.name=production).'),
+          'type': ''
      },
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.')
+          'help_text': _('List of absolute paths to delete and then to create before starting the application. This should be used exclusively for directory cleanup.'),
+          'type': ''
      },
      'job_xml': { 
           'name': 'job_xml',
@@ -781,7 +840,8 @@ class ShellAction(Action):
           'value': [],
           'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                         'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.')
+                        'files specified in the Job XML element.'),
+          'type': ''
      }
   }
 
@@ -797,19 +857,22 @@ class SshAction(Action):
           'name': 'host',
           'label': _('User and Host'),
           'value': 'user@host.com',
-          'help_text': _('Where the shell will be executed.')
+          'help_text': _('Where the shell will be executed.'),
+          'type': ''
      },         
      'ssh_command': { 
           'name': 'ssh_command',
           'label': _('Ssh command'),
           'value': 'ls',
-          'help_text': _('The path of the Shell command to execute.')
+          'help_text': _('The path of the Shell command to execute.'),
+          'type': 'text'
      },    
      'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('The arguments of the command can then be specified using one or more argument element.')
+          'help_text': _('The arguments of the command can then be specified using one or more argument element.'),
+          'type': ''
      },
      'capture_output': { 
           'name': 'capture_output',
@@ -818,7 +881,8 @@ class SshAction(Action):
           'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
                          'command output must be in Java Properties file format and it must not exceed 2KB. '
                          'From within the workflow definition, the output of an %(program)s action node is accessible '
-                         'via the String action:output(String node, String key) function') % {'program': TYPE}
+                         'via the String action:output(String node, String key) function') % {'program': TYPE},
+          'type': ''
      },
   }
 
@@ -834,32 +898,37 @@ class FsAction(Action):
           'name': 'deletes',
           'label': _('Delete path'),
           'value': [],
-          'help_text': _('Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory.')
+          'help_text': _('Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory.'),
+          'type': ''
      },
      'mkdirs': { 
           'name': 'mkdirs',
           'label': _('Create directory'),
           'value': [],
-          'help_text': _('Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op.')
+          'help_text': _('Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op.'),
+          'type': ''
      },
      'moves': { 
           'name': 'moves',
           'label': _('Move file'),
           'value': [],
-          'help_text': _('Move a file or directory to another path.')
+          'help_text': _('Move a file or directory to another path.'),
+          'type': ''
      },  
      'chmods': { 
           'name': 'chmods',
           'label': _('Change permissions'),
           'value': [],
           'help_text': _('Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic '
-                         'representation (e.g. -rwxrw-rw-) or an octal representation (755).')
+                         'representation (e.g. -rwxrw-rw-) or an octal representation (755).'),
+          'type': ''
      },
      'touchzs': { 
           'name': 'touchzs',
           'label': _('Create or touch a file'),
           'value': [],
-          'help_text': _('Creates a zero length file in the specified path if none exists or touch it.')
+          'help_text': _('Creates a zero length file in the specified path if none exists or touch it.'),
+          'type': ''
      },
      'chgrps': { 
           'name': 'chgrps',
@@ -868,13 +937,14 @@ class FsAction(Action):
           'help_text': _('TWhen doing a chgrp command on a directory, by default the command is applied '
                          'to the directory and the files one level within the directory. To apply the chgrp command to the directory, without affecting '
                          'the files within it, the dir-files attribute must be set to false . To apply the chgrp command recursively to all levels within a directory, '
-                         'put a recursive element inside the element.')
+                         'put a recursive element inside the element.'),
+          'type': ''
      }
   }
 
   @classmethod
   def get_mandatory_fields(cls):
-    return []
+    return [cls.FIELDS['deletes'], cls.FIELDS['mkdirs'], cls.FIELDS['moves'], cls.FIELDS['chmods']]
 
 
 class EmailAction(Action):
@@ -884,25 +954,29 @@ class EmailAction(Action):
           'name': 'to',
           'label': _('To addresses'),
           'value': '',
-          'help_text': _('Comma-separated values.')
+          'help_text': _('Comma-separated values.'),
+          'type': ''
      },         
      'cc': { 
           'name': 'cc',
           'label': _('Cc addresses (optional)'),
           'value': '',
-          'help_text': _('Comma-separated values.')
+          'help_text': _('Comma-separated values.'),
+          'type': ''
      },    
      'subject': {
           'name': 'subject',
           'label': _('Subject'),
           'value': 'Subject',
-          'help_text': _('Plain-text.')
+          'help_text': _('Plain-text.'),
+          'type': ''
      },
      'body': { 
           'name': 'body',
           'label': _('Body'),
           'value': '',
-          'help_text': _('Plain-text.')
+          'help_text': _('Plain-text.'),
+          'type': 'text'
      },
   }
 
@@ -918,13 +992,15 @@ class StreamingAction(Action):
           'name': 'mapper',
           'label': _('Mapper'),
           'value': '',
-          'help_text': _('The executable/script to be used as mapper.')
+          'help_text': _('The executable/script to be used as mapper.'),
+          'type': ''
      },
      'reducer': { 
           'name': 'reducer',
           'label': _('Reducer'),
           'value': '',
-          'help_text': _('The executable/script to be used as reducer.')
+          'help_text': _('The executable/script to be used as reducer.'),
+          'type': ''
      },
      # Common
      'files': { 
@@ -969,6 +1045,14 @@ class StreamingAction(Action):
 class DistCpAction(Action):
   TYPE = 'distcp'
   FIELDS = {
+     'distcp_parameters': { 
+          'name': 'distcp_parameters',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('The arguments of the %(type)s command. Put options first, then source paths, then destination path.') % {'type': TYPE.title()},
+          'type': 'text'
+     },
+      # Common
      'prepares': { 
           'name': 'prepares',
           'label': _('Prepares'),
@@ -988,18 +1072,12 @@ class DistCpAction(Action):
           'help_text': _('Command-line parameters used to start the JVM that will execute '
                         'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
                         'configuration property. E.g. -Dexample-property=hue')
-     },
-     'distcp_parameters': { 
-          'name': 'distcp_parameters',
-          'label': _('Arguments'),
-          'value': [],
-          'help_text': _('The arguments of the %(type)s command. Put options first, then source paths, then destination path.') % {'type': TYPE.title()}
      }
   }
 
   @classmethod
   def get_mandatory_fields(cls):
-    return []
+    return [cls.FIELDS['distcp_parameters']]
 
 
 class KillAction(Action):
@@ -1009,7 +1087,8 @@ class KillAction(Action):
           'name': 'message',
           'label': _('Message'),
           'value': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'),
-          'help_text': _('Message to display when the workflow fails. Can contain some EL functions.')
+          'help_text': _('Message to display when the workflow fails. Can contain some EL functions.'),
+          'type': 'text'
      }
   }
 

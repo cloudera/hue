@@ -230,7 +230,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 </div>
 
-</div>
+
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass()" style="min-height: 50px !important;">
@@ -1475,7 +1475,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <table data-bind="foreach: addActionProperties">
       <tr>
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
-        <td><input data-bind="value: value"/></td>
+        
+        <td>
+          <!-- ko if: type == '' -->
+          <input type="text" data-bind="filechooser: value, attr: { placeholder: help_text }">
+          <!-- /ko -->
+          <!-- ko if: type == 'text' -->
+          <input data-bind="value: value" class="input-xxlarge"/>
+          <!-- /ko -->
+        </td>
       </tr>
     </table>
 
@@ -1556,6 +1564,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </div>
 
 
+</div>
 
 <div id="exposeOverlay"></div>
 
