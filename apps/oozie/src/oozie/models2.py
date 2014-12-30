@@ -896,46 +896,42 @@ class FsAction(Action):
           'name': 'deletes',
           'label': _('Delete path'),
           'value': [],
-          'help_text': _('Delete the specified path, if it is a directory it deletes recursively all its content and then deletes the directory.'),
+          'help_text': _('Deletes recursively all content.'),
           'type': ''
      },
      'mkdirs': { 
           'name': 'mkdirs',
           'label': _('Create directory'),
           'value': [],
-          'help_text': _('Create the specified directory, it creates all missing directories in the path. If the directory already exist it does a no-op.'),
+          'help_text': _('Sub directories are created if needed.'),
           'type': ''
      },
      'moves': { 
           'name': 'moves',
-          'label': _('Move file'),
+          'label': _('Move file or directory'),
           'value': [],
-          'help_text': _('Move a file or directory to another path.'),
+          'help_text': _('Destination.'),
           'type': ''
      },  
      'chmods': { 
           'name': 'chmods',
           'label': _('Change permissions'),
           'value': [],
-          'help_text': _('Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic '
-                         'representation (e.g. -rwxrw-rw-) or an octal representation (755).'),
+          'help_text': _('File or directory.'),
           'type': ''
      },
      'touchzs': { 
           'name': 'touchzs',
           'label': _('Create or touch a file'),
           'value': [],
-          'help_text': _('Creates a zero length file in the specified path if none exists or touch it.'),
+          'help_text': _('Or update its modification date.'),
           'type': ''
      },
      'chgrps': { 
           'name': 'chgrps',
-          'label': _('Changes the group for the specified path. '),
+          'label': _('Change the group'),
           'value': [],
-          'help_text': _('TWhen doing a chgrp command on a directory, by default the command is applied '
-                         'to the directory and the files one level within the directory. To apply the chgrp command to the directory, without affecting '
-                         'the files within it, the dir-files attribute must be set to false . To apply the chgrp command recursively to all levels within a directory, '
-                         'put a recursive element inside the element.'),
+          'help_text': _('File or directory.'),
           'type': ''
      }
   }

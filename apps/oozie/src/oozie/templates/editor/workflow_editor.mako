@@ -1212,111 +1212,127 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="fs-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+  
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: '${ _("Delete") }', visible: properties.deletes().length > 0"></span>     
+      <ul data-bind="foreach: properties.deletes" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+        </li>
+      </ul>
+
+      <span data-bind="text: '${ _("Create") }', visible: properties.mkdirs().length > 0 || properties.touchzs().length > 0"></span>     
+      <ul data-bind="foreach: properties.mkdirs" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+        </li>
+      </ul>      
+      <ul data-bind="foreach: properties.touchzs" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+        </li>
+      </ul>      
+    
+      <span data-bind="text: '${ _("Move") }', visible: properties.moves().length > 0"></span>     
+      <ul data-bind="foreach: properties.moves" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: true} }, visible: source().length > 0'></span>
+          ${ _('to') }
+          <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: true} }, visible: destination().length > 0'></span>
+        </li>
+      </ul>      
+    
+      <span data-bind="text: '${ _("Change permissions") }', visible: properties.chmods().length > 0"></span>     
+      <ul data-bind="foreach: properties.chmods" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
+          ${ _('to') }
+          <span data-bind="text: permissions"/>
+          <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
+          <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
+          <span data-bind="visible: recursive, text: '${ _('recursivelt') }'"/>            
+        </li>
+      </ul>  
+      
+      <span data-bind="text: '${ _("Change groups") }', visible: properties.chgrps().length > 0"></span>     
+      <ul data-bind="foreach: properties.chgrps" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
+          ${ _('to') }
+          <span data-bind="text: group"/>
+          <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
+          <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
+          <span data-bind="visible: recursive, text: '${ _('recursively') }'"/>            
+        </li>
+      </ul>
+    </div>    
+  
+  
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.deletes.label"></span>
-          <ul data-bind="foreach: properties.deletes">
-            <li>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.deletes.push({'value': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.deletes.push(ko.mapping.fromJS({'value': ''})); }">
+            <span data-bind="text: $root.workflow_properties.deletes.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.deletes" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>            
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>        
 
-          <br/>
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.mkdirs.push(ko.mapping.fromJS({'value': ''})); }">
+            <span data-bind="text: $root.workflow_properties.mkdirs.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.mkdirs" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.mkdirs.help_text }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
 
-          <span data-bind="text: $root.workflow_properties.mkdirs.label"></span>
-          <ul data-bind="foreach: properties.mkdirs">
-            <li>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.mkdirs.push({'value': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.touchzs.push(ko.mapping.fromJS({'value': ''})); }">
+            <span data-bind="text: $root.workflow_properties.touchzs.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.touchzs" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.touchzs.help_text }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
+        
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.moves.push(ko.mapping.fromJS({'source': '', 'destination': ''})); }">
+            <span data-bind="text: $root.workflow_properties.moves.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.moves" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: source, value: source" placeholder="${ _('Source path') }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: false} }, visible: source().length > 0'></span>
+            
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: destination, value: destination" placeholder="${ _('New destination path') }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: false} }, visible: destination().length > 0'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
 
-          <br/>
-
-          <span data-bind="text: $root.workflow_properties.touchzs.label"></span>
-          <ul data-bind="foreach: properties.touchzs">
-            <li>
-              <input data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.touchzs.push({'value': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>
-
-          <br/>
-
-          <span data-bind="text: $root.workflow_properties.moves.label"></span>
-          <ul data-bind="foreach: properties.moves">
-            <li>
-              <input data-bind="value: source"/>
-              <input data-bind="value: target"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.moves.push({'source': '', 'target': ''}); }">
-            <i class="fa fa-plus"></i>
-          </button>
-
-          <br/>
-
-          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
-          <span data-bind="text: $root.workflow_properties.chmods.label"></span>
-          <ul data-bind="foreach: properties.chmods">
-            <li>
-              ${ _('Path') }
-              <input data-bind="value: value"/>
-              ${ _('Permissions') }
-              <input data-bind="value: permissions"/>
-              ${ _('Also apply to files') }
-              <input type="checkbox" data-bind="value: dir_files"/>
-              ${ _('Recursive') }
-              <input type="checkbox" data-bind="value: recursive"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'permissions': '600', 'dir_files': true, 'recursive': false}); }">
-            <i class="fa fa-plus"></i>
-          </button>
-
-          <br/>
-
-          <span data-bind="text: $root.workflow_properties.chgrps.label"></span>
-          <ul data-bind="foreach: properties.chgrps">
-            <li>
-              ${ _('Path') }
-              <input data-bind="value: value"/>
-              ${ _('Group') }
-              <input data-bind="value: group"/>
-              ${ _('Also apply to files') }
-              <input type="checkbox" data-bind="value: dir_files"/>
-              ${ _('Recursive') }
-              <input type="checkbox" data-bind="value: recursive"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <button data-bind="click: function(){ properties.chmods.push({'value': '', 'group': 'mygroup', 'dir_files': false, 'recursive': false}); }">
-            <i class="fa fa-plus"></i>
-          </button>
       </div>
     </div>
 
@@ -1329,6 +1345,49 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.chmods.push(ko.mapping.fromJS({'value': '', 'permissions': '755', 'dir_files': false, 'recursive': false})); }">
+            <span data-bind="text: $root.workflow_properties.chmods.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.chmods" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            
+            <input class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
+            ${ _('Only for directories') }
+            <input type="checkbox" data-bind="checked: dir_files"/>
+            ${ _('Recursive to sub directories') }
+            <input type="checkbox" data-bind="checked: recursive"/>
+            <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
+
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.chgrps.push(ko.mapping.fromJS({'value': '', 'group': '', 'dir_files': false, 'recursive': false})); }">
+            <span data-bind="text: $root.workflow_properties.chgrps.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>                    
+        <ul data-bind="foreach: properties.chgrps" class="unstyled">
+          <li>
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            
+            <input class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
+            ${ _('Only for directories') }
+            <input type="checkbox" data-bind="checked: dir_files"/>
+            ${ _('Recursive to sub directories') }
+            <input type="checkbox" data-bind="checked: recursive"/>
+            <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
+        
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">

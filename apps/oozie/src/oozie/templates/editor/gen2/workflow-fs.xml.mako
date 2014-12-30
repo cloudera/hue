@@ -32,11 +32,11 @@
             % endfor
 
             % for param in node['properties']['moves']:
-              <move source='${ smart_path(param['source'], mapping) }' target='${ smart_path(param['target'], mapping) }'/>
+              <move source='${ smart_path(param['source'], mapping) }' target='${ smart_path(param['destination'], mapping) }'/>
             % endfor
 
-            % for param in node['properties']['moves']:
-              <chmod path='${ smart_path(param['value'], mapping) }' permissions='${ param['permissions'] }' dir-files='${ 'true' if dir_files else 'false' }'>
+            % for param in node['properties']['chmods']:
+              <chmod path='${ smart_path(param['value'], mapping) }' permissions='${ param['permissions'] }' dir-files='${ 'true' if param['dir_files'] else 'false' }'>
               % if param['recursive']:
                 <recursive/>
               % endif
@@ -48,7 +48,7 @@
             % endfor
             
             % for param in node['properties']['chgrps']:
-              <chgrp path='${ smart_path(param['value'], mapping) }' group='${ param['group'] }' dir-files='${ 'true' if dir_files else 'false' }'>
+              <chgrp path='${ smart_path(param['value'], mapping) }' group='${ param['group'] }' dir-files='${ 'true' if param['dir_files'] else 'false' }'>
               % if param['recursive']:
                 <recursive/>
               % endif
