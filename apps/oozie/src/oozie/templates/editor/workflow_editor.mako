@@ -986,7 +986,27 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
-          <span data-bind="template: { name: 'common-action-properties' }"></span>
+          <span data-bind="text: $root.workflow_properties.propagate_configuration.label"></span>
+          <input type="checkbox" data-bind="checked: properties.propagate_configuration" />
+
+          <br/>
+
+          <h6>
+            <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''});$(document).trigger('drawArrows') }">
+              ${ _('Properties') } <i class="fa fa-plus"></i>
+            </a>
+          </h6>
+          <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+            <li>
+              <input data-bind="value: name"/>
+              <input data-bind="value: value"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this);$(document).trigger('drawArrows') }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1481,6 +1501,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <input type="text" data-bind="filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type == 'text' -->
+          <input data-bind="value: value" class="input-xxlarge"/>
+          <!-- /ko -->          
+          <!-- ko if: type == 'textarea' -->
           <input data-bind="value: value" class="input-xxlarge"/>
           <!-- /ko -->
         </td>
