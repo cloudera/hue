@@ -513,3 +513,7 @@ em {
   border: 1px solid #d8d8d8;
   border-top: none;
 }
+
+#addActionDemiModal input, #addActionDemiModal select {
+  margin-bottom: 0;
+} 

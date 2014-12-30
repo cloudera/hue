@@ -391,6 +391,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <a class="widget-icon"><i class="fa fa-files-o"></i></a>
       <!-- /ko -->
 
+      <!-- ko if: widgetType() == 'kill-widget' -->
+      <a class="widget-icon"><i class="fa fa-stop"></i></a>
+      <!-- /ko -->
+
       <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
 
       <!-- ko if: widgetType() == 'decision-widget' -->
@@ -1491,10 +1495,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type == 'text' -->
-          <input data-bind="value: value" class="input-xxlarge"/>
+          <input data-bind="value: value" class="input-xlarge"/>
           <!-- /ko -->          
           <!-- ko if: type == 'textarea' -->
-          <input data-bind="value: value" class="input-xxlarge"/>
+          <input data-bind="value: value" class="input-xlarge"/>
           <!-- /ko -->
           <!-- ko if: type == 'workflow' -->
           <select data-bind="options: $root.addActionWorkflows, optionsText: 'name', value: $root.selectedSubWorkflow"></select>
