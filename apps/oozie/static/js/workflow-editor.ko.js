@@ -217,7 +217,11 @@ var Workflow = function (vm, workflow) {
       },
       success: function (data) {
         if (data.status == 0) {
-          viewModel.addActionProperties(data.properties);
+          viewModel.addActionProperties.removeAll();
+          $.each(data.properties, function(i, prop) {
+        	viewModel.addActionProperties.push(ko.mapping.fromJS(prop));  
+          });
+          
           if (data.workflows.length > 0) {
             viewModel.subworfklows(data.workflows);
           }
