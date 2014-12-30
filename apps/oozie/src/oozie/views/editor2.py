@@ -267,19 +267,6 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 
-def import_hue_3_7_workflows(request):
-  response = {'status': -1}
-
-  try:
-    response['status'] = 0
-    response['json'] = import_workflows_from_hue_3_7().to_xml()
-  except Exception, e:
-    response['message'] = str(e)
-    
-  return HttpResponse(json.dumps(response), mimetype="application/json") 
-
-
-
 def list_editor_coordinators(request):
   coordinators = Document2.objects.filter(type='oozie-coordinator2', owner=request.user)
 
