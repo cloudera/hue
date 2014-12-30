@@ -775,24 +775,22 @@ class ShellAction(Action):
      'shell_command': { 
           'name': 'shell_command',
           'label': _('Shell command'),
-          'value': 'script.sh',
-          'help_text': _('The path of the Shell command to execute.'),
+          'value': '',
+          'help_text': _('Shell command to execute, e.g script.sh'),
           'type': ''
      },            
      'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('The arguments of the command can then be specified using one or more argument element.'),
+          'help_text': _('One command argument, e.g. -l, --help'),
           'type': ''
      },    
      'env_var': { 
           'name': 'env_var',
           'label': _('Environment variables'),
           'value': [],
-          'help_text': _('Environemnt to be passed to the Shell command. env-var should contain only one pair of environment variable and value. '
-                         'If the pair contains the variable such as $PATH, it should follow the Unix convention such as PATH=$PATH:mypath. '
-                         'Don\'t use ${PATH} which will be substitued by Oozie\'s EL evaluator.'),
+          'help_text': _('e.g. MAX=10 or PATH=$PATH:mypath'),
           'type': ''
      },         
      'capture_output': { 
@@ -871,7 +869,7 @@ class SshAction(Action):
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('The arguments of the command can then be specified using one or more argument element.'),
+          'help_text': _('One command argument, e.g. -l, --help'),
           'type': ''
      },
      'capture_output': { 
