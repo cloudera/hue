@@ -218,7 +218,9 @@ var Workflow = function (vm, workflow) {
       success: function (data) {
         if (data.status == 0) {
           viewModel.addActionProperties(data.properties);
-          viewModel.addActionWorkflows(data.workflows);
+          if (data.workflows.length > 0) {
+            viewModel.addActionWorkflows(data.workflows);
+          }
           if (callback) {
             callback(widget);
           }
@@ -435,7 +437,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   });
   self.toggleArrows = function () {
-    self.hasArrows(!self.hasArrows());
+    self.hasArrows(! self.hasArrows());
   };
 
   self.newAction = ko.observable();
@@ -985,20 +987,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }, function (data) {
       if (data.status == 0) {
         console.log(data.xml);
-      }
-      else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
-  };
-
-  self.import_workflows = function () {
-    $.post("/oozie/editor/workflow/import_workflows/", {
-    }, function (data) {
-      if (data.status == 0) {
-        console.log(data.json);
       }
       else {
         $(document).trigger("error", data.message);
