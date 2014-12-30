@@ -411,7 +411,7 @@ var Workflow = function (vm, workflow) {
   };
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
@@ -454,7 +454,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.depen = ko.observableArray(workflow_json.dependencies);
 
   self.addActionProperties = ko.observableArray([]);
-  self.addActionWorkflows = ko.observableArray([]);
+  self.addActionWorkflows = ko.observableArray(subworkflows_json);
   self.selectedSubWorkflow = ko.observable();
 
 

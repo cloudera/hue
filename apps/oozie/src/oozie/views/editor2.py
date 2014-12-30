@@ -78,7 +78,8 @@ def edit_workflow(request):
       'workflow_json': json.dumps(workflow_data['workflow']),
       'credentials_json': json.dumps(credentials.credentials.keys()),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
-      'doc1_id': doc.doc.get().id if doc else -1
+      'doc1_id': doc.doc.get().id if doc else -1,
+      'subworkflows_json': json.dumps(_get_workflows(request.user)) # if has sub?
   })
 
 
@@ -98,7 +99,7 @@ def save_workflow(request):
     workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user)
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
-  subworkflows = [node['properties']['subworkflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
+  subworkflows = [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
   if subworkflows:
     dependencies = Document2.objects.filter(uuid__in=subworkflows)
     workflow_doc.dependencies = dependencies
@@ -109,7 +110,6 @@ def save_workflow(request):
   workflow_doc.save()
   
   workflow_instance = Workflow(document=workflow_doc)
-  #workflow_instance.check_workspace(request.fs, request.user)
   
   response['status'] = 0
   response['id'] = workflow_doc.id
@@ -129,18 +129,22 @@ def new_node(request):
   workflows = []
 
   if node['widgetType'] == 'subworkflow-widget':
-    workflows = [{
-        'name': workflow.name,
-        'owner': workflow.owner.username,
-        'value': workflow.uuid
-      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=request.user)
-    ]
+    workflows = _get_workflows(request.user)
     
   response['status'] = 0
   response['properties'] = properties 
   response['workflows'] = workflows
   
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def _get_workflows(user):
+  return [{
+        'name': workflow.name,
+        'owner': workflow.owner.username,
+        'value': workflow.uuid
+      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=user)
+    ]  
 
 
 def add_node(request):
