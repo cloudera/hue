@@ -41,9 +41,9 @@ function loadColumns(viewModel, json_layout) {
   $(json_layout).each(function (cnt, json_col) {
     var _rows = [];
     $(json_col.rows).each(function (rcnt, json_row) {
-      var row = new Row([], viewModel);
+      var row = new ExtendedRow([], viewModel);
       $(json_row.widgets).each(function (wcnt, widget) {
-        var _w = new Widget({
+        var _w = new ExtendedWidget({
           size: widget.size,
           id: widget.id,
           name: widget.name,
@@ -58,14 +58,15 @@ function loadColumns(viewModel, json_layout) {
       row.columns(loadColumns(viewModel, json_row.columns));
       _rows.push(row);
     });
-    var column = new Column(json_col.size, _rows);
+    var column = new ExtendedColumn(json_col.size, _rows);
     _columns = _columns.concat(column);
   });
   return _columns;
 }
 
 function loadLayout(viewModel, json_layout) {
-  viewModel.columns(loadColumns(viewModel, json_layout));
+  var _cols = loadColumns(viewModel, json_layout);
+  viewModel.oozieColumns(_cols);
 }
 
 
@@ -439,12 +440,14 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.newAction = ko.observable();
 
-  self.columns = ko.observable([]);
+  self.columns = ko.observableArray([]);
+  self.oozieColumns = ko.observableArray([]);
+
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
   self.credentials = ko.mapping.fromJSON(credentials_json);
 
-  self.inited = ko.observable(self.columns().length > 0);
+  self.inited = ko.observable(self.oozieColumns().length > 0);
   self.init = function (callback) {
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
@@ -555,7 +558,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         _newRow = _parentCol.addEmptyRow(false, _rowIdx);
       }
 
-      var _w = new Widget({
+      var _w = new ExtendedWidget({
         size: self.currentlyDraggedWidget().size(),
         id: UUID(),
         name: self.currentlyDraggedWidget().name(),
@@ -592,7 +595,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       if (_addForkAndJoin) {
         var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
         var _id = UUID();
-        var _fork = new Widget({
+        var _fork = new ExtendedWidget({
           size: 12,
           id: _id,
           name: 'fork' + '-' + _id.slice(0, 4),
@@ -606,7 +609,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         _forkRow.widgets([_fork]);
       }
 
-      var _w = new Widget({
+      var _w = new ExtendedWidget({
         size: self.currentlyDraggedWidget().size(),
         id: UUID(),
         name: self.currentlyDraggedWidget().name(),
@@ -642,13 +645,13 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }
 
       var _col = row.addColumn(null, atBeginning);
-      var _row = new Row([_w], self);
+      var _row = new ExtendedRow([_w], self);
       _col.addRow(_row);
 
       if (_addForkAndJoin) {
         var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
         var _id = UUID();
-        var _join = new Widget({
+        var _join = new ExtendedWidget({
           size: 12,
           id: _id,
           name: "join" + '-' + _id.slice(0, 4),
@@ -676,7 +679,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.removeWidgetById = function (widget_id) {
-    $.each(self.columns(), function (i, col) {
+    $.each(self.oozieColumns(), function (i, col) {
       self.deeplyRemoveWidgetById(widget_id, col, self)
     });
   }
@@ -834,8 +837,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.getWidgetParentRow = function (widget_id) {
     var _row = null;
-    for (var i = 0; i < self.columns().length; i++) {
-      _row = self.traverseColumnForWidget(widget_id, self.columns()[i]);
+    for (var i = 0; i < self.oozieColumns().length; i++) {
+      _row = self.traverseColumnForWidget(widget_id, self.oozieColumns()[i]);
       if (_row != null) {
         break;
       }
@@ -844,11 +847,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.getRowParentColumn = function (row_id) {
-    return self.traverseColumnForColumn(row_id, self.columns()[0], 0);
+    return self.traverseColumnForColumn(row_id, self.oozieColumns()[0], 0);
   }
 
   self.getColumnParentRow = function (col_id) {
-    return self.traverseColumnForRow(col_id, self.columns()[0], 0);
+    return self.traverseColumnForRow(col_id, self.oozieColumns()[0], 0);
   }
 
   self.getRowParentRow = function (row_id) {
@@ -954,7 +957,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.save = function () {
     $.post("/oozie/editor/workflow/save/", {
-      "layout": ko.mapping.toJSON(self.columns),
+      "layout": ko.mapping.toJSON(self.oozieColumns),
       "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
@@ -977,7 +980,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.gen_xml = function () {
     $.post("/oozie/editor/workflow/gen_xml/", {
-      "layout": ko.mapping.toJSON(self.columns),
+      "layout": ko.mapping.toJSON(self.oozieColumns),
       "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
@@ -1017,7 +1020,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   function bareWidgetBuilder(name, type) {
-    return new Widget({
+    return new ExtendedWidget({
       size: 12,
       id: "",
       name: name,
@@ -1047,4 +1050,78 @@ function logGA(page) {
   if (typeof trackOnGA == 'function') {
     trackOnGA('oozie/editor/workflow' + page);
   }
+}
+
+var ExtendedColumn = function (size, rows) {
+  var self = new Column(size, rows);
+  self.rowPrototype = ExtendedRow;
+  self.oozieStartRow = ko.computed(function () {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "3f107997-04cc-8733-60a9-a4bb62cebffc")) {
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+  self.oozieEndRow = ko.computed(function () {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "33430f0f-ebfa-c3ec-f237-3e77efa03d0a")) {
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+  self.oozieKillRow = ko.computed(function () {
+    var _row = null;
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && row.widgets()[0].id() == "17c9c895-5a16-7443-bb81-f34b30b21548")) {
+        _row = row;
+      }
+    });
+    return _row;
+  }, self);
+
+
+  self.oozieRows = ko.computed(function () {
+    var _rows = [];
+    ko.utils.arrayForEach(self.rows(), function (row) {
+      if ((row.widgets().length > 0 && ["3f107997-04cc-8733-60a9-a4bb62cebffc", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "17c9c895-5a16-7443-bb81-f34b30b21548"].indexOf(row.widgets()[0].id()) == -1) || row.widgets().length == 0) {
+        _rows.push(row);
+      }
+    });
+    return _rows;
+  }, self);
+
+  self.enableOozieDropOnBefore = ko.observable(true);
+  self.enableOozieDropOnAfter = ko.observable(true);
+
+  return self;
+}
+
+var ExtendedRow = function (widgets, vm, columns) {
+  var self = new Row(widgets, vm, columns);
+  self.columnPrototype = ExtendedColumn;
+  self.enableOozieDrop = ko.computed(function(){
+    return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
+  });
+
+  self.enableOozieDropOnBefore = ko.observable(true);
+  self.enableOozieDropOnSide = ko.observable(true);
+
+  return self;
+}
+
+var ExtendedWidget = function (params) {
+  var self = new Widget(params);
+  self.oozieMovable = ko.computed(function() {
+    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "join-widget"].indexOf(self.widgetType()) == - 1
+  });
+
+  self.oozieExpanded = ko.observable(false);
+  self.ooziePropertiesExpanded = ko.observable(false);
+  return self;
 }

@@ -26,52 +26,11 @@ function UUID() {
 
 var Column = function (size, rows) {
   var self = this;
+
+  self.rowPrototype = Row;
   self.id = ko.observable(UUID());
   self.size = ko.observable(size);
   self.rows = ko.observableArray(rows);
-  self.oozieStartRow = ko.computed(function () {
-    var _row = null;
-    ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].id() == "3f107997-04cc-8733-60a9-a4bb62cebffc")) {
-        _row = row;
-      }
-    });
-    return _row;
-  }, self);
-
-  self.oozieEndRow = ko.computed(function () {
-    var _row = null;
-    ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].id() == "33430f0f-ebfa-c3ec-f237-3e77efa03d0a")) {
-        _row = row;
-      }
-    });
-    return _row;
-  }, self);
-
-  self.oozieKillRow = ko.computed(function () {
-    var _row = null;
-    ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && row.widgets()[0].id() == "17c9c895-5a16-7443-bb81-f34b30b21548")) {
-        _row = row;
-      }
-    });
-    return _row;
-  }, self);
-
-
-  self.oozieRows = ko.computed(function () {
-    var _rows = [];
-    ko.utils.arrayForEach(self.rows(), function (row) {
-      if ((row.widgets().length > 0 && ["3f107997-04cc-8733-60a9-a4bb62cebffc", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "17c9c895-5a16-7443-bb81-f34b30b21548"].indexOf(row.widgets()[0].id()) == -1) || row.widgets().length == 0) {
-        _rows.push(row);
-      }
-    });
-    return _rows;
-  }, self);
-
-  self.enableOozieDropOnBefore = ko.observable(true);
-  self.enableOozieDropOnAfter = ko.observable(true);
 
   self.drops = ko.observableArray(["temp"]);
   self.klass = ko.computed(function () {
@@ -83,7 +42,7 @@ var Column = function (size, rows) {
   };
   self.addRow = function (row, atBeginning, atIndex) {
     if (typeof row == "undefined" || row == null) {
-      row = new Row([], viewModel); // Hacky but needed when a new row is deleted
+      row = new self.rowPrototype([], viewModel); // Hacky but needed when a new row is deleted
     }
 
     if (typeof atIndex != "undefined" && atIndex != null) {
@@ -103,6 +62,8 @@ var Column = function (size, rows) {
 
 var Row = function (widgets, vm, columns) {
   var self = this;
+
+  self.columnPrototype = Column;
   self.id = ko.observable(UUID());
   self.widgets = ko.observableArray(widgets);
   self.columns = ko.observableArray(columns ? columns : []);
@@ -111,13 +72,6 @@ var Row = function (widgets, vm, columns) {
       col.percWidth((100 - self.columns().length * 0.5) / self.columns().length);
     });
   });
-
-  self.enableOozieDrop = ko.computed(function(){
-    return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
-  });
-
-  self.enableOozieDropOnBefore = ko.observable(true);
-  self.enableOozieDropOnSide = ko.observable(true);
 
   self.addWidget = function (widget) {
     self.widgets.push(widget);
@@ -140,7 +94,7 @@ var Row = function (widgets, vm, columns) {
   self.addColumn = function (column, atBeginning) {
     if (typeof column == "undefined" || column == null) {
       var _size = Math.max(1, Math.floor(12 / (self.columns().length + 1)));
-      column = new Column(_size, []); // Hacky but needed when a new row is deleted
+      column = new self.columnPrototype(_size, []); // Hacky but needed when a new row is deleted
       self.columns().forEach(function(col){
         col.size(_size);
       });
@@ -205,6 +159,11 @@ var Row = function (widgets, vm, columns) {
 // A widget is generic. It has an id that refer to another object (e.g. facet) with the same id.
 var Widget = function (params) {
   var self = this;
+
+  self.extend = function() {
+    return self;
+  }
+
   self.size = ko.observable(params.size).extend({ numeric: 0 });
 
   self.name = ko.observable(params.name);
@@ -213,13 +172,6 @@ var Widget = function (params) {
   self.properties = ko.observable(typeof params.properties != "undefined" && params.properties != null ? params.properties : {});
   self.offset = ko.observable(typeof params.offset != "undefined" && params.offset != null ? params.offset : 0).extend({ numeric: 0 });
   self.isLoading = ko.observable(typeof params.loading != "undefined" && params.loading != null ? params.loading : false);
-
-  self.oozieMovable = ko.computed(function() {
-    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "join-widget"].indexOf(self.widgetType()) == - 1
-  });
-
-  self.oozieExpanded = ko.observable(false);
-  self.ooziePropertiesExpanded = ko.observable(false);
 
   self.klass = ko.computed(function () {
     return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");

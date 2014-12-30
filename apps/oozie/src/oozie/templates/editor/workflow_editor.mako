@@ -211,12 +211,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 
-<div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
+<div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && oozieColumns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
   <img src="/static/art/hint_arrow.png" />
 </div>
 
-<div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
+<div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && oozieColumns().length == 0 && previewColumns() == ''">
   <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
   <img src="/static/art/hint_arrow_horiz_flipped.png" />
 </div>
@@ -224,12 +224,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
   <div class="container-fluid">
-    <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
+    <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: oozieColumns}">
     </div>
     <div class="clearfix"></div>
   </div>
 </div>
-
 
 
 <script type="text/html" id="column-template">
@@ -1732,7 +1731,7 @@ ${ dashboard.import_bindings() }
 
   function drawArrows(){
     $("canvas").remove();
-    if (viewModel.columns()[0].rows().length > 3){
+    if (viewModel.oozieColumns()[0].rows().length > 3){
       var _links = viewModel.workflow.linkMapping();
       Object.keys(_links).forEach(function(id){
         if (_links[id].length > 0){
