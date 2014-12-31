@@ -516,4 +516,8 @@ em {
 
 #addActionDemiModal input, #addActionDemiModal select {
   margin-bottom: 0;
-} 
+}
+
+canvas {
+  pointer-events: none;
+}
