@@ -2009,7 +2009,7 @@ function datatableScroll() {
   window.clearTimeout(_scrollTimeout);
   _scrollTimeout = window.setTimeout(function(){
     dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
-    if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
+    if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable && viewModel.hasMoreResults()) {
       dataTableEl.animate({opacity: '0.55'}, 200);
       viewModel.fetchResults();
     }
