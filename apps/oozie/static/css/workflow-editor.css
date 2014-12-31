@@ -287,11 +287,15 @@
 }
 
 .drop-target {
-  background-color: #F6F6F6;
+  background-color: #FCFCFC;
   min-height: 20px;
-  border: 2px dotted #DDD;
+  border: 2px dotted #FAFAFA;
   text-align: center;
   padding: 4px;
+}
+.drop-target-dragging {
+  background-color: #F6F6F6;
+  border-color: #DDD;
 }
 
 .ui-sortable.drop-target {
