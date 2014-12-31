@@ -22,8 +22,12 @@
             <job-tracker>${ '${' }jobTracker}</job-tracker>
             <name-node>${ '${' }nameNode}</name-node>
             <streaming>
+                % if node['properties']['mapper']:
                 <mapper>${ node['properties']['mapper'] }</mapper>
+                % endif
+                % if node['properties']['reducer']:
                 <reducer>${ node['properties']['reducer'] }</reducer>
+                % endif
             </streaming>
             ${ common.configuration(node['properties']['properties']) }
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
