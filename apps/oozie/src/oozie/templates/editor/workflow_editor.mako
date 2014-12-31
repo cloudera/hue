@@ -387,28 +387,28 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
 
       <!-- ko if: widgetType() == 'decision-widget' -->
-        <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! ooziePropertiesExpanded()">
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded() && ! ooziePropertiesExpanded()">
           <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
       <!-- ko if: widgetType() != 'decision-widget' -->
-        <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1) && ! ooziePropertiesExpanded()">
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() && (['start-widget', 'end-widget', 'fork-widget', 'join-widget'].indexOf(widgetType()) == -1) && ! oozieExpanded() && ! ooziePropertiesExpanded()">
           <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>
         </div>
       <!-- /ko -->
       <!-- ko if: ooziePropertiesExpanded() -->
         <div class="inline pull-right">
-          <a href="javascript:void(0)" data-bind="click: toggleProperties"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="click: toggleProperties"><i class="fa fa-caret-square-o-left"></i></a>
         </div>
       <!-- /ko -->
     </h2>
-    <div class="card-body" style="padding: 0;" data-bind="click: highlightWidget">
+    <div class="card-body" style="padding: 0;">
       <div class="pull-right" data-bind="visible: $root.isEditing() && ! ooziePropertiesExpanded() && oozieMovable(), click: toggleProperties">
         <div class="advanced-triangle">
           <a href="javascript:void(0)"><i class="fa fa-cogs"></i></a>
         </div>
       </div>
-      <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      <div data-bind="click: function(widget, e){ highlightWidget(widget, e); }, template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
 </script>
@@ -1940,20 +1940,26 @@ ${ dashboard.import_bindings() }
   var lastSeenPosition = null;
   var lastExpandedWidget = null;
   function setLastExpandedWidget(widget) {
-    var _el = $("#wdg_" + widget.id());
     lastExpandedWidget = widget;
-    _el.css("z-index", "1032");
-    lastSeenPosition = _el.position();
-    var _width = _el.width();
+    var _el = $("#wdg_" + widget.id());
+    if (_el.width() < 400){
+      _el.css("z-index", "1032");
+      lastSeenPosition = _el.position();
+      var _width = _el.width();
 
-    _el.css("position", "absolute");
-    _el.css({
-      "top": (lastSeenPosition.top) + "px",
-      "left": lastSeenPosition.left + "px",
-      "width": _width
-    });
-    _el.width(_width < $(window).width() / 2 ? $(window).width() / 2 : _width);
-    $("#exposeOverlay").fadeIn(300);
+      _el.css("position", "absolute");
+      _el.css({
+        "top": (lastSeenPosition.top) + "px",
+        "left": lastSeenPosition.left + "px",
+        "width": _width
+      });
+      _el.width(500);
+      $("#exposeOverlay").fadeIn(300);  
+      widget.oozieExpanded(true);
+    }
+    else {
+      widget.oozieExpanded(false);
+    }
   }
 
   function toggleProperties(widget) {
@@ -1962,58 +1968,47 @@ ${ dashboard.import_bindings() }
       if (!widget.ooziePropertiesExpanded()) {
         setLastExpandedWidget(widget);
         _el.find(".prop-editor").show();
-
-        widget.ooziePropertiesExpanded(!widget.ooziePropertiesExpanded());
+        widget.ooziePropertiesExpanded(true);
       }
       else {
-        $("#exposeOverlay").click();
+        if (widget.oozieExpanded()){
+          exposeOverlayClickHandler();
+        }
+        else {
+          _el.find(".prop-editor").hide();
+          widget.ooziePropertiesExpanded(false);
+        }
       }
     }
   }
 
-  function toggleHighlight(widget) {
-    var _el = $("#wdg_" + widget.id());
-    if (!widget.oozieExpanded()) {
+  function highlightWidget(widget, e) {
+    if (! $(e.target).is("a") && ! $(e.target).is("input") && ! $(e.target).is("i") && ! $(e.target).is("button")){
       setLastExpandedWidget(widget);
-      widget.oozieExpanded(!widget.oozieExpanded());
-    }
-    else {
-      $("#exposeOverlay").click();
     }
   }
 
-  function highlightWidget(widget) {
-    setLastExpandedWidget(widget);
-    widget.oozieExpanded(true);
+  function exposeOverlayClickHandler() {
+    if (lastExpandedWidget) {
+      var _el = $("#wdg_" + lastExpandedWidget.id());
+      _el.find(".prop-editor").hide();
+      _el.removeAttr("style");
+      lastExpandedWidget.ooziePropertiesExpanded(false);
+      lastExpandedWidget.oozieExpanded(false);
+    }
+    addActionDemiModalFieldCancel();
+    $("#exposeOverlay").fadeOut(300);
+    $(document).trigger("drawArrows");
   }
 
   $(document).ready(function(){
     renderChangeables();
 
-    $("#exposeOverlay").on("click", function (e) {
-      if (lastExpandedWidget) {
-        var _el = $("#wdg_" + lastExpandedWidget.id());
-        _el.css("position", "initial");
-        _el.find(".prop-editor").hide();
-        _el.css({
-          "top": "",
-          "left": "",
-          "width": "",
-          "margin-top": "",
-          "margin-left": "",
-          "height": ""
-        });
-        lastExpandedWidget.ooziePropertiesExpanded(false);
-        lastExpandedWidget.oozieExpanded(false);
-      }
-      addActionDemiModalFieldCancel();
-      $("#exposeOverlay").fadeOut(300);
-      $(document).trigger("drawArrows");
-    });
+    $("#exposeOverlay").on("click", exposeOverlayClickHandler);
 
     $(document).keyup(function(e) {
       if (e.keyCode == 27) {
-        $("#exposeOverlay").click();
+        exposeOverlayClickHandler();
         addActionDemiModalFieldCancel();
         $("#addActionDemiModal").modal("hide");
       }
