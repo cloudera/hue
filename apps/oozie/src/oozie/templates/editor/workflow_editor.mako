@@ -1413,15 +1413,25 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.to.label"></span>
-        <input type="text" data-bind="value: properties.to" />
+        <span data-bind="text: $root.workflow_properties.to.label" style="display: inline-block; width: 80px"></span>
+        <input type="text" data-bind="value: properties.to, attr: { placeholder: $root.workflow_properties.to.help_text }" />
         <br/>
-        <span data-bind="text: $root.workflow_properties.subject.label"></span>
-        <input type="text" data-bind="value: properties.subject" />
+        
+        <span data-bind="text: $root.workflow_properties.subject.label" style="display: inline-block; width: 80px"></span>
+        <input type="text" data-bind="value: properties.subject, attr: { placeholder: $root.workflow_properties.subject.help_text }" />
         <br/>
-        <span data-bind="text: $root.workflow_properties.body.label"></span>
-        <input type="text" data-bind="value: properties.body" />
+        
+        <span data-bind="text: $root.workflow_properties.body.label" style="display: inline-block; width: 80px"></span>
+        <textarea data-bind="value: properties.body, attr: { placeholder: $root.workflow_properties.body.help_text }"></textarea>
       </div>
+    </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      ${ _('To') }
+      <span data-bind="text: properties.to"/>
+      <br/>
+      ${ _('About') }
+      <span data-bind="text: properties.subject"/>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
@@ -1434,7 +1444,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.cc.label"></span>
-          <input type="text" data-bind="value: properties.cc" />
+          <input type="text" data-bind="value: properties.cc, attr: { placeholder: $root.workflow_properties.cc.help_text }" />
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1590,10 +1600,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type() == 'text' -->
-          <input data-bind="value: value" class="input-xlarge"/>
+          <input data-bind="value: value, attr: { placeholder: help_text }" class="input-xlarge"/>
           <!-- /ko -->          
           <!-- ko if: type() == 'textarea' -->
-          <input data-bind="value: value" class="input-xlarge"/>
+          <textarea data-bind="value: value" class="input-xlarge"></textarea>
           <!-- /ko -->
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>

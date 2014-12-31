@@ -948,28 +948,28 @@ class EmailAction(Action):
           'name': 'to',
           'label': _('To addresses'),
           'value': '',
-          'help_text': _('Comma-separated values.'),
+          'help_text': _('Comma-separated values'),
           'type': 'text'
      },         
      'cc': { 
           'name': 'cc',
           'label': _('Cc addresses (optional)'),
           'value': '',
-          'help_text': _('Comma-separated values.'),
+          'help_text': _('Comma-separated values'),
           'type': 'text'
      },    
      'subject': {
           'name': 'subject',
           'label': _('Subject'),
-          'value': 'Subject',
-          'help_text': _('Plain-text.'),
+          'value': '',
+          'help_text': _('Plain-text'),
           'type': 'text'
      },
      'body': { 
           'name': 'body',
           'label': _('Body'),
           'value': '',
-          'help_text': _('Plain-text.'),
+          'help_text': _('Plain-text'),
           'type': 'textarea'
      },
   }
