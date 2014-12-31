@@ -380,9 +380,7 @@ class PigAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                       'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -421,9 +419,7 @@ class JavaAction(Action):
           'name': 'java_opts',
           'label': _('Java options'),
           'value': [],
-          'help_text': _('Command-line parameters used to start the JVM that will execute '
-                        'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
-                        'configuration property. E.g. -Dexample-property=hue'),
+          'help_text': _('Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b'),
           'type': ''
      },
      'capture_output': { 
@@ -469,9 +465,7 @@ class JavaAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                       'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -531,9 +525,7 @@ class HiveAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                       'Properties specified in the Job Properties element override properties specified in the '
-                       'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -608,9 +600,7 @@ class HiveServer2Action(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                        'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -702,9 +692,7 @@ class SqoopAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                        'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -757,9 +745,7 @@ class MapReduceAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                        'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -836,9 +822,7 @@ class ShellAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                        'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.'),
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
   }
@@ -1025,9 +1009,7 @@ class StreamingAction(Action):
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                        'Properties specified in the Job Properties element override properties specified in the '
-                        'files specified in the Job XML element.')
+          'help_text': _('Refer to a Hadoop JobConf job.xml')
      }
   }
 
@@ -1042,9 +1024,9 @@ class DistCpAction(Action):
      'distcp_parameters': { 
           'name': 'distcp_parameters',
           'label': _('Arguments'),
-          'value': [],
-          'help_text': _('The arguments of the %(type)s command. Put options first, then source paths, then destination path.') % {'type': TYPE.title()},
-          'type': 'textarea'
+          'value': [{'value': ''}, {'value': ''}],
+          'help_text': _('Options first, then source / destination paths'),
+          'type': 'distcp'
      },
       # Common
      'prepares': { 
@@ -1063,9 +1045,7 @@ class DistCpAction(Action):
           'name': 'java_opts',
           'label': _('Java options'),
           'value': '',
-          'help_text': _('Command-line parameters used to start the JVM that will execute '
-                        'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
-                        'configuration property. E.g. -Dexample-property=hue')
+          'help_text': _('Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b')
      }
   }
 
