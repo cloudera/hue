@@ -1661,7 +1661,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </table>
 
     <br/>
-    <a class="btn btn-primary disable-feedback" data-bind="click: addActionDemiModalFieldPreview">
+    <a class="btn btn-primary disable-feedback" data-bind="css: {'disabled': ! addActionPropertiesFilledOut()}, click: function(field){ addActionPropertiesFilledOut() ? addActionDemiModalFieldPreview(field) : void(0) } ">
       ${ _('Add') }
     </a>
   </div>

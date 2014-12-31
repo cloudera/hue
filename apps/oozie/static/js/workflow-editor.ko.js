@@ -460,6 +460,25 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.addActionProperties = ko.observableArray([]);
+  self.addActionPropertiesFilledOut = ko.computed(function (){
+    var _filledInternalValues = function (val) {
+      var _iAllFilled = true;
+      val.forEach(function(iVal){
+        if (iVal.value() == ''){
+          _iAllFilled = false;
+        }
+      });
+      return _iAllFilled;
+    }
+    var _allFilled = true;
+    ko.utils.arrayForEach(self.addActionProperties(), function (property) {
+      var _val = property.value();
+      if (($.isArray(_val) && !_filledInternalValues(_val) ) || _val == ''){
+        _allFilled = false;
+      }
+    });
+    return _allFilled;
+  });
   self.subworfklows = ko.observableArray(subworkflows_json);
   self.getSubWorkflow = function(uuid) {
     var wf = $.grep(self.subworfklows(), function(wf, i) {
