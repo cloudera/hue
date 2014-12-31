@@ -86,48 +86,48 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
     </div>
-    
+
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableShellAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableShellAction());}}}"
          title="${_('Shell')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
     </div>
-    
+
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSshAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableSshAction());}}}"
          title="${_('Ssh')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-tty"></i></a>
     </div>
-        
+
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableFsAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableFsAction());}}}"
          title="${_('HDFS Fs')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-o"></i></a>
-    </div>    
-    
+    </div>
+
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableEmailAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableEmailAction());}}}"
          title="${_('Email')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-envelope-o"></i></a>
-    </div>    
-    
+    </div>
+
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableStreamingAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableStreamingAction());}}}"
          title="${_('Streaming')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-exchange"></i></a>
-    </div>    
+    </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableDistCpAction(), isEnabled: true,
                     options: {'start': function(event, ui){$root.currentlyDraggedWidget(draggableDistCpAction());}}}"
          title="${_('Distcp')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
-    </div>    
+    </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
@@ -151,11 +151,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
 
     &nbsp;&nbsp;&nbsp;
-    
+
     <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
       <i class="fa fa-fw fa-cog"></i>
     </button>
-    
+
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
         data-bind="css: {'btn': true}, attr: {href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
@@ -318,9 +318,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="widget-template">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (ooziePropertiesExpanded()?' expanded-widget':''),
       draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); }, 'stop': function(event, ui){ $root.enableSideDrop($data); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
-    <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget' && 
+    <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget' &&
         id() != '17c9c895-5a16-7443-bb81-f34b30b21548' && (['fork-widget', 'join-widget', 'decision-widget'].indexOf(widgetType()) == -1 || $root.isEditing())">
-      
+
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && $root.newAction() == null">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         &nbsp;
@@ -439,7 +439,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
-    
+
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
       <ul data-bind="foreach: children" class="unstyled">
         <li>${ _('To') }
@@ -447,7 +447,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
                      value: $data['to']
                      ">
-        </select>      
+        </select>
         ${ _('if') } <input data-bind="value: $data['condition']" />
         </li>
       </ul>
@@ -651,16 +651,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 
 <script type="text/html" id="common-fs-link">
-  <!-- ko if: with_label -->      
+  <!-- ko if: with_label -->
     <a data-bind="attr: {href: '/filebrowser/view' + $data.path }" target="_blank" title="${ _('Open') }">
       <pan data-bind="text: $data.path"></span>
     </a>
-  <!-- /ko -->  
-      
+  <!-- /ko -->
+
    <!-- ko if: ! with_label -->
      <a data-bind="attr: {href: '/filebrowser/view' + $data.path }" target="_blank" title="${ _('Open') }">
        <i class="fa fa-external-link-square"></i>
-     </a> 
+     </a>
    <!-- /ko -->
 </script>
 
@@ -669,16 +669,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="hive-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
-  
+
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true} }'></span>
     </div>
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>        
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: false}}'></span>
-        
+
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
         </div>
@@ -727,9 +727,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>        
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }"/>
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: false}}'></span>
-        
+
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
         </div>
@@ -785,7 +785,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }" />        
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.script_path, attr: { placeholder:  $root.workflow_properties.script_path.help_text }" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: false}}'></span>
 
         <div class="row-fluid">
@@ -831,19 +831,19 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="java-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       <pan data-bind="text: properties.main_class" />
     </div>
 
-    <div data-bind="visible: $root.isEditing">    
+    <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.jar_path.label" style="display: inline-block; width: 75px"></span>        
+        <span data-bind="text: $root.workflow_properties.jar_path.label" style="display: inline-block; width: 75px"></span>
         <input type="text" class="filechooser-input input-xlarge"
             data-bind="filechooser: properties.jar_path, attr: { placeholder: $root.workflow_properties.jar_path.help_text }"
-        />        
+        />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.jar_path(), with_label: false}}'></span>
-        
+
         <br/>
         <span data-bind="text: $root.workflow_properties.main_class.label" style="display: inline-block; width: 75px"></span>
         <input type="text" class="input-xlarge" data-bind="value: properties.main_class, attr: { placeholder: $root.workflow_properties.main_class.help_text }" />
@@ -864,7 +864,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">        
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <h6>
             <a class="pointer" data-bind="click: function(){ properties.java_opts.push({'value': ''}); }">
               <span data-bind="text: $root.workflow_properties.java_opts.label"></span> <i class="fa fa-plus"></i>
@@ -918,7 +918,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       <a href="javascript:void(0)">
         <span type="text" data-bind="text: properties.command().slice(0, 70), attr: { title: properties.command() }" />...
@@ -977,13 +977,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
               <i class="fa fa-minus"></i>
             </a>
           </li>
-        </ul> 
+        </ul>
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.jar_path(), with_label: true} }'></span>
-    </div>    
+    </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1028,7 +1028,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </a>
       </span>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
@@ -1037,7 +1037,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </a>
         </span>
       <!-- /ko -->
-    </div>    
+    </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1096,7 +1096,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <input type="text" data-bind="value: properties.shell_command" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.shell_command(), with_label: false} }'></span>
-        
+
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-arguments' }"></div>
         </div>
@@ -1105,7 +1105,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.shell_command(), with_label: true} }'></span>
-    </div>  
+    </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1119,12 +1119,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
           <input type="checkbox" data-bind="checked: properties.capture_output" />
           <br/>
-          
+
           <h6>
             <a class="pointer" data-bind="click: function(){ properties.env_var.push({'value': ''}); }">
               <span data-bind="text: $root.workflow_properties.env_var.label"></span> <i class="fa fa-plus"></i>
             </a>
-          </h6>                    
+          </h6>
           <ul data-bind="foreach: properties.env_var" class="unstyled">
             <li>
               <input class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.env_var.help_text }"/>
@@ -1164,7 +1164,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <span data-bind="text: $root.workflow_properties.host.label"></span>
         <input type="text" data-bind="value: properties.host" />
         <br/>
-        
+
         <span data-bind="text: $root.workflow_properties.ssh_command.label"></span>
         <input type="text" data-bind="value: properties.ssh_command" />
         <div class="row-fluid">
@@ -1172,11 +1172,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="text: properties.host" />
       <span data-bind="text: properties.ssh_command().slice(0, 75)" />
-    </div> 
+    </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1212,37 +1212,37 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <script type="text/html" id="fs-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
-  
+
     <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="text: '${ _("Delete") }', visible: properties.deletes().length > 0"></span>     
+      <span data-bind="text: '${ _("Delete") }', visible: properties.deletes().length > 0"></span>
       <ul data-bind="foreach: properties.deletes" class="unstyled">
         <li>
-          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
         </li>
       </ul>
 
-      <span data-bind="text: '${ _("Create") }', visible: properties.mkdirs().length > 0 || properties.touchzs().length > 0"></span>     
+      <span data-bind="text: '${ _("Create") }', visible: properties.mkdirs().length > 0 || properties.touchzs().length > 0"></span>
       <ul data-bind="foreach: properties.mkdirs" class="unstyled">
         <li>
-          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
         </li>
-      </ul>      
+      </ul>
       <ul data-bind="foreach: properties.touchzs" class="unstyled">
         <li>
-          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>            
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
         </li>
-      </ul>      
-    
-      <span data-bind="text: '${ _("Move") }', visible: properties.moves().length > 0"></span>     
+      </ul>
+
+      <span data-bind="text: '${ _("Move") }', visible: properties.moves().length > 0"></span>
       <ul data-bind="foreach: properties.moves" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: true} }, visible: source().length > 0'></span>
           ${ _('to') }
           <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: true} }, visible: destination().length > 0'></span>
         </li>
-      </ul>      
-    
-      <span data-bind="text: '${ _("Change permissions") }', visible: properties.chmods().length > 0"></span>     
+      </ul>
+
+      <span data-bind="text: '${ _("Change permissions") }', visible: properties.chmods().length > 0"></span>
       <ul data-bind="foreach: properties.chmods" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
@@ -1250,11 +1250,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <span data-bind="text: permissions"/>
           <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
           <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _('recursivelt') }'"/>            
+          <span data-bind="visible: recursive, text: '${ _('recursivelt') }'"/>
         </li>
-      </ul>  
-      
-      <span data-bind="text: '${ _("Change groups") }', visible: properties.chgrps().length > 0"></span>     
+      </ul>
+
+      <span data-bind="text: '${ _("Change groups") }', visible: properties.chgrps().length > 0"></span>
       <ul data-bind="foreach: properties.chgrps" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
@@ -1262,34 +1262,34 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <span data-bind="text: group"/>
           <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
           <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _('recursively') }'"/>            
+          <span data-bind="visible: recursive, text: '${ _('recursively') }'"/>
         </li>
       </ul>
-    </div>    
-  
-  
+    </div>
+
+
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <h6>
           <a class="pointer" data-bind="click: function(){ properties.deletes.push(ko.mapping.fromJS({'value': ''})); }">
             <span data-bind="text: $root.workflow_properties.deletes.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.deletes" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>            
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
-        </ul>        
+        </ul>
 
         <h6>
           <a class="pointer" data-bind="click: function(){ properties.mkdirs.push(ko.mapping.fromJS({'value': ''})); }">
             <span data-bind="text: $root.workflow_properties.mkdirs.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.mkdirs" class="unstyled">
           <li>
             <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.mkdirs.help_text }"/>
@@ -1304,7 +1304,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <a class="pointer" data-bind="click: function(){ properties.touchzs.push(ko.mapping.fromJS({'value': ''})); }">
             <span data-bind="text: $root.workflow_properties.touchzs.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.touchzs" class="unstyled">
           <li>
             <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.touchzs.help_text }"/>
@@ -1314,17 +1314,17 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
             </a>
           </li>
         </ul>
-        
+
         <h6>
           <a class="pointer" data-bind="click: function(){ properties.moves.push(ko.mapping.fromJS({'source': '', 'destination': ''})); }">
             <span data-bind="text: $root.workflow_properties.moves.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.moves" class="unstyled">
           <li>
             <input class="input-xlarge filechooser-input" data-bind="filechooser: source, value: source" placeholder="${ _('Source path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: false} }, visible: source().length > 0'></span>
-            
+
             <input class="input-xlarge filechooser-input" data-bind="filechooser: destination, value: destination" placeholder="${ _('New destination path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: false} }, visible: destination().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
@@ -1350,12 +1350,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <a class="pointer" data-bind="click: function(){ properties.chmods.push(ko.mapping.fromJS({'value': '', 'permissions': '755', 'dir_files': false, 'recursive': false})); }">
             <span data-bind="text: $root.workflow_properties.chmods.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.chmods" class="unstyled">
           <li>
             <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-            
+
             <input class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
             ${ _('Only for directories') }
             <input type="checkbox" data-bind="checked: dir_files"/>
@@ -1371,12 +1371,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <a class="pointer" data-bind="click: function(){ properties.chgrps.push(ko.mapping.fromJS({'value': '', 'group': '', 'dir_files': false, 'recursive': false})); }">
             <span data-bind="text: $root.workflow_properties.chgrps.label"></span> <i class="fa fa-plus"></i>
           </a>
-        </h6>                    
+        </h6>
         <ul data-bind="foreach: properties.chgrps" class="unstyled">
           <li>
             <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-            
+
             <input class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
             ${ _('Only for directories') }
             <input type="checkbox" data-bind="checked: dir_files"/>
@@ -1387,7 +1387,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
             </a>
           </li>
         </ul>
-        
+
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1416,16 +1416,16 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <span data-bind="text: $root.workflow_properties.to.label" style="display: inline-block; width: 80px"></span>
         <input type="text" data-bind="value: properties.to, attr: { placeholder: $root.workflow_properties.to.help_text }" />
         <br/>
-        
+
         <span data-bind="text: $root.workflow_properties.subject.label" style="display: inline-block; width: 80px"></span>
         <input type="text" data-bind="value: properties.subject, attr: { placeholder: $root.workflow_properties.subject.help_text }" />
         <br/>
-        
+
         <span data-bind="text: $root.workflow_properties.body.label" style="display: inline-block; width: 80px"></span>
         <textarea data-bind="value: properties.body, attr: { placeholder: $root.workflow_properties.body.help_text }"></textarea>
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       ${ _('To') }
       <span data-bind="text: properties.to"/>
@@ -1474,7 +1474,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <input type="text" data-bind="value: properties.mapper" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: false} }'></span>
         <br/>
-        
+
         <span data-bind="text: $root.workflow_properties.reducer.label"></span
         <input type="text" data-bind="value: properties.reducer" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
@@ -1524,19 +1524,32 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
-        <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span>
-        <ul data-bind="foreach: properties.distcp_parameters">
+
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.distcp_parameters.push(ko.mapping.fromJS({'value': ''}));}">
+            <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span> <i class="fa fa-plus"></i>
+          </a>
+        </h6>
+        <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
           <li>
-            <input data-bind="value: value"/>
-            <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this); }">
+            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }"/>
+            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this);  }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
         </ul>
-        <button data-bind="click: function(){ properties.distcp_parameters.push({'value': ''}); }">
-          <i class="fa fa-plus"></i>
-        </button>
+
       </div>
+    </div>
+    
+    <div data-bind="visible: ! $root.isEditing()">
+      ${ _('Parameters') }
+      <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
+        <li>
+          <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
+        </li>
+      </ul>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
@@ -1548,39 +1561,45 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
-		  ${ _('Prepare') }
-		  <ul data-bind="foreach: properties.prepares">
-		    <li>
-		      <span data-bind="text: type"></span>
-		      <input data-bind="value: value"/>
-		      <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); }">
-		        <i class="fa fa-minus"></i>
-		      </a>
-		    </li>
-		  </ul>
-		  <button data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); }">
-		    ${ _('Directory') } <i class="fa fa-plus"></i>
-		  </button>
-		  <button data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); }">
-		    ${ _('Delete') } <i class="fa fa-plus"></i>
-		  </button>
-		  <br/>
-		  ${ _('Properties') }
-		  <ul data-bind="foreach: properties.job_properties">
-		    <li>
-		      <input data-bind="value: name"/>
-		      <input data-bind="value: value"/>
-		      <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); }">
-		        <i class="fa fa-minus"></i>
-		      </a>
-		    </li>
-		  </ul>
-		  <button data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); }">
-		    <i class="fa fa-plus"></i>
-		  </button>
-		  <br/>
-          <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
-          <input type="text" data-bind="value: properties.java_opts" />
+
+		 <h6>${ _('Prepare') }</h6>
+		   <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
+		     <li>
+		       <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
+		       <input type="text" class="filechooser-input input-xlarge"
+		            data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }"/>
+		        <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
+		          <i class="fa fa-minus"></i>
+		        </a>
+		      </li>
+		   </ul>
+		   <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
+		     ${ _('Directory') } <i class="fa fa-plus"></i>
+		   </a>
+		   <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
+		     ${ _('Delete') } <i class="fa fa-plus"></i>
+		   </a>
+		
+		   <h6>
+		     <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+		       ${ _('Properties') } <i class="fa fa-plus"></i>
+		     </a>
+		   </h6>
+           <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+           <li>
+             <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+             <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
+             <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
+               <i class="fa fa-minus"></i>
+              </a>
+             </li>
+           </ul>
+           <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+
+           <h6>             
+             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>             
+           </h6>
+           <input type="text" class="input-xlarge" data-bind="value: properties.java_opts, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" />
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1605,21 +1624,28 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <div class="modal-body">
     <table data-bind="foreach: addActionProperties">
       <tr>
-        <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>        
+        <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
         <td>
           <!-- ko if: type() == '' -->
           <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type() == 'text' -->
           <input data-bind="value: value, attr: { placeholder: help_text }" class="input-xlarge"/>
-          <!-- /ko -->          
+          <!-- /ko -->
           <!-- ko if: type() == 'textarea' -->
           <textarea data-bind="value: value" class="input-xlarge"></textarea>
           <!-- /ko -->
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
-          
+
+          <!-- ko if: type() == 'distcp' -->
+          ${ _('Source') }
+          <input type="text" class="filechooser-input" data-bind="value: value()[0].value, filechooser: value()[0].value" placeholder="${ _('e.g. ${nameNode1}/path/to/input.txt') }">
+          ${ _('Destination') }
+          <input type="text" class="filechooser-input" data-bind="value: value()[1].value, filechooser: value()[1].value" placeholder="${ _('e.g. ${nameNode2}/path/to/output.txt') }">
+          <!-- /ko -->
+
           <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer'].indexOf(name()) != -1 &&  value().length > 0 -->
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false}}'></span>
           <!-- /ko -->
@@ -1629,7 +1655,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
               <i class="fa fa-external-link-square"></i>
             </a>
           </span>
-          <!-- /ko -->          
+          <!-- /ko -->
         </td>
       </tr>
     </table>
