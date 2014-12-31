@@ -119,7 +119,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 </div>
 
 
-<div id="settingsModal" class="modal hide fade" data-backdrop="false">
+<div id="settingsModal" class="modal hide fade">
   <div class="modal-header" style="padding-bottom: 2px">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">${ _('Settings') }</h3>

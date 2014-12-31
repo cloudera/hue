@@ -1667,7 +1667,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 </div>
 
-<div id="settingsModal" class="modal fade hide" data-backdrop="false">
+<div id="settingsModal" class="modal fade hide">
   <div class="modal-header" style="padding-bottom: 2px">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">${ _('Workflow Settings') }</h3>
