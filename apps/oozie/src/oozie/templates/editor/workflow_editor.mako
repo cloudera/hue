@@ -448,7 +448,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                      value: $data['to']
                      ">
         </select>
-        ${ _('if') } <input data-bind="value: $data['condition']" />
+        ${ _('if') } <input type="text" data-bind="value: $data['condition']" />
         </li>
       </ul>
       <a data-bind="click: function(){  children.push({'to': '', 'condition': ''});}">${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
@@ -522,8 +522,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </h6>
     <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
       <li>
-        <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
-        <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
+        <input type="text" data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
@@ -538,7 +538,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </h6>
     <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
       <li>
-        <input class="filechooser-input input-xlarge" data-bind="filechooser: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
+        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
@@ -872,7 +872,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </h6>
           <ul class="unstyled" data-bind="foreach: properties.java_opts">
             <li>
-              <input data-bind="value: value, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" class="input-xlarge"/>
+              <input type="text" data-bind="value: value, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" class="input-xlarge"/>
               <a href="#" data-bind="click: function(){ $parent.properties.java_opts.remove(this); }">
                 <i class="fa fa-minus"></i>
               </a>
@@ -971,8 +971,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
           <li>
-            <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
-            <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
+            <input type="text" data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+            <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
             <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
             </a>
@@ -1021,12 +1021,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
+        <span data-bind="visible: properties.workflow().length > 0">
+          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
+        </span>
       </div>
-      <span data-bind="visible: properties.workflow().length > 0">
-        <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank" title="${ _('Open') }">
-          <i class="fa fa-external-link-square"></i>
-        </a>
-      </span>
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
@@ -1060,8 +1060,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </h6>
           <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
             <li>
-              <input data-bind="value: name"/>
-              <input data-bind="value: value"/>
+              <input type="text" data-bind="value: name"/>
+              <input type="text" data-bind="value: value"/>
               <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
                 <i class="fa fa-minus"></i>
               </a>
@@ -1127,7 +1127,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </h6>
           <ul data-bind="foreach: properties.env_var" class="unstyled">
             <li>
-              <input class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.env_var.help_text }"/>
+              <input type="text" class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.env_var.help_text }"/>
               <a href="#" data-bind="click: function(){ $parent.properties.env_var.remove(this); }">
                 <i class="fa fa-minus"></i>
               </a>
@@ -1277,7 +1277,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.deletes" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
               <i class="fa fa-minus"></i>
@@ -1292,7 +1292,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.mkdirs" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.mkdirs.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.mkdirs.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
               <i class="fa fa-minus"></i>
@@ -1307,7 +1307,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.touchzs" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.touchzs.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.touchzs.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
               <i class="fa fa-minus"></i>
@@ -1322,10 +1322,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.moves" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: source, value: source" placeholder="${ _('Source path') }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: source, value: source" placeholder="${ _('Source path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: false} }, visible: source().length > 0'></span>
 
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: destination, value: destination" placeholder="${ _('New destination path') }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: destination, value: destination" placeholder="${ _('New destination path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: false} }, visible: destination().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
               <i class="fa fa-minus"></i>
@@ -1353,10 +1353,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.chmods" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
 
-            <input class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
+            <input type="text" class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
             ${ _('Only for directories') }
             <input type="checkbox" data-bind="checked: dir_files"/>
             ${ _('Recursive to sub directories') }
@@ -1374,10 +1374,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.chgrps" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
 
-            <input class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
+            <input type="text" class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
             ${ _('Only for directories') }
             <input type="checkbox" data-bind="checked: dir_files"/>
             ${ _('Recursive to sub directories') }
@@ -1532,7 +1532,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </h6>
         <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
           <li>
-            <input class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }"/>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this);  }">
               <i class="fa fa-minus"></i>
@@ -1587,8 +1587,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 		   </h6>
            <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
            <li>
-             <input data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
-             <input class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
+             <input type="text" data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }"/>
+             <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"/>
              <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
                <i class="fa fa-minus"></i>
               </a>
@@ -1630,7 +1630,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type() == 'text' -->
-          <input data-bind="value: value, attr: { placeholder: help_text }" class="input-xlarge"/>
+          <input type="text" data-bind="value: value, attr: { placeholder: help_text }" class="input-xlarge"/>
           <!-- /ko -->
           <!-- ko if: type() == 'textarea' -->
           <textarea data-bind="value: value" class="input-xlarge"></textarea>
@@ -1677,8 +1677,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
         <!-- ko if: name() != 'oozie.use.system.libpath' -->
         <li>
-          <input data-bind="value: name"/>
-          <input data-bind="value: value"/>
+          <input type="text" data-bind="value: name"/>
+          <input type="text" data-bind="value: value"/>
           <a href="#" data-bind="click: function(){ $root.workflow.properties.parameters.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
@@ -1695,8 +1695,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 	  <h4>${ _('Hadoop Properties') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
         <li>
-          <input data-bind="value: name"/>
-          <input data-bind="value: value"/>
+          <input type="text" data-bind="value: name"/>
+          <input type="text" data-bind="value: value"/>
           <a href="#" data-bind="click: function(){ $root.workflow.properties.properties.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
