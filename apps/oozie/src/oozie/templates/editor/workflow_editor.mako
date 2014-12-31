@@ -1472,10 +1472,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()">
         <span data-bind="text: $root.workflow_properties.mapper.label"></span>
         <input type="text" data-bind="value: properties.mapper" />
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: false} }'></span>
         <br/>
-        <span data-bind="text: $root.workflow_properties.reducer.label"></span>
+        
+        <span data-bind="text: $root.workflow_properties.reducer.label"></span
         <input type="text" data-bind="value: properties.reducer" />
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
       </div>
+    </div>
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: $root.workflow_properties.mapper.label, visible: properties.mapper().length > 0"></span>
+      <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: true} }, visible: properties.mapper().length > 0'></span>
+      </br>
+      <span data-bind="text: $root.workflow_properties.reducer.label, visible: properties.reducer().length > 0"></span>
+      <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: true} }, visible: properties.reducer().length > 0'></span>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
@@ -1609,7 +1620,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           
-          <!-- ko if: ['jar_path', 'script_path'].indexOf(name()) != -1 &&  value().length > 0 -->
+          <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer'].indexOf(name()) != -1 &&  value().length > 0 -->
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false}}'></span>
           <!-- /ko -->
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
