@@ -1,7 +1,5 @@
 package com.cloudera.hue.livy.server
 
-import com.cloudera.hue.livy.server.sessions.Session
-
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
