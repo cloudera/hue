@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.repl
 
 import akka.util.Timeout
+import com.cloudera.hue.livy.ExecuteRequest
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.scalatra.{Accepted, AsyncResult, FutureSupport, ScalatraServlet}

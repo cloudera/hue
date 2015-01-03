@@ -14,7 +14,7 @@ class ProcessSessionFactory extends SessionFactory {
 
   override def createSparkSession: Future[Session] = {
     future {
-      val id = UUID.randomUUID().toString
+      val id = "a" //UUID.randomUUID().toString
       new SparkProcessSession(id)
     }
   }

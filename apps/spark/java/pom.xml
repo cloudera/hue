@@ -62,9 +62,7 @@
     <modules>
         <module>livy-core</module>
         <module>livy-repl</module>
-        <!--
         <module>livy-server</module>
-        -->
         <module>livy-yarn</module>
     </modules>
 

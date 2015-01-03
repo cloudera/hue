@@ -3,15 +3,15 @@ package com.cloudera.hue.livy.server
 import java.util.concurrent.TimeoutException
 
 import com.cloudera.hue.livy.{ExecuteRequest, ExecuteResponse, Logging}
-import dispatch._
+import dispatch._, Defaults._
 import org.json4s.JsonDSL._
-import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
+import org.json4s.{DefaultFormats, Formats}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 import scala.io.Source
 
 object SparkProcessSession {
@@ -64,6 +64,9 @@ class SparkProcessSession(val id: String) extends Session with Logging {
 
   import com.cloudera.hue.livy.server.SparkProcessSession._
 
+  private[this] implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+  private[this] implicit def jsonFormats: Formats = DefaultFormats
+
   private[this] var _lastActivity = Long.MaxValue
   private[this] var _state: State = Running()
   private[this] val (process, port) = startProcess()
@@ -77,14 +80,12 @@ class SparkProcessSession(val id: String) extends Session with Logging {
     ensureRunning {
       touchLastActivity()
 
-      val req = (svc / "statements")
-        .POST
-        .setContentType("application/json", "UTF-8")
-        .setBody(compact(write(ExecuteRequest(statement))))
+      var req = (svc / "statements").setContentType("application/json", "UTF-8")
+      req = req << write(ExecuteRequest(statement))
 
       for {
-        rep <- Http(req OK as.String)
-      } yield parse(rep).extract
+        body <- Http(req OK as.json4s.Json)
+      } yield body.extract[ExecuteResponse]
     }
   }
 
@@ -93,8 +94,8 @@ class SparkProcessSession(val id: String) extends Session with Logging {
       val req = svc / "statements" / statementId
 
       for {
-        rep <- Http(req OK as.String)
-      } yield parse(rep).extract
+        body <- Http(req OK as.json4s.Json)
+      } yield body.extract[ExecuteResponse]
     }
   }
 
@@ -103,8 +104,8 @@ class SparkProcessSession(val id: String) extends Session with Logging {
       val req = svc / "statements"
 
       for {
-        rep <- Http(req OK as.String)
-      } yield parse(rep).extract
+        body <- Http(req OK as.json4s.Json)
+      } yield body.extract[List[ExecuteResponse]]
     }
   }
 
@@ -115,8 +116,8 @@ class SparkProcessSession(val id: String) extends Session with Logging {
         .addQueryParameter("to", toIndex.toString)
 
       for {
-        rep <- Http(req OK as.String)
-      } yield parse(rep).extract
+        body <- Http(req OK as.json4s.Json)
+      } yield body.extract[List[ExecuteResponse]]
     }
   }
     override def interrupt(): Unit = {
@@ -126,7 +127,7 @@ class SparkProcessSession(val id: String) extends Session with Logging {
   override def close(): Unit = {
     synchronized {
       _state match {
-        case Running() => {
+        case Running() =>
           _state = Stopping()
 
           // Give the repl some time to shut down cleanly.
@@ -134,12 +135,12 @@ class SparkProcessSession(val id: String) extends Session with Logging {
             Await.ready(Http(svc.DELETE OK as.String), 5 seconds)
           } catch {
             // Ignore timeouts
-            case TimeoutException | InterruptedException =>
+            case _: TimeoutException =>
+            case _: InterruptedException =>
           }
 
           process.destroy()
           _state = Stopped()
-        }
         case Stopping() | Stopped() =>
       }
     }

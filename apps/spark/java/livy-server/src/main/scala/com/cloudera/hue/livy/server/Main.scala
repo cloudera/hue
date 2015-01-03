@@ -2,14 +2,14 @@ package com.cloudera.hue.livy.server
 
 import javax.servlet.ServletContext
 
-import _root_.akka.util.Timeout
+import scala.concurrent.duration._
 import com.cloudera.hue.livy.WebServer
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.ScalatraListener
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor}
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -45,8 +45,6 @@ class WebApp(sessionManager: SessionManager) extends ScalatraServlet with Future
   override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit def jsonFormats: Formats = DefaultFormats
 
-  protected implicit def defaultTimeout: Timeout = Timeout(10)
-
   before() {
     contentType = formats("json")
   }
@@ -70,8 +68,19 @@ class WebApp(sessionManager: SessionManager) extends ScalatraServlet with Future
     new AsyncResult { val is = rep }
   }
 
+  val getStatements = get("/sessions/:sessionId/statements") {
+    sessionManager.get(params("sessionId")) match {
+      case Some(session: Session) =>
+        val statements = session.statements()
+        val statementsWaited = Await.result(statements, Duration.Inf) //5 seconds)
+        //new AsyncResult() { val is = statements }
+        statementsWaited
+      case None => NotFound("Session not found")
+    }
+  }
+
   val getSession = get("/sessions/:sessionId") {
-    sessionManager.get(params("sessionId"))
+    redirect(url(getStatements, "sessionId" -> params("sessionId")))
   }
 
   delete("/sessions/:sessionId") {
@@ -79,33 +88,28 @@ class WebApp(sessionManager: SessionManager) extends ScalatraServlet with Future
     NoContent
   }
 
-  get("/sessions/:sessionId/statements") {
-    val rep = sessionManager.get(params("sessionId")) match {
-      case Some(session) => session.statements()
-      case None => NotFound
-    }
-
-    new AsyncResult() { val is = rep }
-  }
-
   post("/sessions/:sessionId/statements") {
     val req = parsedBody.extract[ExecuteStatementRequest]
 
-    val rep = sessionManager.get(params("sessionId")) match {
-      case Some(session) => session.executeStatement(req.statement)
-      case None => NotFound
-    }
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        val statement = session.executeStatement(req.statement)
+        val foo = Await.result(statement, Duration.Inf)
+        foo
 
-    new AsyncResult() { val is = rep }
+
+        //new AsyncResult() { val is = statement }
+      case None => NotFound("Session not found")
+    }
   }
 
   val getStatement = get("/sessions/:sessionId/statements/:statementId") {
-    val rep = sessionManager.get(params("sessionId")) match {
-      case Some(session) => session.statement(params("statementId").toInt)
-      case None => NotFound
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        val statement = session.statement(params("statementId").toInt)
+        new AsyncResult() { val is = statement }
+      case None => NotFound("Session not found")
     }
-
-    new AsyncResult() { val is = rep }
   }
 }
 
