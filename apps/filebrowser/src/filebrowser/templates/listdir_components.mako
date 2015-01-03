@@ -41,7 +41,7 @@ from django.utils.translation import ugettext as _
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
-        <th class="sortable sorting" data-sort="name" data-bind="click: sort">${_('Name')}</th>
+        <th class="sortable sorting_asc" data-sort="name" data-bind="click: sort">${_('Name')}</th>
         <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
         <th class="sortable sorting" data-sort="user" width="10%" data-bind="click: sort">${_('User')}</th>
         <th class="sortable sorting" data-sort="group" width="10%" data-bind="click: sort">${_('Group')}</th>
@@ -768,7 +768,7 @@ from django.utils.translation import ugettext as _
       self.searchQuery = ko.observable("");
       self.isCurrentDirSentryManaged = ko.observable(false);
 
-      self.filesSorting = function (l, r) {
+      self.fileNameSorting = function (l, r) {
         if (l.name == "..") {
           return -1;
         }
@@ -782,14 +782,21 @@ from django.utils.translation import ugettext as _
           return 1;
         }
         else {
-          return l.name > r.name ? 1 : -1
+          var _ret = l.name > r.name ? 1 : -1;
+          if (self.sortDescending()){
+            _ret = _ret * -1;
+          }
+          return _ret;
         }
       }
 
       self.files = ko.observableArray(ko.utils.arrayMap(files, function (file) {
         return new File(file);
       }));
-      self.files.sort(self.filesSorting)
+
+      if (self.sortBy() == "name"){
+        self.files.sort(self.fileNameSorting);
+      }
 
       self.homeDir = ko.observable("${home_directory}");
 
@@ -819,7 +826,6 @@ from django.utils.translation import ugettext as _
         } else {
           el.addClass("sorting_asc");
         }
-
         self.retrieveData();
       }
 
@@ -901,7 +907,9 @@ from django.utils.translation import ugettext as _
         self.files(ko.utils.arrayMap(files, function (file) {
           return new File(file);
         }));
-        self.files.sort(self.filesSorting)
+        if (self.sortBy() == "name"){
+          self.files.sort(self.fileNameSorting);
+        }
 
         self.breadcrumbs(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
           return new Breadcrumb(breadcrumb);
