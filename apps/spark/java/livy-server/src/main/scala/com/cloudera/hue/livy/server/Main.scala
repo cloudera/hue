@@ -23,7 +23,7 @@ object Main {
 
 class ScalatraBootstrap extends LifeCycle {
 
-  val sessionFactory = new ProcessSessionFactory
+  val sessionFactory = new YarnSessionFactory
   val sessionManager = new SessionManager(sessionFactory)
 
   override def init(context: ServletContext): Unit = {
