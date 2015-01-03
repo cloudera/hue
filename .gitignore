@@ -93,3 +93,6 @@ oozie.sql
 tools/jenkins/ext/
 tools/jenkins/oozie.sql
 apps/logs
+
+# Sublime Text temp files
+*.subl*
