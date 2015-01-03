@@ -163,6 +163,23 @@ class Job(client: YarnClient, appId: ApplicationId) {
     None
   }
 
+  def waitForRPC(timeoutMs: Long): Option[(String, Int)] = {
+    waitForStatus(Running(), timeoutMs)
+
+    val startTimeMs = System.currentTimeMillis()
+
+    while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
+      val statusResponse = client.getApplicationReport(appId)
+
+      (statusResponse.getHost, statusResponse.getRpcPort) match {
+        case ("N/A", _) | (_, -1) =>
+        case (hostname, port) => return Some((hostname, port))
+      }
+    }
+
+    None
+  }
+
   def getHost: String = {
     val statusResponse = client.getApplicationReport(appId)
     statusResponse.getHost

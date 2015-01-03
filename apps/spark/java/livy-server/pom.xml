@@ -65,6 +65,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.cloudera.hue.livy</groupId>
+            <artifactId>livy-yarn</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.4.4</version>
