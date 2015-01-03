@@ -60,8 +60,11 @@ class WebApp(sessionManager: SessionManager)
   }
 
   delete("/sessions/:sessionId") {
-    sessionManager.close(params("sessionId"))
-    NoContent
+    new AsyncResult() {
+      val is = for {
+      _ <- sessionManager.close(params("sessionId"))
+      } yield NoContent
+    }
   }
 
   post("/sessions/:sessionId/statements") {

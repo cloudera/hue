@@ -24,7 +24,7 @@ trait Session {
 
   def statements(fromIndex: Integer, toIndex: Integer): Future[List[ExecuteResponse]]
 
-  def interrupt(): Unit
+  def interrupt(): Future[Unit]
 
-  def close(): Unit
+  def close(): Future[Unit]
 }
