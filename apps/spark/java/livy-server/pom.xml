@@ -82,6 +82,12 @@
             <version>0.11.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.databinder.dispatch</groupId>
+            <artifactId>dispatch-json4s-jackson_2.10</artifactId>
+            <version>0.11.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
