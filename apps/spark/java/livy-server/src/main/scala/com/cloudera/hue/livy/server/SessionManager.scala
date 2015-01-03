@@ -1,7 +1,8 @@
 package com.cloudera.hue.livy.server
 
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
 object SessionManager {
   // Time in milliseconds; TODO: make configurable
@@ -38,20 +39,22 @@ class SessionManager(factory: SessionFactory) {
   }
 
   def close(): Unit = {
-    sessions.values.foreach(close)
+    Await.result(Future.sequence(sessions.values.map(close)), Duration.Inf)
     garbageCollector.shutdown()
   }
 
-  def close(sessionId: String): Unit = {
-    sessions.remove(sessionId) match {
-      case Some(session) => session.close()
-      case None =>
+  def close(sessionId: String): Future[Unit] = {
+    sessions.get(sessionId) match {
+      case Some(session) => close(session)
+      case None => Future.successful(Unit)
     }
   }
 
-  def close(session: Session): Unit = {
-    sessions.remove(session.id)
-    session.close()
+  def close(session: Session): Future[Unit] = {
+    session.close().map { case _ =>
+        sessions.remove(session.id)
+        Unit
+    }
   }
 
   def collectGarbage() = {
