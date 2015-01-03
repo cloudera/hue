@@ -4,14 +4,12 @@ import javax.servlet.ServletContext
 
 import _root_.akka.util.Timeout
 import com.cloudera.hue.livy.WebServer
-import com.cloudera.hue.livy.server.sessions.Session
 import org.json4s.{DefaultFormats, Formats}
+import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.ScalatraListener
-import org.scalatra._
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future, ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object Main {
   def main(args: Array[String]): Unit = {
