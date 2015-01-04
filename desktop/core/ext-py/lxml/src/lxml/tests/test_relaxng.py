@@ -27,8 +27,14 @@ class ETreeRelaxNGTestCase(HelperTestCase):
 </element>
 ''')
         schema = etree.RelaxNG(schema)
-        self.assert_(schema.validate(tree_valid))
-        self.assert_(not schema.validate(tree_invalid))
+        self.assertTrue(schema.validate(tree_valid))
+        self.assertFalse(schema.error_log.filter_from_errors())
+
+        self.assertFalse(schema.validate(tree_invalid))
+        self.assertTrue(schema.error_log.filter_from_errors())
+
+        self.assertTrue(schema.validate(tree_valid))             # repeat valid
+        self.assertFalse(schema.error_log.filter_from_errors())  # repeat valid
 
     def test_relaxng_stringio(self):
         tree_valid = self.parse('<a><b></b></a>')
@@ -43,8 +49,8 @@ class ETreeRelaxNGTestCase(HelperTestCase):
 </element>
 ''')
         schema = etree.RelaxNG(file=schema_file)
-        self.assert_(schema.validate(tree_valid))
-        self.assert_(not schema.validate(tree_invalid))
+        self.assertTrue(schema.validate(tree_valid))
+        self.assertFalse(schema.validate(tree_invalid))
 
     def test_relaxng_elementtree_error(self):
         self.assertRaises(ValueError, etree.RelaxNG, etree.ElementTree())
@@ -61,12 +67,12 @@ class ETreeRelaxNGTestCase(HelperTestCase):
 </element>
 ''')
         schema = etree.RelaxNG(schema)
-        self.assert_(not schema.validate(tree_invalid))
+        self.assertFalse(schema.validate(tree_invalid))
         errors = schema.error_log
-        self.assert_([ log for log in errors
-                       if log.level_name == "ERROR" ])
-        self.assert_([ log for log in errors
-                       if "not expect" in log.message ])
+        self.assertTrue([log for log in errors
+                         if log.level_name == "ERROR"])
+        self.assertTrue([log for log in errors
+                         if "not expect" in log.message])
 
     def test_relaxng_invalid_schema(self):
         schema = self.parse('''\
@@ -109,7 +115,10 @@ class ETreeRelaxNGTestCase(HelperTestCase):
         # this will only work if we access the file through path or
         # file object..
         f = open(fileInTestDir('test1.rng'), 'rb')
-        schema = etree.RelaxNG(file=f)
+        try:
+            schema = etree.RelaxNG(file=f)
+        finally:
+            f.close()
 
     def test_relaxng_shortcut(self):
         tree_valid = self.parse('<a><b></b></a>')
@@ -123,8 +132,8 @@ class ETreeRelaxNGTestCase(HelperTestCase):
   </zeroOrMore>
 </element>
 ''')
-        self.assert_(tree_valid.relaxng(schema))
-        self.assert_(not tree_invalid.relaxng(schema))
+        self.assertTrue(tree_valid.relaxng(schema))
+        self.assertFalse(tree_invalid.relaxng(schema))
 
     def test_multiple_elementrees(self):
         tree = self.parse('<a><b>B</b><c>C</c></a>')
@@ -138,8 +147,11 @@ class ETreeRelaxNGTestCase(HelperTestCase):
   </element>
 </element>
 ''') )
-        self.assert_(schema.validate(tree))
-        self.assert_(schema.validate(tree))
+        self.assertTrue(schema.validate(tree))
+        self.assertFalse(schema.error_log.filter_from_errors())
+
+        self.assertTrue(schema.validate(tree))                   # repeat valid
+        self.assertFalse(schema.error_log.filter_from_errors())  # repeat valid
 
         schema = etree.RelaxNG( self.parse('''\
 <element name="b" xmlns="http://relaxng.org/ns/structure/1.0">
@@ -148,11 +160,13 @@ class ETreeRelaxNGTestCase(HelperTestCase):
 ''') )
         c_tree = etree.ElementTree(tree.getroot()[1])
         self.assertEqual(self._rootstring(c_tree), _bytes('<c>C</c>'))
-        self.assert_(not schema.validate(c_tree))
+        self.assertFalse(schema.validate(c_tree))
+        self.assertTrue(schema.error_log.filter_from_errors())
 
         b_tree = etree.ElementTree(tree.getroot()[0])
         self.assertEqual(self._rootstring(b_tree), _bytes('<b>B</b>'))
-        self.assert_(schema.validate(b_tree))
+        self.assertTrue(schema.validate(b_tree))
+        self.assertFalse(schema.error_log.filter_from_errors())
 
 
 def test_suite():

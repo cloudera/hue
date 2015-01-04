@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -83,13 +83,30 @@ details.</p>
     </table>
   </td>
 </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="str-class.html" class="summary-name" onclick="show_private();">unicode</a><br />
+      str(object='') -&gt; string
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="str-class.html" class="summary-name" onclick="show_private();">bytes</a><br />
+      str(object='') -&gt; string
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.clean.Cleaner-class.html" class="summary-name">Cleaner</a><br />
       Instances cleans the document of each of the possible offending
-elements.
+elements.  The cleaning is controlled by attributes; you can
+override attributes in a subclass, or set them in the constructor.
     </td>
   </tr>
 </table>
@@ -110,6 +127,42 @@ elements.
     </table>
   </td>
 </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">character</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="unichr"></a><span class="summary-sig-name">unichr</span>(<span class="summary-sig-arg">i</span>)</span><br />
+      Return a string of one character with ordinal i; 0 &lt;= i &lt; 256.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_is_javascript_scheme"></a><span class="summary-sig-name">_is_javascript_scheme</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      search(string[, pos[, endpos]]) --&gt; match object or None.
+Scan through string looking for a match, and return a corresponding
+match object instance. Return None if no position in the string matches.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html.clean-pysrc.html#_is_javascript_scheme">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -301,6 +354,13 @@ occurrences of pattern in string by the replacement repl.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="basestring"></a><span class="summary-name">basestring</span> = <code title="str, bytes">str, bytes</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="_css_javascript_re"></a><span class="summary-name">_css_javascript_re</span> = <code title="re.compile(r'(?is)expression\s*\(.*?\)')">re.compile(r'<code class="re-flags">(?is)</code>expression\s<code class="re-op">*</code>\(.<code class="re-op">*?</code>\)')</code>
     </td>
   </tr>
@@ -309,14 +369,6 @@ occurrences of pattern in string by the replacement repl.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="_css_import_re"></a><span class="summary-name">_css_import_re</span> = <code title="re.compile(r'(?i)@\s*import')">re.compile(r'<code class="re-flags">(?i)</code>@\s<code class="re-op">*</code>import')</code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="lxml.html.clean-module.html#_javascript_scheme_re" class="summary-name" onclick="show_private();">_javascript_scheme_re</a> = <code title="re.compile(r'(?i)\s*(?:javascript|jscript|livescript|vbscript|about|mo\
-cha):')">re.compile(r'<code class="re-flags">(?i)</code>\s<code class="re-op">*</code><code class="re-group">(?:</code>javascript<code class="re-op">|</code>jscr<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr class="private">
@@ -401,6 +453,13 @@ a-z0-9%&amp;\?;=~]*)?(?:\([/-_\.,a-z0-9%&amp;\?;=~]*\))?)'),
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="_break_prefer_re"></a><span class="summary-name">_break_prefer_re</span> = <code title="re.compile(r'(?i)[^a-z]')">re.compile(r'<code class="re-flags">(?i)</code><code class="re-group">[</code><code class="re-op">^</code>a<code class="re-op">-</code>z<code class="re-group">]</code>')</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'lxml.html'"><code class="variable-quote">'</code><code class="variable-string">lxml.html</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>
@@ -502,7 +561,7 @@ substituted, only the contents of the element.</p>
   
   <p>Breaks any long words found in the body of the text (not attributes).</p>
 <p>Doesn't effect any of the tags in avoid_elements, by default
-<tt class="rst-docutils literal"><span class="pre">&lt;textarea&gt;</span></tt> and <tt class="rst-docutils literal"><span class="pre">&lt;pre&gt;</span></tt></p>
+<tt class="rst-docutils literal">&lt;textarea&gt;</tt> and <tt class="rst-docutils literal">&lt;pre&gt;</tt></p>
 <p>Breaks words by inserting &amp;#8203;, which is a unicode character
 for Zero Width Space character.  This generally takes up no space
 in rendering, but does copy as a space, and in monospace contexts
@@ -531,25 +590,6 @@ usually takes up space.</p>
   </td>
 </tr>
 </table>
-<a name="_javascript_scheme_re"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">_javascript_scheme_re</h3>
-  
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-re.compile(r'<code class="re-flags">(?i)</code>\s<code class="re-op">*</code><code class="re-group">(?:</code>javascript<code class="re-op">|</code>jscript<code class="re-op">|</code>livescript<code class="re-op">|</code>vbscript<code class="re-op">|</code>about<code class="re-op">|</code>mo<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-cha<code class="re-group">)</code>:')
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="_conditional_comment_re"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -672,14 +712,14 @@ a<code class="re-op">-</code>z0<code class="re-op">-</code>9%&amp;\?;=~<code cla
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

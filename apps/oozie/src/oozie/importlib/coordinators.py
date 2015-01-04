@@ -20,6 +20,7 @@ import logging
 import os
 from lxml import etree
 
+from defusedxml.lxml import parse, fromstring
 from django.core import serializers
 from django.utils.translation import ugettext as _
 
@@ -167,7 +168,7 @@ def import_coordinator_root(coordinator, coordinator_definition_root, metadata=N
     })
 
   # Get XSLT and Transform XML
-  xslt = etree.parse(xslt_definition_fh)
+  xslt = parse(xslt_definition_fh)
   xslt_definition_fh.close()
   transform = etree.XSLT(xslt)
   transformed_root = transform(coordinator_definition_root)
@@ -189,7 +190,7 @@ def import_coordinator_root(coordinator, coordinator_definition_root, metadata=N
 
 def import_coordinator(coordinator, coordinator_definition, metadata=None):
   # Parse Coordinator Definition
-  coordinator_definition_root = etree.fromstring(coordinator_definition)
+  coordinator_definition_root = fromstring(coordinator_definition)
   if coordinator_definition_root is None:
     raise RuntimeError(_("Could not find any nodes in Coordinator definition. Maybe it's malformed?"))
 

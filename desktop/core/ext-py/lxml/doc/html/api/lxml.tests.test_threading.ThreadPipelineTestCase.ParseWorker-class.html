@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -103,7 +103,10 @@
           <td><span class="summary-sig"><a href="lxml.tests.test_threading.ThreadPipelineTestCase.ParseWorker-class.html#XML" class="summary-sig-name">XML</a>(<span class="summary-sig-arg">text</span>,
         <span class="summary-sig-arg">parser</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">base_url</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Parses an XML document or fragment from a string constant.</td>
+      Parses an XML document or fragment from a string constant.
+Returns the root node (or the result returned by a parser target).
+This function can be used to embed &quot;XML literals&quot; in Python code,
+like in</td>
           <td align="right" valign="top">
             
             
@@ -141,26 +144,32 @@
       <code>getName</code>,
       <code>isAlive</code>,
       <code>isDaemon</code>,
+      <code>is_alive</code>,
       <code>join</code>,
       <code>setDaemon</code>,
       <code>setName</code>,
       <code>start</code>
       </p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
-      <code>_set_daemon</code>
+      <code>_reset_internal_locks</code>,
+      <code>_set_daemon</code>,
+      <code>_set_ident</code>
       </p></div>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading._Verbose</code></b> (private):
       <code>_note</code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -184,6 +193,14 @@
 </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b>:
+      <code>daemon</code>,
+      <code>ident</code>,
+      <code>name</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
+      <code>_block</code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -230,11 +247,13 @@ This function can be used to embed &quot;XML literals&quot; in Python code,
 like in</p>
 <blockquote>
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>root = etree.XML(<span class="py-string">&quot;&lt;root&gt;&lt;test/&gt;&lt;/root&gt;&quot;</span>)</pre>
+<span class="py-prompt">&gt;&gt;&gt; </span>root = XML(<span class="py-string">&quot;&lt;root&gt;&lt;test/&gt;&lt;/root&gt;&quot;</span>)
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">print</span>(root.tag)
+<span class="py-output">root</span></pre>
 </blockquote>
-<p>To override the parser with a different <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">XMLParser</span></tt> you can pass it to
-the <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">parser</span></tt> keyword argument.</p>
-<p>The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">base_url</span></tt> keyword argument allows to set the original base URL of
+<p>To override the parser with a different <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">XMLParser</tt> you can pass it to
+the <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">parser</tt> keyword argument.</p>
+<p>The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">base_url</tt> keyword argument allows to set the original base URL of
 the document to support relative Paths when looking up external entities
 (DTD, XInclude, ...).</p>
   <dl class="fields">
@@ -266,14 +285,14 @@ the document to support relative Paths when looking up external entities
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:40 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

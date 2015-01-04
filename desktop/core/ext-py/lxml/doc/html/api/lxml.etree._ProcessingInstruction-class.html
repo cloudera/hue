@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -63,13 +63,13 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class _ProcessingInstruction</h1><p class="nomargin-top"></p>
 <pre class="base-tree">
-      object --+        
-               |        
-        <a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a> --+    
-                   |    
-<a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a> --+
-                       |
-                      <strong class="uidshort">_ProcessingInstruction</strong>
+         object --+        
+                  |        
+           <a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a> --+    
+                      |    
+??.__ContentOnlyElement --+
+                          |
+                         <strong class="uidshort">_ProcessingInstruction</strong>
 </pre>
 
 <dl><dt>Known Subclasses:</dt>
@@ -120,8 +120,29 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._ProcessingInstruction-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._ProcessingInstruction-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">x</span>)</span><br />
       repr(x)</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lxml.etree._ProcessingInstruction-class.html#get" class="summary-sig-name">get</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">key</span>,
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Try to parse pseudo-attributes from the text content of the
+processing instruction, search for one with the given key as
+name and return its associated value.</td>
           <td align="right" valign="top">
             
             
@@ -133,18 +154,17 @@
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__delitem__">__delitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__getitem__">__getitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__len__">__len__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#__setitem__">__setitem__</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#append">append</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#get">get</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#insert">insert</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#items">items</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#keys">keys</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#set">set</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#values">values</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>__delitem__</code>,
+      <code>__getitem__</code>,
+      <code>__len__</code>,
+      <code>__setitem__</code>,
+      <code>append</code>,
+      <code>insert</code>,
+      <code>items</code>,
+      <code>keys</code>,
+      <code>set</code>,
+      <code>values</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#__contains__">__contains__</a></code>,
@@ -184,13 +204,16 @@
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -216,6 +239,17 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="attrib"></a><span class="summary-name">attrib</span><br />
+      Returns a dict containing all pseudo-attributes that can be
+parsed from the text content of this processing instruction.
+Note that modifying the dict currently has no effect on the
+XML node, although this is not guaranteed to stay this way.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="tag"></a><span class="summary-name">tag</span><br />
       Element tag
     </td>
@@ -229,9 +263,8 @@
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a></code></b>:
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#attrib">attrib</a></code>,
-      <code><a href="lxml.etree.__ContentOnlyElement-class.html#text">text</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>.__ContentOnlyElement</code></b>:
+      <code>text</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._Element-class.html" onclick="show_private();">_Element</a></code></b>:
       <code><a href="lxml.etree._Element-class.html#base">base</a></code>,
@@ -296,7 +329,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">x</span>)</span>
     <br /><em class="fname">(Representation operator)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -308,7 +341,36 @@
   <dl class="fields">
     <dt>Overrides:
         object.__repr__
-        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">key</span>,
+        <span class="sig-arg">default</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Try to parse pseudo-attributes from the text content of the
+processing instruction, search for one with the given key as
+name and return its associated value.</p>
+<p>Note that this is only a convenience method for the most
+common case that all text content is structured in
+attribute-like name-value pairs with properly quoted values.
+It is not guaranteed to work for all possible text content.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="lxml.etree._Element-class.html#get">_Element.get</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -338,14 +400,14 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

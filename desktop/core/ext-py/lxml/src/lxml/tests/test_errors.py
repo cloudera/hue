@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import unittest, doctest
 
 # These tests check that error handling in the Pyrex code is
@@ -39,7 +39,7 @@ class ErrorTestCase(HelperTestCase):
         del l
         gc.collect()
 
-        self.assertEquals(sys.getrefcount(None), count)
+        self.assertEqual(sys.getrefcount(None), count)
 
 def test_suite():
     suite = unittest.TestSuite()

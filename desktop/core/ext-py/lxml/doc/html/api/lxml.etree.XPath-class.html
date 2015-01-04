@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -73,7 +73,7 @@
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li><a href="lxml.cssselect.CSSSelector-class.html">cssselect.CSSSelector</a></li><li>, <a href="lxml.etree.ETXPath-class.html">ETXPath</a></li>  </ul>
+<li><a href="lxml.etree.ETXPath-class.html">ETXPath</a></li><li>, <a href="lxml.cssselect.CSSSelector-class.html">cssselect.CSSSelector</a></li>  </ul>
 </dd></dl>
 
 <hr />
@@ -81,11 +81,11 @@
 A compiled XPath expression that can be called on Elements and ElementTrees.</p>
 <p>Besides the XPath expression, you can pass prefix-namespace
 mappings and extension functions to the constructor through the
-keyword arguments <tt class="rst-docutils literal"><span class="pre">namespaces</span></tt> and <tt class="rst-docutils literal"><span class="pre">extensions</span></tt>.  EXSLT
+keyword arguments <tt class="rst-docutils literal">namespaces</tt> and <tt class="rst-docutils literal">extensions</tt>.  EXSLT
 regular expression support can be disabled with the 'regexp'
 boolean keyword (defaults to True).  Smart strings will be
 returned for string results unless you pass
-<tt class="rst-docutils literal"><span class="pre">smart_strings=False</span></tt>.</p>
+<tt class="rst-docutils literal">smart_strings=False</tt>.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -134,7 +134,7 @@ returned for string results unless you pass
         <span class="summary-sig-arg">extensions</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">regexp</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">smart_strings</span>=<span class="summary-sig-default">True</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             
             
@@ -168,7 +168,7 @@ returned for string results unless you pass
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree.XPath-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree.XPath-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">x</span>)</span><br />
       repr(x)</td>
           <td align="right" valign="top">
             
@@ -186,12 +186,15 @@ returned for string results unless you pass
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -217,7 +220,8 @@ returned for string results unless you pass
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="path"></a><span class="summary-name">path</span>
+        <a name="path"></a><span class="summary-name">path</span><br />
+      The literal XPath expression.
     </td>
   </tr>
   <tr>
@@ -269,7 +273,7 @@ returned for string results unless you pass
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+  x.__init__(...) initializes x; see help(type(x)) for signature
   <dl class="fields">
     <dt>Overrides:
         object.__init__
@@ -309,7 +313,7 @@ returned for string results unless you pass
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">...</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">x</span>)</span>
     <br /><em class="fname">(Representation operator)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -321,7 +325,6 @@ returned for string results unless you pass
   <dl class="fields">
     <dt>Overrides:
         object.__repr__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -351,14 +354,14 @@ returned for string results unless you pass
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

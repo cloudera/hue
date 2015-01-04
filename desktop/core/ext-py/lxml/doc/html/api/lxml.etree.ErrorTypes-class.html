@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -62,6 +62,13 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class ErrorTypes</h1><p class="nomargin-top"></p>
+<pre class="base-tree">
+object --+
+         |
+        <strong class="uidshort">ErrorTypes</strong>
+</pre>
+
+<hr />
 Libxml2 error types
 
 <!-- ==================== INSTANCE METHODS ==================== -->
@@ -100,6 +107,25 @@ Libxml2 error types
       
     </td>
   </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
 </table>
 <!-- ==================== CLASS VARIABLES ==================== -->
 <a name="section-ClassVariables"></a>
@@ -118,6 +144,13 @@ Libxml2 error types
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="BUF_OVERFLOW"></a><span class="summary-name">BUF_OVERFLOW</span> = <code title="7000">7000</code>
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -193,13 +226,6 @@ Libxml2 error types
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="CATALOG_RECURSION"></a><span class="summary-name">CATALOG_RECURSION</span> = <code title="1654">1654</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="CHECK_"></a><span class="summary-name">CHECK_</span> = <code title="6005">6005</code>
     </td>
   </tr>
 <tr>
@@ -466,13 +492,6 @@ Libxml2 error types
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="CHECK_WRONG_PREV"></a><span class="summary-name">CHECK_WRONG_PREV</span> = <code title="5019">5019</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="CHECK_X"></a><span class="summary-name">CHECK_X</span> = <code title="6006">6006</code>
     </td>
   </tr>
 <tr>
@@ -1200,6 +1219,13 @@ Libxml2 error types
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="ERR_NAME_TOO_LONG"></a><span class="summary-name">ERR_NAME_TOO_LONG</span> = <code title="110">110</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="ERR_NMTOKEN_REQUIRED"></a><span class="summary-name">ERR_NMTOKEN_REQUIRED</span> = <code title="67">67</code>
     </td>
   </tr>
@@ -1439,6 +1465,13 @@ Libxml2 error types
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="ERR_URI_REQUIRED"></a><span class="summary-name">ERR_URI_REQUIRED</span> = <code title="70">70</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ERR_USER_STOP"></a><span class="summary-name">ERR_USER_STOP</span> = <code title="111">111</code>
     </td>
   </tr>
 <tr>
@@ -5249,6 +5282,13 @@ Libxml2 error types
         <a name="XPTR_UNKNOWN_SCHEME"></a><span class="summary-name">XPTR_UNKNOWN_SCHEME</span> = <code title="1900">1900</code>
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__qualname__"></a><span class="summary-name">__qualname__</span> = <code title="'ErrorTypes'"><code class="variable-quote">'</code><code class="variable-string">ErrorTypes</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -5262,6 +5302,31 @@ Libxml2 error types
  6: u'ERR_INVALID_HEX_CHARREF',
  7: u'ERR_INVALID_DEC_CHARREF',
 ..."><code class="variable-group">{</code>0<code class="variable-op">: </code><code class="variable-quote">u'</code><code class="variable-string">ERR_OK</code><code class="variable-quote">'</code><code class="variable-op">, </code>1<code class="variable-op">: </code><code class="variable-quote">u'</code><code class="variable-string">ERR_INTERNAL_ERROR</code><code class="variable-quote">'</code><code class="variable-op">, </code>2<code class="variable-op">: </code><code class="variable-quote">u'</code><code class="variable-string">ERR_NO_</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
     </td>
   </tr>
 </table>
@@ -5334,14 +5399,14 @@ Libxml2 error types
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

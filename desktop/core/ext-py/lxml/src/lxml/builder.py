@@ -54,13 +54,13 @@ except NameError:
         return hasattr(f, '__call__')
 
 try:
-    basestring = __builtins__["basestring"]
-except (NameError, KeyError):
+    basestring
+except NameError:
     basestring = str
 
 try:
-    unicode = __builtins__["unicode"]
-except (NameError, KeyError):
+    unicode
+except NameError:
     unicode = str
 
 
@@ -144,13 +144,13 @@ class ElementMaker(object):
     For namespace support, you can pass a namespace map (``nsmap``)
     and/or a specific target ``namespace`` to the ElementMaker class::
 
-    >>> E = ElementMaker(namespace="http://my.ns/")
-    >>> print(ET.tostring( E.test ))
-    <test xmlns="http://my.ns/"/>
+        >>> E = ElementMaker(namespace="http://my.ns/")
+        >>> print(ET.tostring( E.test ))
+        <test xmlns="http://my.ns/"/>
 
-    >>> E = ElementMaker(namespace="http://my.ns/", nsmap={'p':'http://my.ns/'})
-    >>> print(ET.tostring( E.test ))
-    <p:test xmlns:p="http://my.ns/"/>
+        >>> E = ElementMaker(namespace="http://my.ns/", nsmap={'p':'http://my.ns/'})
+        >>> print(ET.tostring( E.test ))
+        <p:test xmlns:p="http://my.ns/"/>
     """
 
     def __init__(self, typemap=None,
@@ -177,16 +177,24 @@ class ElementMaker(object):
             typemap = typemap.copy()
         else:
             typemap = {}
-        
+
         def add_text(elem, item):
-            if len(elem):
+            try:
                 elem[-1].tail = (elem[-1].tail or "") + item
-            else:
+            except IndexError:
                 elem.text = (elem.text or "") + item
+
+        def add_cdata(elem, cdata):
+            if elem.text:
+                raise ValueError("Can't add a CDATA section. Element already has some text: %r" % elem.text)
+            elem.text = cdata
+
         if str not in typemap:
             typemap[str] = add_text
         if unicode not in typemap:
             typemap[unicode] = add_text
+        if ET.CDATA not in typemap:
+            typemap[ET.CDATA] = add_cdata
 
         def add_dict(elem, item):
             attrib = elem.attrib
@@ -217,11 +225,17 @@ class ElementMaker(object):
                 if ET.iselement(item):
                     elem.append(item)
                     continue
-                raise TypeError("bad argument type: %r" % item)
-            else:
-                v = t(elem, item)
-                if v:
-                    get(type(v))(elem, v)
+                for basetype in type(item).__mro__:
+                    # See if the typemap knows of any of this type's bases.
+                    t = get(basetype)
+                    if t is not None:
+                        break
+                else:
+                    raise TypeError("bad argument type: %s(%r)" %
+                                    (type(item).__name__, item))
+            v = t(elem, item)
+            if v:
+                get(type(v))(elem, v)
 
         return elem
 

@@ -1,7 +1,37 @@
+# Copyright (c) 2004 Ian Bicking. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+# 1. Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in
+# the documentation and/or other materials provided with the
+# distribution.
+#
+# 3. Neither the name of Ian Bicking nor the names of its contributors may
+# be used to endorse or promote products derived from this software
+# without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL IAN BICKING OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """The ``lxml.html`` tool set for HTML handling.
 """
 
-import threading
+import sys
 import re
 try:
     from urlparse import urljoin
@@ -11,31 +41,30 @@ except ImportError:
 import copy
 from lxml import etree
 from lxml.html import defs
-from lxml import cssselect
 from lxml.html._setmixin import SetMixin
 try:
-    from UserDict import DictMixin
+    from collections import MutableMapping as DictMixin
 except ImportError:
-    # DictMixin was introduced in Python 2.4
-    from lxml.html._dictmixin import DictMixin
+    # Python < 2.6
+    from UserDict import DictMixin
 try:
     set
 except NameError:
     # Python 2.3
     from sets import Set as set
 try:
-    bytes = __builtins__["bytes"]
-except (KeyError, NameError):
+    bytes
+except NameError:
     # Python < 2.6
     bytes = str
 try:
-    unicode = __builtins__["unicode"]
-except (KeyError, NameError):
+    unicode
+except NameError:
     # Python 3
     unicode = str
 try:
-    basestring = __builtins__["basestring"]
-except (KeyError, NameError):
+    basestring
+except NameError:
     # Python 3
     basestring = (str, bytes)
 
@@ -67,8 +96,8 @@ _forms_xpath = etree.XPath("descendant-or-self::form|descendant-or-self::x:form"
 _class_xpath = etree.XPath("descendant-or-self::*[@class and contains(concat(' ', normalize-space(@class), ' '), concat(' ', $class_name, ' '))]")
 _id_xpath = etree.XPath("descendant-or-self::*[@id=$id]")
 _collect_string_content = etree.XPath("string()")
-_css_url_re = re.compile(r'url\(('+'["][^"]*["]|'+"['][^']*[']|"+r'[^)]*)\)', re.I)
-_css_import_re = re.compile(r'@import "(.*?)"')
+_iter_css_urls = re.compile(r'url\(('+'["][^"]*["]|'+"['][^']*[']|"+r'[^)]*)\)', re.I).finditer
+_iter_css_imports = re.compile(r'@import "(.*?)"').finditer
 _label_xpath = etree.XPath("//label[@for=$id]|//x:label[@for=$id]",
                            namespaces={'x':XHTML_NAMESPACE})
 _archive_re = re.compile(r'[^ ]+')
@@ -85,7 +114,7 @@ def _transform_result(typ, result):
     if issubclass(typ, bytes):
         return tostring(result, encoding='utf-8')
     elif issubclass(typ, unicode):
-        return tostring(result, encoding=unicode)
+        return tostring(result, encoding='unicode')
     else:
         return result
 
@@ -184,7 +213,7 @@ class HtmlMixin(object):
 
             >>> h = fragment_fromstring('<div>Hello <b>World!</b></div>')
             >>> h.find('.//b').drop_tag()
-            >>> print(tostring(h, encoding=unicode))
+            >>> print(tostring(h, encoding='unicode'))
             <div>Hello World!</div>
         """
         parent = self.getparent()
@@ -248,30 +277,38 @@ class HtmlMixin(object):
         """
         return _collect_string_content(self)
 
-    def cssselect(self, expr):
+    def cssselect(self, expr, translator='html'):
         """
         Run the CSS expression on this element and its children,
         returning a list of the results.
 
-        Equivalent to lxml.cssselect.CSSSelect(expr)(self) -- note
-        that pre-compiling the expression can provide a substantial
+        Equivalent to lxml.cssselect.CSSSelect(expr, translator='html')(self)
+        -- note that pre-compiling the expression can provide a substantial
         speedup.
         """
-        return cssselect.CSSSelector(expr)(self)
+        # Do the import here to make the dependency optional.
+        from lxml.cssselect import CSSSelector
+        return CSSSelector(expr, translator=translator)(self)
 
     ########################################
     ## Link functions
     ########################################
 
-    def make_links_absolute(self, base_url=None, resolve_base_href=True):
+    def make_links_absolute(self, base_url=None, resolve_base_href=True,
+                            handle_failures=None):
         """
         Make all links in the document absolute, given the
         ``base_url`` for the document (the full URL where the document
-        came from), or if no ``base_url`` is given, then the ``.base_url`` of the document.
+        came from), or if no ``base_url`` is given, then the ``.base_url``
+        of the document.
 
         If ``resolve_base_href`` is true, then any ``<base href>``
         tags in the document are used *and* removed from the document.
         If it is false then any such tag is ignored.
+
+        If ``handle_failures`` is None (default), a failure to process
+        a URL will abort the processing.  If set to 'ignore', errors
+        are ignored.  If set to 'discard', failing URLs will be removed.
         """
         if base_url is None:
             base_url = self.base_url
@@ -280,25 +317,49 @@ class HtmlMixin(object):
                     "No base_url given, and the document has no base_url")
         if resolve_base_href:
             self.resolve_base_href()
-        def link_repl(href):
-            return urljoin(base_url, href)
+
+        if handle_failures == 'ignore':
+            def link_repl(href):
+                try:
+                    return urljoin(base_url, href)
+                except ValueError:
+                    return href
+        elif handle_failures == 'discard':
+            def link_repl(href):
+                try:
+                    return urljoin(base_url, href)
+                except ValueError:
+                    return None
+        elif handle_failures is None:
+            def link_repl(href):
+                return urljoin(base_url, href)
+        else:
+            raise ValueError(
+                "unexpected value for handle_failures: %r" % handle_failures)
+
         self.rewrite_links(link_repl)
 
-    def resolve_base_href(self):
+    def resolve_base_href(self, handle_failures=None):
         """
         Find any ``<base href>`` tag in the document, and apply its
         values to all links found in the document.  Also remove the
         tag once it has been applied.
+
+        If ``handle_failures`` is None (default), a failure to process
+        a URL will abort the processing.  If set to 'ignore', errors
+        are ignored.  If set to 'discard', failing URLs will be removed.
         """
         base_href = None
-        basetags = self.xpath('//base[@href]|//x:base[@href]', namespaces={'x':XHTML_NAMESPACE})
+        basetags = self.xpath('//base[@href]|//x:base[@href]',
+                              namespaces={'x': XHTML_NAMESPACE})
         for b in basetags:
             base_href = b.get('href')
             b.drop_tree()
         if not base_href:
             return
-        self.make_links_absolute(base_href, resolve_base_href=False)
-        
+        self.make_links_absolute(base_href, resolve_base_href=False,
+                                 handle_failures=handle_failures)
+
     def iterlinks(self):
         """
         Yield (element, attribute, link, pos), where attribute may be None
@@ -308,23 +369,26 @@ class HtmlMixin(object):
 
         Note: <base href> is *not* taken into account in any way.  The
         link you get is exactly the link in the document.
+
+        Note: multiple links inside of a single text string or
+        attribute value are returned in reversed order.  This makes it
+        possible to replace or delete them from the text string value
+        based on their reported text positions.  Otherwise, a
+        modification at one text position can change the positions of
+        links reported later on.
         """
         link_attrs = defs.link_attrs
-        for el in self.iter():
+        for el in self.iter(etree.Element):
             attribs = el.attrib
             tag = _nons(el.tag)
-            if tag != 'object':
-                for attrib in link_attrs:
-                    if attrib in attribs:
-                        yield (el, attrib, attribs[attrib], 0)
-            elif tag == 'object':
+            if tag == 'object':
                 codebase = None
                 ## <object> tags have attributes that are relative to
                 ## codebase
                 if 'codebase' in attribs:
                     codebase = el.get('codebase')
                     yield (el, 'codebase', codebase, 0)
-                for attrib in 'classid', 'data':
+                for attrib in ('classid', 'data'):
                     if attrib in attribs:
                         value = el.get(attrib)
                         if codebase is not None:
@@ -336,7 +400,25 @@ class HtmlMixin(object):
                         if codebase is not None:
                             value = urljoin(codebase, value)
                         yield (el, 'archive', value, match.start())
-            if tag == 'param':
+            else:
+                for attrib in link_attrs:
+                    if attrib in attribs:
+                        yield (el, attrib, attribs[attrib], 0)
+            if tag == 'meta':
+                http_equiv = attribs.get('http-equiv', '').lower()
+                if http_equiv == 'refresh':
+                    content = attribs.get('content', '')
+                    i = content.find(';')
+                    url = content[i+1:] if i >= 0 else content
+                    if url[:4].lower() == 'url=':
+                        url = url[4:]
+                    #else:
+                    # No "url=" means the redirect won't work, but we might
+                    # as well be permissive and return the entire string.
+                    if url:
+                        url, pos = _unquote_match(url, i + 5)
+                        yield (el, 'content', url, pos)
+            elif tag == 'param':
                 valuetype = el.get('valuetype') or ''
                 if valuetype.lower() == 'ref':
                     ## FIXME: while it's fine we *find* this link,
@@ -346,16 +428,29 @@ class HtmlMixin(object):
                     ## doesn't have a valuetype="ref" (which seems to be the norm)
                     ## http://www.w3.org/TR/html401/struct/objects.html#adef-valuetype
                     yield (el, 'value', el.get('value'), 0)
-            if tag == 'style' and el.text:
-                for match in _css_url_re.finditer(el.text):
-                    url, start = _unquote_match(match.group(1), match.start(1))
-                    yield (el, None, url, start)
-                for match in _css_import_re.finditer(el.text):
-                    yield (el, None, match.group(1), match.start(1))
+            elif tag == 'style' and el.text:
+                urls = [
+                    # (start_pos, url)
+                    _unquote_match(match.group(1), match.start(1))[::-1]
+                    for match in _iter_css_urls(el.text)
+                    ] + [
+                    (match.start(1), match.group(1))
+                    for match in _iter_css_imports(el.text)
+                    ]
+                if urls:
+                    # sort by start pos to bring both match sets back into order
+                    # and reverse the list to report correct positions despite
+                    # modifications
+                    urls.sort(reverse=True)
+                    for start, url in urls:
+                        yield (el, None, url, start)
             if 'style' in attribs:
-                for match in _css_url_re.finditer(attribs['style']):
-                    url, start = _unquote_match(match.group(1), match.start(1))
-                    yield (el, 'style', url, start)
+                urls = list(_iter_css_urls(attribs['style']))
+                if urls:
+                    # return in reversed order to simplify in-place modifications
+                    for match in urls[::-1]:
+                        url, start = _unquote_match(match.group(1), match.start(1))
+                        yield (el, 'style', url, start)
 
     def rewrite_links(self, link_repl_func, resolve_base_href=True,
                       base_href=None):
@@ -378,9 +473,11 @@ class HtmlMixin(object):
         if base_href is not None:
             # FIXME: this can be done in one pass with a wrapper
             # around link_repl_func
-            self.make_links_absolute(base_href, resolve_base_href=resolve_base_href)
+            self.make_links_absolute(
+                base_href, resolve_base_href=resolve_base_href)
         elif resolve_base_href:
             self.resolve_base_href()
+
         for el, attrib, link, pos in self.iterlinks():
             new_link = link_repl_func(link.strip())
             if new_link == link:
@@ -392,18 +489,18 @@ class HtmlMixin(object):
                 else:
                     del el.attrib[attrib]
                 continue
+
             if attrib is None:
                 new = el.text[:pos] + new_link + el.text[pos+len(link):]
                 el.text = new
             else:
-                cur = el.attrib[attrib]
+                cur = el.get(attrib)
                 if not pos and len(cur) == len(link):
-                    # Most common case
-                    el.attrib[attrib] = new_link
+                    new = new_link  # most common case
                 else:
                     new = cur[:pos] + new_link + cur[pos+len(link):]
-                    el.attrib[attrib] = new
-                    
+                el.set(attrib, new)
+
 
 class _MethodFunc(object):
     """
@@ -426,14 +523,14 @@ class _MethodFunc(object):
             doc = fromstring(doc, **kw)
         else:
             if 'copy' in kw:
-                copy = kw.pop('copy')
+                make_a_copy = kw.pop('copy')
             else:
-                copy = self.copy
-            if copy:
+                make_a_copy = self.copy
+            if make_a_copy:
                 doc = copy.deepcopy(doc)
         meth = getattr(doc, self.name)
         result = meth(*args, **kw)
-        # FIXME: this None test is a bit sloppy 
+        # FIXME: this None test is a bit sloppy
         if result is None:
             # Then return what we got in
             return _transform_result(result_type, doc)
@@ -505,13 +602,22 @@ class HtmlElementClassLookup(etree.CustomElementClassLookup):
 # parsing
 ################################################################################
 
-def document_fromstring(html, parser=None, **kw):
+_looks_like_full_html_unicode = re.compile(
+    unicode(r'^\s*<(?:html|!doctype)'), re.I).match
+_looks_like_full_html_bytes = re.compile(
+    r'^\s*<(?:html|!doctype)'.encode('ascii'), re.I).match
+
+def document_fromstring(html, parser=None, ensure_head_body=False, **kw):
     if parser is None:
         parser = html_parser
     value = etree.fromstring(html, parser, **kw)
     if value is None:
         raise etree.ParserError(
             "Document is empty")
+    if ensure_head_body and value.find('head') is None:
+        value.insert(0, Element('head'))
+    if ensure_head_body and value.find('body') is None:
+        value.append(Element('body'))
     return value
 
 def fragments_fromstring(html, no_leading_text=False, base_url=None,
@@ -529,9 +635,14 @@ def fragments_fromstring(html, no_leading_text=False, base_url=None,
     if parser is None:
         parser = html_parser
     # FIXME: check what happens when you give html with a body, head, etc.
-    start = html[:20].lstrip().lower()
-    if not start.startswith('<html') and not start.startswith('<!doctype'):
-        html = '<html><body>%s</body></html>' % html
+    if isinstance(html, bytes):
+        if not _looks_like_full_html_bytes(html):
+            # can't use %-formatting in early Py3 versions
+            html = ('<html><body>'.encode('ascii') + html +
+                    '</body></html>'.encode('ascii'))
+    else:
+        if not _looks_like_full_html_unicode(html):
+            html = '<html><body>%s</body></html>' % html
     doc = document_fromstring(html, parser=parser, base_url=base_url, **kw)
     assert _nons(doc.tag) == 'html'
     bodies = [e for e in doc if _nons(e.tag) == 'body']
@@ -556,23 +667,33 @@ def fragment_fromstring(html, create_parent=False, base_url=None,
     element.
 
     If create_parent is true (or is a tag name) then a parent node
-    will be created to encapsulate the HTML in a single element.
+    will be created to encapsulate the HTML in a single element.  In
+    this case, leading or trailing text is allowed.
 
     base_url will set the document's base_url attribute (and the tree's docinfo.URL)
     """
     if parser is None:
         parser = html_parser
+
+    accept_leading_text = bool(create_parent)
+
+    elements = fragments_fromstring(
+        html, parser=parser, no_leading_text=not accept_leading_text,
+        base_url=base_url, **kw)
+
     if create_parent:
         if not isinstance(create_parent, basestring):
             create_parent = 'div'
-        return fragment_fromstring('<%s>%s</%s>' % (
-            create_parent, html, create_parent),
-                                   parser=parser, base_url=base_url, **kw)
-    elements = fragments_fromstring(html, parser=parser, no_leading_text=True,
-                                    base_url=base_url, **kw)
+        new_root = Element(create_parent)
+        if elements:
+            if isinstance(elements[0], basestring):
+                new_root.text = elements[0]
+                del elements[0]
+            new_root.extend(elements)
+        return new_root
+
     if not elements:
-        raise etree.ParserError(
-            "No elements found")
+        raise etree.ParserError('No elements found')
     if len(elements) > 1:
         raise etree.ParserError(
             "Multiple elements found (%s)"
@@ -595,12 +716,14 @@ def fromstring(html, base_url=None, parser=None, **kw):
     """
     if parser is None:
         parser = html_parser
-    start = html[:10].lstrip().lower()
-    if start.startswith('<html') or start.startswith('<!doctype'):
-        # Looks like a full HTML document
-        return document_fromstring(html, parser=parser, base_url=base_url, **kw)
-    # otherwise, lets parse it out...
+    if isinstance(html, bytes):
+        is_full_html = _looks_like_full_html_bytes(html)
+    else:
+        is_full_html = _looks_like_full_html_unicode(html)
     doc = document_fromstring(html, parser=parser, base_url=base_url, **kw)
+    if is_full_html:
+        return doc
+    # otherwise, lets parse it out...
     bodies = doc.findall('body')
     if not bodies:
         bodies = doc.findall('{%s}body' % XHTML_NAMESPACE)
@@ -633,6 +756,8 @@ def fromstring(html, base_url=None, parser=None, **kw):
                 # We don't care about text or tail in a head
                 other_head.drop_tree()
         return doc
+    if body is None:
+        return doc
     if (len(body) == 1 and (not body.text or not body.text.strip())
         and (not body[-1].tail or not body[-1].tail.strip())):
         # The body has just one element, so it was probably a single
@@ -663,7 +788,7 @@ def parse(filename_or_url, parser=None, base_url=None, **kw):
 def _contains_block_level_tag(el):
     # FIXME: I could do this with XPath, but would that just be
     # unnecessarily slow?
-    for el in el.iter():
+    for el in el.iter(etree.Element):
         if _nons(el.tag) in defs.block_tags:
             return True
     return False
@@ -703,7 +828,7 @@ class FormElement(HtmlElement):
         return FieldsDict(self.inputs)
     def _fields__set(self, value):
         prev_keys = self.fields.keys()
-        for key, value in value.iteritems():
+        for key, value in value.items():
             if key in prev_keys:
                 prev_keys.remove(key)
             self.fields[key] = value
@@ -818,21 +943,31 @@ def submit_form(form, extra_values=None, open_http=None):
         values.extend(extra_values)
     if open_http is None:
         open_http = open_http_urllib
-    return open_http(form.method, form.action, values)
+    if form.action:
+        url = form.action
+    else:
+        url = form.base_url
+    return open_http(form.method, url, values)
 
 def open_http_urllib(method, url, values):
-    import urllib
+    if not url:
+        raise ValueError("cannot submit, no URL provided")
     ## FIXME: should test that it's not a relative URL or something
+    try:
+        from urllib import urlencode, urlopen
+    except ImportError: # Python 3
+        from urllib.request import urlopen
+        from urllib.parse import urlencode
     if method == 'GET':
         if '?' in url:
             url += '&'
         else:
             url += '?'
-        url += urllib.urlencode(values)
+        url += urlencode(values)
         data = None
     else:
-        data = urllib.urlencode(values)
-    return urllib.urlopen(url, data)
+        data = urlencode(values)
+    return urlopen(url, data)
 
 class FieldsDict(DictMixin):
 
@@ -849,6 +984,10 @@ class FieldsDict(DictMixin):
         return self.inputs.keys()
     def __contains__(self, item):
         return item in self.inputs
+    def __iter__(self):
+        return iter(self.inputs.keys())
+    def __len__(self):
+        return len(self.inputs)
 
     def __repr__(self):
         return '<%s for form %s>' % (
@@ -948,7 +1087,7 @@ class InputMixin(object):
             type = ''
         return '<%s %x name=%r%s>' % (
             self.__class__.__name__, id(self), self.name, type)
-    
+
 class TextareaElement(InputMixin, HtmlElement):
     """
     ``<textarea>`` element.  You can get the name with ``.name`` and
@@ -959,11 +1098,22 @@ class TextareaElement(InputMixin, HtmlElement):
         """
         Get/set the value (which is the contents of this element)
         """
-        return self.text or ''
+        content = self.text or ''
+        if self.tag.startswith("{%s}" % XHTML_NAMESPACE):
+            serialisation_method = 'xml'
+        else:
+            serialisation_method = 'html'
+        for el in self:
+            # it's rare that we actually get here, so let's not use ''.join()
+            content += etree.tostring(
+                el, method=serialisation_method, encoding='unicode')
+        return content
     def _value__set(self, value):
+        del self[:]
         self.text = value
     def _value__del(self):
         self.text = ''
+        del self[:]
     value = property(_value__get, _value__set, _value__del, doc=_value__get.__doc__)
 
 HtmlElementClassLookup._default_element_classes['textarea'] = TextareaElement
@@ -991,9 +1141,12 @@ class SelectElement(InputMixin, HtmlElement):
         if self.multiple:
             return MultipleSelectOptions(self)
         for el in _options_xpath(self):
-            if 'selected' in el.attrib:
+            if el.get('selected') is not None:
                 value = el.get('value')
-                # FIXME: If value is None, what to return?, get_text()?
+                if value is None:
+                    value = el.text or ''
+                if value:
+                    value = value.strip()
                 return value
         return None
 
@@ -1006,9 +1159,14 @@ class SelectElement(InputMixin, HtmlElement):
             self.value.update(value)
             return
         if value is not None:
+            value = value.strip()
             for el in _options_xpath(self):
-                # FIXME: also if el.get('value') is None?
-                if el.get('value') == value:
+                opt_value = el.get('value')
+                if opt_value is None:
+                    opt_value = el.text or ''
+                if opt_value:
+                    opt_value = opt_value.strip()
+                if opt_value == value:
                     checked_option = el
                     break
             else:
@@ -1034,7 +1192,15 @@ class SelectElement(InputMixin, HtmlElement):
         All the possible values this select can have (the ``value``
         attribute of all the ``<option>`` elements.
         """
-        return [el.get('value') for el in _options_xpath(self)]
+        options = []
+        for el in _options_xpath(self):
+            value = el.get('value')
+            if value is None:
+                value = el.text or ''
+            if value:
+                value = value.strip()
+            options.append(value)
+        return options
     value_options = property(value_options, doc=value_options.__doc__)
 
     def _multiple__get(self):
@@ -1071,11 +1237,22 @@ class MultipleSelectOptions(SetMixin):
 
     def __iter__(self):
         for option in self.options:
-            yield option.get('value')
+            if 'selected' in option.attrib:
+                opt_value = option.get('value')
+                if opt_value is None:
+                    opt_value = option.text or ''
+                if opt_value:
+                    opt_value = opt_value.strip()
+                yield opt_value
 
     def add(self, item):
         for option in self.options:
-            if option.get('value') == item:
+            opt_value = option.get('value')
+            if opt_value is None:
+                opt_value = option.text or ''
+            if opt_value:
+                opt_value = opt_value.strip()
+            if opt_value == item:
                 option.set('selected', '')
                 break
         else:
@@ -1084,7 +1261,12 @@ class MultipleSelectOptions(SetMixin):
 
     def remove(self, item):
         for option in self.options:
-            if option.get('value') == item:
+            opt_value = option.get('value')
+            if opt_value is None:
+                opt_value = option.text or ''
+            if opt_value:
+                opt_value = opt_value.strip()
+            if opt_value == item:
                 if 'selected' in option.attrib:
                     del option.attrib['selected']
                 else:
@@ -1181,6 +1363,13 @@ class CheckboxGroup(list):
         self.value.clear()
     value = property(_value__get, _value__set, _value__del, doc=_value__get.__doc__)
 
+    def value_options(self):
+        """
+        Returns a list of all the possible values.
+        """
+        return [el.get('value') for el in self]
+    value_options = property(value_options, doc=value_options.__doc__)
+
     def __repr__(self):
         return '%s(%s)' % (
             self.__class__.__name__, list.__repr__(self))
@@ -1240,9 +1429,9 @@ class InputElement(InputMixin, HtmlElement):
     Checkboxes and radios have the attribute ``input.checkable ==
     True`` (for all others it is false) and a boolean attribute
     ``.checked``.
-    
+
     """
-    
+
     ## FIXME: I'm a little uncomfortable with the use of .checked
     def _value__get(self):
         """
@@ -1321,7 +1510,7 @@ class LabelElement(HtmlElement):
     Label elements are linked to other elements with their ``for``
     attribute.  You can access this element with ``label.for_element``.
     """
-    
+
     def _for_element__get(self):
         """
         Get/set the element this label points to.  Return None if it
@@ -1358,11 +1547,10 @@ def html_to_xhtml(html):
     except AttributeError:
         pass
     prefix = "{%s}" % XHTML_NAMESPACE
-    for el in html.iter():
+    for el in html.iter(etree.Element):
         tag = el.tag
-        if isinstance(tag, basestring):
-            if tag[0] != '{':
-                el.tag = prefix + tag
+        if tag[0] != '{':
+            el.tag = prefix + tag
 
 def xhtml_to_html(xhtml):
     """Convert all tags in an XHTML tree to HTML by removing their
@@ -1385,9 +1573,9 @@ __bytes_replace_meta_content_type = re.compile(
     r'<meta http-equiv="Content-Type"[^>]*>'.encode('ASCII')).sub
 
 def tostring(doc, pretty_print=False, include_meta_content_type=False,
-             encoding=None, method="html"):
+             encoding=None, method="html", with_tail=True, doctype=None):
     """Return an HTML string representation of the document.
- 
+
     Note: if include_meta_content_type is true this will create a
     ``<meta http-equiv="Content-Type" ...>`` tag in the head;
     regardless of the value of include_meta_content_type any existing
@@ -1395,13 +1583,21 @@ def tostring(doc, pretty_print=False, include_meta_content_type=False,
 
     The ``encoding`` argument controls the output encoding (defauts to
     ASCII, with &#...; character references for any characters outside
-    of ASCII).
+    of ASCII).  Note that you can pass the name ``'unicode'`` as
+    ``encoding`` argument to serialise to a Unicode string.
 
     The ``method`` argument defines the output method.  It defaults to
     'html', but can also be 'xml' for xhtml output, or 'text' to
-    serialise to plain text without markup.  Note that you can pass
-    the builtin ``unicode`` type as ``encoding`` argument to serialise
-    to a unicode string.
+    serialise to plain text without markup.
+
+    To leave out the tail text of the top-level element that is being
+    serialised, pass ``with_tail=False``.
+
+    The ``doctype`` option allows passing in a plain string that will
+    be serialised before the XML tree.  Note that passing in non
+    well-formed content here will make the XML output non well-formed.
+    Also, an existing doctype in the document tree will not be removed
+    when serialising an ElementTree instance.
 
     Example::
 
@@ -1419,12 +1615,30 @@ def tostring(doc, pretty_print=False, include_meta_content_type=False,
         >>> html.tostring(root, method='text')
         b'Helloworld!'
 
-        >>> html.tostring(root, method='text', encoding=unicode)
+        >>> html.tostring(root, method='text', encoding='unicode')
         u'Helloworld!'
+
+        >>> root = html.fragment_fromstring('<div><p>Hello<br>world!</p>TAIL</div>')
+        >>> html.tostring(root[0], method='text', encoding='unicode')
+        u'Helloworld!TAIL'
+
+        >>> html.tostring(root[0], method='text', encoding='unicode', with_tail=False)
+        u'Helloworld!'
+
+        >>> doc = html.document_fromstring('<p>Hello<br>world!</p>')
+        >>> html.tostring(doc, method='html', encoding='unicode')
+        u'<html><body><p>Hello<br>world!</p></body></html>'
+
+        >>> print(html.tostring(doc, method='html', encoding='unicode',
+        ...          doctype='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'
+        ...                  ' "http://www.w3.org/TR/html4/strict.dtd">'))
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+        <html><body><p>Hello<br>world!</p></body></html>
     """
     html = etree.tostring(doc, method=method, pretty_print=pretty_print,
-                          encoding=encoding)
-    if not include_meta_content_type:
+                          encoding=encoding, with_tail=with_tail,
+                          doctype=doctype)
+    if method == 'html' and not include_meta_content_type:
         if isinstance(html, str):
             html = __str_replace_meta_content_type('', html)
         else:
@@ -1433,33 +1647,57 @@ def tostring(doc, pretty_print=False, include_meta_content_type=False,
 
 tostring.__doc__ = __fix_docstring(tostring.__doc__)
 
-def open_in_browser(doc):
+def open_in_browser(doc, encoding=None):
     """
-    Open the HTML document in a web browser (saving it to a temporary
-    file to open it).
+    Open the HTML document in a web browser, saving it to a temporary
+    file to open it.  Note that this does not delete the file after
+    use.  This is mainly meant for debugging.
     """
     import os
     import webbrowser
+    import tempfile
+    if not isinstance(doc, etree._ElementTree):
+        doc = etree.ElementTree(doc)
+    handle, fn = tempfile.mkstemp(suffix='.html')
+    f = os.fdopen(handle, 'wb')
     try:
-        write_doc = doc.write
-    except AttributeError:
-        write_doc = etree.ElementTree(element=doc).write
-    fn = os.tempnam() + '.html'
-    write_doc(fn, method="html")
+        doc.write(f, method="html", encoding=encoding or doc.docinfo.encoding or "UTF-8")
+    finally:
+        # we leak the file itself here, but we should at least close it
+        f.close()
     url = 'file://' + fn.replace(os.path.sep, '/')
     print(url)
     webbrowser.open(url)
-    
+
 ################################################################################
 # configure Element class lookup
 ################################################################################
 
 class HTMLParser(etree.HTMLParser):
+    """An HTML parser that is configured to return lxml.html Element
+    objects.
+    """
     def __init__(self, **kwargs):
         super(HTMLParser, self).__init__(**kwargs)
         self.set_element_class_lookup(HtmlElementClassLookup())
 
 class XHTMLParser(etree.XMLParser):
+    """An XML parser that is configured to return lxml.html Element
+    objects.
+
+    Note that this parser is not really XHTML aware unless you let it
+    load a DTD that declares the HTML entities.  To do this, make sure
+    you have the XHTML DTDs installed in your catalogs, and create the
+    parser like this::
+
+        >>> parser = XHTMLParser(load_dtd=True)
+
+    If you additionally want to validate the document, use this::
+
+        >>> parser = XHTMLParser(dtd_validation=True)
+
+    For catalog support, see http://www.xmlsoft.org/catalog.html.
+    """
     def __init__(self, **kwargs):
         super(XHTMLParser, self).__init__(**kwargs)
         self.set_element_class_lookup(HtmlElementClassLookup())

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -63,13 +63,11 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class AncestorsIterator</h1><p class="nomargin-top"></p>
 <pre class="base-tree">
-        object --+        
-                 |        
-<a href="lxml.etree._ElementTagMatcher-class.html" onclick="show_private();">_ElementTagMatcher</a> --+    
-                     |    
-      <a href="lxml.etree._ElementIterator-class.html" onclick="show_private();">_ElementIterator</a> --+
-                         |
-                        <strong class="uidshort">AncestorsIterator</strong>
+           object --+    
+                    |    
+<a href="lxml.etree._ElementMatchIterator-class.html" onclick="show_private();">_ElementMatchIterator</a> --+
+                        |
+                       <strong class="uidshort">AncestorsIterator</strong>
 </pre>
 
 <hr />
@@ -95,25 +93,6 @@ Iterates over the ancestors of an element (from parent to parent).
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="lxml.etree.AncestorsIterator-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">node</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
-      x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">a new object with type S, a subtype of T</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -132,20 +111,24 @@ Iterates over the ancestors of an element (from parent to parent).
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ElementIterator-class.html" onclick="show_private();">_ElementIterator</a></code></b>:
-      <code><a href="lxml.etree._ElementIterator-class.html#__iter__">__iter__</a></code>,
-      <code><a href="lxml.etree._ElementIterator-class.html#__next__">__next__</a></code>,
-      <code><a href="lxml.etree._ElementIterator-class.html#next">next</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lxml.etree._ElementMatchIterator-class.html" onclick="show_private();">_ElementMatchIterator</a></code></b>:
+      <code><a href="lxml.etree._ElementMatchIterator-class.html#__iter__">__iter__</a></code>,
+      <code><a href="lxml.etree._ElementMatchIterator-class.html#__next__">__next__</a></code>,
+      <code><a href="lxml.etree._ElementMatchIterator-class.html#next">next</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -193,31 +176,6 @@ Iterates over the ancestors of an element (from parent to parent).
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">node</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  x.__init__(...) initializes x; see x.__class__.__doc__ for signature
-  <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -268,14 +226,14 @@ Iterates over the ancestors of an element (from parent to parent).
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:37 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

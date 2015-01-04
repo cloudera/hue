@@ -11,13 +11,14 @@ class NamespaceRegistryError(LxmlRegistryError):
     pass
 
 
+@cython.internal
 cdef class _NamespaceRegistry:
     u"Dictionary-like namespace registry"
     cdef object _ns_uri
-    cdef object _ns_uri_utf
+    cdef bytes _ns_uri_utf
     cdef dict _entries
     cdef char* _c_ns_uri_utf
-    def __init__(self, ns_uri):
+    def __cinit__(self, ns_uri):
         self._ns_uri = ns_uri
         if ns_uri is None:
             self._ns_uri_utf = None
@@ -32,14 +33,17 @@ cdef class _NamespaceRegistry:
 
         Forgivingly update the registry.
 
-        If registered values do not match the required type for this
-        registry, or if their name starts with '_', they will be
-        silently discarded. This allows registrations at the module or
-        class level using vars(), globals() etc."""
+        ``class_dict_iterable`` may be a dict or some other iterable
+        that yields (name, value) pairs.
+
+        If a value does not match the required type for this registry,
+        or if the name starts with '_', it will be silently discarded.
+        This allows registrations at the module or class level using
+        vars(), globals() etc."""
         if hasattr(class_dict_iterable, u'items'):
             class_dict_iterable = class_dict_iterable.items()
         for name, item in class_dict_iterable:
-            if (name is None or name[:1] != u'_') and callable(item):
+            if (name is None or name[:1] != '_') and callable(item):
                 self[name] = item
 
     def __getitem__(self, name):
@@ -76,8 +80,10 @@ cdef class _NamespaceRegistry:
         return iter(self._entries.items())
 
     def clear(self):
-        python.PyDict_Clear(self._entries)
+        self._entries.clear()
 
+@cython.final
+@cython.internal
 cdef class _ClassNamespaceRegistry(_NamespaceRegistry):
     u"Dictionary-like registry for namespace implementation classes"
     def __setitem__(self, name, item):
@@ -98,9 +104,11 @@ cdef class ElementNamespaceClassLookup(FallbackElementClassLookup):
     Element class lookup scheme that searches the Element class in the
     Namespace registry.
     """
-    cdef object _namespace_registries
-    def __init__(self, ElementClassLookup fallback=None):
+    cdef dict _namespace_registries
+    def __cinit__(self):
         self._namespace_registries = {}
+
+    def __init__(self, ElementClassLookup fallback=None):
         FallbackElementClassLookup.__init__(self, fallback)
         self._lookup_function = _find_nselement_class
 
@@ -108,8 +116,9 @@ cdef class ElementNamespaceClassLookup(FallbackElementClassLookup):
         u"""get_namespace(self, ns_uri)
 
         Retrieve the namespace object associated with the given URI.
+        Pass None for the empty namespace.
 
-        Creates a new one if it does not yet exist."""
+        Creates a new namespace object if it does not yet exist."""
         if ns_uri:
             ns_utf = _utf8(ns_uri)
         else:
@@ -125,7 +134,6 @@ cdef object _find_nselement_class(state, _Document doc, xmlNode* c_node):
     cdef python.PyObject* dict_result
     cdef ElementNamespaceClassLookup lookup
     cdef _NamespaceRegistry registry
-    cdef char* c_namespace_utf
     if state is None:
         return _lookupDefaultElementClass(None, doc, c_node)
 
@@ -136,7 +144,7 @@ cdef object _find_nselement_class(state, _Document doc, xmlNode* c_node):
     c_namespace_utf = _getNs(c_node)
     if c_namespace_utf is not NULL:
         dict_result = python.PyDict_GetItem(
-            lookup._namespace_registries, c_namespace_utf)
+            lookup._namespace_registries, <unsigned char*>c_namespace_utf)
     else:
         dict_result = python.PyDict_GetItem(
             lookup._namespace_registries, None)
@@ -146,7 +154,7 @@ cdef object _find_nselement_class(state, _Document doc, xmlNode* c_node):
 
         if c_node.name is not NULL:
             dict_result = python.PyDict_GetItem(
-                classes, c_node.name)
+                classes, <unsigned char*>c_node.name)
         else:
             dict_result = NULL
 
@@ -172,10 +180,7 @@ def FunctionNamespace(ns_uri):
 
     Creates a new one if it does not yet exist. A function namespace
     can only be used to register extension functions."""
-    if ns_uri:
-        ns_utf = _utf8(ns_uri)
-    else:
-        ns_utf = None
+    ns_utf = _utf8(ns_uri) if ns_uri else None
     try:
         return __FUNCTION_NAMESPACE_REGISTRIES[ns_utf]
     except KeyError:
@@ -183,6 +188,7 @@ def FunctionNamespace(ns_uri):
                    _XPathFunctionNamespaceRegistry(ns_uri)
         return registry
 
+@cython.internal
 cdef class _FunctionNamespaceRegistry(_NamespaceRegistry):
     def __setitem__(self, name, item):
         if not callable(item):
@@ -196,9 +202,11 @@ cdef class _FunctionNamespaceRegistry(_NamespaceRegistry):
     def __repr__(self):
         return u"FunctionNamespace(%r)" % self._ns_uri
 
+@cython.final
+@cython.internal
 cdef class _XPathFunctionNamespaceRegistry(_FunctionNamespaceRegistry):
     cdef object _prefix
-    cdef object _prefix_utf
+    cdef bytes _prefix_utf
 
     property prefix:
         u"Namespace prefix for extension functions."
@@ -229,16 +237,3 @@ cdef list _find_all_extension_prefixes():
                 ns_prefixes.append(
                     (registry._prefix_utf, registry._ns_uri_utf))
     return ns_prefixes
-
-cdef object _find_extension(ns_uri_utf, name_utf):
-    cdef python.PyObject* dict_result
-    dict_result = python.PyDict_GetItem(
-        __FUNCTION_NAMESPACE_REGISTRIES, ns_uri_utf)
-    if dict_result is NULL:
-        return None
-    extensions = (<_NamespaceRegistry>dict_result)._entries
-    dict_result = python.PyDict_GetItem(extensions, name_utf)
-    if dict_result is NULL:
-        return None
-    else:
-        return <object>dict_result

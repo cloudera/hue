@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -42,8 +42,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="lxml-module.html">Package&nbsp;lxml</a> ::
-        <a href="lxml.html-module.html">Package&nbsp;html</a> ::
+        lxml ::
+        html ::
+        CheckboxGroup ::
         Class&nbsp;CheckboxGroup
       </span>
     </td>
@@ -71,11 +72,11 @@ object --+
 </pre>
 
 <hr />
-<p>Represents a group of checkboxes (<tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=checkbox&gt;</span></tt>) that
+<p>Represents a group of checkboxes (<tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;input type=checkbox&gt;</tt>) that
 have the same name.</p>
-<p>In addition to using this like a list, the <tt class="rst-docutils literal"><span class="pre">.value</span></tt> attribute
+<p>In addition to using this like a list, the <tt class="rst-docutils literal">.value</tt> attribute
 returns a set-like object that you can add to or remove from to
-check and uncheck checkboxes.  You can also use <tt class="rst-docutils literal"><span class="pre">.value_options</span></tt>
+check and uncheck checkboxes.  You can also use <tt class="rst-docutils literal">.value_options</tt>
 to get the possible values.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
@@ -176,7 +177,6 @@ uncheck individual checkboxes according to their value.</td>
       <code>__getitem__</code>,
       <code>__getslice__</code>,
       <code>__gt__</code>,
-      <code>__hash__</code>,
       <code>__iadd__</code>,
       <code>__imul__</code>,
       <code>__init__</code>,
@@ -191,6 +191,7 @@ uncheck individual checkboxes according to their value.</td>
       <code>__rmul__</code>,
       <code>__setitem__</code>,
       <code>__setslice__</code>,
+      <code>__sizeof__</code>,
       <code>append</code>,
       <code>count</code>,
       <code>extend</code>,
@@ -203,10 +204,37 @@ uncheck individual checkboxes according to their value.</td>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>list</code></b>:
+      <code>__hash__</code>
       </p>
     </td>
   </tr>
@@ -235,6 +263,14 @@ uncheck individual checkboxes according to their value.</td>
         <a href="lxml.html.CheckboxGroup-class.html#value" class="summary-name">value</a><br />
       Return a set-like object that can be modified to check or
 uncheck individual checkboxes according to their value.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="lxml.html.CheckboxGroup-class.html#value_options" class="summary-name">value_options</a><br />
+      Returns a list of all the possible values.
     </td>
   </tr>
   <tr>
@@ -330,6 +366,21 @@ uncheck individual checkboxes according to their value.
   </dl>
 </td></tr></table>
 </div>
+<a name="value_options"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">value_options</h3>
+  Returns a list of all the possible values.
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.value_options(<span class="summary-sig-arg">self</span>)</span>
+        - Returns a list of all the possible values.
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -355,14 +406,14 @@ uncheck individual checkboxes according to their value.
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:39 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -61,7 +61,7 @@
 </table>
 <!-- ==================== PACKAGE DESCRIPTION ==================== -->
 <h1 class="epydoc">Package html</h1><p class="nomargin-top"><span class="codelink"><a href="lxml.html-pysrc.html">source&nbsp;code</a></span></p>
-The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">lxml.html</span></tt> tool set for HTML handling.
+The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">lxml.html</tt> tool set for HTML handling.
 
 <!-- ==================== SUBMODULES ==================== -->
 <a name="section-Submodules"></a>
@@ -83,14 +83,13 @@ The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutil
   <tr><td class="summary">
   <ul class="nomargin">
     <li> <strong class="uidlink"><a href="lxml.html.ElementSoup-module.html">lxml.html.ElementSoup</a></strong>: <em class="summary">Legacy interface to the BeautifulSoup HTML parser.</em>    </li>
-    <li class="private"> <strong class="uidlink">lxml.html._dictmixin</strong>    </li>
     <li class="private"> <strong class="uidlink">lxml.html._setmixin</strong>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.builder-module.html">lxml.html.builder</a></strong>: <em class="summary">A set of HTML generator tags for building HTML documents.</em>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.clean-module.html">lxml.html.clean</a></strong>: <em class="summary">A cleanup tool for HTML.</em>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.defs-module.html">lxml.html.defs</a></strong>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.diff-module.html">lxml.html.diff</a></strong>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.formfill-module.html">lxml.html.formfill</a></strong>    </li>
-    <li> <strong class="uidlink"><a href="lxml.html.html5parser-module.html">lxml.html.html5parser</a></strong>: <em class="summary">An interface to html5lib.</em>    </li>
+    <li> <strong class="uidlink"><a href="lxml.html.html5parser-module.html">lxml.html.html5parser</a></strong>: <em class="summary">An interface to html5lib that mimics the lxml.html interface.</em>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.soupparser-module.html">lxml.html.soupparser</a></strong>: <em class="summary">External interface to the BeautifulSoup HTML parser.</em>    </li>
     <li> <strong class="uidlink"><a href="lxml.html.usedoctest-module.html">lxml.html.usedoctest</a></strong>: <em class="summary">Doctest module for HTML comparison.</em>    </li>
   </ul></td></tr>
@@ -118,6 +117,22 @@ The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutil
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="str-class.html" class="summary-name" onclick="show_private();">bytes</a><br />
+      str(object='') -&gt; string
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="str-class.html" class="summary-name" onclick="show_private();">unicode</a><br />
+      str(object='') -&gt; string
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="lxml.html.HtmlMixin-class.html" class="summary-name" onclick="show_private();">HtmlMixin</a>
     </td>
   </tr>
@@ -127,7 +142,10 @@ The <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutil
     </td><td class="summary">
         <a href="lxml.html._MethodFunc-class.html" class="summary-name" onclick="show_private();">_MethodFunc</a><br />
       An object that represents a method on an element as a function;
-the function takes either an element or an HTML string.
+the function takes either an element or an HTML string.  It
+returns whatever the function normally returns, or if the function
+works in-place (and so returns None) it returns a serialized form
+of the resulting document.
     </td>
   </tr>
 <tr class="private">
@@ -202,7 +220,8 @@ the function takes either an element or an HTML string.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.TextareaElement-class.html" class="summary-name" onclick="show_private();">TextareaElement</a><br />
-      <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;textarea&gt;</span></tt> element.
+      <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;textarea&gt;</tt> element.  You can get the name with <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">.name</tt> and
+get/set the value with <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">.value</tt>
     </td>
   </tr>
 <tr class="private">
@@ -210,7 +229,7 @@ the function takes either an element or an HTML string.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.SelectElement-class.html" class="summary-name" onclick="show_private();">SelectElement</a><br />
-      <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;select&gt;</span></tt> element.
+      <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;select&gt;</tt> element.  You can get the name with <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">.name</tt>.
     </td>
   </tr>
 <tr class="private">
@@ -218,7 +237,7 @@ the function takes either an element or an HTML string.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.MultipleSelectOptions-class.html" class="summary-name" onclick="show_private();">MultipleSelectOptions</a><br />
-      Represents all the selected options in a <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;select</span> <span class="pre">multiple&gt;</span></tt> element.
+      Represents all the selected options in a <tt class="rst-rst-docutils literal rst-docutils literal">&lt;select multiple&gt;</tt> element.
     </td>
   </tr>
 <tr class="private">
@@ -226,7 +245,7 @@ the function takes either an element or an HTML string.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.RadioGroup-class.html" class="summary-name" onclick="show_private();">RadioGroup</a><br />
-      This object represents several <tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=radio&gt;</span></tt> elements
+      This object represents several <tt class="rst-rst-docutils literal rst-docutils literal">&lt;input type=radio&gt;</tt> elements
 that have the same name.
     </td>
   </tr>
@@ -235,7 +254,7 @@ that have the same name.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.CheckboxGroup-class.html" class="summary-name" onclick="show_private();">CheckboxGroup</a><br />
-      Represents a group of checkboxes (<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=checkbox&gt;</span></tt>) that
+      Represents a group of checkboxes (<tt class="rst-rst-docutils literal rst-docutils literal">&lt;input type=checkbox&gt;</tt>) that
 have the same name.
     </td>
   </tr>
@@ -253,7 +272,7 @@ checkboxes with the same name.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.InputElement-class.html" class="summary-name" onclick="show_private();">InputElement</a><br />
-      Represents an <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;input&gt;</span></tt> element.
+      Represents an <tt class="rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;input&gt;</tt> element.
     </td>
   </tr>
 <tr class="private">
@@ -261,21 +280,25 @@ checkboxes with the same name.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="lxml.html.LabelElement-class.html" class="summary-name" onclick="show_private();">LabelElement</a><br />
-      Represents a <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal"><span class="pre">&lt;label&gt;</span></tt> element.
+      Represents a <tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">&lt;label&gt;</tt> element.
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.html.HTMLParser-class.html" class="summary-name" onclick="show_private();">HTMLParser</a>
+        <a href="lxml.html.HTMLParser-class.html" class="summary-name" onclick="show_private();">HTMLParser</a><br />
+      An HTML parser that is configured to return lxml.html Element
+objects.
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.html.XHTMLParser-class.html" class="summary-name" onclick="show_private();">XHTMLParser</a>
+        <a href="lxml.html.XHTMLParser-class.html" class="summary-name" onclick="show_private();">XHTMLParser</a><br />
+      An XML parser that is configured to return lxml.html Element
+objects.
     </td>
   </tr>
 </table>
@@ -305,6 +328,46 @@ checkboxes with the same name.
           <td><span class="summary-sig"><a name="__fix_docstring"></a><span class="summary-sig-name">__fix_docstring</span>(<span class="summary-sig-arg">s</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#__fix_docstring">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_iter_css_urls"></a><span class="summary-sig-name">_iter_css_urls</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      finditer(string[, pos[, endpos]]) --&gt; iterator.
+Return an iterator over all non-overlapping matches for the
+RE pattern in string. For each match, the iterator returns a
+match object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html-pysrc.html#_iter_css_urls">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_iter_css_imports"></a><span class="summary-sig-name">_iter_css_imports</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      finditer(string[, pos[, endpos]]) --&gt; iterator.
+Return an iterator over all non-overlapping matches for the
+RE pattern in string. For each match, the iterator returns a
+match object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html-pysrc.html#_iter_css_imports">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -363,6 +426,42 @@ checkboxes with the same name.
       
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_looks_like_full_html_unicode"></a><span class="summary-sig-name">_looks_like_full_html_unicode</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      match(string[, pos[, endpos]]) --&gt; match object or None.
+Matches zero or more characters at the beginning of the string</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html-pysrc.html#_looks_like_full_html_unicode">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_looks_like_full_html_bytes"></a><span class="summary-sig-name">_looks_like_full_html_bytes</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      match(string[, pos[, endpos]]) --&gt; match object or None.
+Matches zero or more characters at the beginning of the string</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html-pysrc.html#_looks_like_full_html_bytes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -371,6 +470,7 @@ checkboxes with the same name.
         <tr>
           <td><span class="summary-sig"><a name="document_fromstring"></a><span class="summary-sig-name">document_fromstring</span>(<span class="summary-sig-arg">html</span>,
         <span class="summary-sig-arg">parser</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">ensure_head_body</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">**kw</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#document_fromstring">source&nbsp;code</a></span>
@@ -456,7 +556,8 @@ element.</td>
         <span class="summary-sig-arg">base_url</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">**kw</span>)</span><br />
       Parse a filename, URL, or file-like object into an HTML document
-tree.</td>
+tree.  Note: this returns a tree, not an element.  Use
+<tt class="rst-docutils literal"><span class="pre">parse(...).getroot()</span></tt> to get the document root.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#parse">source&nbsp;code</a></span>
             
@@ -507,7 +608,9 @@ tree.</td>
           <td><span class="summary-sig"><a href="lxml.html-module.html#submit_form" class="summary-sig-name">submit_form</a>(<span class="summary-sig-arg">form</span>,
         <span class="summary-sig-arg">extra_values</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">open_http</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Helper function to submit a form.</td>
+      Helper function to submit a form.  Returns a file-like object, as from
+<tt class="rst-docutils literal">urllib.urlopen()</tt>.  This object also has a <tt class="rst-docutils literal">.geturl()</tt> function,
+which shows the URL if there were any redirects.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#submit_form">source&nbsp;code</a></span>
             
@@ -619,7 +722,9 @@ occurrences of pattern in string by the replacement repl.</td>
         <span class="summary-sig-arg">pretty_print</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">include_meta_content_type</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">encoding</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">method</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">html</code><code class="variable-quote">'</code></span>)</span><br />
+        <span class="summary-sig-arg">method</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">html</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">with_tail</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">doctype</span>=<span class="summary-sig-default">None</span>)</span><br />
       Return an HTML string representation of the document.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#tostring">source&nbsp;code</a></span>
@@ -636,9 +741,11 @@ occurrences of pattern in string by the replacement repl.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="open_in_browser"></a><span class="summary-sig-name">open_in_browser</span>(<span class="summary-sig-arg">doc</span>)</span><br />
-      Open the HTML document in a web browser (saving it to a temporary
-file to open it).</td>
+          <td><span class="summary-sig"><a name="open_in_browser"></a><span class="summary-sig-name">open_in_browser</span>(<span class="summary-sig-arg">doc</span>,
+        <span class="summary-sig-arg">encoding</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Open the HTML document in a web browser, saving it to a temporary
+file to open it.  Note that this does not delete the file after
+use.  This is mainly meant for debugging.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html-pysrc.html#open_in_browser">source&nbsp;code</a></span>
             
@@ -688,6 +795,13 @@ file to open it).</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="basestring"></a><span class="summary-name">basestring</span> = <code title="str, bytes">str, bytes</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="XHTML_NAMESPACE"></a><span class="summary-name">XHTML_NAMESPACE</span> = <code title="'http://www.w3.org/1999/xhtml'"><code class="variable-quote">'</code><code class="variable-string">http://www.w3.org/1999/xhtml</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
@@ -732,20 +846,6 @@ file to open it).</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="_collect_string_content"></a><span class="summary-name">_collect_string_content</span> = <code title="string()">string()</code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="lxml.html-module.html#_css_url_re" class="summary-name" onclick="show_private();">_css_url_re</a> = <code title="re.compile(r'(?i)url\((&quot;[^&quot;]*&quot;|\'[^\']*\'|[^\)]*)\)')">re.compile(r'<code class="re-flags">(?i)</code>url\(<code class="re-group">(</code>&quot;<code class="re-group">[^</code>&quot;<code class="re-group">]</code><code class="re-op">*</code>&quot;<code class="re-op">|</code>\'<code class="re-group">[^</code>\'<code class="re-group">]</code><code class="re-op">*</code>\'<code class="re-op">|</code><code class="re-group">[^</code>\)<code class="re-group">]</code><code class="re-op">*</code><code class="variable-ellipsis">...</code></code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_css_import_re"></a><span class="summary-name">_css_import_re</span> = <code title="re.compile(r'@import &quot;(.*?)&quot;')">re.compile(r'@import &quot;<code class="re-group">(</code>.<code class="re-op">*?</code><code class="re-group">)</code>&quot;')</code>
     </td>
   </tr>
 <tr class="private">
@@ -818,6 +918,13 @@ file to open it).</td>
         <a name="xhtml_parser"></a><span class="summary-name">xhtml_parser</span> = <code title="XHTMLParser()">XHTMLParser()</code>
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'lxml.html'"><code class="variable-quote">'</code><code class="variable-string">lxml.html</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
 </table>
 <!-- ==================== FUNCTION DETAILS ==================== -->
 <a name="section-FunctionDetails"></a>
@@ -887,7 +994,8 @@ of only elements.</p>
 one element, or if anything but whitespace precedes or follows the
 element.</p>
 <p>If create_parent is true (or is a tag name) then a parent node
-will be created to encapsulate the HTML in a single element.</p>
+will be created to encapsulate the HTML in a single element.  In
+this case, leading or trailing text is allowed.</p>
 <p>base_url will set the document's base_url attribute (and the tree's docinfo.URL)</p>
   <dl class="fields">
   </dl>
@@ -937,8 +1045,8 @@ is a fragment or a document.</p>
   
   <p>Parse a filename, URL, or file-like object into an HTML document
 tree.  Note: this returns a tree, not an element.  Use
-<tt class="rst-docutils literal"><span class="pre">parse(...).getroot()</span></tt> to get the document root.</p>
-<p>You can override the base URL with the <tt class="rst-docutils literal"><span class="pre">base_url</span></tt> keyword.  This
+<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">parse(...).getroot()</span></tt> to get the document root.</p>
+<p>You can override the base URL with the <tt class="rst-docutils literal">base_url</tt> keyword.  This
 is most useful when parsing from a file-like object.</p>
   <dl class="fields">
   </dl>
@@ -961,7 +1069,7 @@ is most useful when parsing from a file-like object.</p>
   </tr></table>
   
   <p>Helper function to submit a form.  Returns a file-like object, as from
-<tt class="rst-docutils literal"><span class="pre">urllib.urlopen()</span></tt>.  This object also has a <tt class="rst-docutils literal"><span class="pre">.geturl()</span></tt> function,
+<tt class="rst-rst-docutils literal rst-docutils literal">urllib.urlopen()</tt>.  This object also has a <tt class="rst-rst-docutils literal rst-docutils literal">.geturl()</tt> function,
 which shows the URL if there were any redirects.</p>
 <p>You can use this like:</p>
 <pre class="rst-literal-block">
@@ -971,14 +1079,14 @@ response = form.submit()
 doc = parse(response)
 doc.make_links_absolute(response.geturl())
 </pre>
-<p>To change the HTTP requester, pass a function as <tt class="rst-docutils literal"><span class="pre">open_http</span></tt> keyword
+<p>To change the HTTP requester, pass a function as <tt class="rst-docutils literal">open_http</tt> keyword
 argument that opens the URL for you.  The function must have the following
 signature:</p>
 <pre class="rst-literal-block">
 open_http(method, URL, values)
 </pre>
 <p>The action is one of 'GET' or 'POST', the URL is the target URL as a
-string, and the values are a sequence of <tt class="rst-docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt> tuples with the
+string, and the values are a sequence of <tt class="rst-docutils literal">(name, value)</tt> tuples with the
 form data.</p>
   <dl class="fields">
   </dl>
@@ -995,7 +1103,9 @@ form data.</p>
         <span class="sig-arg">pretty_print</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">include_meta_content_type</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">encoding</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">method</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">html</code><code class="variable-quote">'</code></span>)</span>
+        <span class="sig-arg">method</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">html</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">with_tail</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">doctype</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="lxml.html-pysrc.html#tostring">source&nbsp;code</a></span>&nbsp;
@@ -1004,17 +1114,23 @@ form data.</p>
   
   <p>Return an HTML string representation of the document.</p>
 <p>Note: if include_meta_content_type is true this will create a
-<tt class="rst-docutils literal"><span class="pre">&lt;meta</span> <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">...&gt;</span></tt> tag in the head;
+<tt class="rst-docutils literal">&lt;meta <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">...&gt;</span></tt> tag in the head;
 regardless of the value of include_meta_content_type any existing
-<tt class="rst-docutils literal"><span class="pre">&lt;meta</span> <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">...&gt;</span></tt> tag will be removed</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">encoding</span></tt> argument controls the output encoding (defauts to
+<tt class="rst-docutils literal">&lt;meta <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">...&gt;</span></tt> tag will be removed</p>
+<p>The <tt class="rst-docutils literal">encoding</tt> argument controls the output encoding (defauts to
 ASCII, with &amp;#...; character references for any characters outside
-of ASCII).</p>
-<p>The <tt class="rst-docutils literal"><span class="pre">method</span></tt> argument defines the output method.  It defaults to
+of ASCII).  Note that you can pass the name <tt class="rst-docutils literal">'unicode'</tt> as
+<tt class="rst-docutils literal">encoding</tt> argument to serialise to a Unicode string.</p>
+<p>The <tt class="rst-docutils literal">method</tt> argument defines the output method.  It defaults to
 'html', but can also be 'xml' for xhtml output, or 'text' to
-serialise to plain text without markup.  Note that you can pass
-the builtin <tt class="rst-docutils literal"><span class="pre">unicode</span></tt> type as <tt class="rst-docutils literal"><span class="pre">encoding</span></tt> argument to serialise
-to a unicode string.</p>
+serialise to plain text without markup.</p>
+<p>To leave out the tail text of the top-level element that is being
+serialised, pass <tt class="rst-docutils literal">with_tail=False</tt>.</p>
+<p>The <tt class="rst-docutils literal">doctype</tt> option allows passing in a plain string that will
+be serialised before the XML tree.  Note that passing in non
+well-formed content here will make the XML output non well-formed.
+Also, an existing doctype in the document tree will not be removed
+when serialising an ElementTree instance.</p>
 <p>Example:</p>
 <pre class="rst-literal-block">
 &gt;&gt;&gt; from lxml import html
@@ -1031,8 +1147,25 @@ to a unicode string.</p>
 &gt;&gt;&gt; html.tostring(root, method='text')
 'Helloworld!'
 
-&gt;&gt;&gt; html.tostring(root, method='text', encoding=unicode)
+&gt;&gt;&gt; html.tostring(root, method='text', encoding='unicode')
 u'Helloworld!'
+
+&gt;&gt;&gt; root = html.fragment_fromstring('&lt;div&gt;&lt;p&gt;Hello&lt;br&gt;world!&lt;/p&gt;TAIL&lt;/div&gt;')
+&gt;&gt;&gt; html.tostring(root[0], method='text', encoding='unicode')
+u'Helloworld!TAIL'
+
+&gt;&gt;&gt; html.tostring(root[0], method='text', encoding='unicode', with_tail=False)
+u'Helloworld!'
+
+&gt;&gt;&gt; doc = html.document_fromstring('&lt;p&gt;Hello&lt;br&gt;world!&lt;/p&gt;')
+&gt;&gt;&gt; html.tostring(doc, method='html', encoding='unicode')
+u'&lt;html&gt;&lt;body&gt;&lt;p&gt;Hello&lt;br&gt;world!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;'
+
+&gt;&gt;&gt; print(html.tostring(doc, method='html', encoding='unicode',
+...          doctype='&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;'
+...                  ' &quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;'))
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot; &quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;body&gt;&lt;p&gt;Hello&lt;br&gt;world!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </pre>
   <dl class="fields">
   </dl>
@@ -1151,24 +1284,6 @@ descendant-or-self::*[@class and contains(concat(' ', normalize-space(<span clas
   </dl>
 </td></tr></table>
 </div>
-<a name="_css_url_re"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">_css_url_re</h3>
-  
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-re.compile(r'<code class="re-flags">(?i)</code>url\(<code class="re-group">(</code>&quot;<code class="re-group">[^</code>&quot;<code class="re-group">]</code><code class="re-op">*</code>&quot;<code class="re-op">|</code>\'<code class="re-group">[^</code>\'<code class="re-group">]</code><code class="re-op">*</code>\'<code class="re-op">|</code><code class="re-group">[^</code>\)<code class="re-group">]</code><code class="re-op">*</code><code class="re-group">)</code>\)')
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="make_links_absolute"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1212,14 +1327,14 @@ _MethodFunc('make_links_absolute', copy= True)
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

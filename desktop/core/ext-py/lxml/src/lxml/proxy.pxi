@@ -2,65 +2,79 @@
 
 # Proxies represent elements, their reference is stored in the C
 # structure of the respective node to avoid multiple instantiation of
-# the Python class
+# the Python class.
+#
+# In PyPy, we store weak references instead of borrowed back-pointer
+# references as borrowed references cannot be long-lived in its
+# compatibility layer cpyext. Since we can't know when the object dies
+# (and even the weak-ref callback won't tell us that), we double check
+# on access that the object really is still alive and delete the
+# weak-ref if it isn't.
 
 cdef inline _Element getProxy(xmlNode* c_node):
     u"""Get a proxy for a given node.
     """
     #print "getProxy for:", <int>c_node
     if c_node is not NULL and c_node._private is not NULL:
-        return <_Element>c_node._private
+        if python.IS_PYPY:
+            return <_Element>python.PyWeakref_LockObject(<python.PyObject*>c_node._private)
+        else:
+            return <_Element>c_node._private
     else:
         return None
 
-cdef inline int hasProxy(xmlNode* c_node):
-    return c_node._private is not NULL
-    
+cdef inline bint hasProxy(xmlNode* c_node):
+    if c_node._private is NULL:
+        return False
+    if python.IS_PYPY:
+        return _isProxyAliveInPypy(c_node)
+    return True
+
+cdef bint _isProxyAliveInPypy(xmlNode* c_node):
+    retval = True
+    if python.PyWeakref_LockObject(<python.PyObject*>c_node._private) is None:
+        # proxy has already died => remove weak reference
+        weakref_ptr = <python.PyObject*>c_node._private
+        c_node._private = NULL
+        python.Py_XDECREF(weakref_ptr)
+        retval = False
+    return retval
+
 cdef inline int _registerProxy(_Element proxy, _Document doc,
                                xmlNode* c_node) except -1:
     u"""Register a proxy and type for the node it's proxying for.
     """
     #print "registering for:", <int>proxy._c_node
-    assert c_node._private is NULL, u"double registering proxy!"
+    assert not hasProxy(c_node), u"double registering proxy!"
     proxy._doc = doc
     proxy._c_node = c_node
-    c_node._private = <void*>proxy
-    # additional INCREF to make sure _Document is GC-ed LAST!
-    proxy._gc_doc = <python.PyObject*>doc
-    python.Py_INCREF(doc)
+    if python.IS_PYPY:
+        c_node._private = <void*>python.PyWeakref_NewRef(proxy, NULL)
+    else:
+        c_node._private = <void*>proxy
+    return 0
 
 cdef inline int _unregisterProxy(_Element proxy) except -1:
     u"""Unregister a proxy for the node it's proxying for.
     """
-    cdef xmlNode* c_node
-    c_node = proxy._c_node
-    assert c_node._private is <void*>proxy, u"Tried to unregister unknown proxy"
-    c_node._private = NULL
+    cdef xmlNode* c_node = proxy._c_node
+    if python.IS_PYPY:
+        weakref_ptr = <python.PyObject*>c_node._private
+        c_node._private = NULL
+        python.Py_XDECREF(weakref_ptr)
+    else:
+        assert c_node._private is <void*>proxy, u"Tried to unregister unknown proxy"
+        c_node._private = NULL
     return 0
-
-cdef inline void _releaseProxy(_Element proxy):
-    u"""An additional DECREF for the document.
-    """
-    python.Py_XDECREF(proxy._gc_doc)
-    proxy._gc_doc = NULL
-
-cdef inline void _updateProxyDocument(xmlNode* c_node, _Document doc):
-    u"""Replace the document reference of a proxy and return the old one
-    iff it was replaced (None otherwise).
-    """
-    cdef _Document old_doc
-    cdef _Element element = <_Element>c_node._private
-    if element._doc is not doc:
-        old_doc = element._doc
-        element._doc = doc
-        python.Py_INCREF(doc)
-        element._gc_doc = <python.PyObject*>doc
-        python.Py_DECREF(old_doc)
 
 ################################################################################
 # temporarily make a node the root node of its document
 
 cdef xmlDoc* _fakeRootDoc(xmlDoc* c_base_doc, xmlNode* c_node) except NULL:
+    return _plainFakeRootDoc(c_base_doc, c_node, 1)
+
+cdef xmlDoc* _plainFakeRootDoc(xmlDoc* c_base_doc, xmlNode* c_node,
+                               bint with_siblings) except NULL:
     # build a temporary document that has the given node as root node
     # note that copy and original must not be modified during its lifetime!!
     # always call _destroyFakeDoc() after use!
@@ -68,10 +82,11 @@ cdef xmlDoc* _fakeRootDoc(xmlDoc* c_base_doc, xmlNode* c_node) except NULL:
     cdef xmlNode* c_root
     cdef xmlNode* c_new_root
     cdef xmlDoc*  c_doc
-    c_root = tree.xmlDocGetRootElement(c_base_doc)
-    if c_root is c_node:
-        # already the root node
-        return c_base_doc
+    if with_siblings or (c_node.prev is NULL and c_node.next is NULL):
+        c_root = tree.xmlDocGetRootElement(c_base_doc)
+        if c_root is c_node:
+            # already the root node, no siblings
+            return c_base_doc
 
     c_doc  = _copyDoc(c_base_doc, 0)                   # non recursive!
     c_new_root = tree.xmlDocCopyNode(c_node, c_doc, 2) # non recursive!
@@ -152,37 +167,45 @@ cdef int attemptDeallocation(xmlNode* c_node):
 cdef xmlNode* getDeallocationTop(xmlNode* c_node):
     u"""Return the top of the tree that can be deallocated, or NULL.
     """
-    cdef xmlNode* c_current
-    cdef xmlNode* c_top
+    cdef xmlNode* c_next
     #print "trying to do deallocating:", c_node.type
-    if c_node._private is not NULL:
+    if hasProxy(c_node):
         #print "Not freeing: proxies still exist"
         return NULL
-    c_current = c_node.parent
-    c_top = c_node
-    while c_current is not NULL:
+    while c_node.parent is not NULL:
+        c_node = c_node.parent
         #print "checking:", c_current.type
-        if c_current.type == tree.XML_DOCUMENT_NODE or \
-               c_current.type == tree.XML_HTML_DOCUMENT_NODE:
+        if c_node.type == tree.XML_DOCUMENT_NODE or \
+               c_node.type == tree.XML_HTML_DOCUMENT_NODE:
             #print "not freeing: still in doc"
             return NULL
         # if we're still attached to the document, don't deallocate
-        if c_current._private is not NULL:
+        if hasProxy(c_node):
             #print "Not freeing: proxies still exist"
             return NULL
-        c_top = c_current
-        c_current = c_current.parent
     # see whether we have children to deallocate
-    if canDeallocateChildNodes(c_top):
-        return c_top
-    else:
+    if not canDeallocateChildNodes(c_node):
         return NULL
+    # see whether we have siblings to deallocate
+    c_next = c_node.prev
+    while c_next:
+        if _isElement(c_next):
+            if hasProxy(c_next) or not canDeallocateChildNodes(c_next):
+                return NULL
+        c_next = c_next.prev
+    c_next = c_node.next
+    while c_next:
+        if _isElement(c_next):
+            if hasProxy(c_next) or not canDeallocateChildNodes(c_next):
+                return NULL
+        c_next = c_next.next
+    return c_node
 
 cdef int canDeallocateChildNodes(xmlNode* c_parent):
     cdef xmlNode* c_node
     c_node = c_parent.children
     tree.BEGIN_FOR_EACH_ELEMENT_FROM(c_parent, c_node, 1)
-    if c_node._private is not NULL:
+    if hasProxy(c_node):
         return 0
     tree.END_FOR_EACH_ELEMENT_FROM(c_node)
     return 1
@@ -198,10 +221,10 @@ cdef void _copyParentNamespaces(xmlNode* c_from_node, xmlNode* c_to_node) nogil:
     cdef xmlNs* c_new_ns
     cdef int prefix_known
     c_parent = c_from_node.parent
-    while c_parent is not NULL and (tree._isElementOrXInclude(c_parent) or
-                                    c_parent.type == tree.XML_DOCUMENT_NODE):
+    while c_parent and (tree._isElementOrXInclude(c_parent) or
+                        c_parent.type == tree.XML_DOCUMENT_NODE):
         c_new_ns = c_parent.nsDef
-        while c_new_ns is not NULL:
+        while c_new_ns:
             # libxml2 will check if the prefix is already defined
             tree.xmlNewNs(c_to_node, c_new_ns.href, c_new_ns.prefix)
             c_new_ns = c_new_ns.next
@@ -219,19 +242,18 @@ cdef int _growNsCache(_nscache* c_ns_cache) except -1:
         c_ns_cache.size = 20
     else:
         c_ns_cache.size *= 2
-    c_ns_ptr = <xmlNs**> cstd.realloc(
+    c_ns_ptr = <xmlNs**> stdlib.realloc(
         c_ns_cache.new, c_ns_cache.size * sizeof(xmlNs*))
     if c_ns_ptr is not NULL:
         c_ns_cache.new = c_ns_ptr
-        c_ns_ptr = <xmlNs**> cstd.realloc(
+        c_ns_ptr = <xmlNs**> stdlib.realloc(
             c_ns_cache.old, c_ns_cache.size * sizeof(xmlNs*))
     if c_ns_ptr is not NULL:
         c_ns_cache.old = c_ns_ptr
     else:
-        cstd.free(c_ns_cache.new)
-        cstd.free(c_ns_cache.old)
-        python.PyErr_NoMemory()
-        return -1
+        stdlib.free(c_ns_cache.new)
+        stdlib.free(c_ns_cache.old)
+        raise MemoryError()
     return 0
 
 cdef inline int _appendToNsCache(_nscache* c_ns_cache,
@@ -261,11 +283,8 @@ cdef int _stripRedundantNamespaceDeclarations(
             _appendToNsCache(c_ns_cache, c_nsdef[0], c_nsdef[0])
             c_nsdef = &c_nsdef[0].next
         else:
-            # known namespace href => strip the ns
-            if c_ns is tree.xmlSearchNs(c_element.doc, c_element.parent,
-                                        c_ns.prefix):
-                # prefix is not shadowed by parents => ns is reusable
-                _appendToNsCache(c_ns_cache, c_nsdef[0], c_ns)
+            # known namespace href => cache mapping and strip old ns
+            _appendToNsCache(c_ns_cache, c_nsdef[0], c_ns)
             # cut out c_nsdef.next and prepend it to garbage chain
             c_ns_next = c_nsdef[0].next
             c_nsdef[0].next = c_del_ns_list[0]
@@ -327,7 +346,7 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
 
     tree.BEGIN_FOR_EACH_FROM(c_element, c_element, 1)
     if tree._isElementOrXInclude(c_element):
-        if c_element._private is not NULL:
+        if hasProxy(c_element):
             proxy_count += 1
 
         # 1) cut out namespaces defined here that are already known by
@@ -341,16 +360,25 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
         c_node = c_element
         while c_node is not NULL:
             if c_node.ns is not NULL:
-                for i from 0 <= i < c_ns_cache.last:
+                c_ns = NULL
+                for i in range(c_ns_cache.last):
                     if c_node.ns is c_ns_cache.old[i]:
-                        c_node.ns = c_ns_cache.new[i]
+                        if (c_node.type == tree.XML_ATTRIBUTE_NODE
+                                and c_node.ns.prefix
+                                and not c_ns_cache.new[i].prefix):
+                            # avoid dropping prefix from attributes
+                            continue
+                        c_ns = c_ns_cache.new[i]
                         break
-                else:
-                    # not in cache => find a replacement from this document
+
+                if not c_ns:
+                    # not in cache or not acceptable
+                    # => find a replacement from this document
                     c_ns = doc._findOrBuildNodeNs(
-                        c_start_node, c_node.ns.href, c_node.ns.prefix)
+                        c_start_node, c_node.ns.href, c_node.ns.prefix,
+                        c_node.type == tree.XML_ATTRIBUTE_NODE)
                     _appendToNsCache(&c_ns_cache, c_node.ns, c_ns)
-                    c_node.ns = c_ns
+                c_node.ns = c_ns
 
             if c_node is c_element:
                 # after the element, continue with its attributes
@@ -365,9 +393,9 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
 
     # cleanup
     if c_ns_cache.new is not NULL:
-        cstd.free(c_ns_cache.new)
+        stdlib.free(c_ns_cache.new)
     if c_ns_cache.old is not NULL:
-        cstd.free(c_ns_cache.old)
+        stdlib.free(c_ns_cache.old)
 
     # 3) fix the names in the tree if we moved it from a different thread
     if doc._c_doc.dict is not c_source_doc.dict:
@@ -377,7 +405,12 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
     #    (and potentially deallocate the source document)
     if proxy_count > 0:
         if proxy_count == 1 and c_start_node._private is not NULL:
-            _updateProxyDocument(c_start_node, doc)
+            proxy = getProxy(c_start_node)
+            if proxy is not None:
+                if proxy._doc is not doc:
+                    proxy._doc = doc
+            else:
+                fixElementDocument(c_start_node, doc, proxy_count)
         else:
             fixElementDocument(c_start_node, doc, proxy_count)
 
@@ -387,12 +420,16 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
 cdef void fixElementDocument(xmlNode* c_element, _Document doc,
                              size_t proxy_count):
     cdef xmlNode* c_node = c_element
+    cdef _Element proxy = None # init-to-None required due to fake-loop below
     tree.BEGIN_FOR_EACH_FROM(c_element, c_node, 1)
     if c_node._private is not NULL:
-        _updateProxyDocument(c_node, doc)
-        proxy_count -= 1
-        if proxy_count == 0:
-            return
+        proxy = getProxy(c_node)
+        if proxy is not None:
+            if proxy._doc is not doc:
+                proxy._doc = doc
+            proxy_count -= 1
+            if proxy_count == 0:
+                return
     tree.END_FOR_EACH_FROM(c_node)
 
 cdef void fixThreadDictNames(xmlNode* c_element,
@@ -408,8 +445,7 @@ cdef void fixThreadDictNames(xmlNode* c_element,
         fixThreadDictNsForNode(c_element, c_src_dict, c_dict)
         c_element = c_element.children
         while c_element is not NULL:
-            if tree._isElementOrXInclude(c_element):
-                fixThreadDictNamesForNode(c_element, c_src_dict, c_dict)
+            fixThreadDictNamesForNode(c_element, c_src_dict, c_dict)
             c_element = c_element.next
     elif tree._isElementOrXInclude(c_element):
         fixThreadDictNamesForNode(c_element, c_src_dict, c_dict)
@@ -421,9 +457,10 @@ cdef void fixThreadDictNamesForNode(xmlNode* c_element,
     tree.BEGIN_FOR_EACH_FROM(c_element, c_node, 1)
     if c_node.name is not NULL:
         fixThreadDictNameForNode(c_node, c_src_dict, c_dict)
-    if c_node.type == tree.XML_ELEMENT_NODE:
+    if c_node.type in (tree.XML_ELEMENT_NODE, tree.XML_XINCLUDE_START):
         fixThreadDictNamesForAttributes(
             c_node.properties, c_src_dict, c_dict)
+        fixThreadDictNsForNode(c_node, c_src_dict, c_dict)
     elif c_node.type == tree.XML_TEXT_NODE:
         # libxml2's SAX2 parser interns some indentation space
         fixThreadDictContentForNode(c_node, c_src_dict, c_dict)
@@ -446,7 +483,7 @@ cdef inline void fixThreadDictNamesForAttributes(tree.xmlAttr* c_attr,
 cdef inline void fixThreadDictNameForNode(xmlNode* c_node,
                                           tree.xmlDict* c_src_dict,
                                           tree.xmlDict* c_dict) nogil:
-    cdef char* c_name = c_node.name
+    cdef const_xmlChar* c_name = c_node.name
     if c_name is not NULL and \
            c_node.type != tree.XML_TEXT_NODE and \
            c_node.type != tree.XML_COMMENT_NODE:
@@ -460,10 +497,10 @@ cdef inline void fixThreadDictContentForNode(xmlNode* c_node,
                                              tree.xmlDict* c_src_dict,
                                              tree.xmlDict* c_dict) nogil:
     if c_node.content is not NULL and \
-           c_node.content is not <char*>&c_node.properties:
+           c_node.content is not <xmlChar*>&c_node.properties:
         if tree.xmlDictOwns(c_src_dict, c_node.content):
             # result can be NULL on memory error, but we don't handle that here
-            c_node.content = tree.xmlDictLookup(c_dict, c_node.content, -1)
+            c_node.content = <xmlChar*>tree.xmlDictLookup(c_dict, c_node.content, -1)
 
 cdef inline void fixThreadDictNsForNode(xmlNode* c_node,
                                         tree.xmlDict* c_src_dict,

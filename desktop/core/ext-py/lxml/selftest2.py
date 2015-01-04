@@ -14,6 +14,16 @@ except ImportError:
 
 from lxml import etree as ElementTree
 
+def stdout():
+    if sys.version_info[0] < 3:
+        return sys.stdout
+    class bytes_stdout(object):
+        def write(self, data):
+            if isinstance(data, bytes):
+                data = data.decode('ISO8859-1')
+            sys.stdout.write(data)
+    return bytes_stdout()
+
 def unserialize(text):
     file = StringIO(text)
     tree = ElementTree.parse(file)
@@ -25,11 +35,10 @@ def serialize(elem, encoding=None):
     if encoding:
         tree.write(file, encoding=encoding)
     else:
-        encoding = "utf-8"
         tree.write(file)
     result = file.getvalue()
     if sys.version_info[0] >= 3:
-        result = result.decode(encoding)
+        result = result.decode('ISO8859-1')
     result = result.replace(' />', '/>')
     if result[-1:] == '\n':
         result = result[:-1]
@@ -117,15 +126,19 @@ def parsefile():
     here; by default, the 'parse' function opens the file in binary
     mode, and doctest doesn't filter out carriage returns.
 
-    >>> tree = ElementTree.parse(open("samples/simple.xml", "rb"))
-    >>> tree.write(sys.stdout)
+    >>> file = open("samples/simple.xml", "rb")
+    >>> tree = ElementTree.parse(file)
+    >>> file.close()
+    >>> tree.write(stdout())
     <root>
        <element key="value">text</element>
        <element>text</element>tail
        <empty-element/>
     </root>
-    >>> tree = ElementTree.parse(open("samples/simple-ns.xml", "rb"))
-    >>> tree.write(sys.stdout)
+    >>> file = open("samples/simple-ns.xml", "rb")
+    >>> tree = ElementTree.parse(file)
+    >>> file.close()
+    >>> tree.write(stdout())
     <root xmlns="http://namespace/">
        <element key="value">text</element>
        <element>text</element>tail
@@ -387,7 +400,8 @@ def makeelement():
 ##     >>> builder = ElementTree.TreeBuilder()
 ##     >>> builder.addobserver(observer)
 ##     >>> parser = ElementTree.XMLParser(builder)
-##     >>> parser.feed(open("samples/simple.xml", "rb").read())
+##     >>> file = open("samples/simple.xml", "rb")
+##     >>> parser.feed(file.read())
 ##     start root
 ##     start element
 ##     end element
@@ -396,6 +410,7 @@ def makeelement():
 ##     start empty-element
 ##     end empty-element
 ##     end root
+##     >>> file.close()
 
 ##     """
 
@@ -432,3 +447,6 @@ if __name__ == "__main__":
     import doctest, selftest2
     failed, tested = doctest.testmod(selftest2)
     print("%d tests ok." % (tested - failed))
+    if failed > 0:
+        print("%d tests failed. Exiting with non-zero return code." % failed)
+        sys.exit(1)

@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -71,7 +71,7 @@ object --+
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li class="private"><a href="lxml.etree.__ContentOnlyElement-class.html" onclick="show_private();">__ContentOnlyElement</a></li><li>, <a href="lxml.etree.ElementBase-class.html">ElementBase</a></li>  </ul>
+<li><a href="lxml.etree.ElementBase-class.html">ElementBase</a></li><li>, <i>unreachable</i>.__ContentOnlyElement</li>  </ul>
 </dd></dl>
 
 <hr />
@@ -103,9 +103,8 @@ _Document as long as there is some pointer to a node in it.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__contains__"></a><span class="summary-sig-name">__contains__</span>(<span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>)</span><br />
-      y in x</td>
+          <td><span class="summary-sig"><a name="__contains__"></a><span class="summary-sig-name">__contains__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span></td>
           <td align="right" valign="top">
             
             
@@ -154,9 +153,9 @@ _Document as long as there is some pointer to a node in it.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__delitem__"></a><span class="summary-sig-name">__delitem__</span>(<span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>)</span><br />
-      del x[y]</td>
+          <td><span class="summary-sig"><a name="__delitem__"></a><span class="summary-sig-name">__delitem__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>)</span><br />
+      Deletes the given subelement or a slice.</td>
           <td align="right" valign="top">
             
             
@@ -206,8 +205,8 @@ slice.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__len__"></a><span class="summary-sig-name">__len__</span>(<span class="summary-sig-arg">x</span>)</span><br />
-      len(x)</td>
+          <td><span class="summary-sig"><a name="__len__"></a><span class="summary-sig-name">__len__</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns the number of subelements.</td>
           <td align="right" valign="top">
             
             
@@ -291,10 +290,10 @@ slice.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__setitem__"></a><span class="summary-sig-name">__setitem__</span>(<span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">i</span>,
-        <span class="summary-sig-arg">y</span>)</span><br />
-      x[i]=y</td>
+          <td><span class="summary-sig"><a name="__setitem__"></a><span class="summary-sig-name">__setitem__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">value</span>)</span><br />
+      Replaces the given subelement index or slice.</td>
           <td align="right" valign="top">
             
             
@@ -310,8 +309,9 @@ slice.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#_init" class="summary-sig-name" onclick="show_private();">_init</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Called after object initialisation.</td>
+          <td><span class="summary-sig"><a name="_init"></a><span class="summary-sig-name">_init</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Called after object initialisation.  Custom subclasses may override
+this if they recursively call _init() in the superclasses.</td>
           <td align="right" valign="top">
             
             
@@ -383,8 +383,9 @@ element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#clear" class="summary-sig-name">clear</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Resets an element.</td>
+          <td><span class="summary-sig"><a name="clear"></a><span class="summary-sig-name">clear</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Resets an element.  This function removes all subelements, clears
+all attributes and sets the text and tail properties to None.</td>
           <td align="right" valign="top">
             
             
@@ -418,8 +419,9 @@ element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="find"></a><span class="summary-sig-name">find</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#find" class="summary-sig-name">find</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
       Finds the first matching subelement, by tag name or path.</td>
           <td align="right" valign="top">
             
@@ -436,8 +438,9 @@ element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="findall"></a><span class="summary-sig-name">findall</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#findall" class="summary-sig-name">findall</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
       Finds all matching subelements, by tag name or path.</td>
           <td align="right" valign="top">
             
@@ -454,9 +457,10 @@ element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="findtext"></a><span class="summary-sig-name">findtext</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#findtext" class="summary-sig-name">findtext</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">path</span>,
-        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
       Finds text for the first matching subelement, by tag name or path.</td>
           <td align="right" valign="top">
             
@@ -493,7 +497,8 @@ element.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#getchildren" class="summary-sig-name">getchildren</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Returns all direct children.</td>
+      Returns all direct children.  The elements are returned in document
+order.</td>
           <td align="right" valign="top">
             
             
@@ -510,7 +515,8 @@ element.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#getiterator" class="summary-sig-name">getiterator</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Returns a sequence or iterator of all elements in the subtree in
 document order (depth first pre-order), starting with this
 element.</td>
@@ -637,8 +643,9 @@ contains this element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#items" class="summary-sig-name">items</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Gets element attributes, as a sequence.</td>
+          <td><span class="summary-sig"><a name="items"></a><span class="summary-sig-name">items</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gets element attributes, as a sequence. The attributes are returned in
+an arbitrary order.</td>
           <td align="right" valign="top">
             
             
@@ -655,7 +662,8 @@ contains this element.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#iter" class="summary-sig-name">iter</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterate over all elements in the subtree in document order (depth
 first pre-order), starting with this element.</td>
           <td align="right" valign="top">
@@ -674,7 +682,8 @@ first pre-order), starting with this element.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#iterancestors" class="summary-sig-name">iterancestors</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterate over the ancestors of this element (from parent to parent).</td>
           <td align="right" valign="top">
             
@@ -693,7 +702,8 @@ first pre-order), starting with this element.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#iterchildren" class="summary-sig-name">iterchildren</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">reversed</span>=<span class="summary-sig-default">False</span>)</span><br />
+        <span class="summary-sig-arg">reversed</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterate over the children of this element.</td>
           <td align="right" valign="top">
             
@@ -711,7 +721,8 @@ first pre-order), starting with this element.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#iterdescendants" class="summary-sig-name">iterdescendants</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterate over the descendants of this element in document order.</td>
           <td align="right" valign="top">
             
@@ -728,8 +739,9 @@ first pre-order), starting with this element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="iterfind"></a><span class="summary-sig-name">iterfind</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
+          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#iterfind" class="summary-sig-name">iterfind</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">namespaces</span>=<span class="summary-sig-default">None</span>)</span><br />
       Iterates over all matching subelements, by tag name or path.</td>
           <td align="right" valign="top">
             
@@ -748,7 +760,8 @@ first pre-order), starting with this element.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#itersiblings" class="summary-sig-name">itersiblings</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">preceding</span>=<span class="summary-sig-default">False</span>)</span><br />
+        <span class="summary-sig-arg">preceding</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterate over the following or preceding siblings of this element.</td>
           <td align="right" valign="top">
             
@@ -767,7 +780,8 @@ first pre-order), starting with this element.</td>
         <tr>
           <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#itertext" class="summary-sig-name">itertext</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">tag</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">with_tail</span>=<span class="summary-sig-default">True</span>)</span><br />
+        <span class="summary-sig-arg">with_tail</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">*tags</span>)</span><br />
       Iterates over the text content of a subtree.</td>
           <td align="right" valign="top">
             
@@ -784,8 +798,9 @@ first pre-order), starting with this element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#keys" class="summary-sig-name">keys</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Gets a list of attribute names.</td>
+          <td><span class="summary-sig"><a name="keys"></a><span class="summary-sig-name">keys</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gets a list of attribute names.  The names are returned in an
+arbitrary order (just like for an ordinary Python dictionary).</td>
           <td align="right" valign="top">
             
             
@@ -822,9 +837,11 @@ first pre-order), starting with this element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#remove" class="summary-sig-name">remove</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="remove"></a><span class="summary-sig-name">remove</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">element</span>)</span><br />
-      Removes a matching subelement.</td>
+      Removes a matching subelement. Unlike the find methods, this
+method compares elements based on identity, not on tag value
+or contents.</td>
           <td align="right" valign="top">
             
             
@@ -878,8 +895,9 @@ first pre-order), starting with this element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.etree._Element-class.html#values" class="summary-sig-name">values</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Gets element attribute values as a sequence of strings.</td>
+          <td><span class="summary-sig"><a name="values"></a><span class="summary-sig-name">values</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gets element attribute values as a sequence of strings.  The
+attributes are returned in an arbitrary order.</td>
           <td align="right" valign="top">
             
             
@@ -915,13 +933,16 @@ first pre-order), starting with this element.</td>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__init__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -947,8 +968,9 @@ first pre-order), starting with this element.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.etree._Element-class.html#attrib" class="summary-name">attrib</a><br />
-      Element attribute dictionary.
+        <a name="attrib"></a><span class="summary-name">attrib</span><br />
+      Element attribute dictionary. Where possible, use get(), set(),
+keys(), values() and items() to access element attributes.
     </td>
   </tr>
 <tr>
@@ -957,14 +979,17 @@ first pre-order), starting with this element.</td>
     </td><td class="summary">
         <a href="lxml.etree._Element-class.html#base" class="summary-name">base</a><br />
       The base URI of the Element (xml:base or HTML base URL).
+None if the base URI is unknown.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="nsmap"></a><span class="summary-name">nsmap</span><br />
-      Namespace prefix-&gt;URI mapping known in the context of this Element.
+        <a href="lxml.etree._Element-class.html#nsmap" class="summary-name">nsmap</a><br />
+      Namespace prefix-&gt;URI mapping known in the context of this
+Element.  This includes all namespace declarations of the
+parents.
     </td>
   </tr>
 <tr>
@@ -995,17 +1020,19 @@ first pre-order), starting with this element.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.etree._Element-class.html#tail" class="summary-name">tail</a><br />
+        <a name="tail"></a><span class="summary-name">tail</span><br />
       Text after this element's end tag, but before the next sibling
-element's start tag.
+element's start tag. This is either a string or the value None, if
+there was no text.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="lxml.etree._Element-class.html#text" class="summary-name">text</a><br />
-      Text before the first subelement.
+        <a name="text"></a><span class="summary-name">text</span><br />
+      Text before the first subelement. This is either a string or
+the value None, if there was no text.
     </td>
   </tr>
   <tr>
@@ -1082,26 +1109,6 @@ element's start tag.
   </dl>
 </td></tr></table>
 </div>
-<a name="_init"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">_init</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Called after object initialisation.  Custom subclasses may override
-this if they recursively call _init() in the superclasses.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="addnext"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1150,22 +1157,75 @@ automatically discarded when adding at the root level.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="clear"></a>
+<a name="find"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">clear</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">find</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Resets an element.  This function removes all subelements, clears
-all attributes and sets the text and tail properties to None.
+  <p>Finds the first matching subelement, by tag name or path.</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="findall"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">findall</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Finds all matching subelements, by tag name or path.</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="findtext"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">findtext</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">default</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Finds text for the first matching subelement, by tag name or path.</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1191,7 +1251,7 @@ order.
 <div class="fields">      <p><strong>Deprecated:</strong>
         Note that this method has been deprecated as of
 ElementTree 1.3 and lxml 2.0.  New code should use
-<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">list(element)</span></tt> or simply iterate over elements.
+<tt class="rst-rst-docutils literal rst-docutils literal">list(element)</tt> or simply iterate over elements.
       </p>
 </div></td></tr></table>
 </div>
@@ -1203,7 +1263,8 @@ ElementTree 1.3 and lxml 2.0.  New code should use
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">getiterator</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1213,10 +1274,8 @@ ElementTree 1.3 and lxml 2.0.  New code should use
   <p>Returns a sequence or iterator of all elements in the subtree in
 document order (depth first pre-order), starting with this
 element.</p>
-<p>Can be restricted to find only elements with a specific tag
-(pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;xyz&quot;</span></tt>) or from a namespace (pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;{ns}*&quot;</span></tt>).</p>
-<p>You can also pass the Element, Comment, ProcessingInstruction and
-Entity factory functions to look only for the specific element type.</p>
+<p>Can be restricted to find only elements with a specific tag,
+see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
   <dl class="fields">
   </dl>
 <div class="fields">      <p><strong>Deprecated:</strong>
@@ -1224,7 +1283,7 @@ Entity factory functions to look only for the specific element type.</p>
 ElementTree 1.3 and lxml 2.0.  It returns an iterator in
 lxml, which diverges from the original ElementTree
 behaviour.  If you want an efficient iterator, use the
-<tt class="rst-rst-docutils literal rst-docutils literal"><span class="pre">element.iter()</span></tt> method instead.  You should only use this
+<tt class="rst-rst-docutils literal rst-docutils literal">element.iter()</tt> method instead.  You should only use this
 method in new code if you require backwards compatibility
 with older versions of lxml or ElementTree.
       </p>
@@ -1276,26 +1335,6 @@ the last parent that was returned.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="items"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">items</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Gets element attributes, as a sequence. The attributes are returned in
-an arbitrary order.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="iter"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1304,7 +1343,8 @@ an arbitrary order.
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iter</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1313,10 +1353,16 @@ an arbitrary order.
   
   <p>Iterate over all elements in the subtree in document order (depth
 first pre-order), starting with this element.</p>
-<p>Can be restricted to find only elements with a specific tag
-(pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;xyz&quot;</span></tt>) or from a namespace (pass <tt class="rst-docutils literal"><span class="pre">tag=&quot;{ns}*&quot;</span></tt>).</p>
+<p>Can be restricted to find only elements with a specific tag:
+pass <tt class="rst-docutils literal">&quot;{ns}localname&quot;</tt> as tag. Either or both of <tt class="rst-docutils literal">ns</tt> and
+<tt class="rst-docutils literal">localname</tt> can be <tt class="rst-docutils literal">*</tt> for a wildcard; <tt class="rst-docutils literal">ns</tt> can be empty
+for no namespace. <tt class="rst-docutils literal">&quot;localname&quot;</tt> is equivalent to <tt class="rst-docutils literal"><span class="pre">&quot;{}localname&quot;</span></tt>
+(i.e. no namespace) but <tt class="rst-docutils literal">&quot;*&quot;</tt> is <tt class="rst-docutils literal"><span class="pre">&quot;{*}*&quot;</span></tt> (any or no namespace),
+not <tt class="rst-docutils literal"><span class="pre">&quot;{}*&quot;</span></tt>.</p>
 <p>You can also pass the Element, Comment, ProcessingInstruction and
 Entity factory functions to look only for the specific element type.</p>
+<p>Passing more than one tag will let the iterator return all elements
+matching any of these tags, in document order.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1329,7 +1375,8 @@ Entity factory functions to look only for the specific element type.</p>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iterancestors</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1337,8 +1384,8 @@ Entity factory functions to look only for the specific element type.</p>
   </tr></table>
   
   <p>Iterate over the ancestors of this element (from parent to parent).</p>
-<p>The generated elements can be restricted to a specific tag name with
-the 'tag' keyword.</p>
+<p>Can be restricted to find only elements with a specific tag,
+see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1352,7 +1399,8 @@ the 'tag' keyword.</p>
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iterchildren</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">reversed</span>=<span class="sig-default">False</span>)</span>
+        <span class="sig-arg">reversed</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1360,9 +1408,9 @@ the 'tag' keyword.</p>
   </tr></table>
   
   <p>Iterate over the children of this element.</p>
-<p>As opposed to using normal iteration on this element, the generated
-elements can be restricted to a specific tag name with the 'tag'
-keyword and reversed with the 'reversed' keyword.</p>
+<p>As opposed to using normal iteration on this element, the returned
+elements can be reversed with the 'reversed' keyword and restricted
+to find only elements with a specific tag, see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1375,7 +1423,8 @@ keyword and reversed with the 'reversed' keyword.</p>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">iterdescendants</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1383,9 +1432,33 @@ keyword and reversed with the 'reversed' keyword.</p>
   </tr></table>
   
   <p>Iterate over the descendants of this element in document order.</p>
-<p>As opposed to <tt class="rst-docutils literal"><span class="pre">el.iter()</span></tt>, this iterator does not yield the element
-itself.  The generated elements can be restricted to a specific tag
-name with the 'tag' keyword.</p>
+<p>As opposed to <tt class="rst-docutils literal">el.iter()</tt>, this iterator does not yield the element
+itself.  The returned elements can be restricted to find only elements
+with a specific tag, see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="iterfind"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">iterfind</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">namespaces</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Iterates over all matching subelements, by tag name or path.</p>
+<p>The optional <tt class="rst-docutils literal">namespaces</tt> argument accepts a
+prefix-to-namespace mapping that allows the usage of XPath
+prefixes in the path expression.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1399,7 +1472,8 @@ name with the 'tag' keyword.</p>
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">itersiblings</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">preceding</span>=<span class="sig-default">False</span>)</span>
+        <span class="sig-arg">preceding</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1407,10 +1481,13 @@ name with the 'tag' keyword.</p>
   </tr></table>
   
   <p>Iterate over the following or preceding siblings of this element.</p>
-<p>The direction is determined by the 'preceding' keyword which defaults
-to False, i.e. forward iteration over the following siblings.  The
-generated elements can be restricted to a specific tag name with the
-'tag' keyword.</p>
+<p>The direction is determined by the 'preceding' keyword which
+defaults to False, i.e. forward iteration over the following
+siblings.  When True, the iterator yields the preceding
+siblings in reverse document order, i.e. starting right before
+the current element and going backwards.</p>
+<p>Can be restricted to find only elements with a specific tag,
+see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1424,7 +1501,8 @@ generated elements can be restricted to a specific tag name with the
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">itertext</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">tag</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">with_tail</span>=<span class="sig-default">True</span>)</span>
+        <span class="sig-arg">with_tail</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">*tags</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -1432,72 +1510,10 @@ generated elements can be restricted to a specific tag name with the
   </tr></table>
   
   <p>Iterates over the text content of a subtree.</p>
-<p>You can pass the <tt class="rst-docutils literal"><span class="pre">tag</span></tt> keyword argument to restrict text content to
-a specific tag name.</p>
-<p>You can set the <tt class="rst-docutils literal"><span class="pre">with_tail</span></tt> keyword argument to <tt class="rst-docutils literal"><span class="pre">False</span></tt> to skip
+<p>You can pass a tag name to restrict text content to specific elements,
+see <a href="lxml.etree._Element-class.html#iter" class="link">iter</a>.</p>
+<p>You can set the <tt class="rst-docutils literal">with_tail</tt> keyword argument to <tt class="rst-docutils literal">False</tt> to skip
 over tail text.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="keys"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">keys</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Gets a list of attribute names.  The names are returned in an
-arbitrary order (just like for an ordinary Python dictionary).
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="remove"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">element</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Removes a matching subelement. Unlike the find methods, this
-method compares elements based on identity, not on tag value
-or contents.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="values"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">values</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Gets element attribute values as a sequence of strings.  The
-attributes are returned in an arbitrary order.
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1521,18 +1537,6 @@ attributes are returned in an arbitrary order.
   </td>
 </tr>
 </table>
-<a name="attrib"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">attrib</h3>
-  Element attribute dictionary. Where possible, use get(), set(),
-keys(), values() and items() to access element attributes.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="base"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1550,27 +1554,16 @@ Element, regardless of the document type (XML or HTML).</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="tail"></a>
+<a name="nsmap"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">tail</h3>
-  Text after this element's end tag, but before the next sibling
-element's start tag. This is either a string or the value None, if
-there was no text.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="text"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">text</h3>
-  Text before the first subelement. This is either a string or
-the value None, if there was no text.
+  <h3 class="epydoc">nsmap</h3>
+  <p>Namespace prefix-&gt;URI mapping known in the context of this
+Element.  This includes all namespace declarations of the
+parents.</p>
+<p>Note that changing the returned dict has no effect on the Element.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -1600,14 +1593,14 @@ the value None, if there was no text.
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:38 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:09 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

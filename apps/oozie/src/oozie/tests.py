@@ -28,6 +28,7 @@ from datetime import datetime
 
 from itertools import chain
 
+from defusedxml.common import EntitiesForbidden
 from nose.plugins.skip import SkipTest
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
@@ -2087,6 +2088,19 @@ class TestImportWorkflow04(OozieMockBase):
     # Should throw PopupException
     import_workflow(workflow, contents)
 
+  @raises(EntitiesForbidden)
+  def test_import_workflow_xxe_attack(self):
+    """
+    Validates import workflow with external entity expansion attack
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-xxe-attack.xml')
+    contents = f.read()
+    f.close()
+
+    # Should throw PopupException
+    import_workflow(workflow, contents)
 
   def test_import_workflow_basic(self):
     """

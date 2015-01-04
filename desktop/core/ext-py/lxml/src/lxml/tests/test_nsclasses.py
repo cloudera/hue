@@ -58,19 +58,19 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
         tree = self.parse(_bytes('<bluff xmlns="ns10"><ns11:maeh xmlns:ns11="ns11"/></bluff>'))
 
         el = tree.getroot()
-        self.assert_(isinstance(el, etree.ElementBase))
-        self.assert_(hasattr(el, 'bluff'))
+        self.assertTrue(isinstance(el, etree.ElementBase))
+        self.assertTrue(hasattr(el, 'bluff'))
         self.assertFalse(hasattr(el[0], 'maeh'))
         self.assertFalse(hasattr(el[0], 'bluff'))
-        self.assertEquals(el.bluff(), 'bluff')
+        self.assertEqual(el.bluff(), 'bluff')
         del el
 
         self.Namespace('ns11').update(maeh_dict)
         el = tree.getroot()
-        self.assert_(hasattr(el, 'bluff'))
-        self.assert_(hasattr(el[0], 'maeh'))
-        self.assertEquals(el.bluff(), 'bluff')
-        self.assertEquals(el[0].maeh(), 'maeh')
+        self.assertTrue(hasattr(el, 'bluff'))
+        self.assertTrue(hasattr(el[0], 'maeh'))
+        self.assertEqual(el.bluff(), 'bluff')
+        self.assertEqual(el[0].maeh(), 'maeh')
         del el
 
         self.Namespace('ns10').clear()
@@ -80,7 +80,7 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
         self.assertFalse(hasattr(el, 'bluff'))
         self.assertFalse(hasattr(el, 'maeh'))
         self.assertFalse(hasattr(el[0], 'bluff'))
-        self.assert_(hasattr(el[0], 'maeh'))
+        self.assertTrue(hasattr(el[0], 'maeh'))
 
         self.Namespace('ns11').clear()
 
@@ -102,13 +102,13 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
         el = tree.getroot()
         self.assertFalse(isinstance(el, etree.ElementBase))
         for child in el[:-1]:
-            self.assert_(isinstance(child, etree.ElementBase), child.tag)
+            self.assertTrue(isinstance(child, etree.ElementBase), child.tag)
         self.assertFalse(isinstance(el[-1], etree.ElementBase))
 
-        self.assert_(hasattr(el[0], 'bluff'))
-        self.assert_(hasattr(el[1], 'bluff'))
-        self.assert_(hasattr(el[2], 'maeh'))
-        self.assert_(hasattr(el[3], 'maeh'))
+        self.assertTrue(hasattr(el[0], 'bluff'))
+        self.assertTrue(hasattr(el[1], 'bluff'))
+        self.assertTrue(hasattr(el[2], 'maeh'))
+        self.assertTrue(hasattr(el[3], 'maeh'))
         self.assertFalse(hasattr(el[4], 'maeh'))
         del el
 
@@ -122,24 +122,24 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
         self.Namespace('ns21').update(maeh_dict)
 
         el = etree.Element("{ns20}bluff")
-        self.assert_(hasattr(el, 'bluff'))
+        self.assertTrue(hasattr(el, 'bluff'))
 
         child = etree.SubElement(el, "{ns21}maeh")
-        self.assert_(hasattr(child, 'maeh'))
+        self.assertTrue(hasattr(child, 'maeh'))
         child = etree.SubElement(el, "{ns20}bluff")
-        self.assert_(hasattr(child, 'bluff'))
+        self.assertTrue(hasattr(child, 'bluff'))
         child = etree.SubElement(el, "{ns21}bluff")
         self.assertFalse(hasattr(child, 'bluff'))
         self.assertFalse(hasattr(child, 'maeh'))
 
-        self.assert_(hasattr(el[0], 'maeh'))
-        self.assert_(hasattr(el[1], 'bluff'))
+        self.assertTrue(hasattr(el[0], 'maeh'))
+        self.assertTrue(hasattr(el[1], 'bluff'))
         self.assertFalse(hasattr(el[2], 'bluff'))
         self.assertFalse(hasattr(el[2], 'maeh'))
 
-        self.assertEquals(el.bluff(), 'bluff')
-        self.assertEquals(el[0].maeh(), 'maeh')
-        self.assertEquals(el[1].bluff(), 'bluff')
+        self.assertEqual(el.bluff(), 'bluff')
+        self.assertEqual(el[0].maeh(), 'maeh')
+        self.assertEqual(el[1].bluff(), 'bluff')
 
         self.Namespace('ns20').clear()
         self.Namespace('ns21').clear()
@@ -153,10 +153,10 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
 
         el = etree.Element("{ns30}bluff")
         etree.SubElement(el, "maeh")
-        self.assert_(hasattr(el, 'bluff'))
-        self.assert_(hasattr(el[0], 'maeh'))
-        self.assertEquals(el.bluff(), 'bluff')
-        self.assertEquals(el[0].maeh(), 'maeh')
+        self.assertTrue(hasattr(el, 'bluff'))
+        self.assertTrue(hasattr(el[0], 'maeh'))
+        self.assertEqual(el.bluff(), 'bluff')
+        self.assertEqual(el[0].maeh(), 'maeh')
 
         self.Namespace(None).clear()
         self.Namespace('ns30').clear()
@@ -176,32 +176,32 @@ class ETreeNamespaceClassesTestCase(HelperTestCase):
             maeh("TeXT", bluff, honk(), "TAiL"),
             "Tail")
 
-        self.assertEquals('default_class', el.tag)
-        self.assertEquals('testtext', el.text)
-        self.assertEquals(None, el.tail)
-        self.assertEquals(2, len(el))
-        self.assertEquals(7, len(list(el.iter())))
+        self.assertEqual('default_class', el.tag)
+        self.assertEqual('testtext', el.text)
+        self.assertEqual(None, el.tail)
+        self.assertEqual(2, len(el))
+        self.assertEqual(7, len(list(el.iter())))
 
-        self.assertEquals('bluff_class', el[0].tag)
-        self.assertEquals('TaIL', el[0][0].tail)
-        self.assertEquals('TaIL', ''.join(el[0].itertext()))
-        self.assertEquals('{http://a.b/c}HONK',
+        self.assertEqual('bluff_class', el[0].tag)
+        self.assertEqual('TaIL', el[0][0].tail)
+        self.assertEqual('TaIL', ''.join(el[0].itertext()))
+        self.assertEqual('{http://a.b/c}HONK',
                           el[0][0].tag)
-        self.assertEquals('maeh_class',
+        self.assertEqual('maeh_class',
                           el[0][1].tag)
 
-        self.assertEquals('maeh_class', el[1].tag)
-        self.assertEquals('TeXT', el[1].text)
-        self.assertEquals('bluff_class', el[1][0].tag)
-        self.assertEquals('{http://a.b/c}HONK', el[1][1].tag)
-        self.assertEquals('TAiL', el[1][1].tail)
+        self.assertEqual('maeh_class', el[1].tag)
+        self.assertEqual('TeXT', el[1].text)
+        self.assertEqual('bluff_class', el[1][0].tag)
+        self.assertEqual('{http://a.b/c}HONK', el[1][1].tag)
+        self.assertEqual('TAiL', el[1][1].tail)
 
-        self.assertEquals('TeXTTAiL',
+        self.assertEqual('TeXTTAiL',
                           ''.join(el[1].itertext()))
-        self.assertEquals('Tail', el[1].tail)
-        self.assertEquals('TAiL', el[1][1].tail)
-        self.assertEquals('bluff_class', el[1][0].tag)
-        self.assertEquals('{http://a.b/c}HONK', el[1][1].tag)
+        self.assertEqual('Tail', el[1].tail)
+        self.assertEqual('TAiL', el[1][1].tail)
+        self.assertEqual('bluff_class', el[1][0].tag)
+        self.assertEqual('{http://a.b/c}HONK', el[1][1].tag)
         
 
 def test_suite():

@@ -64,7 +64,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(2, el_class.i)
+        self.assertEqual(2, el_class.i)
 
     def test_lookup_keep_ref_assertion(self):
         el_class = self._buildElementClass()
@@ -75,8 +75,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, el_class.EL)
-        self.assertRaises(AssertionError, el_class.EL.getchildren)
+        self.assertNotEqual(None, el_class.EL)
+        self.assertRaises(ReferenceError, el_class.EL.getchildren)
 
     def test_lookup_tag(self):
         el_class = self._buildElementClass()
@@ -87,8 +87,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, root.TAG)
-        self.assertEquals(root.tag, root.TAG)
+        self.assertNotEqual(None, root.TAG)
+        self.assertEqual(root.tag, root.TAG)
 
     def test_lookup_text(self):
         el_class = self._buildElementClass()
@@ -99,8 +99,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, root.TEXT)
-        self.assertEquals(root.text, root.TEXT)
+        self.assertNotEqual(None, root.TEXT)
+        self.assertEqual(root.text, root.TEXT)
 
     def test_lookup_tail(self):
         el_class = self._buildElementClass()
@@ -111,7 +111,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(root.tail, root.TAIL)
+        self.assertEqual(root.tail, root.TAIL)
 
     def test_lookup_attrib(self):
         el_class = self._buildElementClass()
@@ -126,7 +126,7 @@ class PyClassLookupTestCase(HelperTestCase):
         items1.sort()
         items2 = list(root.ATTRIB.items())
         items2.sort()
-        self.assertEquals(items1, items2)
+        self.assertEqual(items1, items2)
 
     def test_lookup_prefix(self):
         el_class = self._buildElementClass()
@@ -137,7 +137,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(root.prefix, root.PREFIX)
+        self.assertEqual(root.prefix, root.PREFIX)
 
     def test_lookup_sourceline(self):
         el_class = self._buildElementClass()
@@ -148,7 +148,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(root.sourceline, root.LINE)
+        self.assertEqual(root.sourceline, root.LINE)
 
     def test_lookup_getitem(self):
         el_class = self._buildElementClass()
@@ -159,8 +159,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tag = root.CHILD_TAG
-        self.assertNotEquals(None, child_tag)
-        self.assertEquals(root[0].tag, child_tag)
+        self.assertNotEqual(None, child_tag)
+        self.assertEqual(root[0].tag, child_tag)
 
     def test_lookup_getitem_neg(self):
         el_class = self._buildElementClass()
@@ -172,8 +172,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tag = root.CHILD_TAG
-        self.assertNotEquals(None, child_tag)
-        self.assertEquals(root[-1].tag, child_tag)
+        self.assertNotEqual(None, child_tag)
+        self.assertEqual(root[-1].tag, child_tag)
 
     def test_lookup_getslice(self):
         el_class = self._buildElementClass()
@@ -185,8 +185,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertEquals([ c.tag for c in root[1:-1] ],
+        self.assertNotEqual(None, child_tags)
+        self.assertEqual([ c.tag for c in root[1:-1] ],
                           child_tags)
 
     def test_lookup_len(self):
@@ -198,7 +198,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(1, el_class.LEN)
+        self.assertEqual(1, el_class.LEN)
 
     def test_lookup_bool(self):
         el_class = self._buildElementClass()
@@ -209,7 +209,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assert_(el_class.TRUE)
+        self.assertTrue(el_class.TRUE)
 
     def test_lookup_get(self):
         el_class = self._buildElementClass()
@@ -220,8 +220,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, el_class.VAL)
-        self.assertEquals(root[0].get('a1'), el_class.VAL)
+        self.assertNotEqual(None, el_class.VAL)
+        self.assertEqual(root[0].get('a1'), el_class.VAL)
 
     def test_lookup_get_default(self):
         el_class = self._buildElementClass()
@@ -233,7 +233,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(default, el_class.VAL)
+        self.assertEqual(default, el_class.VAL)
 
     def test_lookup_getchildren(self):
         el_class = self._buildElementClass()
@@ -245,8 +245,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertEquals([ c.tag for c in root.getchildren() ],
+        self.assertNotEqual(None, child_tags)
+        self.assertEqual([ c.tag for c in root.getchildren() ],
                           child_tags)
 
     def test_lookup_iter_children(self):
@@ -259,8 +259,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertEquals([ c.tag for c in root.getchildren() ],
+        self.assertNotEqual(None, child_tags)
+        self.assertEqual([ c.tag for c in root.getchildren() ],
                           child_tags)
 
     def test_lookup_iterchildren(self):
@@ -273,8 +273,8 @@ class PyClassLookupTestCase(HelperTestCase):
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertEquals([ c.tag for c in root.getchildren() ],
+        self.assertNotEqual(None, child_tags)
+        self.assertEqual([ c.tag for c in root.getchildren() ],
                           child_tags)
 
     def test_lookup_iterchildren_tag(self):
@@ -289,14 +289,14 @@ class PyClassLookupTestCase(HelperTestCase):
 
         root = self.XML(xml_str)
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertEquals([], child_tags)
+        self.assertNotEqual(None, child_tags)
+        self.assertEqual([], child_tags)
 
         c1 = root[0]
         child_tags = root.CHILD_TAGS
-        self.assertNotEquals(None, child_tags)
-        self.assertNotEquals([], child_tags)
-        self.assertEquals(
+        self.assertNotEqual(None, child_tags)
+        self.assertNotEqual([], child_tags)
+        self.assertEqual(
             [ c.tag for c in root[0].iterchildren(tag='{objectified}c2') ],
             child_tags)
 
@@ -309,7 +309,7 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertEquals(root.tag, root.PARENT)
+        self.assertEqual(root.tag, root.PARENT)
 
     def test_lookup_getnext(self):
         el_class = self._buildElementClass()
@@ -320,8 +320,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, el_class.NEXT)
-        self.assertEquals(root[0][1].getnext().tag, el_class.NEXT)
+        self.assertNotEqual(None, el_class.NEXT)
+        self.assertEqual(root[0][1].getnext().tag, el_class.NEXT)
 
     def test_lookup_getprevious(self):
         el_class = self._buildElementClass()
@@ -332,8 +332,8 @@ class PyClassLookupTestCase(HelperTestCase):
             return el_class
         self._setClassLookup(lookup)
         root = self.XML(xml_str)
-        self.assertNotEquals(None, el_class.PREV)
-        self.assertEquals(root[0][1].getprevious().tag, el_class.PREV)
+        self.assertNotEqual(None, el_class.PREV)
+        self.assertEqual(root[0][1].getprevious().tag, el_class.PREV)
 
 
 def test_suite():

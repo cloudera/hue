@@ -34,7 +34,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -62,7 +62,7 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module html5parser</h1><p class="nomargin-top"><span class="codelink"><a href="lxml.html.html5parser-pysrc.html">source&nbsp;code</a></span></p>
-An interface to html5lib.
+An interface to html5lib that mimics the lxml.html interface.
 
 <!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -218,13 +218,30 @@ element.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="lxml.html.html5parser-module.html#parse" class="summary-sig-name">parse</a>(<span class="summary-sig-arg">filename_url_or_file</span>,
+          <td><span class="summary-sig"><a name="parse"></a><span class="summary-sig-name">parse</span>(<span class="summary-sig-arg">filename_url_or_file</span>,
         <span class="summary-sig-arg">guess_charset</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">parser</span>=<span class="summary-sig-default">None</span>)</span><br />
       Parse a filename, URL, or file-like object into an HTML document
-tree.</td>
+tree.  Note: this returns a tree, not an element.  Use
+<tt class="rst-docutils literal"><span class="pre">parse(...).getroot()</span></tt> to get the document root.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="lxml.html.html5parser-pysrc.html#parse">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_looks_like_url"></a><span class="summary-sig-name">_looks_like_url</span>(<span class="summary-sig-arg">str</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lxml.html.html5parser-pysrc.html#_looks_like_url">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -254,6 +271,13 @@ tree.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="xhtml_parser"></a><span class="summary-name">xhtml_parser</span> = <code title="XHTMLParser()">XHTMLParser()</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="html_parser"></a><span class="summary-name">html_parser</span> = <code title="HTMLParser()">HTMLParser()</code>
     </td>
   </tr>
@@ -261,7 +285,7 @@ tree.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="xhtml_parser"></a><span class="summary-name">xhtml_parser</span> = <code title="XHTMLParser()">XHTMLParser()</code>
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'lxml.html'"><code class="variable-quote">'</code><code class="variable-string">lxml.html</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>
@@ -332,7 +356,8 @@ string.</p>
 one element, or if anything but whitespace precedes or follows the
 element.</p>
 <p>If create_parent is true (or is a tag name) then a parent node
-will be created to encapsulate the HTML in a single element.</p>
+will be created to encapsulate the HTML in a single element.  In
+this case, leading or trailing text is allowed.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -357,29 +382,6 @@ will be created to encapsulate the HTML in a single element.</p>
 <p>This tries to minimally parse the chunk of text, without knowing if it
 is a fragment or a document.</p>
 <p>base_url will set the document's base_url attribute (and the tree's docinfo.URL)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="parse"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">parse</span>(<span class="sig-arg">filename_url_or_file</span>,
-        <span class="sig-arg">guess_charset</span>=<span class="sig-default">True</span>,
-        <span class="sig-arg">parser</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="lxml.html.html5parser-pysrc.html#parse">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  Parse a filename, URL, or file-like object into an HTML document
-tree.  Note: this returns a tree, not an element.  Use
-<tt class="rst-docutils literal"><span class="pre">parse(...).getroot()</span></tt> to get the document root.
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -409,14 +411,14 @@ tree.  Note: this returns a tree, not an element.  Use
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://codespeak.net/lxml/">lxml API</a></th>
+            ><a class="navbar" target="_top" href="/">lxml API</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0 on Sun Jun 21 09:44:36 2009
+    Generated by Epydoc 3.0.1 on Thu Nov 20 19:47:08 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

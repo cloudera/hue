@@ -26,10 +26,12 @@ def _getNsTag(tag):
     else:
         return (None, tag)
 
+
 class ElementTreeContentHandler(ContentHandler):
     """Build an lxml ElementTree from SAX events.
     """
     def __init__(self, makeelement=None):
+        ContentHandler.__init__(self)
         self._root = None
         self._root_siblings = []
         self._element_stack = []
@@ -45,7 +47,7 @@ class ElementTreeContentHandler(ContentHandler):
         return ElementTree(self._root)
 
     etree = property(_get_etree, doc=_get_etree.__doc__)
-    
+
     def setDocumentLocator(self, locator):
         pass
 
@@ -70,15 +72,18 @@ class ElementTreeContentHandler(ContentHandler):
         if prefix is None:
             self._default_ns = ns_uri_list[-1]
 
-    def startElementNS(self, ns_name, qname, attributes=None):
-        ns_uri, local_name = ns_name
+    def _buildTag(self, ns_name_tuple):
+        ns_uri, local_name = ns_name_tuple
         if ns_uri:
-            el_name = "{%s}%s" % ns_name
+            el_tag = "{%s}%s" % ns_name_tuple
         elif self._default_ns:
-            el_name = "{%s}%s" % (self._default_ns, local_name)
+            el_tag = "{%s}%s" % (self._default_ns, local_name)
         else:
-            el_name = local_name
+            el_tag = local_name
+        return el_tag
 
+    def startElementNS(self, ns_name, qname, attributes=None):
+        el_name = self._buildTag(ns_name)
         if attributes:
             attrs = {}
             try:
@@ -119,10 +124,15 @@ class ElementTreeContentHandler(ContentHandler):
 
     def endElementNS(self, ns_name, qname):
         element = self._element_stack.pop()
-        if ns_name != _getNsTag(element.tag):
-            raise SaxError("Unexpected element closed: {%s}%s" % ns_name)
+        el_tag = self._buildTag(ns_name)
+        if el_tag != element.tag:
+            raise SaxError("Unexpected element closed: " + el_tag)
 
     def startElement(self, name, attributes=None):
+        if attributes:
+            attributes = dict(
+                    [((None, k), v) for k, v in attributes.items()]
+                )
         self.startElementNS((None, name), name, attributes)
 
     def endElement(self, name):
@@ -139,7 +149,7 @@ class ElementTreeContentHandler(ContentHandler):
             last_element.text = (last_element.text or '') + data
 
     ignorableWhitespace = characters
-        
+
 
 class ElementTreeProducer(object):
     """Produces SAX events for an element and children.

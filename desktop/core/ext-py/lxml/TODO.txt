@@ -8,12 +8,14 @@ lxml
 In general
 ----------
 
-* test namespaces more in-depth
-
 * more testing on multi-threading
 
 * better exception messages for XPath and schemas based on error log,
   e.g. missing namespace mappings in XPath
+
+* when building statically, compile everything into one shared library
+  instead of one for lxml.etree and one for lxml.objectify to prevent
+  the redundant static linking of the library dependencies.
 
 * more testing on input/output of encoded filenames, including custom
   resolvers, relative XSLT imports, ...
@@ -26,11 +28,11 @@ In general
 * use per-call or per-thread error logs in XSLT/XPath/etc. to keep the
   messages separate, especially in exceptions
 
+* add 'nsmap' parameter to cleanup_namespaces()
 
-QName
------
+* fix tail text handling in addnext()/addprevious()
 
-* expose prefix support?
+* make Element nsmap editable to allow defining new namespaces (LP#555602)
 
 
 Entities
@@ -46,9 +48,11 @@ Objectify
   attributes, not XML children
 
 
-Maybe
------
+Incremental parsing
+-------------------
 
-* rewrite iterparse() to accept a parser as argument instead of being
-  one (or maybe not: iterparse() can't deal with all parser options
-  anyway).
+* create all iterparse events only on start events and
+  store the end events in the stack
+
+* rewrite SAX event creation in a more C-ish way to avoid having to
+  acquire the GIL on each event
