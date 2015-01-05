@@ -377,6 +377,11 @@
   margin-right: 3px;
 }
 
+.advanced-triangle-container {
+  position: absolute;
+  right: 0;
+}
+
 .advanced-triangle {
   width: 0;
   height: 0;
@@ -452,6 +457,11 @@ input[type="text"].filechooser-input {
   border-right: none;
   margin-bottom: 0;
 }
+
+input[type="text"].filechooser-input, input[type="text"].half {
+  width: 50%;
+}
+
 
 .fileChooserBtn {
   height: 31px;
