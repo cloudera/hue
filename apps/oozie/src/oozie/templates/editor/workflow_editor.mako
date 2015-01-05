@@ -1820,6 +1820,9 @@ ${ dashboard.import_bindings() }
       "width": 450
     });
     $("#addActionDemiModal").width(_el.width()).css("top", _el.offset().top + 25).css("left", _el.offset().left).modal("show");
+    $("html, body").animate({
+      scrollTop: $("#addActionDemiModal").offset().top - 200
+    }, 200);
   }
 
   function addActionDemiModalFieldPreview(field) {
