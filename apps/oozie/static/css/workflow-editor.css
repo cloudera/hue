@@ -534,3 +534,7 @@ em {
 canvas {
   pointer-events: none;
 }
+
+ul.unstyled li {
+  white-space: nowrap;
+}
