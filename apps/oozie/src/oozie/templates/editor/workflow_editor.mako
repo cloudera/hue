@@ -1995,6 +1995,7 @@ ${ dashboard.import_bindings() }
           widget.ooziePropertiesExpanded(false);
         }
       }
+      $(document).trigger("drawArrows");
     }
   }
 
