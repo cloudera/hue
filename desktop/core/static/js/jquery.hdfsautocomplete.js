@@ -119,6 +119,13 @@
       $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
     });
 
+    $(window).on("keydown", function(e){
+      if ((e.keyCode==32 && e.ctrlKey) || e.keyCode == 191){
+        e.preventDefault();
+      }
+    });
+
+
     var _hdfsAutocompleteSelectedIndex = -1;
     var _filterTimeout = -1;
     _el.keyup(function (e) {
