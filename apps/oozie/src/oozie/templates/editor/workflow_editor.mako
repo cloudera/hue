@@ -1627,13 +1627,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
         <td>
           <!-- ko if: type() == '' -->
-          <input type="text" class="filechooser-input" data-bind="value: value, filechooser: value, attr: { placeholder: help_text }">
+          <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: value, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type() == 'text' -->
-          <input type="text" data-bind="value: value, attr: { placeholder: help_text }" class="input-xlarge"/>
+          <input type="text" data-bind="value: value, valueUpdate:'afterkeydown', attr: { placeholder: help_text }" class="input-xlarge"/>
           <!-- /ko -->
           <!-- ko if: type() == 'textarea' -->
-          <textarea data-bind="value: value" class="input-xlarge"></textarea>
+          <textarea data-bind="value: value, valueUpdate:'afterkeydown'" class="input-xlarge"></textarea>
           <!-- /ko -->
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
@@ -1641,9 +1641,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
           <!-- ko if: type() == 'distcp' -->
           ${ _('Source') }
-          <input type="text" class="filechooser-input" data-bind="value: value()[0].value, filechooser: value()[0].value" placeholder="${ _('e.g. ${nameNode1}/path/to/input.txt') }">
+          <input type="text" class="filechooser-input" data-bind="value: value()[0].value, valueUpdate:'afterkeydown', filechooser: value()[0].value" placeholder="${ _('e.g. ${nameNode1}/path/to/input.txt') }">
           ${ _('Destination') }
-          <input type="text" class="filechooser-input" data-bind="value: value()[1].value, filechooser: value()[1].value" placeholder="${ _('e.g. ${nameNode2}/path/to/output.txt') }">
+          <input type="text" class="filechooser-input" data-bind="value: value()[1].value, valueUpdate:'afterkeydown', filechooser: value()[1].value" placeholder="${ _('e.g. ${nameNode2}/path/to/output.txt') }">
           <!-- /ko -->
 
           <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer'].indexOf(name()) != -1 &&  value().length > 0 -->
