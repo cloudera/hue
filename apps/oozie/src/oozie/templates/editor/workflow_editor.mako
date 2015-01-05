@@ -1781,6 +1781,8 @@ ${ dashboard.import_bindings() }
   var globalFilechooserOptions = {
     skipInitialPathIfEmpty: true,
     showExtraHome: true,
+    uploadFile: true,
+    createFolder: true,
     extraHomeProperties: {
       label: '${ _('Workspace') }',
       icon: 'fa-folder-open',

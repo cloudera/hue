@@ -1041,8 +1041,8 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
           handleChoice(filePath, stripHdfsPrefix);
           $("#chooseFile").modal("hide");
         },
-        createFolder: false,
-        uploadFile: false,
+        createFolder: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
+        uploadFile: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
         initialPath: _initialPath,
         errorRedirectPath: "",
         forceRefresh: true,
