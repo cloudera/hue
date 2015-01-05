@@ -43,3 +43,7 @@
 .tooltip {
   z-index: 1051;
 }
+
+.demi-modal {
+  z-index: 1032;
+}
