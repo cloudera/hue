@@ -30,6 +30,8 @@
             uploadFile:true,
             selectFolder:false,
             suppressErrors:false,
+            showExtraHome:false,
+            extraHomeProperties:{},
             labels: {
                 BACK: "Back",
                 SELECT_FOLDER: "Select this folder",
@@ -38,7 +40,8 @@
                 CANCEL: "Cancel",
                 FILE_NOT_FOUND: "The file has not been found",
                 UPLOAD_FILE: "Upload a file",
-                FAILED: "Failed"
+                FAILED: "Failed",
+                HOME: "Home"
             },
             user: "",
             onFileChoose:function () {
@@ -123,13 +126,25 @@
                 $.totalStorage(STORAGE_PREFIX + _parent.options.user, path);
                 _parent.previousPath = path;
                 var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0").css("marginLeft", "0");
+                
                 var _home = $("<li>");
-                var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> Home').css("cursor", "pointer").click(function () {
+                var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
                     _parent.navigateTo("/?default_to_home");
                 });
                 _homelink.appendTo(_home);
                 $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
                 _home.appendTo(_breadcrumbs);
+
+                if (_parent.options.showExtraHome) {
+                  var _extraHome = $("<li>");
+                  var _extraHomelink = $("<a>").addClass("nounderline").html('<i class="fa ' + _parent.options.extraHomeProperties.icon + '"></i> ' + _parent.options.extraHomeProperties.label).css("cursor", "pointer").click(function () {
+                    _parent.navigateTo(_parent.options.extraHomeProperties.path);
+                  });
+                  _extraHomelink.appendTo(_extraHome);
+                  $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_extraHome);
+                  _extraHome.appendTo(_breadcrumbs);
+                }
+                
                 if (typeof data.breadcrumbs != "undefined" && data.breadcrumbs != null){
                   var _bLength = data.breadcrumbs.length;
                   $(data.breadcrumbs).each(function (cnt, crumb) {
