@@ -538,3 +538,44 @@ canvas {
 ul.unstyled li {
   white-space: nowrap;
 }
+
+#file-uploader {
+  float: left;
+  margin-right: 3px;
+  margin-top: 10px;
+}
+
+.qq-upload-button {
+  display: inline-block;
+  height: 29px;
+  min-height: 29px;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 29px;
+  color: #444;
+  text-align: center;
+  text-shadow: none;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  background-image: -moz-linear-gradient(top,#fff,#f1f1f1);
+  background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f1f1f1));
+  background-image: -webkit-linear-gradient(top,#fff,#f1f1f1);
+  background-image: -o-linear-gradient(top,#fff,#f1f1f1);
+  background-image: linear-gradient(to bottom,#fff,#f1f1f1);
+  background-repeat: repeat-x;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-color: #f1f1f1 #f1f1f1 #cbcbcb;
+  border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+  border-color: rgba(0,0,0,0.1);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#fff1f1f1',GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
