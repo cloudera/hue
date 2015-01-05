@@ -402,13 +402,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </div>
       <!-- /ko -->
     </h2>
-    <div class="card-body" style="padding: 0;">
+    <div class="card-body" style="padding: 0; position: relative">
       <div class="advanced-triangle-container" data-bind="visible: $root.isEditing() && ! ooziePropertiesExpanded() && oozieMovable(), click: toggleProperties">
         <div class="advanced-triangle">
           <a href="javascript:void(0)"><i class="fa fa-cogs"></i></a>
         </div>
       </div>
-      <div data-bind="click: function(widget, e){ highlightWidget(widget, e); }, template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
 </script>
@@ -1985,12 +1985,6 @@ ${ dashboard.import_bindings() }
     }
   }
 
-  function highlightWidget(widget, e) {
-    if (! $(e.target).is("a") && ! $(e.target).is("input") && ! $(e.target).is("i") && ! $(e.target).is("button")){
-      setLastExpandedWidget(widget);
-    }
-  }
-
   function exposeOverlayClickHandler() {
     if (lastExpandedWidget) {
       var _el = $("#wdg_" + lastExpandedWidget.id());
@@ -2023,6 +2017,12 @@ ${ dashboard.import_bindings() }
       resizeTimeout = window.setTimeout(function () {
         renderChangeables();
       }, 200);
+    });
+
+    $(document).on("click", ".widget-main-section", function(e){
+      if (! $(e.target).is("a") && ! $(e.target).is("input") && ! $(e.target).is("i") && ! $(e.target).is("button")){
+        setLastExpandedWidget(ko.dataFor($(e.target).parents(".card-widget")[0]));
+      }
     });
 
   });
