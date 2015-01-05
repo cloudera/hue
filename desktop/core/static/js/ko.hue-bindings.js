@@ -958,9 +958,22 @@ ko.bindingHandlers.hivechooser = {
   }
 }
 
+ko.bindingHandlers.hdfsAutocomplete = {
+  init: function (element, valueAccessor, allBindingsAccessor, vm) {
+    var stripHashes = function (str) {
+      return str.replace(/#/gi, encodeURIComponent("#"));
+    };
+
+    var self = $(element);
+    self.attr("autocomplete", "off");
+    self.jHueHdfsAutocomplete({});
+  }
+};
+
 ko.bindingHandlers.filechooser = {
   init: function (element, valueAccessor, allBindingsAccessor, vm) {
     var self = $(element);
+    self.attr("autocomplete", "off");
     if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
       self.val(valueAccessor().value ? valueAccessor().value(): valueAccessor()());
       self.data("fullPath", self.val());
