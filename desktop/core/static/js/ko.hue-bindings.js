@@ -1034,15 +1034,16 @@ ko.bindingHandlers.filechooser = {
   }
 };
 
+
 function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+  var _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
     e.preventDefault();
     // check if it's a relative path
     callFileChooser();
 
     function callFileChooser() {
       var _initialPath = $.trim(inputElement.val()) != "" ? inputElement.val() : "/";
-      if (allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == ""){
+      if ((allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || allBindingsAccessor().filechooserPrefixSeparator){
         _initialPath = "";
       }
       if (inputElement.data("fullPath")){
@@ -1076,6 +1077,9 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
     }
 
     function handleChoice(filePath, stripHdfsPrefix) {
+      if (allBindingsAccessor().filechooserPrefixSeparator){
+        filePath = inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] + '=' + filePath;
+      }
       if (stripHdfsPrefix){
         inputElement.val(filePath);
       }
@@ -1102,6 +1106,10 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
       }
     }
   });
+  if (allBindingsAccessor().filechooserDisabled){
+    _btn.addClass("disabled").attr("disabled", "disabled");
+  }
+  return _btn;
 }
 
 ko.bindingHandlers.tooltip = {
