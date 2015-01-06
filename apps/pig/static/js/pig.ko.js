@@ -69,7 +69,7 @@ var PigScript = function (pigScript) {
   self.getParameters = function () {
     var params = {};
     var variables = this.script().match(/([^\\]|^)\$[^\d'"](\w*)/g);
-    var macro_defines = this.script().match(/define [^ ]+ \(([^\)]*)\)/gi); // no multiline
+    var macro_defines = this.script().match(/define [^ ]+ *\(([^\)]*)\)/gi); // no multiline
     var macro_returns = this.script().match(/returns +([^\{]*)/gi); // no multiline
 
     if (variables) {
