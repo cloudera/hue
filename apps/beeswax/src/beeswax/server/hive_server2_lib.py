@@ -14,12 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from itertools import imap
 
 import logging
 import re
 
+from itertools import imap
 from operator import itemgetter
+
+from django.utils.translation import ugettext as _
 
 from desktop.lib import thrift_util
 from desktop.conf import LDAP_PASSWORD, LDAP_USERNAME
