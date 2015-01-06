@@ -1059,7 +1059,7 @@ $(document).ready(function () {
       "bInfo": false,
       "bFilter": false,
       "aoColumns": [
-        { "sWidth" : "100px"},
+        { "sWidth" : "100px", "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         { "sWidth" : "80px", "bSortable": false },
         { "bSortable": false, "sWidth" : "4px" }
@@ -1091,7 +1091,7 @@ $(document).ready(function () {
         var _rows = [];
         $(data.queries).each(function(cnt, item){
           _rows.push([
-            '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
+            '<span data-sort-value="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
             '<code style="cursor:pointer">' + hue.htmlEncode(item.query) + '</code>',
             (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
             (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')
