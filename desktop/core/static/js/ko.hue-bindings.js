@@ -734,10 +734,23 @@ ko.bindingHandlers.typeahead = {
         if (valueAccessor.extraKeywords) {
           _source = _source.concat(valueAccessor.extraKeywords.split(" "))
         }
+
+        if (valueAccessor.sourceSuffix && _source) {
+          var _tmp = [];
+          _source.forEach(function(item){
+            _tmp.push(item + valueAccessor.sourceSuffix);
+          });
+          _source = _tmp;
+        }
         return _source;
       },
       onselect: function (val) {
-        valueAccessor.target(val);
+        if (typeof valueAccessor.target == "function") {
+          valueAccessor.target(val);
+        }
+        else {
+         valueAccessor.target = val;
+        }
       }
     }
 
@@ -807,13 +820,23 @@ ko.bindingHandlers.typeahead = {
     }
 
     elem.blur(function () {
-      valueAccessor.target(elem.val());
+      if (typeof valueAccessor.target == "function") {
+        valueAccessor.target(elem.val());
+      }
+      else {
+       valueAccessor.target = elem.val();
+      }
     });
   },
   update: function (element, valueAccessor) {
     var elem = $(element);
     var value = valueAccessor();
-    elem.val(value.target());
+    if (typeof value.target == "function") {
+      elem.val(value.target());
+    }
+    else {
+      elem.val(value.target);
+    }
   }
 };
 

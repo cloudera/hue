@@ -86,7 +86,9 @@ var Node = function (node) {
 
   self.actionParameters = ko.observableArray([]);
   self.actionParametersUI = ko.computed(function() { // TODO: remove truncation when autocomplete
-    return $.map(self.actionParameters().slice(0, 3), function(param) {return param + '=...'}).join();
+    if (self.actionParameters()){
+      return $.map(self.actionParameters().slice(0, 3), function(param) {return param + '=...'}).join();  
+    }
   });
   self.actionParametersFetched = ko.observable(false);
   
