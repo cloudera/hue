@@ -79,12 +79,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         <h1 class="card-heading simple">${ _('Which workflow to schedule?') }</h1>
 
         <div class="card-body">
-          <select data-bind="options: workflows,
-                         optionsText: 'name',
-                         optionsValue: 'uuid',
-                         value: coordinator.properties.workflow,
-                         optionsCaption: 'Choose...'">
-          </select>
+          <a class="pointer" data-bind="visible: ! coordinator.properties.workflow(), click: showChooseWorkflow">${ _('Choose a workflow...') }</a>
+          <!-- ko if: coordinator.properties.workflow -->
+            <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name">${ _('Choose a workflow...') }</a>
+          <!-- /ko -->
+
         </div>
       </div>
 
@@ -239,6 +238,26 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   </div>
 </div>
 
+<div id="chooseWorkflowDemiModal" class="demi-modal hide" data-backdrop="false">
+  <div class="modal-body">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <div style="float: left; margin-right: 10px;text-align: center">
+      <input id="chooseWorkflowInput" type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
+    </div>
+    <div>
+      <ul data-bind="foreach: $root.filteredModalWorkflows().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalWorkflows().length > 0"
+          class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
+        <li data-bind="click: selectWorkflow">
+          <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
+          </span>
+        </li>
+      </ul>
+      <div class="alert alert-info inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+        ${_('There are no workflows matching your search term.')}
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="settingsModal" class="modal hide fade">
   <div class="modal-header" style="padding-bottom: 2px">
@@ -309,26 +328,25 @@ ${ dashboard.import_bindings() }
   var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode });
   ko.applyBindings(viewModel);
 
-  function showAddActionDemiModal(widget) {
-    newAction = widget;
-    $("#addActionDemiModal").modal("show");
+  function showChooseWorkflow() {
+    $("#chooseWorkflowDemiModal").modal("show");
   }
 
-  function addActionDemiModalFieldPreview(field) {
-    if (newAction != null) {
-      viewModel.coordinator.addNode(newAction);
-      $("#addActionDemiModal").modal("hide");
-    }
-  }
-
-  function addActionDemiModalFieldCancel() {
-    viewModel.removeWidgetById(newAction.id());
+  function selectWorkflow(wf) {
+    viewModel.coordinator.properties.workflow(wf.uuid());
+    $("#chooseWorkflowDemiModal").modal("hide");
   }
   
   $(document).on("showSubmitPopup", function(event, data){
     $('#submit-coord-modal').html(data);
     $('#submit-coord-modal').modal('show');
-  });  
+  });
+
+  $(document).ready(function() {
+    $("#chooseWorkflowDemiModal").modal({
+      show: false
+    });
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

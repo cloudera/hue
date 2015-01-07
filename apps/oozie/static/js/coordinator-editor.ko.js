@@ -89,6 +89,29 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   self.workflows = ko.mapping.fromJS(workflows_json);
   self.coordinator = new Coordinator(self, coordinator_json);
   self.credentials = ko.mapping.fromJS(credentials_json);
+
+  self.workflowModalFilter = ko.observable("");
+  self.filteredModalWorkflows = ko.computed(function() {
+    var _filter = self.workflowModalFilter().toLowerCase();
+    if (!_filter) {
+      return self.workflows();
+    }
+    else {
+      return ko.utils.arrayFilter(self.workflows(), function(wf) {
+        return wf.name().toLowerCase().indexOf(_filter.toLowerCase()) > -1;
+      });
+    }
+  }, self);
+
+  self.getWorkflowById = function (uuid) {
+    var _wfs = ko.utils.arrayFilter(self.workflows(), function(wf) {
+      return wf.uuid() == uuid;
+    });
+    if (_wfs.length > 0){
+      return _wfs[0];
+    }
+    return null;
+  }
   
   
   self.save = function () {
