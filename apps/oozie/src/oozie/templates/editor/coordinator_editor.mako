@@ -81,9 +81,8 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         <div class="card-body">
           <a class="pointer" data-bind="visible: ! coordinator.properties.workflow(), click: showChooseWorkflow">${ _('Choose a workflow...') }</a>
           <!-- ko if: coordinator.properties.workflow -->
-            <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name">${ _('Choose a workflow...') }</a>
+            <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
           <!-- /ko -->
-
         </div>
       </div>
 
@@ -242,7 +241,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 10px;text-align: center">
-      <input id="chooseWorkflowInput" type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
+      <input type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.filteredModalWorkflows().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalWorkflows().length > 0"

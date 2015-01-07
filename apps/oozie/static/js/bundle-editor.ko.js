@@ -51,11 +51,32 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json) {
   self.bundle = new Bundle(self, bundle_json);
   
   self.coordinators = ko.mapping.fromJS(coordinators_json);
-  self.selectedCoordinator = ko.observable();
 
-  self.addBundledCoordinator = function() {
-    self.bundle.addCoordinator(self.selectedCoordinator());
-    self.selectedCoordinator(null);
+  self.coordinatorModalFilter = ko.observable("");
+  self.filteredModalCoordinators = ko.computed(function() {
+    var _filter = self.coordinatorModalFilter().toLowerCase();
+    if (!_filter) {
+      return self.coordinators();
+    }
+    else {
+      return ko.utils.arrayFilter(self.coordinators(), function(coord) {
+        return coord.name().toLowerCase().indexOf(_filter.toLowerCase()) > -1;
+      });
+    }
+  }, self);
+
+  self.getCoordinatorById = function (uuid) {
+    var _coords = ko.utils.arrayFilter(self.coordinators(), function(coord) {
+      return coord.uuid() == uuid;
+    });
+    if (_coords.length > 0){
+      return _coords[0];
+    }
+    return null;
+  }
+
+  self.addBundledCoordinator = function (uuid) {
+    self.bundle.addCoordinator(uuid);
   };
 
   
