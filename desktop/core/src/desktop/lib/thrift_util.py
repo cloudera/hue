@@ -293,57 +293,73 @@ class PooledClient(object):
   def __init__(self, conf):
     self.conf = conf
 
-  def __getattr__(self, attr):
-    if attr in self.__dict__:
-      return self.__dict__[attr]
+  def __getattr__(self, attr_name):
+    if attr_name in self.__dict__:
+      return self.__dict__[attr_name]
 
     # Fetch the thrift client from the pool
     superclient = _connection_pool.get_client(self.conf)
-    res = getattr(superclient, attr)
 
-    if not callable(res):
-      # It's a simple attribute. We can put the superclient back in the pool.
-      _connection_pool.return_client(self.conf, superclient)
-      return res
-    else:
-      # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
-      # and return the connection to the pool when done.
-      def wrapper(*args, **kwargs):
+    # Fetch the attribute. If it's callable, wrap it in a wrapper that re-gets
+    # the client.
+    try:
+      attr = getattr(superclient, attr_name)
+
+      if callable(attr):
+        return self._wrap_callable(attr_name)
+      else:
+        return attr
+    finally:
+      self._return_client(superclient)
+
+  def _wrap_callable(self, attr_name):
+    # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
+    # and return the connection to the pool when done.
+    def wrapper(*args, **kwargs):
+      superclient = _connection_pool.get_client(self.conf)
+
+      try:
+        attr = getattr(superclient, attr_name)
+
         try:
-          try:
-            # Poke it to see if it's closed on the other end. This can happen if a connection
-            # sits in the connection pool longer than the read timeout of the server.
-            sock = _grab_transport_from_wrapper(superclient.transport).handle
-            if sock and create_synchronous_io_multiplexer().read([sock]):
-              # the socket is readable, meaning there is either data from a previous call
-              # (i.e our protocol is out of sync), or the connection was shut down on the
-              # remote side. Either way, we need to reopen the connection.
-              # If the socket was closed remotely, btw, socket.read() will return
-              # an empty string.  This is a fairly normal condition, btw, since
-              # there are timeouts on both the server and client sides.
-              superclient.transport.close()
-              superclient.transport.open()
+          # Poke it to see if it's closed on the other end. This can happen if a connection
+          # sits in the connection pool longer than the read timeout of the server.
+          sock = _grab_transport_from_wrapper(superclient.transport).handle
+          if sock and create_synchronous_io_multiplexer().read([sock]):
+            # the socket is readable, meaning there is either data from a previous call
+            # (i.e our protocol is out of sync), or the connection was shut down on the
+            # remote side. Either way, we need to reopen the connection.
+            # If the socket was closed remotely, btw, socket.read() will return
+            # an empty string.  This is a fairly normal condition, btw, since
+            # there are timeouts on both the server and client sides.
+            superclient.transport.close()
+            superclient.transport.open()
 
-            superclient.set_timeout(self.conf.timeout_seconds)
-            return res(*args, **kwargs)
-          except TApplicationException, e:
-            # Unknown thrift exception... typically IO errors
-            logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
-            raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
-          except socket.error, e:
-            logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
-            raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
-          except TTransportException, e:
-            logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
-            raise StructuredThriftTransportException(e, error_code=502)
-          except Exception, e:
-            # Stack tends to be only noisy here.
-            logging.info("Thrift saw exception: " + str(e), exc_info=False)
-            raise
-        finally:
-          _connection_pool.return_client(self.conf, superclient)
-      wrapper.attr = attr # Save the name of the attribute as it is replaced by 'wrapper'
-      return wrapper
+          superclient.set_timeout(self.conf.timeout_seconds)
+
+          return attr(*args, **kwargs)
+        except TApplicationException, e:
+          # Unknown thrift exception... typically IO errors
+          logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
+          raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
+        except socket.error, e:
+          logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
+          raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
+        except TTransportException, e:
+          logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
+          raise StructuredThriftTransportException(e, error_code=502)
+        except Exception, e:
+          # Stack tends to be only noisy here.
+          logging.info("Thrift saw exception: " + str(e), exc_info=False)
+          raise
+      finally:
+        self._return_client(superclient)
+    wrapper.attr = attr_name # Save the name of the attribute as it is replaced by 'wrapper'
+
+    return wrapper
+
+  def _return_client(self, superclient):
+    _connection_pool.return_client(self.conf, superclient)
 
 
 class SuperClient(object):
