@@ -160,7 +160,9 @@ var Workflow = function (vm, workflow) {
 
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
+
   self.movedNode = null;
+  self.versions = ko.mapping.fromJS(['uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.4.5', 'uri:oozie:workflow:0.5']) 
 
   self.nodeIds = ko.computed(function () {
     var mapping = [];

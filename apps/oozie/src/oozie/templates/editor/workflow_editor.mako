@@ -1711,6 +1711,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <i class="fa fa-fw fa-long-arrow-down"></i>
       </a>
 
+      <h4>${ _("Version") }</h4>
+      <select class="input-xlarge" data-bind="value: $root.workflow.properties.schema_version, options: $root.workflow.versions"></select>
+
       <h4>${ _("Job XML") }</h4>
       <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.job_xml, filechooserOptions: globalFilechooserOptions"/>
 
