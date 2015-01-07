@@ -17,14 +17,18 @@
 
 import logging
 import os
+import pwd
 import simplejson
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-from desktop.models import Document
 from hadoop import cluster
+
+from desktop.lib.exceptions_renderable import PopupException
+from useradmin.models import install_sample_user
+from desktop.models import Document
 
 import beeswax.conf
 
@@ -32,8 +36,7 @@ from beeswax.models import SavedQuery, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
-from useradmin.models import install_sample_user
-from desktop.lib.exceptions_renderable import PopupException
+
 
 LOG = logging.getLogger(__name__)
 
@@ -42,18 +45,25 @@ class InstallException(Exception):
   pass
 
 
-class Command(NoArgsCommand):
-  """
-  Install examples but do not overwrite them.
-  """
-  def handle_noargs(self, **options):
+class Command(BaseCommand):
+  args = '<beeswax|impala>'
+  help = 'Install examples but do not overwrite them.'
+
+  def handle(self, *args, **options):
+    if args:
+      app_name = args[0]
+      user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
+    else:
+      app_name = options['app_name']
+      user = options['user']
+
     exception = None
 
     # Documents will belong to this user but we run the install as the current user
     try:
       sample_user = install_sample_user()
-      self._install_queries(sample_user, options['app_name'])
-      self._install_tables(options['user'], options['app_name'])
+      self._install_queries(sample_user, app_name)
+      self._install_tables(user, app_name)
     except Exception, ex:
       exception = ex
 
