@@ -2048,6 +2048,8 @@ ${ dashboard.import_bindings() }
       }
     });
 
+    $.jHueScrollUp();
+
   });
 
 </script>
