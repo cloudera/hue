@@ -115,7 +115,7 @@ class Workflow(Job):
                   "description": "",
                   "job_xml": "",
                   "sla_enabled": False,
-                  "schema_version": "uri:oozie:workflow:0.4",
+                  "schema_version": "uri:oozie:workflow:0.5",
                   "sla_workflow_enabled": False,
                   "credentials": [],
                   "properties": [],
