@@ -30,7 +30,7 @@
             % endif
 
             % for argument in node['properties']['distcp_parameters']:
-              <argument>${ argument['value'] }</argument>
+              <arg>${ argument['value'] }</arg>
             % endfor
         </distcp>
         <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
