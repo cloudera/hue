@@ -610,6 +610,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   <ul class="unstyled" data-bind="foreach: properties.parameters">
     <li style="margin-bottom: 3px">
       <input type="text" class="filechooser-input seventy" data-bind="value: value, filechooser: value, filechooserOptions: globalFilechooserOptions, filechooserDisabled: true, filechooserPrefixSeparator: '=', event: { change: enableFilechooser, keyup: enableFilechooser }, attr: { placeholder: ' ${ _("Fill me up!") }' }, typeahead: { target: value, source: $parent.actionParametersUI, sourceSuffix: '=', triggerOnFocus: true }"/>
+      <span data-bind='template: { name: "param-fs-link", data: {path: value()} }'></span>
       <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
@@ -662,6 +663,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
        <i class="fa fa-external-link-square"></i>
      </a>
    <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="param-fs-link">
+  <!-- ko if: path.split('=', 2)[1] -->
+    <a data-bind="attr: {href: '/filebrowser/view' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
+      <i class="fa fa-external-link-square"></i>
+    </a>
+  <!-- /ko -->
 </script>
 
 
