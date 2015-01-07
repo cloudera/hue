@@ -16,14 +16,12 @@
 # limitations under the License.
 
 import logging
-import sys,os
+import os
 
 from thrift import Thrift
 from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport
 from thrift.protocol import TBinaryProtocol
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../gen-py'))
 
 from hbased import Hbase as thrift_hbase
 from hbased import ttypes
