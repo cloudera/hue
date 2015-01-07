@@ -85,10 +85,13 @@ var Node = function (node) {
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
   self.actionParameters = ko.observableArray([]);
-  self.actionParametersUI = ko.computed(function() { // TODO: remove truncation when autocomplete
-    if (self.actionParameters()){
-      return $.map(self.actionParameters().slice(0, 3), function(param) {return param + '=...'}).join();  
-    }
+  self.actionParametersUI = ko.computed(function() {
+	if (typeof self.properties.parameters != "undefined") {
+      var _vars = $.map(self.properties.parameters(), function(p, i) { return p.value().split('=', 1)[0]; });
+      return $.grep(self.actionParameters(), function(param) {
+        return _vars.indexOf(param) == -1;
+      });
+	}
   });
   self.actionParametersFetched = ko.observable(false);
   
@@ -101,7 +104,7 @@ var Node = function (node) {
       }
     });
     return _link;
-  }
+  };
 
   self.set_link = function (name, node_id) {
     var _link = self.get_link(name);
@@ -112,7 +115,7 @@ var Node = function (node) {
     }
     _link[name] = node_id;
     self.children.valueHasMutated();
-  }
+  };
 
   self.remove_link = function (name, child) {
     var _link = null;
@@ -126,19 +129,28 @@ var Node = function (node) {
     if (_link != null) {
       self.children.remove(_link);
     }
-  }
+  };
   
-  if (typeof self.properties.parameters != "undefined") { // Fetch once the possible variable when they exist 
-    self.properties.parameters.subscribe(function(newVal) { // TODO: only fetch when first time focus on one of the parameters and showing the autocomplete.
-      if (newVal && ! self.actionParametersFetched()) {
-	    $.post("/oozie/editor/workflow/action/parameters/", {
-		  "node": ko.mapping.toJSON(self),
-	     }, function (data) {
-	       self.actionParametersFetched(true);
-  	       self.actionParameters(data.parameters);
-	    }).fail(function (xhr, textStatus, errorThrown) {
-	      $(document).trigger("error", xhr.responseText);
-	    });
+  self.fetch_parameters = function() {
+    if (typeof self.properties.parameters != "undefined" && ! self.actionParametersFetched()) { // Fetch once the possible variable when they exist 
+      $.post("/oozie/editor/workflow/action/parameters/", {
+         "node": ko.mapping.toJSON(self),
+	  }, function (data) {
+	    self.actionParametersFetched(true);
+	    self.actionParameters(data.parameters);
+	    if (data.parameters.length > 0 && self.properties.parameters().length == 0) { // If new node with variables, give a hint by adding a parameter
+	      self.properties.parameters.push(ko.mapping.fromJS({'value': ''}));
+	    }
+	  }).fail(function (xhr, textStatus, errorThrown) {
+	    $(document).trigger("error", xhr.responseText);
+      });
+    }
+  };  
+  
+  if (typeof self.properties.parameters != "undefined") { 
+    self.properties.parameters.subscribe(function(newVal) {
+      if (newVal) {
+	    self.fetch_parameters();
 	  }
     });  
   }
@@ -229,6 +241,7 @@ var Workflow = function (vm, workflow) {
           if (data.workflows.length > 0) {
             viewModel.subworfklows(data.workflows);
           }
+
           if (callback) {
             callback(widget);
           }
@@ -253,6 +266,7 @@ var Workflow = function (vm, workflow) {
           var node = self.movedNode;
         } else {
           var node = new Node(_node);
+          node.fetch_parameters();
         }
 
         self.nodes.push(node);
@@ -1027,8 +1041,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.showSubmitPopup = function () {
-    // If self.workflow.id() == null, need to save wf for now
-
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
