@@ -27,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 
 
-from oozie.models2 import Job, Workflow, find_dollar_variables
+from oozie.models2 import Job, Workflow, find_dollar_variables, find_dollar_braced_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -37,6 +37,7 @@ class TestEditor():
 
   def setUp(self):
     self.wf = Workflow()
+
 
   def test_parsing(self):
     assert_equal(['input', 'LIMIT', 'out'], find_dollar_variables("""
@@ -54,6 +55,15 @@ WHERE
 ORDER BY sample_07.salary DESC
 LIMIT $limit"""))
 
+
+  def test_hive_script_parsing(self):
+    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("""
+    SELECT ${field}
+    FROM ${hivevar:tablename}
+    LIMIT ${hiveconf:LIMIT}  
+    """))
+
+
   def test_workflow_gen_xml(self):
     assert_equal(
         '<workflow-app name="Test" xmlns="0">\n'
@@ -61,6 +71,7 @@ LIMIT $limit"""))
         .split(),
         self.wf.to_xml({'output': '/path'}).split()
     )
+
 
   def test_job_validate_xml_name(self):
     assert_equal('a', Job.validate_name('a'))

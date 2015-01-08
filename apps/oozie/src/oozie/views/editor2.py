@@ -35,7 +35,8 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
 from oozie.forms import ParameterForm
-from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7, find_dollar_variables
+from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7,\
+    find_dollar_variables, find_dollar_braced_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -177,15 +178,20 @@ def action_parameters(request):
   try:
     node_data = json.loads(request.POST.get('node', '{}'))
     
+    parameters = parameters.union(set(Node(node_data).find_parameters()))
+    
     script_path = node_data.get('properties', {}).get('script_path', {})
     if script_path:
       script_path = script_path.replace('hdfs://', '')
+
       if request.fs.do_as_user(request.user, request.fs.exists, script_path):
-        data =  request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024**2)
-        parameters = parameters.union(set(find_dollar_variables(data)))
-       
-    parameters = parameters.union(set(Node(node_data).find_parameters()))
-                    
+        data =  request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024 ** 2)  
+
+        if node_data['type'] in ('hive', 'hive2'):
+          parameters = parameters.union(set(find_dollar_braced_variables(data)))
+        elif node_data['type'] == 'pig':
+          parameters = parameters.union(set(find_dollar_variables(data)))
+                
     response['status'] = 0
     response['parameters'] = list(parameters)
   except Exception, e:
