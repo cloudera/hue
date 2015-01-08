@@ -408,6 +408,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <a href="javascript:void(0)"><i class="fa fa-cogs"></i></a>
         </div>
       </div>
+      <!-- ko if: id() == '17c9c895-5a16-7443-bb81-f34b30b21548' && ooziePropertiesExpanded() -->
+      <div class="advanced-triangle-container" data-bind="visible: $root.isEditing(), click: toggleProperties">
+        <div class="advanced-triangle">
+          <a href="javascript:void(0)"><i class="fa fa-caret-square-o-left"></i></a>
+        </div>
+      </div>
+      <!-- /ko -->
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
     </div>
   </div>
