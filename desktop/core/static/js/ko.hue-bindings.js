@@ -1038,6 +1038,7 @@ ko.bindingHandlers.filechooser = {
 function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor) {
   var _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
     e.preventDefault();
+    $("html").addClass("modal-open");
     // check if it's a relative path
     callFileChooser();
 
@@ -1075,6 +1076,9 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
         filterExtensions: allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
       });
       $("#chooseFile").modal("show");
+      $("#chooseFile").on("hidden", function(){
+        $("html").removeClass("modal-open");
+      });
     }
 
     function handleChoice(filePath, stripHdfsPrefix) {

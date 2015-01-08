@@ -175,7 +175,7 @@
                     var _addFile = true;
                     if (_parent.options.filterExtensions != "" && file.type == "file"){
                         var _allowedExtensions = _parent.options.filterExtensions.split(",");
-                        var _fileExtension = file.name.split(".").pop();
+                        var _fileExtension = file.name.split(".").pop().toLowerCase();
                         _addFile = _allowedExtensions.indexOf(_fileExtension) > -1;
                     }
                     if (_addFile){
