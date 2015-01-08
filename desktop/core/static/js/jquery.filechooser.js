@@ -32,6 +32,7 @@
             suppressErrors:false,
             showExtraHome:false,
             extraHomeProperties:{},
+            filterExtensions:"",
             labels: {
                 BACK: "Back",
                 SELECT_FOLDER: "Select this folder",
@@ -171,23 +172,32 @@
                 _breadcrumbs.appendTo($(_parent.element));
 
                 $(data.files).each(function (cnt, file) {
-                    var _f = $("<li>");
-                    var _flink = $("<a>");
-                    _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
-                    if (file.type == "dir") {
-                        $("<i class='fa fa-folder'></i>").prependTo(_flink);
-                        _f.click(function () {
-                            _parent.options.onFolderChange(file.path);
-                            _parent.navigateTo(file.path);
-                        });
+                    var _addFile = true;
+                    if (_parent.options.filterExtensions != "" && file.type == "file"){
+                        var _allowedExtensions = _parent.options.filterExtensions.split(",");
+                        var _fileExtension = file.name.split(".").pop();
+                        _addFile = _allowedExtensions.indexOf(_fileExtension) > -1;
                     }
-                    if (file.type == "file") {
-                        $("<i class='fa fa-file-o'></i>").prependTo(_flink);
-                        _f.click(function () {
-                            _parent.options.onFileChoose(file.path);
-                        });
+                    if (_addFile){
+                        var _f = $("<li>");
+                        var _flink = $("<a>");
+                        
+                        _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
+                        if (file.type == "dir") {
+                            $("<i class='fa fa-folder'></i>").prependTo(_flink);
+                            _f.click(function () {
+                                _parent.options.onFolderChange(file.path);
+                                _parent.navigateTo(file.path);
+                            });
+                        }
+                        if (file.type == "file") {
+                            $("<i class='fa fa-file-o'></i>").prependTo(_flink);
+                            _f.click(function () {
+                                _parent.options.onFileChoose(file.path);
+                            });
+                        }
+                        _f.appendTo(_flist);
                     }
-                    _f.appendTo(_flist);
                 });
                 _flist.appendTo($(_parent.element));
                 var _actions = $("<div>").addClass("jHueFilechooserActions");
