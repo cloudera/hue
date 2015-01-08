@@ -1164,6 +1164,17 @@ def find_json_parameters(fields):
 def find_dollar_variables(text):
   return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)  
 
+def find_dollar_braced_variables(text):
+  vars = set()
+  
+  for var in re.findall('\$\{(.+)\}', text, re.MULTILINE):  
+    if ':' in var:
+      var = var.split(':', 1)[1]    
+    vars.add(var)
+  
+  return list(vars) 
+
+
 
 
 def import_workflows_from_hue_3_7():
