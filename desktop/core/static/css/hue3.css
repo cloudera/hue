@@ -1608,6 +1608,11 @@ body.modal-open {
   overflow: hidden;
 }
 
+html.modal-open {
+  overflow: hidden;
+}
+
+
 .demi-modal {
   position: fixed;
   top: 0;
