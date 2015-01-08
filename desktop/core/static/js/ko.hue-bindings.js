@@ -1071,7 +1071,8 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
         errorRedirectPath: "",
         forceRefresh: true,
         showExtraHome: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.showExtraHome,
-        extraHomeProperties: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.extraHomeProperties ? allBindingsAccessor().filechooserOptions.extraHomeProperties : {}
+        extraHomeProperties: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.extraHomeProperties ? allBindingsAccessor().filechooserOptions.extraHomeProperties : {},
+        filterExtensions: allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
       });
       $("#chooseFile").modal("show");
     }
