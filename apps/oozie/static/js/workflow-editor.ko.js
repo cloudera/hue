@@ -88,6 +88,9 @@ var Node = function (node) {
   self.actionParametersUI = ko.computed(function() {
 	if (typeof self.properties.parameters != "undefined") {
       var _vars = $.map(self.properties.parameters(), function(p, i) { return p.value().split('=', 1)[0]; });
+      if (typeof self.actionParameters() == "undefined"){
+        return _vars;
+      }
       return $.grep(self.actionParameters(), function(param) {
         return _vars.indexOf(param) == -1;
       });
@@ -138,7 +141,7 @@ var Node = function (node) {
 	  }, function (data) {
 	    self.actionParametersFetched(true);
 	    self.actionParameters(data.parameters);
-	    if (data.parameters.length > 0 && self.properties.parameters().length == 0) { // If new node with variables, give a hint by adding a parameter
+	    if (data.parameters && data.parameters.length > 0 && self.properties.parameters().length == 0) { // If new node with variables, give a hint by adding a parameter
 	      self.properties.parameters.push(ko.mapping.fromJS({'value': ''}));
 	    }
 	  }).fail(function (xhr, textStatus, errorThrown) {
