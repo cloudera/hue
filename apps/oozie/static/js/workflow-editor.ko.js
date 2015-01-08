@@ -235,7 +235,7 @@ var Workflow = function (vm, workflow) {
     self.nodes(nodes)
   }
 
-  self.newNode = function (widget, callback) {
+  self.newNode = function (widget, callback, sourceNode) {
     $.ajax({
       type: "POST",
       url: "/oozie/editor/workflow/new_node/",
@@ -255,7 +255,7 @@ var Workflow = function (vm, workflow) {
           }
 
           if (callback) {
-            callback(widget);
+            callback(widget, sourceNode);
           }
         }
       },
@@ -263,11 +263,12 @@ var Workflow = function (vm, workflow) {
     });
   };
 
-  self.addNode = function (widget) {
+  self.addNode = function (widget, copiedNode) {
     $.post("/oozie/editor/workflow/add_node/", {
       "workflow": ko.mapping.toJSON(workflow),
       "node": ko.mapping.toJSON(widget),
       "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
+      "copiedProperties": copiedNode ? ko.mapping.toJSON(copiedNode.properties) : "{}"
     }, function (data) {
       if (data.status == 0) {
         var _node = ko.mapping.toJS(widget);

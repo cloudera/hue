@@ -136,7 +136,7 @@ def new_node(request):
 
   if node['widgetType'] == 'subworkflow-widget':
     workflows = _get_workflows(request.user)
-    
+
   response['status'] = 0
   response['properties'] = properties 
   response['workflows'] = workflows
@@ -160,9 +160,13 @@ def add_node(request):
   workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
   properties = json.loads(request.POST.get('properties', '{}'))
+  copied_properties = json.loads(request.POST.get('copiedProperties', '{}'))
 
   _properties = dict(NODES[node['widgetType']].get_fields())
   _properties.update(dict([(_property['name'], _property['value']) for _property in properties]))
+
+  if copied_properties:
+    _properties.update(copied_properties)
 
   response['status'] = 0
   response['properties'] = _properties
