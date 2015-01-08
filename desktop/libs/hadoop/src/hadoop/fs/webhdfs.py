@@ -597,7 +597,6 @@ class WebHdfs(Hdfs):
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner)
       else:
         self.do_as_user(owner, self.copyfile, source_file, destination_file)
-        self.do_as_superuser(self.chown, destination_file, owner, owner)
 
 
   def copy(self, src, dest, recursive=False, dir_mode=None, owner=None):
