@@ -176,8 +176,17 @@ var Workflow = function (vm, workflow) {
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
 
+  self.versions = ko.mapping.fromJS(['uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.4.5', 'uri:oozie:workflow:0.5']);
   self.movedNode = null;
-  self.versions = ko.mapping.fromJS(['uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.4.5', 'uri:oozie:workflow:0.5']) 
+  self.properties.show_arrows.subscribe(function (newVal) {
+    if (newVal){
+      $(document).trigger("drawArrows");
+    }
+    else {
+      $(document).trigger("removeArrows");
+    }
+  });
+
 
   self.nodeIds = ko.computed(function () {
     var mapping = [];
@@ -449,19 +458,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   });
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
-  };
-
-  self.hasArrows = ko.observable(true);
-  self.hasArrows.subscribe(function (newVal) {
-    if (newVal){
-      $(document).trigger("drawArrows");
-    }
-    else {
-      $(document).trigger("removeArrows");
-    }
-  });
-  self.toggleArrows = function () {
-    self.hasArrows(! self.hasArrows());
   };
 
   self.newAction = ko.observable();

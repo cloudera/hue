@@ -1725,10 +1725,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <i class="fa fa-plus"></i> ${ _('Add property') }
       </a>
 
-      <h4>${ _("Toggle arrows") }</h4>
-      <a title="${ _('Toggle arrow showing') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleArrows, css: {'btn': true, 'btn-inverse': hasArrows}">
-        <i class="fa fa-fw fa-long-arrow-down"></i>
-      </a>
+      <h4>${ _("Show graph arrows") }</h4>      
+      <input type="checkbox" data-bind="checked: $root.workflow.properties.show_arrows" title="${ _('Toggle arrow showing') }" rel="tooltip" data-placement="bottom" />
 
       <h4>${ _("Version") }</h4>
       <select class="input-xlarge" data-bind="value: $root.workflow.properties.schema_version, options: $root.workflow.versions"></select>
@@ -1970,7 +1968,7 @@ ${ dashboard.import_bindings() }
 
   function renderChangeables() {
     resizeDrops();
-    if (viewModel.hasArrows()){
+    if (viewModel.workflow.properties.show_arrows()){
       drawArrows();
     }
   }
