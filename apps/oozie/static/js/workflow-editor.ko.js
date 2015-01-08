@@ -277,6 +277,7 @@ var Workflow = function (vm, workflow) {
 
         if (self.movedNode) {
           var node = self.movedNode;
+          self.movedNode = null;
         } else {
           var node = new Node(_node);
           node.fetch_parameters();
@@ -419,8 +420,6 @@ var Workflow = function (vm, workflow) {
 
     self.removeNode(node.id());
     self.addNode(widget);
-
-    self.movedNode = null;
   };
 
   self.getParents = function (node_id) { // Join nodes can have multiple parents
