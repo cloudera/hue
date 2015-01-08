@@ -113,7 +113,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <li><a href="${ url('impala:index') }"><img src="${ apps['impala'].icon_path }" class="app-icon"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                <li><a href="${ url('beeswax:index') }"><img src="${ apps['pig'].icon_path }" class="app-icon"/> ${_('Pig Script')}</a></li>
+                <li><a href="${ url('pig:index') }"><img src="${ apps['pig'].icon_path }" class="app-icon"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'spark' in apps:
                 <li><a href="${ url('spark:index') }"><img src="${ apps['spark'].icon_path }" class="app-icon"/> ${_('Spark Job')}</a></li>
