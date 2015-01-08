@@ -655,8 +655,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
 <script type="text/html" id="common-fs-link">
   <!-- ko if: with_label -->
-    <a data-bind="attr: {href: '/filebrowser/view' + $data.path }" target="_blank" title="${ _('Open') }">
-      <pan data-bind="text: $data.path"></span>
+    <a data-bind="attr: {href: '/filebrowser/view' + $data.path , title: '${ _('Open') } '+ $data.path }" target="_blank">
+      <pan data-bind="text: $data.path.split('/').pop()"></span>
     </a>
   <!-- /ko -->
 
