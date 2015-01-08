@@ -238,7 +238,7 @@
                 _el.val(path.substring(0, path.lastIndexOf("/")));
               }
               else {
-                _el.val(path + "/" + item);
+                _el.val(path + (path.charAt(path.length - 1) == "/" ? "" : "/") + item);
               }
               if ($(this).html().indexOf("folder") > -1) {
                 _el.val(_el.val() + "/");
