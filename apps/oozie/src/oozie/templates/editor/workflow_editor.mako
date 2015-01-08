@@ -322,9 +322,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         id() != '17c9c895-5a16-7443-bb81-f34b30b21548' && (['fork-widget', 'join-widget', 'decision-widget'].indexOf(widgetType()) == -1 || $root.isEditing())">
 
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && $root.newAction() == null">
-        <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
+        <a href="javascript:void(0)" class="move-widget" title="${ _('Move node') }"><i class="fa fa-arrows"></i></a>
         &nbsp;
-        <a href="javascript:void(0)" class="move-widget clone-widget"><i class="fa fa-copy"></i></a>
+        <a href="javascript:void(0)" class="move-widget clone-widget" title="${ _('Copy node') }"><i class="fa fa-copy"></i></a>
         &nbsp;
       </span>
 
@@ -545,7 +545,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </h6>
     <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
       <li>
-        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserOptions: globalFilechooserOptions, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
+        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz', filechooserOptions: globalFilechooserOptions, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
         <span data-bind='template: { name: "common-fs-link", data: { path: name(), with_label: false} }'></span>
         <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
@@ -1824,8 +1824,9 @@ ${ dashboard.import_bindings() }
       if (viewModel.currentlyDraggedOp() == "move"){
         viewModel.workflow.moveNode(widget);
       }
-      else {
-        viewModel.workflow.newNode(widget, viewModel.workflow.addNode);
+      else { // Copy
+        var _sourceNode = viewModel.workflow.getNodeById(viewModel.currentlyDraggedWidget().id());
+        viewModel.workflow.newNode(widget, viewModel.workflow.addNode, _sourceNode);
       }
       $(document).trigger("drawArrows");
     }
