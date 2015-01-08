@@ -119,7 +119,8 @@ class Workflow(Job):
                   "sla_workflow_enabled": False,
                   "credentials": [],
                   "properties": [],
-                  "sla": Workflow.SLA_DEFAULT
+                  "sla": Workflow.SLA_DEFAULT,
+                  "show_arrows": True,
               },
               "nodes":[
                   {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
@@ -155,6 +156,8 @@ class Workflow(Job):
       _data['workflow']['properties']['parameters'] = [
           {'name': 'oozie.use.system.libpath', 'value': True},
       ]
+    if 'show_arrows' not in _data['workflow']['properties']:
+      _data['workflow']['properties']['show_arrows'] = True
 
     return _data
   
