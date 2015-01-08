@@ -30,7 +30,7 @@
 <%def name="prepares(prepares)">
         % if prepares:
             <prepare>
-                % for p in prepares:
+                % for p in sorted(prepares, key=lambda k: k['type']):
                   <%
                     operation = p['type']
                     path = p['value']

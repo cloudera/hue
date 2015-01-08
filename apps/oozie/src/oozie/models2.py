@@ -359,7 +359,7 @@ class PigAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -444,7 +444,7 @@ class JavaAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -504,7 +504,7 @@ class HiveAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -579,7 +579,7 @@ class HiveServer2Action(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -671,7 +671,7 @@ class SqoopAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -724,7 +724,7 @@ class MapReduceAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -769,7 +769,7 @@ class ShellAction(Action):
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('One command argument, e.g. -l, --help'),
+          'help_text': _('One arg, e.g. -l, --help'),
           'type': ''
      },    
      'env_var': { 
@@ -801,7 +801,7 @@ class ShellAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.'),
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
      'job_properties': { 
@@ -853,7 +853,7 @@ class SshAction(Action):
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('One command argument, e.g. -l, --help'),
+          'help_text': _('One arg, e.g. -l, --help'),
           'type': ''
      },
      'capture_output': { 
@@ -991,7 +991,7 @@ class StreamingAction(Action):
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
-          'help_text': _('Archives uncompressed into the running directory.')
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.')
      },
      'job_properties': { 
           'name': 'job_properties',
