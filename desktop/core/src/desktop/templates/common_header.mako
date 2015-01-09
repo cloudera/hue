@@ -430,6 +430,8 @@ from django.utils.translation import ugettext as _
                <li><a href="${url('oozie:list_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
+           <% from oozie.conf import ENABLE_V2 %>
+           % if ENABLE_V2.get():
            <li class="dropdown-submenu">
              <a href="${ url('oozie:list_editor_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" /> ${_('Editors 2')}</a>
              <ul class="dropdown-menu">
@@ -437,7 +439,8 @@ from django.utils.translation import ugettext as _
                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
                <li><a href="${url('oozie:list_editor_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
-           </li>           
+           </li>
+           % endif
          </ul>
        </li>
        % endif
