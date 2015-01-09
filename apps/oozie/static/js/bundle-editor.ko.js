@@ -37,10 +37,11 @@ var Bundle = function (vm, bundle) {
 }
 
 
-var BundleEditorViewModel = function (bundle_json, coordinators_json) {
+var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_json) {
   var self = this;
 
-  self.isEditing = ko.observable(true);
+  self.canEdit = ko.mapping.fromJS(can_edit_json);
+  self.isEditing = ko.observable(true && self.canEdit());
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
   });

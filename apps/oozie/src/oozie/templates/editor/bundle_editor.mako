@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, commonshare
 from django.utils.translation import ugettext as _
 %>
 
@@ -31,32 +31,45 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 </script>
 
 
+<div id="editor">
+
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}">
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}, visible: bundle.id() != null">
       <i class="fa fa-play"></i>
     </a>
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
+
     &nbsp;&nbsp;&nbsp;
-    % if user.is_superuser:
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}">
-        <i class="fa fa-cog"></i>
-      </button>
-      &nbsp;&nbsp;&nbsp;
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}">
-        <i class="fa fa-save"></i>
-      </button>
-      &nbsp;&nbsp;&nbsp;
-      <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-file-o"></i>
-      </a>
-      <a class="btn" href="${ url('oozie:list_editor_bundles') }" title="${ _('Bundles') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-tags"></i>
-      </a>
-    % endif
+
+    <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
+      <i class="fa fa-cog"></i>
+    </button>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}, visible: canEdit">
+      <i class="fa fa-save"></i>
+    </button>
+
+    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
+        attr: {'data-original-title': '${ _("Share") } ' + name},
+        css: {'isShared': isShared(), 'btn': true},
+        visible: bundle.id() != null && canEdit()">
+      <i class="fa fa-users"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-file-o"></i>
+    </a>
+    <a class="btn" href="${ url('oozie:list_editor_bundles') }" title="${ _('Bundles') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-tags"></i>
+    </a>
   </div>
 
   <form class="form-search">
@@ -159,6 +172,10 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
 <div id="submit-modal" class="modal hide"></div>
 
+
+</div>
+
+
 <div id="exposeOverlay"></div>
 
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
@@ -169,10 +186,13 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
 ${ dashboard.import_layout() }
 
+${ commonshare() | n,unicode }
+
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/share.vm.js"></script>
 
 ${ dashboard.import_bindings() }
 
@@ -180,8 +200,11 @@ ${ dashboard.import_bindings() }
 
 
 <script type="text/javascript">
-  var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode });
-  ko.applyBindings(viewModel);
+  var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode }, ${ can_edit_json | n,unicode });
+  ko.applyBindings(viewModel, $("#editor")[0]);
+
+  var shareViewModel = setupSharing("#documentShareModal");
+  shareViewModel.setDocId(${ doc1_id });
 
   var tempCoordinator = null;
   function showChooseCoordinator(coord) {

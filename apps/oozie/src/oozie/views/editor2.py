@@ -341,6 +341,8 @@ def save_coordinator(request):
 
   if coordinator_data['properties']['workflow']:
     dependencies = Document2.objects.filter(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
+    for doc in dependencies:
+      doc.doc.get().can_read_or_exception(request.user)
     coordinator_doc.dependencies = dependencies
 
   coordinator_doc.update_data(coordinator_data)
@@ -415,24 +417,32 @@ def _submit_coordinator(request, coordinator, mapping):
     
 
 def list_editor_bundles(request):
-  bundles = Document2.objects.filter(type='oozie-bundle2', owner=request.user)
+  bundles = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
 
   return render('editor/list_editor_bundles.mako', request, {
       'bundles': bundles
   })
 
 
+@check_document_access_permission()
 def edit_bundle(request):
   bundle_id = request.GET.get('bundle')
+  doc = None
   
   if bundle_id:
-    bundle = Bundle(document=Document2.objects.get(id=bundle_id)) # Todo perms
+    doc = Document2.objects.get(id=bundle_id)
+    bundle = Bundle(document=doc)
   else:
     bundle = Bundle()
 
+  coordinators = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
+                      for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
+
   return render('editor/bundle_editor.mako', request, {
       'bundle_json': bundle.json,
-      'coordinators_json': json.dumps(list(Document2.objects.filter(type='oozie-coordinator2', owner=request.user).values('uuid', 'name'))) # Todo perms
+      'coordinators_json': json.dumps(coordinators),
+      'doc1_id': doc.doc.get().id if doc else -1,
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))      
   })
 
 
@@ -440,18 +450,22 @@ def new_bundle(request):
   return edit_bundle(request)
 
 
+@check_document_modify_permission()
 def save_bundle(request):
   response = {'status': -1}
 
-  bundle_data = json.loads(request.POST.get('bundle', '{}')) # TODO perms
+  bundle_data = json.loads(request.POST.get('bundle', '{}'))
 
   if bundle_data.get('id'):
     bundle_doc = Document2.objects.get(id=bundle_data['id'])
   else:      
     bundle_doc = Document2.objects.create(name=bundle_data['name'], uuid=bundle_data['uuid'], type='oozie-bundle2', owner=request.user)
+    Document.objects.link(bundle_doc, owner=bundle_doc.owner, name=bundle_doc.name, description=bundle_doc.description, extra='bundle2')
 
   if bundle_data['coordinators']:
-    dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']]) # TODO perms
+    dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']])
+    for doc in dependencies:
+      doc.doc.get().can_read_or_exception(request.user)    
     bundle_doc.dependencies = dependencies
 
   bundle_doc.update_data(bundle_data)
@@ -465,8 +479,9 @@ def save_bundle(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@check_document_access_permission()
 def submit_bundle(request, doc_id):
-  bundle = Bundle(document=Document2.objects.get(id=doc_id)) # Todo perms  
+  bundle = Bundle(document=Document2.objects.get(id=doc_id))  
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':

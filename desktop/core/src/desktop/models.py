@@ -638,7 +638,9 @@ class Document2(models.Model):
     self.data = json.dumps(data_dict)
 
   def get_absolute_url(self):
-    if self.type == 'oozie-workflow2':
-      return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    if self.type == 'oozie-coordinator2':
+      return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
+    elif self.type == 'oozie-bundle2':
+      return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)    
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
