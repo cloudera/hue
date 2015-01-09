@@ -75,10 +75,11 @@ var Coordinator = function (vm, coordinator) {
 }
 
 
-var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, workflows_json) {
+var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, workflows_json, can_edit_json) {
   var self = this;
 
-  self.isEditing = ko.observable(true);
+  self.canEdit = ko.mapping.fromJS(can_edit_json);
+  self.isEditing = ko.observable(true && self.canEdit());
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
   });

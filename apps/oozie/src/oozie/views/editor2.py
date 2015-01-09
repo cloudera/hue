@@ -86,8 +86,8 @@ def edit_workflow(request):
       'credentials_json': json.dumps(credentials.credentials.keys()),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
       'doc1_id': doc.doc.get().id if doc else -1,
-      'subworkflows_json': json.dumps(_get_workflows(request.user)), # if has sub?
-      'can_edit_job_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'subworkflows_json': json.dumps(_get_workflows(request.user)),
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
 
@@ -99,7 +99,7 @@ def new_workflow(request):
 def save_workflow(request):
   response = {'status': -1}
 
-  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+  workflow = json.loads(request.POST.get('workflow', '{}'))
   layout = json.loads(request.POST.get('layout', '{}'))
 
   if workflow.get('id'):
@@ -282,19 +282,21 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
 
 
 def list_editor_coordinators(request):
-  coordinators = [d.content_object for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
-  coordinators = Document2.objects.filter(type='oozie-coordinator2', owner=request.user)
+  coordinators = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor/list_editor_coordinators.mako', request, {
       'coordinators': coordinators
   })
 
 
+@check_document_access_permission()
 def edit_coordinator(request):
   coordinator_id = request.GET.get('coordinator')
+  doc = None
   
   if coordinator_id:
-    coordinator = Coordinator(document=Document2.objects.get(id=coordinator_id)) # Todo perms
+    doc = Document2.objects.get(id=coordinator_id)
+    coordinator = Coordinator(document=doc)
   else:
     coordinator = Coordinator()
 
@@ -306,10 +308,18 @@ def edit_coordinator(request):
   except Exception, e:
     LOG.error(smart_str(e))
 
+  workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
+                                    for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+
+  if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
+    raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
+
   return render('editor/coordinator_editor.mako', request, {
       'coordinator_json': coordinator.json,
       'credentials_json': json.dumps(credentials.credentials.keys()),
-      'workflows_json': json.dumps(list(Document2.objects.filter(type='oozie-workflow2', owner=request.user).values('uuid', 'name'))) # Todo perms
+      'workflows_json': json.dumps(workflows),
+      'doc1_id': doc.doc.get().id if doc else -1,
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
 
@@ -317,15 +327,17 @@ def new_coordinator(request):
   return edit_coordinator(request)
 
 
+@check_document_modify_permission()
 def save_coordinator(request):
   response = {'status': -1}
 
-  coordinator_data = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
+  coordinator_data = json.loads(request.POST.get('coordinator', '{}'))
 
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:      
     coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
+    Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
   if coordinator_data['properties']['workflow']:
     dependencies = Document2.objects.filter(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
@@ -345,7 +357,7 @@ def save_coordinator(request):
 def gen_xml_coordinator(request):
   response = {'status': -1}
 
-  coordinator_dict = json.loads(request.POST.get('coordinator', '{}')) # TODO perms
+  coordinator_dict = json.loads(request.POST.get('coordinator', '{}'))
 
   coordinator = Coordinator(data=coordinator_dict)
 
@@ -355,8 +367,9 @@ def gen_xml_coordinator(request):
   return HttpResponse(json.dumps(response), mimetype="application/json") 
 
 
+@check_document_access_permission()
 def submit_coordinator(request, doc_id):
-  coordinator = Coordinator(document=Document2.objects.get(id=doc_id)) # Todo perms  
+  coordinator = Coordinator(document=Document2.objects.get(id=doc_id))  
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':

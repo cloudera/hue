@@ -32,34 +32,28 @@ LOG = logging.getLogger(__name__)
 
 def check_document_access_permission():
   def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      # uuid=request.GET.get('uuid')
-      
-      # workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
-      
-      wid = {}
+    def decorate(request, *args, **kwargs):      
+      doc_id = {}
       
       try:
-        workflow_id = request.GET.get('workflow')      
-        if workflow_id:
+        if request.GET.get('workflow'):
+          workflow_id = request.GET.get('workflow')
           if workflow_id.isdigit():
-            wid['id'] = workflow_id
+            doc_id['id'] = workflow_id
           else:
-            wid['uuid'] = workflow_id
+            doc_id['uuid'] = workflow_id
         elif request.GET.get('uuid'):
-          wid['uuid'] = request.GET.get('uuid')
+          doc_id['uuid'] = request.GET.get('uuid')
+        elif request.GET.get('coordinator'):
+          doc_id['id'] = request.GET.get('coordinator')
+        elif 'doc_id' in kwargs:
+          doc_id['id'] = kwargs['doc_id']
 
-        doc2 = Document2.objects.get(type='oozie-workflow2', **wid)          
-        doc2.doc.get().can_read_or_exception(request.user)
+        if doc_id:
+          doc2 = Document2.objects.get(**doc_id)          
+          doc2.doc.get().can_read_or_exception(request.user)
       except Document.DoesNotExist:
-        raise PopupException(_('Job %(id)s does not exist') % {'id': wid})
-      
-      if 'workflow' in kwargs:
-        job_type = 'workflow'
-      elif 'coordinator' in kwargs:
-        job_type = 'coordinator'
-      else:
-        job_type = 'bundle'
+        raise PopupException(_('Job %(id)s does not exist') % {'id': doc_id})
 
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)
@@ -69,18 +63,20 @@ def check_document_access_permission():
 def check_document_modify_permission():
   def inner(view_func):
     def decorate(request, *args, **kwargs):
-      wid = None            
+      doc_id = None            
       
-      workflow = json.loads(request.POST.get('workflow', '{}'))
+      job = json.loads(request.POST.get('workflow', '{}'))
+      if not job:
+        job = json.loads(request.POST.get('coordinator', '{}'))
 
-      if workflow.get('id'):
-        wid = workflow.get('id')
+      if job and job.get('id'):
+        doc_id = job.get('id')
       
-      try:
-        doc2 = Document2.objects.get(id=workflow['id'])
-        doc2.doc.get().can_write_or_exception(request.user)
-      except Document.DoesNotExist:
-        raise PopupException(_('Job %(id)s does not exist') % {'id': wid})
+        try:
+          doc2 = Document2.objects.get(id=job['id'])
+          doc2.doc.get().can_write_or_exception(request.user)
+        except Document.DoesNotExist:
+          raise PopupException(_('Job %(id)s does not exist') % {'id': doc_id})
 
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)

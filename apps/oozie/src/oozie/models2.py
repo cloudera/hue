@@ -1405,7 +1405,7 @@ class Coordinator(Job):
   @property      
   def deployment_dir(self):
     if not self.data['properties'].get('deployment_dir'):
-      self.data['properties']['deployment_dir'] = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too    
+      self.data['properties']['deployment_dir'] = Job.get_workspace(user)    
     return self.data['properties']['deployment_dir']
   
   def find_parameters(self):
@@ -1638,7 +1638,7 @@ class Bundle(Job):
   @property      
   def deployment_dir(self):
     if not self.data['properties'].get('deployment_dir'):
-      self.data['properties']['deployment_dir'] = Hdfs.join(REMOTE_SAMPLE_DIR.get(), 'hue-oozie-%s' % time.time()) # Could be home of user too    
+      self.data['properties']['deployment_dir'] = Job.get_workspace(user)    
     return self.data['properties']['deployment_dir']
   
   def find_parameters(self):

@@ -445,12 +445,12 @@ var Workflow = function (vm, workflow) {
   };
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_job_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
 
-  self.canEdit = ko.mapping.fromJS(can_edit_job_json);
+  self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(true && self.canEdit());
   self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
