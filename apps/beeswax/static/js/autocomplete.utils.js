@@ -16,20 +16,21 @@
 
 function hac_jsoncalls(options) {
   var _url = typeof options.autocompleteBaseURL != "undefined" ? options.autocompleteBaseURL : HIVE_AUTOCOMPLETE_BASE_URL;
-    
-  if (options.database != null) {
-    _url += options.database
-  }
-  if (options.table != null) {
-    _url += "/" + options.table
-  }
+  if (_url != ""){
+    if (options.database != null) {
+      _url += options.database
+    }
+    if (options.table != null) {
+      _url += "/" + options.table
+    }
 
-  $.ajax({
-    type: "GET",
-    url: _url + "?" + Math.random(),
-    success: options.onDataReceived,
-    async: options.sync == "undefined"
-  });
+    $.ajax({
+      type: "GET",
+      url: _url + "?" + Math.random(),
+      success: options.onDataReceived,
+      async: options.sync == "undefined"
+    });
+  }
 }
 
 function hac_hasExpired(timestamp){
