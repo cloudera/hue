@@ -640,8 +640,13 @@ class HiveServerClient:
 
   def get_partitions(self, database, table_name, max_parts):
     table = self.get_table(database, table_name)
-    # TODO: do a 'use DB' ?
-    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
+
+    if max_parts is None or max_parts <= 0:
+      max_rows = 10000
+    else:
+      max_rows = 1000 if max_parts <= 250 else max_parts
+
+    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name, max_rows=max_rows) # DB prefix supported since Hive 0.13
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
 
 
