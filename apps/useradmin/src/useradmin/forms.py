@@ -198,9 +198,9 @@ class AddLdapUsersForm(forms.Form):
 class AddLdapGroupsForm(forms.Form):
   groupname_pattern = forms.CharField(
       label=_t("Name"),
-      max_length=80,
-      help_text=_t("Required. 80 characters or fewer."),
-      error_messages={'invalid': _t("80 characters or fewer.") })
+      max_length=256,
+      help_text=_t("Required. 256 characters or fewer."),
+      error_messages={'invalid': _t("256 characters or fewer.") })
   dn = forms.BooleanField(label=_t("Distinguished name"),
                           help_text=_t("Whether or not the group should be imported by "
                                     "distinguished name."),
