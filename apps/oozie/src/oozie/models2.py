@@ -1513,7 +1513,7 @@ class Dataset():
     if type(self._data['start']) == unicode: 
       self._data['start'] = parse(self._data['start'])
 
-    self._data['name'] = self._data['workflow_variable'] # Todo Harmonize name for Oozie XML
+    self._data['name'] = self._data['workflow_variable']
 
     return self._data      
       
@@ -1614,7 +1614,7 @@ class Bundle(Job):
     if mapping is None:
       mapping = {}
 
-    mapping.update(dict(list(Document2.objects.filter(type='oozie-coordinator2', uuid__in=self.data['coordinators']).values('uuid', 'name')))) # TODO perms
+    mapping.update(dict(list(Document2.objects.filter(type='oozie-coordinator2', uuid__in=self.data['coordinators']).values('uuid', 'name'))))
     tmpl = "editor/gen2/bundle.xml.mako"
     return force_unicode(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {

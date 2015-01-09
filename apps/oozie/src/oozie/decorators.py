@@ -46,6 +46,8 @@ def check_document_access_permission():
           doc_id['uuid'] = request.GET.get('uuid')
         elif request.GET.get('coordinator'):
           doc_id['id'] = request.GET.get('coordinator')
+        elif request.GET.get('bundle'):
+          doc_id['id'] = request.GET.get('bundle')          
         elif 'doc_id' in kwargs:
           doc_id['id'] = kwargs['doc_id']
 
@@ -68,6 +70,8 @@ def check_document_modify_permission():
       job = json.loads(request.POST.get('workflow', '{}'))
       if not job:
         job = json.loads(request.POST.get('coordinator', '{}'))
+      elif not job:
+        job = json.loads(request.POST.get('bundle', '{}'))
 
       if job and job.get('id'):
         doc_id = job.get('id')
