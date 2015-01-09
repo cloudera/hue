@@ -15,15 +15,80 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
 from django.utils.functional import wraps
+from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document, Document2
 
 from oozie.models import Job, Node, Dataset
 
 
 LOG = logging.getLogger(__name__)
+
+
+def check_document_access_permission():
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      # uuid=request.GET.get('uuid')
+      
+      # workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+      
+      wid = {}
+      
+      try:
+        workflow_id = request.GET.get('workflow')      
+        if workflow_id:
+          if workflow_id.isdigit():
+            wid['id'] = workflow_id
+          else:
+            wid['uuid'] = workflow_id
+        elif request.GET.get('uuid'):
+          wid['uuid'] = request.GET.get('uuid')
+
+        doc2 = Document2.objects.get(type='oozie-workflow2', **wid)          
+        doc2.doc.get().can_read_or_exception(request.user)
+      except Document.DoesNotExist:
+        raise PopupException(_('Job %(id)s does not exist') % {'id': wid})
+      
+      if 'workflow' in kwargs:
+        job_type = 'workflow'
+      elif 'coordinator' in kwargs:
+        job_type = 'coordinator'
+      else:
+        job_type = 'bundle'
+
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
+
+
+def check_document_modify_permission():
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      wid = None            
+      
+      workflow = json.loads(request.POST.get('workflow', '{}'))
+
+      if workflow.get('id'):
+        wid = workflow.get('id')
+      
+      try:
+        doc2 = Document2.objects.get(id=workflow['id'])
+        doc2.doc.get().can_write_or_exception(request.user)
+      except Document.DoesNotExist:
+        raise PopupException(_('Job %(id)s does not exist') % {'id': wid})
+
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
+
+
+
+## Oozie v1 below
 
 
 def check_job_access_permission(exception_class=PopupException):

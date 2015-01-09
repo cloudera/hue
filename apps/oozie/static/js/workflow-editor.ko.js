@@ -240,7 +240,6 @@ var Workflow = function (vm, workflow) {
       type: "POST",
       url: "/oozie/editor/workflow/new_node/",
       data: {
-        "workflow": ko.mapping.toJSON(workflow),
         "node": ko.mapping.toJSON(widget)
       },
       success: function (data) {
@@ -265,7 +264,6 @@ var Workflow = function (vm, workflow) {
 
   self.addNode = function (widget, copiedNode) {
     $.post("/oozie/editor/workflow/add_node/", {
-      "workflow": ko.mapping.toJSON(workflow),
       "node": ko.mapping.toJSON(widget),
       "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
       "copiedProperties": copiedNode ? ko.mapping.toJSON(copiedNode.properties) : "{}"
@@ -447,17 +445,18 @@ var Workflow = function (vm, workflow) {
   };
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_job_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
 
-  self.isEditing = ko.observable(true);
+  self.canEdit = ko.mapping.fromJS(can_edit_job_json);
+  self.isEditing = ko.observable(true && self.canEdit());
   self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });
   self.toggleEditing = function () {
-    self.isEditing(!self.isEditing());
+    self.isEditing(! self.isEditing());
   };
 
   self.newAction = ko.observable();

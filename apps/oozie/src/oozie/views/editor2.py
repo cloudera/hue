@@ -34,6 +34,7 @@ from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
+from oozie.decorators import check_document_access_permission, check_document_modify_permission
 from oozie.forms import ParameterForm
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
@@ -43,16 +44,16 @@ LOG = logging.getLogger(__name__)
 
 
 
-def list_editor_workflows(request):
-  workflows = Document2.objects.filter(type='oozie-workflow2', owner=request.user)
+def list_editor_workflows(request):  
+  workflows = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   return render('editor/list_editor_workflows.mako', request, {
       'workflows': workflows
   })
 
 
+@check_document_access_permission()
 def edit_workflow(request):
-
   workflow_id = request.GET.get('workflow')
   
   if workflow_id:
@@ -60,9 +61,9 @@ def edit_workflow(request):
     if workflow_id.isdigit():
       wid['id'] = workflow_id
     else:
-      wid['uuid'] =workflow_id
+      wid['uuid'] = workflow_id
     doc = Document2.objects.get(type='oozie-workflow2', **wid)
-    workflow = Workflow(document=doc) # Todo perms
+    workflow = Workflow(document=doc)
   else:
     doc = None
     workflow = Workflow()
@@ -85,7 +86,8 @@ def edit_workflow(request):
       'credentials_json': json.dumps(credentials.credentials.keys()),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
       'doc1_id': doc.doc.get().id if doc else -1,
-      'subworkflows_json': json.dumps(_get_workflows(request.user)) # if has sub?
+      'subworkflows_json': json.dumps(_get_workflows(request.user)), # if has sub?
+      'can_edit_job_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
 
@@ -93,6 +95,7 @@ def new_workflow(request):
   return edit_workflow(request)
 
 
+@check_document_modify_permission()
 def save_workflow(request):
   response = {'status': -1}
 
@@ -128,7 +131,6 @@ def save_workflow(request):
 def new_node(request):
   response = {'status': -1}
 
-  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
 
   properties = NODES[node['widgetType']].get_mandatory_fields()
@@ -150,14 +152,13 @@ def _get_workflows(user):
         'owner': workflow.owner.username,
         'value': workflow.uuid,
         'id': workflow.id
-      } for workflow in Document2.objects.filter(type='oozie-workflow2', owner=user)
+      } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2')]
     ]  
 
 
 def add_node(request):
   response = {'status': -1}
 
-  workflow = json.loads(request.POST.get('workflow', '{}')) # TODO perms
   node = json.loads(request.POST.get('node', '{}'))
   properties = json.loads(request.POST.get('properties', '{}'))
   copied_properties = json.loads(request.POST.get('copiedProperties', '{}'))
@@ -189,7 +190,7 @@ def action_parameters(request):
       script_path = script_path.replace('hdfs://', '')
 
       if request.fs.do_as_user(request.user, request.fs.exists, script_path):
-        data =  request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024 ** 2)  
+        data = request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024 ** 2)  
 
         if node_data['type'] in ('hive', 'hive2'):
           parameters = parameters.union(set(find_dollar_braced_variables(data)))
@@ -204,11 +205,12 @@ def action_parameters(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@check_document_access_permission()
 def workflow_parameters(request):
   response = {'status': -1}
 
   try:
-    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', owner=request.user, uuid=request.GET.get('uuid'))) # TODO perms 
+    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid'))) 
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
@@ -222,7 +224,7 @@ def gen_xml_workflow(request):
   response = {'status': -1}
 
   try:
-    workflow_json = json.loads(request.POST.get('workflow', '{}')) # TODO perms
+    workflow_json = json.loads(request.POST.get('workflow', '{}'))
   
     workflow = Workflow(workflow=workflow_json)
   
@@ -234,8 +236,9 @@ def gen_xml_workflow(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@check_document_access_permission()
 def submit_workflow(request, doc_id):
-  workflow = Workflow(document=Document2.objects.get(id=doc_id)) # Todo perms
+  workflow = Workflow(document=Document2.objects.get(id=doc_id))
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -277,7 +280,9 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 
+
 def list_editor_coordinators(request):
+  coordinators = [d.content_object for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
   coordinators = Document2.objects.filter(type='oozie-coordinator2', owner=request.user)
 
   return render('editor/list_editor_coordinators.mako', request, {
