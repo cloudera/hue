@@ -933,7 +933,7 @@ ${ commonshare() | n,unicode }
           }
           var _showHCatHint = false;
           if (_line.indexOf(KLASS) == -1) {
-            if (_partial.indexOf("'") == _partial.length - 1) {
+            if (_partial.indexOf("'") == _partial.length - 1 && HIVE_AUTOCOMPLETE_BASE_URL != "") {
               _showHCatHint = true;
             }
             showHdfsAutocomplete(_autocompleteUrl + "?format=json", _showHCatHint);
