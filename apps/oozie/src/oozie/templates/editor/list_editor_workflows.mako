@@ -30,11 +30,27 @@ ${ layout.menubar(section='workflows') }
   <div class="card card-small">
   <h1 class="card-heading simple">${ _('Workflow Manager') }</h1>
 
+  <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+    <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
+
+    <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
+    
+    <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+
+    <a href="${ url('oozie:new_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+  </div>
+
   % for workflow in workflows:
     <div>
       <a href="${ url('oozie:edit_workflow') }?workflow=${ workflow.id }">
         ${ workflow.name }
-      </a>
+        
+        ${ workflow.description }
+        
+        ${ workflow.owner }
+        
+        ${ workflow.last_modified }
+      </a>      
     </div>
   % endfor
 

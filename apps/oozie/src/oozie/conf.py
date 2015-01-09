@@ -60,13 +60,20 @@ OOZIE_JOBS_COUNT = Config(
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
 
-ENABLE_CRON_SCHEDULING = Config( # Until Hue 4
+ENABLE_V2 = Config( # Until Hue 4
+  key='enable_v2',
+  default=False,
+  type=coerce_bool,
+  help=_t('Use version 2 of Editor.')
+)
+
+
+ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   key='enable_cron_scheduling',
   default=True,
   type=coerce_bool,
   help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
 )
-
 
 def config_validator(user):
   res = []
