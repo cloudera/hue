@@ -171,7 +171,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
         attr: {'data-original-title': '${ _("Share") } ' + name},
         css: {'isShared': isShared(), 'btn': true},
-        visible: workflow.id() != null, visible: canEdit">
+        visible: workflow.id() != null && canEdit()">
       <i class="fa fa-users"></i>
     </a>
 
@@ -1789,7 +1789,7 @@ ${ dashboard.import_bindings() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_job_json | n,unicode }); 
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = setupSharing("#documentShareModal");
