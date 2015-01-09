@@ -42,8 +42,14 @@ LOG = logging.getLogger(__name__)
 
 @ensure_csrf_cookie
 def app(request):
+  autocomplete_base_url = ''
+  try:
+    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
+  except:
+    pass
+  
   return render('app.mako', request, {
-    'autocomplete_base_url': reverse('beeswax:api_autocomplete_databases', kwargs={}),
+    'autocomplete_base_url': autocomplete_base_url,
   })
 
 
