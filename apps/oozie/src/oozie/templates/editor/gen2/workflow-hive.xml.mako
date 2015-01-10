@@ -23,8 +23,8 @@
             <name-node>${'${'}nameNode}</name-node>
 
             ${ common.prepares(node['properties']['prepares']) }
-            % if node['properties']['job_xml']:
-              <job-xml>${ node['properties']['job_xml'] }</job-xml>
+            % if node['properties']['hive_xml']:
+              <job-xml>${ node['properties']['hive_xml'] }</job-xml>
             % endif
             ${ common.configuration(node['properties']['properties']) }
 

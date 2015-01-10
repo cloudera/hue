@@ -524,18 +524,18 @@ class HiveAction(Action):
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
-          'name': 'job_xml',
-          'label': _('Job XML'),
+     'hive_xml': { 
+          'name': 'hive_xml',
+          'label': _('Hive XML'),
           'value': [],
-          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'help_text': _('Refer to a hive-site.xml renamed hive-conf.xml'),
           'type': ''
      }
   }
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['script_path']]
+    return [cls.FIELDS['script_path'], cls.FIELDS['hive_xml']]
 
 
 class HiveServer2Action(Action):
