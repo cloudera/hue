@@ -1,8 +1,6 @@
 
 SINGLE_BIT_MASK =  [1 << x for x in range(7, -1, -1)]
 
-]
-
 class BitString(object):
 
 	def __init__(self, bytes, length=None, offset=None):
