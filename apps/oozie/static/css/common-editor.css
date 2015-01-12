@@ -47,3 +47,8 @@
 .demi-modal {
   z-index: 1033;
 }
+
+.ribbon-wrapper {
+  top: 70px;
+}
+
