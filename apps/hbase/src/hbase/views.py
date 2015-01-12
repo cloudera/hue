@@ -73,7 +73,7 @@ def api_router(request, url): # On split, deserialize anything
   if request.POST.get('dest', False):
     url_params += [request.FILES.get(request.REQUEST.get('dest'))]
 
-  return api_dump(HbaseApi().query(*url_params))
+  return api_dump(HbaseApi(request.user).query(*url_params))
 
 def api_dump(response):
   ignored_fields = ('thrift_spec', '__.+__')

@@ -37,6 +37,9 @@ LOG = logging.getLogger(__name__)
 # Format methods similar to Thrift API, for similarity with catch-all
 class HbaseApi(object):
 
+  def __init__(self, user):
+    self.user = user
+
   def query(self, action, *args):
     try:
       if hasattr(self, action):
@@ -57,15 +60,16 @@ class HbaseApi(object):
   def getClusters(self):
     clusters = []
     try:
-      full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'","\""))
+      full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
     except:
       full_config = [conf.HBASE_CLUSTERS.get()]
     for config in full_config: #hack cause get() is weird
-      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
+
+      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<protocol>https?://)?(?P<host>.+):(?P<port>[0-9]+)\)', config)
       if match:
         clusters += [{
           'name': match.group('name'),
-          'host': match.group('host'),
+          'host': (match.group('protocol') + match.group('host')) if match.group('protocol') else match.group('host'),
           'port': int(match.group('port'))
         }]
       else:
@@ -85,14 +89,25 @@ class HbaseApi(object):
   def connectCluster(self, name):
     _security = self._get_security()
     target = self.getCluster(name)
-    return thrift_util.get_client(get_client_type(),
+    client = thrift_util.get_client(get_client_type(),
                                   target['host'],
                                   target['port'],
                                   service_name="Hue HBase Thrift Client for %s" % name,
                                   kerberos_principal=_security['kerberos_principal_short_name'],
                                   use_sasl=_security['use_sasl'],
                                   timeout_seconds=None,
-                                  transport=conf.THRIFT_TRANSPORT.get())
+                                  transport=conf.THRIFT_TRANSPORT.get(),
+                                  transport_mode=conf.TRANSPORT_MODE.get(),
+                                  http_url=\
+                                      ('http://' if (conf.TRANSPORT_MODE.get() == 'http' and not target['host'].startswith('http')) else '') \
+                                      + target['host'] + ':' + str(target['port'])
+    )
+
+    if hasattr(client, 'setCustomHeaders'):
+      client.setCustomHeaders({'doAs': self.user.username})
+
+    return client
+
   @classmethod
   def _get_security(cls):
     principal = get_server_principal()
