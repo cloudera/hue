@@ -166,7 +166,7 @@ function displayViewModel(params) {
   self.isLoading = ko.observable(true);
 
   self.totalPages = ko.computed(function () {
-    return Math.max(Math.floor(self.size() / self.length()), 1);
+    return Math.max(Math.ceil(self.size() / self.length()), 1);
   });
 
   self.upperPage = ko.observable(Math.min(self.totalPages(), 50));
