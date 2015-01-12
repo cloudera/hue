@@ -287,14 +287,14 @@
 }
 
 .drop-target {
-  background-color: #FCFCFC;
+  background-color: #F6F6F6;
   min-height: 20px;
-  border: 2px dotted #FAFAFA;
+  border: 2px dotted #DDD;
   text-align: center;
   padding: 4px;
 }
 .drop-target-dragging {
-  background-color: #F6F6F6;
+  background-color: #F0F0F0;
   border-color: #DDD;
 }
 
@@ -305,6 +305,7 @@
 .drop-target-highlight {
   min-height: 20px;
   background-color: #CCC;
+  border-color: #BBB;
 }
 
 .drop-target-disabled {
