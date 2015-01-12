@@ -193,9 +193,15 @@ var Workflow = function (vm, workflow) {
     var isDirtyContainer = [];
     $.each(self.nodes(), function (index, node) {
       for(var property in node.properties) {
-         if (typeof node.properties[property] == "function"){
-           isDirtyContainer.push(node.properties[property]()); 
-         }
+        if (typeof node.properties[property] == "function"){
+          var _obs = node.properties[property]();
+           isDirtyContainer.push(_obs);
+           if ($.isArray(_obs)){
+             _obs.forEach(function(item){
+               isDirtyContainer.push(item.value());
+             });
+           }
+        }
       }
     });
     return isDirtyContainer;
