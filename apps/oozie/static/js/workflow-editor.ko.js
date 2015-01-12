@@ -173,6 +173,8 @@ var Workflow = function (vm, workflow) {
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
+  self.isDirty = ko.observable(false);
+
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
 
@@ -187,6 +189,28 @@ var Workflow = function (vm, workflow) {
     }
   });
 
+  self.nodesProperties = ko.computed(function () {
+    var isDirtyContainer = [];
+    $.each(self.nodes(), function (index, node) {
+      for(var property in node.properties) {
+         if (typeof node.properties[property] == "function"){
+           isDirtyContainer.push(node.properties[property]()); 
+         }
+      }
+    });
+    return isDirtyContainer;
+  });
+
+  self.oldNodesPropertiesHash = "";
+  self.nodesProperties.subscribe(function(newVal){
+    if (self.oldNodesPropertiesHash == ""){
+      self.oldNodesPropertiesHash = JSON.stringify(newVal);
+    }
+    if (JSON.stringify(newVal) !== self.oldNodesPropertiesHash){
+      self.oldNodesPropertiesHash = JSON.stringify(newVal);
+      self.isDirty(true);
+    }
+  });
 
   self.nodeIds = ko.computed(function () {
     var mapping = [];
@@ -256,6 +280,7 @@ var Workflow = function (vm, workflow) {
           if (callback) {
             callback(widget, sourceNode);
           }
+          self.isDirty(true);
         }
       },
       async: false
@@ -350,6 +375,7 @@ var Workflow = function (vm, workflow) {
         }
 
         vm.currentlyCreatingFork = false;
+        self.isDirty(true);
 
       } else {
         $(document).trigger("error", data.message);
@@ -406,6 +432,7 @@ var Workflow = function (vm, workflow) {
       } else if (parent.type() == 'decision-widget') {
         parent.remove_link('to', childId);
       }
+      self.isDirty(true);
     }
     else {
       self.nodes.remove(node);
@@ -1013,6 +1040,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         if (window.location.search.indexOf("workflow") == -1) {
           window.location.hash = '#workflow=' + data.id;
         }
+        self.workflow.isDirty(false);
       }
       else {
         $(document).trigger("error", data.message);
