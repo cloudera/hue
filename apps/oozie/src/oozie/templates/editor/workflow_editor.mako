@@ -143,6 +143,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
 
+    <span data-bind="visible: workflow.isDirty" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
       <i class="fa fa-fw fa-play"></i>
     </a>
@@ -195,11 +197,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </div>
   </form>
 </div>
-
-<div class="ribbon-wrapper" data-bind="visible: workflow.isDirty">
-  <div class="ribbon">${ _('Unsaved') }</div>
-</div>
-
 
 
 <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && oozieColumns().length == 0">
@@ -2074,22 +2071,6 @@ ${ dashboard.import_bindings() }
     });
 
     $.jHueScrollUp();
-
-    window.onbeforeunload = function (e) {
-      if (viewModel.workflow.isDirty()) {
-        var message = "${ _('You have unsaved changes in this workflow.') }";
-
-        if (!e) e = window.event;
-        e.cancelBubble = true;
-        e.returnValue = message;
-
-        if (e.stopPropagation) {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-        return message;
-      }
-    };
 
   });
 
