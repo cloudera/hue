@@ -741,7 +741,13 @@ ${ commonshare() | n,unicode }
 <script src="/static/js/codemirror-pig.js"></script>
 <script src="/static/js/codemirror-show-hint.js"></script>
 <script src="/static/js/codemirror-pig-hint.js"></script>
+% if autocomplete_base_url != '':
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+% else:
+<script type="text/javascript" charset="utf-8">
+  var hac_getTables = function() {};
+</script>
+% endif
 
 <link rel="stylesheet" href="/pig/static/css/pig.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
