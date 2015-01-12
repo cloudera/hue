@@ -1398,7 +1398,7 @@ function reinitializeTable(max) {
         heightAfterCorrection: 0
       });
       reinitializeTableExtenders();
-      container.height($("#results .dataTables_wrapper").height());
+      container.height($(window).height() - 150);
       $("#results .dataTables_wrapper").jHueScrollUp();
     } else if ($('#resultEmpty').height() > 0) {
       container.height($('#resultEmpty').height());
@@ -2017,6 +2017,8 @@ function datatableScroll() {
 
 var firstFnDrawcallback = false;
 
+var manualFetchResultCounter = 0;
+
 function addResults(viewModel, dataTable, startRow, nextRow) {
   if (startRow == 0) {
     firstFnDrawcallback = true;
@@ -2024,8 +2026,12 @@ function addResults(viewModel, dataTable, startRow, nextRow) {
   dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(startRow, nextRow), startRow));
 
   % if app_name == 'impala':
-  if (startRow == 0 && viewModel.scrollNotWorking() && viewModel.hasMoreResults()){
+  manualFetchResultCounter += (nextRow - startRow);
+  if (manualFetchResultCounter < 100 && viewModel.scrollNotWorking() && viewModel.hasMoreResults()){
     manualFetch();
+  }
+  else {
+    manualFetchResultCounter = 0;
   }
   %endif
 }
