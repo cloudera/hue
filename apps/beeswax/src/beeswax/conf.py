@@ -95,6 +95,7 @@ THRIFT_VERSION = Config(
   default=7
 )
 
+
 SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),

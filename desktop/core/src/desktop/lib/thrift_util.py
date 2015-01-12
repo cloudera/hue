@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Utilities for Thrift
 
 import Queue
 import logging
@@ -32,7 +31,9 @@ from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TM
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
+
 from desktop.lib.python_util import create_synchronous_io_multiplexer
+from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
@@ -45,6 +46,7 @@ MAX_RECURSION_DEPTH = 50
 # depends on the number of millis the call took.
 WARN_LEVEL_CALL_DURATION_MS = 5000
 INFO_LEVEL_CALL_DURATION_MS = 1000
+
 
 class LifoQueue(Queue.Queue):
     '''
@@ -67,6 +69,7 @@ class LifoQueue(Queue.Queue):
     def _get(self):
         return self.queue.pop()
 
+
 class ConnectionConfig(object):
   """ Struct-like class encapsulating the configuration of a Thrift client. """
   def __init__(self, klass, host, port, service_name,
@@ -82,7 +85,9 @@ class ConnectionConfig(object):
                validate=False,
                timeout_seconds=45,
                transport='buffered',
-               multiple=False):
+               multiple=False,
+               transport_mode='socket',
+               http_url=''):
     """
     @param klass The thrift client class
     @param host Host to connect to
@@ -103,6 +108,8 @@ class ConnectionConfig(object):
     @param timeout_seconds Timeout for thrift calls
     @param transport string representation of thrift transport to use
     @param multiple Whether Use MultiplexedProtocol
+    @param transport_mode Can be socket or http
+    @param Url used when using http transport mode
     """
     self.klass = klass
     self.host = host
@@ -121,10 +128,13 @@ class ConnectionConfig(object):
     self.timeout_seconds = timeout_seconds
     self.transport = transport
     self.multiple = multiple
+    self.transport_mode = transport_mode
+    self.http_url = http_url
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
-                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport, self.multiple]))
+                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport,
+                               self.multiple, self.transport_mode, self.http_url]))
 
 class ConnectionPooler(object):
   """
@@ -238,30 +248,40 @@ def connect_to_thrift(conf):
 
   Returns a tuple of (service, protocol, transport)
   """
-  if conf.use_ssl:
-    sock = TSSLSocket(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
+  if conf.transport_mode == 'TCP':
+    if conf.use_ssl:
+      mode = TSSLSocket(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
+    else:
+      mode = TSocket(conf.host, conf.port)
   else:
-    sock = TSocket(conf.host, conf.port)
+    mode = THttpClient(conf.http_url)
+
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)
-    sock.setTimeout(conf.timeout_seconds * 1000.0)
-  if conf.use_sasl:
+    mode.setTimeout(conf.timeout_seconds * 1000.0)
+
+  if conf.transport_mode == 'HTTP':
+    if conf.use_sasl and conf.mechanism != 'PLAIN':
+      mode.set_kerberos_auth()
+    else:
+      mode.set_basic_auth(conf.username, conf.password)
+
+  if conf.transport_mode == 'TCP' and conf.use_sasl:
     def sasl_factory():
       saslc = sasl.Client()
       saslc.setAttr("host", str(conf.host))
       saslc.setAttr("service", str(conf.kerberos_principal))
       if conf.mechanism == 'PLAIN':
         saslc.setAttr("username", str(conf.username))
-        saslc.setAttr("password", str(conf.password)) # defaults to hue for a non-empty string unless using ldap
+        saslc.setAttr("password", str(conf.password)) # Defaults to 'hue' for a non-empty string unless using LDAP
       saslc.init()
       return saslc
-
-    transport = TSaslClientTransport(sasl_factory, conf.mechanism, sock)
+    transport = TSaslClientTransport(sasl_factory, conf.mechanism, mode)
   elif conf.transport == 'framed':
-    transport = TFramedTransport(sock)
+    transport = TFramedTransport(mode)
   else:
-    transport = TBufferedTransport(sock)
+    transport = TBufferedTransport(mode)
 
   protocol = TBinaryProtocol(transport)
   if conf.multiple:
@@ -324,7 +344,7 @@ class PooledClient(object):
         try:
           # Poke it to see if it's closed on the other end. This can happen if a connection
           # sits in the connection pool longer than the read timeout of the server.
-          sock = _grab_transport_from_wrapper(superclient.transport).handle
+          sock = self.conf.transport_mode == 'TCP' and _grab_transport_from_wrapper(superclient.transport).handle
           if sock and create_synchronous_io_multiplexer().read([sock]):
             # the socket is readable, meaning there is either data from a previous call
             # (i.e our protocol is out of sync), or the connection was shut down on the

@@ -24,7 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SSL
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, QUERY_TYPES
 
@@ -81,7 +81,14 @@ def get_query_server_config(name='beeswax', server=None):
         'server_name': 'beeswax', # Aka HiveServer2 now
         'server_host': HIVE_SERVER_HOST.get(),
         'server_port': HIVE_SERVER_PORT.get(),
-        'principal': kerberos_principal
+        'principal': kerberos_principal,
+        'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
+            'protocol': 'https' if SSL.ENABLED.get() else 'http',
+            'host': HIVE_SERVER_HOST.get(),
+            'port': hive_site.hiveserver2_thrift_http_port(),
+            'end_point': hive_site.hiveserver2_thrift_http_path()
+        },
+        'transport_mode': hive_site.hiveserver2_transport_mode(),
     }
 
   LOG.debug("Query Server: %s" % query_server)

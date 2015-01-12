@@ -25,14 +25,17 @@ from desktop.lib.conf import Config, validate_thrift_transport
 HBASE_CLUSTERS = Config(
   key="hbase_clusters",
   default="(Cluster|localhost:9090)",
-  help=_t("Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security."),
-  type=str)
+  help=_t("Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security."
+          "Prefix hostname with https:// if using SSL and http mode with impersonation."),
+  type=str
+)
 
 TRUNCATE_LIMIT = Config(
   key="truncate_limit",
   default="500",
   help=_t("Hard limit of rows or columns per row fetched before truncating."),
-  type=int)
+  type=int
+)
 
 THRIFT_TRANSPORT = Config(
   key="thrift_transport",
@@ -49,6 +52,11 @@ HBASE_CONF_DIR = Config(
   default=os.environ.get("HBASE_CONF_DIR", '/etc/hbase/conf')
 )
 
+TRANSPORT_MODE = Config(
+  key="transport_mode",
+  help=_t("Force the underlying mode of the Thrift Transport: socket|http. http is required for using the doAs impersonation."),
+  default='socket'
+)
 
 
 def config_validator(user):

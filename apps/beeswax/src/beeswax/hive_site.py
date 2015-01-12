@@ -46,6 +46,10 @@ _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.prin
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
 _CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.doAs'
 
+_CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
+_CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
+_CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
+
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -125,6 +129,15 @@ def hiveserver2_impersonation_enabled():
 
 def hiveserver2_jdbc_url():
   return 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+
+def hiveserver2_transport_mode():
+  return get_conf().get(_CNF_HIVESERVER2_TRANSPORT_MODE, 'TCP').upper()
+
+def hiveserver2_thrift_http_port():
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT, '10001')
+
+def hiveserver2_thrift_http_path():
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PATH, 'cliservice')
 
 
 def _parse_hive_site():

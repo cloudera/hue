@@ -22,11 +22,13 @@ import urllib
 from django.utils.encoding import iri_to_uri, smart_str
 
 from requests import exceptions
+from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 __docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
+
 
 class RestException(Exception):
   """
@@ -75,8 +77,6 @@ class HttpClient(object):
     """
     @param base_url: The base url to the API.
     @param exc_class: An exception class to handle non-200 results.
-
-    Creates an HTTP(S) client to connect to the Cloudera Manager API.
     """
     self._base_url = base_url.rstrip('/')
     self._exc_class = exc_class or RestException
@@ -88,6 +88,9 @@ class HttpClient(object):
     self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
     return self
 
+  def set_basic_auth(self, username, password):
+    self._session.auth = HTTPBasicAuth(username, password)
+    return self
 
   def set_headers(self, headers):
     """
