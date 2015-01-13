@@ -23,7 +23,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Bundles"), "oozie", user) | n,unicode }
-${ layout.menubar(section='Bundles') }
+${ layout.menubar(section='Bundles', is_editor=True) }
 
 
 <div class="container-fluid">
