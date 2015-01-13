@@ -193,6 +193,8 @@ def edit_user(request, username=None):
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)
+    if request.user.is_superuser and request.user.username != username:
+      form.fields.pop("password_old")
     if form.is_valid(): # All validation rules pass
       if instance is None:
         instance = form.save()
@@ -238,6 +240,8 @@ def edit_user(request, username=None):
       'groups': default_user_group and [default_user_group] or []
     }
     form = form_class(instance=instance, initial=initial)
+    if request.user.is_superuser and request.user.username != username:
+      form.fields.pop("password_old")
 
   return render('edit_user.mako', request, dict(form=form, username=username))
 

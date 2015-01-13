@@ -62,7 +62,7 @@ ${ layout.menubar(section='users') }
             </div>
           % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
-          % if username:
+          % if username and "password_old" in form.fields:
             ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
           % endif
         % endif
