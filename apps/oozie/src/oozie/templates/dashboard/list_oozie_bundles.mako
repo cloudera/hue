@@ -132,7 +132,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
   </div>
 </div>
 
-<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
@@ -282,30 +282,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
     $.fn.dataTableExt.sErrMode = "throw";
 
-    $.fn.dataTableExt.afnFiltering.push(
-      function (oSettings, aData, iDataIndex) {
-        var urlHashes = ""
-
-        var statusBtn = $("a.btn-status.active");
-        var statusFilter = true;
-        if (statusBtn.length > 0) {
-          var statuses = []
-          $.each(statusBtn, function () {
-            statuses.push($(this).attr("data-value"));
-          });
-          statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
-        }
-
-        var dateBtn = $("a.btn-date.active");
-        var dateFilter = true;
-        if (dateBtn.length > 0) {
-          var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
-          dateFilter = Date.parse(aData[0]) >= minAge;
-        }
-
-        return statusFilter && dateFilter;
-      }
-    );
+    $.fn.dataTableExt.afnFiltering.push(PersistedButtonsFilters); // from dashboard-utils.js
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
@@ -369,8 +346,8 @@ ${layout.menubar(section='bundles', dashboard=True)}
                 try {
                   runningTable.fnAddData([
                     bundle.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
-                    '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
-                    '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
+                    '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'" data-type="date">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
+                    '<span class="' + bundle.statusClass + '" data-type="status">' + bundle.status + '</span>',
                     bundle.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width:1%"></div></div>',
                     bundle.user,
@@ -385,7 +362,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
             }
             else {
-              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 2, false);
+              runningTable.fnUpdate('<span class="' + bundle.statusClass + '" data-type="status">' + bundle.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -409,8 +386,8 @@ ${layout.menubar(section='bundles', dashboard=True)}
           var bundle = new Bundle(item);
           try {
             completedTable.fnAddData([
-              '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
-              '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
+              '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'" data-type="date">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
+              '<span class="' + bundle.statusClass + '" data-type="status">' + bundle.status + '</span>',
               bundle.appName,
               bundle.user,
               '<span data-sort-value="'+ bundle.createdInMillis +'">' + emptyStringIfNull(bundle.created) + '</span>',
@@ -437,7 +414,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
               }
             });
             if (foundRow != null) {
-              runningTable.fnUpdate('<span class="' + bundle.statusClass + '">' + bundle.status + '</span>', foundRow, 2, false);
+              runningTable.fnUpdate('<span class="' + bundle.statusClass + '" data-type="status">' + bundle.status + '</span>', foundRow, 2, false);
               if (bundle.progress == 0){
                 runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }

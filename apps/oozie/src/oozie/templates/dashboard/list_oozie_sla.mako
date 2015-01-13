@@ -151,7 +151,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
   </div>
 </div>
 
-<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
