@@ -185,14 +185,14 @@ def make_query_context(type, info):
 class HiveServerQueryHistory(QueryHistory):
   # Map from (thrift) server state
   STATE_MAP = {
-    TOperationState.INITIALIZED_STATE          : QueryHistory.STATE.submitted,
-    TOperationState.RUNNING_STATE         : QueryHistory.STATE.running,
-    TOperationState.FINISHED_STATE      : QueryHistory.STATE.available,
-    TOperationState.CANCELED_STATE          : QueryHistory.STATE.failed,
-    TOperationState.CLOSED_STATE         : QueryHistory.STATE.expired,
-    TOperationState.ERROR_STATE        : QueryHistory.STATE.failed,
-    TOperationState.UKNOWN_STATE        : QueryHistory.STATE.failed,
-    TOperationState.PENDING_STATE        : QueryHistory.STATE.submitted,
+    TOperationState.INITIALIZED_STATE : QueryHistory.STATE.submitted,
+    TOperationState.RUNNING_STATE     : QueryHistory.STATE.running,
+    TOperationState.FINISHED_STATE    : QueryHistory.STATE.available,
+    TOperationState.CANCELED_STATE    : QueryHistory.STATE.failed,
+    TOperationState.CLOSED_STATE      : QueryHistory.STATE.expired,
+    TOperationState.ERROR_STATE       : QueryHistory.STATE.failed,
+    TOperationState.UKNOWN_STATE      : QueryHistory.STATE.failed,
+    TOperationState.PENDING_STATE     : QueryHistory.STATE.submitted,
   }
 
   node_type = HIVE_SERVER2
