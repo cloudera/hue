@@ -293,7 +293,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
   </div>
 </div>
 
-<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">

@@ -136,7 +136,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 </div>
 
 
-<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
@@ -284,30 +284,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     $.fn.dataTableExt.sErrMode = "throw";
 
-    $.fn.dataTableExt.afnFiltering.push(
-      function (oSettings, aData, iDataIndex) {
-        var urlHashes = ""
-
-        var statusBtn = $("a.btn-status.active");
-        var statusFilter = true;
-        if (statusBtn.length > 0) {
-          var statuses = []
-          $.each(statusBtn, function () {
-            statuses.push($(this).attr("data-value"));
-          });
-          statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
-        }
-
-        var dateBtn = $("a.btn-date.active");
-        var dateFilter = true;
-        if (dateBtn.length > 0) {
-          var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
-          dateFilter = Date.parse(aData[0]) >= minAge;
-        }
-
-        return statusFilter && dateFilter;
-      }
-    );
+    $.fn.dataTableExt.afnFiltering.push(PersistedButtonsFilters); // from dashboard-utils.js
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
@@ -369,8 +346,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                 try {
                   runningTable.fnAddData([
                     wf.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>':'',
-                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
-                    '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
+                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'" data-type="date">' + emptyStringIfNull(wf.lastModTime) + '</span>',
+                    '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>',
                     wf.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
@@ -384,7 +361,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               }
             }
             else {
-              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 2, false);
+              runningTable.fnUpdate('<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -408,8 +385,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           var wf = new Workflow(item);
           try {
             completedTable.fnAddData([
-              '<span data-sort-value="'+ wf.endTimeInMillis +'">' + emptyStringIfNull(wf.endTime) + '</span>',
-              '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
+              '<span data-sort-value="'+ wf.endTimeInMillis +'" data-type="date">' + emptyStringIfNull(wf.endTime) + '</span>',
+              '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', decodeURIComponent(wf.appName),
               '<span data-sort-value="'+ wf.durationInMillis +'">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
               '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
@@ -436,7 +413,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               }
             });
             if (foundRow != null) {
-              runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 2, false);
+              runningTable.fnUpdate('<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', foundRow, 2, false);
               if (wf.progress == 0){
                 runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }

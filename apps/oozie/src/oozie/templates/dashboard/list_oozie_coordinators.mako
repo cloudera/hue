@@ -154,7 +154,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
 </div>
 
-<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 
@@ -318,30 +318,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
     $.fn.dataTableExt.sErrMode = "throw";
 
-    $.fn.dataTableExt.afnFiltering.push(
-      function (oSettings, aData, iDataIndex) {
-        var urlHashes = ""
-
-        var statusBtn = $("a.btn-status.active");
-        var statusFilter = true;
-        if (statusBtn.length > 0) {
-          var statuses = []
-          $.each(statusBtn, function () {
-            statuses.push($(this).attr("data-value"));
-          });
-          statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
-        }
-
-        var dateBtn = $("a.btn-date.active");
-        var dateFilter = true;
-        if (dateBtn.length > 0) {
-          var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
-          dateFilter = Date.parse(aData[0]) >= minAge;
-        }
-
-        return statusFilter && dateFilter;
-      }
-    );
+    $.fn.dataTableExt.afnFiltering.push(PersistedButtonsFilters); // from dashboard-utils.js
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
@@ -416,8 +393,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                 try {
                   runningTable.fnAddData([
                     coord.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
-                    '<span data-sort-value="'+ coord.nextMaterializedTimeInMillis +'">' + emptyStringIfNull(coord.nextMaterializedTime) + '</span>',
-                    '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
+                    '<span data-sort-value="'+ coord.nextMaterializedTimeInMillis +'" data-type="date">' + emptyStringIfNull(coord.nextMaterializedTime) + '</span>',
+                    '<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>',
                     coord.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     coord.user,
@@ -437,7 +414,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               }
             }
             else {
-              runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 2, false);
+              runningTable.fnUpdate('<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>', foundRow, 2, false);
             }
           });
         }
@@ -460,8 +437,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           var coord = new Coordinator(item);
           try {
             completedTable.fnAddData([
-              '<span data-sort-value="'+ coord.endTimeInMillis +'">' + emptyStringIfNull(coord.endTime) + '</span>',
-              '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
+              '<span data-sort-value="'+ coord.endTimeInMillis +'" data-type="date">' + emptyStringIfNull(coord.endTime) + '</span>',
+              '<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>',
               coord.appName,
               '<span data-sort-value="'+ coord.durationInMillis +'">' + emptyStringIfNull(coord.duration) + '</span>',
               coord.user,
@@ -501,6 +478,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               % endif
             });
             if (foundRow != null) {
+              runningTable.fnUpdate('<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>', foundRow, 2, false);
               if (coord.progress == 0){
                 runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
               }
