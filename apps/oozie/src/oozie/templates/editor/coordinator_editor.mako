@@ -271,7 +271,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 <div id="settingsModal" class="modal hide fade">
   <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3 id="myModalLabel">${ _('Coordinator Settings') }</h3>
   </div>
   <div class="modal-body">
