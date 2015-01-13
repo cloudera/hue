@@ -533,7 +533,8 @@ def get_collections(request):
   result = {'status': -1, 'message': ''}
 
   try:
-    result['collection'] = SearchController(request.user).get_all_indexes()
+    show_all = json.loads(request.POST.get('show_all'))
+    result['collection'] = SearchController(request.user).get_all_indexes(show_all=show_all)
     result['status'] = 0
 
   except Exception, e:

@@ -93,10 +93,14 @@ class SearchController(object):
   def get_solr_collection(self):
     return SolrApi(SOLR_URL.get(), self.user).collections()
 
-  def get_all_indexes(self):
+  def get_all_indexes(self, show_all=False):
     indexes = []
     try:
       indexes = self.get_solr_collection().keys()
     except:
       pass
-    return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
+
+    if show_all or not indexes:
+      return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
+    else:
+      return indexes
