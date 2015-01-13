@@ -833,8 +833,10 @@ var NewTemplate = function (vm, initial) {
   };
 
   self.syncCollections = function () {
+    vm.isSyncingCollections(true);
     $.post("/search/get_collections", {
         collection: ko.mapping.toJSON(vm.collection),
+        show_all: ko.mapping.toJSON(vm.showCores)
       }, function (data) {
         if (data.status == 0) {
           // Sync new and old names
@@ -843,10 +845,14 @@ var NewTemplate = function (vm, initial) {
               self.collections.push(name);
             }
           });
+          var _toDelete = [];
           $.each(self.collections(), function(index, collection) {
             if (data.collection.indexOf(collection) == -1) {
-              self.collections.remove(collection);
+              _toDelete.push(collection);
             }
+          });
+          $.each(_toDelete, function(index, collection) {
+            self.collections.remove(collection);
           });
         }
         else {
@@ -855,6 +861,7 @@ var NewTemplate = function (vm, initial) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     }).done(function() {
+      vm.isSyncingCollections(false);
       self.inited(true);
     });
   };
@@ -923,6 +930,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isEditing(! self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
+
+  self.showCores = ko.observable(false);
+  self.showCores.subscribe(function(newValue) {
+    self.initial.syncCollections();
+  });
+  self.isSyncingCollections = ko.observable(false);
 
   function bareWidgetBuilder(name, type){
     return new Widget({

@@ -52,8 +52,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a search index') }
     <!-- ko if: columns().length == 0 -->
-    <select data-bind="options: $root.initial.collections, value: $root.collection.name">
+    <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections">
     </select>
+    <label class="checkbox" style="display:inline-block; margin-left: 10px"><input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') } <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i></label>
     <!-- /ko -->
   </form>
 

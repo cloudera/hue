@@ -157,13 +157,15 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
                 title="${_('Delete the selected indexes. These must be solr cloud collections. Cores cannot be deleted currently.')}" data-toggle="modal" data-target="#deleteCollections">
               <i class="fa fa-times"></i> ${_('Delete')}
             </button>
-            <a href="#create" class="btn toolbarBtn pull-right">
-              <i class="fa fa-plus-circle"></i> ${_('Create')}
-            </a>
+            <label class="checkbox" style="display:inline-block; margin-left: 20px" data-bind="visible: hasCloudCollections"><input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }</label>
           </div>
         </%def>
 
-        <%def name="creation()"></%def>
+        <%def name="creation()">
+          <a href="#create" class="btn toolbarBtn">
+              <i class="fa fa-plus-circle"></i> ${_('Create')}
+            </a>
+        </%def>
       </%actionbar:render>
 
       <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
@@ -183,7 +185,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
                 <th width="100%">${_('Name')}</th>
               </tr>
             </thead>
-            <tbody data-bind="foreach: filteredCollections">
+            <tbody data-bind="foreach: displayCollections">
               <tr data-bind="routie: 'edit/' + name()" class="pointer">
                 <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
                   <span data-bind="css: {'fa-check': $parent.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
