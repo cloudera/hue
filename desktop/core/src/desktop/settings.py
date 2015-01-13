@@ -28,6 +28,7 @@ from guppy import hpy
 
 import desktop.conf
 import desktop.log
+import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
@@ -219,6 +220,10 @@ LOCALE_PATHS.extend([app.locale_path for app in appmanager.DESKTOP_LIBS])
 # Load desktop config
 _desktop_conf_modules = [dict(module=desktop.conf, config_key=None)]
 conf.initialize(_desktop_conf_modules, _config_dir)
+
+# Register the redaction filters into the root logger as soon as possible.
+desktop.redaction.register_log_filtering(desktop.conf.get_redaction_rules())
+
 
 # Activate l10n
 # Install apps
