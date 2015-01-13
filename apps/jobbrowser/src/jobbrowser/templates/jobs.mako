@@ -296,7 +296,12 @@ ${ components.menubar() }
       }
       else {
         isUpdating = true;
-        _url += "&state=running";
+        if ($(".btn-status.active").length > 0) {
+          _url += "&state=" + $(".btn-status.active").data("value");
+        }
+        else {
+          _url += "&state=running";
+        }
       }
 
       _url += "&user=" + $("#userFilter").val().trim();
