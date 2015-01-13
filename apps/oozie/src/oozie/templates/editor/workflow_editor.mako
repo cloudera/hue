@@ -1964,6 +1964,7 @@ ${ dashboard.import_bindings() }
 
   $(document).on("editingToggled", function(){
     $("canvas").remove();
+    exposeOverlayClickHandler();
     window.setTimeout(renderChangeables, 100);
   });
 
