@@ -25,70 +25,70 @@ from desktop.conf import AUDIT_EVENT_LOG_DIR, AUDIT_LOG_MAX_FILE_SIZE
 
 
 def test_one_audit():
-  log_tmp = tempfile.NamedTemporaryFile("w+t")
+  with tempfile.NamedTemporaryFile("w+t") as log_tmp:
 
-  # KB
-  reset = [
-      AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp),
-      AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25KB')
-  ]
+    # KB
+    reset = [
+        AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp.name),
+        AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25KB')
+    ]
 
-  audit_logger = get_audit_logger()
-  audit_handler = audit_logger.handlers[0]
+    audit_logger = get_audit_logger()
+    audit_handler = audit_logger.handlers[0]
 
-  assert_equal(25 * 1024 ** 1, audit_handler.maxBytes)
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-  assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert_equal(25 * 1024 ** 1, audit_handler.maxBytes)
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
+    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
 
-  audit_logger = get_audit_logger()
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    audit_logger = get_audit_logger()
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
 
-  # Cleanup
-  audit_logger.removeHandler(audit_handler)
+    # Cleanup
+    audit_logger.removeHandler(audit_handler)
 
-  for r in reset:
-    r()
+    for r in reset:
+      r()
 
-  # MB
-  reset = [
-      AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp),
-      AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25MB')
-  ]
+    # MB
+    reset = [
+        AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp.name),
+        AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25MB')
+    ]
 
-  audit_logger = get_audit_logger()
-  audit_handler = audit_logger.handlers[0]
+    audit_logger = get_audit_logger()
+    audit_handler = audit_logger.handlers[0]
 
-  assert_equal(25 * 1024 ** 2, audit_handler.maxBytes)
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-  assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert_equal(25 * 1024 ** 2, audit_handler.maxBytes)
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
+    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
 
-  audit_logger = get_audit_logger()
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    audit_logger = get_audit_logger()
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
 
-  # Cleanup
-  audit_logger.removeHandler(audit_handler)
+    # Cleanup
+    audit_logger.removeHandler(audit_handler)
 
-  for r in reset:
-    r()
+    for r in reset:
+      r()
 
-  # GB
-  reset = [
-      AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp),
-      AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25GB')
-  ]
+    # GB
+    reset = [
+        AUDIT_EVENT_LOG_DIR.set_for_testing(log_tmp.name),
+        AUDIT_LOG_MAX_FILE_SIZE.set_for_testing('25GB')
+    ]
 
-  audit_logger = get_audit_logger()
-  audit_handler = audit_logger.handlers[0]
+    audit_logger = get_audit_logger()
+    audit_handler = audit_logger.handlers[0]
 
-  assert_equal(25 * 1024 ** 3, audit_handler.maxBytes)
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-  assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert_equal(25 * 1024 ** 3, audit_handler.maxBytes)
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
+    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
 
-  audit_logger = get_audit_logger()
-  assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    audit_logger = get_audit_logger()
+    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
 
-  # Cleanup
-  audit_logger.removeHandler(audit_handler)
+    # Cleanup
+    audit_logger.removeHandler(audit_handler)
 
-  for r in reset:
-    r()
+    for r in reset:
+      r()
