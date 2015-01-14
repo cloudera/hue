@@ -36,8 +36,8 @@ def check_document_access_permission():
       doc_id = {}
       
       try:
-        if request.GET.get('workflow'):
-          workflow_id = request.GET.get('workflow')
+        if request.GET.get('workflow') or request.POST.get('workflow'):
+          workflow_id = request.GET.get('workflow') or request.POST.get('workflow')
           if workflow_id.isdigit():
             doc_id['id'] = workflow_id
           else:
