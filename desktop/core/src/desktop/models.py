@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import calendar
 import logging
 import json
 import uuid
@@ -345,6 +346,9 @@ class DocumentManager(models.Manager):
       LOG.warn(force_unicode(e))
 
 
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
+
+
 class Document(models.Model):
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
@@ -644,3 +648,17 @@ class Document2(models.Model):
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)    
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    
+  def to_dict(self):
+    return {
+      'owner': self.owner.username,
+      'name': self.name,
+      'description': self.description,
+      'uuid': self.uuid,
+      'id': self.id,
+      'type': self.type,
+      'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
+      'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
+      'isSelected': False
+    }
+

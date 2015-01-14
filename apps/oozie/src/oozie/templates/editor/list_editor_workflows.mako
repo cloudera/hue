@@ -17,7 +17,6 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
-  import time as py_time
 %>
 <%namespace name="actionbar" file="../actionbar.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -38,10 +37,16 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="fa fa-calendar"></i> ${ _('Schedule') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
-        <button class="btn toolbarBtn" id="delete-btn" disabled="disabled"><i class="fa fa-times"></i> ${ _('Delete') }</button>
+        <a data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': ! oneSelected()}">
+          <i class="fa fa-play"></i> ${ _('Submit') }
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! oneSelected()}">
+          <i class="fa fa-files-o"></i> ${ _('Copy') }
+        </a>
+        <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! moreThanOneSelected() }">
+          <i class="fa fa-times"></i> ${ _('Delete') }
+        </a>
       </div>
     </%def>
 
@@ -60,36 +65,20 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         <th>${ _('Last Modified') }</th>
       </tr>
     </thead>
-    <tbody>
-  % for workflow in workflows:
-      <tr>
-        <td data-row-selector-exclude="true">
-           <div class="hueCheckbox workflowCheck fa" data-row-selector-exclude="true"
-            ##% if workflow.can_read(user):
-                data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
-                data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
-                data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
-            ##% endif
-            ##% if workflow.is_editable(user):
-                data-delete-id="${ workflow.id }"
-            ##% endif
-          ></div>
-          ##% if workflow.can_read(user):
-            <a href="${ url('oozie:edit_workflow') }?workflow=${ workflow.id }" data-row-selector="true"></a>
-          ##% endif
-        </td>
-        <td>${ workflow.name }</td>
-        <td>${ workflow.description }</td>
-        <td>${ workflow.owner }</td>
-        <td nowrap="nowrap" data-sort-value="${py_time.mktime(workflow.last_modified.timetuple())}">${ utils.format_date(workflow.last_modified) }</td>
-      </tr>
-  % endfor
-  </tbody>
+    <tbody data-bind="foreach: { data: jobs }">
+      <td data-row-selector-exclude="true">
+        <input type="checkbox" class="hueCheckbox workflowCheck" data-bind="checked: isSelected" data-row-selector-exclude="true"></input>
+        <a data-bind="attr: { 'href': '${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
+      </td>
+      <td data-bind="text: name"></td>
+      <td data-bind="text: description"></td>
+      <td data-bind="text: owner"></td>
+      <td data-bind="text: last_modified, attr: { 'data-sort-value': last_modified_ts }" data-type="date"></td>
+    </tbody>
   </table>
 
   </div>
 </div>
-
 
 
 <div class="hueOverlay" data-bind="visible: isLoading">
@@ -104,7 +93,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 <div id="submit-wf-modal" class="modal hide"></div>
 
 <div id="deleteWf" class="modal hide fade">
-  <form id="deleteWfForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
+  <form id="deleteWfForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -114,107 +103,74 @@ ${ layout.menubar(section='workflows', is_editor=True) }
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
-    <div class="hide">
-      ##<select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
-    </div>
   </form>
 </div>
 
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function () {
-    var viewModel = {
-      ##availableJobs : ko.observableArray(${ json_jobs | n }),
-      chosenJobs : ko.observableArray([]),
-      isLoading: ko.observable(false)
+  var Editor = function () {
+    var self = this;
+    
+    self.jobs = ko.mapping.fromJS(${ workflows_json | n });
+    self.selectedJobs = ko.computed(function() {
+      return $.grep(self.jobs(), function(job) { return job.isSelected(); });
+    });
+    self.isLoading = ko.observable(false);
+    
+    self.oneSelected = ko.computed(function() {
+      return self.selectedJobs().length == 1;
+    });
+    self.moreThanOneSelected = ko.computed(function() {
+      return self.selectedJobs().length >= 1;
+    });
+    
+    self.showSubmitPopup = function () {
+      $.get("/oozie/editor/workflow/submit/" + self.selectedJobs()[0].id(), {
+      }, function (data) {
+        $(document).trigger("showSubmitPopup", data);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
     };
-
+    
+    self.delete2 = function() {      
+      $.post("${ url('oozie:delete_workflow') }", {
+        "selection": ko.mapping.toJSON(self.selectedJobs)
+      }, function() {
+        $.each(self.selectedJobs(), function(index, job) { 
+          alert(self.jobs.remove(job)); // Remove from table + cancel auto sort?
+        });
+        $('#deleteWf').modal('hide');
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+    
+    self.copy = function() {
+      $.post("${ url('oozie:copy_workflow') }", {
+        "workflow": self.selectedJobs()[0].id()
+      }, function(data) {
+        // add to list or refresh page
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+  }
+    
+  var viewModel;
+    
+  $(document).ready(function () {
+    viewModel = new Editor();
     ko.applyBindings(viewModel);
 
-    $(".selectAll").click(function () {
-      if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("fa-check");
-        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
-      }
-      else {
-        $(this).attr("checked", "checked").addClass("fa-check");
-        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
-      }
-      toggleActions();
-    });
-
-    $(".workflowCheck").click(function () {
-      if ($(this).attr("checked")) {
-        $(this).removeClass("fa-check").removeAttr("checked");
-      }
-      else {
-        $(this).addClass("fa-check").attr("checked", "checked");
-      }
-      $(".selectAll").removeAttr("checked").removeClass("fa-check");
-      toggleActions();
-    });
-
-    function toggleActions() {
-      $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
-      if (selector.length == 1) {
-        var action_buttons = [
-          ['#submit-btn', 'data-submit-url'],
-          ['#schedule-btn', 'data-schedule-url'],
-          ['#clone-btn', 'data-clone-url'],
-          ['#export-btn', 'data-export-url']
-        ];
-        $.each(action_buttons, function (index) {
-          if (selector.attr(this[1])) {
-            $(this[0]).removeAttr("disabled");
-          } else {
-            $(this[0]).attr("disabled", "disabled");
-          }
-        });
-      }
-      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
-      if (can_delete.length > 0 && can_delete.length == selector.length) {
-        $("#trash-btn").removeAttr("disabled");
-        $("#trash-btn-caret").removeAttr("disabled");
-      }
-    }
-
-    $("#delete-btn").click(function (e) {
-      viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenJobs.push($(this).data("delete-id"));
-      });
-      $("#deleteWf").modal("show");
-    });
-
-    $("#submit-btn").click(function () {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _action = _this.attr("data-submit-url");
-      $.get(_action, function (response) {
-          $("#submit-wf-modal").html(response);
-          $("#submit-wf-modal").modal("show");
-        }
-      );
-    });
-
-    $("#clone-btn").click(function (e) {
-      viewModel.isLoading(true);
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _url = _this.attr("data-clone-url");
-      $.post(_url, function (data) {
-        window.location = data.url;
-      });
-    });
-
-    $("#schedule-btn").click(function (e) {
-      viewModel.isLoading(true);
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _url = _this.attr("data-schedule-url");
-      window.location.replace(_url);
+    $(document).on("showSubmitPopup", function(event, data){
+      $('#submit-wf-modal').html(data);
+      $('#submit-wf-modal').modal('show');
     });
 
     var oTable = $("#workflowTable").dataTable({

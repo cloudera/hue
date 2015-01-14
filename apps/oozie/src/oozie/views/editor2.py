@@ -17,6 +17,7 @@
 
 import json
 import logging
+import uuid
 
 from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
@@ -45,10 +46,10 @@ LOG = logging.getLogger(__name__)
 
 
 def list_editor_workflows(request):  
-  workflows = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+  workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   return render('editor/list_editor_workflows.mako', request, {
-      'workflows': workflows
+      'workflows_json': json.dumps(workflows)
   })
 
 
@@ -93,6 +94,57 @@ def edit_workflow(request):
 
 def new_workflow(request):
   return edit_workflow(request)
+
+
+def delete_workflow(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  jobs = json.loads(request.POST.get('selection'))
+
+  for job in jobs:
+    doc2 = Document2.objects.get(id=job['id'])
+    doc = doc2.doc.get()
+    doc.can_write_or_exception(request.user)
+    
+    doc.delete()
+    doc2.delete()
+
+  response = {}
+  
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_document_access_permission()
+def copy_workflow(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  workflow_id = request.POST.get('workflow')
+  doc2 = Document2.objects.get(type='oozie-workflow2', id=workflow_id)
+  
+  name = doc2.name + '-copy'
+  copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+
+  doc2.pk = None
+  doc2.id = None
+  doc2.uuid = str(uuid.uuid4())  
+  doc2.name = name
+  doc2.owner = request.user
+  doc2.save()
+
+  doc2.doc.all().delete()
+  doc2.doc.add(copy_doc)
+  
+  workflow = Workflow(document=doc2)
+
+  workflow = Workflow()
+  workflow.set_workspace(request.user)
+  workflow.check_workspace(request.fs, request.user)
+
+  response = {'url': reverse('oozie:edit_workflow', kwargs={'workflow': doc2.id})}
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @check_document_modify_permission()
