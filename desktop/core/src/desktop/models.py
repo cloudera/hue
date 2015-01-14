@@ -656,6 +656,7 @@ class Document2(models.Model):
       'description': self.description,
       'uuid': self.uuid,
       'id': self.id,
+      'doc1_id': self.doc.get().id,
       'type': self.type,
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),

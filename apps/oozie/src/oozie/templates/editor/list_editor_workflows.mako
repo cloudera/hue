@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="../actionbar.mako" />
@@ -24,6 +24,9 @@
 
 ${ commonheader(_("Workflows"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows', is_editor=True) }
+
+
+<div id="editor">
 
 <div class="container-fluid">
   <div class="card card-small">
@@ -39,13 +42,23 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         <a data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': ! oneSelected()}">
           <i class="fa fa-play"></i> ${ _('Submit') }
         </a>
-        &nbsp;&nbsp;&nbsp;
+
+        <span style="padding-right:40px"></span>
+
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+          attr: {'data-original-title': '${ _("Share") } ' + name},
+          css: {'disabled': ! oneSelected(), 'btn': true}">
+          <i class="fa fa-users"></i> ${ _('Share') }
+        </a>
+
         <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
+
         <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
+
       </div>
     </%def>
 
@@ -108,21 +121,28 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 </div>
 
 
+</div>
+
+
+${ commonshare() | n,unicode }
+
+
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/share.vm.js"></script>
 
 
 <script type="text/javascript" charset="utf-8">
   var Editor = function () {
     var self = this;
-    
+
     self.jobs = ko.mapping.fromJS(${ workflows_json | n });
     self.selectedJobs = ko.computed(function() {
       return $.grep(self.jobs(), function(job) { return job.isSelected(); });
     });
     self.isLoading = ko.observable(false);
-    
+
     self.oneSelected = ko.computed(function() {
       return self.selectedJobs().length == 1;
     });
@@ -143,7 +163,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     }
 
     self.datatable = null;
-    
+
     self.showSubmitPopup = function () {
       $.get("/oozie/editor/workflow/submit/" + self.selectedJobs()[0].id(), {
       }, function (data) {
@@ -152,8 +172,8 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         $(document).trigger("error", xhr.responseText);
       });
     };
-    
-    self.delete2 = function() {      
+
+    self.delete2 = function() {
       $.post("${ url('oozie:delete_workflow') }", {
         "selection": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
@@ -163,7 +183,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         $(document).trigger("error", xhr.responseText);
       });
     };
-    
+
     self.copy = function() {
       $.post("${ url('oozie:copy_workflow') }", {
         "selection": ko.mapping.toJSON(self.selectedJobs)
@@ -173,13 +193,22 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         $(document).trigger("error", xhr.responseText);
       });
     };
+
+    self.prepareShareModal = function() {
+     shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
+      openShareModal();
+    };
   }
-    
+
   var viewModel;
-    
+  var shareViewModel;
+
   $(document).ready(function () {
     viewModel = new Editor();
-    ko.applyBindings(viewModel, $("#workflowList")[0]);
+    ko.applyBindings(viewModel, $("#editor")[0]);
+
+    shareViewModel = setupSharing("#documentShareModal");
+    shareViewModel.setDocId(-1);
 
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-wf-modal').html(data);
