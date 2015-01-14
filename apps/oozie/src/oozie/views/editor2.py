@@ -111,6 +111,7 @@ def delete_workflow(request):
     doc2.delete()
 
   response = {}
+  request.info(_('Workflows deleted.') if len(jobs) > 1 else _('Workflow deleted.'))
   
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -120,29 +121,34 @@ def copy_workflow(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  workflow_id = request.POST.get('workflow')
-  doc2 = Document2.objects.get(type='oozie-workflow2', id=workflow_id)
+  jobs = json.loads(request.POST.get('selection'))
+
+  for job in jobs:
+    doc2 = Document2.objects.get(type='oozie-workflow2', id=job['id'])
+    
+    name = doc2.name + '-copy'
+    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
   
-  name = doc2.name + '-copy'
-  copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
-
-  doc2.pk = None
-  doc2.id = None
-  doc2.uuid = str(uuid.uuid4())  
-  doc2.name = name
-  doc2.owner = request.user
-  doc2.save()
-
-  doc2.doc.all().delete()
-  doc2.doc.add(copy_doc)
+    doc2.pk = None
+    doc2.id = None
+    doc2.uuid = str(uuid.uuid4())
+    doc2.name = name
+    doc2.owner = request.user    
+    doc2.save()
   
-  workflow = Workflow(document=doc2)
+    doc2.doc.all().delete()
+    doc2.doc.add(copy_doc)
+    
+    workflow = Workflow(document=doc2)
+    workflow.update_name(name)
+    doc2.update_data({'workflow': workflow.get_data()['workflow']})
+    doc2.save()
 
-  workflow = Workflow()
-  workflow.set_workspace(request.user)
-  workflow.check_workspace(request.fs, request.user)
+    workflow.set_workspace(request.user)
+    workflow.check_workspace(request.fs, request.user)
 
-  response = {'url': reverse('oozie:edit_workflow', kwargs={'workflow': doc2.id})}
+  response = {}  
+  request.info(_('Workflows copied.') if len(jobs) > 1 else _('Workflow copied.'))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

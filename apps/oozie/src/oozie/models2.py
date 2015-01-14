@@ -187,6 +187,11 @@ class Workflow(Job):
   def name(self):
     _data = self.get_data()
     return _data['workflow']['name']
+  
+  def update_name(self, name):
+    _data = self.get_data()
+    _data['workflow']['name'] = name
+    self.data = json.dumps(_data)  
 
   @property      
   def deployment_dir(self):
