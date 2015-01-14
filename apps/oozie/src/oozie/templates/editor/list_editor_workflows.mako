@@ -40,10 +40,10 @@ ${ layout.menubar(section='workflows', is_editor=True) }
           <i class="fa fa-play"></i> ${ _('Submit') }
         </a>
         &nbsp;&nbsp;&nbsp;
-        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! oneSelected()}">
+        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
-        <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! moreThanOneSelected() }">
+        <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
       </div>
@@ -126,13 +126,13 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     self.oneSelected = ko.computed(function() {
       return self.selectedJobs().length == 1;
     });
-    self.moreThanOneSelected = ko.computed(function() {
+    self.atLeastOneSelected = ko.computed(function() {
       return self.selectedJobs().length >= 1;
     });
     self.allSelected = ko.observable(false);
 
     self.handleSelect = function(wf) {
-      wf.isSelected(!wf.isSelected());
+      wf.isSelected(! wf.isSelected());
     }
 
     self.selectAll = function() {
@@ -157,9 +157,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
       $.post("${ url('oozie:delete_workflow') }", {
         "selection": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
-        $.each(self.selectedJobs(), function(index, job) { 
-          alert(self.jobs.remove(job)); // Remove from table + cancel auto sort?
-        });
+        window.location.reload();
         $('#deleteWf').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
@@ -168,9 +166,9 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     
     self.copy = function() {
       $.post("${ url('oozie:copy_workflow') }", {
-        "workflow": self.selectedJobs()[0].id()
+        "selection": ko.mapping.toJSON(self.selectedJobs)
       }, function(data) {
-        // add to list or refresh page
+        window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
