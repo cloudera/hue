@@ -26,6 +26,7 @@ from dateutil.parser import parse
 from string import Template
 
 from django.utils.encoding import force_unicode
+from desktop.lib.json_utils import JSONEncoderForHTML
 from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
@@ -1381,14 +1382,13 @@ class Coordinator(Job):
   def uuid(self):
     return self.document.uuid
 
-  @property
-  def json(self):
+  def json_for_html(self):
     _data = self.data.copy()
 
     _data['properties']['start'] = _data['properties']['start'].strftime('%Y-%m-%dT%H:%M:%S')
     _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
 
-    return json.dumps(_data)
+    return json.dumps(_data, cls=JSONEncoderForHTML)
  
   @property
   def data(self):
@@ -1597,13 +1597,12 @@ class Bundle(Job):
   def uuid(self):
     return self.document.uuid
 
-  @property
-  def json(self):
+  def json_for_html(self):
     _data = self.data.copy()
 
     _data['properties']['kickoff'] = _data['properties']['kickoff'].strftime('%Y-%m-%dT%H:%M:%S')
 
-    return json.dumps(_data)
+    return json.dumps(_data, cls=JSONEncoderForHTML)
  
   @property
   def data(self):

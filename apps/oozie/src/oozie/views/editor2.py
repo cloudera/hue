@@ -29,6 +29,7 @@ from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
+from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document, Document2
 
 from liboozie.credentials import Credentials
@@ -49,7 +50,7 @@ def list_editor_workflows(request):
   workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   return render('editor/list_editor_workflows.mako', request, {
-      'workflows_json': json.dumps(workflows)
+      'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
   })
 
 
@@ -82,12 +83,12 @@ def edit_workflow(request):
     LOG.error(smart_str(e))
 
   return render('editor/workflow_editor.mako', request, {
-      'layout_json': json.dumps(workflow_data['layout']),
-      'workflow_json': json.dumps(workflow_data['workflow']),
-      'credentials_json': json.dumps(credentials.credentials.keys()),
-      'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES),
+      'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML),
+      'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML),
+      'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
+      'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
-      'subworkflows_json': json.dumps(_get_workflows(request.user)),
+      'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
@@ -373,9 +374,9 @@ def edit_coordinator(request):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
   return render('editor/coordinator_editor.mako', request, {
-      'coordinator_json': coordinator.json,
-      'credentials_json': json.dumps(credentials.credentials.keys()),
-      'workflows_json': json.dumps(workflows),
+      'coordinator_json': coordinator.json_for_html(),
+      'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
+      'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
@@ -497,8 +498,8 @@ def edit_bundle(request):
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor/bundle_editor.mako', request, {
-      'bundle_json': bundle.json,
-      'coordinators_json': json.dumps(coordinators),
+      'bundle_json': bundle.json_for_html(),
+      'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))      
   })
