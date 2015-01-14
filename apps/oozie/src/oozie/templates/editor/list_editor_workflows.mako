@@ -25,7 +25,6 @@
 ${ commonheader(_("Workflows"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows', is_editor=True) }
 
-
 <div class="container-fluid">
   <div class="card card-small">
   <h1 class="card-heading simple">${ _('Workflow Manager') }</h1>
@@ -58,7 +57,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="workflowCheck"></div></th>
+        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
@@ -66,14 +65,16 @@ ${ layout.menubar(section='workflows', is_editor=True) }
       </tr>
     </thead>
     <tbody data-bind="foreach: { data: jobs }">
-      <td data-row-selector-exclude="true">
-        <input type="checkbox" class="hueCheckbox workflowCheck" data-bind="checked: isSelected" data-row-selector-exclude="true"></input>
-        <a data-bind="attr: { 'href': '${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
-      </td>
-      <td data-bind="text: name"></td>
-      <td data-bind="text: description"></td>
-      <td data-bind="text: owner"></td>
-      <td data-bind="text: last_modified, attr: { 'data-sort-value': last_modified_ts }" data-type="date"></td>
+      <tr>
+        <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
+          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
+          <a data-bind="attr: { 'href': '${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
+        </td>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: description"></td>
+        <td data-bind="text: owner"></td>
+        <td data-bind="text: last_modified, attr: { 'data-sort-value': last_modified_ts }" data-type="date"></td>
+      </tr>
     </tbody>
   </table>
 
@@ -128,6 +129,20 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     self.moreThanOneSelected = ko.computed(function() {
       return self.selectedJobs().length >= 1;
     });
+    self.allSelected = ko.observable(false);
+
+    self.handleSelect = function(wf) {
+      wf.isSelected(!wf.isSelected());
+    }
+
+    self.selectAll = function() {
+      self.allSelected(! self.allSelected());
+      ko.utils.arrayForEach(self.jobs(), function (job) {
+        job.isSelected(self.allSelected());
+      });
+    }
+
+    self.datatable = null;
     
     self.showSubmitPopup = function () {
       $.get("/oozie/editor/workflow/submit/" + self.selectedJobs()[0].id(), {
@@ -166,7 +181,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     
   $(document).ready(function () {
     viewModel = new Editor();
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $("#workflowList")[0]);
 
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-wf-modal').html(data);
@@ -200,12 +215,15 @@ ${ layout.menubar(section='workflows', is_editor=True) }
           "sLast":"${_('Last')}",
           "sNext":"${_('Next')}",
           "sPrevious":"${_('Previous')}"
-        }
+        },
+        "bDestroy": true
       },
       "fnDrawCallback":function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
+
+    viewModel.datatable = oTable;
 
     $("#filterInput").keydown(function (e) {
       if (e.which == 13) {
