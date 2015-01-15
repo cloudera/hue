@@ -420,7 +420,6 @@ def copy_coordinator(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-
 @check_document_modify_permission()
 def save_coordinator(request):
   response = {'status': -1}
@@ -511,10 +510,10 @@ def _submit_coordinator(request, coordinator, mapping):
     
 
 def list_editor_bundles(request):
-  bundles = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
+  bundles = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
 
   return render('editor/list_editor_bundles.mako', request, {
-      'bundles': bundles
+      'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML)
   })
 
 
@@ -533,7 +532,7 @@ def edit_bundle(request):
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor/bundle_editor.mako', request, {
-      'bundle_json': bundle.json_for_html(),
+      'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))      
@@ -569,6 +568,40 @@ def save_bundle(request):
   response['status'] = 0
   response['id'] = bundle_doc.id
   response['message'] = _('Saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_document_access_permission()
+def copy_bundle(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  jobs = json.loads(request.POST.get('selection'))
+
+  for job in jobs:
+    doc2 = Document2.objects.get(type='oozie-bundle2', id=job['id'])
+    
+    name = doc2.name + '-copy'
+    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+  
+    doc2.pk = None
+    doc2.id = None
+    doc2.uuid = str(uuid.uuid4())
+    doc2.name = name
+    doc2.owner = request.user    
+    doc2.save()
+  
+    doc2.doc.all().delete()
+    doc2.doc.add(copy_doc)
+    
+    bundle_data = Bundle(document=doc2).get_data_for_json()
+    bundle_data['name'] = name
+    doc2.update_data(bundle_data)
+    doc2.save()
+
+  response = {}  
+  request.info(_('Bundle copied.') if len(jobs) > 1 else _('Bundle copied.'))
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

@@ -30,7 +30,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Workflow Manager') }</h1>
+  <h1 class="card-heading simple">${ _('Workflow Editor') }</h1>
 
   <%actionbar:render>
     <%def name="search()">
