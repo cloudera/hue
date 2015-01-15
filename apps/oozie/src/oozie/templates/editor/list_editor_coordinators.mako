@@ -23,9 +23,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Coordinators"), "oozie", user) | n,unicode }
-${ layout.menubar(section='Coordinators', is_editor=True) }
-
-
+${ layout.menubar(section='coordinators', is_editor=True) }
 
 <div id="editor">
 
