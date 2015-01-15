@@ -14,3 +14,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import desktop.tests
+import librdbms.conf
+
+
+class TestDatabasePasswordConfig(desktop.tests.BaseTestPasswordConfig):
+
+  def setup(self):
+    self.finish = librdbms.conf.DATABASES.set_for_testing({'test': {}})
+
+  def teardown(self):
+    self.finish()
+
+  def get_config_password(self):
+    return librdbms.conf.DATABASES['test'].PASSWORD
+
+  def get_config_password_file(self):
+    return librdbms.conf.DATABASES['test'].PASSWORD_FILE
+
+  def get_password(self):
+    return librdbms.conf.get_database_password('test')

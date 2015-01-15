@@ -19,7 +19,7 @@ import logging
 
 from desktop.lib.python_util import force_dict_to_strings
 
-from librdbms.conf import DATABASES
+from librdbms.conf import DATABASES, get_database_password
 
 
 LOG = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ def get_query_server_config(server=None):
       'server_host': DATABASES[name].HOST.get(),
       'server_port': DATABASES[name].PORT.get(),
       'username': DATABASES[name].USER.get(),
-      'password': DATABASES[name].PASSWORD.get(),
+      'password': get_database_password(name),
       'options': force_dict_to_strings(DATABASES[name].OPTIONS.get()),
       'alias': name
     }
