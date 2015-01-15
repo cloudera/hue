@@ -750,15 +750,27 @@ ko.bindingHandlers.codemirror = {
 };
 
 ko.bindingHandlers.chosen = {
-  init: function (element) {
-    ko.bindingHandlers.options.init(element);
-    $(element).chosen({disable_search_threshold: 5});
-  },
-  update: function (element, valueAccessor, allBindings) {
-    ko.bindingHandlers.options.update(element, valueAccessor, allBindings);
-    $(element).trigger('chosen:updated');
-  }
-};
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+        var $element = $(element);
+        var options = ko.unwrap(valueAccessor());
+        
+        if (typeof options === 'object')
+            $element.chosen(options);
+        else
+            $element.chosen();
+                
+        ['options', 'selectedOptions', 'value'].forEach(function(propName){
+            if (allBindings.has(propName)){
+                var prop = allBindings.get(propName);
+                if (ko.isObservable(prop)){
+                    prop.subscribe(function(){
+                        $element.trigger('chosen:updated');
+                    });
+                }
+            }
+        });        
+    }
+}
 
 ko.bindingHandlers.tooltip = {
   init: function (element, valueAccessor) {
@@ -772,6 +784,11 @@ ko.bindingHandlers.tooltip = {
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       $(element).tooltip("destroy");
     });
+  },
+  update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+    var options = ko.utils.unwrapObservable(valueAccessor());
+    var self = $(element);
+    self.tooltip(options);
   }
 };
 
@@ -1170,10 +1187,37 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
   return _btn;
 }
 
-ko.bindingHandlers.tooltip = {
-  update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-    var options = ko.utils.unwrapObservable(valueAccessor());
-    var self = $(element);
-    self.tooltip(options);
-  }
-};
+ko.bindingHandlers.datepicker = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+      var DATE_FORMAT = "YYYY-MM-DD";
+      var TIME_FORMAT = "HH:mm:ss";
+      var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+      var _el = $(element);
+      var options = ko.unwrap(valueAccessor());
+      _el.datepicker({
+        format: DATE_FORMAT.toLowerCase()
+      }).on("changeDate", function () {
+        allBindings().value(_el.val());
+      });
+
+    }
+}
+
+
+ko.bindingHandlers.timepicker = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+      var DATE_FORMAT = "YYYY-MM-DD";
+      var TIME_FORMAT = "HH:mm:ss";
+      var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+      var _el = $(element);
+      var options = ko.unwrap(valueAccessor());
+
+      _el.timepicker({
+        minuteStep: 1,
+        showSeconds: true,
+        showMeridian: false,
+        defaultTime: false
+      });
+
+    }
+}
