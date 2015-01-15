@@ -383,3 +383,16 @@ em {
 #settingsModal h4 {
   margin-top: 30px;
 }
+
+.form-horizontal .control-label {
+  width: 90px;
+}
+
+.form-horizontal .controls {
+  margin-left: 98px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
