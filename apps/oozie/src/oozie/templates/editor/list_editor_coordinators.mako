@@ -31,7 +31,7 @@ ${ layout.menubar(section='Coordinators', is_editor=True) }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Coordinator Manager') }</h1>
+  <h1 class="card-heading simple">${ _('Coordinator Editor') }</h1>
 
   <%actionbar:render>
     <%def name="search()">

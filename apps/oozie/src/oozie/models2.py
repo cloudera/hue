@@ -1603,12 +1603,18 @@ class Bundle(Job):
   def uuid(self):
     return self.document.uuid
 
-  def json_for_html(self):
+  def get_data_for_json(self):
     _data = self.data.copy()
 
     _data['properties']['kickoff'] = _data['properties']['kickoff'].strftime('%Y-%m-%dT%H:%M:%S')
 
-    return json.dumps(_data, cls=JSONEncoderForHTML)
+    return _data
+
+  def to_json(self):
+    return json.dumps(self.get_data_for_json())
+
+  def to_json_for_html(self):
+    return json.dumps(self.get_data_for_json(), cls=JSONEncoderForHTML)
  
   @property
   def data(self):
