@@ -556,27 +556,36 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.enableSideDrop = function (widget) {
     toggleSideDrop(widget, true);
+    sideDropsTouched.forEach(function(row) {
+      row.enableOozieDropOnSide(true);
+    });
+    sideDropsTouched = [];
   }
 
+  var sideDropsTouched = [];
   function toggleSideDrop(widget, enable) {
     if (widget != null && widget.id() != "" && self.currentlyDraggedOp() == "move") {
       var _row = self.getWidgetParentRow(widget.id());
       if (_row) {
         _row.enableOozieDropOnSide(enable);
+        sideDropsTouched.push(_row);
         _row.enableOozieDropOnBefore(enable);
 
         var _parentRow = self.getRowParentRow(_row.id());
         if (_parentRow) {
           _parentRow.enableOozieDropOnSide(enable);
+          sideDropsTouched.push(_parentRow);
           if (_parentRow.columns().length <= 2) {
             _parentRow.columns().forEach(function (col) {
               col.enableOozieDropOnBefore(enable);
               col.enableOozieDropOnAfter(enable);
               col.rows()[0].enableOozieDropOnSide(enable);
+              sideDropsTouched.push(col.rows()[0]);
             });
             var _prevParentRow = self.getPrevRow(_parentRow);
             if (_prevParentRow && _prevParentRow.widgets().length > 0 && _prevParentRow.widgets()[0].widgetType() == "fork-widget") {
               _prevParentRow.enableOozieDropOnSide(enable);
+              sideDropsTouched.push(_prevParentRow);
             }
           }
         }
@@ -591,6 +600,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         if (_prevRow) {
           if (_prevRow.widgets().length > 0 && _prevRow.widgets()[0].widgetType() == "start-widget") {
             _prevRow.enableOozieDropOnSide(enable);
+            sideDropsTouched.push(_prevRow);
             self.getRowParentColumn(_prevRow.id()).enableOozieDropOnBefore(enable);
           }
         }
@@ -599,6 +609,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           _nextRow.enableOozieDropOnBefore(enable);
           if (_nextRow.widgets().length > 0 && _nextRow.widgets()[0].widgetType() == "end-widget") {
             _nextRow.enableOozieDropOnSide(enable);
+            sideDropsTouched.push(_nextRow);
             self.getRowParentColumn(_nextRow.id()).enableOozieDropOnAfter(enable);
           }
         }
