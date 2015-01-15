@@ -72,8 +72,8 @@ urlpatterns += patterns(
 
   url(r'^editor/workflow/list/$', 'list_editor_workflows', name='list_editor_workflows'),
   url(r'^editor/workflow/edit/$', 'edit_workflow', name='edit_workflow'),
-  url(r'^editor/workflow/new/$', 'new_workflow', name='new_workflow'),
-  url(r'^editor/workflow/delete/$', 'delete_workflow', name='delete_workflow'),
+  url(r'^editor/workflow/new/$', 'new_workflow', name='new_workflow'),  
+  url(r'^editor/workflow/delete/$', 'delete_job', name='delete_editor_workflow'),
   url(r'^editor/workflow/copy_workflow/$', 'copy_workflow', name='copy_workflow'),
   url(r'^editor/workflow/save/$', 'save_workflow', name='save_workflow'),
   url(r'^editor/workflow/submit/(?P<doc_id>\d+)$', 'submit_workflow', name='editor_submit_workflow'),
@@ -81,14 +81,16 @@ urlpatterns += patterns(
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
   url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
   url(r'^editor/workflow/action/parameters/$', 'action_parameters', name='action_parameters'),
-  url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'), # Temporary
+  url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'),
   
   url(r'^editor/coordinator/list/$', 'list_editor_coordinators', name='list_editor_coordinators'),
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^editor/coordinator/new/$', 'new_coordinator', name='new_coordinator'),
+  url(r'^editor/coordinator/delete/$', 'delete_job', name='delete_editor_coordinator'),
+  url(r'^editor/coordinator/copy_workflow/$', 'copy_coordinator', name='copy_coordinator'),
   url(r'^editor/coordinator/save/$', 'save_coordinator', name='save_coordinator'),
   url(r'^editor/coordinator/submit/(?P<doc_id>\d+)$', 'submit_coordinator', name='editor_submit_coordinator'),
-  url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'), # Temporary
+  url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'),
   
   url(r'^editor/bundle/list/$', 'list_editor_bundles', name='list_editor_bundles'),
   url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),

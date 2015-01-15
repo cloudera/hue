@@ -97,7 +97,7 @@ def new_workflow(request):
   return edit_workflow(request)
 
 
-def delete_workflow(request):
+def delete_job(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
@@ -112,7 +112,7 @@ def delete_workflow(request):
     doc2.delete()
 
   response = {}
-  request.info(_('Workflows deleted.') if len(jobs) > 1 else _('Workflow deleted.'))
+  request.info(_('Document deleted.') if len(jobs) > 1 else _('Document deleted.'))
   
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -341,10 +341,10 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
 
 
 def list_editor_coordinators(request):
-  coordinators = [d.content_object for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
+  coordinators = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor/list_editor_coordinators.mako', request, {
-      'coordinators': coordinators
+      'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML)
   })
 
 
@@ -374,7 +374,7 @@ def edit_coordinator(request):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
   return render('editor/coordinator_editor.mako', request, {
-      'coordinator_json': coordinator.json_for_html(),
+      'coordinator_json': coordinator.to_json_for_html(),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
@@ -384,6 +384,41 @@ def edit_coordinator(request):
 
 def new_coordinator(request):
   return edit_coordinator(request)
+
+
+@check_document_access_permission()
+def copy_coordinator(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  jobs = json.loads(request.POST.get('selection'))
+
+  for job in jobs:
+    doc2 = Document2.objects.get(type='oozie-coordinator2', id=job['id'])
+    
+    name = doc2.name + '-copy'
+    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+  
+    doc2.pk = None
+    doc2.id = None
+    doc2.uuid = str(uuid.uuid4())
+    doc2.name = name
+    doc2.owner = request.user    
+    doc2.save()
+  
+    doc2.doc.all().delete()
+    doc2.doc.add(copy_doc)
+    
+    coordinator_data = Coordinator(document=doc2).get_data_for_json()
+    coordinator_data['name'] = name
+    doc2.update_data(coordinator_data)
+    doc2.save()
+
+  response = {}  
+  request.info(_('Coordinator copied.') if len(jobs) > 1 else _('Coordinator copied.'))
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 
 @check_document_modify_permission()
