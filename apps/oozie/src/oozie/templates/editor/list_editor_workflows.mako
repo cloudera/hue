@@ -174,7 +174,7 @@ ${ commonshare() | n,unicode }
     };
 
     self.delete2 = function() {
-      $.post("${ url('oozie:delete_workflow') }", {
+      $.post("${ url('oozie:delete_editor_workflow') }", {
         "selection": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();
