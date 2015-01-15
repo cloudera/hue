@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import Config, UnspecifiedConfigSection,\
                              ConfigSection, coerce_json_dict
-from desktop.conf import coerce_database
+from desktop.conf import coerce_database, coerce_password_from_script
 
 
 DATABASES = UnspecifiedConfigSection(
@@ -56,6 +56,12 @@ DATABASES = UnspecifiedConfigSection(
         help=_t('Database password.'),
         type=str,
         default='',
+      ),
+      PASSWORD_SCRIPT=Config(
+        key='password_script',
+        help=_t('Execute this script to produce the database password. This will be used when `password` is not set.'),
+        type=coerce_password_from_script,
+        default=None,
       ),
       HOST=Config(
         key='host',
@@ -98,3 +104,15 @@ def config_validator(user):
 
 def get_server_choices():
   return [(alias, DATABASES[alias].NICE_NAME.get() or alias) for alias in DATABASES]
+
+
+def get_database_password(name):
+  """
+  Return the configured database password.
+  """
+
+  password = DATABASES[name].PASSWORD.get()
+  if password is None:
+    password = DATABASES[name].PASSWORD_SCRIPT.get()
+
+  return password

@@ -25,7 +25,7 @@ from operator import itemgetter
 from django.utils.translation import ugettext as _
 
 from desktop.lib import thrift_util
-from desktop.conf import LDAP_PASSWORD, LDAP_USERNAME
+from desktop.conf import get_ldap_password, LDAP_USERNAME
 from desktop.conf import DEFAULT_USER
 from hadoop import cluster
 
@@ -490,7 +490,10 @@ class HiveServerClient:
     principal = self.query_server['principal']
     impersonation_enabled = False
     ldap_username = None
-    ldap_password = None
+    ldap_password = get_ldap_password()
+
+    if ldap_password is not None: # Pass-through LDAP authentication
+      ldap_username = LDAP_USERNAME.get()
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
@@ -498,7 +501,7 @@ class HiveServerClient:
       kerberos_principal_short_name = None
 
     if self.query_server['server_name'] == 'impala':
-      if LDAP_PASSWORD.get(): # Force LDAP auth if ldap_password is provided
+      if ldap_password: # Force LDAP auth if ldap_password is provided
         use_sasl = True
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
       else:
@@ -513,10 +516,6 @@ class HiveServerClient:
       use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP')
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
-
-    if LDAP_PASSWORD.get(): # Pass-through LDAP authentication
-      ldap_username = LDAP_USERNAME.get()
-      ldap_password = LDAP_PASSWORD.get()
 
     return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, ldap_username, ldap_password
 

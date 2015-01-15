@@ -289,7 +289,7 @@ else:
     "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
     "NAME" : desktop.conf.DATABASE.NAME.get(),
     "USER" : desktop.conf.DATABASE.USER.get(),
-    "PASSWORD" : desktop.conf.DATABASE.PASSWORD.get(),
+    "PASSWORD" : desktop.conf.get_database_password(),
     "HOST" : desktop.conf.DATABASE.HOST.get(),
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
@@ -331,7 +331,7 @@ if desktop.conf.DEMO_ENABLED.get():
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
 EMAIL_HOST_USER = desktop.conf.SMTP.USER.get()
-EMAIL_HOST_PASSWORD = desktop.conf.SMTP.PASSWORD.get()
+EMAIL_HOST_PASSWORD = desktop.conf.get_smtp_password()
 EMAIL_USE_TLS = desktop.conf.SMTP.USE_TLS.get()
 DEFAULT_FROM_EMAIL = desktop.conf.SMTP.DEFAULT_FROM.get()
 

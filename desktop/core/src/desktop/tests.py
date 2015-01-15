@@ -16,14 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import desktop
-import desktop.urls
-import desktop.conf
-import logging
 import json
+import logging
 import os
+import sys
+import tempfile
 import time
 
+import desktop
+import desktop.conf
+import desktop.urls
 import desktop.views as views
 import proxy.conf
 
@@ -683,3 +685,95 @@ class TestStrictRedirection():
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
         assert_true(error_msg in response.content, response.content)
+
+
+class BaseTestPasswordConfig(object):
+
+  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+
+  def get_config_password(self):
+    raise NotImplementedError
+
+  def get_config_password_script(self):
+    raise NotImplementedError
+
+  def get_password(self):
+    raise NotImplementedError
+
+  def test_read_password_from_script(self):
+    resets = [
+      self.get_config_password().set_for_testing(None),
+      self.get_config_password_script().set_for_testing(self.SCRIPT)
+    ]
+
+    try:
+      assert_equal(self.get_password(), ' password from script ')
+    finally:
+      for reset in resets:
+        reset()
+
+
+  def test_config_password_overrides_script_password(self):
+
+    resets = [
+      self.get_config_password().set_for_testing(' password from config '),
+      self.get_config_password_script().set_for_testing(self.SCRIPT),
+    ]
+
+    try:
+      assert_equal(self.get_password(), ' password from config ')
+    finally:
+      for reset in resets:
+        reset()
+
+
+class TestDatabasePasswordConfig(BaseTestPasswordConfig):
+
+  def get_config_password(self):
+    return desktop.conf.DATABASE.PASSWORD
+
+  def get_config_password_script(self):
+    return desktop.conf.DATABASE.PASSWORD_SCRIPT
+
+  def get_password(self):
+    return desktop.conf.get_database_password()
+
+
+class TestLDAPPasswordConfig(BaseTestPasswordConfig):
+
+  def get_config_password(self):
+    return desktop.conf.LDAP_PASSWORD
+
+  def get_config_password_script(self):
+    return desktop.conf.LDAP_PASSWORD_SCRIPT
+
+  def get_password(self):
+    return desktop.conf.get_ldap_password()
+
+class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
+
+  def setup(self):
+    self.finish = desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({'test': {}})
+
+  def teardown(self):
+    self.finish()
+
+  def get_config_password(self):
+    return desktop.conf.LDAP.LDAP_SERVERS['test'].BIND_PASSWORD
+
+  def get_config_password_script(self):
+    return desktop.conf.LDAP.LDAP_SERVERS['test'].BIND_PASSWORD_SCRIPT
+
+  def get_password(self):
+    return desktop.conf.get_ldap_bind_password(desktop.conf.LDAP.LDAP_SERVERS['test'])
+
+class TestSMTPPasswordConfig(BaseTestPasswordConfig):
+
+  def get_config_password(self):
+    return desktop.conf.SMTP.PASSWORD
+
+  def get_config_password_script(self):
+    return desktop.conf.SMTP.PASSWORD_SCRIPT
+
+  def get_password(self):
+    return desktop.conf.get_smtp_password()

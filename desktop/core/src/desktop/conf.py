@@ -15,10 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import socket
 import stat
-import logging
+import subprocess
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -49,6 +50,14 @@ def coerce_port(port):
     return ''
   else:
     return port
+
+
+def coerce_password_from_script(script):
+  password = subprocess.check_output(script, shell=True)
+
+  # whitespace may be significant in the password, but most files have a
+  # trailing newline.
+  return password.strip('\n')
 
 
 HTTP_HOST = Config(
@@ -89,6 +98,13 @@ LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
+  default=None)
+
+LDAP_PASSWORD_SCRIPT = Config(
+  key="ldap_password_script",
+  help=_("Execute this script to produce the LDAP password. This will be used when `ldap_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
   default=None)
 
 LDAP_USERNAME = Config(
@@ -245,6 +261,14 @@ SMTP = ConfigSection(
       default=""
     ),
 
+    PASSWORD_SCRIPT = Config(
+      key="password_script",
+      help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
+      type=coerce_password_from_script,
+      private=True,
+      default=None,
+    ),
+
     USE_TLS = Config(
       key="tls",
       help=_("Whether to use a TLS (secure) connection when talking to the SMTP server."),
@@ -289,6 +313,13 @@ DATABASE = ConfigSection(
       help=_('Database password.'),
       private=True,
       type=str,
+      default='',
+    ),
+    PASSWORD_SCRIPT=Config(
+      key='password_script',
+      help=_('Execute this script to produce the database password. This will be used when `password` is not set.'),
+      private=True,
+      type=coerce_password_from_script,
       default='',
     ),
     HOST=Config(
@@ -553,6 +584,11 @@ LDAP = ConfigSection(
                                default=None,
                                private=True,
                                help=_("The password for the bind user.")),
+          BIND_PASSWORD_SCRIPT=Config("bind_password_script",
+                                    default=None,
+                                    private=True,
+                                    type=coerce_password_from_script,
+                                    help=_("Execute this script to produce the LDAP bind user password. This will be used when `bind_password` is not set.")),
           SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
                                             default=True,
                                             type=coerce_bool,
@@ -794,13 +830,17 @@ def validate_ldap(user, config):
   res = []
 
   if config.SEARCH_BIND_AUTHENTICATION.get():
-    if config.LDAP_URL.get() is not None and bool(config.BIND_DN.get()) != bool(config.BIND_PASSWORD.get()):
-      if config.BIND_DN.get() == None:
-        res.append((LDAP.BIND_DN,
-                  unicode(_("If you set bind_password, then you must set bind_dn."))))
-      else:
-        res.append((LDAP.BIND_PASSWORD,
-                    unicode(_("If you set bind_dn, then you must set bind_password."))))
+    if config.LDAP_URL.get() is not None:
+      bind_dn = config.BIND_DN.get()
+      bind_password = config.BIND_PASSWORD.get() or config.BIND_PASSWORD_SCRIPT.get()
+
+      if bool(bind_dn) != bool(bind_password):
+        if bind_dn == None:
+          res.append((LDAP.BIND_DN,
+                    unicode(_("If you set bind_password, then you must set bind_dn."))))
+        else:
+          res.append((LDAP.BIND_PASSWORD,
+                      unicode(_("If you set bind_dn, then you must set bind_password."))))
   else:
     if config.NT_DOMAIN.get() is not None or \
         config.LDAP_USERNAME_PATTERN.get() is not None:
@@ -907,3 +947,35 @@ def get_redaction_policy():
   """
 
   return LOG_REDACTION_FILE.get()
+
+
+def get_database_password():
+  password = DATABASE.PASSWORD.get()
+  if password is None:
+    password = DATABASE.PASSWORD_SCRIPT.get()
+
+  return password
+
+
+def get_smtp_password():
+  password = SMTP.PASSWORD.get()
+  if password is None:
+    password = SMTP.PASSWORD_SCRIPT.get()
+
+  return password
+
+
+def get_ldap_password():
+  password = LDAP_PASSWORD.get()
+  if password is None:
+    password = LDAP_PASSWORD_SCRIPT.get()
+
+  return password
+
+
+def get_ldap_bind_password(ldap_config):
+  password = ldap_config.BIND_PASSWORD.get()
+  if password is None:
+    password = ldap_config.BIND_PASSWORD_SCRIPT.get()
+
+  return password
