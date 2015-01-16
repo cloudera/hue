@@ -18,7 +18,7 @@
 import logging
 import os
 import pwd
-import simplejson
+import json
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -85,7 +85,7 @@ class Command(BaseCommand):
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     table_file = file(os.path.join(data_dir, 'tables.json'))
-    table_list = simplejson.load(table_file)
+    table_list = json.load(table_file)
     table_file.close()
 
     for table_dict in table_list:
@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
   def _install_queries(self, django_user, app_name):
     design_file = file(os.path.join(beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
-    design_list = simplejson.load(design_file)
+    design_list = json.load(design_file)
     design_file.close()
 
     for design_dict in design_list:
@@ -226,7 +226,7 @@ class SampleDesign(object):
       model.type = self.type
       # The data field needs to be a string. The sample file writes it
       # as json (without encoding into a string) for readability.
-      model.data = simplejson.dumps(self.data)
+      model.data = json.dumps(self.data)
       model.desc = self.desc
       model.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))

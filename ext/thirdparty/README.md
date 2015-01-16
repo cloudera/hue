@@ -40,7 +40,6 @@ Checked-in third party dependencies
 |Y|requests|2.0.0|ASL2|https://github.com/kennethreitz/requests/|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
-|Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|tablib|0.9.11|MIT|http://docs.python-tablib.org/en/latest/|

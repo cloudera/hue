@@ -1,9 +1,6 @@
 # encoding: utf-8
 import datetime
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models

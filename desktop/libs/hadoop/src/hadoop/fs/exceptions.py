@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except:
-  import simplejson as json
+import json
 
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
