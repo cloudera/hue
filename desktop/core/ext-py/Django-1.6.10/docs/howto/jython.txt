@@ -1,0 +1,10 @@
+========================
+Running Django on Jython
+========================
+
+.. index:: Jython, Java, JVM
+
+`django-jython`_ supports Django 1.7. Please use that version of the
+documentation for details.
+
+.. _`django-jython`: http://code.google.com/p/django-jython/
