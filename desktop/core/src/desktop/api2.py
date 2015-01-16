@@ -22,12 +22,12 @@ import time
 
 from collections import defaultdict
 
-from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 from django.utils import html
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2, DocumentTag
 
@@ -43,7 +43,7 @@ def get_document(request):
 
   response = _massage_doc_for_json(doc, request.user, with_data=request.GET.get('with_data'))
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def _massage_doc_for_json(document, user, with_data=False):

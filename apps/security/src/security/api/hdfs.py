@@ -17,9 +17,9 @@
 
 import json
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.views import display, listdir_paged
 
@@ -54,9 +54,11 @@ def list_hdfs(request, path):
     else:
       json_response = display(request, path)
   except IOError:
-    json_response = HttpResponse(json.dumps({'files': [], 'page': {}, 'error': 'FILE_NOT_FOUND'}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    json_response = JsonResponse({'files': [], 'page': {}, 'error': 'FILE_NOT_FOUND'})
   except Exception, e:
-    json_response = HttpResponse(json.dumps({'files': [], 'page': {}, 'error': 'ACCESS_DENIED'}), mimetype="application/json") # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    json_response = JsonResponse({'files': [], 'page': {}, 'error': 'ACCESS_DENIED'})
 
   if json.loads(request.GET.get('isDiffMode', 'false')):
     request.doas = 'hdfs'
@@ -78,7 +80,7 @@ def get_acls(request):
     print e
     acls = None
 
-  return HttpResponse(json.dumps(acls is not None and acls['AclStatus'] or None), mimetype="application/json")
+  return JsonResponse(acls is not None and acls['AclStatus'] or None)
 
 
 def update_acls(request):
@@ -97,7 +99,7 @@ def update_acls(request):
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
-  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
+  return JsonResponse({'status': 0})
 
 
 def bulk_delete_acls(request):
@@ -114,7 +116,7 @@ def bulk_delete_acls(request):
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
-  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
+  return JsonResponse({'status': 0})
 
 
 def bulk_add_acls(request):
@@ -130,7 +132,7 @@ def bulk_add_acls(request):
   except Exception, e:
     raise PopupException(unicode(str(e.message), "utf8"))
 
-  return HttpResponse(json.dumps({'status': 0}), mimetype="application/json")
+  return JsonResponse({'status': 0})
 
 
 def bulk_sync_acls(request):

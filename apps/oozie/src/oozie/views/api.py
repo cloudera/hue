@@ -19,9 +19,10 @@ import json
 import logging
 import sys
 
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document
@@ -29,7 +30,7 @@ from desktop.models import Document
 from oozie.forms import WorkflowForm, NodeForm, design_form_by_type
 from oozie.models import Workflow, Node, Start, End, Kill,\
                          Link, Decision, Fork, DecisionEnd, Join,\
-                         NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES_JSON
+                         NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
 
@@ -62,7 +63,7 @@ def error_handler(view_fn):
       'details': details
     }
 
-    return HttpResponse(json.dumps(response), mimetype="application/json", status=error_code)
+    return JsonResponse(response, status=error_code)
   return decorator
 
 
@@ -293,7 +294,7 @@ def _workflow(request, workflow):
 
   response['status'] = 0
   response['data'] = workflow_dict
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -309,7 +310,7 @@ def workflow_validate_node(request, workflow, node_type):
   else:
     response['status'] = -1
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 # Workflow and child links are SPECIAL.
@@ -389,7 +390,7 @@ def workflow_actions(request, workflow):
       'actions': [model_to_dict(action) for action in action_list]
     }
   }
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -411,8 +412,8 @@ def workflows(request):
     }
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def autocomplete_properties(request):
-  return HttpResponse(_STD_PROPERTIES_JSON, mimetype="application/json")
+  return JsonResponse(_STD_PROPERTIES)

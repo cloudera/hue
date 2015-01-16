@@ -2010,8 +2010,6 @@ _STD_PROPERTIES = [
   'mapred.queue.default.acl-administer-jobs',
 ]
 
-_STD_PROPERTIES_JSON = json.dumps(_STD_PROPERTIES)
-
 ACTION_TYPES = {
   Mapreduce.node_type: Mapreduce,
   Streaming.node_type: Streaming,

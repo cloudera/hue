@@ -18,14 +18,13 @@
 import json
 import logging
 
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from desktop.context_processors import get_app_name
-from desktop.lib.django_util import render
+from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 
 from beeswax.design import hql_query
@@ -257,7 +256,7 @@ def load_table(request, database, table):
                  }, force_template=True).content
     response['data'] = popup
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def describe_partitions(request, database, table):
@@ -306,7 +305,7 @@ def analyze_table(request, database, table, column=None):
   else:
     response['message'] = _('A POST request is required')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def has_write_access(user):

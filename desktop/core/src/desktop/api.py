@@ -22,12 +22,12 @@ import time
 
 from collections import defaultdict
 
-from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 from django.utils import html
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document, DocumentTag
 
@@ -196,7 +196,7 @@ def get_document(request):
     doc_id = request.GET['id']
     doc = Document.objects.get(id=doc_id)
     response = massage_doc_for_json(doc, request.user)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
 
 def massage_doc_for_json(document, user, url=''):
   read_perms = document.list_permissions(perm='read')
@@ -237,7 +237,7 @@ def add_tag(request):
   else:
     response['message'] = _('POST request only')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def tag(request):
@@ -254,7 +254,7 @@ def tag(request):
   else:
     response['message'] = _('POST request only')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def update_tags(request):
@@ -271,7 +271,7 @@ def update_tags(request):
   else:
     response['message'] = _('POST request only')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def remove_tag(request):
@@ -287,7 +287,7 @@ def remove_tag(request):
   else:
     response['message'] = _('POST request only')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def update_permissions(request):
@@ -308,4 +308,4 @@ def update_permissions(request):
   else:
     response['message'] = _('POST request only')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

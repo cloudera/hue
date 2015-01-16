@@ -18,9 +18,9 @@
 import json
 import time
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from libsentry.api import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
 from hadoop.cluster import get_defaultfs
@@ -65,7 +65,7 @@ def list_sentry_roles_by_group(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def list_sentry_privileges_by_role(request):
@@ -80,7 +80,7 @@ def list_sentry_privileges_by_role(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def _to_sentry_privilege(privilege):
@@ -154,7 +154,7 @@ def create_role(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def update_role_groups(request):
@@ -178,7 +178,7 @@ def update_role_groups(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def save_privileges(request):
@@ -206,7 +206,7 @@ def save_privileges(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def grant_privilege(request):
@@ -223,7 +223,7 @@ def grant_privilege(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def create_sentry_role(request):
@@ -238,7 +238,7 @@ def create_sentry_role(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def drop_sentry_role(request):
@@ -253,7 +253,7 @@ def drop_sentry_role(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def list_sentry_privileges_by_authorizable(request):
@@ -278,7 +278,7 @@ def list_sentry_privileges_by_authorizable(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def bulk_delete_privileges(request):
@@ -303,7 +303,7 @@ def bulk_delete_privileges(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def bulk_add_privileges(request):
@@ -338,7 +338,7 @@ def bulk_add_privileges(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def rename_sentry_privilege(request):
@@ -354,7 +354,7 @@ def rename_sentry_privilege(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def list_sentry_privileges_for_provider(request):
@@ -372,4 +372,4 @@ def list_sentry_privileges_for_provider(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)

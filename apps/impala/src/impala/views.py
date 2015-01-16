@@ -22,8 +22,7 @@
 import logging
 import json
 
-from django.http import HttpResponse
-
+from desktop.lib.django_util import JsonResponse
 from desktop.context_processors import get_app_name
 
 from beeswax.server import dbms
@@ -52,4 +51,4 @@ def refresh_tables(request):
     except Exception, e:
       response['message'] = str(e)    
   
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

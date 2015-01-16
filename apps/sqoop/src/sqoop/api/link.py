@@ -22,13 +22,13 @@ except ImportError:
 import logging
 import socket
 
-from django.http import HttpResponse
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
 from decorators import get_link_or_exception
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
@@ -52,7 +52,7 @@ def get_links(request):
     response['links'] = list_to_dict(c.get_links())
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not get links.')))
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def create_link(request):
@@ -76,7 +76,7 @@ def create_link(request):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def update_link(request, link):
@@ -99,7 +99,7 @@ def update_link(request, link):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def links(request):
@@ -120,7 +120,7 @@ def link(request, link):
   }
   if request.method == 'GET':
     response['link'] = link.to_dict()
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
   elif request.method == 'POST':
     return update_link(request, link)
   else:
@@ -148,7 +148,7 @@ def link_clone(request, link):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 @get_link_or_exception()
@@ -169,4 +169,4 @@ def link_delete(request, link):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

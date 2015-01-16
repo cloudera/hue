@@ -25,10 +25,9 @@ import urllib
 
 from avro import datafile, io
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render
+from desktop.lib.django_util import JsonResponse, render
 
 from hbase import conf
 from hbase.settings import DJANGO_APPS
@@ -119,7 +118,11 @@ def api_dump(response):
             cleaned[key] = clean(value)
       return cleaned
 
-  return HttpResponse(json.dumps({ 'data': clean(response), 'truncated': True, 'limit': trunc_limit }), content_type="application/json")
+  return JsonResponse({
+    'data': clean(response),
+    'truncated': True,
+    'limit': trunc_limit,
+    })
 
 
 def install_examples(request):
@@ -135,4 +138,4 @@ def install_examples(request):
       LOG.exception(e)
       result['message'] = str(e)
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)

@@ -82,15 +82,15 @@ def make_response(generator, format, name, encoding=None):
   @param encoding Unicode encoding for data
   """
   if format == 'csv':
-    mimetype = 'application/csv'
+    content_type = 'application/csv'
   elif format == 'xls':
-    mimetype = 'application/xls'
+    content_type = 'application/xls'
   else:
     raise Exception("Unknown format: %s" % format)
 
   # FIXME: this should be replaced with StreamingHttpResponse when we upgrade
   # to Django 1.5+.
-  resp = HttpResponse(generator, mimetype=mimetype)
+  resp = HttpResponse(generator, content_type=content_type)
   resp['Content-Disposition'] = 'attachment; filename=%s.%s' % (name, format)
   resp.streaming = True
 

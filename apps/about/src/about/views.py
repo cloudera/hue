@@ -19,11 +19,10 @@ import json
 import logging
 
 from django.conf import settings
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
-from desktop.lib.django_util import render, login_notrequired
+from desktop.lib.django_util import JsonResponse, render, login_notrequired
 from desktop.log.access import access_log_level
 from desktop.models import Settings
 from desktop.views import collect_usage
@@ -66,4 +65,4 @@ def update_preferences(request):
   else:
     response['data'] = _('POST request required.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

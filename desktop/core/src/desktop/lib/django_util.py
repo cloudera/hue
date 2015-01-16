@@ -19,21 +19,22 @@
 
 import logging
 import re
-import simplejson
+import json
 import socket
 import datetime
 
-from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import ungettext, ugettext
-from django.core.context_processors import csrf
-from django.core import urlresolvers, serializers
 from django.conf import settings
-from django.utils.http import urlencode # this version is unicode-friendly
+from django.core import urlresolvers, serializers
+from django.core.context_processors import csrf
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.http import QueryDict, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as django_render_to_response
-from django.template.loader import render_to_string as django_render_to_string
 from django.template import RequestContext
-from django.db import models
+from django.template.loader import render_to_string as django_render_to_string
+from django.utils.http import urlencode # this version is unicode-friendly
+from django.utils.translation import ungettext, ugettext
+from django.utils.tzinfo import LocalTimezone
 
 import desktop.conf
 import desktop.lib.thrift_util
@@ -53,7 +54,7 @@ GROUPNAME_RE_RULE = ".{,80}"
 class PopupException: pass
 
 
-class Encoder(simplejson.JSONEncoder):
+class Encoder(json.JSONEncoder):
   """
   Automatically encodes JSON for Django models and
   Thrift objects, as well as objects that have
@@ -70,7 +71,7 @@ class Encoder(simplejson.JSONEncoder):
       assert len(x) == 1
       return x[0]
 
-    return simplejson.JSONEncoder.default(self, o)
+    return json.JSONEncoder.default(self, o)
 
 def get_username_re_rule():
   return USERNAME_RE_RULE
@@ -261,7 +262,7 @@ def encode_json(data, indent=None):
   Typically this is used from render_json, but it's the natural
   endpoint to test the Encoder logic, so it's separated out.
   """
-  return simplejson.dumps(data, indent=indent, cls=Encoder)
+  return json.dumps(data, indent=indent, cls=Encoder)
 
 def encode_json_for_js(data, indent=None):
   """
@@ -270,7 +271,7 @@ def encode_json_for_js(data, indent=None):
   Typically this is used from render_json, but it's the natural
   endpoint to test the Encoder logic, so it's separated out.
   """
-  return simplejson.dumps(data, indent=indent, cls=JSONEncoderForHTML)
+  return json.dumps(data, indent=indent, cls=JSONEncoderForHTML)
 
 VALID_JSON_IDENTIFIER = re.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$")
 
@@ -294,7 +295,7 @@ def render_json(data, jsonp_callback=None, js_safe=False, status=200):
     if not VALID_JSON_IDENTIFIER.match(jsonp_callback):
       raise IllegalJsonpCallbackNameException("Invalid jsonp callback name: %s" % jsonp_callback)
     json = "%s(%s);" % (jsonp_callback, json)
-  return HttpResponse(json, mimetype='text/javascript', status=status)
+  return HttpResponse(json, content_type='text/javascript', status=status)
 
 def update_if_dirty(model_instance, **kwargs):
   """
@@ -445,3 +446,26 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
       else:
         s += ugettext('%(separator)s %(number)d %(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
   return s
+
+
+# Backported from Django 1.7
+class JsonResponse(HttpResponse):
+    """
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before EcmaScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be an json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    """
+
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+        if safe and not isinstance(data, dict):
+            raise TypeError('In order to allow non-dict objects to be '
+                'serialized set the safe parameter to False')
+        kwargs.setdefault('content_type', 'application/json')
+        data = json.dumps(data, cls=encoder)
+        super(JsonResponse, self).__init__(content=data, **kwargs)

@@ -22,13 +22,13 @@ except ImportError:
 import logging
 import socket
 
-from django.http import HttpResponse
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
 from decorators import get_job_or_exception
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
@@ -54,7 +54,7 @@ def get_jobs(request):
     response['jobs'] = list_to_dict(jobs)
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not get jobs.')))
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def create_job(request):
@@ -81,7 +81,7 @@ def create_job(request):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def update_job(request, job):
@@ -107,7 +107,7 @@ def update_job(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def jobs(request):
@@ -128,7 +128,7 @@ def job(request, job):
   }
   if request.method == 'GET':
     response['job'] = job.to_dict()
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
   elif request.method == 'POST':
     return update_job(request, job)
   else:
@@ -156,7 +156,7 @@ def job_clone(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 @get_job_or_exception()
@@ -178,7 +178,7 @@ def job_delete(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 @get_job_or_exception()
@@ -200,7 +200,7 @@ def job_start(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = [e.to_dict()]
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 @get_job_or_exception()
@@ -222,7 +222,7 @@ def job_stop(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 @get_job_or_exception()
@@ -244,4 +244,4 @@ def job_status(request, job):
   except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

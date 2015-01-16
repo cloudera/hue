@@ -20,10 +20,10 @@ import json
 import logging
 import re
 
-from django.http import HttpResponse
 from django.utils.decorators import available_attrs
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from search.models import Collection
 
@@ -86,7 +86,7 @@ def parse_fields(request):
   else:
     result['message'] = _('Source type %s not supported.') % source_type
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def collections(request):
@@ -103,7 +103,7 @@ def collections(request):
     'collections': massaged_collections
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_create(request):
@@ -151,7 +151,7 @@ def collections_create(request):
   else:
     response['message'] = _('Collection missing.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_import(request):
@@ -179,7 +179,7 @@ def collections_import(request):
   else:
     response['message'] = _('Collection missing.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_remove(request):
@@ -205,7 +205,7 @@ def collections_remove(request):
     response['status'] = 0
     response['message'] = _('Collections removed!')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_fields(request, collection):
@@ -221,7 +221,7 @@ def collections_fields(request, collection):
   response['fields'] = [(field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields]
   response['unique_key'] = unique_key
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_update(request, collection):
@@ -242,7 +242,7 @@ def collections_update(request, collection):
     response['status'] = 0
     response['message'] = _('Collection updated!')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def collections_data(request, collection):
@@ -269,4 +269,4 @@ def collections_data(request, collection):
   else:
     response['message'] = _('Unsupported source %s') % source
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

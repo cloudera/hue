@@ -19,13 +19,12 @@ import json
 import logging
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 
-from desktop.lib.django_util import render
+from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 
@@ -148,7 +147,7 @@ def search(request):
   if 'error' in response:
     augment_solr_exception(response, collection)
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @allow_admin_only
@@ -177,7 +176,7 @@ def save(request):
   else:
     response['message'] = _('There is no collection to search.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def download(request):
@@ -186,9 +185,8 @@ def download(request):
     response = search(request)
 
     if file_format == 'json':
-      mimetype = 'application/json'
-      json_docs = json.dumps(json.loads(response.content)['response']['docs'])
-      resp = HttpResponse(json_docs, mimetype=mimetype)
+      docs = json.loads(response.content)['response']['docs']
+      resp = JsonResponse(docs, safe=False)
       resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
       return resp
     else:
@@ -218,7 +216,7 @@ def admin_collections(request, is_redirect=False):
         'absoluteUrl': collection.get_absolute_url()
       }
       collections.append(massaged_collection)
-    return HttpResponse(json.dumps(collections), mimetype="application/json")
+    return JsonResponse(collections)
 
   return render('admin_collections.mako', request, {
     'existing_hue_collections': existing_hue_collections,
@@ -237,7 +235,7 @@ def admin_collection_delete(request):
     'result': searcher.delete_collections([collection['id'] for collection in collections])
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @allow_admin_only
@@ -251,7 +249,7 @@ def admin_collection_copy(request):
     'result': searcher.copy_collections([collection['id'] for collection in collections])
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def query_suggest(request, collection_id, query=""):
@@ -269,7 +267,7 @@ def query_suggest(request, collection_id, query=""):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def index_fields_dynamic(request):
@@ -291,7 +289,7 @@ def index_fields_dynamic(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_document(request):
@@ -316,7 +314,7 @@ def get_document(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_stats(request):
@@ -340,7 +338,7 @@ def get_stats(request):
       result['status'] = 1
       result['message'] = _('This field does not support stats')
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_terms(request):
@@ -371,7 +369,7 @@ def get_terms(request):
       result['status'] = 1
       result['message'] = _('This field does not support stats')
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_timeline(request):
@@ -417,7 +415,7 @@ def get_timeline(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def new_facet(request):
@@ -437,7 +435,7 @@ def new_facet(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
@@ -508,7 +506,7 @@ def get_range_facet(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_collection(request):
@@ -526,7 +524,7 @@ def get_collection(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def get_collections(request):
@@ -544,7 +542,7 @@ def get_collections(request):
     else:
       result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def install_examples(request):
@@ -561,4 +559,4 @@ def install_examples(request):
       LOG.exception(e)
       result['message'] = str(e)
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)

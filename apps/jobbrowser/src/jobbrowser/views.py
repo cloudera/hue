@@ -24,7 +24,7 @@ import urlparse
 from urllib import quote_plus
 from lxml import html
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -32,7 +32,8 @@ from django.core.urlresolvers import reverse
 from desktop.log.access import access_warn, access_log_level
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.rest.resource import Resource
-from desktop.lib.django_util import render_json, render, copy_query_dict, encode_json_for_js
+from desktop.lib.django_util import JsonResponse, render_json, render, copy_query_dict
+from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
@@ -84,7 +85,7 @@ def job_not_assigned(request, jobid, path):
     except Exception, e:
       result['message'] = _('Error polling job %s: %s') % (jobid, e)
 
-    return HttpResponse(encode_json_for_js(result), mimetype="application/json")
+    return JsonResponse(result, encoder=JSONEncoderForHTML)
   else:
     return render('job_not_assigned.mako', request, {'jobid': jobid, 'path': path})
 
@@ -107,7 +108,7 @@ def jobs(request):
       else:
         raise ex
     json_jobs  = [massage_job_for_json(job, request) for job in jobs]
-    return HttpResponse(encode_json_for_js(json_jobs), mimetype="application/json")
+    return JsonResponse(json_jobs, encoder=JSONEncoderForHTML)
 
   return render('jobs.mako', request, {
     'request': request,
@@ -174,7 +175,7 @@ def single_spark_job(request, job):
     json_job = {
       'job': massage_job_for_json(job, request)
     }
-    return HttpResponse(encode_json_for_js(json_job), mimetype="application/json")
+    return JsonResponse(json_job, encoder=JSONEncoderForHTML)
   else:
     return render('job.mako', request, {
       'request': request,
@@ -202,7 +203,7 @@ def single_job(request, job):
       'failedTasks': json_failed_tasks,
       'recentTasks': json_recent_tasks
     }
-    return HttpResponse(encode_json_for_js(json_job), mimetype="application/json")
+    return JsonResponse(json_job, encoder=JSONEncoderForHTML)
 
   return render('job.mako', request, {
     'request': request,
@@ -239,7 +240,7 @@ def kill_job(request, job):
       if request.REQUEST.get("next"):
         return HttpResponseRedirect(request.REQUEST.get("next"))
       elif request.REQUEST.get("format") == "json":
-        return HttpResponse(encode_json_for_js({'status': 0}), mimetype="application/json")
+        return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
       else:
         raise MessageException("Job Killed")
     time.sleep(1)
@@ -280,7 +281,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
 
   response = {'log': log}
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 
@@ -434,7 +435,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
       "logs": logs,
       "isRunning": job.status.lower() in ('running', 'pending', 'prep')
     }
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
   else:
     return render("attempt_logs.mako", request, context)
 

@@ -19,9 +19,10 @@ import datetime
 import json
 import logging
 
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import JsonResponse
 from desktop.context_processors import get_app_name
 
 from librdbms import conf
@@ -56,7 +57,7 @@ def error_handler(view_fn):
       response = {
         'error': str(e)
       }
-      return HttpResponse(json.dumps(response), mimetype="application/json", status=500)
+      return JsonResponse(response, status=500)
   return decorator
 
 
@@ -67,7 +68,7 @@ def servers(request):
     'servers': servers_dict
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -84,7 +85,7 @@ def databases(request, server):
     'databases': db.get_databases()
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -101,7 +102,7 @@ def tables(request, server, database):
     'tables': db.get_tables(database)
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -118,7 +119,7 @@ def columns(request, server, database, table):
     'columns': db.get_columns(database, table)
   }
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -163,7 +164,7 @@ def execute_query(request, design_id=None):
   except RuntimeError, e:
     response['message']= str(e)
 
-  return HttpResponse(json.dumps(response, cls=ResultEncoder), mimetype="application/json")
+  return JsonResponse(response, encoder=ResultEncoder)
 
 
 @error_handler
@@ -201,7 +202,7 @@ def explain_query(request):
   except RuntimeError, e:
     response['message']= str(e)
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -246,7 +247,7 @@ def fetch_results(request, id, first_row=0):
     'message': fetch_error and error_message or '',
     'results': results_to_dict(results)
   }
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -273,7 +274,7 @@ def save_query(request, design_id=None):
   except RuntimeError, e:
     response['message'] = str(e)
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @error_handler
@@ -288,7 +289,7 @@ def fetch_saved_query(request, design_id):
   design = safe_get_design(request, query_type, design_id)
 
   response['design'] = design_to_dict(design)
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def results_to_dict(results):
