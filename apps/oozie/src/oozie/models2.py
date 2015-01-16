@@ -56,7 +56,7 @@ class Job(object):
 
   @classmethod
   def get_workspace(cls, user):
-    return REMOTE_SAMPLE_DIR.get().replace('$USER', user.username).replace('$TIME', str(time.time()))
+    return (REMOTE_SAMPLE_DIR.get() + '/hue-oozie-$TIME').replace('$USER', user.username).replace('$TIME', str(time.time()))
 
   @property
   def validated_name(self):
