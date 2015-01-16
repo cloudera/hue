@@ -23,6 +23,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2, Document
 
@@ -43,7 +44,7 @@ def create_session(request):
   response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -56,7 +57,7 @@ def execute(request):
   response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -69,7 +70,7 @@ def check_status(request):
   response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -84,7 +85,7 @@ def fetch_result_data(request):
   response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -129,7 +130,7 @@ def get_logs(request):
     } for job in db._get_jobs(response['logs'])]
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def save_notebook(request):
@@ -151,7 +152,7 @@ def save_notebook(request):
   response['id'] = notebook_doc.id
   response['message'] = _('Notebook saved !')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def open_notebook(request):
@@ -164,7 +165,7 @@ def open_notebook(request):
   response['notebook'] = notebook.get_json()
   response['message'] = _('Notebook saved !')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def close_notebook(request):

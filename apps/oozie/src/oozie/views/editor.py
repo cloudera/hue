@@ -30,7 +30,7 @@ from django.utils.functional import curry
 from django.utils.http import http_date
 from django.utils.translation import ugettext as _, activate as activate_translation
 
-from desktop.lib.django_util import render, extract_field_data
+from desktop.lib.django_util import JsonResponse, render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
@@ -246,7 +246,7 @@ def export_workflow(request, workflow):
 
   zip_file = workflow.compress(mapping=mapping)
 
-  response = HttpResponse(mimetype="application/zip")
+  response = HttpResponse(content_type="application/zip")
   response["Last-Modified"] = http_date(time.time())
   response["Content-Length"] = len(zip_file.getvalue())
   response['Content-Disposition'] = 'attachment; filename="workflow-%s-%d.zip"' % (workflow.name, workflow.id)
@@ -329,7 +329,7 @@ def clone_workflow(request, workflow):
 
   response = {'url': reverse('oozie:edit_workflow', kwargs={'workflow': clone.id})}
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 
@@ -358,7 +358,7 @@ def submit_workflow(request, workflow):
                    'params_form': params_form,
                    'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
                  }, force_template=True).content
-  return HttpResponse(json.dumps(popup), mimetype="application/json")
+  return JsonResponse(popup, safe=False)
 
 
 def _submit_workflow(user, fs, jt, workflow, mapping):
@@ -554,7 +554,7 @@ def create_coordinator_dataset(request, coordinator):
                             'dataset': dataset,
                           }, force_template=True).content
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response, safe=False)
 
 
 @check_dataset_access_permission
@@ -587,7 +587,7 @@ def edit_coordinator_dataset(request, dataset):
                           'path': request.path,
                         }, force_template=True).content
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response, safe=False)
 
 
 @check_job_access_permission()
@@ -617,7 +617,7 @@ def create_coordinator_data(request, coordinator, data_type):
   else:
     response['data'] = _('A POST request is required.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @check_job_access_permission()
@@ -629,7 +629,7 @@ def clone_coordinator(request, coordinator):
 
   response = {'url': reverse('oozie:edit_coordinator', kwargs={'coordinator': clone.id})}
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @check_job_access_permission()
@@ -656,7 +656,7 @@ def submit_coordinator(request, coordinator):
                  'params_form': params_form,
                  'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
                 }, force_template=True).content
-  return HttpResponse(json.dumps(popup), mimetype="application/json")
+  return JsonResponse(popup, safe=False)
 
 
 def _submit_coordinator(request, coordinator, mapping):
@@ -787,7 +787,7 @@ def create_bundled_coordinator(request, bundle):
   if response['status'] != 0:
     response['data'] = get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_form=bundled_coordinator_form)
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_form=None):
@@ -826,7 +826,7 @@ def edit_bundled_coordinator(request, bundle, bundled_coordinator):
                             'bundled_coordinator_instance': bundled_coordinator_instance,
                           }, force_template=True).content
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response, safe=False)
 
 
 @check_job_access_permission()
@@ -838,7 +838,7 @@ def clone_bundle(request, bundle):
 
   response = {'url': reverse('oozie:edit_bundle', kwargs={'bundle': clone.id})}
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @check_job_access_permission()
@@ -865,7 +865,7 @@ def submit_bundle(request, bundle):
                  'params_form': params_form,
                  'action': reverse('oozie:submit_bundle',  kwargs={'bundle': bundle.id})
                 }, force_template=True).content
-  return HttpResponse(json.dumps(popup), mimetype="application/json")
+  return JsonResponse(popup, safe=False)
 
 
 def _submit_bundle(request, bundle, properties):
@@ -936,7 +936,7 @@ def install_examples(request):
       LOG.exception(e)
       result['message'] = str(e)
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def jasmine(request):

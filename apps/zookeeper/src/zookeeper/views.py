@@ -19,11 +19,11 @@
 import json
 import logging
 
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render
+from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 
 from zookeeper import settings
@@ -135,7 +135,7 @@ def delete(request, id, path):
       'redirect': reverse('zookeeper:tree', kwargs={'id':id, 'path': path[:path.rindex('/')] or '/'})
     }
 
-  return HttpResponse(json.dumps(redir), mimetype="application/json")
+  return JsonResponse(redir)
 
 
 def create(request, id, path):

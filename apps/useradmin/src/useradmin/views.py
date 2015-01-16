@@ -26,7 +26,8 @@ import ldap
 import ldap_access
 
 from django.contrib.auth.models import User, Group
-from desktop.lib.django_util import render
+
+from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
@@ -93,7 +94,7 @@ def list_for_autocomplete(request):
       'users': massage_users_for_json(users, extended_user_object),
       'groups': massage_groups_for_json(groups)
     }
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
 
   return HttpResponse("")
 

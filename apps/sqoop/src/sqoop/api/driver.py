@@ -22,10 +22,10 @@ except ImportError:
 import logging
 import socket
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
@@ -49,6 +49,6 @@ def driver(request):
       response['driver'] = c.get_driver().to_dict()
     except RestException, e:
       response.update(handle_rest_exception(e, _('Could not get driver.')))
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return JsonResponse(response)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET request required.'), error_code=405)

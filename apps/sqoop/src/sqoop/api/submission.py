@@ -22,11 +22,11 @@ except ImportError:
 import logging
 import socket
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
 from decorators import get_submission_or_exception
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
@@ -52,7 +52,7 @@ def get_submissions(request):
     response['submissions'] = list_to_dict(submissions)
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not get submissions.')))
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 @never_cache
 def submissions(request):

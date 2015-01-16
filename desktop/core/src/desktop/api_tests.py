@@ -23,7 +23,6 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 
 from desktop.lib.django_test_util import make_logged_in_client

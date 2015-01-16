@@ -21,7 +21,6 @@ except ImportError:
   import simplejson as json
 import logging
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.functional import wraps
 

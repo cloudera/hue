@@ -17,8 +17,9 @@
 
 import json
 
-from django.http import HttpResponse, Http404
+from django.http import Http404
 
+from desktop.lib.django_util import JsonResponse
 from librdbms import conf as librdbms_conf
 from librdbms.server import dbms
 
@@ -70,4 +71,4 @@ def autocomplete(request, database=None, table=None):
   else:
     response['databases'] = db.get_databases()
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)

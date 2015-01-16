@@ -21,12 +21,11 @@ import json
 
 from math import log
 
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.context_processors import get_app_name
-from desktop.lib.django_util import render
-from desktop.models import Document2 
+from desktop.lib.django_util import JsonResponse, render
+from desktop.models import Document2
 
 from beeswax.design import hql_query
 from beeswax.server import dbms
@@ -133,7 +132,7 @@ def query(request):
     result['status'] = 0
     db.close(handle)
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def new_facet(request):
@@ -151,7 +150,7 @@ def new_facet(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json")
+  return JsonResponse(result)
 
 
 def new_search(request):
@@ -189,7 +188,7 @@ def save(request):
 
     if dashboard.get('id'):
       dashboard_doc = Document2.objects.get(id=dashboard['id'])
-    else:      
+    else:
       dashboard_doc = Document2.objects.create(name=name, type='impala-dashboard', owner=request.user)
 
     dashboard_doc.update_data({'dashboard': dashboard})
@@ -202,7 +201,7 @@ def save(request):
   else:
     response['message'] = _('There is no dashboard to search.')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def get_fields(request):
@@ -218,7 +217,7 @@ def get_fields(request):
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
 
-  return HttpResponse(json.dumps(result), mimetype="application/json") 
+  return JsonResponse(result)
 
 
 def _round_number_range(n):
