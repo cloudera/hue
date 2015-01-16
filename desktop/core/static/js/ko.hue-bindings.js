@@ -257,8 +257,9 @@ ko.bindingHandlers.daterangepicker = {
       label: "1y"
     }
   ],
+  EXTRA_INTERVAL_OPTIONS: [],
 
-  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     var DATE_FORMAT = "YYYY-MM-DD";
     var TIME_FORMAT = "HH:mm:ss";
     var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
@@ -331,6 +332,11 @@ ko.bindingHandlers.daterangepicker = {
             '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
             '<input type="text" class="input-large form-control start-date-custom" />' +
             '</div>' +
+            '<a class="custom-popover" href="javascript:void(0)" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" data-html="true"' +
+            '       title="' + KO_DATERANGEPICKER_LABELS.CUSTOM_POPOVER_TITLE + '"' +
+            '       data-content="' + KO_DATERANGEPICKER_LABELS.CUSTOM_POPOVER_CONTENT + '">' +
+            '<i class="fa fa-question-circle"></i>' +
+            ' </a>' +
             '</div>' +
             '<div class="facet-field-cnt custom">' +
             '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.END + '</div>' +
@@ -356,6 +362,8 @@ ko.bindingHandlers.daterangepicker = {
 
     _tmpl.insertAfter(_el);
 
+    $(".custom-popover").popover();
+
     var _minMoment = moment(_options.min());
     var _maxMoment = moment(_options.max());
 
@@ -367,14 +375,25 @@ ko.bindingHandlers.daterangepicker = {
       _tmpl.find(".end-date").val(_maxMoment.utc().format(DATE_FORMAT));
       _tmpl.find(".end-time").val(_maxMoment.utc().format(TIME_FORMAT));
       _tmpl.find(".interval").val(_options.gap());
+      _tmpl.find(".interval-select").val(_options.gap());
       _tmpl.find(".interval-custom").val(_options.gap());
+      if (_tmpl.find(".interval-select").val() == null || ko.bindingHandlers.daterangepicker.EXTRA_INTERVAL_OPTIONS.indexOf(_tmpl.find(".interval-select").val()) > -1) {
+        pushIntervalValue(_options.gap());
+        _tmpl.find(".facet-field-cnt.custom").show();
+        _tmpl.find(".facet-field-cnt.picker").hide();
+      }
     }
     else {
       _tmpl.find(".facet-field-cnt.custom").show();
       _tmpl.find(".facet-field-cnt.picker").hide();
-      _tmpl.find(".start-date-custom").val(_options.min())
-      _tmpl.find(".end-date-custom").val(_options.max())
-      _tmpl.find(".interval-custom").val(_options.gap())
+      _tmpl.find(".start-date-custom").val(_options.min());
+      _tmpl.find(".end-date-custom").val(_options.max());
+      _tmpl.find(".interval-custom").val(_options.gap());
+      pushIntervalValue(_options.gap());
+    }
+
+    if (typeof _options.relatedgap != "undefined"){
+      pushIntervalValue(_options.relatedgap());
     }
 
     _tmpl.find(".start-date").datepicker({
@@ -455,20 +474,54 @@ ko.bindingHandlers.daterangepicker = {
 
     _tmpl.find(".interval-custom").on("change", function () {
       _options.gap(_tmpl.find(".interval-custom").val());
-      matchIntervals();
+      matchIntervals(true);
+      if (typeof _options.relatedgap != "undefined"){
+        _options.relatedgap(_options.gap());
+      }
     });
 
-    function matchIntervals() {
+    function pushIntervalValue(newValue) {
+      var _found = false;
+      ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS.forEach(function(interval) {
+        if (interval.value == newValue){
+          _found = true;
+        }
+      });
+      if (!_found){
+        ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS.push({
+          value: newValue,
+          label: newValue
+        });
+        ko.bindingHandlers.daterangepicker.EXTRA_INTERVAL_OPTIONS.push(newValue);
+        _intervalOptions.push('<option value="' + newValue + '">' + newValue + '</option>');
+      }
+    }
+
+    function matchIntervals(fromCustom) {
       _tmpl.find(".interval-select").val(_options.gap());
       if (_tmpl.find(".interval-select").val() == null) {
-        _tmpl.find(".interval-select").val(_tmpl.find(".interval-select option:first").val());
-        _options.gap(_tmpl.find(".interval-select").val());
-        _tmpl.find(".interval-custom").val(_options.gap());
+        if (fromCustom){
+          pushIntervalValue(_options.gap());
+          if (bindingContext.$root.intervalOptions){
+            bindingContext.$root.intervalOptions(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+          }
+        }
+        else {
+          _tmpl.find(".interval-select").val(_tmpl.find(".interval-select option:first").val());
+          _options.gap(_tmpl.find(".interval-select").val());
+          if (typeof _options.relatedgap != "undefined"){
+            _options.relatedgap(_options.gap());
+          }
+          _tmpl.find(".interval-custom").val(_options.gap());
+        }
       }
     }
 
     _tmpl.find(".interval-select").on("change", function () {
       _options.gap(_tmpl.find(".interval-select").val());
+      if (typeof _options.relatedgap != "undefined"){
+        _options.relatedgap(_options.gap());
+      }
       _tmpl.find(".interval").val(_options.gap());
       _tmpl.find(".interval-custom").val(_options.gap());
     });
@@ -548,7 +601,7 @@ ko.bindingHandlers.daterangepicker = {
 
       $(".interval-select").html(renderOptions(_opts));
 
-      matchIntervals();
+      matchIntervals(true);
     }
   }
 }

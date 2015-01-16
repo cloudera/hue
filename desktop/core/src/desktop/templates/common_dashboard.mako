@@ -218,7 +218,9 @@
       END: "${_('End')}",
       INTERVAL: "${_('Interval')}",
       CUSTOM_FORMAT: "${_('Custom Format')}",
-      DATE_PICKERS: "${_('Date Pickers')}"
+      DATE_PICKERS: "${_('Date Pickers')}",
+      CUSTOM_POPOVER_TITLE: "${_('e.g.')}",
+      CUSTOM_POPOVER_CONTENT: "${_('Start')}: NOW-5DAYS<br/>${_('End')}: NOW<br/>${_('Interval')}: +1HOURS<br/><a href='http://lucene.apache.org/solr/4_10_2/solr-core/org/apache/solr/util/DateMathParser.html' target='_blank'>${_('Read more...')}</a>"
     };
   </script>
   <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
