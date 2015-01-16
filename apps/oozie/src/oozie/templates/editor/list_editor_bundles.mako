@@ -62,7 +62,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:new_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:new_bundle') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
     </%def>
   </%actionbar:render>
 
