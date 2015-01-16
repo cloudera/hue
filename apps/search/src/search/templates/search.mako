@@ -276,7 +276,7 @@ ${ dashboard.layout_skeleton() }
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() -->
-        <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, min: properties.min, max: properties.max}"></div>
+        <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
         <br/>
       <!-- /ko -->
     <!-- /ko -->
@@ -720,7 +720,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
-      <span data-bind="visible: ! $root.isEditing(), with: $root.collection.getFacetById($parent.id())">
+      <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Interval') }</span>
          <select class="input-small" data-bind="options: $root.intervalOptions,
                        optionsText: 'label',
