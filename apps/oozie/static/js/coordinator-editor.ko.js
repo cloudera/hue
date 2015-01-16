@@ -40,6 +40,14 @@ var Coordinator = function (vm, coordinator) {
 	  });
 	}
   });
+
+  self.properties.cron_advanced.subscribe(function(value) {
+    if (value) {
+      coordCron.disable();
+    } else {
+      coordCron.enable();
+    }
+  });
   
   self.addVariable = function() {
     var _var = {       
@@ -94,7 +102,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   self.workflowModalFilter = ko.observable("");
   self.filteredModalWorkflows = ko.computed(function() {
     var _filter = self.workflowModalFilter().toLowerCase();
-    if (!_filter) {
+    if (! _filter) {
       return self.workflows();
     }
     else {
@@ -153,8 +161,6 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   };
   
   self.showSubmitPopup = function () {
-    // If self.coordinator.id() == null, need to save wf for now
-
     $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
