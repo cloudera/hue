@@ -731,9 +731,7 @@ def test_view_avro():
 
     # autodetect
     response = c.get('/filebrowser/view/test-avro-filebrowser/test-view.avro')
-    # (Note: we use eval here cause of an incompatibility issue between
-    # the representation string of JSON dicts in simplejson vs. json)
-    assert_equal(eval(response.context['view']['contents']), dummy_datum)
+    assert_equal(json.loads(response.context['view']['contents']), dummy_datum)
 
     # offsetting should work as well
     response = c.get('/filebrowser/view/test-avro-filebrowser/test-view.avro?offset=1')

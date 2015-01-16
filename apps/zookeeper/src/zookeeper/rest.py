@@ -17,7 +17,7 @@
 
 import urllib2
 import urllib
-import simplejson
+import json
 
 from contextlib import contextmanager
 
@@ -172,7 +172,7 @@ class ZooKeeper(object):
         """ Send a GET request and convert errors to exceptions """
         try:
             req = urllib2.urlopen(uri)
-            resp = simplejson.load(req)
+            resp = json.load(req)
 
             if 'Error' in resp:
                raise ZooKeeper.Error(resp['Error'])
@@ -191,7 +191,7 @@ class ZooKeeper(object):
             if data is not None:
                 req.add_data(data)
 
-            resp = simplejson.load(urllib2.urlopen(req))
+            resp = json.load(urllib2.urlopen(req))
             if 'Error' in resp:
                 raise ZooKeeper.Error(resp['Error'])
             return resp

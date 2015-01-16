@@ -18,7 +18,7 @@
 # Extra form fields and widgets.
 
 import logging
-import simplejson
+import json
 import urllib
 
 from django.forms import Widget, Field
@@ -527,4 +527,4 @@ class DependencyAwareForm(forms.Form):
     return [ data(*x) for x in self.dependencies ]
 
   def render_dep_metadata(self):
-    return urllib.quote_plus(simplejson.dumps(self._calculate_data(), separators=(',', ':')))
+    return urllib.quote_plus(json.dumps(self._calculate_data(), separators=(',', ':')))

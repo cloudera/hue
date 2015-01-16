@@ -64,7 +64,6 @@ cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit,libsasl2-modules-gssapi-mit
 mysql-devel,libmysqlclient-dev,libmysqlclient-dev
 python-devel,python-dev,python-dev
 python-setuptools,python-setuptools,python-setuptools
-python-simplejson,python-simplejson,python-simplejson
 sqlite-devel,libsqlite3-dev,libsqlite3-dev
 ant,ant,ant
 libsasl2-dev,cyrus-sasl-devel,libsasl2-dev

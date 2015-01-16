@@ -18,10 +18,7 @@ import logging
 import posixpath
 import threading
 import time
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 from django.utils.translation import ugettext as _
 

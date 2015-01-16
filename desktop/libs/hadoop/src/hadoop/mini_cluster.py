@@ -48,7 +48,7 @@ import shutil
 import socket
 import time
 import tempfile
-import simplejson
+import json
 import lxml.etree
 import urllib2
 
@@ -235,7 +235,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       while not details:
         try:
           details_file.seek(0)
-          details = simplejson.load(details_file)
+          details = json.load(details_file)
         except ValueError:
           pass
         if self.clusterproc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):

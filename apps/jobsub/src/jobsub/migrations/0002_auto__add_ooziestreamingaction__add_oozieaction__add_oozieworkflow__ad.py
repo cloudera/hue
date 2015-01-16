@@ -18,10 +18,7 @@
 
 import datetime
 import logging
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 from south.db import db
 from south.v2 import SchemaMigration

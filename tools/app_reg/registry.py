@@ -22,10 +22,7 @@ Registry for the applications
 import glob
 import logging
 import os
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 import common
 
