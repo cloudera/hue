@@ -65,20 +65,30 @@ LIMIT $limit"""))
 
 
   def test_workflow_gen_xml(self):
-    assert_equal(
-        '<workflow-app name="Test" xmlns="0">\n'
-        '</workflow-app>'
-        .split(),
+    assert_equal([
+        u'<workflow-app', u'name="My_Workflow"', u'xmlns="uri:oozie:workflow:0.5">', u'<start', u'to="End"/>', u'<kill', u'name="Kill">', u'<message>Action', u'failed,', 
+        u'error', u'message[${wf:errorMessage(wf:lastErrorNode())}]</message>', u'</kill>', u'<end', u'name="End"/>', u'</workflow-app>'],
         self.wf.to_xml({'output': '/path'}).split()
     )
 
 
   def test_job_validate_xml_name(self):
-    assert_equal('a', Job.validate_name('a'))
-    assert_equal('aa', Job.validate_name('aa'))
-    assert_equal('_a', Job.validate_name('%a'))
-    assert_equal(len('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), len(Job.validate_name('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaz')))
-    assert_equal('My_______1st_Workflow__With___Bad__letter_', Job.validate_name('My <...> 1st Workflow [With] (Bad) letter$'))
+    job = Workflow()
+
+    job.update_name('a')
+    assert_equal('a', job.validated_name)
+
+    job.update_name('aa')
+    assert_equal('aa', job.validated_name)
+    
+    job.update_name('%a')
+    assert_equal('_a', job.validated_name)
+    
+    job.update_name('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaz')
+    assert_equal(len('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), len(job.validated_name))
+    
+    job.update_name('My <...> 1st W$rkflow [With] (Bad) letter$')
+    assert_equal('My_______1st_W_rkflow__With___Bad__lette', job.validated_name)
 
 
 #  def test_workflow_name(self):
