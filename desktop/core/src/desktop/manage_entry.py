@@ -34,14 +34,11 @@ def _deprecation_check(arg0):
 def entry():
   _deprecation_check(sys.argv[0])
 
-  from django.core.management import execute_manager, find_commands, find_management_module
+  from django.core.management import execute_from_command_line, find_commands, find_management_module
   from django.core.management import LaxOptionParser
   from django.core.management.base import BaseCommand
-  try:
-    from desktop import settings, appmanager
-  except ImportError, ie:
-    traceback.print_exc()
-    sys.exit(1)
+
+  os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
 
   # What's the subcommand being run?
   # This code uses the same logic from django.core.management to handle command args
@@ -55,9 +52,9 @@ def entry():
 
   # Let django handle the normal execution
   if os.getenv("DESKTOP_PROFILE"):
-    _profile(prof_id, lambda: execute_manager(settings))
+    _profile(prof_id, lambda: execute_from_command_line(sys.argv))
   else:
-    execute_manager(settings)
+    execute_from_command_line(sys.argv)
 
 
 def _profile(prof_id, func):
