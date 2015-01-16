@@ -132,5 +132,5 @@ def csrf_token(request):
   """
   Returns the rendered common footer
   """
-  csrf_token = csrf(request)["csrf_token"]
-  return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />",csrf_token)
+  csrf_token = unicode(csrf(request)["csrf_token"])
+  return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
