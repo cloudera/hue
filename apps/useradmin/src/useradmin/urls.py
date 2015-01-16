@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
 username_re = get_username_re_rule()

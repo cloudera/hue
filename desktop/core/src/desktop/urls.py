@@ -20,13 +20,13 @@ import os
 import re
 
 from django.conf import settings
-from django.conf.urls.defaults import include, patterns
+from django.conf.urls import include, patterns
 from django.contrib import admin
 
 from desktop import appmanager
 
 # Django expects handler404 and handler500 to be defined.
-# django.conf.urls.defaults provides them. But we want to override them.
+# django.conf.urls provides them. But we want to override them.
 # Also see http://code.djangoproject.com/ticket/5350
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
