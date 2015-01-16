@@ -388,7 +388,7 @@ class DatasetForm(forms.ModelForm):
 
   class Meta:
     model = Dataset
-    exclude = ('coordinator')
+    exclude = ('coordinator',)
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'uri': forms.TextInput(attrs={'class': 'span5'}),
@@ -401,7 +401,7 @@ class DatasetForm(forms.ModelForm):
 class DataInputForm(forms.ModelForm):
   class Meta:
     model = DataInput
-    exclude = ('coordinator')
+    exclude = ('coordinator',)
 
   def __init__(self, *args, **kwargs):
     coordinator = kwargs['coordinator']
@@ -415,7 +415,7 @@ class DataInputForm(forms.ModelForm):
 class DataOutputForm(forms.ModelForm):
   class Meta:
     model = DataOutput
-    exclude = ('coordinator')
+    exclude = ('coordinator',)
 
   def __init__(self, *args, **kwargs):
     coordinator = kwargs['coordinator']
