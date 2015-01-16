@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     'liboauth.views',
@@ -23,5 +23,3 @@ urlpatterns = patterns(
        url(r'^social_login/oauth/?$', 'oauth_login', name='oauth_login'),
        url(r'^social_login/oauth_authenticated/?$', 'oauth_authenticated', name='oauth_authenticated'),
 )
-
-
