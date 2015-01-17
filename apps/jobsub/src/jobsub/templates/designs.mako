@@ -947,8 +947,8 @@ $(document).ready(function(e) {
 
   // load the autocomplete properties
   var AUTOCOMPLETE_PROPERTIES;
-  $.getJSON("${ url('oozie:autocomplete_properties') }", function (properties) {
-    AUTOCOMPLETE_PROPERTIES = properties;
+  $.getJSON("${ url('oozie:autocomplete_properties') }", function (data) {
+    AUTOCOMPLETE_PROPERTIES = data.properties;
   });
 });
 </script>
