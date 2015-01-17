@@ -237,7 +237,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
     $.getJSON("${url('oozie:list_oozie_workflows')}?format=json&justsla=true", function (data) {
       var _autocomplete = [];
-      $(data).each(function (iWf, item) {
+      $(data.jobs).each(function (iWf, item) {
         _autocomplete.push(item.id);
       });
       $("input[name='job_name']").typeahead({
