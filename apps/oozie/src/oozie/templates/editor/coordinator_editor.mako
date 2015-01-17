@@ -53,7 +53,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     &nbsp;&nbsp;&nbsp;
 
     <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" 
-        data-bind="click: $root.save, css: {'btn': true}, visible: canEdit">
+        data-bind="click: $root.save, css: {'btn': true}, visible: coordinator.properties.workflow() && canEdit">
       <i class="fa fa-save"></i>
     </button>
     
@@ -93,11 +93,17 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         <div class="card-body">
           <a class="pointer" data-bind="visible: ! coordinator.properties.workflow(), click: showChooseWorkflow">${ _('Choose a workflow...') }</a>
           <!-- ko if: coordinator.properties.workflow -->
+            <!-- ko if: isEditing -->            
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
             
             <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
              <i class="fa fa-external-link-square"></i>
+            </a>
+            <!-- /ko -->
+            <!-- ko ifnot: isEditing -->
+            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }, text: getWorkflowById(coordinator.properties.workflow()).name" target="_blank" title="${ _('Open') }">              
             </a>            
+            <!-- /ko -->            
           <!-- /ko -->
         </div>
       </div>
@@ -142,14 +148,15 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         </div>
       </div>
 
-      <div class="card card-home" data-bind="visible: coordinator.properties.workflow">
+      <div class="card card-home" data-bind="visible: coordinator.properties.workflow()">
         <h1 class="card-heading simple">${ _('Workflow Parameters') }</h1>
 
         <div class="card-body">
           <ul data-bind="foreach: coordinator.variables" class="unstyled">
             <li>
-              <input data-bind="value: workflow_variable"/>
-              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name'"></select>
+              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', value: workflow_variable, optionsValue: 'name', visible: $root.isEditing"></select>
+
+              <span data-bind="text: workflow_variable, visible: ! $root.isEditing()"/></span>
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -254,18 +261,28 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                 </div>
               </div>
               <!-- /ko -->
-              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }">
+              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
                 <i class="fa fa-minus"></i>
               </a>              
             </li>
           </ul>
 
-          <a class="pointer" data-bind="click: coordinator.addVariable">
-            <i class="fa fa-plus"></i> ${ _('Add a parameter') }
+          <a class="pointer" data-bind="click: function() { coordinator.addVariable() }, visible: isEditing">
+            <i class="fa fa-plus"></i> ${ _('Add parameter') }
           </a>
+
         </div>
+        
       </div>
 
+      <div class="card card-home" data-bind="visible: coordinator.id() == null && coordinator.properties.workflow()">
+        <div class="card-body">
+          <a href type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" 
+            data-bind="click: $root.save, css: {'btn': true}">
+            ${ _('Save') }
+          </a>        
+        </div>
+      </div>
 
     </div>
   </div>
