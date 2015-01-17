@@ -534,8 +534,11 @@ def test_add_ldap_groups():
   assert_true('Location' in response, response)
   assert_true('/useradmin/groups' in response['Location'], response)
 
-  response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongnametoolongnametoolongnametoolongnametoolongnametoolongname'))
-  assert_true('Ensure this value has at most 80 characters' in response.context['form'].errors['groupname_pattern'][0], response)
+  response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
+                                                'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
+                                                'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
+                                                'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'))
+  assert_true('Ensure this value has at most 256 characters' in response.context['form'].errors['groupname_pattern'][0], response)
 
   # Test wild card
   response = c.post(URL, dict(groupname_pattern='*r*'))
