@@ -860,7 +860,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
       }
       jobs.append(massaged_job)
 
-  return jobs
+  return { 'jobs': jobs }
 
 
 def check_job_access_permission(request, job_id):
