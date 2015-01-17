@@ -1413,10 +1413,11 @@ class Coordinator(Job):
   def name(self):
     return self.data['name']
 
+  def set_workspace(self, user):
+    self.data['properties']['deployment_dir'] = Job.get_workspace(user)
+
   @property      
-  def deployment_dir(self):
-    if not self.data['properties'].get('deployment_dir'):
-      self.data['properties']['deployment_dir'] = Job.get_workspace(user)    
+  def deployment_dir(self):    
     return self.data['properties']['deployment_dir']
   
   def find_parameters(self):
@@ -1651,10 +1652,11 @@ class Bundle(Job):
   def kick_off_time_utc(self):
     return utc_datetime_format(self.data['properties']['kickoff'])  
   
+  def set_workspace(self, user):
+    self.data['properties']['deployment_dir'] = Job.get_workspace(user)
+  
   @property      
-  def deployment_dir(self):
-    if not self.data['properties'].get('deployment_dir'):
-      self.data['properties']['deployment_dir'] = Job.get_workspace(user)    
+  def deployment_dir(self):    
     return self.data['properties']['deployment_dir']
   
   def find_parameters(self):

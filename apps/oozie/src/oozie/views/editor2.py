@@ -358,6 +358,7 @@ def edit_coordinator(request):
     coordinator = Coordinator(document=doc)
   else:
     coordinator = Coordinator()
+    coordinator.set_workspace(request.user)
 
   api = get_oozie(request.user)
   credentials = Credentials()
@@ -527,6 +528,7 @@ def edit_bundle(request):
     bundle = Bundle(document=doc)
   else:
     bundle = Bundle()
+    bundle.set_workspace(request.user)
 
   coordinators = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]

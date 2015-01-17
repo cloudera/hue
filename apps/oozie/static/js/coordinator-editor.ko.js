@@ -35,6 +35,13 @@ var Coordinator = function (vm, coordinator) {
 		"uuid": self.properties.workflow(),
 	   }, function (data) {
 		 self.workflowParameters(data.parameters);
+		 // Pre-add the variables
+		 $.each(data.parameters, function(index, param) {
+		   if (self.variables().length < data.parameters.length) {
+		     self.addVariable();
+		   }
+		   self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+		 });
 	  }).fail(function (xhr, textStatus, errorThrown) {
 	    $(document).trigger("error", xhr.responseText);
 	  });
@@ -42,7 +49,7 @@ var Coordinator = function (vm, coordinator) {
   });
 
   self.properties.cron_advanced.subscribe(function(value) {
-    if (value) {
+    if (value || ! vm.isEditing()) {
       coordCron.disable();
     } else {
       coordCron.enable();
@@ -87,9 +94,10 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   var self = this;
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
-  self.isEditing = ko.observable(true && self.canEdit());
+  self.isEditing = ko.observable(self.canEdit());
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
+    self.coordinator.properties.cron_advanced.valueHasMutated();
   });
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
