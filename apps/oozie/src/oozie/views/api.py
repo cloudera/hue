@@ -416,4 +416,4 @@ def workflows(request):
 
 
 def autocomplete_properties(request):
-  return JsonResponse(_STD_PROPERTIES)
+  return JsonResponse({ 'properties': _STD_PROPERTIES })
