@@ -1150,7 +1150,7 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
 
     function callFileChooser() {
       var _initialPath = $.trim(inputElement.val()) != "" ? inputElement.val() : "/";
-      if ((allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || allBindingsAccessor().filechooserPrefixSeparator){
+      if ((allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)){
         _initialPath = "";
       }
       if (inputElement.data("fullPath")){
@@ -1172,14 +1172,14 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
           handleChoice(filePath, stripHdfsPrefix);
           $("#chooseFile").modal("hide");
         },
-        createFolder: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
-        uploadFile: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
+        createFolder: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
+        uploadFile: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
         initialPath: _initialPath,
         errorRedirectPath: "",
         forceRefresh: true,
-        showExtraHome: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.showExtraHome,
-        extraHomeProperties: allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.extraHomeProperties ? allBindingsAccessor().filechooserOptions.extraHomeProperties : {},
-        filterExtensions: allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
+        showExtraHome: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.showExtraHome,
+        extraHomeProperties: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.extraHomeProperties ? allBindingsAccessor().filechooserOptions.extraHomeProperties : {},
+        filterExtensions: allBindingsAccessor && allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
       });
       $("#chooseFile").modal("show");
       $("#chooseFile").on("hidden", function(){
@@ -1188,7 +1188,7 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
     }
 
     function handleChoice(filePath, stripHdfsPrefix) {
-      if (allBindingsAccessor().filechooserPrefixSeparator){
+      if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator){
         filePath = inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] + '=' + filePath;
       }
       if (stripHdfsPrefix){
@@ -1198,26 +1198,28 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
         inputElement.val("hdfs://" + filePath);
       }
       inputElement.change();
-      if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
-        if (valueAccessor().value){
-          valueAccessor().value(inputElement.val());
-          if (valueAccessor().displayJustLastBit){
-            inputElement.data("fullPath", inputElement.val());
-            inputElement.attr("data-original-title", inputElement.val());
-            var _val = inputElement.val();
-            inputElement.val(_val.split("/")[_val.split("/").length - 1])
+      if (valueAccessor){
+        if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
+          if (valueAccessor().value){
+            valueAccessor().value(inputElement.val());
+            if (valueAccessor().displayJustLastBit){
+              inputElement.data("fullPath", inputElement.val());
+              inputElement.attr("data-original-title", inputElement.val());
+              var _val = inputElement.val();
+              inputElement.val(_val.split("/")[_val.split("/").length - 1])
+            }
+          }
+          else {
+            valueAccessor()(inputElement.val());
           }
         }
         else {
-          valueAccessor()(inputElement.val());
+          valueAccessor(inputElement.val());
         }
-      }
-      else {
-        valueAccessor(inputElement.val());
       }
     }
   });
-  if (allBindingsAccessor().filechooserDisabled){
+  if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled){
     _btn.addClass("disabled").attr("disabled", "disabled");
   }
   return _btn;
