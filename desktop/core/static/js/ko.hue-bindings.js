@@ -1033,7 +1033,7 @@ ko.bindingHandlers.select2 = {
   },
   update: function (element, valueAccessor, allBindingsAccessor, vm) {
     if (typeof allBindingsAccessor().visible != "undefined"){
-      if (allBindingsAccessor().visible()) {
+      if ((typeof allBindingsAccessor().visible == "boolean" && allBindingsAccessor().visible) || (typeof allBindingsAccessor().visible == "function" && allBindingsAccessor().visible())) {
         $(element).select2("container").show();
       }
       else {
