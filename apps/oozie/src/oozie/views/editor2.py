@@ -317,8 +317,9 @@ def submit_workflow(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-    popup = render('editor/submit_job_popup.mako', request, {
+    popup = render('editor/submit_job_popup2.mako', request, {
                      'params_form': params_form,
+                     'name': workflow.name,
                      'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
                    }, force_template=True).content
     return HttpResponse(json.dumps(popup), mimetype="application/json")
@@ -484,8 +485,9 @@ def submit_coordinator(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor/submit_job_popup.mako', request, {
+  popup = render('editor/submit_job_popup2.mako', request, {
                  'params_form': params_form,
+                 'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
                 }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
@@ -629,8 +631,9 @@ def submit_bundle(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor/submit_job_popup.mako', request, {
+  popup = render('editor/submit_job_popup2.mako', request, {
                  'params_form': params_form,
+                 'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
                 }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
