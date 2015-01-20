@@ -29,6 +29,32 @@ var Coordinator = function (vm, coordinator) {
   self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
   self.workflowParameters = ko.mapping.fromJS(typeof coordinator.workflowParameters != "undefined" && coordinator.workflowParameters != null ? coordinator.workflowParameters : []);
 
+  self.properties.startDateUI = ko.observable(typeof coordinator.properties.start != "undefined" && coordinator.properties.start.indexOf("T") > -1 ? coordinator.properties.start.split("T")[0]:"");
+  self.properties.startTimeUI = ko.observable(typeof coordinator.properties.start != "undefined" && coordinator.properties.start.indexOf("T") > -1 ? coordinator.properties.start.split("T")[1]:"");
+  self.properties.endDateUI = ko.observable(typeof coordinator.properties.end != "undefined" && coordinator.properties.end.indexOf("T") > -1 ? coordinator.properties.end.split("T")[0]:"");
+  self.properties.endTimeUI = ko.observable(typeof coordinator.properties.end != "undefined" && coordinator.properties.end.indexOf("T") > -1 ? coordinator.properties.end.split("T")[1]:"");
+
+  self.properties.startDateUI.subscribe(function(newVal){
+    self.setStartDate();
+  });
+  self.properties.startTimeUI.subscribe(function(newVal){
+    self.setStartDate();
+  });
+  self.properties.endDateUI.subscribe(function(newVal){
+    self.setEndDate();
+  });
+  self.properties.endTimeUI.subscribe(function(newVal){
+    self.setEndDate();
+  });
+
+
+  self.setStartDate = function() {
+    self.properties.start(self.properties.startDateUI() + "T" + self.properties.startTimeUI());
+  }
+  self.setEndDate = function() {
+    self.properties.end(self.properties.endDateUI() + "T" + self.properties.endTimeUI());
+  }
+
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
 	  $.get("/oozie/editor/workflow/parameters/", {
@@ -50,9 +76,9 @@ var Coordinator = function (vm, coordinator) {
 
   self.properties.cron_advanced.subscribe(function(value) {
     if (value || ! vm.isEditing()) {
-      //coordCron.disable();
+      coordCron.disable();
     } else {
-      //coordCron.enable();
+      coordCron.enable();
     }
   });
   
