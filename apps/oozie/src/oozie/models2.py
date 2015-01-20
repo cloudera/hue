@@ -533,8 +533,8 @@ class HiveAction(Action):
      'hive_xml': { 
           'name': 'hive_xml',
           'label': _('Hive XML'),
-          'value': [],
-          'help_text': _('Refer to a hive-site.xml renamed hive-conf.xml'),
+          'value': '',
+          'help_text': _('Refer to a hive-site.xml for connecting to Hive'),
           'type': ''
      }
   }
@@ -608,7 +608,7 @@ class HiveServer2Action(Action):
      'job_xml': { 
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
@@ -700,7 +700,7 @@ class SqoopAction(Action):
      'job_xml': { 
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
@@ -753,7 +753,7 @@ class MapReduceAction(Action):
      'job_xml': { 
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
@@ -830,7 +830,7 @@ class ShellAction(Action):
      'job_xml': { 
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
@@ -1017,7 +1017,7 @@ class StreamingAction(Action):
      'job_xml': { 
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml')
      }
   }

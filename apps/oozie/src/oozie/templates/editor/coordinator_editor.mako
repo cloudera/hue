@@ -115,11 +115,10 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
         <form class="form-horizontal">
           <div class="control-group" data-bind="visible: ! coordinator.properties.cron_advanced()">
-            <label class="control-label">${ _('Crontab') }</label>
             <div class="controls" id="jqCron-container">
               <div id="jqCron-instance" style="margin-top: 5px; display: inline-block"></div>
               <label class="checkbox" style="display: inline-block; margin-top: 5px">
-                <input type="checkbox" name="coordinator.properties.cron_advanced" data-bind="checked: coordinator.properties.cron_advanced" /> ${ _('Advanced Cron syntax') }
+                <input type="checkbox" name="coordinator.properties.cron_advanced" data-bind="checked: coordinator.properties.cron_advanced" /> ${ _('Advanced syntax') }
               </label>
             </div>
           </div>
