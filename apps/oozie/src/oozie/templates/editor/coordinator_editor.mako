@@ -404,6 +404,18 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 
 <div id="submit-coord-modal" class="modal hide"></div>
+<div id="chooseFile" class="modal hide fade">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+      <div id="filechooser">
+      </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
 
 
 </div>
@@ -418,6 +430,8 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 <link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
 <script src="/static/js/jqCron.js" type="text/javascript"></script>
+
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/static/ext/select2/select2.css">
 <script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
