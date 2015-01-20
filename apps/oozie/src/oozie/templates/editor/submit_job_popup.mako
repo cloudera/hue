@@ -21,14 +21,14 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form action="${ action }" method="POST" class="form-horizontal submit-form">
+<form action="${ action }" method="POST">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Submit this job?') }</h3>
+    <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
   </div>
   <div class="modal-body">
-    
+    <fieldset>
       <div id="param-container">
 
        ${ params_form.management_form | n,unicode }
@@ -37,64 +37,26 @@
           % for hidden in form.hidden_fields():
             ${ hidden | n,unicode }
           % endfor
-
-          <div class="control-group
-          % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+          <div class="fieldWrapper">
+            <div class="row-fluid
+              % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
                 hide
               % endif
-          ">
-            <label class="control-label">${ form['name'].form.initial.get('name') }</label>
-            <div class="controls">
-              ${ utils.render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
-              <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                        aria-expanded="false">
-                  <i class="fa fa-calendar"></i>
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                  <li>
-                    <a class="pointer now-link">
-                      ${ _('Now') }
-                    </a>
-                    <a class="pointer calendar-link">
-                      ${ _('Calendar') }
-                    </a>
-                  </li>
-                </ul>
-                </div>
+              ">
+              <div class="span6">
+                ${ form['name'].form.initial.get('name') }
+              </div>
+              <div class="span6">
+                ${ utils.render_field(form['value'], show_label=False) }
+              </div>
             </div>
           </div>
-
          % endfor
       </div>
-
+    </fieldset>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
     <input id="submit-btn" type="submit" class="btn btn-primary" value="${ _('Submit') }"/>
   </div>
 </form>
-
-<script type="text/javascript">
-  $('.submit-form .filechooser-input').each(function(){
-      $(this).after(getFileBrowseButton($(this), true, null, true));
-  });
-
-  $(".now-link").on("click", function(){
-    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm:SS"));
-  });
-
-  $(".calendar-link").on("click", function(){
-    var DATE_FORMAT = "YYYY-MM-DD";
-    var _el = $(this).parents(".controls").find("input[type='text']");
-    _el.datepicker({
-      format: DATE_FORMAT.toLowerCase()
-     }).on("changeDate", function () {
-      _el.datepicker('hide');
-      _el.val(_el.val() + "T00:00:00");
-    });
-   _el.datepicker('show');
-  }); 
-</script>
-

@@ -355,6 +355,7 @@ def submit_workflow(request, workflow):
 
   popup = render('editor/submit_job_popup.mako', request, {
                    'params_form': params_form,
+                   'name': workflow.name,
                    'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
                  }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
@@ -653,6 +654,7 @@ def submit_coordinator(request, coordinator):
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
+                 'name': coordinator.name,
                  'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
                 }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
@@ -862,6 +864,7 @@ def submit_bundle(request, bundle):
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
+                 'name': bundle.name,
                  'action': reverse('oozie:submit_bundle',  kwargs={'bundle': bundle.id})
                 }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
