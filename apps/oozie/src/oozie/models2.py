@@ -1348,7 +1348,7 @@ class Coordinator(Job):
           'id': None, 
           'uuid': None,
           'name': 'My Coordinator',
-          'variables': [],
+          'variables': [], # Aka workflow parameters
           'properties': {
               'deployment_dir': '',
               'schema_version': 'uri:oozie:coordinator:0.2',
@@ -1357,8 +1357,8 @@ class Coordinator(Job):
               'cron_frequency': '0 0 * * *',
               'cron_advanced': False,
               'timezone': 'America/Los_Angeles',
-              'start': datetime.today(),
-              'end': datetime.today() + timedelta(days=3),
+              'start': '${start_date}',
+              'end': '${end_date}', 
               'workflow': None,
               'timeout': None,
               'concurrency': None,
@@ -1368,8 +1368,11 @@ class Coordinator(Job):
               'sla_enabled': False,
               'sla_workflow_enabled': False,
               'credentials': [],
-              'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}],
-              'properties': [], # Aka workflow parameters
+              'parameters': [
+                  {'name': 'oozie.use.system.libpath', 'value': True},
+                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%M:%S')},
+                  {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%S')}
+              ],
               'sla': Workflow.SLA_DEFAULT
           }
       }
@@ -1385,8 +1388,11 @@ class Coordinator(Job):
   def get_data_for_json(self):
     _data = self.data.copy()
 
-    _data['properties']['start'] = _data['properties']['start'].strftime('%Y-%m-%dT%H:%M:%S')
-    _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
+    if type(self._data['properties']['start']) == datetime:
+      _data['properties']['start'] = _data['properties']['start'].strftime('%Y-%m-%dT%H:%M:%S')
+
+    if type(self._data['properties']['end']) == datetime:
+      _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
     
     return _data
 
@@ -1398,10 +1404,10 @@ class Coordinator(Job):
  
   @property
   def data(self):
-    if type(self._data['properties']['start']) == unicode:
+    if type(self._data['properties']['start']) != datetime and not '$' in self._data['properties']['start']:
       self._data['properties']['start'] = parse(self._data['properties']['start'])
       
-    if type(self._data['properties']['end']) == unicode:
+    if type(self._data['properties']['end']) != datetime and not '$' in self._data['properties']['end']:
       self._data['properties']['end'] = parse(self._data['properties']['end'])    
 
     if self.document is not None:
@@ -1422,6 +1428,9 @@ class Coordinator(Job):
   
   def find_parameters(self):
     params = set()
+
+    for param in find_json_parameters([self.data['properties']]):
+      params.add(param)
 
     if self.sla_enabled:
       for param in find_json_parameters(self.sla):
