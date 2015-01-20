@@ -143,7 +143,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
 
-    <span data-bind="visible: workflow.isDirty" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+    <span data-bind="visible: workflow.isDirty() || workflow.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
 
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
       <i class="fa fa-fw fa-play"></i>
@@ -385,7 +385,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <a class="widget-icon"><i class="fa fa-stop"></i></a>
       <!-- /ko -->
 
-      <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+      <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
 
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded() && ! ooziePropertiesExpanded()">
@@ -449,17 +449,31 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
 
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
+      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" 
+        data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
+                <br/>
+                ${"${"} hadoop:counters('secondjob')[RECORDS][REDUCE_OUT] lt 1000000 }
+                <br/>
+                <a href='http://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions'>${ _('Click for more') }</a>">
+          <i class="fa fa-question-circle" title="${ _('Click for more info') }"></i>
+      </a>    
       <ul data-bind="foreach: children" class="unstyled">
-        <li>${ _('To') }
-        <select data-bind="options: $root.workflow.nodeIds,
+        <li>
+          ${ _('If') } <input type="text" data-bind="value: $data['condition']" />
+          ${ _('go to') }
+          <select data-bind="options: $root.workflow.nodeIds,
                      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
                      value: $data['to']
                      ">
-        </select>
-        ${ _('if') } <input type="text" data-bind="value: $data['condition']" />
+          </select>
+          <a class="pointer" data-bind="click: function(){ $parent.children.remove(this);}">
+            <i class="fa fa-minus"></i>
+          </a>
         </li>
       </ul>
-      <a data-bind="click: function(){  children.push({'to': '', 'condition': ''});}">${ _('Jump to another node') } <i class="fa fa-plus"></i></a>
+      <a class="pointer" data-bind="click: function(){ children.push({'to': '', 'condition': ''});}">
+        ${ _('Jump to another node') } <i class="fa fa-plus"></i>
+      </a>
     </div>
   </div>
   <!-- /ko -->
@@ -1669,11 +1683,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           <!-- ko if: type() == 'distcp' -->
           ${ _('Source') }
           <input type="text" class="filechooser-input" data-bind="value: value()[0].value, valueUpdate:'afterkeydown', filechooser: value()[0].value, filechooserOptions: globalFilechooserOptions" placeholder="${ _('e.g. ${nameNode1}/path/to/input.txt') }">
+          </br>
           ${ _('Destination') }
           <input type="text" class="filechooser-input" data-bind="value: value()[1].value, valueUpdate:'afterkeydown', filechooser: value()[1].value, filechooserOptions: globalFilechooserOptions" placeholder="${ _('e.g. ${nameNode2}/path/to/output.txt') }">
           <!-- /ko -->
 
-          <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer'].indexOf(name()) != -1 &&  value().length > 0 -->
+          <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer', 'hive_xml'].indexOf(name()) != -1 &&  value().length > 0 -->
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false}}'></span>
           <!-- /ko -->
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
@@ -2074,7 +2089,7 @@ ${ dashboard.import_bindings() }
     });
 
     $.jHueScrollUp();
-
+    $(".custom-popover").popover();
   });
 
 </script>
