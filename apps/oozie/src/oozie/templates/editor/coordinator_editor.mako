@@ -175,7 +175,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               <div class="control-group" style="margin-bottom: 0">
                 <label class="control-label">${ _('Timezone') }</label>
                 <div class="controls">
-                  <select data-bind="options: $root.availableTimezones, value: coordinator.properties.timezone, chosen: { width: '200px'}"></select>
+                  <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: coordinator.properties.timezone}" style="width: 180px"></select>
                   <span class="help-inline"></span>
                 </div>
               </div>
@@ -194,10 +194,12 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
         <div class="card-body">
           <ul data-bind="foreach: coordinator.variables" class="unstyled">
-            <li>
-              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', value: workflow_variable, optionsValue: 'name', visible: $root.isEditing"></select>
+            <li style="margin-bottom: 10px">
+              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _("Select a parameter") }', update: workflow_variable, type: 'parameter'}, visible: $root.isEditing" style="width: 120px"></select>
 
               <span data-bind="text: workflow_variable, visible: ! $root.isEditing()"/></span>
+
+              &nbsp;&nbsp;
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -230,7 +232,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   <!-- /ko -->
                 </ul>
               </div>
-              <input data-bind="value: dataset_variable"/>
+              <input type="text" data-bind="value: dataset_variable" style="margin-bottom:0"/>
 
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->              
               
@@ -416,6 +418,9 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 <link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
 <script src="/static/js/jqCron.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="/static/ext/select2/select2.css">
+<script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout() }
 

@@ -943,6 +943,20 @@ ko.bindingHandlers.select2 = {
       if (options.type == "scope" && viewModel.availablePrivileges().indexOf(options.update) == -1) {
         viewModel.availablePrivileges.push(options.update);
       }
+      if (options.type == "parameter" && options.update != "") {
+        var _found = false;
+        allBindingsAccessor().options().forEach(function(opt){
+          if (opt[allBindingsAccessor().optionsValue]() == options.update){
+            _found = true;
+          }
+        });
+        if (!_found){
+          allBindingsAccessor().options.push({
+            name: ko.observable(options.update),
+            value: ko.observable(options.update)
+          });
+        }
+      }
     }
     $(element)
         .select2(options)
@@ -989,6 +1003,20 @@ ko.bindingHandlers.select2 = {
                   viewModel.tempRoles.push(_r);
                   viewModel.roles.push(_r);
                 }
+                if (_type == "parameter") {
+                  var _found = false;
+                  allBindingsAccessor().options().forEach(function(opt){
+                    if (opt[allBindingsAccessor().optionsValue]() == _newVal){
+                      _found = true;
+                    }
+                  });
+                  if (!_found){
+                    allBindingsAccessor().options.push({
+                      name: ko.observable(_newVal),
+                      value: ko.observable(_newVal)
+                    });
+                  }
+                }
                 if (_isArray) {
                   var _vals = $(element).select2("val");
                   _vals.push(_newVal);
@@ -1004,6 +1032,14 @@ ko.bindingHandlers.select2 = {
         })
   },
   update: function (element, valueAccessor, allBindingsAccessor, vm) {
+    if (typeof allBindingsAccessor().visible != "undefined"){
+      if (allBindingsAccessor().visible()) {
+        $(element).select2("container").show();
+      }
+      else {
+        $(element).select2("container").hide();
+      }
+    }
     if (typeof valueAccessor().update != "undefined") {
       $(element).select2("val", valueAccessor().update());
     }
