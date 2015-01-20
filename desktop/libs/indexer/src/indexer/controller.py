@@ -57,7 +57,8 @@ class CollectionManagerController(object):
       try:
         api.collections()
         setattr(self, '_solr_cloud_mode', True)
-      except:
+      except Exception, e:
+        LOG.info('Non SolrCloud server: %s' % e)
         setattr(self, '_solr_cloud_mode', False)
     return getattr(self, '_solr_cloud_mode')
 
