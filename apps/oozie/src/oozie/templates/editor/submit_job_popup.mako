@@ -43,11 +43,29 @@
                 hide
               % endif
               ">
-              <div class="span6">
+              <div class="span3">
                 ${ form['name'].form.initial.get('name') }
               </div>
               <div class="span6">
                 ${ utils.render_field(form['value'], show_label=False) }
+                ..
+              </div>
+              <div class="btn-group span3">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-expanded="false">
+                  <i class="fa fa-calendar"></i>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li>
+                    <a href="#">
+                      ${ _('Now') }
+                    </a>
+                    <a href="#">
+                      ${ _('Calendar') }
+                    </a>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
