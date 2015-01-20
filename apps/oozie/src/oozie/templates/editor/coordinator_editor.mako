@@ -232,7 +232,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   <!-- /ko -->
                 </ul>
               </div>
-              <input type="text" data-bind="value: dataset_variable" style="margin-bottom:0"/>
+              <input type="text" data-bind="value: dataset_variable, filechooser: dataset_variable" style="margin-bottom:0; width: 270px" class="filechooser-input" />
 
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->              
               
@@ -248,72 +248,81 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                 <i class="fa fa-sliders"></i>
               </a>
 
-              <div data-bind="visible: show_advanced" style="padding-left: 20px">
-                Done flag 
-                <input type="checkbox" data-bind="checked: use_done_flag" />
-                <input data-bind="value: done_flag, visible: use_done_flag"/>
-                
-                Same start
-                <input type="checkbox" data-bind="checked: same_start" />                
-                <input data-bind="value: start, visible: ! same_start()" />
-                
-                Same timezone
-                <input type="checkbox" data-bind="checked: same_timezone" />
-                <input data-bind="value: timezone, visible: ! same_timezone()" />
-                
-                <div class="control-group">
-                  <label class="control-label">${ _('Instance') }</label>
-
-                  <div class="controls">
-                    <div class="btn-group" data-toggle="buttons-radio">
-                      <button id="default-btn" type="button" class="btn"
-                              data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
-                        ${ _('Default') }
-                      </button>
-                      <button id="single-btn" type="button" class="btn"
-                              data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
-                        ${ _('Single') }
-                      </button>
-                      <button id="range-btn" type="button" class="btn"
-                              data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
-                        ${ _('Range') }
-                      </button>
-                    </div>
-                    <span class="help-block">instance_choice.help_text</span>
-
-                    <div data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
-                      <span class="span1">${ _('Start') }</span>
-                      <input name="instance_start" type="number"
-                             data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
-                      <label style="display: inline">
-                        &nbsp;
-                        <input type="checkbox" data-bind="checked: is_advanced_start_instance">
-                        ${ _('(advanced)') }
-                      </label>
-                      <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"
-                             class="span4"/>
-                      <span class="help-block">advanced_start_instance.help_text </span>
-                    </div>
-                    <div data-bind="visible: instance_choice() == 'range'">
-                      <span class="span1">${ _('End') }</span>
-                      <input name="instance_end" type="number"
-                             data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
-                      <label style="display: inline">
-                        &nbsp;
-                        <input type="checkbox" data-bind="checked: is_advanced_end_instance">
-                        ${ _('(advanced)') }
-                      </label>
-                      <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"
-                             class="span4"/>
-                      <span class="help-block">advanced_end_instance.help_text</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- /ko -->
               <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
                 <i class="fa fa-minus"></i>
-              </a>              
+              </a>
+
+              <div data-bind="visible: show_advanced" style="padding: 20px">
+
+                <form class="form-horizontal">
+                  <div class="control-group">
+                    <label class="control-label">${ _('Done flag') }</label>
+                    <div class="controls">
+                      <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag()?'9px':'-1px'}" />
+                      <input type="text" data-bind="value: done_flag, visible: use_done_flag"/>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">${ _('Same start') }</label>
+                    <div class="controls">
+                      <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start()?'9px':'-1px'}" />
+                      <input type="text" data-bind="value: start, visible: ! same_start()"/>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">${ _('Same timezone') }</label>
+                    <div class="controls">
+                      <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone()?'5px':'0'}" />
+                      <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone()" style="width: 180px"></select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">${ _('Instance') }</label>
+                    <div class="controls">
+                      <div class="btn-group" data-toggle="buttons-radio">
+                        <button id="default-btn" type="button" class="btn"
+                                data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
+                          ${ _('Default') }
+                        </button>
+                        <button id="single-btn" type="button" class="btn"
+                                data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
+                          ${ _('Single') }
+                        </button>
+                        <button id="range-btn" type="button" class="btn"
+                                data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
+                          ${ _('Range') }
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="control-group" data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
+                    <label class="control-label">${ _('Start') }</label>
+                    <div class="controls">
+                      <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
+                      <label style="display: inline">
+                          &nbsp;
+                          <input type="checkbox" data-bind="checked: is_advanced_start_instance" style="margin-top:0">
+                          ${ _('(advanced)') }
+                        </label>
+                        <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"/>
+                    </div>
+                  </div>
+                  <div class="control-group" data-bind="visible: instance_choice() == 'range'">
+                    <label class="control-label">${ _('End') }</label>
+                    <div class="controls">
+                      <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
+                      <label style="display: inline">
+                          &nbsp;
+                          <input type="checkbox" data-bind="checked: is_advanced_end_instance" style="margin-top:0">
+                          ${ _('(advanced)') }
+                        </label>
+                        <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"/>
+                    </div>
+                  </div>
+                </form>
+                
+              </div>
+              <!-- /ko -->
             </li>
           </ul>
 
