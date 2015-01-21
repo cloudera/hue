@@ -25,7 +25,7 @@
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+    <h3>${ _('Submit this job?') }</h3>
   </div>
   <div class="modal-body">
     <fieldset>
