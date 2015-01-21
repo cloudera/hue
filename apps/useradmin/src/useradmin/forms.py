@@ -307,6 +307,11 @@ class PermissionsEditForm(forms.ModelForm):
   """
   Form to manage the set of groups that have a particular permission.
   """
+
+  class Meta:
+    model = Group
+    fields = ()
+
   def __init__(self, *args, **kwargs):
     super(PermissionsEditForm, self).__init__(*args, **kwargs)
 
