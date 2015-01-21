@@ -30,7 +30,8 @@
         },
         smartTooltip: "",
         smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
-        showOnFocus: false
+        showOnFocus: false,
+        skipKeydownEvents: false
       };
 
   function Plugin(element, options) {
@@ -119,11 +120,13 @@
       $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
     });
 
-    _el.on("keydown", function(e){
-      if ((e.keyCode==32 && e.ctrlKey) || e.keyCode == 191){
-        e.preventDefault();
-      }
-    });
+    if (! _this.options.skipKeydownEvents){
+      _el.on("keydown", function(e){
+        if ((e.keyCode==32 && e.ctrlKey) || e.keyCode == 191){
+          e.preventDefault();
+        }
+      });
+    }
 
 
     var _hdfsAutocompleteSelectedIndex = -1;

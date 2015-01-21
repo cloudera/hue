@@ -15,10 +15,12 @@
 // limitations under the License.
 /*
  * jHue HDFS tree plugin
- * shows a tree HDFS picker, if home is set it pre-populates the path
+ * shows a tree HDFS picker, if initialPath is set it pre-populates the path
+ * if home is specified a home link will appear
  * use attached to an element, ie:
  * $("#el").jHueHdfsTree({
- *    home: "/user",
+ *    initialPath: "/user",
+ *    home: "/user/hue"
  *    onPathChange: function (path) {
  *      console.log(path);
  *    }
@@ -28,14 +30,16 @@
 (function ($, window, document, undefined) {
   var pluginName = "jHueHdfsTree",
       defaults = {
-        home: "/",
+        home: "",
+        initialPath: "/",
         onPathChange: function () {
         },
         createFolder: true,
         labels: {
           CREATE_FOLDER: "Create folder",
           FOLDER_NAME: "Folder name",
-          CANCEL: "Cancel"
+          CANCEL: "Cancel",
+          HOME: "Home"
         }
       },
       STORAGE_PREFIX = "hueFileBrowserLastPathForUser_";
@@ -67,13 +71,50 @@
     var _this = this;
 
     if (typeof optionalPath != "undefined") {
-      _this.options.home = optionalPath;
+      _this.options.initialPath = optionalPath;
     }
     var _el = $(_this.element);
     _el.empty();
     _el.addClass("jHueHdfsTree");
+
+    if (_this.options.home != ""){
+      var _homeLink = $("<a>").html('<i class="fa fa-home"></i> ' + _this.options.labels.HOME).click(function () {
+        var _path = _this.options.home;
+        _this.options.onPathChange(_path);
+        _this.lastPath = _path;
+        _tree.find("a").removeClass("selected");
+        var _paths = [];
+        var _re = /\//g;
+        while ((match = _re.exec(_path)) != null) {
+          _paths.push(_path.substr(0, match.index));
+        }
+        _paths.push(_path);
+        
+        showHdfsLeaf({
+          paths: _paths,
+          scroll: true
+        });
+      });
+      _homeLink.css({
+        "cursor": "pointer",
+        "position": "fixed",
+        "margin-top": "-10px",
+        "margin-left": "12px",
+        "font-size": "16px",
+        "background-color": "#FFF",
+        "width": "560px"
+      })
+    }
+    
     var _tree = $("<ul>").addClass("content unstyled").html('<li><a class="pointer"><i class="fa fa-folder-open-o"></i> /</a></li>');
+    _tree.css("padding-top", "30px");
+    
+    if (_this.options.home != ""){
+      _homeLink.appendTo(_el);
+    }
     _tree.appendTo(_el);
+
+
 
     _tree.find("a").on("click", function () {
       _this.options.onPathChange("/");
@@ -81,7 +122,7 @@
       _tree.find("a:eq(0)").addClass("selected");
     });
 
-    var _root = $("<ul>").addClass("content unstyled").attr("data-path", "").attr("data-loaded", "true");
+    var _root = $("<ul>").addClass("content unstyled").attr("data-path", "__JHUEHDFSTREE__ROOT__").attr("data-loaded", "true");
     _root.appendTo(_tree.find("li"));
 
     var BASE_PATH = "/filebrowser/view";
@@ -101,33 +142,46 @@
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {
-          _el.find("[data-path='" + currentPath + "']").attr("data-loaded", true);
-          _el.find("[data-path='" + currentPath + "']").siblings("a").find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
+          var _dataPathForCurrent = currentPath != "" ? currentPath : "__JHUEHDFSTREE__ROOT__";
+          _el.find("[data-path='" + _dataPathForCurrent + "']").attr("data-loaded", true);
+          _el.find("[data-path='" + _dataPathForCurrent + "']").siblings("a").find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
+          _tree.find("a").removeClass("selected");
+          _el.find("[data-path='" + _dataPathForCurrent + "']").siblings("a").addClass("selected");
+          
+          if (options.scroll) {
+            _el.parent().scrollTop(_el.find("[data-path='" + _dataPathForCurrent + "']").siblings("a").position().top + _el.parent().scrollTop() - 30);
+          }
           $(data.files).each(function (cnt, item) {
             if (item.name != "." && item.name != ".." && item.type == "dir") {
               var _path = item.path;
-              var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + _path + '" data-loaded="false"></ul>');
-              var _destination = _path.substr(0, _path.lastIndexOf("/"));
-              _li.appendTo(_el.find("[data-path='" + _destination + "']"));
-              _li.find("a").on("click", function () {
-                _this.options.onPathChange(_path);
-                _this.lastPath = _path;
-                _tree.find("a").removeClass("selected");
-                _li.find("a:eq(0)").addClass("selected");
-                if (_li.find(".content").attr("data-loaded") == "false") {
-                  showHdfsLeaf({
-                    leaf: _path
-                  });
+              if (_el.find("[data-path='" + _path + "']").length == 0){
+                var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + _path + '" data-loaded="false"></ul>');
+                var _destination = _path.substr(0, _path.lastIndexOf("/"));
+                if (_destination == ""){
+                  _destination = "__JHUEHDFSTREE__ROOT__";
                 }
-                else {
-                  if (_li.find(".content").is(":visible")) {
-                    _li.find(".content").hide();
+                _li.appendTo(_el.find("[data-path='" + _destination + "']"));
+                _li.find("a").on("click", function () {
+                  _this.options.onPathChange(_path);
+                  _this.lastPath = _path;
+                  _tree.find("a").removeClass("selected");
+                  _li.find("a:eq(0)").addClass("selected");
+                  if (_li.find(".content").attr("data-loaded") == "false") {
+                    showHdfsLeaf({
+                      leaf: _path,
+                      scroll: false
+                    });
                   }
                   else {
-                    _li.find(".content").show();
+                    if (_li.find(".content").is(":visible")) {
+                      _li.find(".content").hide();
+                    }
+                    else {
+                      _li.find(".content").show();
+                    }
                   }
-                }
-              });
+                });
+              }
             }
           });
           if (_this.options.createFolder) {
@@ -174,20 +228,23 @@
           }
           if (options.paths != null && options.paths.length > 0) {
             showHdfsLeaf({
-              paths: options.paths
+              paths: options.paths,
+              scroll: options.scroll
             });
           }
         }
       });
     }
 
+    Plugin.prototype.showHdfsLeaf = showHdfsLeaf;
+
     var _paths = [];
-    if (_this.options.home != "/") {
+    if (_this.options.initialPath != "/") {
       var _re = /\//g;
-      while ((match = _re.exec(_this.options.home)) != null) {
-        _paths.push(_this.options.home.substr(0, match.index));
+      while ((match = _re.exec(_this.options.initialPath)) != null) {
+        _paths.push(_this.options.initialPath.substr(0, match.index));
       }
-      _paths.push(_this.options.home);
+      _paths.push(_this.options.initialPath);
     }
 
     showHdfsLeaf({
