@@ -198,7 +198,7 @@ var Workflow = function (vm, workflow) {
            isDirtyContainer.push(_obs);
            if ($.isArray(_obs)){
              _obs.forEach(function(item){
-               isDirtyContainer.push(item.value());
+               isDirtyContainer.push(typeof item.value == "function" ? item.value() : item.value);
              });
            }
         }
