@@ -113,16 +113,16 @@
           var isChecked = $(this).is(":checked");
           selectorContainer.find("input.selector:visible").each(function () {
             if (isChecked) {
-              $(this).attr("checked", "checked");
+              $(this).prop("checked", true);
               $(this).data("opt").attr("selected", "selected");
             }
             else {
-              $(this).removeAttr("checked");
+              $(this).prop("checked", false);
               $(this).data("opt").removeAttr("selected");
             }
           });
           if (searchBox.val() != "") {
-            $(this).removeAttr("checked");
+            $(this).prop("checked", false);
           }
           _this.options.onChange();
         }).prependTo(selectAll);
