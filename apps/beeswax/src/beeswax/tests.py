@@ -1428,6 +1428,17 @@ for x in sys.stdin:
     resp = self.client.get("/metastore/databases/")
     assert_true('my_db' in resp.context['databases'], resp)
 
+    # Test for accented characters in 'comment'
+    resp = self.client.post("/beeswax/create/database", {
+      'name': 'credito',
+      'comment': 'crédito',
+      'create': 'Create database',
+      'use_default_location': True,
+    }, follow=True)
+    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
+    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+    resp = self.client.get("/metastore/databases/")
+    assert_true('credito' in resp.context['databases'], resp)
 
   def test_select_query_server(self):
     c = make_logged_in_client()
