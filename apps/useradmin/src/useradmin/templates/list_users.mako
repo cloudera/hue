@@ -190,11 +190,11 @@ ${layout.menubar(section='users')}
 
     $("#selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");;
         $(".userCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
         $(".userCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
