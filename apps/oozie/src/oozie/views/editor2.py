@@ -68,7 +68,7 @@ def open_old_workflow(request):
     _workflow = import_workflow_from_hue_3_7(workflow)
     return _edit_workflow(request, None, _workflow)
   except Exception, e:
-    LOG.warn(smart_str(e))
+    LOG.warn('Could not open old worklow: %s' % smart_str(e))
     return old_edit_workflow(request, workflow=workflow.id)
 
 
