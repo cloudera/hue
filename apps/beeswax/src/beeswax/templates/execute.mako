@@ -2782,7 +2782,9 @@ viewModel.design.fileResources.values.subscribe(function() {
   });
   $(document).on('stop_watch.query', function(e) {
     if (viewModel.design.results.errors().length == 0) {
-      window.location.href = "${request.GET['on_success_url']}";
+      window.setTimeout(function(){
+        window.location.href = "${request.GET['on_success_url']}";
+      }, 200);
     }
   });
 % elif action == 'editor-results':
