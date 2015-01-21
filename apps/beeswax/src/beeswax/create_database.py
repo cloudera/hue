@@ -45,8 +45,6 @@ def create_database(request):
       proposed_query = django_mako.render_to_string("create_database_statement.mako", {
         'database': form.cleaned_data,
       })
-      # Mako outputs bytestring in utf8
-      proposed_query = proposed_query.decode('utf-8')
       query = hql_query(proposed_query)
       return execute_directly(request, query, on_success_url=reverse('metastore:databases'))
   else:
