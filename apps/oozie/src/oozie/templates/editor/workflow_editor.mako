@@ -322,7 +322,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget' &&
         id() != '17c9c895-5a16-7443-bb81-f34b30b21548' && (['fork-widget', 'join-widget', 'decision-widget'].indexOf(widgetType()) == -1 || $root.isEditing())">
 
-      <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && $root.newAction() == null">
+      <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && ($root.newAction() == null || $root.newAction().id() != id())">
         <a href="javascript:void(0)" class="move-widget" title="${ _('Move node') }"><i class="fa fa-arrows"></i></a>
         &nbsp;
         <a href="javascript:void(0)" class="move-widget clone-widget" title="${ _('Copy node') }"><i class="fa fa-copy"></i></a>
