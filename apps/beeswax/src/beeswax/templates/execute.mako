@@ -2750,8 +2750,8 @@ function setupCodeMirrorSubscription() {
 viewModel = new BeeswaxViewModel("${app_name}");
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
-shareViewModel = setupSharing("#documentShareModal");
-shareViewModel.setDocId(${doc_id})
+shareViewModel = initSharing("#documentShareModal");
+shareViewModel.setDocId(${doc_id});
 
 % if not beeswax_conf.USE_GET_LOG_API.get() and app_name != 'impala':
   viewModel.shouldAppendLogs = true;

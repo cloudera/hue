@@ -205,7 +205,7 @@ ${ commonshare() | n,unicode }
     viewModel = new Editor();
     ko.applyBindings(viewModel, $("#editor")[0]);
 
-    shareViewModel = setupSharing("#documentShareModal");
+    shareViewModel = initSharing("#documentShareModal");
     shareViewModel.setDocId(-1);
 
     $(document).on("showSubmitPopup", function(event, data){

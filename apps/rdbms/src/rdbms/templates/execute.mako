@@ -672,7 +672,7 @@ ${ commonshare() | n,unicode }
 
   // Knockout
   viewModel = new RdbmsViewModel();
-  shareViewModel = setupSharing("#documentShareModal");
+  shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${doc_id});
 
   viewModel.fetchServers();

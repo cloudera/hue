@@ -332,7 +332,7 @@ ${ commonshare() | n,unicode }
     viewModel = new HomeViewModel(JSON_TAGS, JSON_DOCS);
     ko.applyBindings(viewModel, $('#documentList')[0]);
 
-    shareViewModel = setupSharing("#documentShareModal", viewModel.updateDoc);
+    shareViewModel = initSharing("#documentShareModal", viewModel.updateDoc);
 
     var selectedUserOrGroup, map, dropdown = null;
 
@@ -424,7 +424,7 @@ ${ commonshare() | n,unicode }
 
   function shareDoc(doc) {
     shareViewModel.selectedDoc(doc);
-    $("#documentShareModal").modal("show");
+    openShareModal();
   }
 
   function moveDoc(doc) {

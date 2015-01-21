@@ -1815,7 +1815,7 @@ ${ dashboard.import_bindings() }
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
   ko.applyBindings(viewModel, $("#editor")[0]);
 
-  var shareViewModel = setupSharing("#documentShareModal");
+  var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
 
   viewModel.init();
