@@ -282,7 +282,7 @@ from django.utils.translation import ugettext as _
   <div id="moveModal" class="modal hide fade">
     <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       ${ csrf_token(request) | n,unicode }
-      <div class="modal-header">
+      <div class="modal-header" style="padding-bottom: 10px">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Move to')}</h3>
       </div>
@@ -291,7 +291,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="modal-footer">
         <div>
-          <input type="text" class="input-xlarge disable-autsofocus" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
+          <input type="text" class="input-xlarge disable-autofocus" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
@@ -304,7 +304,7 @@ from django.utils.translation import ugettext as _
   <div id="copyModal" class="modal hide fade">
     <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       ${ csrf_token(request) | n,unicode }
-      <div class="modal-header">
+      <div class="modal-header" style="padding-bottom: 10px">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Copy to')}</h3>
       </div>
@@ -1054,7 +1054,8 @@ from django.utils.translation import ugettext as _
               $("#moveHdfsTree").remove();
               $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
               $("#moveHdfsTree").jHueHdfsTree({
-                home: viewModel.currentPath(),
+                home: "/user/${ user }",
+                initialPath: viewModel.currentPath(),
                 onPathChange: function (path) {
                   $("#moveDestination").val(path);
                   $("#moveNameRequiredAlert").hide();
@@ -1089,7 +1090,8 @@ from django.utils.translation import ugettext as _
           $("#copyHdfsTree").remove();
           $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
           $("#copyHdfsTree").jHueHdfsTree({
-            home: viewModel.currentPath(),
+            home: "/user/${ user }",
+            initialPath: viewModel.currentPath(),
             onPathChange: function(path){
               $("#copyDestination").val(path);
               $("#copyNameRequiredAlert").hide();
@@ -1652,7 +1654,11 @@ from django.utils.translation import ugettext as _
        });
 
       $("#moveDestination").jHueHdfsAutocomplete({
-        showOnFocus: true
+        showOnFocus: true,
+        skipKeydownEvents: true,
+        onEnter: function (el) {
+          $("#jHueHdfsAutocomplete").hide();
+        }
       });
 
       $("#copyForm").on("submit", function () {
@@ -1673,7 +1679,11 @@ from django.utils.translation import ugettext as _
 
 
       $("#copyDestination").jHueHdfsAutocomplete({
-        showOnFocus: true
+        showOnFocus: true,
+        skipKeydownEvents: true,
+        onEnter: function (el) {
+          $("#jHueHdfsAutocomplete").hide();
+        }
       });
 
       $(".create-directory-link").click(function () {
@@ -1801,6 +1811,7 @@ from django.utils.translation import ugettext as _
 
       $("#hueBreadcrumbText").jHueHdfsAutocomplete({
         home: "/user/${ user }/",
+        skipKeydownEvents: true,
         onEnter: function (el) {
           viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(el.val().substring(1)));
           viewModel.getStats(function (data) {
@@ -1810,6 +1821,7 @@ from django.utils.translation import ugettext as _
             } else {
               location.hash = stripHashes(el.val());
             }
+            $("#jHueHdfsAutocomplete").hide();
           });
         },
         onBlur: function() {
