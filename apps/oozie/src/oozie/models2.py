@@ -1184,12 +1184,6 @@ def find_dollar_braced_variables(text):
   return list(vars) 
 
 
-
-
-def import_workflows_from_hue_3_7():
-  return import_workflow_from_hue_3_7(OldWorflows.objects.filter(managed=True).filter(is_trashed=False)[12].get_full_node())
-
-
 def import_workflow_from_hue_3_7(old_wf):
   """
   Example of data to transform
@@ -1234,19 +1228,20 @@ def import_workflow_from_hue_3_7(old_wf):
   data['workflow']['properties']['description'] = old_wf.description
   data['workflow']['properties']['sla'] = old_wf.sla
   data['workflow']['properties']['sla_enabled'] = old_wf.sla_enabled
+  data['workflow']['properties']['imported'] = True
+  data['workflow']['properties']['wf1_id'] = old_wf.id
       
   # Layout
   rows = data['layout'][0]['rows']
   
   def _create_layout(nodes, size=12):
     wf_rows = []
-    
-    for node in nodes:      
+
+    for node in nodes:
       if type(node) == list and len(node) == 1:
         node = node[0]
       if type(node) != list:
-        if node.node_type != 'kill': # No kill widget displayed yet
-          wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
         if node[0].node_type == 'fork':
           wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})  
@@ -1285,7 +1280,7 @@ def import_workflow_from_hue_3_7(old_wf):
     
     return wf_rows
   
-  wf_rows = _create_layout(old_nodes[1:-1])
+  wf_rows = _create_layout(old_nodes)
     
   if wf_rows:
     data['layout'][0]['rows'] = [data['layout'][0]['rows'][0]] + wf_rows + [data['layout'][0]['rows'][-1]]
@@ -1296,12 +1291,13 @@ def import_workflow_from_hue_3_7(old_wf):
     for node in nodes:
       if type(node) != list:
         properties = {}
-        if '%s-widget' % node.node_type in NODES and node.node_type != 'kill-widget':
+        if '%s-widget' % node.node_type in NODES:
           properties = dict(NODES['%s-widget' % node.node_type].get_fields())
-        
-        if node.node_type == 'pig-widget':
+
+        if node.node_type == 'pig':
           properties['script_path'] = node.script_path
-          properties['params'] = json.loads(node.params)
+          properties['parameters'] = json.loads(node.params)
+          # [{u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'INPUT=${input}'}, {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'OUTPUT=${output}'}]
           properties['files'] = json.loads(node.files)
           properties['archives'] = json.loads(node.archives)
           properties['job_properties'] = json.loads(node.archives)          

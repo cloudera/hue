@@ -1054,6 +1054,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
+    	if (data.url) { 
+          window.location.replace(data.url);
+    	}
     	if (self.workflow.id() == null) {
     	  shareViewModel.setDocId(data.doc1_id);
     	}

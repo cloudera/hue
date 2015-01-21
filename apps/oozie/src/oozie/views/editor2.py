@@ -38,8 +38,10 @@ from liboozie.submission2 import Submission
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission
 from oozie.forms import ParameterForm
-from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflows_from_hue_3_7,\
+from oozie.models import Workflow as OlfWorklow
+from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
+from oozie.views.editor import edit_workflow as old_edit_workflow 
 
 
 LOG = logging.getLogger(__name__)
@@ -49,29 +51,43 @@ LOG = logging.getLogger(__name__)
 def list_editor_workflows(request):  
   workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
+  workflows_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OlfWorklow, request.user) if job.managed]
+  if workflows_v1:
+    workflows.extend(workflows_v1)
+  
   return render('editor/list_editor_workflows.mako', request, {
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
   })
+
+
+def open_old_workflow(request):
+  doc_id = request.GET.get('workflow')
+  workflow = Document.objects.get(id=doc_id).content_object.get_full_node()
+  
+  try:
+    _workflow = import_workflow_from_hue_3_7(workflow)
+    return _edit_workflow(request, None, _workflow)
+  except Exception, e:
+    LOG.warn(smart_str(e))
+    return old_edit_workflow(request, workflow=workflow.id)
 
 
 @check_document_access_permission()
 def edit_workflow(request):
   workflow_id = request.GET.get('workflow')
   
-  if workflow_id:
-    wid = {}
-    if workflow_id.isdigit():
-      wid['id'] = workflow_id
-    else:
-      wid['uuid'] = workflow_id
-    doc = Document2.objects.get(type='oozie-workflow2', **wid)
-    workflow = Workflow(document=doc)
+  wid = {}
+  if workflow_id.isdigit():
+    wid['id'] = workflow_id
   else:
-    doc = None
-    workflow = Workflow()
-    workflow.set_workspace(request.user)
-    workflow.check_workspace(request.fs, request.user)
-  
+    wid['uuid'] = workflow_id
+  doc = Document2.objects.get(type='oozie-workflow2', **wid)
+  workflow = Workflow(document=doc)
+
+  return _edit_workflow(request, doc, workflow)
+
+
+def _edit_workflow(request, doc, workflow):
   workflow_data = workflow.get_data()
 
   api = get_oozie(request.user)
@@ -94,7 +110,12 @@ def edit_workflow(request):
 
 
 def new_workflow(request):
-  return edit_workflow(request)
+  doc = None
+  workflow = Workflow()
+  workflow.set_workspace(request.user)
+  workflow.check_workspace(request.fs, request.user)
+      
+  return _edit_workflow(request, doc, workflow)
 
 
 def delete_job(request):
@@ -164,13 +185,17 @@ def save_workflow(request):
   if workflow.get('id'):
     workflow_doc = Document2.objects.get(id=workflow['id'])
   else:      
-    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user)
+    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user, description=workflow['properties']['description'])
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
   subworkflows = [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
   if subworkflows:
     dependencies = Document2.objects.filter(uuid__in=subworkflows)
     workflow_doc.dependencies = dependencies
+
+  if workflow['properties'].get('imported'): # Old workflow format
+    workflow['properties']['imported'] = False
+    response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})

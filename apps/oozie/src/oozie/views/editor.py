@@ -253,6 +253,7 @@ def export_workflow(request, workflow):
   response.write(zip_file.getvalue())
   return response
 
+
 @check_job_access_permission()
 def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
