@@ -678,6 +678,7 @@ def submit_external_job(request, application_path):
 
   popup = render('editor/submit_job_popup.mako', request, {
                    'params_form': params_form,
+                   'name': _('Job'),
                    'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path})
                  }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
