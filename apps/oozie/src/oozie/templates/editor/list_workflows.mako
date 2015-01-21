@@ -104,7 +104,7 @@ ${ layout.menubar(section='workflows') }
           </td>
           <td>${ workflow.description }</td>
 
-          <td nowrap="nowrap" data-sort-value="${py_time.mktime(workflow.last_modified.timetuple())}">${ utils.format_date(workflow.last_modified) }</td>
+          <td nowrap="nowrap" data-sort-value="${ py_time.mktime(workflow.last_modified.timetuple()) }">${ utils.format_date(workflow.last_modified) }</td>
           <td><span class="badge badge-info">${ workflow.actions.count() }</span></td>
           <td>
             <span class="label label-info">${ workflow.status }</span>

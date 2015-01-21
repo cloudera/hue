@@ -32,9 +32,9 @@ LOG = logging.getLogger(__name__)
 
 def check_document_access_permission():
   def inner(view_func):
-    def decorate(request, *args, **kwargs):      
+    def decorate(request, *args, **kwargs):
       doc_id = {}
-      
+
       try:
         if request.GET.get('workflow') or request.POST.get('workflow'):
           workflow_id = request.GET.get('workflow') or request.POST.get('workflow')
@@ -47,14 +47,14 @@ def check_document_access_permission():
         elif request.GET.get('coordinator'):
           doc_id['id'] = request.GET.get('coordinator')
         elif request.GET.get('bundle'):
-          doc_id['id'] = request.GET.get('bundle')          
+          doc_id['id'] = request.GET.get('bundle')
         elif 'doc_id' in kwargs:
           doc_id['id'] = kwargs['doc_id']
 
         if doc_id:
-          doc2 = Document2.objects.get(**doc_id)          
+          doc2 = Document2.objects.get(**doc_id)
           doc2.doc.get().can_read_or_exception(request.user)
-      except Document.DoesNotExist:
+      except Document2.DoesNotExist:
         raise PopupException(_('Job %(id)s does not exist') % {'id': doc_id})
 
       return view_func(request, *args, **kwargs)
@@ -65,8 +65,8 @@ def check_document_access_permission():
 def check_document_modify_permission():
   def inner(view_func):
     def decorate(request, *args, **kwargs):
-      doc_id = None            
-      
+      doc_id = None
+
       job = json.loads(request.POST.get('workflow', '{}'))
       if not job:
         job = json.loads(request.POST.get('coordinator', '{}'))
@@ -75,7 +75,7 @@ def check_document_modify_permission():
 
       if job and job.get('id'):
         doc_id = job.get('id')
-      
+
         try:
           doc2 = Document2.objects.get(id=job['id'])
           doc2.doc.get().can_write_or_exception(request.user)

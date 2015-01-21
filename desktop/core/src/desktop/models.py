@@ -499,6 +499,20 @@ class Document(models.Model):
   def list_permissions(self, perm='read'):
     return DocumentPermission.objects.list(document=self, perm=perm)
 
+  def to_dict(self):
+    return {
+      'owner': self.owner.username,
+      'name': self.name,
+      'description': self.description,
+      'uuid': None,
+      'id': self.id,
+      'doc1_id': self.id,
+      'type': str(self.content_type),
+      'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
+      'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
+      'isSelected': False
+    }
+
 
 class DocumentPermissionManager(models.Manager):
 

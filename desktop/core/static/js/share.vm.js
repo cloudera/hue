@@ -69,7 +69,7 @@ function prettifyUsername(userId) {
 }
 
 function initSharing(id, updateFunc) {
-  if(!updateFunc) {
+  if(! updateFunc) {
     updateFunc = function () {}
   }
   shareViewModel = new ShareViewModel(updateFunc);

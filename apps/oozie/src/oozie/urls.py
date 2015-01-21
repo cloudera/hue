@@ -82,6 +82,7 @@ urlpatterns += patterns(
   url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
   url(r'^editor/workflow/action/parameters/$', 'action_parameters', name='action_parameters'),
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'),
+  url(r'^editor/workflow/open_old_workflow/$', 'open_old_workflow', name='open_old_workflow'),
   
   url(r'^editor/coordinator/list/$', 'list_editor_coordinators', name='list_editor_coordinators'),
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
