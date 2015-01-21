@@ -188,6 +188,8 @@ def get_next_ha_yarncluster():
             LOG.warn('Picking RM HA: %s' % name)
             from hadoop.yarn import resource_manager_api
             resource_manager_api._api_cache = None # Reset cache
+            from hadoop.yarn import mapreduce_api
+            mapreduce_api._api_cache = None
             return (config, rm)
           else:
             LOG.info('RM %s is not RUNNING, skipping it: %s' % (name, cluster_info))
