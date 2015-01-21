@@ -1,0 +1,12 @@
+backend hue-backend
+    balance source
+
+    # work around the backend being slow
+    timeout server 120s
+
+    option httpclose
+    option forwardfor
+    option httpchk HEAD /desktop/debug/is_alive
+    http-check expect status 200
+
+%(servers)s

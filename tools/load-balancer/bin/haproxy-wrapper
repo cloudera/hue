@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+#   Copyright 2014 Cloudera, Inc.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+import os
+import signal
+import subprocess
+import sys
+import errno
+
+pidfile = None
+
+def read_pidfile():
+    if pidfile is not None:
+        try:
+            f = open(pidfile)
+        except IOError:
+            pass
+        else:
+            try:
+                return [int(pid) for pid in f.readlines()]
+            finally:
+                f.close()
+
+    return []
+
+def handle_signal(sig, frame):
+    if pidfile is not None:
+        for pid in read_pidfile():
+            os.kill(pid, sig)
+
+def handle_sigusr2(sig, frame):
+    child_pids = read_pidfile()
+    spawn_haproxy(child_pids)
+
+def handle_sigchld(sig, frame):
+    pass
+
+def spawn_haproxy(child_pids):
+    args = sys.argv[1:]
+
+    # Start haproxy in systemd daemon mode, which leaves the parent process still running.
+    args.append('-Ds')
+
+    # send a soft-stop to any processes still open.
+    if child_pids:
+        args.append('-sf')
+        args.extend(str(pid) for pid in child_pids)
+
+    return subprocess.Popen(args)
+
+def main():
+    global pidfile
+
+    it = iter(sys.argv)
+
+    # Extract the pidfile from the arguments.
+    pidfile = None
+    while True:
+        try:
+            arg = next(it)
+        except StopIteration:
+            break
+
+        if arg == '-p':
+            pidfile = next(it)
+
+    signal.signal(signal.SIGHUP, handle_signal)
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGQUIT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+    signal.signal(signal.SIGUSR1, handle_signal)
+    signal.signal(signal.SIGUSR2, handle_sigusr2)
+    signal.signal(signal.SIGCHLD, handle_sigchld)
+
+    spawn_haproxy([])
+
+    while True:
+        # we could be re-executed, so we want to wait for all child processes,
+        # not just the haproxy.
+        try:
+            (pid, status) = os.waitpid(-1, 0)
+        except OSError, e:
+            # Ignore interrupts
+            if e.errno == errno.EINTR:
+                continue
+            elif e.errno == errno.ECHILD:
+                # No more children to reap
+                break
+            else:
+                raise e
+
+    return os.WEXITSTATUS(status)
+
+if __name__ == '__main__':
+    sys.exit(main())
