@@ -203,7 +203,7 @@ ${ dashboard.import_bindings() }
   var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#editor")[0]);
 
-  var shareViewModel = setupSharing("#documentShareModal");
+  var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
 
   var tempCoordinator = null;

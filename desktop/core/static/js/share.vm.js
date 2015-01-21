@@ -3,6 +3,9 @@ var shareViewModel;
 function ShareViewModel(updateDocF) {
   var self = this;
 
+  self.hasInitBeenCalled = false;
+  self.hasSetupBeenCalled = false;
+
   self.selectedPerm = ko.observable('read');
   self.selectedPermLabel = ko.computed(function() {
     if (self.selectedPerm() == 'write') {
@@ -39,6 +42,11 @@ function ShareViewModel(updateDocF) {
 
 function openShareModal() {
   $("#documentShareModal").modal("show");
+  setupSharing(function(){
+    $("#documentShareAddBtn").removeClass("disabled");
+    $("#documentShareCaret").removeClass("disabled");
+    $("#documentShareTypeahead").removeAttr("disabled");
+  });
 }
 
 function isShared() {
@@ -60,70 +68,92 @@ function prettifyUsername(userId) {
   return "";
 }
 
-function setupSharing(id, updateFunc) {
+function initSharing(id, updateFunc) {
   if(!updateFunc) {
     updateFunc = function () {}
   }
   shareViewModel = new ShareViewModel(updateFunc);
   ko.applyBindings(shareViewModel, $(id)[0]);
+  shareViewModel.hasInitBeenCalled = true;
+  return shareViewModel;
+}
 
-  $.getJSON('/desktop/api/users/autocomplete', function (data) {
-    JSON_USERS_GROUPS = data;
-    dropdown = [];
-    map = {};
+function setupSharing(id, updateFunc) {
+  if (shareViewModel == null || !shareViewModel.hasInitBeenCalled) {
+    shareViewModel = initSharing(id, updateFunc);
+  }
 
-    $.each(JSON_USERS_GROUPS.users, function (i, user) {
-      var _display = prettifyUsername(user.id);
-      map[_display] = user;
-      dropdown.push(_display);
-    });
+  if (! self.hasSetupBeenCalled){
+    $.getJSON('/desktop/api/users/autocomplete', function (data) {
+      self.hasSetupBeenCalled = true;
+      JSON_USERS_GROUPS = data;
+      dropdown = [];
+      map = {};
 
-    $.each(JSON_USERS_GROUPS.groups, function (i, group) {
-      map[group.name] = group;
-      dropdown.push(group.name);
-    });
+      $.each(JSON_USERS_GROUPS.users, function (i, user) {
+        var _display = prettifyUsername(user.id);
+        map[_display] = user;
+        dropdown.push(_display);
+      });
 
-    $("#documentShareTypeahead").typeahead({
-      source: function (query, process) {
-        process(dropdown);
-      },
-      matcher: function (item) {
-        if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
-          return true;
+      $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+        map[group.name] = group;
+        dropdown.push(group.name);
+      });
+
+      $("#documentShareTypeahead").typeahead({
+        source: function (query, process) {
+          process(dropdown);
+        },
+        matcher: function (item) {
+          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+            return true;
+          }
+        },
+        sorter: function (items) {
+          return items.sort();
+        },
+        highlighter: function (item) {
+          var _icon = "fa";
+          var _display = "";
+          if (map[item].hasOwnProperty("username")) {
+            _icon += " fa-user";
+          }
+          else {
+            _icon += " fa-users";
+          }
+          var regex = new RegExp('(' + this.query + ')', 'gi');
+          return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
+        },
+        updater: function (item) {
+          selectedUserOrGroup = map[item];
+          return item;
         }
-      },
-      sorter: function (items) {
-        return items.sort();
-      },
-      highlighter: function (item) {
-        var _icon = "fa";
-        var _display = "";
-        if (map[item].hasOwnProperty("username")) {
-          _icon += " fa-user";
+      });
+
+      $("#documentShareTypeahead").on("keyup", function (e) {
+        var _code = (e.keyCode ? e.keyCode : e.which);
+        if (_code == 13) {
+          handleTypeaheadSelection();
         }
-        else {
-          _icon += " fa-users";
-        }
-        var regex = new RegExp('(' + this.query + ')', 'gi');
-        return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
-      },
-      updater: function (item) {
-        selectedUserOrGroup = map[item];
-        return item;
+      });
+
+      if (typeof id == "function"){
+        id();
       }
     });
 
-    $("#documentShareTypeahead").on("keyup", function (e) {
-      var _code = (e.keyCode ? e.keyCode : e.which);
-      if (_code == 13) {
-        handleTypeaheadSelection();
+    $("#documentShareAddBtn").on("click", function () {
+      if (! $(this).hasClass("disabled")){
+        handleTypeaheadSelection();  
       }
     });
-  });
-
-  $("#documentShareAddBtn").on("click", function () {
-    handleTypeaheadSelection();
-  });
+  }
+  else {
+    if (typeof id == "function"){
+      id();
+    }
+  }
 
   return shareViewModel;
 }

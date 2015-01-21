@@ -789,12 +789,12 @@ ${ commonshare() | n,unicode }
 
   var viewModel = new PigViewModel(appProperties);
   ko.applyBindings(viewModel, $("#pig-editor-app")[0]);
-  var shareViewModel = setupSharing("#documentShareModal");
+  var shareViewModel = initSharing("#documentShareModal");
 
   function tryShareQuery() {
     if (viewModel.currentScript().docId() != -1) {
       shareViewModel.setDocId(viewModel.currentScript().docId())
-      $("#documentShareModal").modal("show");
+      openShareModal();
     }
   }
 

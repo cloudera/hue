@@ -498,7 +498,7 @@ ${ dashboard.import_bindings() }
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
 
-  var shareViewModel = setupSharing("#documentShareModal");
+  var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
 
   function showChooseWorkflow() {
