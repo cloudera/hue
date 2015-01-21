@@ -45,14 +45,14 @@ LOG = logging.getLogger(__name__)
 
 
 class Job(object):
-  
+
   def find_all_parameters(self, with_lib_path=True):
     params = self.find_parameters()
 
     for param in self.parameters:
       params[param['name'].strip()] = param['value']
 
-    return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']  
+    return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']
 
   @classmethod
   def get_workspace(cls, user):
@@ -67,10 +67,10 @@ class Job(object):
         if not re.match('[a-zA-Z_]', c):
           c = '_'
       else:
-        if not re.match('[\-_a-zA-Z0-9]', c):        
+        if not re.match('[\-_a-zA-Z0-9]', c):
           c = '_'
       good_name.append(c)
-      
+
     return ''.join(good_name)
 
 
@@ -89,7 +89,7 @@ class Workflow(Job):
       {'key': 'upstream-apps', 'value': ''},
   ]
   HUE_ID = 'hue-id-w'
-  
+
   def __init__(self, data=None, document=None, workflow=None):
     self.document = document
 
@@ -109,7 +109,7 @@ class Workflow(Job):
               "klass":"card card-home card-column span12"
           }],
           'workflow': workflow if workflow is not None else {
-              "id": None, 
+              "id": None,
               "uuid": None,
               "name": "My Workflow",
               "properties": {
@@ -122,31 +122,32 @@ class Workflow(Job):
                   "properties": [],
                   "sla": Workflow.SLA_DEFAULT,
                   "show_arrows": True,
+                  "wf1_id": None
               },
               "nodes":[
-                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},            
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
                   {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]},
                   {"id":"17c9c895-5a16-7443-bb81-f34b30b21548","name":"Kill","type":"kill-widget","properties":{'message': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]')},"children":[]}
               ]
           }
       })
-      
+
   @property
   def id(self):
-    return self.document.id  
-  
+    return self.document.id
+
   @property
   def uuid(self):
-    return self.document.uuid   
-  
+    return self.document.uuid
+
   def get_json(self):
     _data = self.get_data()
 
     return json.dumps(_data)
- 
+
   def get_data(self):
     _data = json.loads(self.data)
-    
+
     if self.document is not None:
       _data['workflow']['id'] = self.document.id
       _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid',))
@@ -161,7 +162,7 @@ class Workflow(Job):
       _data['workflow']['properties']['show_arrows'] = True
 
     return _data
-  
+
   def to_xml(self, mapping=None):
     if mapping is None:
       mapping = {}
@@ -170,7 +171,7 @@ class Workflow(Job):
     data = self.get_data()
     nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if node.name == 'End'] # End at the end
     node_mapping = dict([(node.id, node) for node in nodes])
-    
+
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict([(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
 
@@ -188,33 +189,33 @@ class Workflow(Job):
   def name(self):
     _data = self.get_data()
     return _data['workflow']['name']
-  
+
   def update_name(self, name):
     _data = self.get_data()
     _data['workflow']['name'] = name
-    self.data = json.dumps(_data)  
+    self.data = json.dumps(_data)
 
-  @property      
+  @property
   def deployment_dir(self):
     _data = self.get_data()
     return _data['workflow']['properties']['deployment_dir']
-  
-  @property      
+
+  @property
   def parameters(self):
     _data = self.get_data()
     return _data['workflow']['properties']['parameters']
 
-  @property      
+  @property
   def sla_enabled(self):
     _data = self.get_data()
     return _data['workflow']['properties']['sla_enabled']
 
-  @property      
+  @property
   def sla(self):
     _data = self.get_data()
     return _data['workflow']['properties']['sla']
 
-  @property      
+  @property
   def nodes(self):
     _data = self.get_data()
     return [Node(node) for node in _data['workflow']['nodes']]
@@ -235,13 +236,13 @@ class Workflow(Job):
     _data = json.loads(self.data)
 
     _data['workflow']['properties']['deployment_dir'] = Job.get_workspace(user)
-    
+
     self.data = json.dumps(_data)
 
   def check_workspace(self, fs, user):
-    # Create optional root workspace for the first submission    
+    # Create optional root workspace for the first submission
     root = REMOTE_SAMPLE_DIR.get().rsplit('/', 1)
-    if len(root) > 1 and '$' not in root[0]:      
+    if len(root) > 1 and '$' not in root[0]:
       create_directories(fs, [root[0]])
 
     Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
@@ -249,11 +250,11 @@ class Workflow(Job):
 
 
 class Node():
-  def __init__(self, data):    
+  def __init__(self, data):
     self.data = data
-    
+
     self._augment_data()
-    
+
   def to_xml(self, mapping=None, node_mapping=None, workflow_mapping=None):
     if mapping is None:
       mapping = {}
@@ -271,15 +272,15 @@ class Node():
 
     return django_mako.render_to_string(self.get_template_name(), data)
 
-  @property      
+  @property
   def id(self):
     return self.data['id']
-  
-  @property      
+
+  @property
   def name(self):
     return self.data['name']
 
-  @property      
+  @property
   def sla_enabled(self):
     _data = self.get_data()
     return _data['workflow']['properties']['sla_enabled']
@@ -287,14 +288,14 @@ class Node():
   def _augment_data(self):
     self.data['type'] = self.data['type'].replace('-widget', '')
     self.data['uuid'] = self.data['id']
-    
+
     # Action Node
     if 'credentials' not in self.data['properties']:
-      self.data['properties']['credentials'] = []     
+      self.data['properties']['credentials'] = []
     if 'prepares' not in self.data['properties']:
       self.data['properties']['prepares'] = []
     if 'job_xml' not in self.data['properties']:
-      self.data['properties']['job_xml'] = []      
+      self.data['properties']['job_xml'] = []
     if 'properties' not in self.data['properties']:
       self.data['properties']['properties'] = []
     if 'params' not in self.data['properties']:
@@ -307,16 +308,16 @@ class Node():
       self.data['properties']['sla_enabled'] = False
     if 'sla' not in self.data['properties']:
       self.data['properties']['sla'] = []
-    
+
   def get_template_name(self):
-    return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']    
+    return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']
 
   def find_parameters(self):
-    return find_parameters(self)    
+    return find_parameters(self)
 
 
 class Action(object):
-  
+
   @classmethod
   def get_fields(cls):
     return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', [])]
@@ -335,21 +336,21 @@ class EndNode(Action):
 class PigAction(Action):
   TYPE = 'pig'
   FIELDS = {
-     'script_path': { 
+     'script_path': {
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
           'help_text': _('Path to the script on HDFS.'),
           'type': ''
-     },            
-     'parameters': { 
+     },
+     'parameters': {
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
           'help_text': _('The Pig parameters of the script without -param. e.g. INPUT=${inputDir}'),
           'type': ''
      },
-     'arguments': { 
+     'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
@@ -357,35 +358,35 @@ class PigAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
@@ -402,21 +403,21 @@ class PigAction(Action):
 class JavaAction(Action):
   TYPE = 'java'
   FIELDS = {
-     'jar_path': { 
+     'jar_path': {
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
           'help_text': _('Path to the jar on HDFS.'),
           'type': ''
-     },            
-     'main_class': { 
+     },
+     'main_class': {
           'name': 'main_class',
           'label': _('Main class'),
           'value': '',
           'help_text': _('Java class. e.g. org.apache.hadoop.examples.Grep'),
           'type': 'text'
      },
-     'arguments': { 
+     'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
@@ -424,14 +425,14 @@ class JavaAction(Action):
                          'and they are passed to the main method in the same order.'),
           'type': ''
      },
-     'java_opts': { 
+     'java_opts': {
           'name': 'java_opts',
           'label': _('Java options'),
           'value': [],
           'help_text': _('Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b'),
           'type': ''
      },
-     'capture_output': { 
+     'capture_output': {
           'name': 'capture_output',
           'label': _('Capture output'),
           'value': False,
@@ -442,35 +443,35 @@ class JavaAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': [],
@@ -482,19 +483,19 @@ class JavaAction(Action):
   @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['jar_path'], cls.FIELDS['main_class']]
-  
-  
+
+
 class HiveAction(Action):
   TYPE = 'hive'
   FIELDS = {
-     'script_path': { 
+     'script_path': {
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
           'help_text': _('Path to the script on HDFS.'),
           'type': ''
-     },            
-     'parameters': { 
+     },
+     'parameters': {
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
@@ -502,35 +503,35 @@ class HiveAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'hive_xml': { 
+     'hive_xml': {
           'name': 'hive_xml',
           'label': _('Hive XML'),
           'value': '',
@@ -547,14 +548,14 @@ class HiveAction(Action):
 class HiveServer2Action(Action):
   TYPE = 'hive2'
   FIELDS = {
-     'script_path': { 
+     'script_path': {
           'name': 'script_path',
           'label': _('Script'),
           'value': '',
           'help_text': _('Path to the script on HDFS.'),
           'type': ''
-     },            
-     'parameters': { 
+     },
+     'parameters': {
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
@@ -562,14 +563,14 @@ class HiveServer2Action(Action):
           'type': ''
      },
      # Common
-     'jdbc_url': { 
+     'jdbc_url': {
           'name': 'jdbc_url',
           'label': _('JDBC URL'),
           'value': 'jdbc:hive2://localhost:10000/default',
           'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.'),
           'type': ''
-     },     
-     'password': { 
+     },
+     'password': {
           'name': 'password',
           'label': _('Password'),
           'value': '',
@@ -577,35 +578,35 @@ class HiveServer2Action(Action):
                          'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
           'type': ''
      },
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': '',
@@ -622,21 +623,21 @@ class HiveServer2Action(Action):
 class SubWorkflowAction(Action):
   TYPE = 'subworkflow'
   FIELDS = {
-     'workflow': { 
+     'workflow': {
           'name': 'workflow',
           'label': _('Sub-workflow'),
           'value': None,
           'help_text': _('The sub-workflow application to include. You must own all the sub-workflows'),
           'type': 'workflow'
      },
-     'propagate_configuration': { 
+     'propagate_configuration': {
           'name': 'propagate_configuration',
           'label': _('Propagate configuration'),
           'value': True,
           'help_text': _('If the workflow job configuration should be propagated to the child workflow.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
@@ -647,20 +648,20 @@ class SubWorkflowAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['workflow']] 
+    return [cls.FIELDS['workflow']]
 
 
 class SqoopAction(Action):
   TYPE = 'sqoop'
   FIELDS = {
-     'command': { 
+     'command': {
           'name': 'command',
           'label': _('Sqoop command'),
           'value': 'import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1',
           'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE},
           'type': 'textarea'
-     },            
-     'parameters': { 
+     },
+     'parameters': {
           'name': 'parameters',
           'label': _('Arguments'),
           'value': [],
@@ -669,35 +670,35 @@ class SqoopAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': '',
@@ -714,7 +715,7 @@ class SqoopAction(Action):
 class MapReduceAction(Action):
   TYPE = 'mapreduce'
   FIELDS = {
-     'jar_path': { 
+     'jar_path': {
           'name': 'jar_path',
           'label': _('Jar name'),
           'value': '',
@@ -722,35 +723,35 @@ class MapReduceAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': '',
@@ -765,30 +766,30 @@ class MapReduceAction(Action):
 
 
 class ShellAction(Action):
-  TYPE = 'shell' 
+  TYPE = 'shell'
   FIELDS = {
-     'shell_command': { 
+     'shell_command': {
           'name': 'shell_command',
           'label': _('Shell command'),
           'value': '',
           'help_text': _('Shell command to execute, e.g script.sh'),
           'type': ''
-     },            
+     },
      'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
           'help_text': _('One arg, e.g. -l, --help'),
           'type': ''
-     },    
-     'env_var': { 
+     },
+     'env_var': {
           'name': 'env_var',
           'label': _('Environment variables'),
           'value': [],
           'help_text': _('e.g. MAX=10 or PATH=$PATH:mypath'),
           'type': ''
-     },         
-     'capture_output': { 
+     },
+     'capture_output': {
           'name': 'capture_output',
           'label': _('Capture output'),
           'value': True,
@@ -799,35 +800,35 @@ class ShellAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.'),
           'type': ''
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
           'type': ''
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production'),
           'type': ''
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.'),
           'type': ''
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': '',
@@ -842,22 +843,22 @@ class ShellAction(Action):
 
 
 class SshAction(Action):
-  TYPE = 'ssh' 
+  TYPE = 'ssh'
   FIELDS = {
-     'host': { 
+     'host': {
           'name': 'host',
           'label': _('User and Host'),
           'value': 'user@host.com',
           'help_text': _('Where the shell will be executed.'),
           'type': 'text'
-     },         
-     'ssh_command': { 
+     },
+     'ssh_command': {
           'name': 'ssh_command',
           'label': _('Ssh command'),
           'value': 'ls',
           'help_text': _('The path of the Shell command to execute.'),
           'type': 'textarea'
-     },    
+     },
      'arguments': {
           'name': 'arguments',
           'label': _('Arguments'),
@@ -865,7 +866,7 @@ class SshAction(Action):
           'help_text': _('One arg, e.g. -l, --help'),
           'type': ''
      },
-     'capture_output': { 
+     'capture_output': {
           'name': 'capture_output',
           'label': _('Capture output'),
           'value': True,
@@ -883,44 +884,44 @@ class SshAction(Action):
 
 
 class FsAction(Action):
-  TYPE = 'fs' 
+  TYPE = 'fs'
   FIELDS = {
-     'deletes': { 
+     'deletes': {
           'name': 'deletes',
           'label': _('Delete path'),
           'value': [],
           'help_text': _('Deletes recursively all content.'),
           'type': ''
      },
-     'mkdirs': { 
+     'mkdirs': {
           'name': 'mkdirs',
           'label': _('Create directory'),
           'value': [],
           'help_text': _('Sub directories are created if needed.'),
           'type': ''
      },
-     'moves': { 
+     'moves': {
           'name': 'moves',
           'label': _('Move file or directory'),
           'value': [],
           'help_text': _('Destination.'),
           'type': ''
-     },  
-     'chmods': { 
+     },
+     'chmods': {
           'name': 'chmods',
           'label': _('Change permissions'),
           'value': [],
           'help_text': _('File or directory.'),
           'type': ''
      },
-     'touchzs': { 
+     'touchzs': {
           'name': 'touchzs',
           'label': _('Create or touch a file'),
           'value': [],
           'help_text': _('Or update its modification date.'),
           'type': ''
      },
-     'chgrps': { 
+     'chgrps': {
           'name': 'chgrps',
           'label': _('Change the group'),
           'value': [],
@@ -935,22 +936,22 @@ class FsAction(Action):
 
 
 class EmailAction(Action):
-  TYPE = 'email' 
+  TYPE = 'email'
   FIELDS = {
-     'to': { 
+     'to': {
           'name': 'to',
           'label': _('To addresses'),
           'value': '',
           'help_text': _('Comma-separated values'),
           'type': 'text'
-     },         
-     'cc': { 
+     },
+     'cc': {
           'name': 'cc',
           'label': _('Cc addresses (optional)'),
           'value': '',
           'help_text': _('Comma-separated values'),
           'type': 'text'
-     },    
+     },
      'subject': {
           'name': 'subject',
           'label': _('Subject'),
@@ -958,7 +959,7 @@ class EmailAction(Action):
           'help_text': _('Plain-text'),
           'type': 'text'
      },
-     'body': { 
+     'body': {
           'name': 'body',
           'label': _('Body'),
           'value': '',
@@ -975,14 +976,14 @@ class EmailAction(Action):
 class StreamingAction(Action):
   TYPE = 'streaming'
   FIELDS = {
-     'mapper': { 
+     'mapper': {
           'name': 'mapper',
           'label': _('Mapper'),
           'value': '',
           'help_text': _('The executable/script to be used as mapper.'),
           'type': ''
      },
-     'reducer': { 
+     'reducer': {
           'name': 'reducer',
           'label': _('Reducer'),
           'value': '',
@@ -990,31 +991,31 @@ class StreamingAction(Action):
           'type': ''
      },
      # Common
-     'files': { 
+     'files': {
           'name': 'files',
           'label': _('Files'),
           'value': [],
           'help_text': _('Files put in the running directory.')
      },
-     'archives': { 
+     'archives': {
           'name': 'archives',
           'label': _('Archives'),
           'value': [],
           'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.')
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production')
      },
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.')
      },
-     'job_xml': { 
+     'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
           'value': '',
@@ -1030,7 +1031,7 @@ class StreamingAction(Action):
 class DistCpAction(Action):
   TYPE = 'distcp'
   FIELDS = {
-     'distcp_parameters': { 
+     'distcp_parameters': {
           'name': 'distcp_parameters',
           'label': _('Arguments'),
           'value': [{'value': ''}, {'value': ''}],
@@ -1038,19 +1039,19 @@ class DistCpAction(Action):
           'type': 'distcp'
      },
       # Common
-     'prepares': { 
+     'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
           'help_text': _('Path to manipulate before starting the application.')
      },
-     'job_properties': { 
+     'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
           'help_text': _('value, e.g. production')
      },
-     'java_opts': { 
+     'java_opts': {
           'name': 'java_opts',
           'label': _('Java options'),
           'value': '',
@@ -1066,7 +1067,7 @@ class DistCpAction(Action):
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
-     'message': { 
+     'message': {
           'name': 'message',
           'label': _('Message'),
           'value': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'),
@@ -1083,7 +1084,7 @@ class KillAction(Action):
 class JoinAction(Action):
   TYPE = 'join'
   FIELDS = {}
-  
+
   @classmethod
   def get_mandatory_fields(cls):
     return []
@@ -1092,7 +1093,7 @@ class JoinAction(Action):
 class ForkNode(Action):
   TYPE = 'fork'
   FIELDS = {}
-  
+
   @classmethod
   def get_mandatory_fields(cls):
     return []
@@ -1101,11 +1102,11 @@ class ForkNode(Action):
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
-  
+
   @classmethod
   def get_mandatory_fields(cls):
     return []
-  
+
 
 NODES = {
   'start-widget': StartNode,
@@ -1115,18 +1116,18 @@ NODES = {
   'hive-widget': HiveAction,
   'hive2-widget': HiveServer2Action,
   'sqoop-widget': SqoopAction,
-  'mapreduce-widget': MapReduceAction,  
+  'mapreduce-widget': MapReduceAction,
   'subworkflow-widget': SubWorkflowAction,
   'shell-widget': ShellAction,
-  'ssh-widget': SshAction,  
+  'ssh-widget': SshAction,
   'fs-widget': FsAction,
   'email-widget': EmailAction,
   'streaming-widget': StreamingAction,
-  'distcp-widget': DistCpAction,  
+  'distcp-widget': DistCpAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
   'fork-widget': ForkNode,
-  'decision-widget': DecisionNode,  
+  'decision-widget': DecisionNode,
 }
 
 
@@ -1171,17 +1172,17 @@ def find_json_parameters(fields):
   return params
 
 def find_dollar_variables(text):
-  return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)  
+  return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)
 
 def find_dollar_braced_variables(text):
   vars = set()
-  
-  for var in re.findall('\$\{(.+)\}', text, re.MULTILINE):  
+
+  for var in re.findall('\$\{(.+)\}', text, re.MULTILINE):
     if ':' in var:
-      var = var.split(':', 1)[1]    
+      var = var.split(':', 1)[1]
     vars.add(var)
-  
-  return list(vars) 
+
+  return list(vars)
 
 
 def import_workflow_from_hue_3_7(old_wf):
@@ -1192,19 +1193,19 @@ def import_workflow_from_hue_3_7(old_wf):
   [<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
   [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
   """
-  
+
   uuids = {}
 
   old_nodes = old_wf.get_hierarchy()
-  
+
   wf = Workflow()
   wf_rows = []
   wf_nodes = []
-  
+
   data = wf.get_data()
-  
+
   # UUIDs node mapping
-  for node in old_wf.node_list:    
+  for node in old_wf.node_list:
     if node.name == 'kill':
       node_uuid = '17c9c895-5a16-7443-bb81-f34b30b21548'
     elif node.name == 'start':
@@ -1215,7 +1216,7 @@ def import_workflow_from_hue_3_7(old_wf):
       node_uuid = str(uuid.uuid4())
 
     uuids[node.id] = node_uuid
-    
+
   # Workflow
   data['workflow']['uuid'] = str(uuid.uuid4())
   data['workflow']['name'] = old_wf.name
@@ -1230,10 +1231,10 @@ def import_workflow_from_hue_3_7(old_wf):
   data['workflow']['properties']['sla_enabled'] = old_wf.sla_enabled
   data['workflow']['properties']['imported'] = True
   data['workflow']['properties']['wf1_id'] = old_wf.id
-      
+
   # Layout
   rows = data['layout'][0]['rows']
-  
+
   def _create_layout(nodes, size=12):
     wf_rows = []
 
@@ -1244,44 +1245,44 @@ def import_workflow_from_hue_3_7(old_wf):
         wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
         if node[0].node_type == 'fork':
-          wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})  
-          
-          wf_rows.append({  
+          wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+
+          wf_rows.append({
             "id": str(uuid.uuid4()),
-            "widgets":[  
+            "widgets":[
 
             ],
-            "columns":[  
-               {  
+            "columns":[
+               {
                   "id": str(uuid.uuid4()),
                   "size": (size / len(node[1])),
-                  "rows": 
-                     [{  
+                  "rows":
+                     [{
                         "id": str(uuid.uuid4()),
                         "widgets": c['widgets'],
                         "columns":[]
-                      } 
-                    for c in col] if type(col) == list else [{  
+                      }
+                    for c in col] if type(col) == list else [{
                         "id": str(uuid.uuid4()),
                         "widgets": col['widgets'],
                         "columns":[]
                       }
-                   ] 
-                  ,                  
+                   ]
+                  ,
                   "klass":"card card-home card-column span%s" % (size / len(node[1]))
                }
                for col in _create_layout(node[1], size)
             ]
           })
-          
+
           wf_rows.append({"widgets":[{"size":size, "name": 'Join', "id":  uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
         else:
           wf_rows.append(_create_layout(node, size))
-    
+
     return wf_rows
-  
+
   wf_rows = _create_layout(old_nodes)
-    
+
   if wf_rows:
     data['layout'][0]['rows'] = [data['layout'][0]['rows'][0]] + wf_rows + [data['layout'][0]['rows'][-1]]
 
@@ -1296,13 +1297,118 @@ def import_workflow_from_hue_3_7(old_wf):
 
         if node.node_type == 'pig':
           properties['script_path'] = node.script_path
-          properties['parameters'] = json.loads(node.params)
-          # [{u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'INPUT=${input}'}, {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'OUTPUT=${output}'}]
-          properties['files'] = json.loads(node.files)
+          properties['parameters'] = [param for param in json.loads(node.params) if param['value'] != '-param']
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
           properties['archives'] = json.loads(node.archives)
-          properties['job_properties'] = json.loads(node.archives)          
+          properties['job_properties'] = json.loads(node.job_properties)
           properties['prepares'] = json.loads(node.prepares)
           properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'hive':
+          properties['script_path'] = node.script_path
+          properties['parameters'] = [param for param in json.loads(node.params) if param['value'] != '-param']
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['hive_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'java':
+          properties['jar_path'] = node.jar_path
+          properties['main_class'] = node.main_class
+          properties['arguments'] = [{'value': arg} for arg in node.args.split(' ')]
+          properties['java_opts'] = node.java_opts
+          properties['capture_output'] = node.capture_output
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'sqoop':
+          properties['command'] = node.script_path
+          properties['parameters'] = json.loads(node.params)
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'mapreduce':
+          properties['jar_path'] = node.jar_path
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'shell':
+          properties['shell_command'] = node.command
+          properties['arguments'] = json.loads(node.params)
+          properties['capture_output'] = node.capture_output
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'ssh':
+          properties['user'] = '%s@%s' % (node.user, node.host)
+          properties['ssh_command'] = node.command
+          properties['params'] = json.loads(node.params)
+          properties['capture_output'] = node.capture_output
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'fs':
+          properties['deletes'] = [{'value': f['name']} for f in json.loads(node.deletes)]
+          properties['mkdirs'] = [{'value': f['name']} for f in json.loads(node.mkdirs)]
+          properties['moves'] = json.loads(node.moves)
+          chmods = json.loads(node.chmods)
+          for c in chmods:
+            c['value'] = c['path']
+            c['dir_files'] = False
+          properties['chmods'] = chmods
+          properties['touchzs'] = [{'value': f['name']} for f in json.loads(node.touchzs)]
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'email':
+          properties['to'] = node.to
+          properties['cc'] = node.cc
+          properties['subject'] = node.subject
+          properties['body'] = node.body
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'streaming':
+          properties['mapper'] = node.mapper
+          properties['reducer'] = node.reducer
+          properties['files'] = [{'value': f} for f in json.loads(node.files)]
+          properties['archives'] = json.loads(node.archives)
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
+          properties['job_xml'] = node.job_xml
+          properties['description'] = node.description
+          properties['sla'] = node.sla
+          properties['sla_enabled'] = node.sla_enabled
+        elif node.node_type == 'distcp':
+          properties['distcp_parameters'] = json.loads(node.params)
+          properties['java_opts'] = node.job_xml
+          properties['job_properties'] = json.loads(node.job_properties)
+          properties['prepares'] = json.loads(node.prepares)
           properties['description'] = node.description
           properties['sla'] = node.sla
           properties['sla_enabled'] = node.sla_enabled
@@ -1318,7 +1424,7 @@ def import_workflow_from_hue_3_7(old_wf):
         _dig_nodes(node)
 
   _dig_nodes(old_nodes)
-  
+
   data['workflow']['nodes'] = wf_nodes
 
   return Workflow(data=json.dumps(data))
@@ -1341,7 +1447,7 @@ class Coordinator(Job):
       self._data = data
     else:
       self._data = {
-          'id': None, 
+          'id': None,
           'uuid': None,
           'name': 'My Coordinator',
           'variables': [], # Aka workflow parameters
@@ -1354,7 +1460,7 @@ class Coordinator(Job):
               'cron_advanced': False,
               'timezone': 'America/Los_Angeles',
               'start': '${start_date}',
-              'end': '${end_date}', 
+              'end': '${end_date}',
               'workflow': None,
               'timeout': None,
               'concurrency': None,
@@ -1389,7 +1495,7 @@ class Coordinator(Job):
 
     if type(self._data['properties']['end']) == datetime:
       _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
-    
+
     return _data
 
   def to_json(self):
@@ -1397,20 +1503,20 @@ class Coordinator(Job):
 
   def to_json_for_html(self):
     return json.dumps(self.get_data_for_json(), cls=JSONEncoderForHTML)
- 
+
   @property
   def data(self):
     if type(self._data['properties']['start']) != datetime and not '$' in self._data['properties']['start']:
       self._data['properties']['start'] = parse(self._data['properties']['start'])
-      
+
     if type(self._data['properties']['end']) != datetime and not '$' in self._data['properties']['end']:
-      self._data['properties']['end'] = parse(self._data['properties']['end'])    
+      self._data['properties']['end'] = parse(self._data['properties']['end'])
 
     if self.document is not None:
       self._data['id'] = self.document.id
 
     return self._data
-  
+
   @property
   def name(self):
     return self.data['name']
@@ -1418,10 +1524,10 @@ class Coordinator(Job):
   def set_workspace(self, user):
     self.data['properties']['deployment_dir'] = Job.get_workspace(user)
 
-  @property      
-  def deployment_dir(self):    
+  @property
+  def deployment_dir(self):
     return self.data['properties']['deployment_dir']
-  
+
   def find_parameters(self):
     params = set()
 
@@ -1449,27 +1555,27 @@ class Coordinator(Job):
 # [{'name': parameter['workflow_variable'], 'value': parameter['dataset_variable']} for parameter in self.data['variables'] if parameter['dataset_type'] == 'parameter']
 
     return dict([(param, '') for param in list(params)])
-  
-  @property      
+
+  @property
   def sla_enabled(self):
     return self.data['properties']['sla_enabled']
 
-  @property      
+  @property
   def sla(self):
     return self.data['properties']['sla']
-  
-  @property      
+
+  @property
   def parameters(self):
     return self.data['properties']['parameters']
-  
+
   @property
   def datasets(self):
     return self.inputDatasets + self.outputDatasets
-  
+
   @property
-  def inputDatasets(self):    
+  def inputDatasets(self):
     return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'input_path']
-    
+
   @property
   def outputDatasets(self):
     return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'output_path']
@@ -1489,7 +1595,7 @@ class Coordinator(Job):
   @property
   def cron_frequency(self):
     data_dict = self.data['properties']
-    
+
     if 'cron_frequency' in data_dict:
       return data_dict['cron_frequency']
     else:
@@ -1511,10 +1617,10 @@ class Coordinator(Job):
       mapping = {}
 
     tmpl = "editor/gen2/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace') 
-  
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
+
   @property
-  def properties(self):    
+  def properties(self):
     props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
     props += self.data['properties']['properties']
     return props
@@ -1527,17 +1633,17 @@ class Dataset():
 
   @property
   def data(self):
-    if type(self._data['start']) == unicode: 
+    if type(self._data['start']) == unicode:
       self._data['start'] = parse(self._data['start'])
 
     self._data['name'] = self._data['workflow_variable']
 
-    return self._data      
-      
+    return self._data
+
   @property
   def frequency(self):
     return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['frequency_unit'], 'number': self.data['frequency_number']}
-      
+
   @property
   def start_utc(self):
     return utc_datetime_format(self.data['start'])
@@ -1589,7 +1695,7 @@ class Bundle(Job):
       self._data = data
     else:
       self._data = {
-          'id': None, 
+          'id': None,
           'uuid': None,
           'name': 'My Bundle',
           'coordinators': [],
@@ -1621,7 +1727,7 @@ class Bundle(Job):
 
   def to_json_for_html(self):
     return json.dumps(self.get_data_for_json(), cls=JSONEncoderForHTML)
- 
+
   @property
   def data(self):
     if type(self._data['properties']['kickoff']) == unicode:
@@ -1631,7 +1737,7 @@ class Bundle(Job):
       self._data['id'] = self.document.id
 
     return self._data
- 
+
   def to_xml(self, mapping=None):
     if mapping is None:
       mapping = {}
@@ -1643,26 +1749,26 @@ class Bundle(Job):
                 'bundle': self,
                 'mapping': mapping
            })))
-  
-  
-  @property      
+
+
+  @property
   def name(self):
     return self.data['name']
-  
-  @property      
+
+  @property
   def parameters(self):
-    return self.data['properties']['parameters']  
-  
+    return self.data['properties']['parameters']
+
   @property
   def kick_off_time_utc(self):
-    return utc_datetime_format(self.data['properties']['kickoff'])  
-  
+    return utc_datetime_format(self.data['properties']['kickoff'])
+
   def set_workspace(self, user):
     self.data['properties']['deployment_dir'] = Job.get_workspace(user)
-  
-  @property      
-  def deployment_dir(self):    
+
+  @property
+  def deployment_dir(self):
     return self.data['properties']['deployment_dir']
-  
+
   def find_parameters(self):
     return {}
