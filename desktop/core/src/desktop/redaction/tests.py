@@ -23,7 +23,7 @@ from desktop.redaction.engine import RedactionEngine, \
                                      parse_redaction_rules_from_string, \
                                      parse_redaction_rules_from_file
 from desktop.redaction.logfilter import add_log_redaction_filter_to_logger
-from nose.tools import assert_is, assert_equal, assert_not_equal
+from nose.tools import assert_true, assert_equal, assert_not_equal
 
 
 class MockLoggingHandler(logging.Handler):
@@ -56,7 +56,7 @@ class TestRedactionRule(object):
     rule = RedactionRule('password=', 'password=".*"', 'password="???"')
 
     message = 'message'
-    assert_is(rule.redact(message), message)
+    assert_true(rule.redact(message) is message)
 
   def test_equality(self):
     rule1 = RedactionRule('password=', 'password=".*"', 'password="???"')
