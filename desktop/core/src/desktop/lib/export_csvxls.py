@@ -21,7 +21,7 @@ import gc
 import logging
 import tablib
 
-from django.http import HttpResponse
+from django.http import StreamingHttpResponse
 from django.utils.encoding import smart_str
 from desktop.lib import i18n
 
@@ -88,11 +88,8 @@ def make_response(generator, format, name, encoding=None):
   else:
     raise Exception("Unknown format: %s" % format)
 
-  # FIXME: this should be replaced with StreamingHttpResponse when we upgrade
-  # to Django 1.5+.
-  resp = HttpResponse(generator, content_type=content_type)
+  resp = StreamingHttpResponse(generator, content_type=content_type)
   resp['Content-Disposition'] = 'attachment; filename=%s.%s' % (name, format)
-  resp.streaming = True
 
   try:
     del resp['Content-Length']

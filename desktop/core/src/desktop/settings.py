@@ -130,9 +130,7 @@ MIDDLEWARE_CLASSES = [
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
     'django.middleware.csrf.CsrfViewMiddleware',
 
-    # FIXME: we can switch back to the django version when we upgrade to 1.5+
-    #'django.middleware.http.ConditionalGetMiddleware',
-    'desktop.middleware.ConditionalGetMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
 ]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
