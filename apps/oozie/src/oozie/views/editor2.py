@@ -38,7 +38,7 @@ from liboozie.submission2 import Submission
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission
 from oozie.forms import ParameterForm
-from oozie.models import Workflow as OlfWorklow
+from oozie.models import Workflow as OlfWorklow, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
 from oozie.views.editor import edit_workflow as old_edit_workflow 
@@ -125,12 +125,17 @@ def delete_job(request):
   jobs = json.loads(request.POST.get('selection'))
 
   for job in jobs:
-    doc2 = Document2.objects.get(id=job['id'])
-    doc = doc2.doc.get()
-    doc.can_write_or_exception(request.user)
-    
-    doc.delete()
-    doc2.delete()
+    if job.get('uuid'):
+      doc2 = Document2.objects.get(id=job['id'])
+      doc = doc2.doc.get()
+      doc.can_write_or_exception(request.user)
+      
+      doc.delete()
+      doc2.delete()
+    else: # Old workflow version
+      job = Job.objects.can_read_or_exception(request, job['object_id'])
+      Job.objects.can_edit_or_exception(request, job)
+      OlfWorklow.objects.destroy(job, request.fs)      
 
   response = {}
   request.info(_('Document deleted.') if len(jobs) > 1 else _('Document deleted.'))

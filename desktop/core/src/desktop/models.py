@@ -507,6 +507,7 @@ class Document(models.Model):
       'uuid': None,
       'id': self.id,
       'doc1_id': self.id,
+      'object_id': self.object_id,
       'type': str(self.content_type),
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),

@@ -55,8 +55,8 @@
                   <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
 
                   % if ENABLE_V2.get():
-                    <li class="inline alert alert-warn" style="margin-left:20px; margin-bottom:0px">
-                     ${ _('This is the old editor, please migrate your workflows to the ') } <a style="display:inline" href="${url('oozie:list_editor_workflows')}">${ _('new editor.') }</a>
+                    <li class="inline alert alert-warn" style="margin-left:20px; margin-bottom:0px; margin-top:4px">
+                      ${ _('This is the old editor, please migrate your workflows to the ') } <a style="display:inline" href="${url('oozie:list_editor_workflows')}">${ _('new editor.') }</a>
                     </li>
                   % endif
                 % endif
