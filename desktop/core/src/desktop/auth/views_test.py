@@ -344,7 +344,7 @@ class TestLogin(object):
     client.get('/accounts/logout')
     # Login
     response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-    assert_true(any(["admin_wizard.mako" in _template.filename for _template in response.template]), response.content) # Go to superuser wizard
+    assert_true(any(["admin_wizard.mako" in _template.filename for _template in response.templates]), response.content) # Go to superuser wizard
 
   def test_login_expiration(self):
     """ Expiration test without superusers """

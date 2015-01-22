@@ -134,29 +134,29 @@ def test_skip_wizard():
   c = make_logged_in_client() # is_superuser
 
   response = c.get('/', follow=True)
-  assert_true(['admin_wizard.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
   c.cookies['hueLandingPage'] = 'home'
   response = c.get('/', follow=True)
-  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
   c.cookies['hueLandingPage'] = ''
   response = c.get('/', follow=True)
-  assert_true(['admin_wizard.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
 
   c = make_logged_in_client(username="test_skip_wizard", password="test_skip_wizard", is_superuser=False)
 
   response = c.get('/', follow=True)
-  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
   c.cookies['hueLandingPage'] = 'home'
   response = c.get('/', follow=True)
-  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
   c.cookies['hueLandingPage'] = ''
   response = c.get('/', follow=True)
-  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+  assert_true(['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
 
 def test_log_view():
   c = make_logged_in_client()
@@ -399,7 +399,7 @@ def test_error_handling():
     c.store_exc_info = store_exc_info
 
     response = c.get('/500_internal_error')
-    assert_true(any(["500.mako" in _template.filename for _template in response.template]))
+    assert_true(any(["500.mako" in _template.filename for _template in response.templates]))
     assert_true('Thank you for your patience' in response.content)
     assert_true(exc_msg not in response.content)
 
@@ -411,7 +411,7 @@ def test_error_handling():
 
     # PopupException
     response = c.get('/popup_exception')
-    assert_true(any(["popup_error.mako" in _template.filename for _template in response.template]))
+    assert_true(any(["popup_error.mako" in _template.filename for _template in response.templates]))
     assert_true(exc_msg in response.content)
   finally:
     # Restore the world
@@ -513,7 +513,7 @@ def test_404_handling():
   view_name = '/the-view-that-is-not-there'
   c = make_logged_in_client()
   response = c.get(view_name)
-  assert_true(any(['404.mako' in _template.filename for _template in response.template]), response.template)
+  assert_true(any(['404.mako' in _template.filename for _template in response.templates]), response.templates)
   assert_true('Not Found' in response.content)
   assert_true(view_name in response.content)
 
