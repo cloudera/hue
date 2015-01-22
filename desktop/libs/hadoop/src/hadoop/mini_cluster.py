@@ -155,7 +155,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "jar",
         hadoop.conf.HADOOP_TEST_JAR.get(),
         "minicluster",
-        "-writeConfig", tmppath("config.xml"), 
+        "-writeConfig", tmppath("config.xml"),
         "-writeDetails", tmppath("details.json"),
         "-datanodes", str(self.num_datanodes),
         "-tasktrackers", str(self.num_tasktrackers),
@@ -255,7 +255,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     # Parse the configuration using XPath and place into self.config.
     config = lxml.etree.parse(tmppath("config.xml"))
-    self.config = dict( (property.find("./name").text, property.find("./value").text) 
+    self.config = dict( (property.find("./name").text, property.find("./value").text)
       for property in config.xpath("/configuration/property"))
 
     # Write out Hadoop-style configuration directory, 
@@ -265,7 +265,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     hadoop.conf.HADOOP_CONF_DIR.set_for_testing(self.config_dir)
 
-    write_config(self.config, tmppath("conf/core-site.xml"), 
+    write_config(self.config, tmppath("conf/core-site.xml"),
       ["fs.defaultFS", "jobclient.completion.poll.interval",
        "dfs.namenode.checkpoint.period", "dfs.namenode.checkpoint.dir",
        'hadoop.proxyuser.'+self.superuser+'.groups', 'hadoop.proxyuser.'+self.superuser+'.hosts'])

@@ -93,9 +93,9 @@ class ParquetOptions(object):
 
 def index(request):
   # Redirect to home directory by default
-  path = request.user.get_home_directory()  
+  path = request.user.get_home_directory()
 
-  try: 
+  try:
     if not request.fs.isdir(path):
        path = '/'
   except Exception:
