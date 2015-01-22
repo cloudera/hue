@@ -72,7 +72,7 @@ class QueryHistory(models.Model):
   log_context = models.CharField(max_length=1024, null=True)
 
   server_host = models.CharField(max_length=128, help_text=_('Host of the query server.'), default='')
-  server_port = models.SmallIntegerField(help_text=_('Port of the query server.'), default=0)
+  server_port = models.PositiveIntegerField(help_text=_('Port of the query server.'), default=10000)
   server_name = models.CharField(max_length=128, help_text=_('Name of the query server.'), default='')
   server_type = models.CharField(max_length=128, help_text=_('Type of the query server.'), default=BEESWAX, choices=SERVER_TYPE)
   query_type = models.SmallIntegerField(help_text=_('Type of the query.'), default=HQL, choices=((HQL, 'HQL'), (IMPALA, 'IMPALA')))
