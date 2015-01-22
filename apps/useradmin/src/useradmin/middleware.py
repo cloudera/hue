@@ -52,5 +52,8 @@ class LdapSynchronizationMiddleware(object):
         connection = ldap_access.get_connection_from_server(next(LDAP.LDAP_SERVERS.__iter__()))
       else:
         connection = ldap_access.get_connection_from_server()
-      request.session[self.USER_CACHE_NAME] = import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False)
+
+      import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False)
+
+      request.session[self.USER_CACHE_NAME] = True
       request.session.modified = True
