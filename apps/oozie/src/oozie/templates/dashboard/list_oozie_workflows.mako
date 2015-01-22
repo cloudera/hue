@@ -433,6 +433,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   });
 
 </script>
+
 ${ utils.bulk_dashboard_functions() }
 
 ${ commonfooter(messages) | n,unicode }

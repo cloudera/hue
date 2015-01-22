@@ -29,10 +29,26 @@ var Coordinator = function (vm, coordinator) {
   self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
   self.workflowParameters = ko.mapping.fromJS(typeof coordinator.workflowParameters != "undefined" && coordinator.workflowParameters != null ? coordinator.workflowParameters : []);
 
-  self.properties.startDateUI = ko.observable(typeof coordinator.properties.start != "undefined" && coordinator.properties.start.indexOf("T") > -1 ? coordinator.properties.start.split("T")[0]:"");
-  self.properties.startTimeUI = ko.observable(typeof coordinator.properties.start != "undefined" && coordinator.properties.start.indexOf("T") > -1 ? coordinator.properties.start.split("T")[1]:"");
-  self.properties.endDateUI = ko.observable(typeof coordinator.properties.end != "undefined" && coordinator.properties.end.indexOf("T") > -1 ? coordinator.properties.end.split("T")[0]:"");
-  self.properties.endTimeUI = ko.observable(typeof coordinator.properties.end != "undefined" && coordinator.properties.end.indexOf("T") > -1 ? coordinator.properties.end.split("T")[1]:"");
+  
+  self._get_parameter = function(name) {
+    var _param = $.grep(self.properties.parameters(), function(param) {
+      return param.name() == name;
+    });
+
+    if (_param) {
+      return _param[0];
+    } else {
+      return null;
+    }
+  }
+  
+  self.start_date = self._get_parameter('start_date');
+  self.end_date = self._get_parameter('end_date');
+  
+  self.properties.startDateUI = ko.observable(typeof self.start_date.value() != "undefined" && self.start_date.value().indexOf("T") > -1 ? self.start_date.value().split("T")[0] : "");
+  self.properties.startTimeUI = ko.observable(typeof self.start_date.value() != "undefined" && self.start_date.value().indexOf("T") > -1 ? self.start_date.value().split("T")[1] : "");
+  self.properties.endDateUI = ko.observable(typeof self.end_date.value() != "undefined" && self.end_date.value().indexOf("T") > -1 ? self.end_date.value().split("T")[0] : "");
+  self.properties.endTimeUI = ko.observable(typeof self.end_date.value() != "undefined" && self.end_date.value().indexOf("T") > -1 ? self.end_date.value().split("T")[1] : "");
 
   self.properties.startDateUI.subscribe(function(newVal){
     self.setStartDate();
@@ -47,13 +63,13 @@ var Coordinator = function (vm, coordinator) {
     self.setEndDate();
   });
 
-
   self.setStartDate = function() {
-    self.properties.start(self.properties.startDateUI() + "T" + self.properties.startTimeUI());
+    self.start_date.value(self.properties.startDateUI() + "T" + self.properties.startTimeUI());
   }
   self.setEndDate = function() {
-    self.properties.end(self.properties.endDateUI() + "T" + self.properties.endTimeUI());
+    self.end_date.value(self.properties.endDateUI() + "T" + self.properties.endTimeUI());
   }
+  
 
   self.properties.workflow.subscribe(function(newVal) {
     if (newVal) {
