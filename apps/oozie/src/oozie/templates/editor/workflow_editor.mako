@@ -197,10 +197,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
     </div>
     
-<div class="inline alert alert-warn" style="margin-left:200px" data-bind="visible: $root.workflow.properties.imported">
-    ${ _('This workflow was imported from an old Hue version, save it to create a copy in the new format or') }
-    <a data-bind="attr: { href: '/oozie/edit_workflow/' + $root.workflow.properties.wf1_id() }">${ _('open it in the old editor.') }</a>
-  </div>    
+    <div class="inline alert alert-warn" style="margin-left:200px" data-bind="visible: $root.workflow.properties.imported">
+      ${ _('This workflow was imported from an old Hue version, save it to create a copy in the new format or') }
+      <a data-bind="attr: { href: '/oozie/edit_workflow/' + $root.workflow.properties.wf1_id() }">${ _('open it in the old editor.') }</a>
+    </div>    
   </form>
 </div>
 
