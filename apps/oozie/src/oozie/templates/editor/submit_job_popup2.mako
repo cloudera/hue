@@ -38,10 +38,10 @@
             ${ hidden | n,unicode }
           % endfor
 
-          <div class="control-group
-          % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
-                hide
-              % endif
+          <div class="control-group"
+            % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+                style="display: none"
+            % endif
           ">
             <label class="control-label">${ form['name'].form.initial.get('name') }</label>
             <div class="controls">

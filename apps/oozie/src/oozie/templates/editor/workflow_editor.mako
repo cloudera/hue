@@ -1786,7 +1786,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         </li>
         <!-- /ko -->
       </ul>
-      <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push({'name': '', 'value': ''}); }">
+      <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push(ko.mapping.fromJS({'name': '', 'value': ''})); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
       </a>
 
