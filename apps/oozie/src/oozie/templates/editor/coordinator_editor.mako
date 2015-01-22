@@ -76,6 +76,8 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   </div>
 
   <form class="form-search">
+    <span data-bind="visible: coordinator.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+
     <div class="inline object-name">
       <span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
@@ -123,7 +125,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
             <label class="control-label">${ _('Crontab') }</label>
             <div class="controls">
               <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency" name="cron_frequency"/>
-              <span class="help-inline"><a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.0.0/org/quartz/CronExpression.html" target="_blank">
+              <span class="help-inline"><a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
                 <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
               </span>
             </div>
