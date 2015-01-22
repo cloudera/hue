@@ -21,11 +21,11 @@ import os
 import posixpath
 import tarfile
 import tempfile
-from zipfile import ZipFile
 
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-
+from desktop.lib.exceptions_renderable import PopupException
 from django.utils.translation import ugettext as _
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from zipfile import ZipFile
 
 
 __all__ = ['archive_factory']
@@ -47,6 +47,10 @@ class Archive(object):
     Creates all directories passed at the given basepath.
     """
     for directory in dirs:
+      # Stops if directory start with '/' or points to a relative path
+      if os.path.isabs(directory) or '..' in directory:
+        raise IllegalPathException()
+
       directory = os.path.join(basepath, directory)
       try:
         os.makedirs(directory)
@@ -147,6 +151,12 @@ class TarballArchive(Archive):
         dirs.append(tarinfo.name)
       else:
         files.append(tarinfo.name)
+        parent = os.path.dirname(tarinfo.path)
+        # getmembers() sometimes doesn't return all the directories
+        # Go up the path one directory at the time
+        while parent != '' and parent not in dirs:
+          dirs.append(parent)
+          parent = os.path.dirname(parent)
     return (dirs, files)
 
   def _create_files(self, basepath, files=[]):
@@ -166,3 +176,8 @@ def archive_factory(path, archive_type='zip'):
     return ZipArchive(path)
   elif archive_type == 'tarball' or archive_type == 'tar.gz' or archive_type == 'tgz':
     return TarballArchive(path)
+
+class IllegalPathException(PopupException):
+
+  def __init__(self):
+    super(IllegalPathException, self).__init__('''Archive path cannot be absolute or contain '..' ''')
