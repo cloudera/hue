@@ -240,7 +240,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               
               &nbsp;&nbsp;
               
-              <input type="text" data-bind="value: dataset_variable, filechooser: dataset_variable" style="margin-bottom:0; width: 300px" class="filechooser-input" />
+              <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
+                dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' : 
+                dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' : 
+                '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
+                valueUpdate: 'afterkeydown'" style="margin-bottom:0; width: 380px" />
 
               <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
                 <i class="fa fa-minus"></i>
@@ -248,88 +252,111 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
 
+                <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
+                  <i class="fa fa-sliders"></i>
+                </a>
+                
+                <span style="padding-left:100px">
+                  <span data-bind="visible: dataset_variable().length == 0">
+                    e.g. /data/${'$'}{YEAR}/${'$'}{MONTH}/${'$'}{DAY}
+                  </span>
+                  <span data-bind="visible: dataset_variable().length > 0">
+                    ${ _('Will convert to') }
+                    <a href="/filebrowser/view">
+                    /user/hue/2015/01/01
+                    ## use start_date as the date
+                  </span>
+                  </a>
+                </span>
 
-            ## <div class="btn-group" data-toggle="buttons-radio">
-            ##   <a class="btn pointer" data-bind="css: {'active': coordinator.properties.frequency_unit() == 'hours'}, click: function(){ coordinator.properties.frequency_unit('hours') }">${ _('Hourly') }</a>
-            ##   <a class="btn pointer" data-bind="css: {'active': coordinator.properties.frequency_unit() == 'days'}, click: function(){ coordinator.properties.frequency_unit('days') }">${ _('Daily') }</a>
-            ##   <a class="btn pointer" data-bind="css: {'active': coordinator.properties.frequency_unit() == 'weeks'}, click: function(){ coordinator.properties.frequency_unit('weeks') }">${ _('Weekly') }</a>
-            ##   <a class="btn pointer" data-bind="css: {'active': coordinator.properties.frequency_unit() == 'months'}, click: function(){ coordinator.properties.frequency_unit('months') }">${ _('Monthly') }</a>
-            ## </div>
-
-              <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
-                <i class="fa fa-sliders"></i>
-              </a>
-
-              <div data-bind="visible: show_advanced" style="padding: 20px">
-
-                <form class="form-horizontal">
-                  <div class="control-group">
-                    <label class="control-label">${ _('Done flag') }</label>
-                    <div class="controls">
-                      <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag()?'9px':'-1px'}" />
-                      <input type="text" data-bind="value: done_flag, visible: use_done_flag"/>
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">${ _('Same start') }</label>
-                    <div class="controls">
-                      <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start()?'9px':'-1px'}" />
-                      <input type="text" data-bind="value: start, visible: ! same_start()"/>
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">${ _('Same timezone') }</label>
-                    <div class="controls">
-                      <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone()?'5px':'0'}" />
-                      <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone()" style="width: 180px"></select>
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">${ _('Instance') }</label>
-                    <div class="controls">
-                      <div class="btn-group" data-toggle="buttons-radio">
-                        <button id="default-btn" type="button" class="btn"
-                                data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
-                          ${ _('Default') }
-                        </button>
-                        <button id="single-btn" type="button" class="btn"
-                                data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
-                          ${ _('Single') }
-                        </button>
-                        <button id="range-btn" type="button" class="btn"
-                                data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
-                          ${ _('Range') }
-                        </button>
+                <div data-bind="visible: show_advanced" style="padding: 20px">
+                  <form class="form-horizontal">
+                    <div class="control-group">
+                      <label class="control-label">${ _('Done flag') }</label>
+                      <div class="controls">
+                        <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag()?'9px':'-1px'}" />
+                        <input type="text" data-bind="value: done_flag, visible: use_done_flag"/>
                       </div>
                     </div>
-                  </div>
-                  <div class="control-group" data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
-                    <label class="control-label">${ _('Start') }</label>
-                    <div class="controls">
-                      <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
-                      <label style="display: inline">
-                          &nbsp;
-                          <input type="checkbox" data-bind="checked: is_advanced_start_instance" style="margin-top:0">
-                          ${ _('(advanced)') }
-                        </label>
-                        <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"/>
+                    <div class="control-group">
+                      <label class="control-label">${ _('Same frequency') }</label>
+                      <div class="controls">
+                        <input type="checkbox" data-bind="checked: same_frequency, style: {'margin-top': same_frequency() ? '5px' : '0'}" />
+                        <span data-bind="visible: ! same_frequency()">
+                          ${ _('Every') }
+                        </span>
+                        <select data-bind="value: frequency_number, visible: ! same_frequency()" style="width: 50px">
+                          % for i in xrange(0, 60):
+                          <option value="${ i }">${ i }</option>
+                          % endfor
+                        </select>
+                        <select data-bind="value: frequency_unit, visible: ! same_frequency()" style="width: 100px">
+                          <option value="minutes">Minutes</option>
+                          <option value="hours">Hours</option>
+                          <option value="days" selected="selected">Days</option>
+                          <option value="months">Months</option>
+                        </select>
+                      </div>
+                    </div>                  
+                    <div class="control-group">
+                      <label class="control-label">${ _('Same start') }</label>
+                      <div class="controls">
+                        <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start()?'9px':'-1px'}" />
+                        <input type="text" data-bind="value: start, visible: ! same_start()"/>
+                      </div>
+                    </div>                  
+                    <div class="control-group">
+                      <label class="control-label">${ _('Same timezone') }</label>
+                      <div class="controls">
+                        <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone()?'5px':'0'}" />
+                        <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone()" style="width: 180px"></select>
+                      </div>
                     </div>
-                  </div>
-                  <div class="control-group" data-bind="visible: instance_choice() == 'range'">
-                    <label class="control-label">${ _('End') }</label>
-                    <div class="controls">
-                      <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
-                      <label style="display: inline">
-                          &nbsp;
-                          <input type="checkbox" data-bind="checked: is_advanced_end_instance" style="margin-top:0">
-                          ${ _('(advanced)') }
-                        </label>
-                        <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"/>
+                    <div class="control-group">
+                      <label class="control-label">${ _('Instance') }</label>
+                      <div class="controls">
+                        <div class="btn-group" data-toggle="buttons-radio">
+                          <button id="default-btn" type="button" class="btn"
+                                  data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
+                            ${ _('Default') }
+                          </button>
+                          <button id="single-btn" type="button" class="btn"
+                                  data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
+                            ${ _('Single') }
+                          </button>
+                          <button id="range-btn" type="button" class="btn"
+                                  data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
+                            ${ _('Range') }
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </form>
-
-              </div>
+                    <div class="control-group" data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
+                      <label class="control-label">${ _('Start') }</label>
+                      <div class="controls">
+                        <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
+                        <label style="display: inline">
+                            &nbsp;
+                            <input type="checkbox" data-bind="checked: is_advanced_start_instance" style="margin-top:0">
+                            ${ _('(advanced)') }
+                          </label>
+                          <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"/>
+                      </div>
+                    </div>
+                    <div class="control-group" data-bind="visible: instance_choice() == 'range'">
+                      <label class="control-label">${ _('End') }</label>
+                      <div class="controls">
+                        <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
+                        <label style="display: inline">
+                            &nbsp;
+                            <input type="checkbox" data-bind="checked: is_advanced_end_instance" style="margin-top:0">
+                            ${ _('(advanced)') }
+                          </label>
+                          <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"/>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               <!-- /ko -->
             </li>
           </ul>
@@ -403,16 +430,20 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       </a>
 
       <h4>${ _('Timeout') }</h4>
-      <input data-bind="value: coordinator.properties.timeout"/>
+      <input data-bind="value: coordinator.properties.timeout" type="number"/>
 
       <h4>${ _('Concurrency') }</h4>
-      <input data-bind="value: coordinator.properties.concurrency"/>
-
+      <select data-bind="options: availableSettings, optionsCaption: '${ _("Default") }', value: coordinator.properties.concurrency"></select>
+      
       <h4>${ _('Execution') }</h4>
-      <input data-bind="value: coordinator.properties.execution"/>
+      <select data-bind="value: coordinator.properties.execution">
+		<option value="FIFO">${ _("FIFO (oldest first)") }</option>
+		<option value="LIFO">${ _("LIFO (newest first)") }</option>
+		<option value="LAST_ONLY">${ _("LAST_ONLY (discards all older materializations)") }</option>
+      </select>
 
       <h4>${ _('Throttle') }</h4>
-      <input data-bind="value: coordinator.properties.throttle"/>
+      <select data-bind="options: availableSettings, optionsCaption: '${ _("Default") }', value: coordinator.properties.throttle"></select>
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.coordinator.properties">
@@ -522,6 +553,10 @@ ${ dashboard.import_bindings() }
   $(document).ready(function() {
     $("#chooseWorkflowDemiModal").modal({
       show: false
+    });
+    
+    $(".dataset-input").typeahead({
+      source: ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
     });
   });
 </script>

@@ -79,9 +79,9 @@ class Workflow(Job):
   PROPERTY_APP_PATH = 'oozie.wf.application.path'
   SLA_DEFAULT = [
       {'key': 'enabled', 'value': False},
-      {'key': 'nominal-time', 'value': ''},
+      {'key': 'nominal-time', 'value': '${nominal_time}'},
       {'key': 'should-start', 'value': ''},
-      {'key': 'should-end', 'value': ''},
+      {'key': 'should-end', 'value': '${30 * MINUTES}'},
       {'key': 'max-duration', 'value': ''},
       {'key': 'alert-events', 'value': ''},
       {'key': 'alert-contact', 'value': ''},
