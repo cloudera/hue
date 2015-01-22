@@ -240,6 +240,10 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               
               <input type="text" data-bind="value: dataset_variable, filechooser: dataset_variable" style="margin-bottom:0; width: 300px" class="filechooser-input" />
 
+              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
+                <i class="fa fa-minus"></i>
+              </a>
+
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
 
 
@@ -252,10 +256,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
               <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
                 <i class="fa fa-sliders"></i>
-              </a>
-
-              <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
-                <i class="fa fa-minus"></i>
               </a>
 
               <div data-bind="visible: show_advanced" style="padding: 20px">

@@ -197,10 +197,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
     </div>
     
-    <div class="inline alert alert-warn" style="margin-left:200px" data-bind="visible: $root.workflow.properties.imported">
+    <!-- ko if: $root.workflow.properties.imported -->
+    <div class="inline alert alert-warn" style="margin-left:100px">
       ${ _('This workflow was imported from an old Hue version, save it to create a copy in the new format or') }
       <a data-bind="attr: { href: '/oozie/edit_workflow/' + $root.workflow.properties.wf1_id() }">${ _('open it in the old editor.') }</a>
-    </div>    
+    </div>
+    <!-- /ko -->
   </form>
 </div>
 
@@ -456,7 +458,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
       <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" 
-        data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
+        data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>
+                <br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
                 <br/>
                 ${"${"} hadoop:counters('secondjob')[RECORDS][REDUCE_OUT] lt 1000000 }
                 <br/>
@@ -477,7 +480,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
           </a>
         </li>
       </ul>
-      <a class="pointer" data-bind="click: function(){ children.push({'to': '', 'condition': ''});}">
+      <a class="pointer" data-bind="click: function(){ children.push({'to': '', 'condition': '${'${'} 1 gt 0 }'});}">
         ${ _('Jump to another node') } <i class="fa fa-plus"></i>
       </a>
     </div>
