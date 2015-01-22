@@ -16,6 +16,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from oozie.conf import ENABLE_V2
 %>
 
 <%namespace name="utils" file="utils.inc.mako" />
@@ -52,6 +53,12 @@
                   <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
                   <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
                   <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
+
+                  % if ENABLE_V2.get():
+                    <li class="inline alert alert-warn" style="margin-left:20px; margin-bottom:0px">
+                     ${ _('This is the old editor, please migrate your workflows to the ') } <a style="display:inline" href="${url('oozie:list_editor_workflows')}">${ _('new editor.') }</a>
+                    </li>
+                  % endif
                 % endif
               % endif
             </ul>
