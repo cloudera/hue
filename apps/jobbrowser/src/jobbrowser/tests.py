@@ -412,10 +412,12 @@ class TestMapReduce2NoHadoop:
 
   def test_jobs(self):
     response = self.c.get('/jobbrowser/?format=json')
-    assert_equal(len(json.loads(response.content)), 2)
+    response_content = json.loads(response.content)
+    assert_equal(len(response_content['jobs']), 2)
 
     response = self.c.get('/jobbrowser/jobs/?format=json&text=W=MapReduce-copy2')
-    assert_equal(len(json.loads(response.content)), 1)
+    response_content = json.loads(response.content)
+    assert_equal(len(response_content['jobs']), 1)
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')

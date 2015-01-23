@@ -107,7 +107,9 @@ def jobs(request):
         raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
       else:
         raise ex
-    json_jobs  = [massage_job_for_json(job, request) for job in jobs]
+    json_jobs = {
+      'jobs': [massage_job_for_json(job, request) for job in jobs],
+    }
     return JsonResponse(json_jobs, encoder=JSONEncoderForHTML)
 
   return render('jobs.mako', request, {
