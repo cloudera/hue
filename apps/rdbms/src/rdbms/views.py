@@ -121,6 +121,7 @@ def save_design(request, save_form, query_form, type_, design, explicit_save=Fal
       design.name = beeswax_models.SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.is_auto = True
 
+  design.name = design.name[:64]
   design.type = type_
   design.data = new_data
 
