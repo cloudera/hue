@@ -28,7 +28,7 @@ from nose.tools import assert_true, assert_equal, assert_not_equal
 
 class MockLoggingHandler(logging.Handler):
   def __init__(self, *args, **kwargs):
-    super(MockLoggingHandler, self).__init__(*args, **kwargs)
+    logging.Handler.__init__(self, *args, **kwargs)
 
     self.records = []
 
