@@ -21,6 +21,8 @@ set -e
 
 export LIVY_HOME=$(dirname $0)
 
+cd $LIVY_HOME/java
+
 exec java \
 	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 \
 	-cp "livy-server/target/lib/*:livy-server/target/livy-server-3.7.0-SNAPSHOT.jar" \
