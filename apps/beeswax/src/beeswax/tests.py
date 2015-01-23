@@ -2099,6 +2099,26 @@ class TestWithMockedServer(object):
     assert_equal('test_save_design desc', saved_design.doc.get().description)
     assert_false(saved_design.doc.get().is_historic())
 
+    # Save design with len(name) = 64
+    response = _make_query(self.client, 'SELECT', submission_type='Save',
+                name='test_character_limit', desc='test_character_limit desc')
+    content = json.loads(response.content)
+    design_id = content['design_id']
+
+    design = SavedQuery.objects.get(id=design_id)
+    design_obj = hql_query('SELECT')
+
+    # Save query
+    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj,
+                                explicit_save=True, name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc')
+    len_after = len(saved_design.name)
+    assert_equal(len_after, 64)
+    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj,
+                                explicit_save=False, name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc')
+    # Above design name is already 64 characters, so saved_design name shouldn't exceed the limit
+    len_after = len(saved_design.name)
+    assert_equal(len_after, 64)
+
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
     sql_escaped = 'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'

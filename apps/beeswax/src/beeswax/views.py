@@ -121,6 +121,7 @@ def _save_design(user, design, type_, design_obj, explicit_save, name=None, desc
       design.name = models.SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.is_auto = True
 
+  design.name = design.name[:64]
   design.type = type_
   design.data = new_data
 
