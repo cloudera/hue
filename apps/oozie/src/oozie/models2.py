@@ -1490,11 +1490,13 @@ class Coordinator(Job):
   def get_data_for_json(self):
     _data = self.data.copy()
 
-    if type(self._data['properties']['start']) == datetime:
-      _data['properties']['start'] = _data['properties']['start'].strftime('%Y-%m-%dT%H:%M:%S')
+    start_date = filter(lambda a: a['name'] == 'start_date', self._data['properties']['parameters'])
+    if start_date and type(start_date[0]['value']) == datetime:
+      start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
-    if type(self._data['properties']['end']) == datetime:
-      _data['properties']['end'] = _data['properties']['end'].strftime('%Y-%m-%dT%H:%M:%S')
+    end_date = filter(lambda a: a['name'] == 'end_date', self._data['properties']['parameters'])
+    if end_date and type(end_date[0]['value']) == datetime:
+      end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return _data
 
@@ -1582,11 +1584,11 @@ class Coordinator(Job):
 
   @property
   def start_utc(self):
-    return utc_datetime_format(self.data['properties']['start'])
+    return self.data['properties']['start']
 
   @property
   def end_utc(self):
-    return utc_datetime_format(self.data['properties']['end'])
+    return self.data['properties']['end']
 
   @property
   def frequency(self):
@@ -1622,7 +1624,7 @@ class Coordinator(Job):
   @property
   def properties(self):
     props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
-    props += self.data['properties']['properties']
+    props += self.data['properties']['parameters']
     return props
 
 
