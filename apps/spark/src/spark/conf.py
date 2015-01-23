@@ -52,7 +52,7 @@ SPARK_SERVER_BIN = Config(
   key="spark_server_bin",
   help=_t("Path to spark_server.sh"),
   private=True,
-  default=os.path.join(os.path.dirname(__file__), "..", "..", "spark_server.sh"))
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "livy-server"))
 
 
 def get_spark_status(user):
