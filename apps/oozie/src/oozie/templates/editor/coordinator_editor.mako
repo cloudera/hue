@@ -154,7 +154,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               </div>
 
               <div class="control-group">
-                <label class="control-label">${ _('Starts on') }</label>
+                <label class="control-label">${ _('From') }</label>
                 <div class="controls">
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="input-small" data-bind="value: coordinator.properties.startDateUI, datepicker: {}" />
@@ -166,7 +166,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label">${ _('Ends on') }</label>
+                <label class="control-label">${ _('To') }</label>
                 <div class="controls">
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="input-small" data-bind="value: coordinator.properties.endDateUI, datepicker: {}" />
