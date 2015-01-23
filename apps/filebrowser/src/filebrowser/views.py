@@ -700,17 +700,21 @@ def _read_avro(fhandle, path, offset, length, stats):
     try:
         fhandle.seek(offset)
         data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
-        contents_list = []
-        read_start = fhandle.tell()
-        # Iterate over the entire sought file.
-        for datum in data_file_reader:
-            read_length = fhandle.tell() - read_start
-            if read_length > length and len(contents_list) > 0:
-                break
-            else:
-                datum_str = str(datum) + "\n"
-                contents_list.append(datum_str)
-        data_file_reader.close()
+
+        try:
+            contents_list = []
+            read_start = fhandle.tell()
+            # Iterate over the entire sought file.
+            for datum in data_file_reader:
+                read_length = fhandle.tell() - read_start
+                if read_length > length and len(contents_list) > 0:
+                    break
+                else:
+                    datum_str = str(datum) + "\n"
+                    contents_list.append(datum_str)
+        finally:
+            data_file_reader.close()
+
         contents = "".join(contents_list)
     except:
         logging.warn("Could not read avro file at %s" % path, exc_info=True)
