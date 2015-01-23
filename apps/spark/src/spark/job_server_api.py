@@ -81,11 +81,15 @@ class JobServerApi(object):
       self._thread_local.user = user
 
   def create_session(self, **kwargs):
-    return self._root.post('sessions', params=kwargs)
+    return self._root.post('sessions',
+        data=json.dumps(kwargs),
+        contenttype='application/json')
 
   def submit_statement(self, uuid, statement):
     data = {'statement': statement}
-    return self._root.post('sessions/%s' % uuid, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    return self._root.post('sessions/%s' % uuid,
+        data=json.dumps(data),
+        contenttype=_JSON_CONTENT_TYPE)
 
   def fetch_data(self, session, cell):
     return self._root.get('sessions/%s/cells/%s' % (session, cell))

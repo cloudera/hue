@@ -32,7 +32,7 @@ def coerce_json(j):
 JOB_SERVER_URL = Config(
   key="server_url",
   help=_t("URL of the Spark Job Server."),
-  default="http://localhost:8080/"
+  default="http://localhost:8998/"
 )
 
 LANGUAGES = Config(
