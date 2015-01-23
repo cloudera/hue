@@ -37,7 +37,13 @@ from django.utils.translation import ugettext as _
       % for i, row in enumerate(sample):
       <tr>
         % for item in row:
-        <td>${ smart_unicode(item, errors='ignore') }</td>
+        <td>
+          % if item is None:
+            NULL
+          % else:
+            ${ escape(smart_unicode(item, errors='ignore')).replace(' ', '&nbsp;') | n,unicode }
+          % endif
+        </td>
         % endfor
       </tr>
       % endfor
