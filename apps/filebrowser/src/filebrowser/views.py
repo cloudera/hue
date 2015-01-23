@@ -1241,7 +1241,6 @@ def _upload_archive(request):
                 # Move the file to where it belongs
                 dest = dest[:-4]
             elif dest.lower().endswith('.tar.gz') or dest.lower().endswith('.tgz'):
-                print uploaded_file
                 temp_path = archive_factory(uploaded_file, 'tgz').extract()
                 if not temp_path:
                     raise PopupException(_('Could not extract contents of file.'))
