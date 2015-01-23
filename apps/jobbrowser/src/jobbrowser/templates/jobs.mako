@@ -166,11 +166,11 @@ ${ components.menubar() }
     var updateableRows = {};
 
     function updateRunning(data) {
-      if (data != null && data.length > 0) {
+      if (data != null && data.jobs != null && data.jobs.length > 0) {
         // Update finished jobs from updateableRows.
         // jobs missing from response are finished.
         $.each(updateableRows, function(job_id, job) {
-          if ($.grep(data, function(new_job) {
+          if ($.grep(data.jobs, function(new_job) {
             return new_job.shortId == job_id;
           }).length == 0 ) {
             callJobDetails(job, true);
@@ -180,8 +180,8 @@ ${ components.menubar() }
 
         // Find new jobs and running jobs.
         // Update updateableRows.
-        for(var i = 0; i < data.length; ++i) {
-          var job = data[i];
+        for(var i = 0; i < data.jobs.length; ++i) {
+          var job = data.jobs[i];
           if (Utils.RUNNING_ARRAY.indexOf(job.status.toUpperCase()) > -1) {
             updateableRows[job.shortId] = job;
 
