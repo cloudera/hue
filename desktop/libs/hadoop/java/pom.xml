@@ -24,7 +24,7 @@
     <groupId>com.cloudera.hue</groupId>
     <artifactId>hue-parent</artifactId>
     <relativePath>../../../../maven/pom.xml</relativePath>
-    <version>3.7.0-cdh5.3.0</version>
+    <version>3.7.0-cdh5.3.1</version>
   </parent>
 
   <groupId>com.cloudera.hue</groupId>
