@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd `dirname $0`
-
-exec java \
-	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006 \
-	-cp "java/livy-repl/target/lib/*:java/livy-repl/target/livy-repl-3.7.0-SNAPSHOT.jar" \
-	com.cloudera.hue.livy.repl.Main -usejavacp "$@" 2>/dev/null

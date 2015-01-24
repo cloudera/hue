@@ -6,7 +6,7 @@ import scala.io.Source
 
 object SparkProcessSession {
   val LIVY_HOME = System.getenv("LIVY_HOME")
-  val SPARK_SHELL = LIVY_HOME + "/spark-shell"
+  val SPARK_SHELL = LIVY_HOME + "/bin/spark-shell"
 
   def create(id: String): Session = {
     val (process, port) = startProcess()
