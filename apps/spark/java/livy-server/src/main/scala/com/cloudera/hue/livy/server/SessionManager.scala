@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server
 
+import com.cloudera.hue.livy.Logging
+
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
@@ -12,7 +14,7 @@ object SessionManager {
   val GC_PERIOD = 1000 * 60 * 60
 }
 
-class SessionManager(factory: SessionFactory) {
+class SessionManager(factory: SessionFactory) extends Logging {
 
   private implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
@@ -30,11 +32,12 @@ class SessionManager(factory: SessionFactory) {
   }
 
   def createSparkSession(): Future[Session] = {
-    val session = factory.createSparkSession
+    val session = factory.createSparkSession()
 
     session.map({ case(session: Session) =>
-        sessions.put(session.id, session)
-        session
+      info("created session %s" format session.id)
+      sessions.put(session.id, session)
+      session
     })
   }
 
