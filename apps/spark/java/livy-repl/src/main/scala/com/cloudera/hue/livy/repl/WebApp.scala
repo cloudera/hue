@@ -2,7 +2,8 @@ package com.cloudera.hue.livy.repl
 
 import akka.util.Timeout
 import com.cloudera.hue.livy.ExecuteRequest
-import org.json4s.{DefaultFormats, Formats}
+import com.fasterxml.jackson.core.JsonParseException
+import org.json4s.{MappingException, DefaultFormats, Formats}
 import org.scalatra.json._
 import org.scalatra.{Accepted, AsyncResult, FutureSupport, ScalatraServlet}
 
@@ -53,5 +54,11 @@ class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureS
       System.exit(0)
     }
     Accepted()
+  }
+
+  error {
+    case e: JsonParseException => halt(400, e.getMessage)
+    case e: MappingException => halt(400, e.getMessage)
+    case t => throw t
   }
 }

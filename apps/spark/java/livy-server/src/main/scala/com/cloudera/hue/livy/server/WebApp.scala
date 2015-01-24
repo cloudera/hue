@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server
 
-import org.json4s.{DefaultFormats, Formats}
+import com.fasterxml.jackson.core.JsonParseException
+import org.json4s.{MappingException, DefaultFormats, Formats}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
@@ -85,5 +86,11 @@ class WebApp(sessionManager: SessionManager)
         new AsyncResult() { val is = statement }
       case None => NotFound("Session not found")
     }
+  }
+
+  error {
+    case e: JsonParseException => halt(400, e.getMessage)
+    case e: MappingException => halt(400, e.getMessage)
+    case t => throw t
   }
 }
