@@ -1,11 +1,12 @@
 package com.cloudera.hue.livy.server
 
 import com.fasterxml.jackson.core.JsonParseException
-import org.json4s.{MappingException, DefaultFormats, Formats}
+import org.json4s.{DefaultFormats, Formats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor}
 
 object WebApp {
   case class CreateSessionRequest(lang: String)
@@ -40,32 +41,40 @@ class WebApp(sessionManager: SessionManager)
       case lang => halt(400, "unsupported language: " + lang)
     }
 
-    val rep = for {
-      session <- sessionFuture
-    } yield redirect(url(getSession, "sessionId" -> session.id))
+    val rep = sessionFuture.map {
+      case session => Map("id" -> session.id, "state" -> session.state)
+    }
 
-    new AsyncResult { val is = rep }
+    // FIXME: this is silently eating exceptions.
+    //new AsyncResult { val is = rep }
+    Await.result(rep, Duration.Inf)
   }
 
   val getStatements = get("/sessions/:sessionId/statements") {
     sessionManager.get(params("sessionId")) match {
       case Some(session: Session) =>
         val statements = session.statements()
-        new AsyncResult() { val is = statements }
+
+        // FIXME: this is silently eating exceptions.
+        //new AsyncResult() { val is = statements }
+        Await.result(statements, Duration.Inf)
       case None => NotFound("Session not found")
     }
   }
 
   val getSession = get("/sessions/:sessionId") {
-    redirect(url(getStatements, "sessionId" -> params("sessionId")))
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) => Map("id" -> session.id, "state" -> session.state)
+      case None => NotFound("Session not found")
+    }
   }
 
   delete("/sessions/:sessionId") {
-    new AsyncResult() {
-      val is = for {
-      _ <- sessionManager.close(params("sessionId"))
-      } yield NoContent
-    }
+    val future = sessionManager.close(params("sessionId"))
+
+    // FIXME: this is silently eating exceptions.
+    //new AsyncResult() { val is = for { _ <- future } yield NoContent }
+    Await.result(future, Duration.Inf)
   }
 
   post("/sessions/:sessionId/statements") {
@@ -74,7 +83,10 @@ class WebApp(sessionManager: SessionManager)
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         val statement = session.executeStatement(req.statement)
-        new AsyncResult() { val is = statement }
+
+        // FIXME: this is silently eating exceptions.
+        //new AsyncResult() { val is = statement }
+        Await.result(statement, Duration.Inf)
       case None => NotFound("Session not found")
     }
   }
@@ -83,7 +95,10 @@ class WebApp(sessionManager: SessionManager)
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         val statement = session.statement(params("statementId").toInt)
-        new AsyncResult() { val is = statement }
+
+        // FIXME: this is silently eating exceptions.
+        //new AsyncResult() { val is = statement }
+        Await.result(statement, Duration.Inf)
       case None => NotFound("Session not found")
     }
   }
@@ -91,6 +106,7 @@ class WebApp(sessionManager: SessionManager)
   error {
     case e: JsonParseException => halt(400, e.getMessage)
     case e: MappingException => halt(400, e.getMessage)
+    case e: SessionFailedtoStart => halt(500, e.getMessage)
     case t => throw t
   }
 }

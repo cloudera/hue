@@ -28,3 +28,5 @@ trait Session {
 
   def close(): Future[Unit]
 }
+
+class SessionFailedtoStart(msg: String) extends Exception(msg) {}

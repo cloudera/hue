@@ -1,10 +1,14 @@
 package com.cloudera.hue.livy.server
 
+import java.lang.ProcessBuilder.Redirect
+
+import com.cloudera.hue.livy.Logging
+
 import scala.annotation.tailrec
 import scala.concurrent.Future
 import scala.io.Source
 
-object SparkProcessSession {
+object SparkProcessSession extends Logging {
   val LIVY_HOME = System.getenv("LIVY_HOME")
   val SPARK_SHELL = LIVY_HOME + "/bin/spark-shell"
 
@@ -21,6 +25,8 @@ object SparkProcessSession {
     def parsePort(lines: Iterator[String]): Option[Int] = {
       if (lines.hasNext) {
         val line = lines.next()
+        info("shell output: %s" format line)
+
         line match {
           case regex(port_) => Some(port_.toInt)
           case _ => parsePort(lines)
@@ -33,6 +39,7 @@ object SparkProcessSession {
     def startProcess(): (Process, Int) = {
       val pb = new ProcessBuilder(SPARK_SHELL)
       pb.environment().put("PORT", "0")
+      pb.redirectError(Redirect.INHERIT)
       val process = pb.start()
 
       val source = Source.fromInputStream(process.getInputStream)
@@ -47,7 +54,7 @@ object SparkProcessSession {
         case None =>
           // Make sure to reap the process.
           process.waitFor()
-          throw new Exception("Couldn't start livy-repl")
+          throw new SessionFailedtoStart("Couldn't start livy-repl")
       }
     }
 
