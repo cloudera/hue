@@ -48,14 +48,14 @@ class ScalatraBootstrap extends LifeCycle {
   var sessionManager: SessionManager = null
 
   override def init(context: ServletContext): Unit = {
-    context.mount(new WebApp(sessionManager), "/*")
-
     val sessionFactory = context.getInitParameter(Main.SESSION_KIND) match {
       case Main.PROCESS_SESSION => new ProcessSessionFactory
       case Main.YARN_SESSION => new YarnSessionFactory
     }
 
     sessionManager = new SessionManager(sessionFactory)
+
+    context.mount(new WebApp(sessionManager), "/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
