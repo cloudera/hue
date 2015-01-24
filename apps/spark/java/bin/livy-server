@@ -19,11 +19,9 @@
 
 set -e
 
-export LIVY_HOME=$(dirname $0)
-
-cd $LIVY_HOME/java
+export LIVY_HOME=$(cd $(dirname $0)/.. && pwd)
 
 exec java \
 	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 \
-	-cp "livy-server/target/lib/*:livy-server/target/livy-server-3.7.0-SNAPSHOT.jar" \
+	-cp "$LIVY_HOME/livy-server/target/lib/*:$LIVY_HOME/livy-server/target/livy-server-3.7.0-SNAPSHOT.jar" \
 	com.cloudera.hue.livy.server.Main "$@"
