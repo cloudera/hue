@@ -39,10 +39,14 @@ def editor(request):
   })
 
 
-def list_notebooks(request):
+def new(request):
+  return editor(request)
+  
+
+def notebooks(request):
   notebooks = Document2.objects.filter(type='notebook', owner=request.user)
 
-  return render('list_notebooks.mako', request, {
+  return render('notebooks.mako', request, {
       'notebooks': notebooks
   })
 
