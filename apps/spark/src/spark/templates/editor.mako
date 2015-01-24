@@ -112,16 +112,23 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           data-bind="click: saveNotebook, css: {'btn': true}">
         <i class="fa fa-save"></i>
       </button>
+      
       &nbsp;&nbsp;&nbsp;
+      
       <button type="button" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
           data-bind="click: newNotebook, css: {'btn': true}">
         <i class="fa fa-file-o"></i>
       </button>
+      
+      <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <i class="fa fa-file-o"></i>
+      </a>
+            
       <button type="button" title="${ _('Open') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
           data-bind="click: newNotebook, css: {'btn': true}">
         <i class="fa fa-folder-open-o"></i>
       </button>      
-      <a class="btn" href="${ url('spark:list_notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
         <i class="fa fa-terminal"></i>
       </a>
     % endif
@@ -232,7 +239,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
         </textarea>
         <div class="overlay">
-          <select data-bind="options: availableSnippets, value: selectedSnippet"></select>
+          <select data-bind="options: availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'"></select>
           <i class="fa fa-plus-circle" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
         </div>
       </div>
@@ -302,7 +309,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
               </div>
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
-            <a href="javascript:void(0)" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
+            <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
             <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
             <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -321,40 +328,55 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
               <i class="fa fa-caret-down"></i>
             </button>
             <ul class="dropdown-menu">
-              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}</a>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+                  <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+                </a>
               </li>
-              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-                <i class="hcha hcha-line-chart"></i> ${_('Lines')}</a>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+                  <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+                </a>
               </li>
-              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}</a>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                  <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+                </a>
               </li>
-              <li><a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-                <i class="hcha hcha-map-chart"></i> ${_('Map')}</a>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                  <i class="hcha hcha-map-chart"></i> ${_('Map')}
+                </a>
               </li>
             </ul>
           </div>
 
           <div class="pull-right">
-            <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Logs') }">
+            <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
               <i class="fa fa-file-text-o"></i>
             </a>
             &nbsp;
-            <a data-bind="visible: status() == 'available', click: function() { $data.showDownload(! $data.showDownload()); }" href="javascript:void(0)" class="btn" title="${ _('Logs') }">
-              <i class="fa fa-download"></i>
-            </a>
-
-            <span data-bind="visible: showDownload() && result.hasSomeResults()">
-              <form method="POST" action="${ url('spark:download') }">
-                ${ csrf_token(request) | n,unicode }
-                <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
-                <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
-
-                <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
-                <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
-              </form>
-            </span>
+            
+            <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults()">
+              <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-download"></i>
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <form method="POST" action="${ url('spark:download') }">
+                  ${ csrf_token(request) | n,unicode }
+                  <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
+                  <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
+                  <input type="number" value="1000"/>
+                  <li>
+                    <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
+                  </li>
+                  <li>
+                    <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
+                  </li>
+                </form>
+              </ul>            
+            </div>
           </div>
         </div>
 
@@ -377,19 +399,20 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
         <div class="row-fluid" data-bind="visible: result.hasSomeResults() && showGrid()" style="max-height: 400px; margin-top: 4px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
-            <a title="${_('Toggle columns')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
+            <a title="${_('Hide')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
               <i class="fa fa-chevron-left"></i>
             </a>
 
-            <ul class="nav nav-list" style="border: none; background-color: #FFF">
-              <li class="nav-header">${_('columns')}</li>
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">              
+              <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
+              </a>
             </ul>
             <ul class="unstyled" data-bind="foreach: result.meta">
               <li data-bind="visible: name != ''"><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
             </ul>
           </div>
           <div data-bind="css:{'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
-            <a title="${_('Toggle columns')}" class="pointer" style="position:absolute; margin-left: -10px; margin-top: 10px" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
+            <a title="${_('Show columns')}" class="pointer" style="position:absolute; margin-left: -15px; margin-top: 10px" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
               <i class="fa fa-chevron-right"></i>
             </a>
             <div data-bind="css: resultsKlass">
@@ -407,9 +430,9 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         </div>
 
         <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showChart()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
 
-            <a title="${_('Toggle settings')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
+            <a title="${_('Hide')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
               <i class="fa fa-chevron-left"></i>
             </a>
 
@@ -478,9 +501,9 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
               <ul class="dropdown-menu">
-              <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
-              <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
-              <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
+              <li><a data-edit="fontSize 5"><font size="5">${ _("Huge") }</font></a></li>
+              <li><a data-edit="fontSize 3"><font size="3">${ _("Normal") }</font></a></li>
+              <li><a data-edit="fontSize 1"><font size="1">${ _("Small") }</font></a></li>
               </ul>
           </div>
           <div class="btn-group">

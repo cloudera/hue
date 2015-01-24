@@ -131,7 +131,6 @@ var Snippet = function (notebook, snippet) {
   self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
-  self.showDownload = ko.observable(typeof snippet.showDownload != "undefined" && snippet.showDownload != null ? snippet.showDownload : false);
   self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
 
   self.progress.subscribe(function (val){
@@ -146,6 +145,7 @@ var Snippet = function (notebook, snippet) {
   self.showChart.subscribe(function (val){
     if (val){
       self.showGrid(false);
+      self.isLeftPanelVisible(true);
       $(document).trigger("forceChartDraw", self);
     }
   });
@@ -422,8 +422,15 @@ var Notebook = function (vm, notebook) {
   self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
-  self.selectedSnippet = ko.observable('scala');
-  self.availableSnippets = ko.observableArray(['impala', 'hive', 'scala', 'spark sql', 'python', 'text', 'pig']); // presto, mysql, oracle, sqlite, postgres, phoenix
+  self.selectedSnippet = ko.observable("scala");
+  self.availableSnippets = ko.observableArray([
+      {"name": "Scala", "type": "scala"},
+      {"name": "Python", "type": "python"},
+      {"name": "Impala SQL", "type": "impala"},
+      {"name": "Hive SQL", "type": "hive"},
+      {"name": "Text", "type": "text"},
+      {"name": "Pig", "type": "pig"}
+  ]); // presto, mysql, oracle, sqlite, postgres, phoenix
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {

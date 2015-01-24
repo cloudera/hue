@@ -22,8 +22,9 @@ from django.conf.urls.defaults import patterns, url
 urlpatterns = patterns('spark.views',
   url(r'^$', 'editor', name='index'),
   url(r'^editor$', 'editor', name='editor'),
-  url(r'^list_notebooks$', 'list_notebooks', name='list_notebooks'),
-  url(r'^download', 'download', name='download'),  
+  url(r'^notebooks$', 'notebooks', name='notebooks'),
+  url(r'^new$', 'new', name='new'),
+  url(r'^download$', 'download', name='download'),  
 )
 
 # APIs
