@@ -247,25 +247,27 @@ class HS2Api():
 # Spark
 
 
-class SparkApi(): 
-  
+class SparkApi():
+
   def __init__(self, user):
     self.user = user
-  
+
   def create_session(self, lang='scala'):
     api = get_spark_api(self.user)
+    response = api.create_session(lang=lang)
     return {
         'type': lang,
-        'id': api.create_session(lang=lang)
-    } 
-  
-  def execute(self, notebook, snippet):    
+        'id': response['id']
+    }
+
+  def execute(self, notebook, snippet):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
-    
+    response = api.submit_statement(session['id'], snippet['statement'])
+
     try:
       return {
-          'id': api.submit_statement(session['id'], snippet['statement']).split('cells/')[1],
+          'id': response['id'],
           'has_result_set': True,
       }
     except Exception, e:
@@ -288,8 +290,7 @@ class SparkApi():
   def fetch_result(self, notebook, snippet, rows, start_over):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
-    cell = snippet['result']['handle']['id']  
-    
+    cell = snippet['result']['handle']['id']
 
     try:
       data = api.fetch_data(session['id'], cell)
@@ -299,7 +300,7 @@ class SparkApi():
         raise SessionExpired(e)
       else:
         raise e
-      
+
     return {
         'data': [data['output']] if start_over else [], # start_over not supported
         'meta': [{'name': 'Header', 'type': 'String', 'comment': ''}]
@@ -310,6 +311,6 @@ class SparkApi():
 
   def get_log(self, snippet):
     return 'Not available'
-  
-  def _progress(self, snippet, logs):  
+
+  def _progress(self, snippet, logs):
     return 50

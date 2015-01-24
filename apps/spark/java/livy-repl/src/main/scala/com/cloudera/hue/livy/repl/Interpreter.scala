@@ -3,10 +3,11 @@ package com.cloudera.hue.livy.repl
 import java.io._
 import java.util.concurrent.{BlockingQueue, SynchronousQueue}
 
-import com.cloudera.hue.livy.{Complete, ExecuteResponse}
+import com.cloudera.hue.livy.ExecuteResponse
 import org.apache.spark.repl.SparkILoop
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.concurrent._
 import scala.concurrent.duration.Duration
 import scala.tools.nsc.SparkHelper
@@ -17,6 +18,8 @@ class SparkInterpreter {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   private val inQueue = new SynchronousQueue[ILoop.Request]
+  private var executedStatements = 0
+  private var statements_ = new mutable.ArrayBuffer[ExecuteResponse]
 
   org.apache.spark.repl.Main.interp = new ILoop(inQueue)
 
@@ -29,17 +32,28 @@ class SparkInterpreter {
   }
   thread.start()
 
-  def statements = {
-    org.apache.spark.repl.Main.interp.history.asStrings
+  def statements: List[ExecuteResponse] = synchronized { statements_.toList }
+
+  def statement(id: Int): Option[ExecuteResponse] = synchronized {
+    if (id < statements_.length) {
+      Some(statements_(id))
+    } else {
+      None
+    }
   }
 
   def execute(statement: String): Future[ExecuteResponse] = {
+    executedStatements += 1
+
     val promise = Promise[ILoop.ExecuteResponse]()
     inQueue.put(ILoop.ExecuteRequest(statement, promise))
 
-    for {
-      rep <- promise.future
-    } yield ExecuteResponse(0, List(statement), List(rep.output))
+    promise.future.map {
+      case rep =>
+        val executeResponse = ExecuteResponse(executedStatements - 1, List(statement), List(rep.output))
+        synchronized { statements_ += executeResponse }
+        executeResponse
+    }
   }
 
   def close(): Unit = {

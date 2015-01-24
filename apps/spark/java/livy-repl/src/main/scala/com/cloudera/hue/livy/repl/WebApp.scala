@@ -1,11 +1,11 @@
 package com.cloudera.hue.livy.repl
 
-import akka.util.Timeout
+import _root_.akka.util.Timeout
 import com.cloudera.hue.livy.ExecuteRequest
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{MappingException, DefaultFormats, Formats}
 import org.scalatra.json._
-import org.scalatra.{Accepted, AsyncResult, FutureSupport, ScalatraServlet}
+import org.scalatra._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
@@ -44,6 +44,15 @@ class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureS
     val req = parsedBody.extract[ExecuteRequest]
     val statement = req.statement
     new AsyncResult { val is = interpreter.execute(statement) }
+  }
+
+  get("/statements/:statementId") {
+    val statementId = params("statementId").toInt
+
+    interpreter.statement(statementId) match {
+      case Some(statement) => statement
+      case None => NotFound("Statement not found")
+    }
   }
 
   delete("/") {
