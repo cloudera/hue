@@ -107,6 +107,7 @@ class WebApp(sessionManager: SessionManager)
     case e: JsonParseException => halt(400, e.getMessage)
     case e: MappingException => halt(400, e.getMessage)
     case e: SessionFailedtoStart => halt(500, e.getMessage)
+    case e: dispatch.StatusCode => halt(e.code, e.getMessage)
     case t => throw t
   }
 }
