@@ -1,5 +1,6 @@
 package com.cloudera.hue.livy.server
 
+import com.cloudera.hue.livy.server.sessions.{SessionFailedtoStart, Session}
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, Formats, MappingException}
 import org.scalatra._
@@ -69,14 +70,6 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  delete("/sessions/:sessionId") {
-    val future = sessionManager.close(params("sessionId"))
-
-    // FIXME: this is silently eating exceptions.
-    //new AsyncResult() { val is = for { _ <- future } yield NoContent }
-    Await.result(future, Duration.Inf)
-  }
-
   post("/sessions/:sessionId/statements") {
     val req = parsedBody.extract[ExecuteStatementRequest]
 
@@ -90,6 +83,39 @@ class WebApp(sessionManager: SessionManager)
       case None => NotFound("Session not found")
     }
   }
+
+  post("/sessions/:sessionId/stop") {
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        val future = session.stop()
+
+        // FIXME: this is silently eating exceptions.
+        //new AsyncResult() { val is = for { _ <- future } yield NoContent }
+        Await.result(future, Duration.Inf)
+      case None => NotFound("Session not found")
+    }
+  }
+
+  post("/sessions/:sessionId/interrupt") {
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        val future = session.interrupt()
+
+        // FIXME: this is silently eating exceptions.
+        //new AsyncResult() { val is = for { _ <- future } yield NoContent }
+        Await.result(future, Duration.Inf)
+      case None => NotFound("Session not found")
+    }
+  }
+
+  delete("/sessions/:sessionId") {
+    val future = sessionManager.delete(params("sessionId"))
+
+    // FIXME: this is silently eating exceptions.
+    //new AsyncResult() { val is = for { _ <- future } yield NoContent }
+    Await.result(future, Duration.Inf)
+  }
+
 
   val getStatement = get("/sessions/:sessionId/statements/:statementId") {
     sessionManager.get(params("sessionId")) match {

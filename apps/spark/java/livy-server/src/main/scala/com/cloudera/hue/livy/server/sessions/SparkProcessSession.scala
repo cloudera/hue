@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import java.lang.ProcessBuilder.Redirect
 
@@ -64,8 +64,8 @@ object SparkProcessSession extends Logging {
 
 private class SparkProcessSession(id: String, process: Process, port: Int) extends SparkWebSession(id, "localhost", port) {
 
-  override def close(): Future[Unit] = {
-    super.close() andThen { case r =>
+  override def stop(): Future[Unit] = {
+    super.stop() andThen { case r =>
       // Make sure the process is reaped.
       process.waitFor()
 

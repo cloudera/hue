@@ -59,6 +59,6 @@ class ScalatraBootstrap extends LifeCycle {
   }
 
   override def destroy(context: ServletContext): Unit = {
-    sessionManager.close()
+    sessionManager.shutdown()
   }
 }

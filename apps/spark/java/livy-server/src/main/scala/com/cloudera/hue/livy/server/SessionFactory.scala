@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.server
 
 import java.util.UUID
 
+import com.cloudera.hue.livy.server.sessions.{Session, SparkYarnSession, SparkProcessSession}
 import com.cloudera.hue.livy.yarn.Client
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 

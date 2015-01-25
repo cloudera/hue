@@ -307,7 +307,11 @@ class SparkApi():
     }
 
   def cancel(self, notebook, snippet):
-    pass
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+    response = api.cancel(session['id'])
+
+    return {'status': 'canceled'}
 
   def get_log(self, snippet):
     return 'Not available'

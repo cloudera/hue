@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy._
 import dispatch._
@@ -8,15 +8,13 @@ import org.json4s.{DefaultFormats, Formats}
 import scala.annotation.tailrec
 import scala.concurrent.{Future, _}
 
-abstract class SparkWebSession(val id: String, hostname: String, port: Int)
-  extends Session
-  with Logging {
+abstract class SparkWebSession(val id: String, hostname: String, port: Int) extends Session with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
 
   private[this] var _lastActivity = Long.MaxValue
-  private[this] var _state: State = Running()
+  private[this] var _state: State = Idle()
   private[this] val svc = host(hostname, port)
 
   override def lastActivity: Long = _lastActivity
@@ -24,15 +22,17 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int)
   override def state: State = _state
 
   override def executeStatement(statement: String): Future[ExecuteResponse] = {
-    ensureRunning {
+    ensureIdle {
+      _state = Busy()
       touchLastActivity()
 
       var req = (svc / "statements").setContentType("application/json", "UTF-8")
       req = req << write(ExecuteRequest(statement))
 
-      for {
-        body <- Http(req OK as.json4s.Json)
-      } yield body.extract[ExecuteResponse]
+      Http(req OK as.json4s.Json).map {
+        transition(Idle())
+        _.extract[ExecuteResponse]
+      }
     }
   }
 
@@ -68,43 +68,47 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int)
     }
   }
   override def interrupt(): Future[Unit] = {
-    close()
+    stop()
   }
 
-  override def close(): Future[Unit] = {
+  override def stop(): Future[Unit] = {
     synchronized {
       _state match {
-        case Running() =>
-          _state = Stopping()
+        case Idle() =>
+          _state = Busy()
 
           Http(svc.DELETE OK as.String).map { case rep =>
             synchronized {
-              _state = Stopped()
+              _state = Dead()
             }
 
             Unit
           }
-        case Stopping() =>
-          @tailrec
-          def waitForStateChange(state: State): Unit = {
-            if (_state == state) {
-              Thread.sleep(1000)
-              waitForStateChange(state)
-            }
-          }
-
+        case Starting() =>
           Future {
-            waitForStateChange(Stopping())
-
-            if (_state == Stopped()) {
-              Future.successful(Unit)
-            } else {
-              Future.failed(new IllegalStateException("livy-repl did not stop: %s" format _state))
-            }
+            waitForStateChangeFrom(Starting(), { stop() })
           }
-        case Stopped() =>
+        case Busy() =>
+          Future {
+            waitForStateChangeFrom(Busy(), { stop() })
+          }
+        case Dead() =>
           Future.successful(Unit)
       }
+    }
+  }
+
+  private def transition(state: State) = synchronized {
+    _state = state
+  }
+
+  @tailrec
+  private def waitForStateChangeFrom[A](state: State, f: => A): A = {
+    if (_state == state) {
+      Thread.sleep(1000)
+      waitForStateChangeFrom(state, f)
+    } else {
+      f
     }
   }
 
@@ -112,12 +116,23 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int)
     _lastActivity = System.currentTimeMillis()
   }
 
-  private def ensureRunning[A](f: => A) = {
+  private def ensureIdle[A](f: => A) = {
     synchronized {
-      if (_state == Running()) {
+      if (_state == Idle()) {
         f
       } else {
         throw new IllegalStateException("Session is in state %s" format _state)
+      }
+    }
+  }
+
+  private def ensureRunning[A](f: => A) = {
+    synchronized {
+      _state match {
+        case Idle() | Busy() =>
+          f
+        case _ =>
+          throw new IllegalStateException("Session is in state %s" format _state)
       }
     }
   }
