@@ -154,7 +154,7 @@ private class ILoop(inQueue: BlockingQueue[ILoop.Request], outString: StringWrit
               var output = outString.getBuffer.toString
 
               // Strip the trailing '\n'
-              output = output.substring(0, output.length - 1)
+              output = output.stripSuffix("\n")
 
               outString.getBuffer.setLength(0)
 
