@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.yarn.{Client, Job}
 import org.apache.hadoop.fs.Path
@@ -42,8 +42,8 @@ object SparkYarnSession {
 private class SparkYarnSession(id: String, job: Job, hostname: String, port: Int)
   extends SparkWebSession(id, hostname, port) {
 
-  override def close(): Future[Unit] = {
-    super.close() andThen { case r =>
+  override def stop(): Future[Unit] = {
+    super.stop() andThen { case r =>
       job.waitForFinish(10000)
       r
     }

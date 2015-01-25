@@ -1,15 +1,10 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.ExecuteResponse
 
 import scala.concurrent.Future
 
 trait Session {
-  sealed trait State
-  case class Running() extends State
-  case class Stopping() extends State
-  case class Stopped() extends State
-
   def id: String
 
   def lastActivity: Long
@@ -26,7 +21,13 @@ trait Session {
 
   def interrupt(): Future[Unit]
 
-  def close(): Future[Unit]
+  def stop(): Future[Unit]
 }
+
+sealed trait State
+case class Starting() extends State
+case class Idle() extends State
+case class Busy() extends State
+case class Dead() extends State
 
 class SessionFailedtoStart(msg: String) extends Exception(msg) {}

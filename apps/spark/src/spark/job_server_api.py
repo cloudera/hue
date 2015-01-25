@@ -93,3 +93,6 @@ class JobServerApi(object):
 
   def fetch_data(self, session, statement):
     return self._root.get('sessions/%s/statements/%s' % (session, statement))
+
+  def cancel(self, session):
+    return self._root.post('sessions/%s/interrupt' % session)

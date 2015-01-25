@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.server.sessions.Session
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.Duration
@@ -41,20 +42,20 @@ class SessionManager(factory: SessionFactory) extends Logging {
     })
   }
 
-  def close(): Unit = {
-    Await.result(Future.sequence(sessions.values.map(close)), Duration.Inf)
+  def shutdown(): Unit = {
+    Await.result(Future.sequence(sessions.values.map(delete)), Duration.Inf)
     garbageCollector.shutdown()
   }
 
-  def close(sessionId: String): Future[Unit] = {
+  def delete(sessionId: String): Future[Unit] = {
     sessions.get(sessionId) match {
-      case Some(session) => close(session)
+      case Some(session) => delete(session)
       case None => Future.successful(Unit)
     }
   }
 
-  def close(session: Session): Future[Unit] = {
-    session.close().map { case _ =>
+  def delete(session: Session): Future[Unit] = {
+    session.stop().map { case _ =>
         sessions.remove(session.id)
         Unit
     }
@@ -65,7 +66,7 @@ class SessionManager(factory: SessionFactory) extends Logging {
       System.currentTimeMillis() - session.lastActivity > SessionManager.TIMEOUT
     }
 
-    sessions.values.filter(expired).foreach(close)
+    sessions.values.filter(expired).foreach(delete)
   }
 }
 
