@@ -54,9 +54,20 @@ var Assist = function (options) {
     var _cachePath = getTotalStoragePrefix() + _url;
     var _cached = $.totalStorage(_cachePath);
     var _returnCached = false;
-    if (_cached != null && !hasExpired(_cached.timestamp)) {
+    if (_cached != null && !hasExpired(_cached.timestamp) && typeof options.forceReload == "undefined") {
       options.onDataReceived(_cached.data);
       _returnCached = true;
+    }
+
+    if (options.onError) {
+      $.ajaxSetup({
+        error: function(x, e) {
+          if (x.status == 500) {
+            self.hasErrors(true);
+            options.onError(e);
+          }
+        }
+      });
     }
 
     $.ajax({
@@ -89,7 +100,7 @@ var Assist = function (options) {
 
   self.options = options;
 
-  self.getData = function (path) {
+  self.getData = function (path, force) {
     self.path(path);
     self.options.firstLevel = null;
     self.options.secondLevel = null;
@@ -102,11 +113,12 @@ var Assist = function (options) {
         self.options.firstLevel = path;
       }
     }
-    jsonCalls();
+    jsonCalls(force);
   }
 
   // ko observables
   self.isLoading = ko.observable(true);
+  self.hasErrors = ko.observable(false);
   self.path = ko.observable();
   self.selectedMainObject = ko.observable();
   self.mainObjects = ko.observableArray([]);

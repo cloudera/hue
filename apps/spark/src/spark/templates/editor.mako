@@ -189,7 +189,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <a title="${_('Toggle Assist')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: $root.toggleAssist">
           <i class="fa fa-chevron-left"></i>
         </a>
-        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:9px">
+        <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pointer pull-right" style="margin:3px; margin-top:9px" data-bind="click: reloadAssist">
           <i class="fa fa-refresh"></i>
         </a>
         <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
@@ -216,6 +216,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div id="navigatorLoader" class="center" data-bind="visible: $root.assistContent().isLoading">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        </div>
+
+        <div class="center" data-bind="visible: $root.assistContent().hasErrors">
+          ${ _('The database list cannot be loaded.') }
         </div>
       </div>
     </div>
@@ -983,7 +987,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
     assist.getData(viewModel.assistContent().selectedMainObject());
   }
 
-  function loadAssistMain() {
+  function loadAssistMain(force) {
     assist.options.onDataReceived = function (data) {
       if (data.databases) {
         viewModel.assistContent().mainObjects(data.databases);
@@ -993,10 +997,17 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         }
       }
     }
-    assist.getData();
+    assist.options.onError = function (error) {
+      viewModel.assistContent().isLoading(false);
+    }
+    assist.getData(null, force);
   }
 
   loadAssistMain();
+
+  function reloadAssist() {
+    loadAssistMain(true);
+  }
 
   function needsTruncation(level) {
     return (level.name.length + level.type.length) > 20;
