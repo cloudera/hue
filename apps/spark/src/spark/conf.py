@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -23,12 +24,28 @@ from desktop.lib.conf import Config
 from spark.settings import NICE_NAME
 
 
+def coerce_json(j):
+  return json.loads(j)
+
+
 JOB_SERVER_URL = Config(
   key="server_url",
   help=_t("URL of the Spark Job Server."),
   default="http://localhost:8080/"
 )
 
+LANGUAGES = Config(
+  key="languages",
+  help=_t("List of available types of snippets."),
+  type=coerce_json,
+  default="""[
+      {"name": "Scala", "type": "scala"},
+      {"name": "Python", "type": "python"},
+      {"name": "Impala SQL", "type": "impala"},
+      {"name": "Hive SQL", "type": "hive"},
+      {"name": "Text", "type": "text"}
+  ]"""
+)
 
 
 def get_spark_status(user):

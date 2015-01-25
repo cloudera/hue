@@ -68,7 +68,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/static/js/hue.utils.js"></script>
 <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
-<script src="/spark/static/js/spark.vm.js" type="text/javascript" charset="utf-8"></script>
+<script src="/spark/static/js/spark.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
 
@@ -243,7 +243,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
         </textarea>
         <div class="overlay">
-          <select data-bind="options: availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'"></select>
+          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'"></select>
           <i class="fa fa-plus-circle" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
         </div>
       </div>
@@ -944,11 +944,12 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
     }
   };
 
-  var _opts = {
+  var options = ${ options_json | n,unicode };
+  $.extend(options, {
     assistVisible: $.totalStorage("sparkAssistVisible") != null ? $.totalStorage("sparkAssistVisible") : true
-  }
+  });
 
-  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, _opts);
+  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);
   viewModel.assistContent(assist);
   ko.applyBindings(viewModel);
   viewModel.init();

@@ -422,15 +422,7 @@ var Notebook = function (vm, notebook) {
   self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
-  self.selectedSnippet = ko.observable("scala");
-  self.availableSnippets = ko.observableArray([
-      {"name": "Scala", "type": "scala"},
-      {"name": "Python", "type": "python"},
-      {"name": "Impala SQL", "type": "impala"},
-      {"name": "Hive SQL", "type": "hive"},
-      {"name": "Text", "type": "text"},
-      {"name": "Pig", "type": "pig"}
-  ]); // presto, mysql, oracle, sqlite, postgres, phoenix
+  self.selectedSnippet = ko.observable("scala");  
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {
@@ -528,6 +520,8 @@ function EditorViewModel(notebooks, options) {
 
   self.assistContent = ko.observable();
 
+  self.availableSnippets = ko.mapping.fromJS(options.languages);
+  
   self.init = function() {
     $.each(notebooks, function(index, notebook) {
       self.loadNotebook(notebook);
@@ -553,7 +547,6 @@ function EditorViewModel(notebooks, options) {
   self.saveNotebook = function() {
     self.selectedNotebook().save();
   };
-
 }
 
 

@@ -21,6 +21,7 @@ import logging
 from desktop.lib.django_util import render
 from desktop.models import Document2
 
+from spark.conf import LANGUAGES
 from spark.models import Notebook, get_api
 
 LOG = logging.getLogger(__name__)
@@ -35,7 +36,8 @@ def editor(request):
     notebook = Notebook()
     
   return render('editor.mako', request, {
-      'notebooks_json': json.dumps([notebook.get_data()])
+      'notebooks_json': json.dumps([notebook.get_data()]),
+      'options_json': json.dumps({'languages': LANGUAGES.get()})
   })
 
 
