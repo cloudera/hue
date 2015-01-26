@@ -268,7 +268,7 @@ class SparkApi():
     try:
       return {
           'id': response['id'],
-          'has_result_set': response['state'] != 'running',
+          'has_result_set': True,
       }
     except Exception, e:
       message = force_unicode(str(e))
