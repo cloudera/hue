@@ -200,8 +200,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
-            <li>
-              <a href="javascript:void(0)" class="pull-right" style="padding-right:5px" data-bind="click: showTablePreview"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+            <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
+              <a href="javascript:void(0)" class="pull-right" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
