@@ -68,6 +68,12 @@
             <groupId>com.cloudera.hue.livy</groupId>
             <artifactId>livy-yarn</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

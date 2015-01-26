@@ -21,6 +21,10 @@ trait Logging {
     logger.warn(message.toString)
   }
 
+  def error(message: => Any, t: Throwable) = {
+    logger.error(message.toString, t)
+  }
+
   def error(message: => Any) = {
     logger.error(message.toString)
   }

@@ -1,15 +1,17 @@
 package com.cloudera.hue.livy.repl
 
 import _root_.akka.util.Timeout
-import com.cloudera.hue.livy.ExecuteRequest
+import com.cloudera.hue.livy.{Logging, ExecuteRequest}
 import com.fasterxml.jackson.core.JsonParseException
-import org.json4s.{MappingException, DefaultFormats, Formats}
-import org.scalatra.json._
+import org.json4s.{DefaultFormats, Formats, MappingException}
+import org.scalatra.json.JacksonJsonSupport
 import org.scalatra._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
-class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
+object WebApp extends Logging {}
+
+class WebApp(session: Session) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
   override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit val jsonFormats: Formats = DefaultFormats
@@ -37,19 +39,20 @@ class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureS
   }
 
   get("/statements") {
-    interpreter.statements
+    session.statements
   }
 
   post("/statements") {
     val req = parsedBody.extract[ExecuteRequest]
-    val statement = req.statement
-    new AsyncResult { val is = interpreter.execute(statement) }
+    val statement: String = req.statement
+    val rep = session.execute(statement)
+    new AsyncResult { val is = rep }
   }
 
   get("/statements/:statementId") {
     val statementId = params("statementId").toInt
 
-    interpreter.statement(statementId) match {
+    session.statement(statementId) match {
       case Some(statement) => statement
       case None => NotFound("Statement not found")
     }
@@ -58,7 +61,7 @@ class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureS
   delete("/") {
     Future {
       state = ShuttingDown()
-      interpreter.close()
+      session.close()
       Thread.sleep(1000)
       System.exit(0)
     }
@@ -66,8 +69,11 @@ class WebApp(interpreter: SparkInterpreter) extends ScalatraServlet with FutureS
   }
 
   error {
-    case e: JsonParseException => halt(400, e.getMessage)
-    case e: MappingException => halt(400, e.getMessage)
-    case t => throw t
+    case e: JsonParseException => BadRequest(e.getMessage)
+    case e: MappingException => BadRequest(e.getMessage)
+    case e =>
+      WebApp.error("internal error", e)
+      InternalServerError(e.toString)
+      halt(500)
   }
 }

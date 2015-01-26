@@ -1,5 +1,6 @@
 package com.cloudera.hue.livy.server
 
+import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.server.sessions.{SessionFailedToStart, Session}
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, Formats, MappingException}
@@ -9,7 +10,7 @@ import org.scalatra.json.JacksonJsonSupport
 import scala.concurrent._
 import scala.concurrent.duration._
 
-object WebApp {
+object WebApp extends Logging {
   case class CreateSessionRequest(lang: String)
   case class ExecuteStatementRequest(statement: String)
 }
@@ -21,7 +22,7 @@ class WebApp(sessionManager: SessionManager)
   with JacksonJsonSupport
   with UrlGeneratorSupport {
 
-  import com.cloudera.hue.livy.server.WebApp._
+  import WebApp._
 
   override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit def jsonFormats: Formats = DefaultFormats
@@ -55,9 +56,7 @@ class WebApp(sessionManager: SessionManager)
           headers = Map("Location" -> url(getSession, "sessionId" -> session.id.toString)))
     }
 
-    // FIXME: this is silently eating exceptions.
-    //new AsyncResult { val is = rep }
-    Await.result(rep, Duration.Inf)
+    new AsyncResult { val is = rep }
   }
 
   post("/sessions/:sessionId/stop") {
@@ -65,9 +64,7 @@ class WebApp(sessionManager: SessionManager)
       case Some(session) =>
         val future = session.stop()
 
-        // FIXME: this is silently eating exceptions.
-        //new AsyncResult() { val is = for { _ <- future } yield NoContent }
-        Await.result(future, Duration.Inf)
+        new AsyncResult() { val is = for { _ <- future } yield NoContent }
       case None => NotFound("Session not found")
     }
   }
@@ -80,8 +77,7 @@ class WebApp(sessionManager: SessionManager)
         } yield Accepted()
 
         // FIXME: this is silently eating exceptions.
-        //new AsyncResult() { val is = for { _ <- future } yield NoContent }
-        Await.result(future, Duration.Inf)
+        new AsyncResult() { val is = for { _ <- future } yield NoContent }
       case None => NotFound("Session not found")
     }
   }
@@ -92,8 +88,7 @@ class WebApp(sessionManager: SessionManager)
     } yield Accepted()
 
     // FIXME: this is silently eating exceptions.
-    //new AsyncResult() { val is = for { _ <- future } yield NoContent }
-    Await.result(future, Duration.Inf)
+    new AsyncResult() { val is = for { _ <- future } yield NoContent }
   }
 
   get("/sessions/:sessionId/statements") {
@@ -130,13 +125,15 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-
   error {
-    case e: JsonParseException => halt(400, e.getMessage)
-    case e: MappingException => halt(400, e.getMessage)
-    case e: SessionFailedToStart => halt(500, e.getMessage)
-    case e: dispatch.StatusCode => halt(e.code, e.getMessage)
-    case t => throw t
+    case e: JsonParseException => BadRequest(e.getMessage)
+    case e: MappingException => BadRequest(e.getMessage)
+    case e: SessionFailedToStart => InternalServerError(e.getMessage)
+    case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
+    case e =>
+      WebApp.error("internal error", e)
+      InternalServerError(e.toString)
+      halt(500)
   }
 
   private def formatSession(session: Session) = {
