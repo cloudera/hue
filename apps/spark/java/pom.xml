@@ -50,13 +50,16 @@
     <properties>
         <javaVersion>1.7</javaVersion>
         <hadoop.version>2.5.0</hadoop.version>
+        <guava.version>11.0.2</guava.version>
+        <jetty.version>8.1.16.v20140903</jetty.version>
+        <json4s.version>3.2.11</json4s.version>
         <logback.version>1.1.2</logback.version>
-        <jetty.version>8.1.14.v20131031</jetty.version>
         <scala.binary.version>2.10.3</scala.binary.version>
         <scala.macros.version>2.0.1</scala.macros.version>
         <scala.version>2.10.3</scala.version>
         <scalatra.version>2.2.1</scalatra.version>
         <spark.version>1.1.0</spark.version>
+        <dispatch.version>0.11.2</dispatch.version>
     </properties>
 
     <modules>

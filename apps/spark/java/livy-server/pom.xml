@@ -35,13 +35,13 @@
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s_2.10</artifactId>
-            <version>3.2.11</version>
+            <version>${json4s.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_2.10</artifactId>
-            <version>3.2.11</version>
+            <version>${json4s.version}</version>
         </dependency>
 
         <dependency>
@@ -71,21 +71,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>11.0.2</version>
-        </dependency>
-
-        <dependency>
             <groupId>net.databinder.dispatch</groupId>
             <artifactId>dispatch-core_2.10</artifactId>
-            <version>0.11.2</version>
+            <version>${dispatch.version}</version>
         </dependency>
 
         <dependency>
             <groupId>net.databinder.dispatch</groupId>
             <artifactId>dispatch-json4s-jackson_2.10</artifactId>
-            <version>0.11.2</version>
+            <version>${dispatch.version}</version>
         </dependency>
 
     </dependencies>
