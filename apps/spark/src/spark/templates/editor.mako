@@ -239,16 +239,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
       <div class="add-snippet">
-        <textarea id="shadowEditor">
-${_('Example: SELECT * FROM tablename, or press CTRL + space')}
-
-
-
-
-        </textarea>
         <div class="overlay">
-          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'"></select>
-          <i class="fa fa-plus-circle" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
+          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" class="input-small"></select>
+          <i class="fa fa-plus-circle fa-5x" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
         </div>
       </div>
     </div>
@@ -300,9 +293,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-        <div class="inline pull-right">
-          <strong class="muted" data-bind="text: status, visible: type() != 'text'"></strong> &nbsp;
-          <strong class="muted" data-bind="visible: type() != 'text'">Took 1s</strong> &nbsp;
+        <div class="inline pull-right">          
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -317,7 +308,9 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
               </div>
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
-            <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running'" class="btn codeMirror-overlaybtn">${ _('Go!') }</a>
+            <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn">
+              ${ _('Go!') }
+            </a>
             <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
             <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -329,7 +322,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           <a data-bind="visible: result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
             <i class="fa fa-th"></i>
           </a>
-          <div class="btn-group" data-bind="visible: result.hasSomeResults()">
+          <div class="btn-group" data-bind="visible: type() != 'scala' && type() != 'python' && result.hasSomeResults()">
             <button class="btn dropdown-toggle" style="height: 31px" data-bind="css: {'active': $data.showChart}" data-toggle="dropdown">
               <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
               <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
@@ -362,12 +355,17 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           </div>
 
           <div class="pull-right">
-            <a data-bind="visible: status() != 'ready', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
-              <i class="fa fa-file-text-o"></i>
-            </a>
+            <strong class="muted" data-bind="visible: type() != 'text' && status() == 'available'">Took 1s</strong>
+            
             &nbsp;
             
-            <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults()">
+            <a data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
+              <i class="fa fa-file-text-o"></i>
+            </a>
+
+            &nbsp;
+            
+            <div class="btn-group" data-bind="visible: type() != 'scala' && type() != 'python' && status() == 'available' && result.hasSomeResults()">
               <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-download"></i>
                 <i class="fa fa-caret-down"></i>
@@ -408,7 +406,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           ${ _('Success.') }
         </div>
         
-        <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0, css: resultsKlass">
+        <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.meta().length > 0, css: resultsKlass">
           ${ _('Success but empty results.') }
         </div>
 
@@ -1436,12 +1434,6 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
     $(".CodeMirror").each(function () {
       $(this)[0].CodeMirror.refresh();
-    });
-
-    var shadowEditor = CodeMirror.fromTextArea($("#shadowEditor")[0], {
-      lineNumbers: true,
-      readOnly: true,
-      mode: "text/x-hiveql"
     });
 
     var _resizeTimeout = -1;
