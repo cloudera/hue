@@ -377,10 +377,10 @@ var Snippet = function (notebook, snippet) {
 	  }, function (data) {
 	    if (data.status == 0) {
           self.status(data.query_status.status);
+          self.getLogs();
 
           if (self.status() == 'running') {
-        	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
-        	self.getLogs();
+        	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);        	
           } 
           else if (self.status() == 'available') {
         	self.fetchResult(100);
@@ -453,7 +453,7 @@ var Notebook = function (vm, notebook) {
   self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.snippets = ko.observableArray();
-  self.selectedSnippet = ko.observable("scala");  
+  self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []); 
 
   self.getSession = function(session_type) {
@@ -488,18 +488,22 @@ var Notebook = function (vm, notebook) {
 	
 	if (self.getSession(_snippet.type()) == null) {
 	  _snippet.create_session();	  
+    } else {
+      _snippet.status('ready');
     }
-	
+
 	_snippet.init();
   };  
 
   self.newSnippet = function() {
-	var snippet = new Snippet(self, {type: self.selectedSnippet(), result: {}});	  
-	self.snippets.push(snippet);
+	var _snippet = new Snippet(self, {type: self.selectedSnippet(), result: {}});	  
+	self.snippets.push(_snippet);
 	  
 	if (self.getSession(self.selectedSnippet()) == null) {
-	  snippet.create_session();
-	}
+	  _snippet.create_session();
+	} else {
+      _snippet.status('ready');
+    }
   };  
   
   if (notebook.snippets) {
@@ -572,7 +576,7 @@ function EditorViewModel(notebooks, options) {
   };
 
   self.newNotebook = function() {
-	  self.notebooks.push(new Notebook(self, {}));
+	self.notebooks.push(new Notebook(self, {}));
     self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
   };
 

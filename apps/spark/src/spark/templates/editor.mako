@@ -240,7 +240,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <div class="add-snippet">
         <div class="overlay">
-          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" class="input-small"></select>
+          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px"></select>
           <i class="fa fa-plus-circle fa-5x" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
         </div>
       </div>
