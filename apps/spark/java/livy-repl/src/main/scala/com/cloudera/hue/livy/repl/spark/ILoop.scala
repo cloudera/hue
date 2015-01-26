@@ -1,72 +1,17 @@
-package com.cloudera.hue.livy.repl
+package com.cloudera.hue.livy.repl.spark
 
 import java.io._
-import java.util.concurrent.{BlockingQueue, SynchronousQueue}
+import java.util.concurrent.BlockingQueue
 
-import com.cloudera.hue.livy.ExecuteResponse
 import org.apache.spark.repl.SparkILoop
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.concurrent._
-import scala.concurrent.duration.Duration
 import scala.tools.nsc.SparkHelper
 import scala.tools.nsc.interpreter.{Formatting, _}
 import scala.tools.nsc.util.ClassPath
 
-class SparkInterpreter {
-  private implicit def executor: ExecutionContext = ExecutionContext.global
-
-  private val inQueue = new SynchronousQueue[ILoop.Request]
-  private var executedStatements = 0
-  private var statements_ = new mutable.ArrayBuffer[ExecuteResponse]
-
-  org.apache.spark.repl.Main.interp = new ILoop(inQueue)
-
-  // Launch the real interpreter thread.
-  private val thread = new Thread {
-    override def run(): Unit = {
-      val args = Array("-usejavacp")
-      org.apache.spark.repl.Main.interp.process(args)
-    }
-  }
-  thread.start()
-
-  def statements: List[ExecuteResponse] = synchronized { statements_.toList }
-
-  def statement(id: Int): Option[ExecuteResponse] = synchronized {
-    if (id < statements_.length) {
-      Some(statements_(id))
-    } else {
-      None
-    }
-  }
-
-  def execute(statement: String): Future[ExecuteResponse] = {
-    executedStatements += 1
-
-    val promise = Promise[ILoop.ExecuteResponse]()
-    inQueue.put(ILoop.ExecuteRequest(statement, promise))
-
-    promise.future.map {
-      case rep =>
-        val executeResponse = ExecuteResponse(executedStatements - 1, List(statement), List(rep.output))
-        synchronized { statements_ += executeResponse }
-        executeResponse
-    }
-  }
-
-  def close(): Unit = {
-    val promise = Promise[ILoop.ShutdownResponse]()
-    inQueue.put(ILoop.ShutdownRequest(promise))
-
-    Await.result(promise.future, Duration.Inf)
-
-    thread.join()
-  }
-}
-
-private object ILoop {
+object ILoop {
   sealed trait Request
   case class ExecuteRequest(statement: String, promise: Promise[ExecuteResponse]) extends Request
   case class ShutdownRequest(promise: Promise[ShutdownResponse]) extends Request
@@ -76,7 +21,7 @@ private object ILoop {
 }
 
 // FIXME: The spark interpreter is written to own the event loop, so we need to invert it so we can inject our commands into it.
-private class ILoop(inQueue: BlockingQueue[ILoop.Request], outString: StringWriter = new StringWriter)
+class ILoop(inQueue: BlockingQueue[ILoop.Request], outString: StringWriter = new StringWriter)
   extends SparkILoop(
     // we don't actually use the reader, so pass in a null reader for now.
     new BufferedReader(new StringReader("")),

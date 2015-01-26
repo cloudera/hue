@@ -24,6 +24,12 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-repl_2.10</artifactId>
             <version>${spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

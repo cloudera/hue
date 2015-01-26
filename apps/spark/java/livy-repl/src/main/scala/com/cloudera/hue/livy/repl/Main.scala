@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.repl
 
 import javax.servlet.ServletContext
 
+import com.cloudera.hue.livy.repl.spark.SparkSession
 import com.cloudera.hue.livy.{Logging, WebServer}
 import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
@@ -25,15 +26,13 @@ object Main extends Logging {
 
 class ScalatraBootstrap extends LifeCycle {
 
-  //val system = ActorSystem()
-  val sparkInterpreter = new SparkInterpreter
+  val session = new SparkSession()
 
   override def init(context: ServletContext): Unit = {
-    context.mount(new WebApp(sparkInterpreter), "/*")
+    context.mount(new WebApp(session), "/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
-    sparkInterpreter.close()
-    //system.shutdown()
+    session.close()
   }
 }
