@@ -56,8 +56,7 @@ def notebooks(request):
 def download(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  
-  file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
+  file_format = request.POST.get('format', 'csv')
 
   return get_api(request.user, snippet).download(notebook, snippet, file_format)
 

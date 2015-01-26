@@ -322,7 +322,9 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         </div>
 
         <div style="padding-top: 10px;">
-          <a data-bind="visible: result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }"><i class="fa fa-th"></i></a>
+          <a data-bind="visible: result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
+            <i class="fa fa-th"></i>
+          </a>
           <div class="btn-group" data-bind="visible: result.hasSomeResults()">
             <button class="btn dropdown-toggle" style="height: 31px" data-bind="css: {'active': $data.showChart}" data-toggle="dropdown">
               <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
@@ -367,16 +369,21 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
                 <i class="fa fa-caret-down"></i>
               </button>
               <ul class="dropdown-menu pull-right">
-                <form method="POST" action="${ url('spark:download') }">
+                <form method="POST" action="${ url('spark:download') }" id="download-form">
                   ${ csrf_token(request) | n,unicode }
                   <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
                   <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
-                  <input type="number" value="1000"/>
+                  <input type="hidden" name="format" id="download-format"/>
+
                   <li>
-                    <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="fa fa-file-o"></i></button>
+                    <a href="javascript:void(0)" data-bind="click: function() { $('#download-format').val('csv'); $('#download-form').submit(); }" title="${ _('Download first rows as CSV') }">
+                      <i class="fa fa-file-o"></i> ${ _('CSV') } 
+                    </a>
                   </li>
                   <li>
-                    <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="fa fa-file-excel-o"></i></button>
+                    <a href="javascript:void(0)" data-bind="click: function() { $('#download-format').val('xls'); $('#download-form').submit(); }" title="${ _('Download first rows as XLS') }">
+                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
+                    </a>                  
                   </li>
                 </form>
               </ul>            
