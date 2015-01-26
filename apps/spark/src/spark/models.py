@@ -268,7 +268,7 @@ class SparkApi():
     try:
       return {
           'id': response['id'],
-          'has_result_set': True,
+          'has_result_set': response['state'] != 'running',
       }
     except Exception, e:
       message = force_unicode(str(e))
@@ -278,8 +278,15 @@ class SparkApi():
         raise e
 
   def check_status(self, notebook, snippet):
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+    cell = snippet['result']['handle']['id']
+    response = api.fetch_data(session['id'], cell)
+
     try:
-      return {'status': 'available'}
+      return {
+          'status': response['state'],
+      }
     except Exception, e:
       message = force_unicode(str(e))
       if 'session not found' in message:
