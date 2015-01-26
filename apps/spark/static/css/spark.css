@@ -218,3 +218,10 @@ h1.empty {
   text-align: center;
   color: #DDD;
 }
+
+.toggle-left-panel {
+  background-color: #F0F0F0;
+  float: left;
+  padding: 3px;
+  margin-top: 31px;
+}

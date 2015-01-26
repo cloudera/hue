@@ -299,7 +299,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         <div class="inline pull-right">
           <strong class="muted" data-bind="text: status, visible: type() != 'text'"></strong> &nbsp;
           <strong class="muted" data-bind="visible: type() != 'text'">Took 1s</strong> &nbsp;
-          <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data);}"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
 
@@ -403,10 +403,6 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
 
         <div class="row-fluid" data-bind="visible: result.hasSomeResults() && showGrid()" style="max-height: 400px; margin-top: 4px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
-            <a title="${_('Hide')}" class="pull-right pointer" style="margin:3px; margin-top:9px" data-bind="click: toggleLeftPanel">
-              <i class="fa fa-chevron-left"></i>
-            </a>
-
             <ul class="nav nav-list" style="border: none; background-color: #FFF">              
               <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
               </a>
@@ -416,9 +412,14 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
             </ul>
           </div>
           <div data-bind="css:{'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
-            <a title="${_('Show columns')}" class="pointer" style="position:absolute; margin-left: -15px; margin-top: 10px" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
+            <div class="toggle-left-panel">
+            <a title="${_('Show columns')}" class="pointer" data-bind="click: toggleLeftPanel, visible: !isLeftPanelVisible()">
               <i class="fa fa-chevron-right"></i>
             </a>
+            <a title="${_('Hide')}" class="pointer" data-bind="click: toggleLeftPanel, visible: isLeftPanelVisible()">
+              <i class="fa fa-chevron-left"></i>
+            </a>
+            </div>
             <div data-bind="css: resultsKlass">
               <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360">
                 <thead>
@@ -1375,6 +1376,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           _dtElement.animate({opacity: '1'}, 50);
           _dtElement.scrollTop(_dtElement.data("scrollPosition"));
           redrawFixedHeaders();
+          _dtElement.parent().siblings(".toggle-left-panel").height(_dtElement.height());
         }, 100);
       }
       else {
@@ -1415,6 +1417,11 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
           window.setTimeout(function () {
             var _dt = createDatatable(_el, snippet);
             _dt.fnAddData(snippet.result.data());
+            var _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+            _dtElement.parent().siblings(".toggle-left-panel").css({
+              "height": (_dtElement.height() - 30) + "px",
+              "line-height": (_dtElement.height() - 30) + "px"
+            });
             $(document).trigger("forceChartDraw", snippet);
           }, 100);
         }
