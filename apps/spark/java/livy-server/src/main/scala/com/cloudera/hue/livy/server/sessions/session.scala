@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.ExecuteResponse
+import com.cloudera.hue.livy.server.Statement
 
 import scala.concurrent.Future
 
@@ -11,13 +12,13 @@ trait Session {
 
   def state: State
 
-  def executeStatement(statement: String): Future[ExecuteResponse]
+  def executeStatement(statement: String): Statement
 
-  def statement(statementId: Int): Future[ExecuteResponse]
+  def statement(statementId: Int): Option[Statement]
 
-  def statements(): Future[List[ExecuteResponse]]
+  def statements(): List[Statement]
 
-  def statements(fromIndex: Integer, toIndex: Integer): Future[List[ExecuteResponse]]
+  def statements(fromIndex: Integer, toIndex: Integer): List[Statement]
 
   def interrupt(): Future[Unit]
 
@@ -30,4 +31,6 @@ case class Idle() extends State
 case class Busy() extends State
 case class Dead() extends State
 
-class SessionFailedtoStart(msg: String) extends Exception(msg) {}
+class SessionFailedToStart(msg: String) extends Exception(msg)
+
+class StatementNotFound extends Exception

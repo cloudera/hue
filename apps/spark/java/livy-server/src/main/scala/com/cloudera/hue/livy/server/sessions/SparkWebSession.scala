@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy._
+import com.cloudera.hue.livy.server.Statement
 import dispatch._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats}
@@ -19,18 +20,16 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int) exte
   private[this] val svc = host(hostname, port)
 
   private[this] var executedStatements = 0
-  private[this] var statements_ = new ArrayBuffer[ExecuteResponse]
+  private[this] var statements_ = new ArrayBuffer[Statement]
 
   override def lastActivity: Long = _lastActivity
 
   override def state: State = _state
 
-  override def executeStatement(statement: String): (Int, Future[ExecuteResponse]) = {
+  override def executeStatement(statement: String): Statement = {
     ensureIdle {
       _state = Busy()
       touchLastActivity()
-
-      executedStatements += 1
 
       var req = (svc / "statements").setContentType("application/json", "UTF-8")
       req = req << write(ExecuteRequest(statement))
@@ -38,59 +37,40 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int) exte
       val future = Http(req OK as.json4s.Json).map { case (resp) =>
         synchronized {
           transition(Idle())
-          val response: ExecuteResponse = resp.extract[ExecuteResponse]
-          statements_ += response
-          response
+          resp.extract[ExecuteResponse].output
         }
       }
 
-      (executedStatements - 1, future)
+      executedStatements += 1
+      var statement_ = new Statement(executedStatements, statement, future)
+      statements_ += statement_
+
+      statement_
     }
   }
 
-  override def statement(statementId: Int): Future[ExecuteResponse] = {
+  override def statement(statementId: Int): Option[Statement] = {
     ensureRunning {
       if (statementId < statements_.length) {
-        Future.successful(statements_(statementId))
+        Some(statements_(statementId))
       } else {
-        val req = svc / "statements" / statementId
-
-        for {
-          body <- Http(req OK as.json4s.Json)
-        } yield body.extract[ExecuteResponse]
+        None
       }
     }
   }
 
-  override def statements(): Future[List[ExecuteResponse]] = {
+  override def statements(): List[Statement] = {
     ensureRunning {
-      if (_state == Idle()) {
-        Future.successful(statements_.toList)
-      } else {
-        val req = svc / "statements"
-
-        for {
-          body <- Http(req OK as.json4s.Json)
-        } yield body.extract[List[ExecuteResponse]]
-      }
+      statements_.toList
     }
   }
 
-  override def statements(fromIndex: Integer, toIndex: Integer): Future[List[ExecuteResponse]] = {
+  override def statements(fromIndex: Integer, toIndex: Integer): List[Statement] = {
     ensureRunning {
-      if (_state == Idle()) {
-        Future.successful(statements_.slice(fromIndex, toIndex).toList)
-      } else {
-        val req = (svc / "statements")
-          .addQueryParameter("from", fromIndex.toString)
-          .addQueryParameter("to", toIndex.toString)
-
-        for {
-          body <- Http(req OK as.json4s.Json)
-        } yield body.extract[List[ExecuteResponse]]
-      }
+      statements_.slice(fromIndex, toIndex).toList
     }
   }
+
   override def interrupt(): Future[Unit] = {
     stop()
   }

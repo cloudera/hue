@@ -54,7 +54,7 @@ object SparkProcessSession extends Logging {
         case None =>
           // Make sure to reap the process.
           process.waitFor()
-          throw new SessionFailedtoStart("Couldn't start livy-repl")
+          throw new SessionFailedToStart("Couldn't start livy-repl")
       }
     }
 
