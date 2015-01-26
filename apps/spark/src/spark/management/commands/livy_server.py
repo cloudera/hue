@@ -15,42 +15,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Starts the livy server.
-"""
+import logging
+import os
 
 from django.core.management.base import BaseCommand
 import spark.conf
-import desktop.conf
-import hadoop.cluster
 
-import logging
-import os
-import sys
 
 LOG = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     """
     Starts livy server.
     """
 
-    args = '<process|yarn>'
+    args = '<process(default)|yarn>'
     help = 'start livy server with process or yarn workers'
 
     def handle(self, *args, **kwargs):
-        session_kind = args[0]
-
-        cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
-        if cluster_conf is None:
-            LOG.error("Configuration does not contain any MR/Yarn clusters with "
-                      "`submit_to' enabled. Cannot start BeeswaxServer.")
-            sys.exit(1)
+        if not args:
+          session_kind = 'process'
+        else:
+          session_kind = args[0].lower()
 
         env = os.environ.copy()
-        def set_if_present(name, val):
-            if val:
-                env[name] = val
 
         args = [
           os.path.join(
