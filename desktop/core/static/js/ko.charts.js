@@ -20,7 +20,8 @@ ko.HUE_CHARTS = {
     BARCHART: "bars",
     POINTCHART: "points",
     PIECHART: "pie",
-    MAP: "map"
+    MAP: "map",
+    SCATTERCHART: "scatter"
   }
 };
 
@@ -377,6 +378,52 @@ ko.bindingHandlers.mapChart = {
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
   }
 };
+
+ko.bindingHandlers.scatterChart = {
+  update: function (element, valueAccessor) {
+    var options = valueAccessor();
+    var _datum = options.transformer(options.datum);
+    $(element).height(300);
+    if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
+      $(element).find("svg").empty();
+    }
+    if (_datum.length > 0 && _datum[0].values.length > 0 && (isNaN(_datum[0].values[0].x) || isNaN(_datum[0].values[0].y))) {
+      _datum = [];
+      $(element).find("svg").empty();
+    }
+
+    if ($(element).is(":visible")) {
+      nv.addGraph(function () {
+        var _chart = nv.models.scatterChart()
+          .transitionDuration(350)
+          .color(d3.scale.category10().range());
+
+        _chart.tooltipContent(function(key) {
+            return '<h3>' + key + '</h3>';
+        });
+
+        _chart.xAxis.tickFormat(d3.format('.02f'));
+        _chart.yAxis.tickFormat(d3.format('.02f'));
+        _chart.scatter.onlyCircles(true);
+
+        var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+        _d3.datum(_datum)
+            .transition().duration(150)
+            .each("end", options.onComplete != null ? options.onComplete : void(0))
+            .call(_chart);
+
+        nv.utils.windowResize(_chart.update);
+
+        $(element).on("forceUpdate", function(){
+          _chart.update();
+        });
+
+        return _chart;
+      });
+    }
+  }
+};
+
 
 
 function lineChartBuilder(element, options) {

@@ -94,6 +94,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.scatter.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/nv.d3.scatterChart.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
 
@@ -328,6 +330,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
               <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
               <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+              <i class="fa fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
               <i class="fa fa-caret-down"></i>
             </button>
             <ul class="dropdown-menu">
@@ -349,6 +352,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <li>
                 <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
                   <i class="hcha hcha-map-chart"></i> ${_('Map')}
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+                  <i class="fa fa-dot-circle-o"></i> ${_('Scatter')}
                 </a>
               </li>
             </ul>
@@ -451,6 +459,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </a>
             </div>
             <div>
+              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <li class="nav-header">${_('scatter groups')}</li>
+              </ul>
+              <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART)">
+                <ul class="unstyled" data-bind="foreach: result.cleanedMeta">
+                  <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartScatterGroups" /> <span data-bind="text: $data.name"></span></li>
+                </ul>
+              </div>
+
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
                 <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('x-axis')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
@@ -469,7 +486,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                   <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
                 </ul>
               </div>
-              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP">
+              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
                 <select data-bind="options: result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
               </div>
 
@@ -480,10 +497,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
               </div>
 
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
+              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <li class="nav-header">${_('scatter size')}</li>
+              </ul>
+              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
+              </div>
+
+              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
                 <li class="nav-header">${_('sorting')}</li>
               </ul>
-              <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
+              <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
                 <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
                 <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
                 <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
@@ -509,6 +533,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
             <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                   transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP}" class="chart"></div>
+
+            <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: scatterChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
           </div>
         </div>
       </div>
@@ -1284,6 +1311,84 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           _plottedSerie++;
         }
       });
+    }
+    return _datum;
+  }
+
+  /**************************************
+ * Simple test data generator
+ */
+function randomData(groups, points) { //# groups,# points per group
+  var data = [],
+      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
+      random = d3.random.normal();
+
+  for (i = 0; i < groups; i++) {
+    data.push({
+      key: 'Group ' + i,
+      values: []
+    });
+
+    for (j = 0; j < points; j++) {
+      data[i].values.push({
+        x: random()
+      , y: random()
+      , size: 1 //Math.random()   //Configure the size of each scatter point
+      , shape: (Math.random() > 0.95) ? shapes[j % 6] : "circle"  //Configure the shape of each scatter point.
+      });
+    }
+  }
+
+  return data;
+}
+
+  function scatterChartDataTransformer(rawDatum) {
+    var _datum = [];
+
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle().length > 0) {
+      function addToDatum(col) {
+        var _idxX = -1;
+        var _idxY = -1;
+        var _idxSize = -1;
+        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+          if (icol.name == rawDatum.snippet.chartX()) {
+            _idxX = idx;
+          }
+          if (icol.name == rawDatum.snippet.chartYSingle()) {
+            _idxY = idx;
+          }
+          if (icol.name == rawDatum.snippet.chartScatterSize()) {
+            _idxSize = idx;
+          }
+        });
+
+        if (_idxX > -1 && _idxY > -1) {
+          var _data = [];
+          $(rawDatum.counts()).each(function (cnt, item) {
+            _data.push({
+              x: item[_idxX],
+              y: item[_idxY],
+              shape: 'circle',
+              size: _idxSize > -1 ? item[_idxSize] : 100,
+              obj: item
+            });
+          });
+          _datum.push({
+            key: col,
+            values: _data
+          });
+        }
+      }
+
+      if (rawDatum.snippet.chartScatterGroups().length > 0){
+        rawDatum.snippet.chartScatterGroups().forEach(function (col) {
+          addToDatum(col);
+        });
+      }
+      else {
+        addToDatum('${ _('Distribution') }');
+      }
+      
     }
     return _datum;
   }
