@@ -39,6 +39,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/leaflet.css">
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
 <link rel="stylesheet" href="/static/css/nv.d3.css">
+<link rel="stylesheet" href="/static/ext/select2/select2.css">
 
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
@@ -95,6 +96,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
+
 
 
 
@@ -196,7 +200,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <li class="nav-header">${_('database')}</li>
         </ul>
         <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
-          <select data-bind="options: $root.assistContent().mainObjects, chosen: {isAssist: true}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+          <select data-bind="options: $root.assistContent().mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: $root.assistSelectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
           <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
@@ -454,7 +458,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
               </ul>
               <div data-bind="visible: chartType() != ''">
-                <select data-bind="options: result.cleanedMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', chosen: {}" class="input-medium"></select>
+                <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
@@ -463,19 +467,19 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
               </ul>
 
               <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
-                <ul class="unstyled" data-bind="foreach: result.cleanedMeta">
+                <ul class="unstyled" data-bind="foreach: result.cleanedNumericMeta">
                   <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
                 </ul>
               </div>
               <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP">
-                <select data-bind="options: result.cleanedMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', chosen: {}" class="input-medium"></select>
+                <select data-bind="options: result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
                 <li class="nav-header">${_('label')}</li>
               </ul>
               <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
-                <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', chosen: {}" class="input-medium"></select>
+                <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
@@ -588,24 +592,6 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
       });
     }
   };
-
-  ko.bindingHandlers.chosen = {
-    init: function (element, valueAccessor) {
-      $(element).chosen({
-        disable_search_threshold: 5,
-        width: "100%"
-      }).change(function (e, obj) {
-        if (typeof valueAccessor().isAssist != "undefined" && valueAccessor().isAssist) {
-          viewModel.assistContent().selectedMainObject(obj.selected);
-          loadAssistFirstLevel();
-        }
-      });
-    },
-    update: function (element, valueAccessor, allBindings) {
-      $(element).trigger('chosen:updated');
-    }
-  };
-
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, snippet) {
@@ -966,6 +952,11 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
   ko.applyBindings(viewModel);
   viewModel.init();
 
+  viewModel.assistSelectedMainObject.subscribe(function(newVal) {
+    viewModel.assistContent().selectedMainObject(newVal);
+    loadAssistFirstLevel();
+  });
+
   function loadAssistSecondLevel(first) {
     if (!viewModel.assistContent().firstLevelObjects()[first].loaded()) {
       viewModel.assistContent().isLoading(true);
@@ -1007,6 +998,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
         viewModel.assistContent().mainObjects(data.databases);
         if (viewModel.assistContent().mainObjects().length > 0 && !viewModel.assistContent().selectedMainObject()) {
           viewModel.assistContent().selectedMainObject(viewModel.assistContent().mainObjects()[0]);
+          viewModel.assistSelectedMainObject(viewModel.assistContent().selectedMainObject());
           loadAssistFirstLevel();
         }
       }

@@ -29,6 +29,37 @@ var Result = function (snippet, result) {
       return item.name != ''
     });
   });
+
+  function isNumericColumn(type) {
+    return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  }
+
+  function isDateTimeColumn(type) {
+    return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  }
+
+  function isStringColumn(type) {
+    return !isNumericColumn(type) && !isDateTimeColumn(type);
+  }
+
+  self.cleanedNumericMeta = ko.computed(function(){
+    return ko.utils.arrayFilter(self.meta(), function(item) {
+      return item.name != '' && isNumericColumn(item.type)
+    });
+  });
+
+  self.cleanedStringMeta = ko.computed(function(){
+    return ko.utils.arrayFilter(self.meta(), function(item) {
+      return item.name != '' && isStringColumn(item.type)
+    });
+  });
+
+  self.cleanedDateTimeMeta = ko.computed(function(){
+    return ko.utils.arrayFilter(self.meta(), function(item) {
+      return item.name != '' && isDateTimeColumn(item.type)
+    });
+  });
+
   self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
@@ -519,6 +550,7 @@ function EditorViewModel(notebooks, options) {
   };
 
   self.assistContent = ko.observable();
+  self.assistSelectedMainObject = ko.observable();
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
   
