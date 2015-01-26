@@ -263,15 +263,15 @@ class SparkApi():
   def execute(self, notebook, snippet):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
-    response = api.submit_statement(session['id'], snippet['statement'])
 
     try:
+      response = api.submit_statement(session['id'], snippet['statement'])
       return {
           'id': response['id'],
           'has_result_set': True,
       }
     except Exception, e:
-      message = force_unicode(str(e))
+      message = force_unicode(str(e)).lower()
       if 'session not found' in message:
         raise SessionExpired(e)
       else:
@@ -280,15 +280,15 @@ class SparkApi():
   def check_status(self, notebook, snippet):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
-    cell = snippet['result']['handle']['id']
-    response = api.fetch_data(session['id'], cell)
+    cell = snippet['result']['handle']['id']    
 
     try:
+      response = api.fetch_data(session['id'], cell)
       return {
           'status': response['state'],
       }
     except Exception, e:
-      message = force_unicode(str(e))
+      message = force_unicode(str(e)).lower()
       if 'session not found' in message:
         raise SessionExpired(e)
       else:
@@ -302,7 +302,7 @@ class SparkApi():
     try:
       data = api.fetch_data(session['id'], cell)
     except Exception, e:
-      message = force_unicode(str(e))
+      message = force_unicode(str(e)).lower()
       if 'session not found' in message:
         raise SessionExpired(e)
       else:
