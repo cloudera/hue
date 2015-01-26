@@ -3,7 +3,7 @@ package com.cloudera.hue.livy.server
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
-class Statement(val id: Int, val input: String, val output: Future[List[String]]) {
+class Statement(val id: Int, val input: String, val output: Future[Seq[String]]) {
   sealed trait State
   case class Running() extends State
   case class Available() extends State

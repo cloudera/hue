@@ -16,9 +16,9 @@ trait Session {
 
   def statement(statementId: Int): Option[Statement]
 
-  def statements(): List[Statement]
+  def statements(): Seq[Statement]
 
-  def statements(fromIndex: Integer, toIndex: Integer): List[Statement]
+  def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement]
 
   def interrupt(): Future[Unit]
 

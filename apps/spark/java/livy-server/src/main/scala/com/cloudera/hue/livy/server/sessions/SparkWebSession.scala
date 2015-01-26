@@ -60,15 +60,15 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int) exte
     }
   }
 
-  override def statements(): List[Statement] = {
+  override def statements(): Seq[Statement] = {
     ensureRunning {
-      statements_.toList
+      statements_.toSeq
     }
   }
 
-  override def statements(fromIndex: Integer, toIndex: Integer): List[Statement] = {
+  override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = {
     ensureRunning {
-      statements_.slice(fromIndex, toIndex).toList
+      statements_.slice(fromIndex, toIndex).toSeq
     }
   }
 
