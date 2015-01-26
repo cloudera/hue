@@ -26,13 +26,13 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int) exte
 
   override def state: State = _state
 
-  override def executeStatement(statement: String): Statement = {
+  override def executeStatement(input: String): Statement = {
     ensureIdle {
       _state = Busy()
       touchLastActivity()
 
       var req = (svc / "statements").setContentType("application/json", "UTF-8")
-      req = req << write(ExecuteRequest(statement))
+      req = req << write(ExecuteRequest(input))
 
       val future = Http(req OK as.json4s.Json).map { case (resp) =>
         synchronized {
@@ -41,11 +41,12 @@ abstract class SparkWebSession(val id: String, hostname: String, port: Int) exte
         }
       }
 
-      executedStatements += 1
-      var statement_ = new Statement(executedStatements, statement, future)
-      statements_ += statement_
+      var statement = new Statement(executedStatements, input, future)
 
-      statement_
+      executedStatements += 1
+      statements_ += statement
+
+      statement
     }
   }
 

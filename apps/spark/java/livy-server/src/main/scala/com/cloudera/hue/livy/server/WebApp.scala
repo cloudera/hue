@@ -6,8 +6,8 @@ import org.json4s.{DefaultFormats, Formats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Future, Await, ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent._
+import scala.concurrent.duration._
 
 object WebApp {
   case class CreateSessionRequest(lang: String)
@@ -34,6 +34,13 @@ class WebApp(sessionManager: SessionManager)
     sessionManager.getSessionIds
   }
 
+  val getSession = get("/sessions/:sessionId") {
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) => formatSession(session)
+      case None => NotFound("Session not found")
+    }
+  }
+
   post("/sessions") {
     val createSessionRequest = parsedBody.extract[CreateSessionRequest]
 
@@ -43,19 +50,14 @@ class WebApp(sessionManager: SessionManager)
     }
 
     val rep = sessionFuture.map {
-      case session => formatSession(session)
+      case session =>
+        Created(formatSession(session),
+          headers = Map("Location" -> url(getSession, "sessionId" -> session.id.toString)))
     }
 
     // FIXME: this is silently eating exceptions.
     //new AsyncResult { val is = rep }
     Await.result(rep, Duration.Inf)
-  }
-
-  get("/sessions/:sessionId") {
-    sessionManager.get(params("sessionId")) match {
-      case Some(session) => formatSession(session)
-      case None => NotFound("Session not found")
-    }
   }
 
   post("/sessions/:sessionId/stop") {
@@ -101,25 +103,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  post("/sessions/:sessionId/statements") {
-    val req = parsedBody.extract[ExecuteStatementRequest]
-
-    sessionManager.get(params("sessionId")) match {
-      case Some(session) =>
-        Future {
-          val statement: Statement = session.executeStatement(req.statement)
-
-          // FIXME: this is silently eating exceptions.
-          //new AsyncResult() { val is = statement }
-          Await.result(statement.output, Duration.Inf)
-        }
-
-        Accepted()
-      case None => NotFound("Session not found")
-    }
-  }
-
-  get("/sessions/:sessionId/statements/:statementId") {
+  val getStatement = get("/sessions/:sessionId/statements/:statementId") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         session.statement(params("statementId").toInt) match {
@@ -129,6 +113,23 @@ class WebApp(sessionManager: SessionManager)
       case None => NotFound("Session not found")
     }
   }
+
+  post("/sessions/:sessionId/statements") {
+    val req = parsedBody.extract[ExecuteStatementRequest]
+
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        val statement = session.executeStatement(req.statement)
+
+        Created(formatStatement(statement),
+          headers = Map(
+            "Location" -> url(getStatement,
+              "sessionId" -> session.id.toString,
+              "statementId" -> statement.id.toString)))
+      case None => NotFound("Session not found")
+    }
+  }
+
 
   error {
     case e: JsonParseException => halt(400, e.getMessage)
@@ -146,10 +147,17 @@ class WebApp(sessionManager: SessionManager)
   }
 
   private def formatStatement(statement: Statement) = {
+    // Take a couple milliseconds to see if the statement has finished.
+    val output = try {
+      Await.result(statement.output, 10 milliseconds)
+    } catch {
+      case _: TimeoutException => null
+    }
+
     Map(
       "id" -> statement.id,
       "state" -> statement.state.getClass.getSimpleName.toLowerCase,
-      "output" -> statement.output
+      "output" -> output
     )
   }
 }
