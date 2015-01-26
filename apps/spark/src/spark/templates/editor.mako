@@ -881,6 +881,7 @@ ${_('Example: SELECT * FROM tablename, or press CTRL + space')}
             }
           },
           "Ctrl-Enter": function () {
+            allBindingsAccessor().value(editor.getValue());
             valueAccessor().enter();
           }
         },

@@ -101,7 +101,7 @@ var Snippet = function (notebook, snippet) {
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
-  self.statement_raw.extend({ rateLimit: 150 });
+  //self.statement_raw.extend({ rateLimit: 150 });
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
   self.settings = ko.mapping.fromJS(typeof snippet.settings != "undefined" && snippet.settings != null ? snippet.settings : {});
   self.variables = ko.observableArray([]);
