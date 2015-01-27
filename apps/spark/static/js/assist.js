@@ -37,7 +37,7 @@ var Assist = function (options) {
   }
 
 
-  function jsonCalls() {
+  function jsonCalls(force) {
     if (typeof options.baseURL == "undefined" || options.baseURL == null) {
       console.error("Assist should always have a baseURL set to work fine.");
       return null;
@@ -54,7 +54,7 @@ var Assist = function (options) {
     var _cachePath = getTotalStoragePrefix() + _url;
     var _cached = $.totalStorage(_cachePath);
     var _returnCached = false;
-    if (_cached != null && !hasExpired(_cached.timestamp) && typeof options.forceReload == "undefined") {
+    if (_cached != null && !hasExpired(_cached.timestamp) && typeof force == "undefined") {
       options.onDataReceived(_cached.data);
       _returnCached = true;
     }
@@ -93,7 +93,7 @@ var Assist = function (options) {
       error: function (error) {
         $(document).trigger('error', error);
       },
-      async: options.sync == "undefined"
+      async: typeof options.async != "undefined" && optons.async
     });
 
   }
