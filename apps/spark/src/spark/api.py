@@ -165,12 +165,15 @@ def open_notebook(request):
 def close_notebook(request):
   response = {'status': -1}
 
-  notebook_id = request.GET.get('notebook')
-  notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+  notebook = json.loads(request.POST.get('notebook', '{}'))  # Todo perms
   
   response['status'] = 0
   for snippet in notebook['snippets']:
-    get_api(request.user, snippet).close(snippet)
+    try:
+      if snippet['result']['handle']:      
+        get_api(request.user, snippet).close(snippet)
+    except QueryExpired:
+      pass
   response['message'] = _('Notebook closed !')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -182,7 +185,7 @@ def close_statement(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))  # Todo perms
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
+  try:    
     response['result'] = get_api(request.user, snippet).close(snippet)
   except QueryExpired:
     pass
