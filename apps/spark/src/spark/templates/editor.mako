@@ -313,6 +313,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn">
               ${ _('Go!') }
             </a>
+            <span title="${ _('Creating the session') }" data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </span>            
             <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
             <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>

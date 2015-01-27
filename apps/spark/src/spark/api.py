@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
-from desktop.models import Document2
+from desktop.models import Document2, Document
 
 from spark.models import get_api, Notebook
 from spark.decorators import api_error_handler
@@ -137,6 +137,7 @@ def save_notebook(request):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:      
     notebook_doc = Document2.objects.create(name=notebook['name'], type='notebook', owner=request.user)
+    Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra='notebook')
 
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook['name']
