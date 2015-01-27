@@ -978,6 +978,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         }, 600);
       });
 
+      editor.on("focus", function () {
+        if (editor.getValue() == viewModel.snippetPlaceholders[snippet.type()]) {
+          editor.setValue("");
+        }
+      });
+
+      editor.on("blur", function () {
+        if (editor.getValue() == ""){
+          editor.setValue(viewModel.snippetPlaceholders[snippet.type()]); 
+        }
+      });
+
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         wrapperElement.remove();
       });
