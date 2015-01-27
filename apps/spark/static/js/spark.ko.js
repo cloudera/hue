@@ -93,14 +93,14 @@ var TYPE_EDITOR_MAP = {
   'pig': 'text/x-pig'
 }
 
-var Snippet = function (notebook, snippet) {
+var Snippet = function (vm, notebook, snippet) {
   var self = this;
   
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
-  self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
+  self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : vm.snippetPlaceholders[self.type()]);
   //self.statement_raw.extend({ rateLimit: 150 });
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
   self.settings = ko.mapping.fromJS(typeof snippet.settings != "undefined" && snippet.settings != null ? snippet.settings : {});
@@ -150,7 +150,7 @@ var Snippet = function (notebook, snippet) {
       var rightIndex = newVal.indexOf(right.name());
       return leftIndex == rightIndex ? 0 : (leftIndex < rightIndex ? -1 : 1);
     });
-  });
+  });  
   self.statement = ko.computed(function () {
     var statement = self.statement_raw();
     $.each(self.variables(), function (index, variable) {
@@ -163,7 +163,7 @@ var Snippet = function (notebook, snippet) {
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
   self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
-
+  
   self.progress.subscribe(function (val){
     $(document).trigger("progress", {data: val, snippet: self});
   });
@@ -485,7 +485,7 @@ var Notebook = function (vm, notebook) {
   };  
   
   self.addSnippet = function(snippet) {
-	var _snippet = new Snippet(self, snippet);
+	var _snippet = new Snippet(vm, self, snippet);
 	self.snippets.push(_snippet);
 	
 	if (self.getSession(_snippet.type()) == null) {
@@ -498,7 +498,7 @@ var Notebook = function (vm, notebook) {
   };  
 
   self.newSnippet = function() {
-	var _snippet = new Snippet(self, {type: self.selectedSnippet(), result: {}});	  
+	var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), result: {}});	  
 	self.snippets.push(_snippet);
 	  
 	if (self.getSession(self.selectedSnippet()) == null) {
@@ -554,11 +554,13 @@ function EditorViewModel(notebooks, options) {
     self.isAssistVisible(! self.isAssistVisible());
     $(document).trigger("toggleAssist");
   };
+  self.isAssistVisible = ko.observable(options.assistVisible);
 
   self.assistContent = ko.observable();
   self.assistSelectedMainObject = ko.observable();
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
+  self.snippetPlaceholders = options.snippet_placeholders;
   
   self.init = function() {
     $.each(notebooks, function(index, notebook) {

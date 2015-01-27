@@ -309,7 +309,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <input type="text" data-bind="value: value" />
               </div>
             </div>
-            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
+            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
+            </textarea>
             <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn">
               ${ _('Go!') }
             </a>

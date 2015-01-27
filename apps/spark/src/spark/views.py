@@ -18,6 +18,8 @@
 import json
 import logging
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.django_util import render
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
@@ -38,7 +40,15 @@ def editor(request):
     
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
-      'options_json': json.dumps({'languages': LANGUAGES.get()})
+      'options_json': json.dumps({
+          'languages': LANGUAGES.get(),
+          'snippet_placeholders' : {
+              'scala': _('Example: 1 + 1, or press CTRL + space'),
+              'python': _('Example: 1 + 1, or press CTRL + space'),
+              'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+              'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+          }
+      })
   })
 
 
