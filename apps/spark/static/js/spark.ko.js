@@ -286,6 +286,10 @@ var Snippet = function (vm, notebook, snippet) {
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());
 
+    if (self.result.meta().length > 0) {
+      self.close();
+    }
+    
     self.result.clear();
     self.progress(0);
     self.status('running');
@@ -418,6 +422,27 @@ var Snippet = function (vm, notebook, snippet) {
     });
   };
   
+  self.close = function() {
+	if (self.checkStatusTimeout != null) {
+	  clearTimeout(self.checkStatusTimeout);
+	  self.checkStatusTimeout = null;
+	}
+	
+    $.post("/spark/api/close_statement", {
+        notebook: ko.mapping.toJSON(notebook),
+        snippet: ko.mapping.toJSON(self)
+ 	  }, function (data) {
+ 	    if (data.status == 0) {
+ 	      self.status('closed'); 
+ 	    } else {
+ 	      self._ajax_error(data);
+ 	    }
+ 	}).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+      self.status('failed');
+    });
+  };
+  
   self.getLogs = function() {
     $.post("/spark/api/get_logs", {
         notebook: ko.mapping.toJSON(notebook),
@@ -528,6 +553,15 @@ var Notebook = function (vm, notebook) {
       else {
         $(document).trigger("error", data.message);
      }
+   }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+  
+  self.close = function () {
+    $.post("/spark/api/notebook/close", {
+        "notebook": ko.mapping.toJSON(self)
+    }, function (data) {
    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });

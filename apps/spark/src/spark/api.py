@@ -25,7 +25,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2, Document
 
-from spark.models import get_api, Notebook
+from spark.models import get_api, Notebook, QueryExpired
 from spark.decorators import api_error_handler
 
 
@@ -127,7 +127,6 @@ def get_logs(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-
 def save_notebook(request):
   response = {'status': -1}
 
@@ -159,5 +158,34 @@ def open_notebook(request):
   response['status'] = 0
   response['notebook'] = notebook.get_json()
   response['message'] = _('Notebook saved !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def close_notebook(request):
+  response = {'status': -1}
+
+  notebook_id = request.GET.get('notebook')
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+  
+  response['status'] = 0
+  for snippet in notebook['snippets']:
+    get_api(request.user, snippet).close(snippet)
+  response['message'] = _('Notebook closed !')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def close_statement(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))  # Todo perms
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    response['result'] = get_api(request.user, snippet).close(snippet)
+  except QueryExpired:
+    pass
+  response['status'] = 0
 
   return HttpResponse(json.dumps(response), mimetype="application/json")

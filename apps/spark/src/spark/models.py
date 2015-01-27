@@ -24,10 +24,11 @@ from desktop.lib.rest.http_client import RestException
 
 from beeswax import models as beeswax_models, data_export
 from beeswax.design import hql_query
+from beeswax import conf as beeswax_conf
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
-from beeswax.views import safe_get_design, save_design
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
+from beeswax.views import safe_get_design, save_design
 
 from spark.job_server_api import get_api as get_spark_api
 
@@ -242,6 +243,19 @@ class HS2Api():
     else:
       return 50
 
+  @query_error_handler
+  def close(self, snippet):
+    if snippet['type'] == 'impala':
+      from impala import conf as impala_conf
+
+    if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
+      db = self._get_db(snippet)
+  
+      handle = self._get_handle(snippet)
+      db.close_operation(handle)
+      return {'status': 'closed'}
+    else:
+      return {'status': 'skipped'}
 
 
 # Spark
@@ -309,7 +323,7 @@ class SparkApi():
         raise e
 
     return {
-        'data': [data['output']] if start_over else [], # start_over not supported
+        'data': [data['output']] if start_over else [], # start_over not supported yet
         'meta': [{'name': 'Header', 'type': 'String', 'comment': ''}]
     }
 
@@ -325,3 +339,7 @@ class SparkApi():
 
   def _progress(self, snippet, logs):
     return 50
+
+  def close(self, snippet):
+    pass
+
