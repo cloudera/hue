@@ -203,9 +203,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </ul>
         <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
           <select data-bind="options: $root.assistContent().mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: $root.assistSelectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-          <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
+          <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px" data-bind="value: $root.assistContent().filter, valueUpdate: 'afterkeydown'" />
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
-          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: Object.keys($root.assistContent().firstLevelObjects())" class="unstyled assist-main">
+          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
               <a href="javascript:void(0)" class="pull-right" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
