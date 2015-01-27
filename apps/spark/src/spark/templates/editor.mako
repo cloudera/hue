@@ -373,31 +373,33 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
             &nbsp;
             
-            <div class="btn-group" data-bind="visible: type() != 'scala' && type() != 'python' && status() == 'available' && result.hasSomeResults()">
-              <button class="btn dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-download"></i>
-                <i class="fa fa-caret-down"></i>
-              </button>
-              <ul class="dropdown-menu pull-right">
-                <form method="POST" action="${ url('spark:download') }" id="download-form">
-                  ${ csrf_token(request) | n,unicode }
-                  <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
-                  <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
-                  <input type="hidden" name="format" id="download-format"/>
+            <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
+              ${ csrf_token(request) | n,unicode }
+              <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
+              <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
+              <input type="hidden" name="format" class="download-format"/>
 
-                  <li>
-                    <a href="javascript:void(0)" data-bind="click: function() { $('#download-format').val('csv'); $('#download-form').submit(); }" title="${ _('Download first rows as CSV') }">
-                      <i class="fa fa-file-o"></i> ${ _('CSV') } 
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0)" data-bind="click: function() { $('#download-format').val('xls'); $('#download-form').submit(); }" title="${ _('Download first rows as XLS') }">
-                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
-                    </a>                  
-                  </li>
-                </form>
-              </ul>            
-            </div>
+              <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults()">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-download"></i>
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                <ul class="dropdown-menu pull-right">
+                    <li>
+                      <a href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('csv'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as CSV') }">
+                        <i class="fa fa-file-o"></i> ${ _('CSV') } 
+                      </a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('xls'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as XLS') }">
+                        <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
+                      </a>                  
+                    </li>
+                </ul>            
+              </div>
+
+            </form>
+            
           </div>
         </div>
 
@@ -1314,33 +1316,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
     return _datum;
   }
-
-  /**************************************
- * Simple test data generator
- */
-function randomData(groups, points) { //# groups,# points per group
-  var data = [],
-      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
-      random = d3.random.normal();
-
-  for (i = 0; i < groups; i++) {
-    data.push({
-      key: 'Group ' + i,
-      values: []
-    });
-
-    for (j = 0; j < points; j++) {
-      data[i].values.push({
-        x: random()
-      , y: random()
-      , size: 1 //Math.random()   //Configure the size of each scatter point
-      , shape: (Math.random() > 0.95) ? shapes[j % 6] : "circle"  //Configure the shape of each scatter point.
-      });
-    }
-  }
-
-  return data;
-}
 
   function scatterChartDataTransformer(rawDatum) {
     var _datum = [];
