@@ -240,10 +240,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
-      <div class="add-snippet">
-        <div class="overlay">
+      <div class="add-snippet pointer">
+        <div class="overlay pointer" data-bind="click: function(notebook, e){ if (!($(e.target).is('select'))){ newSnippet(); } }">
           <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px"></select>
-          <i class="fa fa-plus-circle fa-5x" data-bind="click: newSnippet" title="${ _('Add a new snippet') }"></i>
+          <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
         </div>
       </div>
     </div>
@@ -461,15 +461,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </a>
             </div>
             <div>
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <li class="nav-header">${_('scatter groups')}</li>
-              </ul>
-              <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART)">
-                <ul class="unstyled" data-bind="foreach: result.cleanedMeta">
-                  <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartScatterGroups" /> <span data-bind="text: $data.name"></span></li>
-                </ul>
-              </div>
-
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
                 <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('x-axis')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
@@ -497,6 +488,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </ul>
               <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
                 <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
+              </div>
+
+              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <li class="nav-header">${_('scatter group')}</li>
+              </ul>
+              <div data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <select data-bind="options: result.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
@@ -1319,8 +1317,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   function scatterChartDataTransformer(rawDatum) {
     var _datum = [];
-
-    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle().length > 0) {
+    
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
       function addToDatum(col) {
         var _idxX = -1;
         var _idxY = -1;
@@ -1355,10 +1353,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         }
       }
 
-      if (rawDatum.snippet.chartScatterGroups().length > 0){
-        rawDatum.snippet.chartScatterGroups().forEach(function (col) {
-          addToDatum(col);
+      if (rawDatum.snippet.chartScatterGroup() != null){
+        var _idxGroup = -1;
+        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+          if (icol.name == rawDatum.snippet.chartScatterGroup()) {
+            _idxGroup = idx;
+          }
         });
+        if (_idxGroup > -1) {
+        $(rawDatum.counts()).each(function (cnt, item) {
+          addToDatum(item[_idxGroup]);
+        });
+        }
       }
       else {
         addToDatum('${ _('Distribution') }');
