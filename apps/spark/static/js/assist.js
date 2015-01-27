@@ -123,4 +123,12 @@ var Assist = function (options) {
   self.selectedMainObject = ko.observable();
   self.mainObjects = ko.observableArray([]);
   self.firstLevelObjects = ko.observable({});
+  
+  self.filter = ko.observable("");
+  self.filter.extend({ rateLimit: 150 });
+  self.filteredFirstLevelObjects  = ko.computed(function(){
+    return ko.utils.arrayFilter(Object.keys(self.firstLevelObjects()), function(item) {
+      return item.toLowerCase().indexOf(self.filter()) > -1;
+    });
+  });
 }
