@@ -24,14 +24,6 @@
             <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>true</useProjectArtifact>
 
-            <!--
-            <includes>
-                <include>com.cloudera.hue.livy:livy-yarn</include>
-                <include>org.slf4j:slf4j-log4j12</include>
-                <include>org.apache.hadoop:hadoop-hdfs</include>
-            </includes>
-            -->
-
             <useTransitiveFiltering>true</useTransitiveFiltering>
         </dependencySet>
     </dependencySets>

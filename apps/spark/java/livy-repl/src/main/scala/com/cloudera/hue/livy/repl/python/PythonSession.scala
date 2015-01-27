@@ -1,11 +1,11 @@
 package com.cloudera.hue.livy.repl.python
 
 import java.io._
+import java.nio.file.Files
 
 import com.cloudera.hue.livy.ExecuteResponse
 import com.cloudera.hue.livy.repl.Session
 import org.json4s.DefaultFormats
-import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
@@ -13,16 +13,35 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 object PythonSession {
-  val LIVY_HOME = System.getenv("LIVY_HOME")
-  val FAKE_SHELL = LIVY_HOME + "/livy-repl/src/main/python/fake_shell.py"
-
   def create(): Session = {
-    val pb = new ProcessBuilder("python", FAKE_SHELL)
+    val file = createScript()
+    val pb = new ProcessBuilder("python", file.toString)
     val process = pb.start()
     val in = process.getInputStream
     val out = process.getOutputStream
 
     new PythonSession(process, in, out)
+  }
+
+  private def createScript(): File = {
+    val source: InputStream = getClass.getClassLoader.getResourceAsStream("fake_shell.py")
+
+    val file = Files.createTempFile("", "").toFile
+    file.deleteOnExit()
+
+    val sink = new FileOutputStream(file)
+    val buf = new Array[Byte](1024)
+    var n = source.read(buf)
+
+    while (n > 0) {
+      sink.write(buf, 0, n)
+      n = source.read(buf)
+    }
+
+    source.close()
+    sink.close()
+
+    file
   }
 
   // Java unfortunately wraps the input stream in a buffer, so we need to hack around it so we can read the output
