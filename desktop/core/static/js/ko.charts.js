@@ -21,6 +21,7 @@ ko.HUE_CHARTS = {
     POINTCHART: "points",
     PIECHART: "pie",
     MAP: "map",
+    GRADIENTMAP: "gradientmap",
     SCATTERCHART: "scatter"
   }
 };
@@ -229,7 +230,6 @@ ko.bindingHandlers.leafletMapChart = {
   }
 };
 
-
 ko.bindingHandlers.mapChart = {
   render: function (element, valueAccessor) {
 
@@ -269,7 +269,7 @@ ko.bindingHandlers.mapChart = {
         _fills["fill_" + cnt] = item;
       });
       $(_data).each(function (cnt, item) {
-        var _place = item.label.toUpperCase();
+        var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
           _mapdata[_place] = {
             fillKey: "fill_" + (Math.floor(item.value / _chunk) - 1),
@@ -372,10 +372,19 @@ ko.bindingHandlers.mapChart = {
     });
   },
   init: function (element, valueAccessor) {
-    ko.bindingHandlers.mapChart.render(element, valueAccessor)
-  },
-  update: function (element, valueAccessor) {
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
+  },
+  update: function (element, valueAccessor, allBindingsAccessor) {
+    if (typeof allBindingsAccessor().mapChart.visible != "undefined"){
+      if ((typeof allBindingsAccessor().mapChart.visible == "boolean" && allBindingsAccessor().mapChart.visible) || (typeof allBindingsAccessor().mapChart.visible == "function" && allBindingsAccessor().mapChart.visible())) {
+        $(element).show();
+        ko.bindingHandlers.mapChart.render(element, valueAccessor);
+      }
+      else {
+        $(element).hide();
+      }
+    }
+    
   }
 };
 
