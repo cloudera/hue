@@ -7,11 +7,16 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.AMRMClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
+import org.apache.spark.repl.Main
 import org.scalatra.servlet.ScalatraListener
 
 object AppMaster extends Logging {
 
+  val SESSION_KIND = "livy-repl.session.kind"
+
   def main(args: Array[String]): Unit = {
+    val lang = args(1)
+
     val containerIdString = System.getenv(ApplicationConstants.Environment.CONTAINER_ID.toString)
     info("got container id: %s" format containerIdString)
     val containerId = ConverterUtils.toContainerId(containerIdString)
@@ -26,20 +31,21 @@ object AppMaster extends Logging {
     info("got node manager port: %s" format nodePortString)
 
     val yarnConfig = new YarnConfiguration()
-    val service = new AppMasterService(yarnConfig, nodeHostString)
+    val service = new AppMasterService(yarnConfig, nodeHostString, lang)
     service.run()
   }
 
 }
 
-class AppMasterService(yarnConfig: YarnConfiguration, nodeHostString: String) extends Logging {
+class AppMasterService(yarnConfig: YarnConfiguration, nodeHostString: String, lang: String) extends Logging {
   val webServer = new WebServer(0)
   val amRMClient = AMRMClient.createAMRMClient()
   amRMClient.init(yarnConfig)
 
   webServer.context.setResourceBase("src/main/com/cloudera/hue/livy/repl")
-  webServer.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
   webServer.context.addEventListener(new ScalatraListener)
+  webServer.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
+  webServer.context.setInitParameter(AppMaster.SESSION_KIND, lang)
 
   def run(): Unit = {
     webServer.start()

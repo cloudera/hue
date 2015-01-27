@@ -34,8 +34,8 @@ object Main extends Logging {
     val server = new WebServer(port)
 
     server.context.setResourceBase("src/main/com/cloudera/hue/livy/repl")
-    server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
     server.context.addEventListener(new ScalatraListener)
+    server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
     server.context.setInitParameter(SESSION_KIND, session_kind)
 
     server.start()

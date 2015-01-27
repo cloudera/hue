@@ -14,6 +14,7 @@ object Client extends Logging {
 
   def main(args: Array[String]): Unit = {
     val packagePath = new Path(args(1))
+    val lang = args(2)
 
     val yarnConf = new YarnConfiguration()
     yarnConf.set("yarn.resourcemanager.am.max-attempts", "1")
@@ -24,7 +25,8 @@ object Client extends Logging {
       val job = client.submitApplication(
         packagePath,
         List(
-          "__package/bin/run-am.sh 1>%s/stdout 2>%s/stderr" format (
+          "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
+            lang,
             ApplicationConstants.LOG_DIR_EXPANSION_VAR,
             ApplicationConstants.LOG_DIR_EXPANSION_VAR
           )
