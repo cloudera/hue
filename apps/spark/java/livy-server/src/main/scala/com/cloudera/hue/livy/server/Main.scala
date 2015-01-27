@@ -8,7 +8,7 @@ import org.scalatra.servlet.ScalatraListener
 
 object Main {
 
-  val SESSION_KIND = "livy.session.kind"
+  val SESSION_KIND = "livy-server.session.kind"
   val PROCESS_SESSION = "process"
   val YARN_SESSION = "yarn"
 

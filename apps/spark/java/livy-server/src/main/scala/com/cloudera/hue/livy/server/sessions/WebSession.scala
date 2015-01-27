@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, _}
 
-abstract class SparkWebSession(val id: String, hostname: String, port: Int) extends Session with Logging {
+abstract class WebSession(val id: String, hostname: String, port: Int) extends Session with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats

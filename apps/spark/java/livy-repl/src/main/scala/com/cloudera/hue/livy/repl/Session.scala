@@ -2,7 +2,7 @@ package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.ExecuteResponse
 
-import scala.concurrent.Future
+import _root_.scala.concurrent.Future
 
 trait Session {
   def statements: Seq[ExecuteResponse]

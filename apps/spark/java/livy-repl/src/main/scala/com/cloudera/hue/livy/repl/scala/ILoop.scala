@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.repl.spark
+package com.cloudera.hue.livy.repl.scala
 
 import java.io._
 import java.util.concurrent.BlockingQueue

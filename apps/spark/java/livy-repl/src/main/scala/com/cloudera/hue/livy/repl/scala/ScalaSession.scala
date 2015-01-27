@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.repl.spark
+package com.cloudera.hue.livy.repl.scala
 
 import java.util.concurrent.SynchronousQueue
 
@@ -9,7 +9,11 @@ import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 
-class SparkSession extends Session {
+object ScalaSession {
+  def create(): Session = new ScalaSession()
+}
+
+private class ScalaSession extends Session {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   private[this] val inQueue = new SynchronousQueue[ILoop.Request]

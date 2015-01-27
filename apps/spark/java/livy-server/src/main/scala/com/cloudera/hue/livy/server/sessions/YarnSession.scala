@@ -6,18 +6,19 @@ import org.apache.hadoop.yarn.api.ApplicationConstants
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future, TimeoutException}
 
-object SparkYarnSession {
+object YarnSession {
   private val LIVY_YARN_PACKAGE = System.getenv("LIVY_YARN_PACKAGE")
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  def create(client: Client, id: String): Future[Session] = {
+  def create(client: Client, id: String, lang: String): Future[Session] = {
     val packagePath = new Path(LIVY_YARN_PACKAGE)
 
     val job = client.submitApplication(
       packagePath,
       List(
-        "__package/bin/run-am.sh 1>%s/stdout 2>%s/stderr" format (
+        "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
+          lang,
           ApplicationConstants.LOG_DIR_EXPANSION_VAR,
           ApplicationConstants.LOG_DIR_EXPANSION_VAR
           )
@@ -31,7 +32,7 @@ object SparkYarnSession {
 
       x match {
         case Some((hostname, port)) =>
-          new SparkYarnSession(id, job, hostname, port)
+          new YarnSession(id, job, hostname, port)
         case None =>
           throw new TimeoutException()
       }
@@ -39,8 +40,8 @@ object SparkYarnSession {
   }
 }
 
-private class SparkYarnSession(id: String, job: Job, hostname: String, port: Int)
-  extends SparkWebSession(id, hostname, port) {
+private class YarnSession(id: String, job: Job, hostname: String, port: Int)
+  extends WebSession(id, hostname, port) {
 
   override def stop(): Future[Unit] = {
     super.stop() andThen { case r =>

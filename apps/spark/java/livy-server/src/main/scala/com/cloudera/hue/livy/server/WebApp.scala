@@ -46,7 +46,8 @@ class WebApp(sessionManager: SessionManager)
     val createSessionRequest = parsedBody.extract[CreateSessionRequest]
 
     val sessionFuture = createSessionRequest.lang match {
-      case "scala" => sessionManager.createSparkSession()
+      case "scala" => sessionManager.createSession(createSessionRequest.lang)
+      case "python" => sessionManager.createSession(createSessionRequest.lang)
       case lang => halt(400, "unsupported language: " + lang)
     }
 
@@ -87,7 +88,6 @@ class WebApp(sessionManager: SessionManager)
       _ <- sessionManager.delete(params("sessionId"))
     } yield Accepted()
 
-    // FIXME: this is silently eating exceptions.
     new AsyncResult() { val is = for { _ <- future } yield NoContent }
   }
 
