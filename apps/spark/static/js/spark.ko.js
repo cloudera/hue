@@ -427,7 +427,7 @@ var Snippet = function (notebook, snippet) {
  	      self.result.logs(data.logs); // Way to append?
  	      self.progress(data.progress);
  	    } else {
- 	    	self._ajax_error(data);
+ 	      self._ajax_error(data);
  	    }
  	}).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);

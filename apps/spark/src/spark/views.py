@@ -19,6 +19,7 @@ import json
 import logging
 
 from desktop.lib.django_util import render
+from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
 
 from spark.conf import LANGUAGES
@@ -46,10 +47,10 @@ def new(request):
   
 
 def notebooks(request):
-  notebooks = Document2.objects.filter(type='notebook', owner=request.user)
+  notebooks = [d.to_dict() for d in Document2.objects.filter(type='notebook', owner=request.user)]
 
   return render('notebooks.mako', request, {
-      'notebooks': notebooks
+      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
 
 
