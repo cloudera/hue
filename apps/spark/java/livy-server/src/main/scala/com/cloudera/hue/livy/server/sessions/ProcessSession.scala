@@ -8,17 +8,17 @@ import scala.annotation.tailrec
 import scala.concurrent.Future
 import scala.io.Source
 
-object SparkProcessSession extends Logging {
+object ProcessSession extends Logging {
   val LIVY_HOME = System.getenv("LIVY_HOME")
-  val SPARK_SHELL = LIVY_HOME + "/bin/spark-shell"
+  val LIVY_REPL = LIVY_HOME + "/bin/livy-repl"
 
-  def create(id: String): Session = {
-    val (process, port) = startProcess()
-    new SparkProcessSession(id, process, port)
+  def create(id: String, lang: String): Session = {
+    val (process, port) = startProcess(lang)
+    new ProcessSession(id, process, port)
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(): (Process, Int) = {
+  private def startProcess(lang: String): (Process, Int) = {
     val regex = """Starting livy-repl on port (\d+)""".r
 
     @tailrec
@@ -36,8 +36,8 @@ object SparkProcessSession extends Logging {
       }
     }
 
-    def startProcess(): (Process, Int) = {
-      val pb = new ProcessBuilder(SPARK_SHELL)
+    def startProcess(lang: String): (Process, Int) = {
+      val pb = new ProcessBuilder(LIVY_REPL, lang)
       pb.environment().put("PORT", "0")
       pb.redirectError(Redirect.INHERIT)
       val process = pb.start()
@@ -58,11 +58,11 @@ object SparkProcessSession extends Logging {
       }
     }
 
-    startProcess()
+    startProcess(lang)
   }
 }
 
-private class SparkProcessSession(id: String, process: Process, port: Int) extends SparkWebSession(id, "localhost", port) {
+private class ProcessSession(id: String, process: Process, port: Int) extends WebSession(id, "localhost", port) {
 
   override def stop(): Future[Unit] = {
     super.stop() andThen { case r =>
