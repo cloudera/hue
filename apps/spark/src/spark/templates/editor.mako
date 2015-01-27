@@ -392,19 +392,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                   <i class="fa fa-caret-down"></i>
                 </button>
                 <ul class="dropdown-menu pull-right">
-                    <li>
-                      <a href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('csv'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as CSV') }">
-                        <i class="fa fa-file-o"></i> ${ _('CSV') } 
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('xls'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as XLS') }">
-                        <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
-                      </a>                  
-                    </li>
+                  <li>
+                    <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('csv'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as CSV') }">
+                      <i class="fa fa-file-o"></i> ${ _('CSV') } 
+                    </a>
+                  </li>
+                  <li>
+                    <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('xls'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as XLS') }">
+                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
+                    </a>                  
+                  </li>
                 </ul>            
               </div>
-
             </form>
             
           </div>
@@ -560,11 +559,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div class="btn-toolbar" data-role="editor-toolbar" data-bind="attr:{'data-target': '#editor_'+id()}, visible: $root.isEditing()">
           <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
-              <ul class="dropdown-menu">
+            <ul class="dropdown-menu">
               <li><a data-edit="fontSize 5"><font size="5">${ _("Huge") }</font></a></li>
               <li><a data-edit="fontSize 3"><font size="3">${ _("Normal") }</font></a></li>
               <li><a data-edit="fontSize 1"><font size="1">${ _("Small") }</font></a></li>
-              </ul>
+            </ul>
           </div>
           <div class="btn-group">
             <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
