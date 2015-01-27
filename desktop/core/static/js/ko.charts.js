@@ -398,8 +398,8 @@ ko.bindingHandlers.scatterChart = {
           .transitionDuration(350)
           .color(d3.scale.category10().range());
 
-        _chart.tooltipContent(function(key) {
-            return '<h3>' + key + '</h3>';
+        _chart.tooltipContent(function(key, x, y, obj) {
+            return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
         });
 
         _chart.xAxis.tickFormat(d3.format('.02f'));
