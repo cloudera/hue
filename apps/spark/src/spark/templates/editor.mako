@@ -1007,6 +1007,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   ko.applyBindings(viewModel);
   viewModel.init();
 
+  $(document).ready(function () {
+    // Close the notebook snippets when leaving the page
+    window.onbeforeunload = function(e) {
+      viewModel.selectedNotebook().close();
+    };
+  });
+
   viewModel.assistSelectedMainObject.subscribe(function(newVal) {
     viewModel.assistContent().selectedMainObject(newVal);
     loadAssistFirstLevel();
