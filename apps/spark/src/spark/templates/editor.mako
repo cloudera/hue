@@ -437,7 +437,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <li data-bind="visible: name != ''"><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
             </ul>
           </div>
-          <div data-bind="css:{'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
+          <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
             <div class="toggle-left-panel" data-bind="click: toggleLeftPanel">
               <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isLeftPanelVisible()">
                 <i class="fa fa-chevron-right"></i>
@@ -469,18 +469,20 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <div>
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('x-axis')}</li>
+                <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
               </ul>
               <div data-bind="visible: chartType() != ''">
                 <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('y-axis')}</li>
+                <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
+                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
               </ul>
 
               <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
