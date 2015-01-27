@@ -314,9 +314,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn">
               ${ _('Go!') }
             </a>
-            <span title="${ _('Creating the session') }" data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn">
-              <i class="fa fa-spinner fa-spin fa-2x"></i>
-            </span>            
             <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
             <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -740,14 +737,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           try {
             var _statement = getStatementAtCursor(cm).statement;
             var _from = _statement.toUpperCase().indexOf("FROM");
+            var _found = [];
             if (_from > -1) {
               var _match = _statement.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
               var _to = _statement.length;
               if (_match) {
                 _to = _match.index;
               }
-              var _found = _statement.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+              _found = _statement.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
             }
+
+
 
             var _foundTable = "";
             for (var i = 0; i < _found.length; i++) {
@@ -763,6 +763,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               else {
                 assist.options.onDataReceived = function (data) {
                   if (data.columns) {
+                    CodeMirror.catalogTables = "";
+                    CodeMirror.possibleTable = false;
                     CodeMirror.catalogFields = "* " + data.columns.join(" ");
                     CodeMirror.showHint(cm, autocompleteSet);
                   }
@@ -776,7 +778,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 if (_aliases[_foundTable]) {
                   _foundTable = _aliases[_foundTable];
                 }
-
                 assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _foundTable);
               }
             }
@@ -879,7 +880,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                   }
                 }
                 else {
-                  if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
+                  if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1 || _before.toUpperCase().indexOf("GROUP BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| SORT/) == null) {
                     fieldsAutocomplete(cm);
                   }
                   else {
