@@ -228,3 +228,8 @@ h1.empty {
 .toggle-left-panel:hover {
   background-color: #F0F0F0;
 }
+
+.chart-icon {
+  width: 15px;
+  text-align: center;
+}

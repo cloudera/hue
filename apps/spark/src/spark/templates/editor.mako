@@ -332,8 +332,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
               <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
               <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-              <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-              <i class="fa fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+              <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+              <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+              <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
               <i class="fa fa-caret-down"></i>
             </button>
             <ul class="dropdown-menu">
@@ -353,13 +354,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 </a>
               </li>
               <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-                  <i class="hcha hcha-map-chart"></i> ${_('Map')}
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+                  <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
                 </a>
               </li>
               <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-                  <i class="fa fa-dot-circle-o"></i> ${_('Scatter')}
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                  <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                  <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
                 </a>
               </li>
             </ul>
@@ -465,15 +471,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <div>
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('x-axis')}</li>
+                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('x-axis')}</li>
+                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
               </ul>
               <div data-bind="visible: chartType() != ''">
-                <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
+                <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('y-axis')}</li>
+                <li data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('y-axis')}</li>
+                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
                 <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
               </ul>
 
@@ -482,8 +490,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                   <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
                 </ul>
               </div>
-              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <select data-bind="options: result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
+              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+                <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
               </div>
 
               <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
@@ -507,10 +515,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
               </div>
 
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
                 <li class="nav-header">${_('sorting')}</li>
               </ul>
-              <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+              <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
                 <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
                 <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
                 <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
@@ -536,6 +544,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
             <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                   transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP}" class="chart"></div>
+
+            <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
 
             <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                   transformer: scatterChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
@@ -1230,6 +1241,32 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return _data;
   }
 
+  function mapChartDataTransformer(rawDatum) {
+    var _data = [];
+    if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
+      var _idxRegion = -1;
+      var _idxValue = -1;
+      rawDatum.snippet.result.meta().forEach(function (col, idx) {
+        if (col.name == rawDatum.snippet.chartX()) {
+          _idxRegion = idx;
+        }
+        if (col.name == rawDatum.snippet.chartYSingle()) {
+          _idxValue = idx;
+        }
+      });
+
+      $(rawDatum.counts()).each(function (cnt, item) {
+        _data.push({
+          label: item[_idxRegion],
+          value: item[_idxValue],
+          obj: item
+        });
+      });
+    }
+    
+    return _data;
+  }
+
   function leafletMapChartDataTransformer(rawDatum) {
     var _data = [];
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
@@ -1326,6 +1363,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         var _idxX = -1;
         var _idxY = -1;
         var _idxSize = -1;
+        var _idxGroup = -1;
         rawDatum.snippet.result.meta().forEach(function (icol, idx) {
           if (icol.name == rawDatum.snippet.chartX()) {
             _idxX = idx;
@@ -1336,18 +1374,23 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           if (icol.name == rawDatum.snippet.chartScatterSize()) {
             _idxSize = idx;
           }
+          if (icol.name == rawDatum.snippet.chartScatterGroup()) {
+            _idxGroup = idx;
+          }
         });
 
         if (_idxX > -1 && _idxY > -1) {
           var _data = [];
           $(rawDatum.counts()).each(function (cnt, item) {
-            _data.push({
-              x: item[_idxX],
-              y: item[_idxY],
-              shape: 'circle',
-              size: _idxSize > -1 ? item[_idxSize] : 100,
-              obj: item
-            });
+            if (_idxGroup == -1 || item[_idxGroup] == col){
+              _data.push({
+                x: item[_idxX],
+                y: item[_idxY],
+                shape: 'circle',
+                size: _idxSize > -1 ? item[_idxSize] : 100,
+                obj: item
+              });
+            }
           });
           _datum.push({
             key: col,
