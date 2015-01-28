@@ -207,7 +207,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-              <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none; position: absolute; right: 4px; margin-left: auto; background-color: #FFF"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+              <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="display: none; position: absolute; right: 10px; margin-left: auto; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
@@ -619,6 +619,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     baseURL: "${url('beeswax:api_autocomplete_databases')}"
   });
 
+  $.scrollbarWidth = function() {
+    var _parent, _child, _width;
+    _parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    _child = _parent.children();
+    _width = _child.innerWidth() - _child.height(99).innerWidth();
+    _parent.remove();
+    return _width;
+  };
+
   ko.bindingHandlers.wysiwyg = {
     init: function (element, valueAccessor, allBindings) {
       $(element).wysiwyg();
@@ -958,26 +967,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       var wrapperElement = $(editor.getWrapperElement());
 
       var _changeTimeout = -1;
-      var _previousLineCount = 7;
       editor.on("change", function () {
-        // var _redraw = false;
-        // if (editor.lineCount() <= 7 && _previousLineCount > 7) {
-        //   editor.setSize("100%", snippet.codemirrorSize());
-        // }
-        // else if (editor.lineCount() > 7 && editor.lineCount() < 21 && (_previousLineCount <=7 || _previousLineCount >= 20)) {
-        //   editor.setSize("100%", "auto");
-        // }
-        // else if (_previousLineCount >= 20) {
-        //   editor.setSize("100%", "270px");
-        // }
-        // if (_previousLineCount != editor.lineCount()){
-        //   $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
-        //     fixedHeader: true,
-        //     includeNavigator: false,
-        //     parentId: snippet.id()
-        //   });
-        // }
-        // _previousLineCount = editor.lineCount();
         window.clearTimeout(_changeTimeout);
         _changeTimeout = window.setTimeout(function(){
           allBindingsAccessor().value(editor.getValue());
@@ -1017,6 +1007,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     window.onbeforeunload = function(e) {
       viewModel.selectedNotebook().close();
     };
+
+    $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
   });
 
   viewModel.assistSelectedMainObject.subscribe(function(newVal) {

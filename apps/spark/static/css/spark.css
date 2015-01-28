@@ -156,7 +156,7 @@
 }
 
 .assist-main {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .editable-empty, .editable-empty:hover {
