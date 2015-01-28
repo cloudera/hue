@@ -21,9 +21,8 @@ set -e
 
 export LIVY_HOME=$(cd $(dirname $0)/.. && pwd)
 
-CLASSPATH="$LIVY_HOME/livy-server/target/lib/*:$LIVY_HOME/livy-server/target/livy-server-3.7.0-SNAPSHOT.jar:$CLASSPATH"
+CLASSPATH="$LIVY_HOME/livy-server/target/lib/*:$LIVY_HOME/livy-server/target/livy-server-3.7.0-SNAPSHOT.jar:`hadoop classpath`:$CLASSPATH"
 
 exec java \
-	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 \
 	-cp "$CLASSPATH" \
-	com.cloudera.hue.livy.server.Main "$@"
+	com.cloudera.hue.livy.yarn.Client "$@"

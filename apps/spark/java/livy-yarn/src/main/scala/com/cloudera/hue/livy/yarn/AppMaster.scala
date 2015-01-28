@@ -15,7 +15,7 @@ object AppMaster extends Logging {
   val SESSION_KIND = "livy-repl.session.kind"
 
   def main(args: Array[String]): Unit = {
-    val lang = args(1)
+    val lang = args(0)
 
     val containerIdString = System.getenv(ApplicationConstants.Environment.CONTAINER_ID.toString)
     info("got container id: %s" format containerIdString)

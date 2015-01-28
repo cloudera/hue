@@ -26,7 +26,7 @@ object YarnSession {
     )
 
     Future {
-      var x = job.waitForRPC(10000)
+      var x = job.waitForRPC(100000)
 
       println("x: %s" format x)
 
