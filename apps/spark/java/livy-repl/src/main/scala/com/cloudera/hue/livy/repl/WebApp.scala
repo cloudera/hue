@@ -7,13 +7,13 @@ import org.json4s.{DefaultFormats, Formats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import _root_.scala.concurrent.{Future, ExecutionContext}
+import _root_.scala.concurrent.{ExecutionContextExecutor, Future, ExecutionContext}
 
 object WebApp extends Logging {}
 
 class WebApp(session: Session) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
-  override protected implicit def executor = ExecutionContext.global
+  override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit val jsonFormats = DefaultFormats
 
   protected implicit def defaultTimeout: Timeout = Timeout(10)
