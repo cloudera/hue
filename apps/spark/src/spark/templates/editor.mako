@@ -313,13 +313,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
-            <a href="javascript:void(0)" title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn">
+            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn pointer">
               ${ _('Go!') }
             </a>
-            <a href="javascript:void(0)" data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn">${ _('Cancel') }</a>
+            <a data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn pointer">${ _('Cancel') }</a>
             <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
+            <div class="resize-panel center"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
           </div>
         </div>
 
@@ -953,34 +954,34 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       element.editor = editor;
       $("#snippet_" + options.id).data("editor", editor);
       editor.setValue(allBindingsAccessor().value());
-      editor.setSize("100%", "100px");
+      editor.setSize("100%", snippet.codemirrorSize());
       var wrapperElement = $(editor.getWrapperElement());
 
       var _changeTimeout = -1;
       var _previousLineCount = 7;
       editor.on("change", function () {
-        var _redraw = false;
-        if (editor.lineCount() <= 7 && _previousLineCount > 7) {
-          editor.setSize("100%", "100px");
-        }
-        else if (editor.lineCount() > 7 && editor.lineCount() < 21 && (_previousLineCount <=7 || _previousLineCount >= 20)) {
-          editor.setSize("100%", "auto");
-        }
-        else if (_previousLineCount >= 20) {
-          editor.setSize("100%", "270px");
-        }
-        if (_previousLineCount != editor.lineCount()){
-          $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
-            fixedHeader: true,
-            includeNavigator: false,
-            parentId: snippet.id()
-          });
-        }
-        _previousLineCount = editor.lineCount();
+        // var _redraw = false;
+        // if (editor.lineCount() <= 7 && _previousLineCount > 7) {
+        //   editor.setSize("100%", snippet.codemirrorSize());
+        // }
+        // else if (editor.lineCount() > 7 && editor.lineCount() < 21 && (_previousLineCount <=7 || _previousLineCount >= 20)) {
+        //   editor.setSize("100%", "auto");
+        // }
+        // else if (_previousLineCount >= 20) {
+        //   editor.setSize("100%", "270px");
+        // }
+        // if (_previousLineCount != editor.lineCount()){
+        //   $("#snippet_" + snippet.id()).find(".resultTable").jHueTableExtender({
+        //     fixedHeader: true,
+        //     includeNavigator: false,
+        //     parentId: snippet.id()
+        //   });
+        // }
+        // _previousLineCount = editor.lineCount();
         window.clearTimeout(_changeTimeout);
         _changeTimeout = window.setTimeout(function(){
           allBindingsAccessor().value(editor.getValue());
-        }, 600);
+        }, 300);
       });
 
       editor.on("focus", function () {
@@ -1492,6 +1493,46 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   $(document).ready(function () {
     resizeAssist();
+
+    var INITIAL_RESIZE_POSITION = 100;
+
+    function getDraggableOptions(minY) {
+      return {
+        axis: "y",
+        start: function(e, ui) {
+          INITIAL_RESIZE_POSITION = ui.offset.top;
+        },
+        drag: function(e, ui) {
+          draggableHelper($(this), e, ui);
+          $(".jHueTableExtenderClonedContainer").hide();
+        },
+        stop: function(e, ui) {
+          $(".jHueTableExtenderClonedContainer").show();
+          draggableHelper($(this), e, ui, true);
+          redrawFixedHeaders();
+        },
+        containment: [0, minY, 4000, minY + 400]
+      }
+    };
+
+    $(".resize-panel a").each(function(){
+      $(this).draggable(getDraggableOptions($(this).parents(".snippet").offset().top + 128));
+    });
+
+    function draggableHelper(el, e, ui, setSize) {
+      var _snippet = ko.dataFor(el.parents(".snippet")[0]);
+      var _cm = $("#snippet_" + _snippet.id()).data("editor");
+      var _newSize = _snippet.codemirrorSize() + (ui.offset.top - INITIAL_RESIZE_POSITION);
+      _cm.setSize("99%", _newSize);
+      if (setSize) {
+        _snippet.codemirrorSize(_newSize);
+      }
+    }
+
+    $(document).on("snippetAdded", function(e, snippet) {
+      var _handle = $("#snippet_" + snippet.id()).find(".resize-panel a");
+      _handle.draggable(getDraggableOptions(_handle.offset().top));
+    });
 
     $(document).on("toggleAssist", function(){
       $.totalStorage("sparkAssistVisible", viewModel.isAssistVisible());

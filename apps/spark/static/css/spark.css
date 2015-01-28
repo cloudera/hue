@@ -233,3 +233,9 @@ h1.empty {
   width: 15px;
   text-align: center;
 }
+
+.resize-panel a {
+  cursor: ns-resize;
+  color: #666;
+  position: absolute;
+}
