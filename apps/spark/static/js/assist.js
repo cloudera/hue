@@ -86,15 +86,12 @@ var Assist = function (options) {
               timestamp: (new Date()).getTime()
             }
             $.totalStorage(_cachePath, _obj);
-            if (!_returnCached) {
-              options.onDataReceived($.totalStorage(_cachePath).data);
-            }
+            options.onDataReceived($.totalStorage(_cachePath).data);
           }
         },
         error: function (error) {
           $(document).trigger('error', error);
-        },
-        async: typeof options.async != "undefined" && optons.async
+        }
       });
     }
 
