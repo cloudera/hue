@@ -70,31 +70,33 @@ var Assist = function (options) {
       });
     }
 
-    $.ajax({
-      type: "GET",
-      url: _url + "?" + Math.random(),
-      success: function (data) {
-        if (data.error){
-          if (typeof options.failsSilentlyOn == "undefined" || (data.code != null && options.failsSilentlyOn.indexOf(data.code) == -1)){
-            $.jHueNotify.error(data.error);
+    if (! _returnCached){
+      $.ajax({
+        type: "GET",
+        url: _url + "?" + Math.random(),
+        success: function (data) {
+          if (data.error){
+            if (typeof options.failsSilentlyOn == "undefined" || (data.code != null && options.failsSilentlyOn.indexOf(data.code) == -1)){
+              $.jHueNotify.error(data.error);
+            }
           }
-        }
-        else {
-          var _obj = {
-            data: data,
-            timestamp: (new Date()).getTime()
+          else {
+            var _obj = {
+              data: data,
+              timestamp: (new Date()).getTime()
+            }
+            $.totalStorage(_cachePath, _obj);
+            if (!_returnCached) {
+              options.onDataReceived($.totalStorage(_cachePath).data);
+            }
           }
-          $.totalStorage(_cachePath, _obj);
-          if (!_returnCached) {
-            options.onDataReceived($.totalStorage(_cachePath).data);
-          }
-        }
-      },
-      error: function (error) {
-        $(document).trigger('error', error);
-      },
-      async: typeof options.async != "undefined" && optons.async
-    });
+        },
+        error: function (error) {
+          $(document).trigger('error', error);
+        },
+        async: typeof options.async != "undefined" && optons.async
+      });
+    }
 
   }
 

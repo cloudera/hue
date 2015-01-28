@@ -81,7 +81,8 @@ ko.bindingHandlers.pieChart = {
         });
 
         $(element).height($(element).width());
-        $(element).parents(".card-widget").on("resize", function () {
+        var _parentSelector = typeof _options.parentSelector != "undefined" ? _options.parentSelector : ".card-widget";
+        $(element).parents(_parentSelector).on("resize", function () {
           if (typeof _options.maxWidth != "undefined") {
             var _max = _options.maxWidth * 1;
             $(element).width(Math.min($(element).parent().width(), _max));
@@ -367,7 +368,9 @@ ko.bindingHandlers.mapChart = {
 
     createDatamap(element, _options, _fills, _mapdata, _noncountries, _maphovers)
 
-    $(element).parents(".card-widget").one("resize", function () {
+    var _parentSelector = typeof _options.parentSelector != "undefined" ? _options.parentSelector : ".card-widget";
+
+    $(element).parents(_parentSelector).one("resize", function () {
       ko.bindingHandlers.mapChart.render(element, valueAccessor);
     });
   },
