@@ -229,7 +229,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
       </div>
     </div>
-    <div data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': !$root.isAssistVisible()}">
+    <div data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': ! $root.isAssistVisible()}">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -242,10 +242,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <div class="add-snippet pointer">
         <div class="overlay pointer" data-bind="click: function(notebook, e){ if (!($(e.target).is('select'))){ newSnippet(); } }">
-          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px"></select>
-          <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
-        </div>
+          <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px">
+          </select>
+          <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>          
+        </div>       
       </div>
+      <div class="overlay" style="padding-bottom:70px"></div>
     </div>
   </div>
 
