@@ -207,7 +207,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-              <a href="javascript:void(0)" class="pull-rsight" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none; position: absolute; right: 4px; margin-left: auto"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+              <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none; position: absolute; right: 4px; margin-left: auto; background-color: #FFF"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
@@ -1554,6 +1554,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       options.snippet.chartYSingle(options.snippet.tempChartOptions.yS);
       options.snippet.chartMapLabel(options.snippet.tempChartOptions.label);
       $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
+    });
+
+    $(document).on("renderDataError", function (e, options){
+      var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+      _dtElement.animate({opacity: '1'}, 50);
+      _dtElement.off("scroll");
     });
 
     $(document).on("progress", function (e, options) {
