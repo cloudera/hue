@@ -13,8 +13,8 @@ import scala.collection.JavaConversions._
 object Client extends Logging {
 
   def main(args: Array[String]): Unit = {
-    val packagePath = new Path(args(1))
-    val lang = args(2)
+    val packagePath = new Path(args(0))
+    val lang = args(1)
 
     val yarnConf = new YarnConfiguration()
     yarnConf.set("yarn.resourcemanager.am.max-attempts", "1")
@@ -35,7 +35,7 @@ object Client extends Logging {
 
       info("waiting for job to start")
 
-      job.waitForStatus(Running(), 10000) match {
+      job.waitForStatus(Running(), 100000) match {
         case Some(Running()) => {
           info("job started successfully on %s:%s" format(job.getHost, job.getPort))
         }

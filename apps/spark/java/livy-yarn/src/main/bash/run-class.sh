@@ -36,7 +36,5 @@ function check_and_enable_64_bit_mode {
 # Check if logback configuration is specified. If not - set to resources/logback.xml
 [[ $JAVA_OPTS != *-Dlogback.configuration* && -f $DEFAULT_LOGBACK_FILE ]] && JAVA_OPTS="$JAVA_OPTS -Dlogback.configuration=file:$DEFAULT_LOGBACK_FILE"
 
-JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006"
-
 echo $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"
 exec $JAVA $JAVA_OPTS -cp "$CLASSPATH" "$@"
