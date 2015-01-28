@@ -74,6 +74,5 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     case e =>
       WebApp.error("internal error", e)
       InternalServerError(e.toString)
-      halt(500)
   }
 }

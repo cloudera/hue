@@ -133,7 +133,6 @@ class WebApp(sessionManager: SessionManager)
     case e =>
       WebApp.error("internal error", e)
       InternalServerError(e.toString)
-      halt(500)
   }
 
   private def formatSession(session: Session) = {
