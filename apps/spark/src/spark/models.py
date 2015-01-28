@@ -250,7 +250,7 @@ class HS2Api():
 
     if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
       db = self._get_db(snippet)
-  
+
       handle = self._get_handle(snippet)
       db.close_operation(handle)
       return {'status': 'closed'}
