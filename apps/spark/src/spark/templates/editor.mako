@@ -109,35 +109,37 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     <a title="${ _('Execute all') }" rel="tooltip" data-placement="bottom" data-bind="click: true, css: {'btn': true}">
       <i class="fa fa-play"></i>
     </a>
+    
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
+    
     &nbsp;&nbsp;&nbsp;
-    % if user.is_superuser:
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
-          data-bind="click: saveNotebook, css: {'btn': true}">
-        <i class="fa fa-save"></i>
-      </button>
+
+    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
+        data-bind="click: saveNotebook, css: {'btn': true}">
+      <i class="fa fa-save"></i>
+    </button>
       
-      &nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;
       
-      <button type="button" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
-          data-bind="click: newNotebook, css: {'btn': true}">
-        <i class="fa fa-file-o"></i>
-      </button>
+    <button type="button" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
+        data-bind="click: newNotebook, css: {'btn': true}">
+      <i class="fa fa-file-o"></i>
+    </button>
       
-      <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-file-o"></i>
-      </a>
+    <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-file-o"></i>
+    </a>
             
-      <button type="button" title="${ _('Open') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
-          data-bind="click: newNotebook, css: {'btn': true}">
-        <i class="fa fa-folder-open-o"></i>
-      </button>      
-      <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-        <i class="fa fa-terminal"></i>
-      </a>
-    % endif
+    <button type="button" title="${ _('Open') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
+        data-bind="click: newNotebook, css: {'btn': true}">
+      <i class="fa fa-folder-open-o"></i>
+    </button>      
+    
+    <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-terminal"></i>
+    </a>
   </div>
 
 
@@ -375,7 +377,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
 
           <div class="pull-right">
-            <strong class="muted" data-bind="visible: type() != 'text' && status() == 'available'">Took 1s</strong>
+            <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime"></strong>
             
             &nbsp;
             
@@ -994,7 +996,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   var options = ${ options_json | n,unicode };
   $.extend(options, {
-    assistVisible: $.totalStorage("sparkAssistVisible") != null ? $.totalStorage("sparkAssistVisible") : true
+    assistVisible: $.totalStorage("sparkAssistVisible") != null ? $.totalStorage("sparkAssistVisible") : false
   });
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);

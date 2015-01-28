@@ -29,7 +29,13 @@ var Result = function (snippet, result) {
       return item.name != ''
     });
   });
-
+  self.startTime = ko.observable(typeof result.startTime != "undefined" && result.startTime != null ? new Date(result.startTime) : new Date());
+  self.endTime = ko.observable(typeof result.endTime != "undefined" && result.endTime != null ? new Date(result.endTime) : new Date());
+  self.executionTime = ko.computed(function() {
+    return self.endTime().getTime() - self.startTime().getTime();
+  });
+  
+  
   function isNumericColumn(type) {
     return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
   }
@@ -39,7 +45,7 @@ var Result = function (snippet, result) {
   }
 
   function isStringColumn(type) {
-    return !isNumericColumn(type) && !isDateTimeColumn(type);
+    return ! isNumericColumn(type) && ! isDateTimeColumn(type);
   }
 
   self.cleanedNumericMeta = ko.computed(function(){
@@ -82,6 +88,8 @@ var Result = function (snippet, result) {
     self.data.removeAll();
     self.logs('');
     self.errors('');
+    self.startTime(new Date());
+    self.endTime(new Date());
   };  
 }
 
@@ -270,6 +278,7 @@ var Snippet = function (vm, notebook, snippet) {
   };
   
   self.create_session = function() {
+	self.status('loading');
     $.post("/spark/api/create_session", {
     	notebook: ko.mapping.toJSON(notebook),
         snippet: ko.mapping.toJSON(self)
@@ -392,9 +401,10 @@ var Snippet = function (vm, notebook, snippet) {
           self.getLogs();
 
           if (self.status() == 'running') {
+        	self.result.endTime(new Date());
         	self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);        	
           } 
-          else if (self.status() == 'available') {
+          else if (self.status() == 'available') {        	
         	self.fetchResult(100);
         	self.progress(100);
           }
@@ -521,8 +531,6 @@ var Notebook = function (vm, notebook) {
 	
 	if (self.getSession(_snippet.type()) == null) {
 	  _snippet.create_session();	  
-    } else {
-      _snippet.status('ready');
     }
 
 	_snippet.init();
@@ -567,12 +575,11 @@ var Notebook = function (vm, notebook) {
   };
   
   self.close = function () {
-    $.post("/spark/api/notebook/close", {
-        "notebook": ko.mapping.toJSON(self)
-    }, function (data) {
-   }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+	if (self.id() != null) {
+      $.post("/spark/api/notebook/close", {
+          "notebook": ko.mapping.toJSON(self)
+      });
+	}
   };
 }
 
