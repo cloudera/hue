@@ -28,7 +28,7 @@ from beeswax import conf as beeswax_conf
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
-from beeswax.views import safe_get_design, save_design
+from beeswax.views import safe_get_design, save_design, _parse_out_hadoop_jobs
 
 from spark.job_server_api import get_api as get_spark_api
 
@@ -257,6 +257,9 @@ class HS2Api():
     else:
       return {'status': 'skipped'}
 
+  def _get_jobs(self, log):
+    return _parse_out_hadoop_jobs(log)
+
 
 # Spark
 
@@ -343,3 +346,5 @@ class SparkApi():
   def close(self, snippet):
     pass
 
+  def _get_jobs(self, log):
+    return []
