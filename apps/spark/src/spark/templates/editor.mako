@@ -207,7 +207,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-              <a href="javascript:void(0)" class="pull-right" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
+              <a href="javascript:void(0)" class="pull-rsight" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="padding-right:5px; display: none; position: absolute; right: 4px; margin-left: auto"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
               <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
@@ -1023,7 +1023,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     loadAssistFirstLevel();
   });
 
-  function loadAssistSecondLevel(first) {
+  function loadAssistSecondLevel(first, force) {
     if (!viewModel.assistContent().firstLevelObjects()[first].loaded()) {
       viewModel.assistContent().isLoading(true);
       assist.options.onDataReceived = function (data) {
@@ -1040,7 +1040,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     window.setTimeout(resizeAssist, 100);
   }
 
-  function loadAssistFirstLevel() {
+  function loadAssistFirstLevel(force) {
     assist.options.onDataReceived = function (data) {
       if (data.tables) {
         var _obj = {};
@@ -1055,14 +1055,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
       viewModel.assistContent().isLoading(false);
     }
-    assist.getData(viewModel.assistContent().selectedMainObject());
+    assist.getData(viewModel.assistContent().selectedMainObject(), force);
   }
 
   function loadAssistMain(force) {
     assist.options.onDataReceived = function (data) {
       if (data.databases) {
         viewModel.assistContent().mainObjects(data.databases);
-        if (viewModel.assistContent().mainObjects().length > 0 && !viewModel.assistContent().selectedMainObject()) {
+        if (force) {
+          loadAssistFirstLevel(force);
+        }
+        else if (viewModel.assistContent().mainObjects().length > 0 && !viewModel.assistContent().selectedMainObject()) {
           viewModel.assistContent().selectedMainObject(viewModel.assistContent().mainObjects()[0]);
           viewModel.assistSelectedMainObject(viewModel.assistContent().selectedMainObject());
           loadAssistFirstLevel();
