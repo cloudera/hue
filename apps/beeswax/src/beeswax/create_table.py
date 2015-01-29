@@ -20,6 +20,7 @@ import csv
 import gzip
 import json
 import logging
+import re
 
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
@@ -40,7 +41,6 @@ from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
   TERMINATOR_CHOICES
 from beeswax.server import dbms
 from beeswax.views import execute_directly
-import re
 
 
 LOG = logging.getLogger(__name__)
@@ -468,7 +468,10 @@ def load_after_create(request, database):
     raise PopupException(msg)
 
   if is_remove_header:
-    remove_header(request.fs, path)
+    try:
+      remove_header(request.fs, path)
+    except Exception, e:
+      raise PopupException(_("The headers of the file could not be removed."), detail=e)
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
