@@ -1,10 +1,11 @@
+import ast
 import cStringIO
+import datetime
+import decimal
 import json
 import logging
 import sys
 import traceback
-import datetime
-import decimal
 
 logging.basicConfig()
 logger = logging.getLogger('fake_shell')
@@ -55,8 +56,18 @@ def execute_reply_error(exc_type, exc_value, tb):
 
 def execute(code):
     try:
-        code = compile(code, '<stdin>', 'single')
-        exec code in global_dict
+        code = ast.parse(code)
+        to_run_exec, to_run_single = code.body[:-1], code.body[-1:]
+
+        for node in to_run_exec:
+            mod = ast.Module([node])
+            code = compile(mod, '<stdin>', 'exec')
+            exec code in global_dict
+
+        for node in to_run_single:
+            mod = ast.Interactive([node])
+            code = compile(mod, '<stdin>', 'single')
+            exec code in global_dict
     except:
         return execute_reply_error(*sys.exc_info())
 
