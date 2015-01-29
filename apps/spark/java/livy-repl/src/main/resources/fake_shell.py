@@ -112,17 +112,70 @@ def execute_request(content):
         return execute(code)
 
 
+def magic_table_convert(value):
+    try:
+        converter = magic_table_types[type(value)]
+    except KeyError:
+        converter = magic_table_types[str]
+
+    return converter(value)
+
+
+def magic_table_convert_seq(items):
+    last_item_type = None
+    converted_items = []
+
+    for item in items:
+        item_type, item = magic_table_convert(item)
+
+        if last_item_type is None:
+            last_item_type = item_type
+        elif last_item_type != item_type:
+            raise ValueError('value has inconsistent types')
+
+        converted_items.append(item)
+
+    return 'ARRAY_TYPE', converted_items
+
+
+def magic_table_convert_map(m):
+    last_key_type = None
+    last_value_type = None
+    converted_items = {}
+
+    for key, value in m:
+        key_type, key = magic_table_convert(key)
+        value_type, value = magic_table_convert(value)
+
+        if last_key_type is None:
+            last_key_type = key_type
+        elif last_value_type != value_type:
+            raise ValueError('value has inconsistent types')
+
+        if last_value_type is None:
+            last_value_type = value_type
+        elif last_value_type != value_type:
+            raise ValueError('value has inconsistent types')
+
+        converted_items[key] = value
+
+    return 'MAP_TYPE', items
+
+
 magic_table_types = {
-    type(None): ('NULL_TYPE', lambda x: x),
-    bool: ('BOOLEAN_TYPE', lambda x: x),
-    int: ('INT_TYPE', lambda x: x),
-    long: ('BIGINT_TYPE', lambda x: x),
-    float: ('DOUBLE_TYPE', lambda x: x),
-    str: ('STRING_TYPE', lambda x: x),
-    unicode: ('STRING_TYPE', lambda x: x.encode('utf-8')),
-    datetime.date: ('DATE_TYPE', str),
-    datetime.datetime: ('TIMESTAMP_TYPE', str),
-    decimal.Decimal: ('DECIMAL_TYPE', str),
+    type(None): lambda x: ('NULL_TYPE', x),
+    bool: lambda x: ('BOOLEAN_TYPE', x),
+    int: lambda x: ('INT_TYPE', x),
+    long: lambda x: ('BIGINT_TYPE', x),
+    float: lambda x: ('DOUBLE_TYPE', x),
+    str: lambda x: ('STRING_TYPE', str(x)),
+    unicode: lambda x: ('STRING_TYPE', x.encode('utf-8')),
+    datetime.date: lambda x: ('DATE_TYPE', str(x)),
+    datetime.datetime: lambda x: ('TIMESTAMP_TYPE', str(x)),
+    decimal.Decimal: lambda x: ('DECIMAL_TYPE', str(x)),
+    tuple: magic_table_convert_seq,
+    list: magic_table_convert_seq,
+    dict: magic_table_convert_map,
 }
 
 
@@ -133,62 +186,50 @@ def magic_table(name):
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
-    if isinstance(value, dict):
+    if not isinstance(value, (list, tuple)):
         value = [value]
 
-    if not isinstance(value, list):
-      return execute_reply_error(Exception, 'row is not a list or dict', [])
-
     headers = {}
-    table = []
-    last_row_type = None
+    data = []
 
     for row in value:
-        # Reject tables that contain different row types.
-        if last_row_type is None:
-            last_row_type = type(row)
-        elif last_row_type != type(row):
-            return execute_reply_error(Exception, 'table contains different row types', [])
+        cols = []
+        data.append(cols)
 
-        table_row = []
-        table.append(table_row)
+        if not isinstance(row, (list, tuple, dict)):
+            row = [row]
 
-        if isinstance(row, dict):
-            iterator = row.iteritems()
-        elif isinstance(row, list):
+        if isinstance(row, (list, tuple)):
             iterator = enumerate(row)
         else:
-            return execute_reply_error(Exception, 'value is not a list or dict', [])
+            iterator = row.iteritems()
 
-        for k, v in iterator:
-            try:
-                type_name, type_converter = magic_table_types[type(v)]
-            except KeyError:
-                type_name, type_converter = 'STRING', str
-
-            table_row.append(type_converter(v))
+        for name, col in iterator:
+            col_type, col = magic_table_convert(col)
 
             try:
-                header = headers[k]
+                header = headers[name]
             except KeyError:
                 header = {
-                    'name': str(k),
-                    'type': type_name,
+                    'name': str(name),
+                    'type': col_type,
                 }
-                headers[k] = header
+                headers[name] = header
             else:
                 # Reject columns that have a different type.
-                if header['type'] != type_name:
+                if header['type'] != col_type:
                     exc_type = Exception
                     exc_value = 'table rows have different types'
                     return execute_reply_error(exc_type, exc_value, [])
+
+            cols.append(col)
 
     headers = [v for k, v in sorted(headers.iteritems())]
 
     return execute_reply_ok({
         'application/vnd.livy.table.v1+json': {
             'headers': headers,
-            'data': table,
+            'data': data,
         }
     })
 
