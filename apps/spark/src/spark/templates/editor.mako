@@ -944,12 +944,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         onKeyEvent: function (cm, e) {
           switch (valueAccessor().mode) {
             case "text/x-hiveql":
-              if (e.type == "keyup" && e.keyCode == 190) {
+              if (e.type == "keyup" && e.keyCode == 190 && !e.shiftKey) {
                 hiveImpalaAutocomplete(cm, CodeMirror.hiveQLHint, true);
               }
               break;
             case "text/x-impalaql":
-              if (e.type == "keyup" && e.keyCode == 190) {
+              if (e.type == "keyup" && e.keyCode == 190 && !e.shiftKey) {
                 hiveImpalaAutocomplete(cm, CodeMirror.impalaSQLHint, true);
               }
               break;
