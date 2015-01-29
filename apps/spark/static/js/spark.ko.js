@@ -354,7 +354,8 @@ var Snippet = function (vm, notebook, snippet) {
           }, 500);
         }
       } else {
-    	self._ajax_error(data);
+    	 self._ajax_error(data);
+       $(document).trigger("renderDataError", {snippet: self});
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
