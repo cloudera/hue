@@ -94,8 +94,18 @@ def execute_request(content):
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
-    if code.startswith('%'):
-        parts = code[1:].split(' ', 1)
+    lines = code.split('\n')
+
+    if lines and lines[-1].startswith('%'):
+        code, magic = lines[:-1], lines[-1]
+
+        # Make sure to execute the other lines first.
+        if code:
+            result = execute('\n'.join(code))
+            if result['content']['status'] != 'ok':
+                return result
+
+        parts = magic[1:].split(' ', 1)
         if len(parts) == 1:
             magic, rest = parts[0], ()
         else:
