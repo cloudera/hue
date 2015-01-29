@@ -2,8 +2,11 @@ package com.cloudera.hue.livy.repl.scala
 
 import java.util.concurrent.SynchronousQueue
 
-import com.cloudera.hue.livy.ExecuteResponse
+import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl.Session
+import org.json4s.jackson.JsonMethods._
+import org.json4s.jackson.Serialization.write
+import org.json4s.{JValue, _}
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -16,9 +19,11 @@ object ScalaSession {
 private class ScalaSession extends Session {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
+  implicit val formats = DefaultFormats
+
   private[this] val inQueue = new SynchronousQueue[ILoop.Request]
   private[this] var executedStatements = 0
-  private[this] var statements_ = new mutable.ArrayBuffer[ExecuteResponse]
+  private[this] var statements_ = new mutable.ArrayBuffer[JValue]
 
   org.apache.spark.repl.Main.interp = new ILoop(inQueue)
 
@@ -31,11 +36,11 @@ private class ScalaSession extends Session {
   }
   thread.start()
 
-  override def statements: List[ExecuteResponse] = synchronized {
+  override def statements: List[JValue] = synchronized {
     statements_.toList
   }
 
-  override def statement(id: Int): Option[ExecuteResponse] = synchronized {
+  override def statement(id: Int): Option[JValue] = synchronized {
     if (id < statements_.length) {
       Some(statements_(id))
     } else {
@@ -43,17 +48,22 @@ private class ScalaSession extends Session {
     }
   }
 
-  override def execute(statement: String): Future[ExecuteResponse] = {
+  override def execute(content: ExecuteRequest): Future[JValue] = {
     executedStatements += 1
 
     val promise = Promise[ILoop.ExecuteResponse]()
-    inQueue.put(ILoop.ExecuteRequest(statement, promise))
+    inQueue.put(ILoop.ExecuteRequest(content.code, promise))
 
     promise.future.map {
       case rep =>
-        val executeResponse = ExecuteResponse(executedStatements - 1, List(statement), List(rep.output))
-        synchronized { statements_ += executeResponse }
-        executeResponse
+        val x = executedStatements - 1
+        parse(write(Map(
+          "status" -> "ok",
+          "execution_count" -> x,
+          "payload" -> Map(
+            "text/plain" -> rep.output
+          )
+        )))
     }
   }
 

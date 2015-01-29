@@ -1,6 +1,6 @@
 package com.cloudera.hue.livy.server.sessions
 
-import com.cloudera.hue.livy.ExecuteResponse
+import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
 
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ trait Session {
 
   def state: State
 
-  def executeStatement(statement: String): Statement
+  def executeStatement(content: ExecuteRequest): Statement
 
   def statement(statementId: Int): Option[Statement]
 

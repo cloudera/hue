@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.{SessionFailedToStart, Session}
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, Formats, MappingException}
@@ -12,7 +13,6 @@ import scala.concurrent.duration._
 
 object WebApp extends Logging {
   case class CreateSessionRequest(lang: String)
-  case class ExecuteStatementRequest(statement: String)
 }
 
 class WebApp(sessionManager: SessionManager)
@@ -110,11 +110,11 @@ class WebApp(sessionManager: SessionManager)
   }
 
   post("/sessions/:sessionId/statements") {
-    val req = parsedBody.extract[ExecuteStatementRequest]
+    val req = parsedBody.extract[ExecuteRequest]
 
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
-        val statement = session.executeStatement(req.statement)
+        val statement = session.executeStatement(req)
 
         Created(formatStatement(statement),
           headers = Map(
@@ -145,7 +145,7 @@ class WebApp(sessionManager: SessionManager)
   private def formatStatement(statement: Statement) = {
     // Take a couple milliseconds to see if the statement has finished.
     val output = try {
-      Await.result(statement.output, 10 milliseconds)
+      Await.result(statement.output, 100 milliseconds)
     } catch {
       case _: TimeoutException => null
     }

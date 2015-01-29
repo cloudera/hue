@@ -1,22 +1,20 @@
 package com.cloudera.hue.livy.repl
 
-import _root_.akka.util.Timeout
-import com.cloudera.hue.livy.{ExecuteRequest, Logging}
+import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.fasterxml.jackson.core.JsonParseException
-import org.json4s.{DefaultFormats, Formats, MappingException}
+import org.json4s.{DefaultFormats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import _root_.scala.concurrent.{ExecutionContextExecutor, Future, ExecutionContext}
+import _root_.scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
-object WebApp extends Logging {}
+object WebApp extends Logging
 
 class WebApp(session: Session) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
   override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit val jsonFormats = DefaultFormats
-
-  protected implicit def defaultTimeout: Timeout = Timeout(10)
 
   sealed trait State
   case class Starting() extends State
@@ -38,18 +36,17 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     Map("state" -> state)
   }
 
-  get("/statements") {
-    session.statements
-  }
-
-  post("/statements") {
+  post("/execute") {
     val req = parsedBody.extract[ExecuteRequest]
-    val statement: String = req.statement
-    val rep = session.execute(statement)
+    val rep = session.execute(req)
     new AsyncResult { val is = rep }
   }
 
-  get("/statements/:statementId") {
+  get("/history") {
+    session.statements
+  }
+
+  get("/history/:statementId") {
     val statementId = params("statementId").toInt
 
     session.statement(statementId) match {
