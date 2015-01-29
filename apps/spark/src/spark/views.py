@@ -47,6 +47,7 @@ def editor(request):
               'python': _('Example: 1 + 1, or press CTRL + space'),
               'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
               'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+              'text': _('<h1>Cool!</h1>That is so cool')
           }
       })
   })

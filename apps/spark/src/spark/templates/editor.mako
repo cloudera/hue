@@ -40,6 +40,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
 <link rel="stylesheet" href="/static/css/nv.d3.css">
 <link rel="stylesheet" href="/static/ext/select2/select2.css">
+<link rel="stylesheet" href="/static/ext/css/medium-editor.min.css">
+<link rel="stylesheet" href="/static/css/bootstrap-medium-editor.css">
 
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
@@ -58,7 +60,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script src="/static/ext/js/markdown.min.js"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.hotkeys.js"></script>
-<script src="/static/js/bootstrap-wysiwyg.js"></script>
 
 <script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
@@ -101,7 +102,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
 
-
+<!--[if IE 9]>
+  <script src="/static/ext/js/classList.min.js" type="text/javascript" charset="utf-8"></script>  
+<![endif]-->
+<script src="/static/ext/js/medium-editor.min.js" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="search-bar">
@@ -562,50 +566,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <div data-bind="visible: type() == 'text'">
         <div data-bind="html: statement_raw, visible: ! $root.isEditing()"></div>
-
-        <div class="btn-toolbar" data-role="editor-toolbar" data-bind="attr:{'data-target': '#editor_'+id()}, visible: $root.isEditing()">
-          <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a data-edit="fontSize 5"><font size="5">${ _("Huge") }</font></a></li>
-              <li><a data-edit="fontSize 3"><font size="3">${ _("Normal") }</font></a></li>
-              <li><a data-edit="fontSize 1"><font size="1">${ _("Small") }</font></a></li>
-            </ul>
-          </div>
-          <div class="btn-group">
-            <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
-            <a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
-            <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></a>
-            <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
-          </div>
-          <div class="btn-group">
-            <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
-            <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="fa fa-list-ol"></i></a>
-            <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="fa fa-indent"></i></a>
-            <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="fa fa-outdent"></i></a>
-          </div>
-          <div class="btn-group">
-            <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
-            <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
-            <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
-            <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
-          </div>
-          <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="fa fa-link"></i></a>
-            <div class="dropdown-menu input-append">
-              <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
-              <button class="btn" type="button">Add</button>
-            </div>
-            <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
-          </div>
-          <div class="btn-group">
-            <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
-            <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
-          </div>
-        </div>
-
-        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, wysiwyg: {}, visible: $root.isEditing()"></div>
-
+        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}, visible: $root.isEditing()"></div>
       </div>
     </div>
   </div>
@@ -630,22 +591,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return _width;
   };
 
-  ko.bindingHandlers.wysiwyg = {
+  ko.bindingHandlers.medium = {
     init: function (element, valueAccessor, allBindings) {
-      $(element).wysiwyg();
-      $(element).on("paste", function () {
-        window.setTimeout(function () {
-          if (markdown.toHTML($(element).text().trim()) != "<p>" + $(element).text().trim() + "</p>") {
-            allBindings().html(markdown.toHTML($(element).text().trim()));
-          }
-        }, 200);
-
+        var editor = new MediumEditor($(element), {
+          buttons: ['bold', 'italic', 'underline', 'quote', 'anchor', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent'],
+          buttonLabels: 'fontawesome',
+          anchorTarget: true
       });
-      $(element).on("blur", function () {
-        allBindings().html($(element).cleanHtml());
+      $(element).on('input', function() {
+        allBindings().value($(element).html())
       });
     }
-  };
+  }
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, snippet) {
