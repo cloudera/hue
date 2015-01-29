@@ -381,7 +381,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
 
           <div class="pull-right">
-            <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime"></strong>
+            <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
             
             &nbsp;
             
@@ -581,6 +581,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     failsSilentlyOn: [500], // error codes from beeswax/views.py - autocomplete
     baseURL: "${url('beeswax:api_autocomplete_databases')}"
   });
+
+  Number.prototype.toHHMMSS = function () {
+    var _s = this;
+    var _ms = _s % 1000;
+    _s = (_s - _ms) / 1000;
+    var _secs = _s % 60;
+    _s = (_s - _secs) / 60;
+    var _mins = _s % 60;
+    var _hrs = (_s - _mins) / 60;
+
+    return (_hrs > 0 ? _hrs + "h, " : "") + (_mins > 0 ? _mins + "m, " : "") + _secs + "." + _ms + "s";
+  }
 
   $.scrollbarWidth = function() {
     var _parent, _child, _width;
