@@ -167,10 +167,6 @@
   white-space: nowrap;
 }
 
-.progress, .progress-neutral .bar {
-  background-color: #DDD;
-}
-
 [contenteditable] {
   min-height: 200px;
   border: 1px solid #DDD;
@@ -238,4 +234,12 @@ h1.empty {
   cursor: ns-resize;
   color: #666;
   position: absolute;
+}
+
+.progress .bar {
+  background-repeat: repeat-x;
+}
+
+.progress, .progress-neutral .bar {
+  background-color: #DDD;
 }
