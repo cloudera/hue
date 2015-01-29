@@ -319,6 +319,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
+            <span data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn pointer">
+              <i class='fa fa-spinner fa-spin fa-2x'></i>
+            </span>
             <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn pointer">
               ${ _('Go!') }
             </a>
@@ -331,10 +334,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <div style="padding-top: 10px;">
-          <button data-bind="visible: result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
+          <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
             <i class="fa fa-th"></i>
           </button>
-          <div class="btn-group" data-bind="visible: type() != 'scala' && type() != 'python' && result.hasSomeResults()">
+          <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
             <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
               <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
               <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
@@ -343,7 +346,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
               <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
             </button>
-            <button class="btn dropdown-toggle" data-bind="css: {'active': $data.showChart}" data-toggle="dropdown">
+            <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
               <i class="fa fa-caret-down"></i>
             </button>
             <ul class="dropdown-menu">

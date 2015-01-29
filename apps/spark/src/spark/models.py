@@ -194,7 +194,8 @@ class HS2Api():
           'name': column.name,
           'type': column.type,
           'comment': column.comment
-        } for column in results.data_table.cols()]
+        } for column in results.data_table.cols()],
+        'type': 'table'
     }
 
   @query_error_handler
@@ -337,11 +338,13 @@ class SparkApi():
         table = data['application/vnd.livy.table.v1+json']
       except KeyError:
         data = [[data['text/plain']]]
-        meta = [{'name': 'Header', 'type': 'String', 'comment': ''}]
+        meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
+        type = 'text'        
       else:
         data = table['data']
         headers = table['headers']
         meta = [{'name': h['name'], 'type': h['type'], 'comment': ''} for h in headers]
+        type = 'table'
 
       # start_over not supported
       if not start_over:
@@ -350,6 +353,7 @@ class SparkApi():
       return {
           'data': data,
           'meta': meta,
+          'type': type
       }
     elif content['status'] == 'error':
       tb = content.get('traceback', None)

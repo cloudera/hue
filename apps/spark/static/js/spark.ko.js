@@ -34,6 +34,7 @@ var Result = function (snippet, result) {
   self.executionTime = ko.computed(function() {
     return self.endTime().getTime() - self.startTime().getTime();
   });
+  self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'plain');
   
   
   function isNumericColumn(type) {
@@ -349,6 +350,7 @@ var Snippet = function (vm, notebook, snippet) {
         if (self.result.meta().length == 0) {
    	      data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
    	      self.result.meta(data.result.meta);
+   	      self.result.type(data.result.type);
         }
 
         var _initialIndex = self.result.data().length;
