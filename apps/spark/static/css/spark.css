@@ -170,6 +170,8 @@
 [contenteditable] {
   min-height: 200px;
   border: 1px solid #DDD;
+  border-top: none;
+  padding: 10px;
 }
 
 [contenteditable]:focus {
