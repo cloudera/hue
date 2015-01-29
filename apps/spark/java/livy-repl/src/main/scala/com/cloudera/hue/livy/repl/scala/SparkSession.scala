@@ -12,11 +12,11 @@ import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 
-object ScalaSession {
-  def create(): Session = new ScalaSession()
+object SparkSession {
+  def create(): Session = new SparkSession()
 }
 
-private class ScalaSession extends Session {
+private class SparkSession extends Session {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   implicit val formats = DefaultFormats

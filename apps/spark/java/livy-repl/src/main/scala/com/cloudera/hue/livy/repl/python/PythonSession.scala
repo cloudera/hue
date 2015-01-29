@@ -14,9 +14,17 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 object PythonSession {
-  def create(): Session = {
-    val file = createScript()
-    val pb = new ProcessBuilder("python", file.toString)
+  def createPython(): Session = {
+    create("python")
+  }
+
+  def createPySpark(): Session = {
+    create(createFakePySpark().toString)
+  }
+
+  private def create(driver: String) = {
+    val fakeShell = createFakeShell()
+    val pb = new ProcessBuilder(driver, fakeShell.toString)
     pb.redirectError(Redirect.INHERIT)
     val process = pb.start()
     val in = process.getInputStream
@@ -25,7 +33,7 @@ object PythonSession {
     new PythonSession(process, in, out)
   }
 
-  private def createScript(): File = {
+  private def createFakeShell(): File = {
     val source: InputStream = getClass.getClassLoader.getResourceAsStream("fake_shell.py")
 
     val file = Files.createTempFile("", "").toFile
@@ -46,32 +54,27 @@ object PythonSession {
     file
   }
 
-  // Java unfortunately wraps the input stream in a buffer, so we need to hack around it so we can read the output
-  // without blocking.
-  private def unwrapInputStream(inputStream: InputStream) = {
-    var filteredInputStream = inputStream
+  private def createFakePySpark(): File = {
+    val source: InputStream = getClass.getClassLoader.getResourceAsStream("fake_pyspark.sh")
 
-    while (filteredInputStream.isInstanceOf[FilterInputStream]) {
-      val field = classOf[FilterInputStream].getDeclaredField("in")
-      field.setAccessible(true)
-      filteredInputStream = field.get(filteredInputStream).asInstanceOf[InputStream]
+    val file = Files.createTempFile("", "").toFile
+    file.deleteOnExit()
+
+    file.setExecutable(true)
+
+    val sink = new FileOutputStream(file)
+    val buf = new Array[Byte](1024)
+    var n = source.read(buf)
+
+    while (n > 0) {
+      sink.write(buf, 0, n)
+      n = source.read(buf)
     }
 
-    filteredInputStream
-  }
+    source.close()
+    sink.close()
 
-  // Java unfortunately wraps the output stream in a buffer, so we need to hack around it so we can read the output
-  // without blocking.
-  private def unwrapOutputStream(outputStream: OutputStream) = {
-    var filteredOutputStream = outputStream
-
-    while (filteredOutputStream.isInstanceOf[FilterOutputStream]) {
-      val field = classOf[FilterOutputStream].getDeclaredField("out")
-      field.setAccessible(true)
-      filteredOutputStream = field.get(filteredOutputStream).asInstanceOf[OutputStream]
-    }
-
-    filteredOutputStream
+    file
   }
 }
 
