@@ -336,10 +336,10 @@ class SparkApi():
       try:
         table = data['application/vnd.livy.table.v1+json']
         data = table['data']
-        meta = [{'name': name, 'type': 'String', 'comment': ''} for name in table['headers']]
+        meta = [{'name': name, 'type': 'INT_TYPE', 'comment': ''} for name in table['headers']]
       except KeyError:
         data = [[data['text/plain']]]
-        meta = [{'name': 'Header', 'type': 'String', 'comment': ''}]
+        meta = [{'name': 'Header', 'type': 'INT_TYPE', 'comment': ''}]
 
       # start_over not supported
       if not start_over:
