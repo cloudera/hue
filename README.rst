@@ -86,7 +86,7 @@ your system:
       * python-simplejson
       * python-setuptools
 
-    CentOS:
+    CentOS/RHEL:
       * ant
       * asciidoc
       * cyrus-sasl-devel
@@ -104,6 +104,7 @@ your system:
       * python-devel
       * python-simplejson
       * sqlite-devel
+      * openssl-devel (for version 7+)
 
     MacOS (mac port):
       * liblxml
