@@ -84,8 +84,12 @@ class JobServerApi(object):
     return self._root.post('sessions', data=json.dumps(kwargs), contenttype='application/json')
 
   def submit_statement(self, uuid, statement):
-    data = {'statement': statement}
+    data = {'code': statement}
     return self._root.post('sessions/%s/statements' % uuid, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+
+  def inspect(self, uuid, statement):
+    data = {'code': statement}
+    return self._root.post('sessions/%s/inspect' % uuid, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
   def fetch_data(self, session, statement):
     return self._root.get('sessions/%s/statements/%s' % (session, statement))

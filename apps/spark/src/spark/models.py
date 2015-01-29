@@ -317,7 +317,7 @@ class SparkApi():
     cell = snippet['result']['handle']['id']
 
     try:
-      data = api.fetch_data(session['id'], cell)
+      response = api.fetch_data(session['id'], cell)
     except Exception, e:
       message = force_unicode(str(e)).lower()
       if 'session not found' in message:
@@ -325,10 +325,43 @@ class SparkApi():
       else:
         raise e
 
-    return {
-        'data': [data['output']] if start_over else [], # start_over not supported yet
-        'meta': [{'name': 'Header', 'type': 'String', 'comment': ''}]
-    }
+    content = response['output']
+
+    if content['status'] == 'ok':
+      # The frontend expects a table, so simulate that by putting our text
+      # into a single cell.
+
+      data = content['data']
+
+      try:
+        table = data['application/vnd.livy.table.v1+json']
+        data = table['data']
+        meta = [{'name': name, 'type': 'String', 'comment': ''} for name in table['headers']]
+      except KeyError:
+        data = [[data['text/plain']]]
+        meta = [{'name': 'Header', 'type': 'String', 'comment': ''}]
+
+      # start_over not supported
+      if not start_over:
+        data = []
+
+      return {
+          'data': data,
+          'meta': meta,
+      }
+    elif content['status'] == 'error':
+      tb = content.get('traceback', None)
+
+      if tb is None:
+        msg = content.get('ename', 'unknown error')
+
+        evalue = content.get('evalue')
+        if evalue is not None:
+          msg = '%s: %s' % (msg, evalue)
+      else:
+        msg = ''.join(tb)
+
+      raise QueryError(msg)
 
   def cancel(self, notebook, snippet):
     api = get_spark_api(self.user)

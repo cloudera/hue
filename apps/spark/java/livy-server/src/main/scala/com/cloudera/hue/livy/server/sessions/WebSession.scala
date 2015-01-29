@@ -1,10 +1,11 @@
 package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy._
+import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
 import dispatch._
 import org.json4s.jackson.Serialization.write
-import org.json4s.{DefaultFormats, Formats}
+import org.json4s.{JValue, DefaultFormats, Formats}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
@@ -26,22 +27,22 @@ abstract class WebSession(val id: String, hostname: String, port: Int) extends S
 
   override def state: State = _state
 
-  override def executeStatement(input: String): Statement = {
+  override def executeStatement(content: ExecuteRequest): Statement = {
     ensureIdle {
       _state = Busy()
       touchLastActivity()
 
-      var req = (svc / "statements").setContentType("application/json", "UTF-8")
-      req = req << write(ExecuteRequest(input))
+      var req = (svc / "execute").setContentType("application/json", "UTF-8")
+      req = req << write(content)
 
       val future = Http(req OK as.json4s.Json).map { case (resp) =>
         synchronized {
           transition(Idle())
-          resp.extract[ExecuteResponse].output
+          resp
         }
       }
 
-      var statement = new Statement(executedStatements, input, future)
+      var statement = new Statement(executedStatements, content, future)
 
       executedStatements += 1
       statements_ += statement
