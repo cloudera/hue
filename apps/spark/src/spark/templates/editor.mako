@@ -317,8 +317,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               ${ _('Go!') }
             </a>
             <a data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn pointer">${ _('Cancel') }</a>
-            <div class="progress" data-bind="css: {'progress-neutral': progress() == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100}" style="height: 1px">
-              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
+              <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
             </div>
             <div class="resize-panel center"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
           </div>
@@ -379,7 +379,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             
             &nbsp;
             
-            <a data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
+            <a data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
               <i class="fa fa-file-text-o"></i>
             </a>
 
@@ -419,7 +419,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs"></pre>
         </div>
 
-        <div data-bind="visible: result.errors().length > 0, css: resultsKlass">
+        <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
           <span data-bind="text: result.errors"></span>
         </div>
         
@@ -1486,13 +1486,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   $(document).ready(function () {
     resizeAssist();
 
-    var INITIAL_RESIZE_POSITION = 100;
+    var initialResizePosition = 100;
 
     function getDraggableOptions(minY) {
       return {
         axis: "y",
         start: function(e, ui) {
-          INITIAL_RESIZE_POSITION = ui.offset.top;
+          initialResizePosition = ui.offset.top;
         },
         drag: function(e, ui) {
           draggableHelper($(this), e, ui);
@@ -1514,7 +1514,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     function draggableHelper(el, e, ui, setSize) {
       var _snippet = ko.dataFor(el.parents(".snippet")[0]);
       var _cm = $("#snippet_" + _snippet.id()).data("editor");
-      var _newSize = _snippet.codemirrorSize() + (ui.offset.top - INITIAL_RESIZE_POSITION);
+      var _newSize = _snippet.codemirrorSize() + (ui.offset.top - initialResizePosition);
       _cm.setSize("99%", _newSize);
       if (setSize) {
         _snippet.codemirrorSize(_newSize);
