@@ -334,7 +334,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <button data-bind="visible: result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
             <i class="fa fa-th"></i>
           </button>
-          <div class="btn-group" data-bind="visible: result.hasSomeResults()">
+          <div class="btn-group" data-bind="visible: type() != 'scala' && type() != 'python' && result.hasSomeResults()">
             <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
               <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
               <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
@@ -909,7 +909,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           },
           "Ctrl-Enter": function () {
             allBindingsAccessor().value(editor.getValue());
-            valueAccessor().enter();
+            if (snippet.status() != 'running' && snippet.status() != 'loading'){
+              valueAccessor().enter();
+            }
           }
         },
         onKeyEvent: function (cm, e) {
