@@ -3,6 +3,8 @@ import json
 import logging
 import sys
 import traceback
+import datetime
+import decimal
 
 logging.basicConfig()
 logger = logging.getLogger('fake_shell')
@@ -99,51 +101,78 @@ def execute_request(content):
         return execute(code)
 
 
-def table_magic(name):
+magic_table_types = {
+    type(None): ('NULL_TYPE', lambda x: x),
+    bool: ('BOOLEAN_TYPE', lambda x: x),
+    int: ('INT_TYPE', lambda x: x),
+    long: ('BIGINT_TYPE', lambda x: x),
+    float: ('DOUBLE_TYPE', lambda x: x),
+    str: ('STRING_TYPE', lambda x: x),
+    unicode: ('STRING_TYPE', lambda x: x.encode('utf-8')),
+    datetime.date: ('DATE_TYPE', str),
+    datetime.datetime: ('TIMESTAMP_TYPE', str),
+    decimal.Decimal: ('DECIMAL_TYPE', str),
+}
+
+
+def magic_table(name):
     try:
         value = global_dict[name]
     except KeyError:
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
-    max_list_cols = 0
-    dict_headers = set()
-
-    if isinstance(value, list):
-        for row in value:
-            if isinstance(row, dict):
-                dict_headers.update(row.iterkeys())
-            elif isinstance(row, list):
-                max_list_cols = max(max_list_cols, len(row))
-            else:
-                return execute_reply_error(Exception, 'row is not a list or dict', [])
-    elif isinstance(value, dict):
-        dict_headers = value.keys()
+    if isinstance(value, dict):
         value = [value]
-    else:
-        return execute_reply_error(Exception, 'value is not a list or dict', [])
 
-    headers = [i for i in xrange(max_list_cols)]
-    dict_header_offset = len(headers)
-    dict_header_index = {}
+    if not isinstance(value, list):
+      return execute_reply_error(Exception, 'row is not a list or dict', [])
 
-    for i, key in enumerate(sorted(dict_headers)):
-        headers.append(key)
-        dict_header_index[key] = dict_header_offset + i
-
+    headers = {}
     table = []
+    last_row_type = None
 
     for row in value:
-        table_row = [None] * len(headers)
+        # Reject tables that contain different row types.
+        if last_row_type is None:
+            last_row_type = type(row)
+        elif last_row_type != type(row):
+            return execute_reply_error(Exception, 'table contains different row types', [])
+
+        table_row = []
         table.append(table_row)
 
-        if isinstance(row, list):
-            for i, col in enumerate(row):
-                table_row[i] = col
+        if isinstance(row, dict):
+            iterator = row.iteritems()
+        elif isinstance(row, list):
+            iterator = enumerate(row)
         else:
-            for key, col in row.iteritems():
-                i = dict_header_index[key]
-                table_row[i] = col
+            return execute_reply_error(Exception, 'value is not a list or dict', [])
+
+        for k, v in iterator:
+            try:
+                type_name, type_converter = magic_table_types[type(v)]
+            except KeyError:
+                type_name, type_converter = 'STRING', str
+
+            table_row.append(type_converter(v))
+
+            try:
+                header = headers[k]
+            except KeyError:
+                header = {
+                    'name': str(k),
+                    'type': type_name,
+                }
+                headers[k] = header
+            else:
+                # Reject columns that have a different type.
+                if header['type'] != type_name:
+                    exc_type = Exception
+                    exc_value = 'table rows have different types'
+                    return execute_reply_error(exc_type, exc_value, [])
+
+    headers = [v for k, v in sorted(headers.iteritems())]
 
     return execute_reply_ok({
         'application/vnd.livy.table.v1+json': {
@@ -154,7 +183,7 @@ def table_magic(name):
 
 
 magic_router = {
-    'table': table_magic,
+    'table': magic_table,
 }
 
 
