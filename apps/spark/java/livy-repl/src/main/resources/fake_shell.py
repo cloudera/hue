@@ -4,23 +4,12 @@ import datetime
 import decimal
 import json
 import logging
+import os
 import sys
 import traceback
 
 logging.basicConfig()
 logger = logging.getLogger('fake_shell')
-
-sys_stdin = sys.stdin
-sys_stdout = sys.stdout
-sys_stderr = sys.stderr
-
-fake_stdin = cStringIO.StringIO()
-fake_stdout = cStringIO.StringIO()
-fake_stderr = cStringIO.StringIO()
-
-sys.stdin = fake_stdin
-sys.stdout = fake_stdout
-sys.stderr = fake_stderr
 
 global_dict = {}
 
@@ -72,7 +61,10 @@ def execute(code):
         return execute_reply_error(*sys.exc_info())
 
     stdout = fake_stdout.getvalue()
+    fake_stdout.truncate(0)
+
     stderr = fake_stderr.getvalue()
+    fake_stderr.truncate(0)
 
     output = ''
 
@@ -253,11 +245,31 @@ msg_type_router = {
     'execute_request': execute_request,
 }
 
+sys_stdin = sys.stdin
+sys_stdout = sys.stdout
+sys_stderr = sys.stderr
+
+fake_stdin = cStringIO.StringIO()
+fake_stdout = cStringIO.StringIO()
+fake_stderr = cStringIO.StringIO()
+
+sys.stdin = fake_stdin
+sys.stdout = fake_stdout
+sys.stderr = fake_stderr
 
 try:
-    while True:
-        fake_stdout.truncate(0)
+    # Load any startup files
+    try:
+        startup = os.environ['PYTHONSTARTUP']
+    except KeyError:
+        pass
+    else:
+        execfile(startup, global_dict)
 
+    fake_stdout.truncate(0)
+    fake_stderr.truncate(0)
+
+    while True:
         line = sys_stdin.readline()
 
         if line == '':

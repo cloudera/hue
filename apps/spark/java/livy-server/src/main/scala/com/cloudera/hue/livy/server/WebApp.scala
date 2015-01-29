@@ -47,6 +47,8 @@ class WebApp(sessionManager: SessionManager)
 
     val sessionFuture = createSessionRequest.lang match {
       case "scala" => sessionManager.createSession(createSessionRequest.lang)
+      case "spark" => sessionManager.createSession(createSessionRequest.lang)
+      case "pyspark" => sessionManager.createSession(createSessionRequest.lang)
       case "python" => sessionManager.createSession(createSessionRequest.lang)
       case lang => halt(400, "unsupported language: " + lang)
     }
