@@ -368,6 +368,9 @@ class SparkApi():
         msg = ''.join(tb)
 
       raise QueryError(msg)
+    
+  def download(self, notebook, snippet, format):
+    return NotImplementedError()
 
   def cancel(self, notebook, snippet):
     api = get_spark_api(self.user)
