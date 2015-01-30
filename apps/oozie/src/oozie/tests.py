@@ -1365,6 +1365,43 @@ class TestEditor(OozieMockBase):
     <end name="end"/>
 </workflow-app>""" in xml, xml)
 
+      # Test when no credentials are checked
+      action1.credentials = [{'name': 'hcat', 'value': False}, {'name': 'hbase', 'value': False}, {'name': 'hive2', 'value': False}]
+      action1.save()
+
+      xml = self.wf.to_xml()
+
+      assert_true("""
+<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">
+  <global>
+      <job-xml>jobconf.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>sleep-all</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+  </global>
+    <start to="MyHive"/>
+    <action name="MyHive">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
+            <script>hello.sql</script>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+        </hive>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>""" in xml, xml)
+
+
     finally:
       beeswax.hive_site.reset()
       if saved is not None:
