@@ -20,6 +20,7 @@
 set -e
 
 export LIVY_HOME=$(cd $(dirname $0)/.. && pwd)
+cd $LIVY_HOME
 
 CLASSPATH="$LIVY_HOME/livy-repl/target/lib/*:$LIVY_HOME/livy-repl/target/livy-repl-3.7.0-SNAPSHOT.jar:$CLASSPATH"
 
