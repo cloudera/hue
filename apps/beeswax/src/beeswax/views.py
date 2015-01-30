@@ -17,6 +17,7 @@
 
 import json
 import logging
+import math
 import re
 import sys
 import time
@@ -473,7 +474,10 @@ def view_results(request, id, first_row=0):
         escaped_row = []
         for field in row:
           if isinstance(field, (int, long, float, complex, bool)):
-            escaped_field = field
+            if math.isnan(field) or math.isinf(field):
+              escaped_field = json.dumps(field)
+            else:
+              escaped_field = field
           elif field is None:
             escaped_field = 'NULL'
           else:
