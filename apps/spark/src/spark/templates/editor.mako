@@ -440,14 +440,24 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           ${ _('Success but empty results.') }
         </div>
 
-        <div class="row-fluid" data-bind="visible: result.hasSomeResults() && showGrid()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': !isLeftPanelVisible()}">
+        <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
+        <div class="row-fluid" style="max-height: 400px; margin-top: 50px">
+          <pre data-bind="text: result.data()[0][1]">            
+          </pre>
+        </div>
+        <!-- /ko -->
+
+        <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
             <ul class="nav nav-list" style="border: none; background-color: #FFF">              
               <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
               </a>
             </ul>
             <ul class="unstyled" data-bind="foreach: result.meta">
-              <li data-bind="visible: name != ''"><input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" /> <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a></li>
+              <li data-bind="visible: name != ''">
+                <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
+                <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
+              </li>
             </ul>
           </div>
           <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
