@@ -31,6 +31,7 @@ from beeswax.server.dbms import get_query_server_config, QueryServerException
 from beeswax.views import safe_get_design, save_design, _parse_out_hadoop_jobs
 
 from spark.job_server_api import get_api as get_spark_api
+from spark.data_export import download as spark_download
 
 
 # To move to Editor API
@@ -329,9 +330,6 @@ class SparkApi():
     content = response['output']
 
     if content['status'] == 'ok':
-      # The frontend expects a table, so simulate that by putting our text
-      # into a single cell.
-
       data = content['data']
 
       try:
@@ -346,7 +344,7 @@ class SparkApi():
         meta = [{'name': h['name'], 'type': h['type'], 'comment': ''} for h in headers]
         type = 'table'
 
-      # start_over not supported
+      # Non start_over not supported
       if not start_over:
         data = []
 
@@ -370,7 +368,14 @@ class SparkApi():
       raise QueryError(msg)
     
   def download(self, notebook, snippet, format):
-    return NotImplementedError()
+    try:
+      api = get_spark_api(self.user)
+      session = _get_snippet_session(notebook, snippet)
+      cell = snippet['result']['handle']['id']
+
+      return spark_download(api, session['id'], cell, format)
+    except Exception, e:
+      raise PopupException(e)
 
   def cancel(self, notebook, snippet):
     api = get_spark_api(self.user)

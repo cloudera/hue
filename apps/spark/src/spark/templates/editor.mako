@@ -400,7 +400,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
               <input type="hidden" name="format" class="download-format"/>
 
-              <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults()">
+              <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
                 <button class="btn dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-download"></i>
                   <i class="fa fa-caret-down"></i>
