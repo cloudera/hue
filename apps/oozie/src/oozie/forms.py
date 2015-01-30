@@ -466,8 +466,8 @@ class RerunForm(forms.Form):
 
 
 class RerunCoordForm(forms.Form):
-  refresh = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
-  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
   actions = forms.MultipleChoiceField(required=True)
 
   def __init__(self, *args, **kwargs):
@@ -479,8 +479,8 @@ class RerunCoordForm(forms.Form):
 
 
 class RerunBundleForm(forms.Form):
-  refresh = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
-  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
   coordinators = forms.MultipleChoiceField(required=True)
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today(),
                                    widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'rerun_start'},
