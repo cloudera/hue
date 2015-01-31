@@ -123,6 +123,7 @@ ${ components.menubar() }
                 <table id="sampleTable" class="table table-striped table-condensed sampleTable">
                   <thead>
                     <tr>
+                      <th style="width: 10px"></th>
                     % for col in table.cols:
                       <th>${col.name}</th>
                     % endfor
@@ -131,6 +132,7 @@ ${ components.menubar() }
                   <tbody>
                   % for i, row in enumerate(sample):
                     <tr>
+                      <td>${ i }</td>
                     % for item in row:
                       <td>
                         % if item is None:
