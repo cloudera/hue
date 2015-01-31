@@ -269,9 +269,8 @@ class YarnApi(JobBrowserApi):
         return KilledYarnJob(self.resource_manager_api, job)
 
       if job.get('applicationType') == 'SPARK':
-        job = SparkJob(job)
-      else:
-        # MR id, assume 'applicationType': 'MAPREDUCE'
+        job = YarnJob(job)
+      elif job.get('applicationType') == 'MAPREDUCE':
         jobid = jobid.replace('application', 'job')
 
         if job['state'] in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING'):
@@ -280,6 +279,8 @@ class YarnApi(JobBrowserApi):
         else:
           json = self.history_server_api.job(self.user, jobid)
           job = YarnJob(self.history_server_api, json['job'])
+      else:
+        job = Application(job, self.resource_manager_api)
     except ApplicationNotRunning, e:
       raise e
     except Exception, e:

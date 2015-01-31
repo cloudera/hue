@@ -291,7 +291,7 @@ class SparkApi():
       }
     except Exception, e:
       message = force_unicode(str(e)).lower()
-      if 'session not found' in message:
+      if 'session not found' in message or 'connection refused' in message or 'session is in state busy' in message:
         raise SessionExpired(e)
       else:
         raise e
