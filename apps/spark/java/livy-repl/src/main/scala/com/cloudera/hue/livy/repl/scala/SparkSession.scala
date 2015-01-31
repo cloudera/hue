@@ -60,7 +60,7 @@ private class SparkSession extends Session {
         parse(write(Map(
           "status" -> "ok",
           "execution_count" -> x,
-          "payload" -> Map(
+          "data" -> Map(
             "text/plain" -> rep.output
           )
         )))

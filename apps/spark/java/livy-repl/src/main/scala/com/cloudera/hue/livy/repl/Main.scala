@@ -27,7 +27,7 @@ object Main extends Logging {
     val session_kind = args(0)
 
     session_kind match {
-      case PYTHON_SESSION | PYSPARK_SESSION | SPARK_SESSION =>
+      case PYTHON_SESSION | PYSPARK_SESSION | SCALA_SESSION | SPARK_SESSION =>
       case _ =>
         println("Unknown session kind: " + session_kind)
         sys.exit(1)
