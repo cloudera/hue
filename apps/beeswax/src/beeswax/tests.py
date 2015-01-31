@@ -1149,7 +1149,6 @@ for x in sys.stdin:
 
     history = QueryHistory.objects.latest('id')
 
-#response = wait_for_query_to_finish(self.client, response)
     assert_equal_mod_whitespace("""
         CREATE TABLE `default.my_table2`
         (
@@ -1420,6 +1419,26 @@ for x in sys.stdin:
       ['"a', 'a"', '"b'], # Hive does not support natively quoted CSV
       ['"a', '""a"', '"b']
     ] )
+
+
+  def test_select_invalid_data(self):
+    filename = '/tmp/test_select_invalid_data'
+    self._make_custom_data_file(filename, [1, 2, 3, 'NaN', 'INF', '-INF', 'BAD']) # Infinity not supported yet
+    self._make_table('test_select_invalid_data', 'CREATE TABLE test_select_invalid_data (timestamp1 DOUBLE)', filename)
+
+    hql = """
+      SELECT * FROM test_select_invalid_data;
+    """
+    resp = _make_query(self.client, hql)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    content = json.loads(resp.content)
+    history_id = content['id']
+    query_history = QueryHistory.get(id=history_id)
+
+    resp = self.client.get("/beeswax/results/%s/0?format=json" % history_id)
+    content = json.loads(resp.content)
+    assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [u'NULL'], [u'NULL'], [u'NULL']], content['results'])
 
 
   def test_create_database(self):
