@@ -38,7 +38,8 @@ LOGGER = logging.getLogger(__name__)
 
 class Application(object):
 
-  def __init__(self, attrs):
+  def __init__(self, attrs, rm_api=None):
+    self.api = rm_api
     for attr in attrs.keys():
       setattr(self, attr, attrs[attr])
 
@@ -75,6 +76,10 @@ class Application(object):
 
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
+
+  def kill(self):
+    return self.api.kill(self.id)
+
 
 class SparkJob(Application):
 
