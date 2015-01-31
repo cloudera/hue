@@ -583,6 +583,12 @@ var Notebook = function (vm, notebook) {
       });
 	}
   };
+  
+  self.clearResults = function () {
+	$.each(self.snippets(), function(index, snippet) {
+      snippet.result.clear();
+	});
+  };
 }
 
 
