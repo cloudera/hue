@@ -33,9 +33,7 @@ var Result = function (snippet, result) {
   self.endTime = ko.observable(typeof result.endTime != "undefined" && result.endTime != null ? new Date(result.endTime) : new Date());
   self.executionTime = ko.computed(function() {
     return self.endTime().getTime() - self.startTime().getTime();
-  });
-  self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'plain');
-  
+  });  
   
   function isNumericColumn(type) {
     return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
@@ -289,6 +287,7 @@ var Snippet = function (vm, notebook, snippet) {
 	      self.status('ready');
 	    }
 	    else {
+	      self.status('failed');
 	      $(document).trigger("error", data.message);
 	    }
 	}).fail(function (xhr, textStatus, errorThrown) {
@@ -482,6 +481,11 @@ var Snippet = function (vm, notebook, snippet) {
   self.init = function() {
 	if (self.status() == 'running') {
 	  self.checkStatus();
+	}
+	
+	if (self.status() == 'loading') {
+	  self.status('failed');
+	  self.progress(0);
 	} 
 	
 	if (self.status() != 'loading' && self.status() != 'ready') {

@@ -338,7 +338,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
             <span data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn pointer">
-              <i class='fa fa-spinner fa-spin fa-2x'></i>
+              <i class='fa fa-spinner fa-spin fa-2x'></i> ${ _('Creating session') }
             </span>
             <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn pointer">
               ${ _('Go!') }
