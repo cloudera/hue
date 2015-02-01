@@ -22,13 +22,13 @@ var Result = function (snippet, result) {
   self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
   self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true);
   self.handle = ko.observable({});
-  self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
-  self.meta.extend({ rateLimit: 50 });
+  self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);  
   self.cleanedMeta = ko.computed(function(){
     return ko.utils.arrayFilter(self.meta(), function(item) {
       return item.name != ''
     });
   });
+  self.fetchedOnce = ko.observable(typeof result.fetchedOnce != "undefined" && result.fetchedOnce != null ? result.fetchedOnce : false);
   self.startTime = ko.observable(typeof result.startTime != "undefined" && result.startTime != null ? new Date(result.startTime) : new Date());
   self.endTime = ko.observable(typeof result.endTime != "undefined" && result.endTime != null ? new Date(result.endTime) : new Date());
   self.executionTime = ko.computed(function() {
@@ -85,7 +85,7 @@ var Result = function (snippet, result) {
     $.each(self.handle, function(key, val) {
       delete self.handle()[key];
     });
-    self.meta.removeAll();
+    self.fetchedOnce(false);
     self.data.removeAll();
     self.logs('');
     self.errors('');
@@ -301,7 +301,7 @@ var Snippet = function (vm, notebook, snippet) {
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());
 
-    if (self.result.meta().length > 0) {
+    if (self.result.fetchedOnce()) {
       self.close();
     }
     
@@ -347,7 +347,8 @@ var Snippet = function (vm, notebook, snippet) {
       if (data.status == 0) {
         rows -= data.result.data.length;
 
-        if (self.result.meta().length == 0) {
+        if (! self.result.fetchedOnce()) {
+          self.result.fetchedOnce(true);        
    	      data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
    	      self.result.meta(data.result.meta);
    	      self.result.type(data.result.type);
