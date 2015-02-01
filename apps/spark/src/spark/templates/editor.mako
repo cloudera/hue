@@ -145,22 +145,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       
     &nbsp;&nbsp;&nbsp;
       
-    <button type="button" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
-        data-bind="click: newNotebook, css: {'btn': true}">
-      <i class="fa fa-file-o"></i>
-    </button>
-      
     <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
-            
-    <button type="button" title="${ _('Open') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("New...") }"
-        data-bind="click: newNotebook, css: {'btn': true}">
-      <i class="fa fa-folder-open-o"></i>
-    </button>      
-    
+
     <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-terminal"></i>
+      <i class="fa fa-tags"></i>
     </a>
   </div>
 
