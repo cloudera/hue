@@ -178,6 +178,10 @@
   outline:none;
 }
 
+.text-snippet h2 {
+  padding-left: 0!important;
+}
+
 .span12.nomargin {
   margin-left: 0;
 }
@@ -244,4 +248,14 @@ h1.empty {
 
 .progress, .progress-neutral .bar {
   background-color: #DDD;
+}
+
+.medium-editor-toolbar-form label {
+  min-height: 20px;
+}
+
+.medium-editor-toolbar-form input[type="checkbox"] {
+  float: left;
+  margin-left: 0;
+  margin-right: 4px;
 }
