@@ -586,8 +586,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
 
       <div data-bind="visible: type() == 'text'">
-        <div data-bind="html: statement_raw, visible: ! $root.isEditing()"></div>
-        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}, visible: $root.isEditing()"></div>
+        <div data-bind="html: statement_raw, visible: ! $root.isEditing()" class="text-snippet"></div>
+        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}, visible: $root.isEditing()" class="text-snippet"></div>
       </div>
     </div>
   </div>
@@ -627,9 +627,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   ko.bindingHandlers.medium = {
     init: function (element, valueAccessor, allBindings) {
         var editor = new MediumEditor($(element), {
-          buttons: ['bold', 'italic', 'underline', 'quote', 'anchor', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent'],
+          buttons: ['header1', 'header2', 'bold', 'italic', 'underline', 'quote', 'anchor', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent'],
           buttonLabels: 'fontawesome',
-          anchorTarget: true
+          anchorTarget: true,
+          anchorInputPlaceholder: '${ _("Paste or type a link") }',
+          anchorInputCheckboxLabel: '${ _("Open in new window") }',
+          firstHeader: 'h2',
+          secondHeader: 'h3'
       });
       $(element).on('input', function() {
         allBindings().value($(element).html())
