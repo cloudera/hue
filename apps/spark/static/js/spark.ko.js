@@ -109,7 +109,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : vm.snippetPlaceholders[self.type()]);
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
-  //self.statement_raw.extend({ rateLimit: 150 });
+  // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
   self.settings = ko.mapping.fromJS(typeof snippet.settings != "undefined" && snippet.settings != null ? snippet.settings : {});
   self.variables = ko.observableArray([]);
@@ -451,7 +451,7 @@ var Snippet = function (vm, notebook, snippet) {
         snippet: ko.mapping.toJSON(self)
  	  }, function (data) {
  	    if (data.status == 0) {
- 	      self.status('closed'); 
+ 	      // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
  	    } else {
  	      self._ajax_error(data);
  	    }
