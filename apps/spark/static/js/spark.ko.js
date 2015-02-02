@@ -260,9 +260,9 @@ var Snippet = function (vm, notebook, snippet) {
   
   self.checkStatusTimeout = null;
   
-  self._ajax_error = function(data) {
+  self._ajax_error = function(data, callback) {
     if (data.status == -2) {
-      self.create_session();
+      self.create_session(callback);
     }
     else if (data.status == -3) {
       self.status('expired');
@@ -276,7 +276,7 @@ var Snippet = function (vm, notebook, snippet) {
     }
   };
   
-  self.create_session = function() {
+  self.create_session = function(callback) {
 	self.status('loading');
     $.post("/spark/api/create_session", {
     	notebook: ko.mapping.toJSON(notebook),
@@ -285,6 +285,9 @@ var Snippet = function (vm, notebook, snippet) {
 	    if (data.status == 0) {
 		  notebook.addSession(ko.mapping.fromJS(data.session));
 	      self.status('ready');
+	      if (callback) {
+	        setTimeout(callback, 500);
+	      }
 	    }
 	    else {
 	      self.status('failed');
@@ -320,7 +323,7 @@ var Snippet = function (vm, notebook, snippet) {
         self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
       } else {
-        self._ajax_error(data);
+        self._ajax_error(data, self.execute);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
