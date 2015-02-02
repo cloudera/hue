@@ -133,7 +133,7 @@ var Snippet = function (vm, notebook, snippet) {
       var match = ko.utils.arrayFirst(self.variables(), function (_var) {
         return _var.name() == name;
       });
-      if (!match) {
+      if (! match) {
         toAdd.push(name);
       }
     });
@@ -141,7 +141,7 @@ var Snippet = function (vm, notebook, snippet) {
       var match = ko.utils.arrayFirst(newVal, function (name) {
         return _var.name() == name;
       });
-      if (!match) {
+      if (! match) {
         toDelete.push(_var);
       }
     });
@@ -593,9 +593,10 @@ var Notebook = function (vm, notebook) {
   };
   
   self.clearResults = function () {
-	$.each(self.snippets(), function(index, snippet) {
+    $.each(self.snippets(), function(index, snippet) {
       snippet.result.clear();
-	});
+      snippet.status('ready');
+    });
   };
 }
 
