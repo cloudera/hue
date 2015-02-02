@@ -68,10 +68,14 @@
 
 .codeMirror-overlaybtn {
   position: absolute;
-  margin-top: -40px;
-  margin-left: 35px;
-  z-index: 3;
-  opacity: 0.5;
+  margin-top: -30px;
+  margin-left: 0;
+  z-index: 10000;
+  border-left: none;
+  border-right: none;
+  width: 14px;
+  opacity: 0.8;
+  border-radius: 0;
 }
 
 .codeMirror-overlaybtn:hover {

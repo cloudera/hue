@@ -330,10 +330,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <span data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn pointer">
               <i class='fa fa-spinner fa-spin fa-2x'></i> ${ _('Creating session') }
             </span>
-            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn codeMirror-overlaybtn pointer">
-              ${ _('Go!') }
+            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
+              <i class="fa fa-play"></i>
             </a>
-            <a data-bind="click: cancel, visible: status() == 'running'" class="btn codeMirror-overlaybtn pointer">${ _('Cancel') }</a>
+            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback codeMirror-overlaybtn pointer"><i class="fa fa-stop"></i></a>
             <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
             </div>
@@ -966,6 +966,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       var _changeTimeout = -1;
       editor.on("change", function () {
+        if (editor.lineCount() >= 30){
+          editor.setSize("100%", "400px");
+          snippet.codemirrorSize(400);
+          redrawFixedHeaders();
+        }
         window.clearTimeout(_changeTimeout);
         _changeTimeout = window.setTimeout(function(){
           allBindingsAccessor().value(editor.getValue());
@@ -982,6 +987,20 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         if (editor.getValue() == ""){
           editor.setValue(viewModel.snippetPlaceholders[snippet.type()]); 
         }
+      });
+
+      $(editor.getWrapperElement()).on("paste", function(){
+        var _previousLineCount = editor.lineCount();
+        window.setTimeout(function(){
+          if (editor.lineCount() > _previousLineCount) {
+            editor.setSize("100%", "auto");
+          }
+          if (editor.lineCount() >= 30){
+            editor.setSize("100%", "400px");
+            snippet.codemirrorSize(400);
+          }
+          redrawFixedHeaders();
+        }, 400);
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
