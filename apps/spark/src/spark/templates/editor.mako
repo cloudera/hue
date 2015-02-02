@@ -222,11 +222,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
               <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="display: none; position: absolute; right: 10px; margin-left: auto; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
-              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel"><span data-bind="text: $data"></span></a>
+              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel, event: { 'dblclick': function(){ addToActiveCodemirror($data); } }"><span data-bind="text: $data"></span></a>
 
               <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
                 <ul data-bind="visible: $root.assistContent().firstLevelObjects()[$data].items().length > 0, foreach: $root.assistContent().firstLevelObjects()[$data].items()" class="unstyled">
-                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: truncateSecondLevel($data)"></span></a></li>
+                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: truncateSecondLevel($data), event: { 'dblclick': function(){ addToActiveCodemirror($data.name +', '); } }"></span></a></li>
                 </ul>
               </div>
             </li>
@@ -641,6 +641,16 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
   }
 
+  var activeCodemirrorEditor = null;
+
+  function addToActiveCodemirror(text) {
+    if (activeCodemirrorEditor != null){
+      activeCodemirrorEditor.replaceSelection(text);
+      activeCodemirrorEditor.setSelection(activeCodemirrorEditor.getCursor());
+      activeCodemirrorEditor.focus();
+    }
+  }
+
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, snippet) {
 
@@ -978,6 +988,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       });
 
       editor.on("focus", function () {
+        activeCodemirrorEditor = editor;
         if (editor.getValue() == viewModel.snippetPlaceholders[snippet.type()]) {
           editor.setValue("");
         }
