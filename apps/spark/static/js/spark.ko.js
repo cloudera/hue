@@ -346,13 +346,6 @@ var Snippet = function (vm, notebook, snippet) {
       if (data.status == 0) {
         rows -= data.result.data.length;
 
-        if (! self.result.fetchedOnce()) {
-          self.result.fetchedOnce(true);        
-   	      data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
-   	      self.result.meta(data.result.meta);
-   	      self.result.type(data.result.type);
-        }
-
         var _initialIndex = self.result.data().length;
         var _tempData = [];
         $.each(data.result.data, function (index, row) {
@@ -363,6 +356,13 @@ var Snippet = function (vm, notebook, snippet) {
 
         $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
+        if (! self.result.fetchedOnce()) {          
+     	  data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
+     	  self.result.meta(data.result.meta);
+     	  self.result.type(data.result.type);
+     	  self.result.fetchedOnce(true);
+        }
+        
         if (data.result.has_more && rows > 0) {
           setTimeout(function () {
             self.fetchResultData(rows, false);

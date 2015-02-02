@@ -444,8 +444,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           ${ _('Success.') }
         </div>
         
-        <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.meta().length > 0, css: resultsKlass">
+        <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
           ${ _('Success but empty results.') }
+        </div>
+        
+        <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
+          ${ _('Loading...') }
         </div>
 
         <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
@@ -491,7 +495,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
         </div>
 
-        <div class="row-fluid" data-bind="visible: result.meta().length > 0 && showChart()" style="max-height: 400px; margin-top: 4px">
+        <div class="row-fluid" data-bind="visible: result.fetchedOnce() && showChart()" style="max-height: 400px; margin-top: 4px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
             <div class="toggle-left-panel" style="float: right; margin-right: -30px; height: 400px; line-height: 400px; margin-top:0" data-bind="click: toggleLeftPanel">
               <a title="${_('Hide settings')}" class="pointer">
