@@ -24,6 +24,11 @@
   margin: 10px;
 }
 
+.snippet-body {
+  margin-top: 0;
+  min-height: 40px;
+}
+
 .CodeMirror {
   border: 1px solid #EEE;
   border-top: none;
