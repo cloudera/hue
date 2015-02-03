@@ -74,7 +74,13 @@ ko.bindingHandlers.pieChart = {
           });
         }
 
-        nv.utils.windowResize(_chart.update);
+        var _resizeTimeout = -1;
+        nv.utils.windowResize(function(){
+          window.clearTimeout(_resizeTimeout);
+          _resizeTimeout = window.setTimeout(function(){
+            _chart.update();
+          }, 200);
+        });
 
         $(element).on("forceUpdate", function(){
           _chart.update();
@@ -424,7 +430,13 @@ ko.bindingHandlers.scatterChart = {
             .each("end", options.onComplete != null ? options.onComplete : void(0))
             .call(_chart);
 
-        nv.utils.windowResize(_chart.update);
+        var _resizeTimeout = -1;
+        nv.utils.windowResize(function(){
+          window.clearTimeout(_resizeTimeout);
+          _resizeTimeout = window.setTimeout(function(){
+            _chart.update();
+          }, 200);
+        });
 
         $(element).on("forceUpdate", function(){
           _chart.update();
@@ -473,7 +485,13 @@ function lineChartBuilder(element, options) {
           .each("end", options.onComplete != null ? options.onComplete : void(0))
           .call(_chart);
 
-      nv.utils.windowResize(_chart.update);
+      var _resizeTimeout = -1;
+      nv.utils.windowResize(function(){
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function(){
+          _chart.update();
+        }, 200);
+      });
 
       $(element).on("forceUpdate", function(){
         _chart.update();
@@ -635,7 +653,13 @@ function barChartBuilder(element, options, isTimeline) {
         });
       }
 
-      nv.utils.windowResize(_chart.update);
+      var _resizeTimeout = -1;
+      nv.utils.windowResize(function(){
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function(){
+          _chart.update();
+        }, 200);
+      });
 
       $(element).on("forceUpdate", function(){
         _chart.update();

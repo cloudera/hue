@@ -1660,23 +1660,27 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }, 100);
     });
 
-    viewModel.notebooks().forEach(function (notebook) {
-      notebook.snippets().forEach(function (snippet) {
-        if (snippet.result.data().length > 0) {
-          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-          window.setTimeout(function () {
-            var _dt = createDatatable(_el, snippet);
-            _dt.fnAddData(snippet.result.data());
-            var _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
-            _dtElement.parent().siblings(".toggle-left-panel").css({
-              "height": (_dtElement.height() - 30) + "px",
-              "line-height": (_dtElement.height() - 30) + "px"
-            });
-            $(document).trigger("forceChartDraw", snippet);
-          }, 100);
-        }
+    function forceChartDraws() {
+      viewModel.notebooks().forEach(function (notebook) {
+        notebook.snippets().forEach(function (snippet) {
+          if (snippet.result.data().length > 0) {
+            var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+            window.setTimeout(function () {
+              var _dt = createDatatable(_el, snippet);
+              _dt.fnAddData(snippet.result.data());
+              var _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+              _dtElement.parent().siblings(".toggle-left-panel").css({
+                "height": (_dtElement.height() - 30) + "px",
+                "line-height": (_dtElement.height() - 30) + "px"
+              });
+              $(document).trigger("forceChartDraw", snippet);
+            }, 100);
+          }
+        });
       });
-    });
+    }
+
+    forceChartDraws();
 
     $(".CodeMirror").each(function () {
       $(this)[0].CodeMirror.refresh();
@@ -1685,7 +1689,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     var _resizeTimeout = -1;
     $(window).on("resize", function(){
       window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(resizeAssist, 200);
+      _resizeTimeout = window.setTimeout(function(){
+        resizeAssist();
+        forceChartDraws();
+      }, 200);
     });
   });
 
