@@ -68,7 +68,8 @@ function BeeswaxViewModel(server) {
     },
     'isRunning': false,
     'statement': '',
-    'isFinished': true
+    'isFinished': true,
+    'isRedacted': false
   };
 
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
@@ -183,6 +184,7 @@ function BeeswaxViewModel(server) {
     self.database(design.database);
     self.design.isParameterized(design.is_parameterized);
     self.design.email(design.email_notify);
+    self.design.isRedacted(design.is_redacted);
 
     self.design.settings.values.removeAll();
     self.design.fileResources.values.removeAll();
@@ -509,6 +511,7 @@ function BeeswaxViewModel(server) {
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
           self.design.history.id(data.id);
+          self.design.isRedacted(data.is_redacted);
           self.watchQueryLoop();
           $(document).trigger('executed.query', data);
         } else {

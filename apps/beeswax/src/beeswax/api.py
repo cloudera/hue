@@ -145,7 +145,8 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
     'status': 0,
     'id': history_obj.id,
     'watch_url': watch_url,
-    'statement': history_obj.get_current_statement()
+    'statement': history_obj.get_current_statement(),
+    'is_redacted': history_obj.is_redacted
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -578,7 +579,8 @@ def design_to_dict(design):
     'file_resources': hql_design.file_resources,
     'functions': hql_design.functions,
     'is_parameterized': hql_design.query.get('is_parameterized', True),
-    'email_notify': hql_design.query.get('email_notify', True)
+    'email_notify': hql_design.query.get('email_notify', True),
+    'is_redacted': design.is_redacted
   }
 
 

@@ -204,6 +204,9 @@ ${layout.menubar(section='query')}
   </div>
 
   <div id="querySide" class="span10">
+    <div class="alert" data-bind="visible: design.isRedacted">
+      ${ _('This query had some sensitive information removed when saved.') }
+    </div>
     <div id="queryContainer" class="card card-small">
       <div class="pull-right" style="margin: 10px">
         <i class="fa fa-question-circle" id="help"></i>
