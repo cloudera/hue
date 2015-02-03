@@ -98,6 +98,12 @@ class Client(yarnConf: YarnConfiguration) {
     containerCtx.setCommands(cmds)
     containerCtx.setLocalResources(Map("__package" -> packageResource))
 
+    // FIXME: Spark needs the `MASTER` environment passed through to run on YARN. This needs a better approach.
+    val master = System.getenv("MASTER")
+    if (master != null) {
+      containerCtx.getEnvironment()("MASTER") = master
+    }
+
     appContext.setApplicationId(appId)
     appContext.setAMContainerSpec(containerCtx)
     appContext.setApplicationType("livy")
