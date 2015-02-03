@@ -15,6 +15,7 @@ object YarnSession {
     val packagePath = new Path(LIVY_YARN_PACKAGE)
 
     val job = client.submitApplication(
+      "livy " + lang,
       packagePath,
       List(
         "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
