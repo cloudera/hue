@@ -23,6 +23,7 @@ object Client extends Logging {
 
     try {
       val job = client.submitApplication(
+        "livy " + lang,
         packagePath,
         List(
           "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
@@ -61,7 +62,7 @@ class Client(yarnConf: YarnConfiguration) {
   yarnClient.init(yarnConf)
   yarnClient.start()
 
-  def submitApplication(packagePath: Path, cmds: List[String]): Job = {
+  def submitApplication(name: String, packagePath: Path, cmds: List[String]): Job = {
     val app = yarnClient.createApplication()
     val newAppResponse = app.getNewApplicationResponse
 
@@ -70,7 +71,7 @@ class Client(yarnConf: YarnConfiguration) {
     info("preparing to submit %s" format appId)
 
     val appContext = app.getApplicationSubmissionContext
-    appContext.setApplicationName(appId.toString)
+    appContext.setApplicationName(name)
 
     val containerCtx = Records.newRecord(classOf[ContainerLaunchContext])
     val resource = Records.newRecord(classOf[Resource])
