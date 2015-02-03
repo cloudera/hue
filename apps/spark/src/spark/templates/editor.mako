@@ -204,7 +204,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script type="text/html" id="notebook">
   <div class="row-fluid">
-    <div class="span2" data-bind="visible: $root.isAssistVisible, css:{'span2': $root.isAssistVisible, 'hidden': !$root.isAssistVisible()}, event: { mouseover: function(){ $('.assist-hover').show(); }, mouseout: function(){ $('.assist-hover').hide(); } }">
+    <div class="span2 assist-container" data-bind="visible: $root.isAssistVisible, css:{'span2': $root.isAssistVisible, 'hidden': !$root.isAssistVisible()}, event: { mouseover: function(){ $('.assist-hover').show(); }, mouseout: function(){ $('.assist-hover').hide(); } }">
       <div class="assist">
         <a title="${_('Toggle Assist')}" class="pull-right pointer assist-hover" style="margin:3px; margin-top:9px; display:none" data-bind="click: $root.toggleAssist">
           <i class="fa fa-chevron-left"></i>
@@ -460,7 +460,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <!-- /ko -->
 
         <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
             <ul class="nav nav-list" style="border: none; background-color: #FFF">              
               <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
               </a>
@@ -496,7 +496,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
+          <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
             <div class="toggle-left-panel" style="float: right; margin-right: -30px; height: 400px; line-height: 400px; margin-top:0" data-bind="click: toggleLeftPanel">
               <a title="${_('Hide settings')}" class="pointer">
                 <i class="fa fa-chevron-left"></i>

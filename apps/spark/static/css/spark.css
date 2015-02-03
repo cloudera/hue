@@ -271,3 +271,8 @@ h1.empty {
 .medium-toolbar-arrow-under:after {
   top: 40px!important;
 }
+
+@media print { 
+ .navigator, .assist-container, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet { display: none !important; }
+ .CodeMirror { border: none; }
+}
