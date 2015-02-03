@@ -590,8 +590,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
 
       <div data-bind="visible: type() == 'text'" class="snippet-body">
-        <div data-bind="html: statement_raw, visible: ! $root.isEditing()" class="text-snippet"></div>
-        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}, visible: $root.isEditing()" class="text-snippet"></div>
+        ##<div data-bind="html: statement_raw, visible: ! $root.isEditing()" class="text-snippet"></div>
+        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
       </div>
     </div>
   </div>
@@ -653,7 +653,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           firstHeader: 'h2',
           secondHeader: 'h3'
       });
-      $(element).on('input', function() {
+      $(element).on('blur', function() {
         allBindings().value($(element).html())
       });
     }

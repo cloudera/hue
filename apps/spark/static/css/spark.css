@@ -176,13 +176,6 @@
   white-space: nowrap;
 }
 
-[contenteditable] {
-  min-height: 200px;
-  border: 1px solid #DDD;
-  border-top: none;
-  padding: 10px;
-}
-
 [contenteditable]:focus {
   outline:none;
 }
@@ -267,4 +260,14 @@ h1.empty {
   float: left;
   margin-left: 0;
   margin-right: 4px;
+}
+
+.medium-editor-toolbar li button {
+  padding: 0!important;
+  height: 40px!important;
+  min-width: 40px!important;
+}
+
+.medium-toolbar-arrow-under:after {
+  top: 40px!important;
 }
