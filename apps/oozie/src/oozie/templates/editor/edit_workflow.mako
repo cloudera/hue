@@ -686,6 +686,7 @@ function save_workflow(callback) {
     _callbackFn = callback;
   }
   workflow.loading(true);
+  $("#btn-save-wf").button('loading');
   if (kill_view_model.enabled()) {
     if (kill_view_model.isValid()) {
       workflow.save({ success: _callbackFn, error: workflow_save_error });
