@@ -82,7 +82,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>          
           <!-- ko if: ! uuid() -->
-            <a data-bind="attr: { 'href': '${ url('oozie:open_old_workflow') }?workflow=' + id() + '&open_old_workflow=true' }" data-row-selector="true"></a>
+            <a data-bind="attr: { 'href': '${ url('oozie:open_old_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->
           <!-- ko if: uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
