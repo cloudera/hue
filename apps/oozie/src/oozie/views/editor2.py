@@ -38,10 +38,10 @@ from liboozie.submission2 import Submission
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission
 from oozie.forms import ParameterForm
-from oozie.models import Workflow as OlfWorklow, Job
+from oozie.models import Workflow as OlfWorklow, Coordinator as OldCoordinator, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
-from oozie.views.editor import edit_workflow as old_edit_workflow 
+from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator
 
 
 LOG = logging.getLogger(__name__)
@@ -374,6 +374,10 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
 def list_editor_coordinators(request):
   coordinators = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
+  coordinators_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldCoordinator, request.user)]
+  if coordinators_v1:
+    coordinators.extend(coordinators_v1)
+
   return render('editor/list_editor_coordinators.mako', request, {
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML)
   })
@@ -416,6 +420,13 @@ def edit_coordinator(request):
 
 def new_coordinator(request):
   return edit_coordinator(request)
+
+
+def open_old_coordinator(request):
+  doc_id = request.GET.get('coordinator')
+  coordinator_id = Document.objects.get(id=doc_id).object_id
+  
+  return old_edit_coordinator(request, coordinator=coordinator_id)
 
 
 @check_document_access_permission()

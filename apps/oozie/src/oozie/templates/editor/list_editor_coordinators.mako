@@ -80,7 +80,12 @@ ${ layout.menubar(section='coordinators', is_editor=True) }
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          <a data-bind="attr: { 'href': '${ url('oozie:edit_coordinator') }?coordinator=' + id() }" data-row-selector="true"></a>
+          <!-- ko if: ! uuid() -->
+            <a data-bind="attr: { 'href': '${ url('oozie:open_old_coordinator') }?coordinator=' + id() }" data-row-selector="true"></a>
+          <!-- /ko -->
+          <!-- ko if: uuid() -->
+            <a data-bind="attr: { 'href': '${ url('oozie:edit_coordinator') }?coordinator=' + id() }" data-row-selector="true"></a>
+          <!-- /ko -->                    
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: description"></td>
