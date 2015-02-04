@@ -473,7 +473,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </ul>
           </div>
           <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
-            <div class="toggle-left-panel" data-bind="click: toggleLeftPanel">
+            <div data-bind="attr: { 'id': 'toggleLeftPanelGrid' + id()}, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel" class="toggle-left-panel">
               <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isLeftPanelVisible()">
                 <i class="fa fa-chevron-right"></i>
               </a>
@@ -481,7 +481,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <i class="fa fa-chevron-left"></i>
               </a>
             </div>
-            <div data-bind="css: resultsKlass">
+            <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }">
               <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360">
                 <thead>
                   <tr data-bind="foreach: result.meta">
@@ -497,7 +497,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
         <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
-            <div class="toggle-left-panel" style="float: right; margin-right: -30px; height: 400px; line-height: 400px; margin-top:0" data-bind="click: toggleLeftPanel">
+            <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel">
               <a title="${_('Hide settings')}" class="pointer">
                 <i class="fa fa-chevron-left"></i>
               </a>
@@ -560,9 +560,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </div>
             </div>
           </div>
-          <div data-bind="css:{'span10 chart-container': isLeftPanelVisible, 'span12 nomargin chart-container': !isLeftPanelVisible()}">
+          <div data-bind="css:{'span10 chart-container': isLeftPanelVisible, 'span12 nomargin chart-container': !isLeftPanelVisible()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }">
 
-            <div class="toggle-left-panel" style="margin-right: -30px; height: 400px; line-height: 400px; margin-top:0" data-bind="visible: !isLeftPanelVisible(), click: toggleLeftPanel">
+            <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isLeftPanelVisible(), click: toggleLeftPanel, attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}">
               <a title="${_('Show settings')}" class="pointer">
                 <i class="fa fa-chevron-right"></i>
               </a>
@@ -1602,6 +1602,20 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
     });
 
+    function resizeToggleLeftPanel(snippet) {
+      var _dtElement;
+      if (snippet.showGrid()){
+        _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+      }
+      else {
+        _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
+      }
+      _dtElement.parents(".snippet-body").find(".toggle-left-panel").css({
+        "height": (_dtElement.height() - 30) + "px",
+        "line-height": (_dtElement.height() - 30) + "px"
+      });
+    }
+
     $(document).on("renderData", function (e, options) {
       var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
       if (options.data.length > 0) {
@@ -1620,7 +1634,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           _dtElement.animate({opacity: '1'}, 50);
           _dtElement.scrollTop(_dtElement.data("scrollPosition"));
           redrawFixedHeaders();
-          _dtElement.parent().siblings(".toggle-left-panel").height(_dtElement.height());
+          resizeToggleLeftPanel(options.snippet);
         }, 100);
       }
       else {
@@ -1654,6 +1668,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
     });
 
+    $(document).on("gridShown", function (e, snippet) {
+      window.setTimeout(function () {
+        resizeToggleLeftPanel(snippet);
+      }, 50);
+    });
+
+    $(document).on("chartShown", function (e, snippet) {
+      window.setTimeout(function () {
+        resizeToggleLeftPanel(snippet);
+      }, 50);
+    });
+
     $(document).on("forceChartDraw", function (e, snippet) {
       window.setTimeout(function () {
         snippet.chartX.notifySubscribers();
@@ -1668,13 +1694,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             window.setTimeout(function () {
               var _dt = createDatatable(_el, snippet);
               _dt.fnAddData(snippet.result.data());
-              var _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
-              _dtElement.parent().siblings(".toggle-left-panel").css({
-                "height": (_dtElement.height() - 30) + "px",
-                "line-height": (_dtElement.height() - 30) + "px"
-              });
+              resizeToggleLeftPanel(snippet);
               $(document).trigger("forceChartDraw", snippet);
-            }, 100);
+            }, 200);
           }
         });
       });

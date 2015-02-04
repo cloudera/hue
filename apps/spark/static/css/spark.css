@@ -223,13 +223,26 @@ h1.empty {
 }
 
 .toggle-left-panel {
-  cursor: pointer;
   float: left;
   padding: 3px;
   margin-top: 31px;
+  width: 10px;
+  text-align: center;
 }
 
-.toggle-left-panel:hover {
+.toggle-left-panel i {
+  display: none;
+}
+
+.toggle-left-panel.hoverable {
+  cursor: pointer;
+}
+
+.toggle-left-panel.hoverable i {
+  display: inline-block;
+}
+
+.toggle-left-panel.hoverable:hover {
   background-color: #F0F0F0;
 }
 

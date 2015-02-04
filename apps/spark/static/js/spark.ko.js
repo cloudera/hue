@@ -179,6 +179,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.showGrid.subscribe(function (val){
     if (val){
       self.showChart(false);
+      $(document).trigger("gridShown", self);
     }
   });
   self.showChart.subscribe(function (val){
@@ -186,6 +187,7 @@ var Snippet = function (vm, notebook, snippet) {
       self.showGrid(false);
       self.isLeftPanelVisible(true);
       $(document).trigger("forceChartDraw", self);
+      $(document).trigger("chartShown", self);
     }
   });
   self.showLogs.subscribe(function (val){
