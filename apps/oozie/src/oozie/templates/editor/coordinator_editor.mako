@@ -40,6 +40,9 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}, visible: coordinator.id() != null">
       <i class="fa fa-play"></i>
     </a>
+    
+    &nbsp;&nbsp;&nbsp;
+    
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
@@ -76,7 +79,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   </div>
 
   <form class="form-search">
-    <span data-bind="visible: coordinator.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+    <span data-bind="visible: coordinator.id() == null" class="muted pull-right">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
 
     <div class="inline object-name">
       <span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
@@ -103,7 +106,9 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
             </a>
             <!-- /ko -->
             <!-- ko ifnot: isEditing -->
-            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }, text: getWorkflowById(coordinator.properties.workflow()).name" target="_blank" title="${ _('Open') }">
+            <span data-bind="text: getWorkflowById(coordinator.properties.workflow()).name"></span>
+            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
+              <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
           <!-- /ko -->

@@ -135,7 +135,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   var self = this;
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
-  self.isEditing = ko.observable(self.canEdit());
+  self.isEditing = ko.observable(coordinator_json.id == null);
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
     self.coordinator.properties.cron_advanced.valueHasMutated();

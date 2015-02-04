@@ -1472,8 +1472,8 @@ class Coordinator(Job):
               'credentials': [],
               'parameters': [
                   {'name': 'oozie.use.system.libpath', 'value': True},
-                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%M:%S')},
-                  {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%S')}
+                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%MZ')},
+                  {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%MZ')}
               ],
               'sla': Workflow.SLA_DEFAULT
           }

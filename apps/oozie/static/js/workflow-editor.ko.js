@@ -489,7 +489,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.isNested = ko.observable(true);
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
-  self.isEditing = ko.observable(true && self.canEdit());
+  self.isEditing = ko.observable(false);
   self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });

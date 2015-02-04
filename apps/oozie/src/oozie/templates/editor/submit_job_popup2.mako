@@ -82,7 +82,7 @@
   });
 
   $(".now-link").on("click", function(){
-    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm:SS"));
+    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm") + 'Z');
   });
 
   $(".calendar-link").on("click", function(){
@@ -92,7 +92,7 @@
       format: DATE_FORMAT.toLowerCase()
      }).on("changeDate", function () {
       _el.datepicker('hide');
-      _el.val(_el.val() + "T00:00:00");
+      _el.val(_el.val() + "T00:00Z");
     });
    _el.datepicker('show');
   }); 
