@@ -35,8 +35,8 @@ nv.models.growingDiscreteBarChart = function() {
     , staggerLabels = false
     , tooltips = true
     , tooltip = function(key, x, y, e, graph) {
-        return '<h3>' + x + '</h3>' +
-               '<p>' +  y + '</p>'
+        return '<h3>' + key + '</h3>' +
+               '<p>' +  y + ' on ' + x + '</p>'
       }
     , x
     , y
