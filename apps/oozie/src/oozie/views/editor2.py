@@ -38,10 +38,10 @@ from liboozie.submission2 import Submission
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission
 from oozie.forms import ParameterForm
-from oozie.models import Workflow as OlfWorklow, Coordinator as OldCoordinator, Job
+from oozie.models import Workflow as OlfWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
-from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator
+from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
 
 
 LOG = logging.getLogger(__name__)
@@ -132,7 +132,7 @@ def delete_job(request):
       
       doc.delete()
       doc2.delete()
-    else: # Old workflow version
+    else: # Old version
       job = Job.objects.can_read_or_exception(request, job['object_id'])
       Job.objects.can_edit_or_exception(request, job)
       OlfWorklow.objects.destroy(job, request.fs)      
@@ -556,6 +556,10 @@ def _submit_coordinator(request, coordinator, mapping):
 def list_editor_bundles(request):
   bundles = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
 
+  bundles_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldBundle, request.user)]
+  if bundles_v1:
+    bundles.extend(bundles_v1)
+
   return render('editor/list_editor_bundles.mako', request, {
       'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML)
   })
@@ -586,6 +590,13 @@ def edit_bundle(request):
 
 def new_bundle(request):
   return edit_bundle(request)
+
+
+def open_old_bundle(request):
+  doc_id = request.GET.get('bundle')
+  bundle_id = Document.objects.get(id=doc_id).object_id
+  
+  return old_edit_bundle(request, bundle=bundle_id)
 
 
 @check_document_modify_permission()

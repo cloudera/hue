@@ -82,7 +82,7 @@ urlpatterns += patterns(
   url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
   url(r'^editor/workflow/action/parameters/$', 'action_parameters', name='action_parameters'),
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'),
-  url(r'^editor/workflow/open_old_workflow/$', 'open_old_workflow', name='open_old_workflow'),
+  url(r'^editor/workflow/open_v1/$', 'open_old_workflow', name='open_old_workflow'),
   
   url(r'^editor/coordinator/list/$', 'list_editor_coordinators', name='list_editor_coordinators'),
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
@@ -92,7 +92,7 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/save/$', 'save_coordinator', name='save_coordinator'),
   url(r'^editor/coordinator/submit/(?P<doc_id>\d+)$', 'submit_coordinator', name='editor_submit_coordinator'),
   url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'),
-  url(r'^editor/coordinator/open_old_coordinator/$', 'open_old_coordinator', name='open_old_coordinator'),
+  url(r'^editor/coordinator/open_v1/$', 'open_old_coordinator', name='open_old_coordinator'),
   
   url(r'^editor/bundle/list/$', 'list_editor_bundles', name='list_editor_bundles'),
   url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),
@@ -100,7 +100,8 @@ urlpatterns += patterns(
   url(r'^editor/bundle/delete/$', 'delete_job', name='delete_editor_bundle'),
   url(r'^editor/bundle/copy/$', 'copy_bundle', name='copy_bundle'),
   url(r'^editor/bundle/save/$', 'save_bundle', name='save_bundle'),
-  url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle')
+  url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle'),
+  url(r'^editor/bundle/open_v1/$', 'open_old_bundle', name='open_old_bundle'),
 )
 
 
