@@ -3,15 +3,16 @@ package com.cloudera.hue.livy.repl.python
 import java.io._
 import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
+import java.util.concurrent.SynchronousQueue
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl.Session
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, JValue}
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 object PythonSession {
   def createPython(): Session = {
@@ -27,10 +28,8 @@ object PythonSession {
     val pb = new ProcessBuilder(driver, fakeShell.toString)
     pb.redirectError(Redirect.INHERIT)
     val process = pb.start()
-    val in = process.getInputStream
-    val out = process.getOutputStream
 
-    new PythonSession(process, in, out)
+    new PythonSession(process)
   }
 
   private def createFakeShell(): File = {
@@ -78,43 +77,172 @@ object PythonSession {
   }
 }
 
-private class PythonSession(process: Process, in: InputStream, out: OutputStream) extends Session {
+private class PythonSession(process: Process) extends Session {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   implicit val formats = DefaultFormats
 
-  private[this] val stdin = new PrintWriter(out)
-  private[this] val stdout = new BufferedReader(new InputStreamReader(in), 1)
+  private val stdin = new PrintWriter(process.getOutputStream)
+  private val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
 
-  private[this] var _statements = ArrayBuffer[JValue]()
+  private var _history = ArrayBuffer[JValue]()
+  private var _state: Session.State = Session.Starting()
 
-  override def statements: Seq[JValue] = _statements
+  private val queue = new SynchronousQueue[Request]
 
-  override def execute(content: ExecuteRequest): Future[JValue] = {
-    Future {
-      val msg = Map("msg_type" -> "execute_request", "content" -> content)
+  private val thread = new Thread {
+    override def run() = {
+      waitUntilReady()
+      loop()
+    }
 
-      stdin.println(write(msg))
-      stdin.flush()
-
+    @tailrec
+    def waitUntilReady(): Unit = {
       val line = stdout.readLine()
-      val rep = parse(line)
+      line match {
+        case null | "READY" =>
+        case _ => waitUntilReady()
+      }
+    }
 
-      rep \ "content"
+    @tailrec
+    def loop(): Unit = {
+      _state = Session.Idle()
+
+      queue.take() match {
+        case ExecuteRequest(code, promise) =>
+          _state = Session.Busy()
+
+          val msg = Map(
+            "msg_type" -> "execute_request",
+            "content" -> Map("code" -> code))
+
+          stdin.println(write(msg))
+          stdin.flush()
+
+          val line = stdout.readLine()
+          // The python process shut down
+          if (line == null) {
+            promise.failure(new Exception("session has been terminated"))
+          } else {
+            val rep = parse(line)
+            assert((rep \ "msg_type").extract[String] == "execute_reply")
+
+            val content: JValue = rep \ "content"
+            _history += content
+
+            promise.success(content)
+
+            loop()
+          }
+
+        case ShutdownRequest(promise) =>
+          _state = Session.ShuttingDown()
+          process.getInputStream.close()
+          process.getOutputStream.close()
+          process.destroy()
+          _state = Session.ShutDown()
+          promise.success(())
+      }
     }
   }
 
-  override def statement(id: Int): Option[JValue] = {
-    if (id < _statements.length) {
-      Some(_statements(id))
+  thread.start()
+
+  override def state = _state
+
+  override def history(): Seq[JValue] = _history
+
+  override def history(id: Int): Option[JValue] = {
+    if (id < _history.length) {
+      Some(_history(id))
     } else {
       None
     }
   }
 
-  override def close(): Unit = {
+  override def execute(code: String): Future[JValue] = {
+    val promise = Promise[JValue]()
+    queue.put(ExecuteRequest(code, promise))
+    promise.future
+  }
+
+  override def close(): Future[Unit] = {
+    _state match {
+      case Session.ShutDown() =>
+        Future.successful(())
+      case Session.ShuttingDown() =>
+        Future {
+          waitForStateChange(Session.ShuttingDown())
+          Future.successful(())
+        }
+      case _ =>
+        synchronized {
+          val promise = Promise[Unit]()
+          queue.put(ShutdownRequest(promise))
+          promise.future.map({ case () => thread.join() })
+        }
+    }
+  }
+}
+
+private sealed trait Request
+private case class ExecuteRequest(code: String, promise: Promise[JValue]) extends Request
+private case class ShutdownRequest(promise: Promise[Unit]) extends Request
+
+case class ExecuteResponse(content: JValue)
+
+/*
+private class Interpreter(process: Process, in: InputStream, out: OutputStream) extends Session {
+  private implicit def executor: ExecutionContext = ExecutionContext.global
+
+  implicit val formats = DefaultFormats
+
+  private val stdin = new PrintWriter(out)
+  private val stdout = new BufferedReader(new InputStreamReader(in), 1)
+
+  private var _history = ArrayBuffer[JValue]()
+  private var _state: Session.State = Session.Starting()
+
+  override def state = _state
+
+  override def history(): Seq[JValue] = _history
+
+  override def history(id: Int): Option[JValue] = {
+    if (id < _history.length) {
+      Some(_history(id))
+    } else {
+      None
+    }
+  }
+
+  override def execute(executeRequest: ExecuteRequest): Future[JValue] = {
+    _state = Session.Busy()
+
+    val msg = Map(
+      "msg_type" -> "execute_request",
+      "content" -> executeRequest)
+
+    stdin.println(write(msg))
+    stdin.flush()
+
+    Future {
+      val line = stdout.readLine()
+      val rep = parse(line)
+      assert((rep \ "msg_type").extract[String] == "execute_reply")
+
+      val content = rep \ "content"
+      _history += content
+      content
+    }
+  }
+
+  override def close(): Future[Unit] = {
+    _state = Session.ShuttingDown()
     process.getInputStream.close()
     process.getOutputStream.close()
     process.destroy()
+    Future.successful(())
   }
 }
+*/
