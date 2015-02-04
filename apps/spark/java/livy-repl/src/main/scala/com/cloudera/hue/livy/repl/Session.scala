@@ -1,16 +1,37 @@
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
 import org.json4s.JValue
 
+import _root_.scala.annotation.tailrec
 import _root_.scala.concurrent.Future
 
+object Session {
+  sealed trait State
+  case class Starting() extends State
+  case class Idle() extends State
+  case class Busy() extends State
+  case class ShuttingDown() extends State
+  case class ShutDown() extends State
+}
+
 trait Session {
-  def statements: Seq[JValue]
+  import com.cloudera.hue.livy.repl.Session._
 
-  def statement(id: Int): Option[JValue]
+  def state: State
 
-  def execute(request: ExecuteRequest): Future[JValue]
+  def execute(code: String): Future[JValue]
 
-  def close(): Unit
+  def history(): Seq[JValue]
+
+  def history(id: Int): Option[JValue]
+
+  def close(): Future[Unit]
+
+  @tailrec
+  final def waitForStateChange(oldState: State): Unit = {
+    if (state == oldState) {
+      Thread.sleep(1000)
+      waitForStateChange(oldState)
+    }
+  }
 }

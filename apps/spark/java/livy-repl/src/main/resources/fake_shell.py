@@ -257,6 +257,9 @@ sys.stdin = fake_stdin
 sys.stdout = fake_stdout
 sys.stderr = fake_stderr
 
+print >> sys_stdout, 'READY'
+sys_stdout.flush()
+
 try:
     # Load any startup files
     try:

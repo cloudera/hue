@@ -8,6 +8,9 @@ import com.cloudera.hue.livy.{Logging, WebServer}
 import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
 
+import _root_.scala.concurrent.Await
+import _root_.scala.concurrent.duration.Duration
+
 object Main extends Logging {
 
   val SESSION_KIND = "livy-repl.session.kind"
@@ -44,7 +47,6 @@ object Main extends Logging {
     println("Starting livy-repl on port %s" format server.port)
 
     server.join()
-    server.stop()
   }
 }
 
@@ -53,7 +55,7 @@ class ScalatraBootstrap extends LifeCycle {
   var session: Session = null
 
   override def init(context: ServletContext): Unit = {
-    val session = context.getInitParameter(Main.SESSION_KIND) match {
+    session = context.getInitParameter(Main.SESSION_KIND) match {
       case Main.PYTHON_SESSION => PythonSession.createPySpark()
       case Main.PYSPARK_SESSION => PythonSession.createPySpark()
       case Main.SCALA_SESSION => SparkSession.create()
@@ -64,6 +66,8 @@ class ScalatraBootstrap extends LifeCycle {
   }
 
   override def destroy(context: ServletContext): Unit = {
-    session.close()
+    if (session != null) {
+      Await.result(session.close(), Duration.Inf)
+    }
   }
 }

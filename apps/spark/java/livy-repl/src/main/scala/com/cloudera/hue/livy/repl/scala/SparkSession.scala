@@ -1,16 +1,14 @@
 package com.cloudera.hue.livy.repl.scala
 
-import java.util.concurrent.SynchronousQueue
-
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl.Session
+import com.cloudera.hue.livy.repl.scala.interpreter.Interpreter
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{JValue, _}
 
 import scala.collection.mutable
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Future}
 
 object SparkSession {
   def create(): Session = new SparkSession()
@@ -21,58 +19,43 @@ private class SparkSession extends Session {
 
   implicit val formats = DefaultFormats
 
-  private[this] val inQueue = new SynchronousQueue[ILoop.Request]
-  private[this] var executedStatements = 0
-  private[this] var statements_ = new mutable.ArrayBuffer[JValue]
+  private var _history = new mutable.ArrayBuffer[JValue]
+  private val interpreter = new Interpreter()
 
-  org.apache.spark.repl.Main.interp = new ILoop(inQueue)
-
-  // Launch the real interpreter thread.
-  private[this] val thread = new Thread {
-    override def run(): Unit = {
-      val args = Array("-usejavacp")
-      org.apache.spark.repl.Main.interp.process(args)
-    }
-  }
-  thread.start()
-
-  override def statements: List[JValue] = synchronized {
-    statements_.toList
+  override def state: Session.State = interpreter.state match {
+    case Interpreter.Starting() => Session.Starting()
+    case Interpreter.Idle() => Session.Idle()
+    case Interpreter.Busy() => Session.Busy()
+    case Interpreter.ShuttingDown() => Session.ShuttingDown()
   }
 
-  override def statement(id: Int): Option[JValue] = synchronized {
-    if (id < statements_.length) {
-      Some(statements_(id))
+  override def history(): Seq[JValue] = _history
+
+  override def history(id: Int): Option[JValue] = synchronized {
+    if (id < _history.length) {
+      Some(_history(id))
     } else {
       None
     }
   }
 
-  override def execute(content: ExecuteRequest): Future[JValue] = {
-    executedStatements += 1
-
-    val promise = Promise[ILoop.ExecuteResponse]()
-    inQueue.put(ILoop.ExecuteRequest(content.code, promise))
-
-    promise.future.map {
+  override def execute(code: String): Future[JValue] = {
+    interpreter.execute(code).map {
       case rep =>
-        val x = executedStatements - 1
-        parse(write(Map(
+        val content = parse(write(Map(
           "status" -> "ok",
-          "execution_count" -> x,
+          "execution_count" -> rep.executionCount,
           "data" -> Map(
-            "text/plain" -> rep.output
+            "text/plain" -> rep.data
           )
         )))
+
+        _history += content
+        content
     }
   }
 
-  override def close(): Unit = {
-    val promise = Promise[ILoop.ShutdownResponse]()
-    inQueue.put(ILoop.ShutdownRequest(promise))
-
-    Await.result(promise.future, Duration.Inf)
-
-    thread.join()
+  override def close(): Future[Unit] = {
+    interpreter.shutdown()
   }
 }

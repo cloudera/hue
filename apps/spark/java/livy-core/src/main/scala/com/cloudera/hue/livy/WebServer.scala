@@ -13,6 +13,9 @@ import scala.concurrent.ExecutionContext
 
 class WebServer(var port: Int) extends Logging {
   val server = new Server(port)
+  server.setGracefulShutdown(1000)
+  server.setStopAtShutdown(true)
+
   val context = new WebAppContext()
 
   context.setContextPath("/")

@@ -7,62 +7,52 @@ import org.json4s.{DefaultFormats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import _root_.scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import _root_.scala.concurrent.ExecutionContext
 
 object WebApp extends Logging
 
 class WebApp(session: Session) extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
-  override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+  override protected implicit def executor: ExecutionContext = ExecutionContext.global
   override protected implicit val jsonFormats = DefaultFormats
-
-  sealed trait State
-  case class Starting() extends State
-  case class Running() extends State
-  case class ShuttingDown() extends State
-
-  var state: State = Starting()
 
   before() {
     contentType = formats("json")
 
-    state match {
-      case ShuttingDown() => halt(500, "Shutting down")
+    session.state match {
+      case Session.ShuttingDown() => halt(500, "Shutting down")
       case _ => {}
     }
   }
 
   get("/") {
+    val state = session.state match {
+      case Session.Starting() => "starting"
+      case Session.Idle() => "idle"
+      case Session.Busy() => "busy"
+      case Session.ShuttingDown() => "shutting_down"
+      case Session.ShutDown() => "shut_down"
+    }
     Map("state" -> state)
   }
 
   post("/execute") {
     val req = parsedBody.extract[ExecuteRequest]
-    val rep = session.execute(req)
+    val rep = session.execute(req.code)
     new AsyncResult { val is = rep }
   }
 
   get("/history") {
-    session.statements
+    session.history()
   }
 
   get("/history/:statementId") {
     val statementId = params("statementId").toInt
 
-    session.statement(statementId) match {
+    session.history(statementId) match {
       case Some(statement) => statement
       case None => NotFound("Statement not found")
     }
-  }
-
-  delete("/") {
-    Future {
-      state = ShuttingDown()
-      session.close()
-      Thread.sleep(1000)
-      System.exit(0)
-    }
-    Accepted()
   }
 
   error {
@@ -73,3 +63,4 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
       InternalServerError(e.toString)
   }
 }
+
