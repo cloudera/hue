@@ -71,10 +71,12 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
               % if coordinator:
                   <li class="nav-header">${ _('Datasets') }</li>
-                % for dataset in coordinator.dataset_set.all():
-                  <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="fa fa-eye"></i> <span class="dataset">${ dataset.name }</span></li>
+                % for dataset in coordinator.datasets:
+                  <li rel="tooltip" title="${ dataset.data['dataset_variable'] }" class="white">
+                    <i class="fa fa-eye"></i> <span class="dataset">${ dataset.data['dataset_variable'][:20] }</span>
+                  </li>
                 % endfor
-                % if not coordinator.dataset_set.all():
+                % if not coordinator.datasets:
                   <li class="white">${ _('No available datasets') }</li>
                 % endif
               % endif
@@ -191,7 +193,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     </td>
                   </tr>
                   <tr data-bind="visible: actions().length == 0 && !isLoading()">
-                    <td colspan="2">
+                    <td colspan="3">
                       <div class="alert">
                         ${ _('There are no actions to be shown.') }
                       </div>
@@ -246,7 +248,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </td>
                 </tr>
                 <tr data-bind="visible: !isLoading() && actions().length == 0">
-                  <td colspan="10">
+                  <td colspan="11">
                     <div class="alert">
                       ${ _('There are no actions to be shown.') }
                     </div>

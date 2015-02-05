@@ -1638,7 +1638,11 @@ class Coordinator(Job):
 
   @property
   def workflow(self):
-    return Document2.objects.get(uuid=self.data['properties']['workflow'])
+    wf_doc = Document2.objects.get(uuid=self.data['properties']['workflow'])
+    return Workflow(document=wf_doc)
+
+  def get_absolute_url(self):
+    return reverse('oozie:edit_coordinator') + '?coordinator=%s' % self.id
 
 
 class Dataset():
