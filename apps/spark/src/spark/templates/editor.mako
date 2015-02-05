@@ -327,9 +327,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
-            <span data-bind="visible: status() == 'loading'" class="codeMirror-overlaybtn pointer">
-              <i class='fa fa-spinner fa-spin fa-2x'></i> ${ _('Creating session') }
-            </span>
+            <a data-bind="visible: status() == 'loading'" class="btn btn-disabled codeMirror-overlaybtn" title="${ _('Creating session') }">
+              <i class="fa fa-spinner fa-spin"></i>
+            </a>
             <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
               <i class="fa fa-play"></i>
             </a>
@@ -1055,6 +1055,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     };
 
     $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
+
+    $(window).bind("keydown", "ctrl+s alt+s meta+s", function(e){
+      e.preventDefault();
+      viewModel.saveNotebook();
+      return false;
+    });
   });
 
   viewModel.assistSelectedMainObject.subscribe(function(newVal) {
