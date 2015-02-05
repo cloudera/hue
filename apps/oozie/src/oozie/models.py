@@ -42,7 +42,7 @@ from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document
+from desktop.models import Document, Document2
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
@@ -50,6 +50,7 @@ from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
+from oozie.models2 import Workflow as NewWorkflow, Coordinator as NewCoordinator
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
@@ -1908,15 +1909,17 @@ class History(models.Model):
   @classmethod
   def get_workflow_from_config(self, conf_dict):
     try:
-      return Workflow.objects.get(id=conf_dict.get(Workflow.HUE_ID))
-    except Workflow.DoesNotExist:
+      doc = Document2.objects.get(type='oozie-workflow2', id=conf_dict.get(Workflow.HUE_ID))
+      return NewWorkflow(document=doc)
+    except Document2.DoesNotExist:
       pass
 
   @classmethod
   def get_coordinator_from_config(self, conf_dict):
     try:
-      return Coordinator.objects.get(id=conf_dict.get(Coordinator.HUE_ID))
-    except Coordinator.DoesNotExist:
+      doc = Document2.objects.get(type='oozie-coordinator2', id=conf_dict.get(Coordinator.HUE_ID))
+      return NewCoordinator(document=doc)
+    except Document2.DoesNotExist:
       pass
 
   @classmethod

@@ -57,9 +57,7 @@
                   % if ENABLE_V2.get():
                     <li class="inline alert alert-warn" style="margin-left:20px; margin-bottom:0px; margin-top:4px">
                       ${ _('This is the old editor, please migrate your jobs to the ') }
-                      <a style="display:inline" href="${url('oozie:new_workflow') if utils.is_selected(section, 'workflows') else url('oozie:new_coordinator') if utils.is_selected(section, 'coordinators') else url('oozie:new_bundle')}">
-                        ${ _('new editor.') }
-                      </a>
+                      <a style="display:inline" href="${url('oozie:new_workflow') if utils.is_selected(section, 'workflows') else url('oozie:new_coordinator') if utils.is_selected(section, 'coordinators') else url('oozie:new_bundle')}">${ _('new editor.') }</a>
                     </li>
                   % endif
                 % endif
