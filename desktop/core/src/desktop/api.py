@@ -51,7 +51,7 @@ def _get_docs(user):
           'documentpermission_set',
         )
         .defer(None)
-        .order_by('-last_modified')[:500],
+        .order_by('-last_modified')[:50],
       Document.objects.get_docs(user)
         .exclude(tags__in=[history_tag])
         .select_related(

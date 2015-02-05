@@ -169,7 +169,7 @@ class Workflow(Job):
   def to_xml(self, mapping=None):
     if mapping is None:
       mapping = {}
-    tmpl = 'editor/gen2/workflow.xml.mako'
+    tmpl = 'editor2/gen/workflow.xml.mako'
 
     data = self.get_data()
     nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if node.name == 'End'] # End at the end
@@ -319,7 +319,7 @@ class Node():
       self.data['properties']['sla'] = []
 
   def get_template_name(self):
-    return 'editor/gen2/workflow-%s.xml.mako' % self.data['type']
+    return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
 
   def find_parameters(self):
     return find_parameters(self)
@@ -1627,7 +1627,7 @@ class Coordinator(Job):
     if mapping is None:
       mapping = {}
 
-    tmpl = "editor/gen2/coordinator.xml.mako"
+    tmpl = "editor2/gen/coordinator.xml.mako"
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   @property
@@ -1758,7 +1758,7 @@ class Bundle(Job):
       mapping = {}
 
     mapping.update(dict(list(Document2.objects.filter(type='oozie-coordinator2', uuid__in=self.data['coordinators']).values('uuid', 'name'))))
-    tmpl = "editor/gen2/bundle.xml.mako"
+    tmpl = "editor2/gen/bundle.xml.mako"
     return force_unicode(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
