@@ -32,7 +32,8 @@ def test_export_csv():
   generator = create_generator(content_generator(header, data), "csv")
   response = make_response(generator, "csv", "foo")
   assert_equal("application/csv", response["content-type"])
-  assert_equal('x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\n', response.content)
+  content = ''.join(response.streaming_content)
+  assert_equal('x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\n', content)
   assert_equal("attachment; filename=foo.csv", response["content-disposition"])
 
 def test_export_xls():
@@ -47,5 +48,6 @@ def test_export_xls():
   generator = create_generator(content_generator(header, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/xls", response["content-type"])
-  assert_equal(dataset.xls, response.content)
+  content = ''.join(response.streaming_content)
+  assert_equal(dataset.xls, content)
   assert_equal("attachment; filename=foo.xls", response["content-disposition"])
