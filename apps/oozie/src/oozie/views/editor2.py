@@ -55,7 +55,7 @@ def list_editor_workflows(request):
   if workflows_v1:
     workflows.extend(workflows_v1)
   
-  return render('editor/list_editor_workflows.mako', request, {
+  return render('editor2/list_editor_workflows.mako', request, {
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
   })
 
@@ -98,7 +98,7 @@ def _edit_workflow(request, doc, workflow):
   except Exception, e:
     LOG.error(smart_str(e))
 
-  return render('editor/workflow_editor.mako', request, {
+  return render('editor2/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML),
       'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
@@ -347,7 +347,7 @@ def submit_workflow(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-    popup = render('editor/submit_job_popup2.mako', request, {
+    popup = render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
                      'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
@@ -378,7 +378,7 @@ def list_editor_coordinators(request):
   if coordinators_v1:
     coordinators.extend(coordinators_v1)
 
-  return render('editor/list_editor_coordinators.mako', request, {
+  return render('editor2/list_editor_coordinators.mako', request, {
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML)
   })
 
@@ -409,7 +409,7 @@ def edit_coordinator(request):
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
-  return render('editor/coordinator_editor.mako', request, {
+  return render('editor2/coordinator_editor.mako', request, {
       'coordinator_json': coordinator.to_json_for_html(),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
@@ -526,7 +526,7 @@ def submit_coordinator(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor/submit_job_popup2.mako', request, {
+  popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
@@ -560,7 +560,7 @@ def list_editor_bundles(request):
   if bundles_v1:
     bundles.extend(bundles_v1)
 
-  return render('editor/list_editor_bundles.mako', request, {
+  return render('editor2/list_editor_bundles.mako', request, {
       'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML)
   })
 
@@ -580,7 +580,7 @@ def edit_bundle(request):
   coordinators = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
-  return render('editor/bundle_editor.mako', request, {
+  return render('editor2/bundle_editor.mako', request, {
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
@@ -683,7 +683,7 @@ def submit_bundle(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor/submit_job_popup2.mako', request, {
+  popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
