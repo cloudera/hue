@@ -30,12 +30,13 @@ def redact(string):
   return global_redaction_engine.redact(string)
 
 
-def register_log_filtering(rules):
+def register_log_filtering(policy):
   """
   `add_redaction_filter` injects the redaction filter into all of the `logger`
   handlers. This must be called after all of the handlers have been added to
   `logger`, otherwise those handlers may expose unredacted strings.
   """
 
-  global_redaction_engine.add_rules(rules)
-  logfilter.add_log_redaction_filter_to_logger(global_redaction_engine, logging.root)
+  if policy:
+    global_redaction_engine.add_policy(policy)
+    logfilter.add_log_redaction_filter_to_logger(global_redaction_engine, logging.root)

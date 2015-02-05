@@ -22,8 +22,7 @@ import logging
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.redaction.engine import parse_redaction_rules_from_file, \
-                                     parse_redaction_rules_from_string
+from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
                              validate_path, list_of_compiled_res, coerce_str_lowercase
@@ -174,13 +173,7 @@ DEMO_ENABLED = Config( # Internal and Temporary
 LOG_REDACTION_FILE = Config(
   key="log_redaction_file",
   help=_("Use this file to parse and redact log message."),
-  type=parse_redaction_rules_from_file,
-  default=None)
-
-LOG_REDACTION_STRING = Config(
-  key="log_redaction_string",
-  help=_("Use this string to parse and redact log message."),
-  type=parse_redaction_rules_from_string,
+  type=parse_redaction_policy_from_file,
   default=None)
 
 def is_https_enabled():
@@ -885,12 +878,9 @@ def config_validator(user):
 
   return res
 
-def get_redaction_rules():
+def get_redaction_policy():
   """
-  Return a list of redaction rules.
+  Return the configured redaction policy.
   """
 
-  file_rules = LOG_REDACTION_FILE.get() or []
-  string_rules = LOG_REDACTION_STRING.get() or []
-
-  return file_rules + string_rules
+  return LOG_REDACTION_FILE.get()
