@@ -7,8 +7,10 @@ if [ -z "$SPARK_HOME" ]; then
 	exit 1
 fi
 
-source "$SPARK_HOME"/bin/utils.sh
-source "$SPARK_HOME"/bin/load-spark-env.sh
+export SPARK_CONF_DIR="$SPARK_HOME/conf"
+
+source "$SPARK_HOME/bin/utils.sh"
+source "$SPARK_HOME/bin/load-spark-env.sh"
 
 export PYTHONPATH="$SPARK_HOME/python/:$PYTHONPATH"
 
@@ -19,4 +21,4 @@ done
 export OLD_PYTHONSTARTUP="$PYTHONSTARTUP"
 export PYTHONSTARTUP="$SPARK_HOME/python/pyspark/shell.py"
 
-exec python livy-repl/src/main/resources/fake_shell.py
+exec python "$@"

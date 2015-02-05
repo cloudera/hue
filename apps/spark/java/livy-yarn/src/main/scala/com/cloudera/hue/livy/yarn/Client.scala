@@ -104,6 +104,12 @@ class Client(yarnConf: YarnConfiguration) {
       containerCtx.getEnvironment()("MASTER") = master
     }
 
+    // FIXME: Spark needs the `SPARK_HOME` environment passed through to run on YARN. This needs a better approach.
+    val spark_home = System.getenv("SPARK_HOME")
+    if (spark_home != null) {
+      containerCtx.getEnvironment()("SPARK_HOME") = spark_home
+    }
+
     appContext.setApplicationId(appId)
     appContext.setAMContainerSpec(containerCtx)
     appContext.setApplicationType("livy")
