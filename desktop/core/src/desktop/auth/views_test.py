@@ -134,7 +134,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     fs.do_as_superuser(fs.create, "/user/ldap2")
 
     response = self.c.post('/accounts/login/', {
-        'username':" ldap2",
+        'username': "ldap2",
         'password': "ldap2"
     }, follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
