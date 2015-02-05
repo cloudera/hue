@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import re
 
 
@@ -23,23 +24,17 @@ class RedactionEngine(object):
   `RedactionEngine` applies a list of `RedactionRule`s to redact a string.
   """
 
-  def __init__(self, rules=None):
-    if rules is None:
-      rules = []
+  def __init__(self, policies=None):
+    if policies is None:
+      policies = []
 
-    self.rules = rules
+    self.policies = policies
 
-  def add_rule(self, rule):
-    self.rules.append(rule)
+  def add_policy(self, policy):
+    self.policies.append(policy)
 
-  def add_rules(self, rules):
-    self.rules.extend(rules)
-
-  def add_rules_from_string(self, string):
-    self.rules.extend(parse_redaction_rules_from_string(string))
-
-  def add_rules_from_file(self, filename):
-    self.rules.extend(parse_redaction_rules_from_filename(filename))
+  def add_policy_from_file(self, filename):
+    self.policies.append(parse_redaction_policy_from_filename(filename))
 
   def redact(self, message):
     """
@@ -47,8 +42,8 @@ class RedactionEngine(object):
     it will return the original string unmodified.
     """
 
-    for rule in self.rules:
-      message = rule.redact(message)
+    for policy in self.policies:
+      message = policy.redact(message)
 
     return message
 
@@ -56,18 +51,29 @@ class RedactionEngine(object):
     """
     Return if the redaction engine contains any redaction rules.
     """
-    return bool(self.rules)
+    return bool(self.policies)
 
   def __repr__(self):
-    return 'RedactionEngine(%r)' % self.rules
+    return 'RedactionEngine(%r)' % self.policies
 
   def __eq__(self, other):
     return \
         isinstance(other, self.__class__) and \
-        self.rules == other.rules
+        self.policies == other.policies
 
   def __ne__(self, other):
     return not self == other
+
+
+class RedactionPolicy(object):
+  def __init__(self, rules):
+    self.rules = rules
+
+  def redact(self, message):
+    for rule in self.rules:
+      message = rule.redact(message)
+
+    return message
 
 
 class RedactionRule(object):
@@ -78,10 +84,10 @@ class RedactionRule(object):
   for the sensitive information and replace it with the `redaction_mask`.
   """
 
-  def __init__(self, trigger, regex, redaction_mask):
+  def __init__(self, trigger, search, replace):
     self.trigger = trigger
-    self.regex = re.compile(regex)
-    self.redaction_mask = redaction_mask
+    self.regex = re.compile(search)
+    self.replace = replace
 
   def redact(self, message):
     """
@@ -89,8 +95,8 @@ class RedactionRule(object):
     `trigger` string then it will return the original string unmodified.
     """
 
-    if self.trigger in message:
-      return self.regex.sub(self.redaction_mask, message)
+    if not self.trigger or self.trigger in message:
+      return self.regex.sub(self.replace, message)
     else:
       return message
 
@@ -98,47 +104,71 @@ class RedactionRule(object):
     return 'RedactionRule(%r, %r, %r)' % (
         self.trigger,
         self.regex.pattern,
-        self.redaction_mask)
+        self.replace)
 
   def __eq__(self, other):
     return \
         isinstance(other, self.__class__) and \
         self.trigger == other.trigger and \
         self.regex == other.regex and \
-        self.redaction_mask == other.redaction_mask
+        self.replace == other.replace
 
   def __ne__(self, other):
     return not self == other
 
 
-def parse_redaction_rules_from_string(string):
+def parse_redaction_policy_from_file(filename):
   """
-  Parse a string into a `RedactionFilter`, where each rule is separated by
-  `||`, and each rule uses the format specified in `parse_one_rule_from_string`.
-  """
-
-  return [parse_one_rule_from_string(line.rstrip()) for line in string.split('||')]
-
-
-def parse_redaction_rules_from_file(filename):
-  """
-  Parse a file into a `RedactionFilter`, where each line comprises a redaction
+  Parse a file into a `RedactionPolicy`, where each line comprises a redaction
   rule string as described in `parse_rules_from_string`.
   """
 
   with open(filename) as f:
-    return [parse_one_rule_from_string(line.rstrip()) for line in f]
+    scheme = json.load(f)
+
+    try:
+      version = scheme['version']
+    except KeyError:
+      raise ValueError('Redaction policy is missing `version` field')
+
+    if version != 1:
+      raise ValueError('unknown version %s' % version)
+
+    try:
+      rules = scheme['rules']
+    except KeyError:
+      raise ValueError('Redaction policy is missing `rules` field')
+
+    rules = [parse_one_rule_from_dict(rule) for rule in rules]
+
+    return RedactionPolicy(rules)
 
 
-def parse_one_rule_from_string(string):
+def parse_one_rule_from_dict(rule):
   """
-  `parse_one_rule_from_string` parses a `Rule` from a string comprised of:
+  `parse_one_rule_from_dict` parses a `RedactionRule` from a dictionary like:
 
-    [TRIGGER]::[REGEX]::[REDACTION_MASK]
+    {
+      "description": "This is the first rule",
+      "trigger": "triggerstring 1",
+      "search": "regex 1",
+      "replace": "replace 1"
+    }
 
-  Where the `TRIGGER` and `REDACTION_MASK` are strings, and `REGEX` is a python
+  Where the `trigger` and `replace` are strings, and `search` is a python
   regular expression.
   """
 
-  trigger, regex, redaction_mask = string.split('::', 3)
-  return RedactionRule(trigger, regex, redaction_mask)
+  trigger = rule.get('trigger')
+
+  try:
+    search = rule['search']
+  except KeyError:
+    raise ValueError('Redaction rule is missing `search` field')
+
+  try:
+    replace = rule['replace']
+  except KeyError:
+    raise ValueError('Redaction rule is missing `replace` field')
+
+  return RedactionRule(trigger, search, replace)

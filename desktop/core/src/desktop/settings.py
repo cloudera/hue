@@ -222,7 +222,7 @@ _desktop_conf_modules = [dict(module=desktop.conf, config_key=None)]
 conf.initialize(_desktop_conf_modules, _config_dir)
 
 # Register the redaction filters into the root logger as soon as possible.
-desktop.redaction.register_log_filtering(desktop.conf.get_redaction_rules())
+desktop.redaction.register_log_filtering(desktop.conf.get_redaction_policy())
 
 
 # Activate l10n

@@ -56,7 +56,7 @@ def add_log_redaction_filter_to_logger(engine, logger):
   `logger`, otherwise those handlers may expose unredacted strings.
   """
 
-  if engine.rules:
+  if engine.policies:
     redaction_filter = RedactionFilter(engine)
 
     for handler in logger.handlers:

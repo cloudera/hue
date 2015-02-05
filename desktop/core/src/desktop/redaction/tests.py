@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import tempfile
 
 from desktop.redaction.engine import RedactionEngine, \
                                      RedactionRule, \
-                                     parse_redaction_rules_from_string, \
-                                     parse_redaction_rules_from_file
+                                     parse_redaction_policy_from_file
 from desktop.redaction.logfilter import add_log_redaction_filter_to_logger
 from nose.tools import assert_true, assert_equal, assert_not_equal
 
@@ -66,31 +66,33 @@ class TestRedactionRule(object):
     assert_equal(rule1, rule2)
     assert_not_equal(rule1, rule3)
 
-  def test_parse_redaction_rules_from_string(self):
-    string = \
-        r'password=::password=".*"::password="???"' \
-        r'||' \
-        r'ssn=::ssn=\d{3}-\d{2}-\d{4}::ssn=XXX-XX-XXXX'
 
-    rules = parse_redaction_rules_from_string(string)
-
-    assert_equal(rules, [
-      RedactionRule('password=', 'password=".*"', 'password="???"'),
-      RedactionRule('ssn=', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
-    ])
-
-  def test_parse_redaction_rules_from_file(self):
+  def test_parse_redaction_policy_from_file(self):
     with tempfile.NamedTemporaryFile() as f:
-      print >> f, r'password=::password=".*"::password="???"'
-      print >> f, r'ssn=::ssn=\d{3}-\d{2}-\d{4}::ssn=XXX-XX-XXXX'
+      json.dump({
+          'version': 1,
+          'rules': [
+            {
+              'description': 'redact passwords',
+              'trigger': 'password=',
+              'search': 'password=".*"',
+              'replace': 'password="???"',
+            },
+            {
+              'description': 'redact social security numbers',
+              'search': '\d{3}-\d{2}-\d{4}',
+              'replace': 'XXX-XX-XXXX',
+            },
+          ]
+      }, f)
 
       f.flush()
 
-      rules = parse_redaction_rules_from_file(f.name)
+      policy = parse_redaction_policy_from_file(f.name)
 
-      assert_equal(rules, [
-        RedactionRule('password=', 'password=".*"', 'password="???"'),
-        RedactionRule('ssn=', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+      assert_equal(policy.rules, [
+        RedactionRule(u'password=', u'password=".*"', u'password="???"'),
+        RedactionRule(None, u'\d{3}-\d{2}-\d{4}', u'XXX-XX-XXXX'),
       ])
 
 
