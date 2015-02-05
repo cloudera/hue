@@ -171,58 +171,59 @@ class OozieServerProvider(object):
 
     _oozie_lock.acquire()
 
-    if not OozieServerProvider.is_oozie_running:
-      LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
-      LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
+    try:
+      if not OozieServerProvider.is_oozie_running:
+        LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
+        LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
 
-      finish = (
-        OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
-      )
+        finish = (
+          OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
+        )
 
-      # Setup
-      cluster = pseudo_hdfs4.shared_cluster()
-      cls._setup_sharelib()
-      cls._reset_oozie(cluster)
+        # Setup
+        cluster = pseudo_hdfs4.shared_cluster()
+        cls._setup_sharelib()
+        cls._reset_oozie(cluster)
 
-      p = cls._start_oozie(cluster)
+        p = cls._start_oozie(cluster)
 
-      def kill():
-        LOG.info("Killing Oozie server (pid %d)." % p.pid)
-        os.kill(p.pid, 9)
-        p.wait()
-      atexit.register(kill)
+        def kill():
+          LOG.info("Killing Oozie server (pid %d)." % p.pid)
+          os.kill(p.pid, 9)
+          p.wait()
+        atexit.register(kill)
 
-      start = time.time()
-      started = False
-      sleep = 0.01
+        start = time.time()
+        started = False
+        sleep = 0.01
 
-      while not started and time.time() - start < 30.0:
-        status = None
-        try:
-          LOG.info('Check Oozie status...')
-          status = get_oozie(cluster.superuser).get_oozie_status()
-          if status['systemMode'] == 'NORMAL':
-            started = True
-            break
-          time.sleep(sleep)
-          sleep *= 2
-        except Exception, e:
-          LOG.info('Oozie server status not NORMAL yet: %s - %s' % (status, e))
-          time.sleep(sleep)
-          sleep *= 2
-          pass
-      if not started:
-        raise Exception("Oozie server took too long to come up.")
+        while not started and time.time() - start < 30.0:
+          status = None
+          try:
+            LOG.info('Check Oozie status...')
+            status = get_oozie(cluster.superuser).get_oozie_status()
+            if status['systemMode'] == 'NORMAL':
+              started = True
+              break
+            time.sleep(sleep)
+            sleep *= 2
+          except Exception, e:
+            LOG.info('Oozie server status not NORMAL yet: %s - %s' % (status, e))
+            time.sleep(sleep)
+            sleep *= 2
+            pass
+        if not started:
+          raise Exception("Oozie server took too long to come up.")
 
-      OozieServerProvider.is_oozie_running = True
+        OozieServerProvider.is_oozie_running = True
 
-      def shutdown():
-        for f in finish:
-          f()
-        cluster.stop()
-      callback = shutdown
-
-    _oozie_lock.release()
+        def shutdown():
+          for f in finish:
+            f()
+          cluster.stop()
+        callback = shutdown
+    finally:
+      _oozie_lock.release()
 
     cluster = pseudo_hdfs4.shared_cluster()
     return get_oozie(cluster.superuser), callback
