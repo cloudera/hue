@@ -254,8 +254,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
-      <div class="add-snippet pointer">
-        <div class="overlay pointer" data-bind="click: function(notebook, e){ if (!($(e.target).is('select'))){ newSnippet(); } }">
+      <div class="add-snippet pointer" data-bind="click: function(notebook, e){ if (!($(e.target).is('select'))){ newSnippet(); } }">
+        <div class="overlay pointer">
           <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px">
           </select>
           <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>          
