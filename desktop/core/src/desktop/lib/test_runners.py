@@ -39,8 +39,10 @@ def _instrumented_test_render(self, *args, **data):
       return self.original_callable_(context, *args, **kwargs)
     self.original_callable_ = self.callable_
     self.callable_ = mako_callable_
-    response = runtime._render(self, self.original_callable_, args, data)
-    self.callable_ = self.original_callable_
+    try:
+      response = runtime._render(self, self.original_callable_, args, data)
+    finally:
+      self.callable_ = self.original_callable_
     return response
 
 
