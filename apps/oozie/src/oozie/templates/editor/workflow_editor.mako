@@ -2069,7 +2069,7 @@ ${ dashboard.import_bindings() }
   var lastExpandedWidget = null;
   function setLastExpandedWidget(widget) {
     lastExpandedWidget = widget;
-    if (!widget.oozieExpanded()){
+    if (! widget.oozieExpanded()){
       var _el = $("#wdg_" + widget.id());
       if (_el.width() < 400){
         _el.css("z-index", "1032");
@@ -2095,7 +2095,7 @@ ${ dashboard.import_bindings() }
   function toggleProperties(widget) {
     if (widget.oozieMovable()) {
       var _el = $("#wdg_" + widget.id());
-      if (!widget.ooziePropertiesExpanded()) {
+      if (! widget.ooziePropertiesExpanded()) {
         setLastExpandedWidget(widget);
         _el.find(".prop-editor").show();
         widget.ooziePropertiesExpanded(true);

@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import time
+
 from datetime import datetime
 
 from django.forms.formsets import formset_factory
@@ -82,6 +83,7 @@ def manage_oozie_jobs(request, job_id, action):
     response['data'] = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex.message)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 def bulk_manage_oozie_jobs(request):
   if request.method != 'POST':
@@ -214,13 +216,12 @@ def list_oozie_workflow(request, job_id):
   if oozie_bundle is not None:
     setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
 
-  history = History.cross_reference_submission_history(request.user, job_id)
+  # To update with the new History document model
+  hue_coord = History.get_coordinator_from_config(oozie_workflow.conf_dict)
+  hue_workflow = (hue_coord and hue_coord.workflow) or History.get_workflow_from_config(oozie_workflow.conf_dict)
 
-  hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
-  hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
-
-  if hue_coord and hue_coord.workflow: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
-  if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
+  if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
+  if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
 
   parameters = oozie_workflow.conf_dict.copy()
   for action in oozie_workflow.actions:
@@ -229,9 +230,8 @@ def list_oozie_workflow(request, job_id):
 
   if hue_workflow:
     workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
-    full_node_list = hue_workflow.node_list
-  else:
-    workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+    full_node_list = hue_workflow.nodes
+  # If no saved workflow, we could try to parse the XML like: workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
 
   if request.GET.get('format') == 'json':
     return_obj = {
@@ -253,7 +253,6 @@ def list_oozie_workflow(request, job_id):
     oozie_slas = api.get_oozie_slas(**params)
 
   return render('dashboard/list_oozie_workflow.mako', request, {
-    'history': history,
     'oozie_workflow': oozie_workflow,
     'oozie_coordinator': oozie_coordinator,
     'oozie_bundle': oozie_bundle,

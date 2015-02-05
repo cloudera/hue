@@ -614,7 +614,7 @@ class Document2Manager(models.Manager):
 
 
 def uuid_default():
-    return uuid.uuid4().hex
+  return uuid.uuid4().hex
 
 
 class Document2(models.Model):    
@@ -677,4 +677,6 @@ class Document2(models.Model):
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
       'isSelected': False
     }
-
+  
+  def can_read_or_exception(self, user):
+    self.doc.get().can_read_or_exception(user)

@@ -25,11 +25,12 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse
 from string import Template
 
+from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
-from desktop.lib.json_utils import JSONEncoderForHTML
 from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
+from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
 
 from hadoop.fs.hadoopfs import Hdfs
@@ -37,7 +38,6 @@ from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.models import Workflow as OldWorflows
 from oozie.utils import utc_datetime_format
 
 
@@ -72,6 +72,9 @@ class Job(object):
       good_name.append(c)
 
     return ''.join(good_name)
+
+  def __str__(self):
+    return '%s' % force_unicode(self.name)
 
 
 class Workflow(Job):
@@ -247,6 +250,12 @@ class Workflow(Job):
 
     Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
     Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
+
+  def gen_status_graph(self, oozie_workflow):
+    return '' # TODO
+
+  def get_absolute_url(self):
+    return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
 
 
 class Node():
@@ -1626,6 +1635,10 @@ class Coordinator(Job):
     props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
     props += self.data['properties']['parameters']
     return props
+
+  @property
+  def workflow(self):
+    return Document2.objects.get(uuid=self.data['properties']['workflow'])
 
 
 class Dataset():
