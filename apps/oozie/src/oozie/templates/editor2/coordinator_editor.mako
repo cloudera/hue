@@ -459,6 +459,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 
 <div id="submit-coord-modal" class="modal hide"></div>
+
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>

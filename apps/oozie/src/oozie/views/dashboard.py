@@ -270,11 +270,11 @@ def list_oozie_coordinator(request, job_id):
   oozie_coordinator = check_job_access_permission(request, job_id)
 
   # Cross reference the submission history (if any)
-  coordinator = None
-  try:
-    coordinator = History.objects.get(oozie_job_id=job_id).job.get_full_node()
-  except History.DoesNotExist:
-    pass
+  coordinator = History.get_coordinator_from_config(oozie_coordinator.conf_dict)
+#  try:
+#    coordinator = History.objects.get(oozie_job_id=job_id).job.get_full_node()
+#  except History.DoesNotExist:
+#    pass
 
   oozie_bundle = None
   if request.GET.get('bundle_job_id'):
