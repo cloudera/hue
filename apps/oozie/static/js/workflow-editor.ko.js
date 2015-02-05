@@ -489,7 +489,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.isNested = ko.observable(true);
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
-  self.isEditing = ko.observable(false);
+  self.isEditing = ko.observable(workflow_json.id == null);
   self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });
@@ -1098,6 +1098,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
+  };
+  
+  self.schedule = function () {
+    window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
 
   function bareWidgetBuilder(name, type) {

@@ -395,6 +395,10 @@ def edit_coordinator(request):
     coordinator = Coordinator()
     coordinator.set_workspace(request.user)
 
+  workflow_uuid = request.GET.get('workflow')
+  if workflow_uuid:
+    coordinator.data['properties']['workflow'] = workflow_uuid
+
   api = get_oozie(request.user)
   credentials = Credentials()
   
