@@ -15,11 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+import inspect
 import json
+import logging
 import os.path
 import re
 import tempfile
+
 import kerberos
 
 from datetime import datetime
@@ -163,7 +165,7 @@ class AppSpecificMiddleware(object):
   def augment_request_with_app(cls, request, view_func):
     """ Stuff the app into the request for use in later-stage middleware """
     if not hasattr(request, "_desktop_app"):
-      module = apputil.getmodule_wrapper(view_func)
+      module = inspect.getmodule(view_func)
       request._desktop_app = apputil.get_app_for_module(module)
       if not request._desktop_app and not module.__name__.startswith('django.'):
         logging.debug("no app for view func: %s in %s" % (view_func, module))
