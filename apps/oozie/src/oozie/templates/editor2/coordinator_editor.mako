@@ -37,7 +37,10 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}, visible: coordinator.id() != null">
+
+    <span data-bind="visible: coordinator.isDirty() || coordinator.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+    
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': coordinator.isDirty()}, visible: coordinator.id() != null">
       <i class="fa fa-play"></i>
     </a>
     
@@ -535,9 +538,11 @@ ${ dashboard.import_bindings() }
       .jqCronGetInstance();
 
   var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode }, ${ can_edit_json | n,unicode });
+
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+  viewModel.coordinator.tracker().markCurrentStateAsClean();
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
@@ -552,8 +557,18 @@ ${ dashboard.import_bindings() }
   }
 
   $(document).on("showSubmitPopup", function(event, data){
-    $('#submit-coord-modal').html(data);
-    $('#submit-coord-modal').modal('show');
+    if (! viewModel.coordinator.isDirty()){
+      $('#submit-coord-modal').html(data);
+      $('#submit-coord-modal').modal('show');
+    }
+  });
+
+  var firstToggled = true;
+  $(document).on("editingToggled", function(){
+    if (firstToggled){
+      firstToggled = false;
+      viewModel.coordinator.tracker().markCurrentStateAsClean();
+    }
   });
 
   $(document).ready(function() {

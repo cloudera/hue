@@ -14,21 +14,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 var Coordinator = function (vm, coordinator) {
+  function changeTracker(objectToTrack, hashFunction) {    
+      hashFunction = hashFunction || ko.toJSON;
+      var lastCleanState = ko.observable(hashFunction(objectToTrack));
+      
+      var result = {
+          somethingHasChanged : ko.dependentObservable(function() {
+              return hashFunction(objectToTrack) != lastCleanState()
+          }),
+          markCurrentStateAsClean : function() {
+              lastCleanState(hashFunction(objectToTrack));   
+          }
+      };
+      
+      return function() { return result }
+  }
+
   var self = this;
 
   self.id = ko.observable(typeof coordinator.id != "undefined" && coordinator.id != null ? coordinator.id : null);
   self.uuid = ko.observable(typeof coordinator.uuid != "undefined" && coordinator.uuid != null ? coordinator.uuid : UUID());
-  self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "");
+  self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "").extend({ trackChange: true });
 
   self.properties = ko.mapping.fromJS(typeof coordinator.properties != "undefined" && coordinator.properties != null ? coordinator.properties : {});
   self.variables = ko.mapping.fromJS(typeof coordinator.variables != "undefined" && coordinator.variables != null ? coordinator.variables : []);
-
+  
   self.variablesUI = ko.observableArray(['parameter', 'input_path', 'output_path']);
   self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
   self.workflowParameters = ko.mapping.fromJS(typeof coordinator.workflowParameters != "undefined" && coordinator.workflowParameters != null ? coordinator.workflowParameters : []);
 
+  self.tracker = new changeTracker(self);
+  
+  self.isDirty = ko.computed(function () {
+    return self.tracker().somethingHasChanged();
+  });
   
   self._get_parameter = function(name) {
     var _param = $.grep(self.properties.parameters(), function(param) {
@@ -126,8 +146,13 @@ var Coordinator = function (vm, coordinator) {
 
        'shared_dataset_uuid': '' // If reusing a shared dataset
     };
-
-	self.variables.push(ko.mapping.fromJS(_var));	  
+    var _koVar = ko.mapping.fromJS(_var);
+    for (key in _koVar) {
+      if (_koVar.hasOwnProperty(key) && ko.isObservable(_koVar[key])) {
+        _koVar[key].extend({ trackChange: true });
+      }
+    }
+	  self.variables.push(_koVar);
   };
 }
 
