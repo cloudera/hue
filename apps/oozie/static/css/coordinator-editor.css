@@ -388,20 +388,8 @@ em {
   width: 90px;
 }
 
-.modal-body .control-label {
-  width: 160px;
-}
-
 .form-horizontal .controls {
   margin-left: 98px;
-}
-
-.modal-body .controls {
-  margin-left: 180px;
-}
-
-.modal-body .control-group {
-  display: inline-block;
 }
 
 .inline-block {
@@ -414,6 +402,4 @@ em {
 
 .datepicker {
   z-index: 1300;
-}
-
 }
