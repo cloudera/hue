@@ -271,7 +271,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   <span data-bind="visible: dataset_variable().length > 0">
                     ${ _('Will convert to') }
                     <a data-bind="text: convertVariables(dataset_variable()), attr: {'href': '/filebrowser/view' + convertVariables(dataset_variable())}"></a>
-                    ## use start_date as the date
                   </span>
                   </a>
                 </span>
@@ -281,7 +280,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                     <div class="control-group">
                       <label class="control-label">${ _('Done flag') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag()?'9px':'-1px'}" />
+                        <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag() ? '9px' : '-1px'}" />
                         <input type="text" data-bind="value: done_flag, visible: use_done_flag"/>
                       </div>
                     </div>
@@ -308,14 +307,14 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                     <div class="control-group">
                       <label class="control-label">${ _('Same start') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start()?'9px':'-1px'}" />
+                        <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start() ? '9px' : '-1px'}" />
                         <input type="text" data-bind="value: start, visible: ! same_start()"/>
                       </div>
                     </div>                  
                     <div class="control-group">
                       <label class="control-label">${ _('Same timezone') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone()?'5px':'0'}" />
+                        <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone() ? '5px' : '0'}" />
                         <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone()" style="width: 180px"></select>
                       </div>
                     </div>

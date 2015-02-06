@@ -88,26 +88,31 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
         <h1 class="card-heading simple">${ _('Which schedules to bundle?') }</h1>
 
         <div class="card-body">
-
-          <a class="pointer" data-bind="click: function() { showChooseCoordinator(); }">
+          <a class="pointer" data-bind="visible: ! isEditing(), click: function() { showChooseCoordinator(); }, visible: $root.isEditing">
             <i class="fa fa-plus"></i> ${ _('Add a coordinator') }
           </a>
         </div>
       </div>
-
           
       <div data-bind="foreach: bundle.coordinators">
         <div class="card card-home" style="margin-top: 20px; padding-bottom: 10px">
           <h1 class="card-heading simple">
-          <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
-          <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id() }" target="_blank" title="${ _('Open') }"><i class="fa fa-external-link-square"></i></a>
-          <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }"><i class="fa fa-times"></i></a>
+            <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
+            <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id() }" target="_blank" title="${ _('Open') }">
+              <i class="fa fa-external-link-square"></i>
+            </a>
+            <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }, visible: $root.isEditing">
+              <i class="fa fa-times"></i>
+            </a>
           </h1>
 
           <div class="card-body">
-
             <ul data-bind="foreach: properties" class="unstyled">
-              <li>
+              <li data-bind="visible: ! $root.isEditing()">
+                <span data-bind="text: name"></span>
+                <span data-bind="text: value"></span>
+              </li>
+              <li data-bind="visible: $root.isEditing">              
                 <input data-bind="value: name"/>
                 <input data-bind="value: value"/>
                 <a href="#" data-bind="click: function(){ $parent.properties.remove(this); }">
@@ -116,13 +121,12 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
               </li>
             </ul>
 
-            <a class="pointer" data-bind="click: function(){ $data.properties.push({'name': '', 'value': ''}); }">
+            <a class="pointer" data-bind="click: function(){ $data.properties.push({'name': '', 'value': ''}); }, visible: $root.isEditing">
               <i class="fa fa-plus"></i> ${ _('Add a parameter') }
             </a>
           </div>
         </div>
       </div>
-   
 
     </div>
   </div>

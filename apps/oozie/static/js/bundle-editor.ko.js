@@ -41,7 +41,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
   var self = this;
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
-  self.isEditing = ko.observable(true && self.canEdit());
+  self.isEditing = ko.observable(bundle_json.id == null);
   self.isEditing.subscribe(function(newVal){
     $(document).trigger("editingToggled");
   });
