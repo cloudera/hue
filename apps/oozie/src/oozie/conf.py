@@ -63,11 +63,10 @@ OOZIE_JOBS_COUNT = Config(
 
 ENABLE_V2 = Config( # Until Hue 4
   key='enable_v2',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_t('Use version 2 of Editor.')
 )
-
 
 ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   key='enable_cron_scheduling',
@@ -75,6 +74,7 @@ ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   type=coerce_bool,
   help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
 )
+
 
 def config_validator(user):
   res = []
