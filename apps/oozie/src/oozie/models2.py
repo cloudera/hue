@@ -1549,23 +1549,15 @@ class Coordinator(Job):
       for param in find_json_parameters(self.sla):
         params.add(param)
 
-# get missed params from wf
+    # Get missed params from workflow
+    for prop in self.workflow.find_parameters():
+      if not prop in params:
+        params.add(prop)
 
-#    for prop in self.workflow.get_parameters():
-#      if not prop['name'] in index:
-#        props.append(prop)
-#        index.append(prop['name'])
-#
-#    # Remove DataInputs and DataOutputs
-#    datainput_names = [_input.name for _input in self.datainput_set.all()]
-#    dataoutput_names = [_output.name for _output in self.dataoutput_set.all()]
-#    removable_names = datainput_names + dataoutput_names
-#    props = filter(lambda prop: prop['name'] not in removable_names, props)
+    # Remove the ones filled up by coordinator
+    removable_names = [ds['workflow_variable'] for ds in self.data['variables']]
 
-# get $params in wf properties
-# [{'name': parameter['workflow_variable'], 'value': parameter['dataset_variable']} for parameter in self.data['variables'] if parameter['dataset_type'] == 'parameter']
-
-    return dict([(param, '') for param in list(params)])
+    return dict([(param, '') for param in list(params) if param not in removable_names])
 
   @property
   def sla_enabled(self):

@@ -1049,6 +1049,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
+	$(".jHueNotify").hide();
     $.post("/oozie/editor/workflow/save/", {
       "layout": ko.mapping.toJSON(self.oozieColumns),
       "workflow": ko.mapping.toJSON(self.workflow)
@@ -1092,6 +1093,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.showSubmitPopup = function () {
+	$(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
