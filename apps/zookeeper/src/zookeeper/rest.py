@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import urllib2
-import urllib
 import json
+import urllib
+import urllib2
 
 from contextlib import contextmanager
 
