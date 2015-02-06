@@ -581,7 +581,7 @@ def edit_bundle(request):
     bundle = Bundle()
     bundle.set_workspace(request.user)
 
-  coordinators = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
+  coordinators = [dict([('id', d.content_object.id), ('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor2/bundle_editor.mako', request, {
