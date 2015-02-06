@@ -112,19 +112,19 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <div class="pull-right" style="padding-right:50px">
   
      <div class="btn-group" data-bind="visible: isEditing">
-       <button class="btn dropdown-toggle" data-toggle="dropdown">
+       <a class="btn dropdown-toggle" data-toggle="dropdown">
          <i class="fa fa-check-square-o"></i>
          <i class="fa fa-caret-down"></i>
-       </button>
+       </a>
        <ul class="dropdown-menu">
          <li>
            <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-             <i class="fa fa-play"></i> ${ _('Execute all snippets') }
+             <i class="fa fa-play fa-fw"></i> ${ _('Execute all snippets') }
            </a>
          </li>
          <li>
            <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-             <i class="fa fa-eraser"></i> ${ _('Clear all results') }
+             <i class="fa fa-eraser fa-fw"></i> ${ _('Clear all results') }
            </a>
         </li>
       </ul>
