@@ -141,6 +141,10 @@
   text-align: right;
 }
 
+.search-bar ul.dropdown-menu li {
+  text-align: left;
+}
+
 .tab-content {
   background-color: #FFFFFF;
   border-left: 1px solid #dddddd;
