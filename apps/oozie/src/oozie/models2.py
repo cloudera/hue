@@ -1790,7 +1790,6 @@ class Bundle(Job):
                 'mapping': mapping
            })))
 
-
   @property
   def name(self):
     return self.data['name']
@@ -1812,3 +1811,22 @@ class Bundle(Job):
 
   def find_parameters(self):
     return {}
+
+
+class History(object):
+
+  @classmethod
+  def get_workflow_from_config(self, conf_dict):
+    try:
+      doc = Document2.objects.get(type='oozie-workflow2', id=conf_dict.get(Workflow.HUE_ID))
+      return Workflow(document=doc)
+    except Document2.DoesNotExist:
+      pass
+
+  @classmethod
+  def get_coordinator_from_config(self, conf_dict):
+    try:
+      doc = Document2.objects.get(type='oozie-coordinator2', id=conf_dict.get(Coordinator.HUE_ID))
+      return Coordinator(document=doc)
+    except Document2.DoesNotExist:
+      pass

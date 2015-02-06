@@ -18,6 +18,8 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  
+  from oozie.conf import ENABLE_V2
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -70,15 +72,25 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               <li class="white">${ oozie_coordinator.id }</li>
 
               % if coordinator:
+              % if ENABLE_V2.get():
                   <li class="nav-header">${ _('Datasets') }</li>
                 % for dataset in coordinator.datasets:
                   <li rel="tooltip" title="${ dataset.data['dataset_variable'] }" class="white">
-                    <i class="fa fa-eye"></i> <span class="dataset">${ dataset.data['workflow_variable'] }</span>
+                    <i class="fa fa-eye"></i> <span class="dataset">${ dataset.data['workflow_variable'][:20] }</span>
                   </li>
                 % endfor
                 % if not coordinator.datasets:
                   <li class="white">${ _('No available datasets') }</li>
                 % endif
+              % else:
+                  <li class="nav-header">${ _('Datasets') }</li>
+                % for dataset in coordinator.dataset_set.all():
+                  <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="fa fa-eye"></i> <span class="dataset">${ dataset.name }</span></li>
+                % endfor
+                % if not coordinator.dataset_set.all():
+                  <li class="white">${ _('No available datasets') }</li>
+                % endif
+              % endif
               % endif
 
               % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'KILLED', 'SUCCEEDED'):

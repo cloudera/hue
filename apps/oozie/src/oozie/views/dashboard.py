@@ -41,16 +41,21 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
 from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
-from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING
-from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
-  RerunBundleForm
-from oozie.models import History, Job, Workflow, utc_datetime_format, Bundle,\
-  Coordinator, get_link
+from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm
+from oozie.models import Workflow, Job, utc_datetime_format, Bundle, Coordinator, get_link
 from oozie.settings import DJANGO_APPS
+
+
+if ENABLE_V2.get():
+  from oozie.models2 import History
+else:
+  from oozie.models import History
 
 
 LOG = logging.getLogger(__name__)
 MAX_COORD_ACTIONS = 250
+
 
 """
 Permissions:
@@ -216,22 +221,40 @@ def list_oozie_workflow(request, job_id):
   if oozie_bundle is not None:
     setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
 
-  # To update with the new History document model
-  hue_coord = History.get_coordinator_from_config(oozie_workflow.conf_dict)
-  hue_workflow = (hue_coord and hue_coord.workflow) or History.get_workflow_from_config(oozie_workflow.conf_dict)
+  if ENABLE_V2.get():
+    # To update with the new History document model
+    hue_coord = History.get_coordinator_from_config(oozie_workflow.conf_dict)
+    hue_workflow = (hue_coord and hue_coord.workflow) or History.get_workflow_from_config(oozie_workflow.conf_dict)
+  
+    if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
+    if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
+    
+    if hue_workflow:
+      workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+      full_node_list = hue_workflow.nodes
+    else:
+      workflow_graph, full_node_list = '', None    
+  else:
+    history = History.cross_reference_submission_history(request.user, job_id)
 
-  if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
-  if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
+    hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
+    hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
+
+    if hue_coord and hue_coord.workflow: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
+    if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
+    
+    if hue_workflow:
+      workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+      full_node_list = hue_workflow.node_list
+    else:
+      workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
 
   parameters = oozie_workflow.conf_dict.copy()
+
   for action in oozie_workflow.actions:
     action.oozie_coordinator = oozie_coordinator
     action.oozie_bundle = oozie_bundle
 
-  if hue_workflow:
-    workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
-    full_node_list = hue_workflow.nodes
-  # If no saved workflow, we could try to parse the XML like: workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
 
   if request.GET.get('format') == 'json':
     return_obj = {
@@ -271,10 +294,10 @@ def list_oozie_coordinator(request, job_id):
 
   # Cross reference the submission history (if any)
   coordinator = History.get_coordinator_from_config(oozie_coordinator.conf_dict)
-#  try:
-#    coordinator = History.objects.get(oozie_job_id=job_id).job.get_full_node()
-#  except History.DoesNotExist:
-#    pass
+  try:
+    coordinator = History.objects.get(oozie_job_id=job_id).job.get_full_node()
+  except:
+    pass
 
   oozie_bundle = None
   if request.GET.get('bundle_job_id'):
