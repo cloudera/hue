@@ -208,6 +208,33 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     </div>
 
   </div>
+
+
+
+  <div id="documentMoveModal" class="modal fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Move to a project')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+          ${_('Select the project you want to move this document to')}
+          <ul class="unstyled">
+            <!-- ko foreach: myTags -->
+              <li>
+                <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
+                  <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
+                </a>
+              </li>
+            <!-- /ko -->
+          </ul>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    </div>
+</div>
+
 </div>
 
 
@@ -288,30 +315,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">${_('No')}</a>
         <a data-bind="click: removeTagFinal" class="btn btn-danger">${_('Yes')}</a>
-    </div>
-</div>
-
-<div id="documentMoveModal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move to a project')}</h3>
-    </div>
-    <div class="modal-body">
-        <p>
-          ${_('Select the project you want to move this document to')}
-          <ul class="unstyled">
-            <!-- ko foreach: myTags -->
-              <li>
-                <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
-                  <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
-                </a>
-              </li>
-            <!-- /ko -->
-          </ul>
-        </p>
-    </div>
-    <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
     </div>
 </div>
 
@@ -428,14 +431,14 @@ ${ commonshare() | n,unicode }
   }
 
   function moveDoc(doc) {
-    viewModel.selectedDoc(doc);
+    shareViewModel.selectedDoc(doc);
     $("#documentMoveModal").modal("show");
   }
 
   function moveDocFinal(tag) {
     $.post("/desktop/api/doc/update_tags", {
       data: JSON.stringify({
-        doc_id: viewModel.selectedDoc().id,
+        doc_id: shareViewModel.selectedDoc().id,
         tag_ids: [tag.id()]
       })
     }, function (response) {
