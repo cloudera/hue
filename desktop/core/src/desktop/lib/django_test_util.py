@@ -56,10 +56,14 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
     if recreate:
       user.delete()
       raise User.DoesNotExist
-  except User.DoesNotExist:    
+  except User.DoesNotExist:
     user = User.objects.create_user(username, username + '@localhost', password)
     user.is_superuser = is_superuser
     user.save()
+  else:
+    if user.is_superuser != is_superuser:
+      user.is_superuser = is_superuser
+      user.save()
 
   if groupname is not None:
     group, created = Group.objects.get_or_create(name=groupname)
