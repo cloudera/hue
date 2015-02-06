@@ -192,7 +192,9 @@ class TestWithHadoop(OozieBase):
 
   def setUp(self):
     super(TestWithHadoop, self).setUp()
-    self.c = make_logged_in_client(is_superuser=False)
+    # FIXME (HUE-2562): The tests unfortunately require superuser at the
+    # moment, but should be rewritten to not need it.
+    self.c = make_logged_in_client(is_superuser=True)
     grant_access("test", "test", "pig")
     self.user = User.objects.get(username='test')
     self.c.post(reverse('pig:install_examples'))
