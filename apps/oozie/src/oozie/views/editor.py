@@ -239,9 +239,9 @@ def import_coordinator(request):
 def export_workflow(request, workflow):
   mapping = dict([(param['name'], param['value']) for param in workflow.find_all_parameters()])
 
-  api = get_oozie(request.user)
+  oozie_api = get_oozie(request.user)
   credentials = Credentials()
-  credentials.fetch(api)
+  credentials.fetch(oozie_api)
   mapping['credentials'] = credentials.get_properties()
 
   zip_file = workflow.compress(mapping=mapping)
@@ -260,11 +260,12 @@ def edit_workflow(request, workflow):
   workflow_form = WorkflowForm(instance=workflow)
   user_can_access_job = workflow.can_read(request.user)
   user_can_edit_job = workflow.is_editable(request.user)
-  api = get_oozie(request.user)
+  oozie_api = get_oozie(request.user)
   credentials = Credentials()
-  credentials.fetch(api)
+  credentials.fetch(oozie_api)
 
   return render('editor/edit_workflow.mako', request, {
+    'oozie_api': oozie_api,
     'workflow_form': workflow_form,
     'workflow': workflow,
     'history': history,

@@ -39,7 +39,7 @@ def get(fs, jt, user):
   return OozieApi(fs, jt, user)
 
 
-class OozieApi:
+class OozieApi(object):
   """
   Oozie submission.
   """
@@ -50,6 +50,7 @@ class OozieApi:
   MAX_DASHBOARD_JOBS = 100
 
   def __init__(self, fs, jt, user):
+    self.oozie_api = get_oozie(user)
     self.fs = fs
     self.jt = jt
     self.user = user
@@ -109,7 +110,7 @@ class OozieApi:
         job_properties=json.dumps(job_properties)
     )
 
-    if pig_script.use_hcatalog and get_oozie(self.user).security_enabled:
+    if pig_script.use_hcatalog and self.oozie_api.security_enabled:
       action.credentials = [{'name': 'hcat', 'value': True}]
       action.save()
 
@@ -137,7 +138,7 @@ class OozieApi:
     return pig_params
 
   def stop(self, job_id):
-    return get_oozie(self.user).job_control(job_id, 'kill')
+    return self.oozie_api.job_control(job_id, 'kill')
 
   def get_jobs(self):
     kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS,}
@@ -146,7 +147,7 @@ class OozieApi:
         ('name', OozieApi.WORKFLOW_NAME)
     ]
 
-    return get_oozie(self.user).get_workflows(**kwargs).jobs
+    return self.oozie_api.get_workflows(**kwargs).jobs
 
   def get_log(self, request, oozie_workflow):
     logs = {}
@@ -220,7 +221,7 @@ class OozieApi:
 
     for job in oozie_jobs:
       if job.is_running():
-        job = get_oozie(self.user).get_job(job.id)
+        job = self.oozie_api.get_job(job.id)
         get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
         get_copy['format'] = 'python'
         request.GET = get_copy
