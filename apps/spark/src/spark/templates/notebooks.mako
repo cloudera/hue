@@ -18,8 +18,9 @@
   from desktop.views import commonheader, commonfooter, commonshare
   from django.utils.translation import ugettext as _
 %>
+<%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Notebooks"), "oozie", user) | n,unicode }
+${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
 
 <div id="editor">
 
@@ -27,13 +28,12 @@ ${ commonheader(_("Notebooks"), "oozie", user) | n,unicode }
   <div class="card card-small">
   <h1 class="card-heading simple">${ _('Spark Editor') }</h1>
 
-
-<div class="actionbar-actions">
-                
+  <%actionbar:render>
+    <%def name="search()">
       <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
-    
-       &nbsp;&nbsp;&nbsp;&nbsp;
-                
+    </%def>
+
+    <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <a data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': ! oneSelected()}">
           <i class="fa fa-play"></i> ${ _('Submit') }
@@ -51,14 +51,18 @@ ${ commonheader(_("Notebooks"), "oozie", user) | n,unicode }
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
 
-        <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+        <a data-bind="click: function() { $('#deleteNotebook').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
 
       </div>
-    
+    </%def>
+
+    <%def name="creation()">
       <a href="${ url('spark:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
-</div>
+    </%def>
+  </%actionbar:render>
+
        
   <table id="notebookTable" class="table datatables">
     <thead>
@@ -97,14 +101,14 @@ ${ commonheader(_("Notebooks"), "oozie", user) | n,unicode }
   <!-- <![endif]-->
 </div>
 
-<div id="submit-wf-modal" class="modal hide"></div>
+<div id="submit-notebook-modal" class="modal hide"></div>
 
-<div id="deleteWf" class="modal hide fade">
-  <form id="deleteWfForm" method="POST" data-bind="submit: delete2">
+<div id="deleteNotebook" class="modal hide fade">
+  <form id="deleteNotebookForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete the selected notebook(s)?') }</h3>
+      <h3 id="deleteNotebookMessage">${ _('Delete the selected notebook(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -144,8 +148,8 @@ ${ commonshare() | n,unicode }
     });
     self.allSelected = ko.observable(false);
 
-    self.handleSelect = function(wf) {
-      wf.isSelected(! wf.isSelected());
+    self.handleSelect = function(notebook) {
+      notebook.isSelected(! notebook.isSelected());
     }
 
     self.selectAll = function() {
@@ -171,7 +175,7 @@ ${ commonshare() | n,unicode }
         "selection": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();
-        $('#deleteWf').modal('hide');
+        $('#deleteNotebook').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -204,8 +208,8 @@ ${ commonshare() | n,unicode }
     shareViewModel.setDocId(-1);
 
     $(document).on("showSubmitPopup", function(event, data){
-      $('#submit-wf-modal').html(data);
-      $('#submit-wf-modal').modal('show');
+      $('#submit-notebook-modal').html(data);
+      $('#submit-notebook-modal').modal('show');
     });
 
     var oTable = $("#notebookTable").dataTable({
