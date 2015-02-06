@@ -247,9 +247,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-            'stop': function(event, ui){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); notifyTypeSubscribers(); });},
+            'stop': function(event, ui){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); });},
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.snippet-body').slideUp('fast', function(){ $('.sortable-snippets').sortable('refreshPositions') }); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.html($(event.toElement).parents('h2').find('img').outerHTML());_title.appendTo(_par);_par.height(40);_par.width(120);return _par;}},
-            dragged: function(widget){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); notifyTypeSubscribers(); });}}">
+            dragged: function(widget){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); });}}">
       </div>
 
       <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
@@ -315,8 +315,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
-
-      <div data-bind="visible: type() != 'text'" class="snippet-body">
+      <!-- ko if: type() != 'text' -->
+      <div class="snippet-body">
         <div class="row-fluid">
           <div data-bind="css: editorKlass">
             <div data-bind="foreach: variables">
@@ -588,11 +588,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
         </div>
       </div>
-
-      <div data-bind="visible: type() == 'text'" class="snippet-body">
-        ##<div data-bind="html: statement_raw, visible: ! $root.isEditing()" class="text-snippet"></div>
-        <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
-      </div>
+      <!-- /ko -->
+      <!-- ko if: type() == 'text' -->
+        <div class="snippet-body">
+          <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
+        </div>
+      <!-- /ko -->
     </div>
   </div>
 </script>
@@ -632,14 +633,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return (s)
     ? this.before(s).remove()
     : jQuery("<p>").append(this.eq(0).clone()).html();
-  }
-
-  function notifyTypeSubscribers() {
-    viewModel.notebooks().forEach(function(nb) {
-      nb.snippets().forEach(function(sp) {
-        sp.type.notifySubscribers();
-      });
-    });
   }
 
   ko.bindingHandlers.medium = {
