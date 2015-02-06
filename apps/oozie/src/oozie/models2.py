@@ -30,6 +30,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
 
@@ -1577,11 +1578,11 @@ class Coordinator(Job):
 
   @property
   def inputDatasets(self):
-    return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'input_path']
+    return [Dataset(dataset, self) for dataset in self.data['variables'] if dataset['dataset_type'] == 'input_path']
 
   @property
   def outputDatasets(self):
-    return [Dataset(dataset) for dataset in self.data['variables'] if dataset['dataset_type'] == 'output_path']
+    return [Dataset(dataset, self) for dataset in self.data['variables'] if dataset['dataset_type'] == 'output_path']
 
   @property
   def start_utc(self):
@@ -1605,14 +1606,14 @@ class Coordinator(Job):
       # Backward compatibility
       freq = '0 0 * * *'
       if data_dict['frequency_number'] == 1:
-        if data_dict['frequency_number'] == 'MINUTES':
+        if data_dict['frequency_unit'] == 'minutes':
           freq = '* * * * *'
-        elif data_dict['frequency_number'] == 'HOURS':
+        elif data_dict['frequency_unit'] == 'hours':
           freq = '0 * * * *'
-        elif data_dict['frequency_number'] == 'DAYS':
+        elif data_dict['frequency_unit'] == 'days':
           freq = '0 0 * * *'
-        elif data_dict['frequency_number'] == 'MONTH':
-          freq = '0 0 * * *'
+        elif data_dict['frequency_unit'] == 'months':
+          freq = '0 0 0 * *'
       return {'frequency': freq, 'isAdvancedCron': False}
 
   def to_xml(self, mapping=None):
@@ -1639,8 +1640,9 @@ class Coordinator(Job):
 
 class Dataset():
 
-  def __init__(self, data):
+  def __init__(self, data, coordinator):
     self._data = data
+    self.coordinator = coordinator
 
   @property
   def data(self):
@@ -1653,11 +1655,38 @@ class Dataset():
 
   @property
   def frequency(self):
-    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['frequency_unit'], 'number': self.data['frequency_number']}
+    if self.data['same_frequency']:
+      if self.coordinator.cron_frequency == '* * * * *':
+        frequency_unit = 'minutes'
+      elif self.coordinator.cron_frequency == '0 * * * *':
+        frequency_unit = 'hours'
+      elif self.coordinator.cron_frequency == '0 0 * * *':
+        frequency_unit = 'days'
+      elif self.coordinator.cron_frequency == '0 0 0 * *':
+        frequency_unit = 'months'
+      else:
+        raise PopupException(_('The frequency of the workflow parameter %s cannot be guessed from the frequency of the coordinator.'
+                               ' It so needs to be specified manually.'))
+      frequency_number = 1
+    else:
+      frequency_unit = self.data['frequency_unit']
+      frequency_number = self.data['frequency_number']
+
+    return '${coord:%(unit)s(%(number)s)}' % {'unit': frequency_unit, 'number': frequency_number}
 
   @property
   def start_utc(self):
-    return utc_datetime_format(self.data['start'])
+    if self.data['same_start']:
+      return self.coordinator.start_utc
+    else:
+      return utc_datetime_format(self.data['start'])
+
+  @property
+  def timezone(self):
+    if self.data['same_timezone']:
+      return self.coordinator.data['properties']['timezone']
+    else:
+      return self.data['timezone']
 
   @property
   def start_instance(self):
