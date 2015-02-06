@@ -83,7 +83,8 @@ def manage_oozie_jobs(request, job_id, action):
   response = {'status': -1, 'data': ''}
 
   try:
-    response['data'] = get_oozie(request.user).job_control(job_id, action)
+    oozie_api = get_oozie(request.user)
+    response['data'] = oozie_api.job_control(job_id, action)
     response['status'] = 0
     if 'notification' in request.POST:
       request.info(_(request.POST.get('notification')))
@@ -103,11 +104,13 @@ def bulk_manage_oozie_jobs(request):
     jobs = request.POST.get('job_ids').split()
     response = {'totalRequests': len(jobs), 'totalErrors': 0, 'messages': ''}
 
+    oozie_api = get_oozie(request.user)
+
     for job_id in jobs:
       job = check_job_access_permission(request, job_id)
       check_job_edition_permission(job, request.user)
       try:
-        get_oozie(request.user).job_control(job_id, request.POST.get('action'))
+        oozie_api.job_control(job_id, request.POST.get('action'))
       except RestException, ex:
         response['totalErrors'] = response['totalErrors'] + 1
         response['messages'] += str(ex)
@@ -271,12 +274,12 @@ def list_oozie_workflow(request, job_id):
 
   oozie_slas = []
   if oozie_workflow.has_sla:
-    api = get_oozie(request.user, api_version="v2")
+    oozie_api = get_oozie(request.user, api_version="v2")
     params = {
       'id': oozie_workflow.id,
       'parent_id': oozie_workflow.id
     }
-    oozie_slas = api.get_oozie_slas(**params)
+    oozie_slas = oozie_api.get_oozie_slas(**params)
 
   return render('dashboard/list_oozie_workflow.mako', request, {
     'oozie_workflow': oozie_workflow,
@@ -329,12 +332,12 @@ def list_oozie_coordinator(request, job_id):
 
   oozie_slas = []
   if oozie_coordinator.has_sla:
-    api = get_oozie(request.user, api_version="v2")
+    oozie_api = get_oozie(request.user, api_version="v2")
     params = {
       'id': oozie_coordinator.id,
       'parent_id': oozie_coordinator.id
     }
-    oozie_slas = api.get_oozie_slas(**params)
+    oozie_slas = oozie_api.get_oozie_slas(**params)
 
   enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
 
@@ -443,7 +446,7 @@ def list_oozie_info(request):
 
 @show_oozie_error
 def list_oozie_sla(request):
-  api = get_oozie(request.user, api_version="v2")
+  oozie_api = get_oozie(request.user, api_version="v2")
 
   if request.method == 'POST':
     params = {}
@@ -462,7 +465,7 @@ def list_oozie_sla(request):
       if request.POST.get('end'):
         params['nominal_end'] = request.POST.get('end')
 
-    oozie_slas = api.get_oozie_slas(**params)
+    oozie_slas = oozie_api.get_oozie_slas(**params)
 
   else:
     oozie_slas = [] # or get latest?
@@ -873,12 +876,13 @@ def check_job_access_permission(request, job_id):
   Notice: its gets an id in input and returns the full object in output (not an id).
   """
   if job_id is not None:
+    oozie_api = get_oozie(request.user)
     if job_id.endswith('W'):
-      get_job = get_oozie(request.user).get_job
+      get_job = oozie_api.get_job
     elif job_id.endswith('C'):
-      get_job = get_oozie(request.user).get_coordinator
+      get_job = oozie_api.get_coordinator
     else:
-      get_job = get_oozie(request.user).get_bundle
+      get_job = oozie_api.get_bundle
 
     try:
       oozie_job = get_job(job_id)
