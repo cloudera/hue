@@ -270,8 +270,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   </span>
                   <span data-bind="visible: dataset_variable().length > 0">
                     ${ _('Will convert to') }
-                    <a href="/filebrowser/view">
-                    /user/hue/2015/01/01
+                    <a data-bind="text: convertVariables(dataset_variable()), attr: {'href': '/filebrowser/view' + convertVariables(dataset_variable())}"></a>
                     ## use start_date as the date
                   </span>
                   </a>
@@ -537,6 +536,18 @@ ${ dashboard.import_bindings() }
       })
       .jqCronGetInstance();
 
+  function convertVariables(path) {
+    var _startDate = moment(viewModel.coordinator.start_date.value());
+    if (_startDate.isValid()){
+      path = path.replace(/\${'$'}{YEAR}/, _startDate.year());
+      path = path.replace(/\${'$'}{MONTH}/, (_startDate.month() < 10 ? '0':'') + _startDate.month());
+      path = path.replace(/\${'$'}{DAY}/, (_startDate.date() < 10 ? '0':'') + _startDate.date());
+      path = path.replace(/\${'$'}{HOUR}/, (_startDate.hours() < 10 ? '0':'') + _startDate.hours());
+      path = path.replace(/\${'$'}{MINUTE}/, (_startDate.minutes() < 10 ? '0':'') + _startDate.minutes());
+    }
+    return path;
+  }
+
   var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode }, ${ can_edit_json | n,unicode });
 
   ko.applyBindings(viewModel, $("#editor")[0]);
@@ -577,7 +588,7 @@ ${ dashboard.import_bindings() }
     });
     
     $(".dataset-input").typeahead({
-      source: ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
+      source: ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
     });
   });
 </script>
