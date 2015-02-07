@@ -596,8 +596,11 @@ def test_user_admin():
   response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
                         dict(username = FUNNY_NAME,
                              first_name = "Hello",
-                             is_active = True))
-  response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
+                             is_active = True,
+                             groups=[group.id for group in test_user.groups.all()]), follow=True)
+  assert_equal(response.status_code, 200)
+  response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), follow=True)
+  assert_equal(response.status_code, 200)
   assert_equal("Hello", response.context["form"].instance.first_name)
   funny_user = User.objects.get(username=FUNNY_NAME)
   # Can't edit other people.
