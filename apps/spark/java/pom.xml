@@ -51,10 +51,9 @@
         <javaVersion>1.7</javaVersion>
         <hadoop.version>2.5.0</hadoop.version>
         <guava.version>11.0.2</guava.version>
-        <jetty.version>8.1.16.v20140903</jetty.version>
+        <jetty.version>8.1.14.v20131031</jetty.version>
         <json4s.version>3.2.11</json4s.version>
         <logback.version>1.1.2</logback.version>
-        <scala.binary.version>2.10.3</scala.binary.version>
         <scala.version>2.10.3</scala.version>
         <scalatra.version>2.2.1</scalatra.version>
         <spark.version>1.1.0</spark.version>
@@ -171,34 +170,6 @@
                     <version>2.4.0</version>
                 </plugin>
 
-                <!-- disable surefire -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.7</version>
-                    <configuration>
-                        <skipTests>true</skipTests>
-                    </configuration>
-                </plugin>
-                <!-- enable scalatest -->
-                <plugin>
-                    <groupId>org.scalatest</groupId>
-                    <artifactId>scalatest-maven-plugin</artifactId>
-                    <version>1.0</version>
-                    <configuration>
-                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                        <junitxml>.</junitxml>
-                        <filereports>WDF TestSuite.txt</filereports>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>test</id>
-                            <goals>
-                                <goal>test</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -248,8 +219,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${javaVersion}</source>
+                    <target>${javaVersion}</target>
                 </configuration>
             </plugin>
 
@@ -300,5 +271,17 @@
         </plugins>
 
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

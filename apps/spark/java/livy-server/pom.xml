@@ -33,32 +33,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s_2.10</artifactId>
-            <version>${json4s.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_2.10</artifactId>
-            <version>${json4s.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.scalatra</groupId>
-            <artifactId>scalatra_2.10</artifactId>
-            <version>${scalatra.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.scalatra</groupId>
-            <artifactId>scalatra-json_2.10</artifactId>
-            <version>${scalatra.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.cloudera.hue.livy</groupId>
             <artifactId>livy-core</artifactId>
             <version>${project.version}</version>
@@ -74,6 +48,12 @@
                     <artifactId>jetty-server</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_2.10</artifactId>
+            <version>${json4s.version}</version>
         </dependency>
 
         <dependency>

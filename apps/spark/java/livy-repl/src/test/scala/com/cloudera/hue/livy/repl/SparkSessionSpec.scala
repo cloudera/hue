@@ -1,9 +1,9 @@
 package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.repl.scala.SparkSession
-import org.json4s.{Extraction, DefaultFormats}
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FunSpec, BeforeAndAfter}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration

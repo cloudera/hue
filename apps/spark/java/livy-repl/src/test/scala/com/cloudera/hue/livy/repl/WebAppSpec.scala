@@ -1,13 +1,12 @@
 package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.repl.Session.State
-import org.json4s.{Extraction, DefaultFormats, JValue}
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
+import org.json4s.{DefaultFormats, Extraction, JValue}
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import org.scalatra.test.scalatest.ScalatraSuite
-
 import _root_.scala.concurrent.Future
 
 class WebAppSpec extends ScalatraSuite with FunSpec with BeforeAndAfter {
