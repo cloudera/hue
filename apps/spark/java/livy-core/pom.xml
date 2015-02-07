@@ -31,7 +31,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
-            <scope>container</scope>
         </dependency>
 
         <dependency>
@@ -44,6 +43,12 @@
             <groupId>org.scalatra</groupId>
             <artifactId>scalatra_2.10</artifactId>
             <version>${scalatra.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.typesafe.akka</groupId>
+                    <artifactId>akka-actor_2.10</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -53,15 +58,28 @@
         </dependency>
 
         <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra-scalatest_2.10</artifactId>
+            <version>${scalatra.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra-json_2.10</artifactId>
+            <version>${scalatra.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_2.10</artifactId>
+            <artifactId>json4s_2.10</artifactId>
             <version>${json4s.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_2.10</artifactId>
+            <version>${json4s.version}</version>
         </dependency>
 
     </dependencies>
