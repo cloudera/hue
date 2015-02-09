@@ -41,6 +41,7 @@ from django.db import transaction
 
 from desktop import redaction
 from desktop.redaction import logfilter
+from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
@@ -1527,10 +1528,12 @@ for x in sys.stdin:
   def test_redacting_queries(self):
     c = make_logged_in_client()
 
-    rule = r'ssn=::ssn=\d{3}-\d{2}-\d{4}::ssn=XXX-XX-XXXX'
-    old_rules = redaction.global_redaction_engine.rules
-    redaction.global_redaction_engine.rules = []
-    redaction.global_redaction_engine.add_rules_from_string(rule)
+    old_policies = redaction.global_redaction_engine.policies
+    redaction.global_redaction_engine.policies = [
+      RedactionPolicy([
+        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+      ])
+    ]
 
     logfilter.add_log_redaction_filter_to_logger(redaction.global_redaction_engine, logging.root)
 
@@ -1557,7 +1560,7 @@ for x in sys.stdin:
       assert_equal(history.query, expected_query)
       assert_false(history.is_redacted)
     finally:
-      redaction.global_redaction_engine.rules = old_rules
+      redaction.global_redaction_engine.policies = old_policies
 
 
 def test_import_gzip_reader():
@@ -2165,10 +2168,12 @@ class TestWithMockedServer(object):
     assert_false(sql in resp.content, resp.content)
 
   def test_redact_saved_design(self):
-    rule = r'ssn=::ssn=\d{3}-\d{2}-\d{4}::ssn=XXX-XX-XXXX'
-    old_rules = redaction.global_redaction_engine.rules
-    redaction.global_redaction_engine.rules = []
-    redaction.global_redaction_engine.add_rules_from_string(rule)
+    old_policies = redaction.global_redaction_engine.policies
+    redaction.global_redaction_engine.policies = [
+      RedactionPolicy([
+        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+      ])
+    ]
 
     logfilter.add_log_redaction_filter_to_logger(redaction.global_redaction_engine, logging.root)
 
@@ -2201,7 +2206,7 @@ class TestWithMockedServer(object):
       assert_equal(data['query']['query'], expected_query)
       assert_false(design.is_redacted)
     finally:
-      redaction.global_redaction_engine.rules = old_rules
+      redaction.global_redaction_engine.policies = old_policies
 
 
 class TestDesign():
