@@ -43,14 +43,16 @@ from liboozie.types import Workflow as OozieWorkflow, Coordinator as Coordinator
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm
-from oozie.models import Workflow, Job, utc_datetime_format, Bundle, Coordinator, get_link
+from oozie.models import Workflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
+from oozie.models2 import History
 from oozie.settings import DJANGO_APPS
 
 
-if ENABLE_V2.get():
-  from oozie.models2 import History
-else:
-  from oozie.models import History
+def get_history():
+  if ENABLE_V2.get():
+    return History
+  else:
+    return OldHistory
 
 
 LOG = logging.getLogger(__name__)
@@ -223,8 +225,8 @@ def list_oozie_workflow(request, job_id):
 
   if ENABLE_V2.get():
     # To update with the new History document model
-    hue_coord = History.get_coordinator_from_config(oozie_workflow.conf_dict)
-    hue_workflow = (hue_coord and hue_coord.workflow) or History.get_workflow_from_config(oozie_workflow.conf_dict)
+    hue_coord = get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
+    hue_workflow = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(oozie_workflow.conf_dict)
   
     if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
     if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
@@ -235,10 +237,10 @@ def list_oozie_workflow(request, job_id):
     else:
       workflow_graph, full_node_list = '', None    
   else:
-    history = History.cross_reference_submission_history(request.user, job_id)
+    history = get_history().cross_reference_submission_history(request.user, job_id)
 
-    hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
-    hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
+    hue_coord = history and history.get_coordinator() or get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
+    hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or get_history().get_workflow_from_config(oozie_workflow.conf_dict)
 
     if hue_coord and hue_coord.workflow: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
     if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
@@ -293,9 +295,9 @@ def list_oozie_coordinator(request, job_id):
   oozie_coordinator = check_job_access_permission(request, job_id)
 
   # Cross reference the submission history (if any)
-  coordinator = History.get_coordinator_from_config(oozie_coordinator.conf_dict)
+  coordinator = get_history().get_coordinator_from_config(oozie_coordinator.conf_dict)
   try:
-    coordinator = History.objects.get(oozie_job_id=job_id).job.get_full_node()
+    coordinator = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
   except:
     pass
 
@@ -354,8 +356,8 @@ def list_oozie_bundle(request, job_id):
   # Cross reference the submission history (if any)
   bundle = None
   try:
-    bundle = History.objects.get(oozie_job_id=job_id).job.get_full_node()
-  except History.DoesNotExist:
+    bundle = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
+  except:
     pass
 
   if request.GET.get('format') == 'json':

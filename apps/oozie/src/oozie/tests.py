@@ -44,7 +44,7 @@ from liboozie.oozie_api_tests import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
-from oozie.conf import ENABLE_CRON_SCHEDULING
+from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
@@ -3467,20 +3467,28 @@ class TestDashboard(OozieMockBase):
 
 
   def test_good_workflow_status_graph(self):
-    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
-
-    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {})
-
-    assert_true(response.context['workflow_graph'])
-    assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
+    finish = ENABLE_V2.set_for_testing(False)
+    try:
+      workflow_count = Document.objects.available_docs(Workflow, self.user).count()
+  
+      response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {})
+  
+      assert_true(response.context['workflow_graph'])
+      assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
+    finally:
+      finish()
 
   def test_bad_workflow_status_graph(self):
-    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
+    finish = ENABLE_V2.set_for_testing(False)
+    try:
+      workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
-    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {})
+      response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {})
 
-    assert_true(response.context['workflow_graph'] is None)
-    assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
+      assert_true(response.context['workflow_graph'] is None)
+      assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
+    except:
+      finish()
 
   def test_list_oozie_sla(self):
     response = self.c.get(reverse('oozie:list_oozie_sla'))

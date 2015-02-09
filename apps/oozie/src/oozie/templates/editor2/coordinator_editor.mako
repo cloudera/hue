@@ -216,7 +216,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                        aria-expanded="false">
+                        aria-expanded="false" data-bind="enable: $root.isEditing">
                   <!-- ko if: dataset_type() == 'parameter' -->
                   ${ _('Parameter') }
                   <!-- /ko -->
@@ -248,11 +248,15 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
               
               &nbsp;&nbsp;
               
-              <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
-                dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' : 
-                dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' : 
-                '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
-                valueUpdate: 'afterkeydown'" style="margin-bottom:0; width: 380px" />
+              <span data-bind="visible: $root.isEditing">
+                <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
+                  dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' : 
+                  dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' : 
+                  '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
+                  valueUpdate: 'afterkeydown'" style="margin-bottom:0; width: 380px" />
+              </span>
+
+              <span data-bind="text: dataset_variable, visible: ! $root.isEditing()"></span>
 
               <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
                 <i class="fa fa-minus"></i>

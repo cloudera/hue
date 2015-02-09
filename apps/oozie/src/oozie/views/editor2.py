@@ -408,7 +408,7 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
-                                    for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+                    for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
@@ -507,6 +507,21 @@ def gen_xml_coordinator(request):
   response['xml'] = coordinator.to_xml()
     
   return HttpResponse(json.dumps(response), mimetype="application/json") 
+
+
+@check_document_access_permission()
+def coordinator_parameters(request):
+  response = {'status': -1}
+
+  try:
+    coordinator = Coordinator(document=Document2.objects.get(type='oozie-coordinator2', uuid=request.GET.get('uuid'))) 
+
+    response['status'] = 0
+    response['parameters'] = coordinator.find_all_parameters(with_lib_path=False)
+  except Exception, e:
+    response['message'] = str(e)
+    
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @check_document_access_permission()

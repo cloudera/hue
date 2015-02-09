@@ -1546,6 +1546,9 @@ class Coordinator(Job):
     for param in find_json_parameters([self.data['properties']]):
       params.add(param)
 
+    for param in find_json_parameters(self.data['variables']):
+      params.add(param)
+
     if self.sla_enabled:
       for param in find_json_parameters(self.sla):
         params.add(param)
