@@ -35,6 +35,7 @@ import beeswax.models
 from beeswax.forms import QueryForm
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
+from beeswax.conf import USE_GET_LOG_API
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
@@ -190,7 +191,8 @@ def watch_query_refresh_json(request, id):
     'isFailure': query_history.is_failure(),
     'id': id,
     'statement': query_history.get_current_statement(),
-    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
+    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id}),
+    'oldLogsApi': USE_GET_LOG_API.get()
   }
 
   # Run time error

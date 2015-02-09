@@ -629,9 +629,15 @@ function BeeswaxViewModel(server) {
           if (data.log) {
             self.applyLogs(data.log)
             // scroll logs
-            self.design.watch.jobUrls(data.jobUrls);
+            if (data.oldLogsApi) {
+              self.design.watch.jobUrls(data.jobUrls);
+            } else {
+              $.each(data.jobUrls, function (i, url) {
+                self.design.watch.jobUrls.push(url);
+              });
+            }
           }
-          if (!failed) {
+          if (! failed) {
             $(document).trigger('stop_watch.query');
 
             if (fn) {
@@ -645,7 +651,13 @@ function BeeswaxViewModel(server) {
           if (data.log) {
             self.applyLogs(data.log)
             // scroll logs
-            self.design.watch.jobUrls(data.jobUrls);
+            if (data.oldLogsApi) {
+              self.design.watch.jobUrls(data.jobUrls);
+            } else {
+              $.each(data.jobUrls, function (i, url) {
+                self.design.watch.jobUrls.push(url);
+              });
+            }
           }
 
           TIMEOUT = Math.min(TIMEOUT + 100, 2000);

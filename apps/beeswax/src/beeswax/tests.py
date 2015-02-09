@@ -266,7 +266,7 @@ for x in sys.stdin:
     """
     Testing query with udf
     """
-    response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test WHERE foo=4",
+    response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
             ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')], local=False)
     response = wait_for_query_to_finish(self.client, response, max=60.0)
@@ -274,10 +274,8 @@ for x in sys.stdin:
 
     assert_equal([2.0, 4.0], content["results"][0])
     log = content['log']
-    assert_true(search_log_line('parse.SemanticAnalyzer', 'Completed plan generation', log), log)
-    assert_true(search_log_line('ql.Driver', 'Semantic Analysis Completed', log), log)
-    assert_true(search_log_line('exec.Task', '100%', log), log)
-    assert_true(search_log_line('ql.Driver', 'OK', log), log)
+    assert_true(search_log_line('map = 100%', log), log)
+    assert_true(search_log_line('reduce = 100%', log), log)
     # Test job extraction while we're at it
     assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
@@ -1785,23 +1783,23 @@ def test_search_log_line():
     2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     org.apache.hadoop.hive.ql.parse.ParseException: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     """
-  assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+  assert_true(search_log_line('FAILED: Parse Error', logs))
 
   logs = "12/08/22 20:50:14 ERROR ql.Driver: FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant'"
-  assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+  assert_true(search_log_line('FAILED: Parse Error', logs))
 
   logs = """
     FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse XXXX Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     org.apache.hadoop.hive.ql.parse.ParseException: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     """
-  assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+  assert_false(search_log_line('FAILED: Undefined', logs))
 
   logs = """
     2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse
     Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     """
-  assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+  assert_false(search_log_line('FAILED: Parse Error', logs))
 
 
 def test_split_statements():
@@ -2222,9 +2220,8 @@ class TestDesign():
     assert_equal('\nADD FILE s3://host/my_s3_file\n', statements[2])
 
 
-def search_log_line(component, expected_log, all_logs):
-  """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
-  return re.compile('.+?%(component)s(.+?)%(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
+def search_log_line(expected_log, all_logs):
+  return re.compile('%(expected_log)s' % {'expected_log': expected_log}).search(all_logs)
 
 
 def test_hiveserver2_get_security():
