@@ -20,6 +20,7 @@ import logging
 import tempfile
 
 from desktop.redaction.engine import RedactionEngine, \
+                                     RedactionPolicy, \
                                      RedactionRule, \
                                      parse_redaction_policy_from_file
 from desktop.redaction.logfilter import add_log_redaction_filter_to_logger
@@ -137,10 +138,12 @@ class TestRedactionLogFilter(object):
     cls.handler = MockLoggingHandler()
     cls.logger.addHandler(cls.handler)
 
-    engine = RedactionEngine([
+    policy = RedactionPolicy([
       RedactionRule('password=', 'password=".*"', 'password="???"'),
       RedactionRule('ssn=', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
     ])
+
+    engine = RedactionEngine([policy])
 
     add_log_redaction_filter_to_logger(engine, cls.logger)
 
