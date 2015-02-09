@@ -27,12 +27,22 @@ var Bundle = function (vm, bundle) {
 
   
   self.addCoordinator = function(coordinator_uuid) {
-    var _var = {       
-       'coordinator': coordinator_uuid,
-       'properties': []
-    };
+    self.getCoordinatorParameters(coordinator_uuid);	  
+  };
+  
+  self.getCoordinatorParameters = function(uuid) {
+	$.get("/oozie/editor/coordinator/parameters/", {
+	  "uuid": uuid,
+	}, function (data) {
+	   var _var = {       
+           'coordinator': uuid,
+		   'properties': data.parameters
+	   };
 
-	self.coordinators.push(ko.mapping.fromJS(_var));	  
+      self.coordinators.push(ko.mapping.fromJS(_var));
+	}).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
 }
 

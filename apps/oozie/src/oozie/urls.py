@@ -93,6 +93,7 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/submit/(?P<doc_id>\d+)$', 'submit_coordinator', name='editor_submit_coordinator'),
   url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'),
   url(r'^editor/coordinator/open_v1/$', 'open_old_coordinator', name='open_old_coordinator'),
+  url(r'^editor/coordinator/parameters/$', 'coordinator_parameters', name='coordinator_parameters'),
   
   url(r'^editor/bundle/list/$', 'list_editor_bundles', name='list_editor_bundles'),
   url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),

@@ -166,6 +166,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
         
       <h4>${ _('Submission Parameters') }</h4>
       <ul data-bind="foreach: bundle.properties.parameters" class="unstyled">
+        <!-- ko if: ['oozie.use.system.libpath', 'start_date', 'end_date'].indexOf(name()) == -1 -->
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
@@ -173,6 +174,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
             <i class="fa fa-minus"></i>
           </a>
         </li>
+        <!-- /ko -->
       </ul>
       <a class="pointer" data-bind="click: function(){ $root.bundle.properties.parameters.push({'name': '', 'value': ''}); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
