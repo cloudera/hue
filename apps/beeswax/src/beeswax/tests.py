@@ -64,7 +64,8 @@ from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
-  PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable
+  PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable,\
+  HiveServerTColumnValue2
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswax.hive_site import get_metastore
 
@@ -1438,8 +1439,7 @@ for x in sys.stdin:
 
     resp = self.client.get("/beeswax/results/%s/0?format=json" % history_id)
     content = json.loads(resp.content)
-    # assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [u'NULL'], [u'NULL'], [u'NULL']], content['results']) # New Hive does not return NULL anymore
-    assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [0.0], [0.0], [0.0]], content['results'])
+    assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [u'NULL'], [u'NULL'], [u'NULL']], content['results'])
 
 
   def test_create_database(self):
@@ -1986,6 +1986,51 @@ class TestHiveServer2API():
                    ], table.partition_keys)
     finally:
       setattr(table, 'extended_describe', prev_extended_describe)
+
+  def test_column_format_values_nulls(self):
+    data = [1, 1, 1]
+    nulls = '\x00'
+
+    assert_equal([1, 1, 1],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    data = [1, 1, 1]
+    nulls = '\x03'
+
+    assert_equal([None, None, 1],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    data = [1, 1, 1, 1, 1, 1, 1, 1]
+    nulls = 't' # 0b1110100
+
+    assert_equal([1, 1, None, 1, None, None, None, 1],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+
+    data = [1, 1, 'not_good', 'NaN', None, 'INF', 'INF', 3]
+    nulls = 't' # 0b1110100
+
+    assert_equal([1, 1, None, 'NaN', None, None, None, 3],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    data = [1] * 18
+    nulls = '\xff\xee\x03'
+
+    assert_equal([None, None, None, None, None, None, None, None, 1, None, None, None, 1, None, None, None, None, None],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    data = [1, 1, 1, 1, 1, 1, 1, 1]
+    nulls = '\x41'
+
+    assert_equal([None, 1, 1, 1, 1, 1, None, 1],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    data = [1] * 8 * 8
+    nulls = '\x01\x23\x45\x67\x89\xab\xcd\xef'
+
+    assert_equal([None, 1, 1, 1, 1, 1, 1, 1, None, None, 1, 1, 1, None, 1, 1, None, 1, None, 1, 1, 1, None, 1, None, None, None, 1, 1, None, None, 1, None, 1, 1,
+                  None, 1, 1, 1, None, None, None, 1, None, 1, None, 1, None, None, 1, None, None, 1, 1, None, None, None, None, None, None, 1, None, None, None],
+                 HiveServerTColumnValue2.set_nulls(data, nulls))
 
 
 class MockDbms:

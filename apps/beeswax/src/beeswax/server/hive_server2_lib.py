@@ -224,29 +224,60 @@ class HiveServerTColumnValue2:
   def val(self):
     # Could directly get index from schema but would need to cache the schema
     if self.column_value.stringVal:
-      return self.column_value.stringVal.values
+      return self._get_val(self.column_value.stringVal)
     elif self.column_value.i16Val is not None:
-      return self.column_value.i16Val.values
+      return self._get_val(self.column_value.i16Val)
     elif self.column_value.i32Val is not None:
-      return self.column_value.i32Val.values
+      return self._get_val(self.column_value.i32Val)
     elif self.column_value.i64Val is not None:
-      return self.column_value.i64Val.values
+      return self._get_val(self.column_value.i64Val)
     elif self.column_value.doubleVal is not None:
-      return self.column_value.doubleVal.values
+      return self._get_val(self.column_value.doubleVal)
     elif self.column_value.boolVal is not None:
-      return self.column_value.boolVal.values
+      return self._get_val(self.column_value.boolVal)
     elif self.column_value.byteVal is not None:
-      return self.column_value.byteVal.values
+      return self._get_val(self.column_value.byteVal)
     elif self.column_value.binaryVal is not None:
-      return self.column_value.binaryVal.values
+      return self._get_val(self.column_value.binaryVal)
+
+  @classmethod
+  def _get_val(cls, column):
+    column.values = cls.set_nulls(column.values, column.nulls)
+    column.nulls = '' # Clear the null values for not re-marking again the column with nulls at the next call
+    return column.values
+
+  @classmethod
+  def mark_nulls(cls, values, bytestring):
+    mask = bytearray(bytestring)
+
+    for n in mask:
+      yield n & 0x01
+      yield n & 0x02
+      yield n & 0x04
+      yield n & 0x08
+
+      yield n & 0x10
+      yield n & 0x20
+      yield n & 0x40
+      yield n & 0x80
+
+  @classmethod
+  def set_nulls(cls, values, bytestring):
+    if bytestring == '' or bytestring == '\x00':
+      return values
+    else:
+      return [None if is_null else value for value, is_null in zip(values, cls.mark_nulls(values, bytestring))]
 
 
 class HiveServerDataTable(DataTable):
-  def __init__(self, results, schema, operation_handle):
+  def __init__(self, results, schema, operation_handle, query_server):
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.operation_handle = operation_handle
-    self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
+    if query_server['server_name'] == 'impala':
+      self.has_more = results.hasMoreRows
+    else:
+      self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
     self.startRowOffset = self.row_set.startRowOffset    # Always 0 in HS2
 
   @property
@@ -567,7 +598,7 @@ class HiveServerClient:
     req = TGetSchemasReq()
     res = self.call(self._client.GetSchemas, req)
 
-    results, schema = self.fetch_result(res.operationHandle)
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
     col = 'TABLE_SCHEM'
@@ -578,7 +609,7 @@ class HiveServerClient:
     req = TGetTablesReq(schemaName=database, tableName=table_names)
     res = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(res.operationHandle, max_rows=5000)
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
     self.close_operation(res.operationHandle)
 
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
@@ -588,7 +619,7 @@ class HiveServerClient:
     req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
 
-    table_results, table_schema = self.fetch_result(res.operationHandle)
+    table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
     if self.query_server['server_name'] == 'impala':
@@ -609,7 +640,7 @@ class HiveServerClient:
 
   def execute_query_statement(self, statement, max_rows=1000, configuration={}):
     (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
-    return HiveServerDataTable(results, schema, operation_handle)
+    return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
   def execute_async_query(self, query, statement=0):
@@ -656,9 +687,9 @@ class HiveServerClient:
 
 
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
-    # The client should check for hasMoreRows and fetch until the result is empty dues to a HS2 bug
+    # Fetch until the result is empty dues to a HS2 bug instead of looking at hasMoreRows
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
-    return HiveServerDataTable(results, schema, operation_handle)
+    return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
   def cancel_operation(self, operation_handle):
@@ -675,7 +706,7 @@ class HiveServerClient:
     req = TGetColumnsReq(schemaName=database, tableName=table)
     res = self.call(self._client.GetColumns, req)
 
-    res, schema = self.fetch_result(res.operationHandle)
+    res, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
     return res, schema
