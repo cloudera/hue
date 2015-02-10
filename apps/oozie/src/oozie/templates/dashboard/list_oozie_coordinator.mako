@@ -93,7 +93,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               % endif
               % endif
 
-              % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'KILLED', 'SUCCEEDED'):
+              % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
                 <li class="nav-header">${ _('Manage') }</li>
                 <li class="white">
                   <div id="rerun-coord-modal" class="modal hide"></div>
@@ -116,6 +116,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      % endif
                      " style="margin-bottom: 5px">
                     ${ _('Resume') }
+                  </button>
+                  <button title="${ _('Edit End Time') }" id="edit-endtime-btn"
+                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
+                     data-confirmation-message="${ _('Update End Time') }"
+                     class="btn btn-small confirmationModal
+                     % if not oozie_coordinator.is_running():
+                       hide
+                     % endif
+                     " style="margin-bottom: 5px">
+                    ${ _('Edit') }
                   </button>
                   <br/>
                   <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
@@ -369,6 +379,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3 class="message"></h3>
   </div>
+  <div id="update-endtime" class="span10">
+    ${ utils.render_field_no_popover(update_endtime_form['end'], show_label=False) }
+  </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
@@ -382,9 +395,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
 % if oozie_coordinator.has_sla:
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
@@ -636,6 +649,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       var _this = $(this);
       $("#confirmation .message").text(_this.attr("data-confirmation-message"));
       $("#confirmation").modal("show");
+
+      if (_this.attr("id") == "edit-endtime-btn") {
+        $("#update-endtime").show();
+      } else {
+        $("#update-endtime").hide();
+      }
+
       $("#confirmation a.btn-danger").click(function() {
         _this.trigger('confirmation');
         $(this).attr("data-loading-text", $(this).text() + " ...");
@@ -645,8 +665,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     $(".confirmationModal").bind('confirmation', function() {
       var _this = this;
-      $.post($(this).attr("data-url"),
-        { 'notification': $(this).attr("data-message") },
+      var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
+      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
+
+      var params = { 'notification': $(_this).attr("data-message") };
+      if ($(this).attr("id") == "edit-endtime-btn") {
+        params['end_time'] = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(),
+                                        IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
+      }
+
+      $.post($(this).attr("data-url"), params,
         function(response) {
           if (response['status'] != 0) {
             $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
@@ -776,5 +804,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     }
   });
 </script>
+
+${ utils.decorate_datetime_fields() }
 
 ${ commonfooter(messages) | n,unicode }

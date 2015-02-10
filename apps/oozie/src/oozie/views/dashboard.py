@@ -43,7 +43,7 @@ from liboozie.submittion import Submission
 from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
-from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateEndTimeForm
 from oozie.models import Workflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History
 from oozie.settings import DJANGO_APPS
@@ -84,7 +84,12 @@ def manage_oozie_jobs(request, job_id, action):
 
   try:
     oozie_api = get_oozie(request.user)
-    response['data'] = oozie_api.job_control(job_id, action)
+    if action == 'change':
+      end_time = 'endtime=%s' % (request.POST.get('end_time'))
+      response['data'] = oozie_api.job_control(job_id, action, parameters={'value': end_time})
+    else:
+      response['data'] = oozie_api.job_control(job_id, action)
+
     response['status'] = 0
     if 'notification' in request.POST:
       request.info(_(request.POST.get('notification')))
@@ -340,6 +345,7 @@ def list_oozie_coordinator(request, job_id):
     oozie_slas = oozie_api.get_oozie_slas(**params)
 
   enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
+  update_endtime_form = UpdateEndTimeForm()
 
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
@@ -350,6 +356,7 @@ def list_oozie_coordinator(request, job_id):
     'show_all_actions': show_all_actions,
     'MAX_COORD_ACTIONS': MAX_COORD_ACTIONS,
     'enable_cron_scheduling': enable_cron_scheduling,
+    'update_endtime_form': update_endtime_form,
   })
 
 

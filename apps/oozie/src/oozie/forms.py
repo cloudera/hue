@@ -526,6 +526,14 @@ class BundleForm(forms.ModelForm):
       'schema_version': forms.widgets.HiddenInput(),
     }
 
+class UpdateEndTimeForm(forms.Form):
+  end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'update_endtime'},
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+
+  def __init__(self, *args, **kwargs):
+    super(UpdateEndTimeForm, self).__init__(*args, **kwargs)
+
 
 def design_form_by_type(node_type, user, workflow):
   klass_form = _node_type_TO_FORM_CLS[node_type]
