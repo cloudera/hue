@@ -23,6 +23,7 @@ engine_modules = {
     'doj.backends.zxjdbc.postgresql': 'postgresql_psycopg2', #django-jython
     'doj.backends.zxjdbc.mysql': 'mysql', #django-jython
     'doj.backends.zxjdbc.oracle': 'oracle', #django-jython
+    'mysql.connector.django': 'mysql', # MySQL Connector/Python
 }
 
 # First, work out if we're multi-db or not, and which databases we have
