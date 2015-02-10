@@ -78,6 +78,7 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
 
   num_rows_seen = 0
   limit_rows = max_rows > -1
+
   while results is not None:
     data = []
     for row in results.rows():

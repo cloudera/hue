@@ -204,8 +204,7 @@ for x in sys.stdin:
     # Minimal server operation
     assert_equal(['default', 'other_db'], self.db.get_databases())
 
-    # Query the data
-    # We use a semicolon here for kicks; the code strips it out.
+    # Use GROUP BY to trigger MR job
     QUERY = """
       SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
     """
@@ -218,9 +217,8 @@ for x in sys.stdin:
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
 
-    assert_equal([0, 255, 32640], content["results"][0], content)
+    assert_equal([0, 255, 32640], content["results"][0], content["results"][0])
     assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col['type'] for col in content["columns"]])
-    assert_equal(1, len(content["hadoop_jobs"]), content) # Should be 1 after HS2 bug is fixed
     self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
 
     # Query multi-page request
