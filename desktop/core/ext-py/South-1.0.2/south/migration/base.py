@@ -138,7 +138,15 @@ class Migrations(with_metaclass(MigrationsMetaclass, list)):
             if app_label in settings.SOUTH_MIGRATION_MODULES:
                 # There's an override.
                 return settings.SOUTH_MIGRATION_MODULES[app_label]
-        return self._application.__name__ + '.migrations'
+        # We see if the south_migrations module exists first, and
+        # use that if we find it.
+        module_name = self._application.__name__ + '.south_migrations'
+        try:
+            importlib.import_module(module_name)
+        except ImportError:
+            return self._application.__name__ + '.migrations'
+        else:
+            return module_name
 
     def get_application(self):
         return self._application
@@ -149,7 +157,7 @@ class Migrations(with_metaclass(MigrationsMetaclass, list)):
         Imports the migrations module object, and throws a paddy if it can't.
         """
         self._application = application
-        if not hasattr(application, 'migrations'):
+        if not hasattr(application, 'migrations') and not hasattr(application, 'south_migrations'):
             try:
                 module = importlib.import_module(self.migrations_module())
                 self._migrations = application.migrations = module
@@ -160,7 +168,10 @@ class Migrations(with_metaclass(MigrationsMetaclass, list)):
                     self._migrations = application.migrations = module
                 else:
                     raise exceptions.NoMigrations(application)
-        self._load_migrations_module(application.migrations)
+        if hasattr(application, 'south_migrations'):
+            self._load_migrations_module(application.south_migrations)
+        else:
+            self._load_migrations_module(application.migrations)
 
     application = property(get_application, set_application)
 

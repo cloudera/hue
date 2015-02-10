@@ -9,13 +9,14 @@ import traceback
 from django.core.management import call_command
 from django.core.management.commands import loaddata
 from django.db import models
+from django import VERSION as DJANGO_VERSION
 
 import south.db
 from south import exceptions
 from south.db import DEFAULT_DB_ALIAS
 from south.models import MigrationHistory
 from south.signals import ran_migration
-from south.utils.py3 import StringIO
+from south.utils.py3 import StringIO, iteritems
 
 
 class Migrator(object):
@@ -30,7 +31,7 @@ class Migrator(object):
     def print_title(self, target):
         if self.verbosity:
             print(self.title(target))
-        
+
     @staticmethod
     def status(target):
         raise NotImplementedError()
@@ -98,7 +99,7 @@ class Migrator(object):
             except:
                 print("Error during commit in migration: %s" % migration)
                 raise
-                
+
 
     def run(self, migration, database):
         # Get the correct ORM.
@@ -113,11 +114,14 @@ class Migrator(object):
         return self.run_migration(migration, database)
 
 
-    def send_ran_migration(self, migration):
+    def send_ran_migration(self, migration, database):
         ran_migration.send(None,
                            app=migration.app_label(),
                            migration=migration,
-                           method=self.__class__.__name__.lower())
+                           method=self.__class__.__name__.lower(),
+                           verbosity=self.verbosity,
+                           interactive=self.interactive,
+                           db=database)
 
     def migrate(self, migration, database):
         """
@@ -127,7 +131,7 @@ class Migrator(object):
         migration_name = migration.name()
         self.print_status(migration)
         result = self.run(migration, database)
-        self.send_ran_migration(migration)
+        self.send_ran_migration(migration, database)
         return result
 
     def migrate_many(self, target, migrations, database):
@@ -157,7 +161,8 @@ class DryRunMigrator(MigratorWrapper):
             if self.verbosity:
                 print(" - Migration '%s' is marked for no-dry-run." % migration)
             return
-        south.db.db.dry_run = True
+        for name, db in iteritems(south.db.dbs):
+            south.db.dbs[name].dry_run = True
         # preserve the constraint cache as it can be mutated by the dry run
         constraint_cache = deepcopy(south.db.db._constraint_cache)
         if self._ignore_fail:
@@ -176,7 +181,8 @@ class DryRunMigrator(MigratorWrapper):
             if self._ignore_fail:
                 south.db.db.debug = old_debug
             south.db.db.clear_run_data(pending_creates)
-            south.db.db.dry_run = False
+            for name, db in iteritems(south.db.dbs):
+                south.db.dbs[name].dry_run = False
             # restore the preserved constraint cache from before dry run was
             # executed
             south.db.db._constraint_cache = constraint_cache
@@ -205,13 +211,19 @@ class FakeMigrator(MigratorWrapper):
 
 
 class LoadInitialDataMigrator(MigratorWrapper):
-    
+
     def load_initial_data(self, target, db='default'):
         if target is None or target != target.migrations[-1]:
             return
         # Load initial data, if we ended up at target
         if self.verbosity:
             print(" - Loading initial data for %s." % target.app_label())
+        if DJANGO_VERSION < (1, 6):
+            self.pre_1_6(target, db)
+        else:
+            self.post_1_6(target, db)
+
+    def pre_1_6(self, target, db):
         # Override Django's get_apps call temporarily to only load from the
         # current app
         old_get_apps = models.get_apps
@@ -223,6 +235,21 @@ class LoadInitialDataMigrator(MigratorWrapper):
         finally:
             models.get_apps = old_get_apps
             loaddata.get_apps = old_get_apps
+
+    def post_1_6(self, target, db):
+        import django.db.models.loading
+        ## build a new 'AppCache' object with just the app we care about.
+        old_cache = django.db.models.loading.cache
+        new_cache = django.db.models.loading.AppCache()
+        new_cache.get_apps = lambda: [new_cache.get_app(target.app_label())]
+
+        ## monkeypatch
+        django.db.models.loading.cache = new_cache
+        try:
+            call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=db)
+        finally:
+            ## unmonkeypatch
+            django.db.models.loading.cache = old_cache
 
     def migrate_many(self, target, migrations, database):
         migrator = self._migrator
