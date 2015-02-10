@@ -16,7 +16,6 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from django.template.defaultfilters import date, time
-import urllib
 from django.utils.translation import ugettext as _
 %>
 
@@ -88,7 +87,7 @@ ${layout.menubar(section='users')}
           <td>
             %if user.is_superuser or user.username == listed_user.username:
               <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
-                         href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }"
+                         href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
                          data-row-selector="true">${listed_user.username}</a></strong>
             %else:
               <strong>${listed_user.username}</strong>

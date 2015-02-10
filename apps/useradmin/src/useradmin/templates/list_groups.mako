@@ -14,8 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import urllib
-
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
@@ -82,7 +80,7 @@ ${layout.menubar(section='groups')}
           <td>
             %if user.is_superuser:
               <strong><a title="${ _('Edit %(groupname)s') % dict(groupname=group.name) }"
-                         href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }"
+                         href="${ url('useradmin.views.edit_group', name=group.name) }"
                          data-row-selector="true">${group.name}</a></strong>
             %else:
               <strong>${group.name}</strong>
