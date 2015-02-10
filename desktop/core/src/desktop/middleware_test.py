@@ -121,24 +121,39 @@ def test_ensure_safe_redirect_middleware():
     # Super user
     c = make_logged_in_client()
 
-    # GET works
-    response = c.get("/useradmin/")
-    assert_equal(200, response.status_code)
+    # POST works
+    response = c.post("/accounts/login/", {
+      'username': 'test',
+      'password': 'test',
+    })
+    assert_equal(302, response.status_code)
 
     # Disallow most redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\d+$'))
-    response = c.get("")
+    response = c.post("/accounts/login/", {
+      'username': 'test',
+      'password': 'test',
+      'next': 'http://example.com',
+    })
     assert_equal(403, response.status_code)
 
     # Allow all redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('.*'))
-    response = c.get("")
+    response = c.post("/accounts/login/", {
+      'username': 'test',
+      'password': 'test',
+      'next': 'http://example.com',
+    })
     assert_equal(302, response.status_code)
 
     # Allow all redirects and disallow most at the same time.
     # should have a logic OR functionality.
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+,.*'))
-    response = c.get("")
+    response = c.post("", {
+      'username': 'test',
+      'password': 'test',
+      'next': 'http://example.com',
+    })
     assert_equal(302, response.status_code)
   finally:
     settings.MIDDLEWARE_CLASSES.pop()
