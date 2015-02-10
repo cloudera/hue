@@ -15,7 +15,6 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
-import urllib
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
 from django.contrib.auth.models import Group
@@ -51,7 +50,7 @@ ${layout.menubar(section='permissions')}
           <td>
             %if user.is_superuser:
               <strong><a title="${_('Edit permission')}"
-                         href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }"
+                         href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
                          data-name="${perm.app}" data-row-selector="true">${perm.app}</a></strong>
             %else:
               <strong>${perm.app}</strong>
