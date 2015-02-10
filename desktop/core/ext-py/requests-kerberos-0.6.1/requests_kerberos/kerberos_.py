@@ -81,9 +81,11 @@ def _negotiate_value(response):
 class HTTPKerberosAuth(AuthBase):
     """Attaches HTTP GSSAPI/Kerberos Authentication to the given Request
     object."""
-    def __init__(self, mutual_authentication=REQUIRED):
+    def __init__(self, mutual_authentication=REQUIRED, service="HTTP"):
         self.context = {}
         self.mutual_authentication = mutual_authentication
+        self.pos = None
+        self.service = service
 
     def generate_request_header(self, response):
         """
@@ -96,10 +98,9 @@ class HTTPKerberosAuth(AuthBase):
 
         try:
             result, self.context[host] = kerberos.authGSSClientInit(
-                "HTTP@{0}".format(host))
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientInit() failed:")
-            log.exception(e)
+                "{0}@{1}".format(self.service, host))
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientInit() failed:")
             return None
 
         if result < 1:
@@ -110,9 +111,8 @@ class HTTPKerberosAuth(AuthBase):
         try:
             result = kerberos.authGSSClientStep(self.context[host],
                                                 _negotiate_value(response))
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientStep() failed:")
-            log.exception(e)
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientStep() failed:")
             return None
 
         if result < 0:
@@ -122,10 +122,9 @@ class HTTPKerberosAuth(AuthBase):
 
         try:
             gss_response = kerberos.authGSSClientResponse(self.context[host])
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientResponse() "
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientResponse() "
                       "failed:")
-            log.exception(e)
             return None
 
         return "Negotiate {0}".format(gss_response)
@@ -225,13 +224,12 @@ class HTTPKerberosAuth(AuthBase):
         try:
             result = kerberos.authGSSClientStep(self.context[host],
                                                 _negotiate_value(response))
-        except kerberos.GSSError as e:
-            log.error("authenticate_server(): authGSSClientStep() failed:")
-            log.exception(e)
+        except kerberos.GSSError:
+            log.exception("authenticate_server(): authGSSClientStep() failed:")
             return False
 
         if result < 1:
-            log.error("auhenticate_server(): authGSSClientStep() failed: "
+            log.error("authenticate_server(): authGSSClientStep() failed: "
                       "{0}".format(result))
             return False
 
@@ -241,10 +239,15 @@ class HTTPKerberosAuth(AuthBase):
     def handle_response(self, response, **kwargs):
         """Takes the given response and tries kerberos-auth, as needed."""
 
+        if self.pos is not None:
+            # Rewind the file position indicator of the body to where
+            # it was to resend the request.
+            response.request.body.seek(self.pos)
+
         if response.status_code == 401:
             _r = self.handle_401(response, **kwargs)
             log.debug("handle_response(): returning {0}".format(_r))
-            return _r
+            return self.handle_response(_r, **kwargs)
         else:
             _r = self.handle_other(response)
             log.debug("handle_response(): returning {0}".format(_r))
@@ -256,4 +259,12 @@ class HTTPKerberosAuth(AuthBase):
 
     def __call__(self, request):
         request.register_hook('response', self.handle_response)
+        try:
+            self.pos = request.body.tell()
+        except AttributeError:
+            # In the case of HTTPKerberosAuth being reused and the body
+            # of the previous request was a file-like object, pos has
+            # the file position of the previous body. Ensure it's set to
+            # None.
+            self.pos = None
         return request

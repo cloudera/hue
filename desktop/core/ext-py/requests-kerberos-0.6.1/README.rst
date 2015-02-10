@@ -25,10 +25,10 @@ Mutual Authentication
 ---------------------
 
 By default, ``HTTPKerberosAuth`` will require mutual authentication from the
-server, and if a server emits a non-error response which is cannot be
+server, and if a server emits a non-error response which cannot be
 authenticated, a ``requests_kerberos.errors.MutualAuthenticationError`` will be
-raised. IF a server emits an error which cannot be authenticated, it will be
-returned to the user but with it's contents and headers stripped.
+raised. If a server emits an error which cannot be authenticated, it will be
+returned to the user but with its contents and headers stripped.
 
 OPTIONAL
 ^^^^^^^^
@@ -65,7 +65,7 @@ authentication, you can do that as well:
 Logging
 -------
 
-This library makes extensive use of python's logging facilities. 
+This library makes extensive use of Python's logging facilities.
 
 Log messages are logged to the ``requests_kerberos`` and
 ``requests_kerberos.kerberos_`` named loggers.
