@@ -170,7 +170,7 @@ class HiveServerTRowSet2:
     self.startRowOffset = row_set.startRowOffset
 
   def is_empty(self):
-    return len(self.rows) == 0
+    return len(self.row_set.columns) == 0
 
   def cols(self, col_names):
     cols_rows = []
