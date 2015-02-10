@@ -48,6 +48,7 @@ class DjangoSetUpPlugin(AlwaysOnPlugin):
 
     """
     name = 'django setup'
+    score = 150
 
     def __init__(self, runner):
         super(DjangoSetUpPlugin, self).__init__()

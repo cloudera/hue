@@ -5,6 +5,8 @@ DATABASES = {
     }
 }
 
+MIDDLEWARE_CLASSES = ()
+
 INSTALLED_APPS = (
     'django_nose',
 )
