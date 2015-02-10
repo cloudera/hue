@@ -96,7 +96,8 @@ def get_csv(client, result_response):
   content = json.loads(result_response.content)
   assert_true(content['isSuccess'])
   csv_link = '/beeswax/download/%s/csv' % content['id']
-  return client.get(csv_link).content
+  csv_resp = client.get(csv_link)
+  return ''.join(csv_resp.streaming_content)
 
 
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
@@ -243,7 +244,7 @@ for x in sys.stdin:
     # Download the data
     response = self.client.get(content["download_urls"]["csv"])
     # Header line plus data lines...
-    assert_equal(257, response.content.count("\n"))
+    assert_equal(257, ''.join(response.streaming_content).count("\n"))
 
   def test_result_escaping(self):
     # Check for XSS and NULL display
@@ -636,7 +637,8 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
     # Get the result in csv. Should have 3 + 1 header row.
     csv_resp = download(handle, 'csv', self.db)
-    assert_equal(len(csv_resp.content.strip().split('\n')), limit + 1)
+    csv_content = ''.join(csv_resp.streaming_content)
+    assert_equal(len(csv_content.strip().split('\n')), limit + 1)
 
   def test_query_done_cb(self):
     hql = 'SELECT * FROM test'
@@ -667,7 +669,7 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
     xls_resp = download(handle, 'xls', self.db)
 
-    dataset.xls = xls_resp.content
+    dataset.xls = ''.join(xls_resp.streaming_content)
     # It should have 257 lines (256 + header)
     assert_equal(len(dataset.csv.strip('\r\n').split('\r\n')), 257, dataset.csv)
 
@@ -675,7 +677,8 @@ for x in sys.stdin:
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
     csv_resp = download(handle, 'csv', self.db)
-    assert_equal(csv_resp.content.replace('.0', ''), dataset.csv.replace('.0', ''))
+    csv_content = ''.join(csv_resp.streaming_content)
+    assert_equal(csv_content.replace('.0', ''), dataset.csv.replace('.0', ''))
 
   def test_data_upload(self):
     hql = 'SELECT * FROM test'
