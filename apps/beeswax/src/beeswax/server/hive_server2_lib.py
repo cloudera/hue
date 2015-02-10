@@ -222,11 +222,9 @@ class HiveServerTColumnValue2:
 
   @property
   def val(self):
-    # TODO get index from schema
-    if self.column_value.boolVal is not None:
-      return self.column_value.boolVal.values
-    elif self.column_value.byteVal is not None:
-      return self.column_value.byteVal.values
+    # Could directly get index from schema but would need to cache the schema
+    if self.column_value.stringVal:
+      return self.column_value.stringVal.values
     elif self.column_value.i16Val is not None:
       return self.column_value.i16Val.values
     elif self.column_value.i32Val is not None:
@@ -235,8 +233,12 @@ class HiveServerTColumnValue2:
       return self.column_value.i64Val.values
     elif self.column_value.doubleVal is not None:
       return self.column_value.doubleVal.values
-    elif self.column_value.stringVal != []:
-      return self.column_value.stringVal.values
+    elif self.column_value.boolVal is not None:
+      return self.column_value.boolVal.values
+    elif self.column_value.byteVal is not None:
+      return self.column_value.byteVal.values
+    elif self.column_value.binaryVal is not None:
+      return self.column_value.binaryVal.values
 
 
 class HiveServerDataTable(DataTable):
@@ -343,7 +345,6 @@ class HiveServerTColumnValue:
 
   @property
   def val(self):
-    # TODO get index from schema
     if self.column_value.boolVal is not None:
       return self.column_value.boolVal.value
     elif self.column_value.byteVal is not None:
@@ -697,11 +698,14 @@ class HiveServerClient:
 
 
   def fetch_log(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
-    req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation,
-                           maxRows=max_rows, fetchType=1)
+    req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows, fetchType=1)
     res = self.call(self._client.FetchResults, req)
 
-    lines = imap(lambda r: r.colVals[0].stringVal.value, res.results.rows)
+    if beeswax_conf.THRIFT_VERSION.get() >= 7:
+      lines = res.results.columns[0].stringVal.values
+    else:
+      lines = imap(lambda r: r.colVals[0].stringVal.value, res.results.rows)
+
     return '\n'.join(lines)
 
 
