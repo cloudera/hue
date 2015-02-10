@@ -1438,7 +1438,8 @@ for x in sys.stdin:
 
     resp = self.client.get("/beeswax/results/%s/0?format=json" % history_id)
     content = json.loads(resp.content)
-    assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [u'NULL'], [u'NULL'], [u'NULL']], content['results'])
+    # assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [u'NULL'], [u'NULL'], [u'NULL']], content['results']) # New Hive does not return NULL anymore
+    assert_equal([[1.0], [2.0], [3.0], [u'NaN'], [0.0], [0.0], [0.0]], content['results'])
 
 
   def test_create_database(self):
