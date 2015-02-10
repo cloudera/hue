@@ -654,7 +654,7 @@ class TestStrictRedirection():
   def setUp(self):
     self.client = make_logged_in_client()
     self.user = dict(username="test", password="test")
-    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$')
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/example.com\/.*$')
 
   def test_redirection_blocked(self):
     # Redirection with code 301 should be handled properly
@@ -670,12 +670,16 @@ class TestStrictRedirection():
     self._test_redirection(redirection_url='/', expected_status_code=302)
     self._test_redirection(redirection_url='/pig', expected_status_code=302)
     self._test_redirection(redirection_url='http://testserver/', expected_status_code=302)
+    self._test_redirection(redirection_url='https://testserver/', expected_status_code=302, **{
+      'SERVER_PORT': '443',
+      'wsgi.url_scheme': 'https',
+    })
+    self._test_redirection(redirection_url='http://example.com/', expected_status_code=302)
 
-  def _test_redirection(self, redirection_url, expected_status_code):
-    self.client.get('/accounts/logout')
-    response = self.client.post('/accounts/login/?next=' + redirection_url, self.user)
+  def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
+    self.client.get('/accounts/logout', **kwargs)
+    response = self.client.post('/accounts/login/?next=' + redirection_url, self.user, **kwargs)
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
         assert_true(error_msg in response.content, response.content)
-
