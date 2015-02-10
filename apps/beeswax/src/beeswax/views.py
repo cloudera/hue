@@ -459,7 +459,6 @@ def view_results(request, id, first_row=0):
   query_context = parse_query_context(context_param)
 
   # Update the status as expired should not be accessible
-  # Impala does not support startover for now
   expired = state == models.QueryHistory.STATE.expired
 
   # Retrieve query results or use empty result if no result set
