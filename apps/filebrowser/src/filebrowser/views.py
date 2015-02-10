@@ -40,7 +40,7 @@ from django.views.static import was_modified_since
 from django.shortcuts import redirect
 from django.template.defaultfilters import urlencode
 from django.utils.functional import curry
-from django.utils.http import http_date, urlquote
+from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from cStringIO import StringIO
@@ -484,7 +484,7 @@ def _massage_stats(request, stats):
         'type': filetype(stats['mode']),
         'rwx': rwx(stats['mode'], stats['aclBit']),
         'mode': stringformat(stats['mode'], "o"),
-        'url': make_absolute(request, "view", dict(path=urlquote(normalized))),
+        'url': make_absolute(request, "view", dict(path=normalized)),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
 
