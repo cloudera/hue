@@ -20,6 +20,6 @@ from .compat import NullHandler
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
-__all__ = [HTTPKerberosAuth, MutualAuthenticationError, REQUIRED, OPTIONAL,
-           DISABLED]
-__version__ = '0.3'
+__all__ = ('HTTPKerberosAuth', 'MutualAuthenticationError', 'REQUIRED',
+           'OPTIONAL', 'DISABLED')
+__version__ = '0.6.1'
