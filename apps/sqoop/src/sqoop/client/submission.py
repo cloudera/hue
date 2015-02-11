@@ -74,7 +74,7 @@ class Submission(object):
     return d
 
 
-class SqoopSubmissionException(SqoopException):
+class SqoopSubmissionException(Exception):
 
   def __init__(self, job_id, status, progress, created, updated, **kwargs):
     self.job_id = job_id

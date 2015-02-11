@@ -68,7 +68,7 @@ class Link(object):
       'update-user': self.update_user,
       'update-date': self.update_date,
       'connector-id': self.connector_id,
-      'link-config-values': [ connector.to_dict() for connector in self.link_config_values ],
+      'link-config-values': [ config.to_dict() for config in self.link_config_values ],
       'enabled': self.enabled
     }
     return d
@@ -81,21 +81,3 @@ class Link(object):
       if key not in Link.SKIP:
         if hasattr(link, key):
           setattr(self, key, getattr(link, key))
-
-
-class SqoopLinkException(SqoopException):
-  def __init__(self, link_config_values):
-    self.link_config_values = link_config_values
-
-  @classmethod
-  def from_dict(cls, error_dict):
-    return SqoopLinkException(**force_dict_to_strings(error_dict))
-
-  def to_dict(self):
-    return {
-      'link-config-values': self.link_config_values
-    }
-
-  def __str__(self):
-    return 'Link Config Values: %s\n' % (self.link_config_values)
-

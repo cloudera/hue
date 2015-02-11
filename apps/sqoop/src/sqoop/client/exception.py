@@ -16,8 +16,23 @@
 
 import logging
 
+from desktop.lib.python_util import force_dict_to_strings
+
 from config import Config
 
 
 class SqoopException(Exception):
-  pass
+  def __init__(self, errors):
+    self.errors = errors
+
+  @classmethod
+  def from_dicts(cls, error_dicts):
+    return SqoopException([force_dict_to_strings(d) for d in error_dicts])
+
+  def to_dict(self):
+    return {
+      'errors': self.errors
+    }
+
+  def __str__(self):
+    return 'Errors: %s\n' % (self.errors)

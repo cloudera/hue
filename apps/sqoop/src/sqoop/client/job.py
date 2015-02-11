@@ -105,25 +105,3 @@ class Job(object):
     for key in self.__dict__:
       if key not in Job.SKIP:
         setattr(self, key, getattr(job, key, getattr(self, key)))
-
-class SqoopJobException(SqoopException):
-  def __init__(self, from_config_values, to_config_values, driver_config_values):
-    self.link_config_values = from_config_values
-    self.link_config_values = to_config_values
-    self.link_config_values = driver_config_values
-
-
-  @classmethod
-  def from_dict(cls, error_dict):
-    return SqoopJobException(**force_dict_to_strings(error_dict))
-
-  def to_dict(self):
-    return {
-      'from-config-values': self.from_config_values,
-      'to-config-values': self.to_config_values,
-      'driver-config-values': self.driver_config_values
-    }
-
-  def __str__(self):
-    return 'From Config Values: %s\nTo Config Values: %s\nDriver Config Values: %s\n' % (self.from_config_values, self.to_config_values, self.driver_config_values)
-

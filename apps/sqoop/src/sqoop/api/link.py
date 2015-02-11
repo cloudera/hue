@@ -27,7 +27,7 @@ from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
-from sqoop.client.link import SqoopLinkException
+from sqoop.client.exception import SqoopException
 from decorators import get_link_or_exception
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
@@ -73,7 +73,7 @@ def create_link(request):
     response['link'] = c.create_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not create link.')))
-  except SqoopLinkException, e:
+  except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -96,7 +96,7 @@ def update_link(request, link):
     response['link'] = c.update_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not update link.')))
-  except SqoopLinkException, e:
+  except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -145,7 +145,7 @@ def link_clone(request, link):
     response['link'] = c.create_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not clone link.')))
-  except SqoopLinkException, e:
+  except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -166,7 +166,7 @@ def link_delete(request, link):
     c.delete_link(link)
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not delete link.')))
-  except SqoopLinkException, e:
+  except SqoopException, e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")

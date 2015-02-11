@@ -58,7 +58,6 @@ class Input(object):
   def from_dict(input_dict):
     if 'values' in input_dict and isinstance(input_dict['values'], basestring):
       input_dict['values'] = input_dict['values'].split(',')
-
     return Input(**force_dict_to_strings(input_dict))
 
   def to_dict(self):
@@ -66,10 +65,12 @@ class Input(object):
       'id': self.id,
       'type': self.type,
       'name': self.name,
-      'sensitive': self.sensitive
+      'sensitive': self.sensitive,
     }
     if self.value:
       d['value'] = self.value
     if self.size != -1:
       d['size'] = self.size
+    if self.values:
+      d['values'] = ','.join(self.values)
     return d

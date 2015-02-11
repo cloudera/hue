@@ -29,7 +29,8 @@ var links = (function($) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
       _attrs = transform_keys(_attrs, {
-        'connector-id': 'connector_id'
+        'connector-id': 'connector_id',
+        'link-config-values': 'link_config_values'
       });
       _attrs = transform_values(_attrs, {
         'link_config_values': to_configs
@@ -39,7 +40,7 @@ var links = (function($) {
   });
 
   var Link = koify.Node.extend({
-    'identifier': 'linkConfig',
+    'identifier': 'link',
     'persists': true,
     'model_class': LinkModel,
     'base_url': '/sqoop/api/links/',
@@ -47,8 +48,45 @@ var links = (function($) {
       var self = this;
       self.parent.initialize.apply(self, arguments);
       self.selected = ko.observable();
+      self.connectors = ko.observableArray();
       self.persisted = ko.computed(function() {
         return self.id() > -1;
+      });
+      self.connector = ko.computed(function() {
+        var connector = null;
+        $.each(self.connectors(), function(index, $connector) {
+          if ($connector.id() == self.connector_id()) {
+            connector = $connector;
+          }
+        });
+        return connector;
+      });
+      self.isHdfs = ko.computed(function() {
+        if (!self.connector()) {
+          return false;
+        }
+
+        return self.connector().name() == connectors.CONNECTOR_NAMES[0];
+      });
+      self.isRdbms = ko.computed(function() {
+        if (!self.connector()) {
+          return false;
+        }
+
+        return self.connector().name() == connectors.CONNECTOR_NAMES[1];
+      });
+      self.hdfsUri = ko.computed(function() {
+        var hdfs_uri = null;
+        $.each(self.link_config_values(), function(index, config) {
+          if (config.name() == 'linkConfig') {
+            $.each(config.inputs(), function(index, input) {
+              if (input.name() == 'linkConfig.uri') {
+                hdfs_uri = input.value();
+              }
+            });
+          }
+        });
+        return hdfs_uri;
       });
       self.connectionString = ko.computed(function() {
         var link_string = null;
@@ -121,12 +159,18 @@ var links = (function($) {
         }
       });
       self.hostAndPort = ko.computed(function() {
-        if (self.host()) {
-          if (self.port()) {
-            return self.host() + ":" + self.port();
+        if (self.isRdbms()) {
+          if (self.host()) {
+            if (self.port()) {
+              return self.host() + ":" + self.port();
+            } else {
+              return self.host();
+            }
           } else {
-            return self.host();
+            return null;
           }
+        } else if (self.isHdfs()) {
+          return self.hdfsUri();
         } else {
           return null;
         }
@@ -180,17 +224,23 @@ var links = (function($) {
         return password;
       });
       self.type = ko.computed(function() {
-        var conn_string = self.connectionString();
-        if (!conn_string) {
+        if (self.isRdbms()) {
+          var conn_string = self.connectionString();
+          if (!conn_string) {
+            return "unknown";
+          }
+
+          var parts = conn_string.split(':');
+          if (parts.length < 2) {
+            return "unknown";
+          }
+
+          return parts[1];
+        } else if (self.isHdfs()) {
+          return "HDFS"
+        } else {
           return "unknown";
         }
-
-        var parts = conn_string.split(':');
-        if (parts.length < 2) {
-          return "unknown";
-        }
-
-        return parts[1];
       });
     },
     'map': function() {
@@ -204,6 +254,16 @@ var links = (function($) {
             var mapped = ko.mapping.fromJS(self.model, mapping_options);
             $.extend(self, mapped);
         }
+    },
+    'getData': function() {
+      var self = this;
+      var model = ko.sqoop.fixModel(self);
+      var data = {};
+      model = transform_keys(model, {
+        'link_config_values': 'link-config-values'
+      });
+      data[self.identifier] = ko.utils.stringifyJson(model);
+      return data;
     }
   });
 
