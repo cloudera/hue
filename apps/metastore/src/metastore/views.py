@@ -146,7 +146,10 @@ def describe_table(request, database, table):
   try:
     table = db.get_table(database, table)
   except Exception, e:
-    raise PopupException(_("Hive Error"), detail=e)
+    if hasattr(e, 'message') and e.message:
+      raise PopupException(_("Hive Error"), detail=e.message)
+    else:
+      raise PopupException(_("Hive Error"), detail=e)
 
   partitions = None
   if app_name != 'impala' and table.partition_keys:
