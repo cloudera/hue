@@ -52,21 +52,9 @@ abstract class WebSession(val id: String, hostname: String, port: Int) extends S
     }
   }
 
-  override def statement(statementId: Int): Option[Statement] = {
-    ensureRunning {
-      if (statementId < statements_.length) {
-        Some(statements_(statementId))
-      } else {
-        None
-      }
-    }
-  }
+  override def statement(statementId: Int): Option[Statement] = statements_.lift(statementId)
 
-  override def statements(): Seq[Statement] = {
-    ensureRunning {
-      statements_.toSeq
-    }
-  }
+  override def statements(): Seq[Statement] = statements_.toSeq
 
   override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = {
     ensureRunning {

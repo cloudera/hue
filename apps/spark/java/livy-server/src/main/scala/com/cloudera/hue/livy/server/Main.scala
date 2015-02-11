@@ -9,20 +9,21 @@ import org.scalatra.servlet.ScalatraListener
 object Main {
 
   val SESSION_KIND = "livy-server.session.kind"
+  val THREAD_SESSION = "thread"
   val PROCESS_SESSION = "process"
   val YARN_SESSION = "yarn"
 
   def main(args: Array[String]): Unit = {
 
     if (args.length != 1) {
-      println("Must specify either `process` or `yarn` for the session kind")
+      println("Must specify either `thread`, `process`, or `yarn` for the session kind")
       sys.exit(1)
     }
 
     val session_kind = args(0)
 
     session_kind match {
-      case PROCESS_SESSION | YARN_SESSION =>
+      case THREAD_SESSION | PROCESS_SESSION | YARN_SESSION =>
       case _ =>
         println("Unknown session kind: " + session_kind)
         sys.exit(1)
@@ -49,6 +50,7 @@ class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext): Unit = {
     val sessionFactory = context.getInitParameter(Main.SESSION_KIND) match {
+      case Main.THREAD_SESSION => new ThreadSessionFactory
       case Main.PROCESS_SESSION => new ProcessSessionFactory
       case Main.YARN_SESSION => new YarnSessionFactory
     }
