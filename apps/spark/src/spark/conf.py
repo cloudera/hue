@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import json
-import os
 import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -31,7 +30,7 @@ def coerce_json(j):
 
 JOB_SERVER_URL = Config(
   key="server_url",
-  help=_t("URL of the Spark Job Server."),
+  help=_t("URL of the Livy Spark Server."),
   default="http://localhost:8998/"
 )
 
@@ -48,16 +47,15 @@ LANGUAGES = Config(
   ]"""
 )
 
+
 def get_spark_status(user):
   from spark.job_server_api import get_api
   status = None
 
   try:
     if not 'test' in sys.argv: # Avoid tests hanging
-      status = str(get_api(user).get_status())
-  except ValueError:
-    # No json returned
-    status = 'OK'
+      get_api(user).get_status()
+      status = 'OK'
   except:
     pass
 
@@ -70,6 +68,6 @@ def config_validator(user):
   status = get_spark_status(user)
 
   if status != 'OK':
-    res.append((NICE_NAME, _("The app won't work without a running Job Server")))
+    res.append((NICE_NAME, _("The app won't work without a running Livy Spark Server")))
 
   return res

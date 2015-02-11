@@ -216,7 +216,7 @@ def admin_collections(request, is_redirect=False):
         'absoluteUrl': collection.get_absolute_url()
       }
       collections.append(massaged_collection)
-    return JsonResponse(collections)
+    return JsonResponse(collections, safe=False)
 
   return render('admin_collections.mako', request, {
     'existing_hue_collections': existing_hue_collections,

@@ -840,7 +840,7 @@ def config_validator(user):
 
   res = []
   if not SECRET_KEY.get():
-    res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string."))))
+    res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
   # Validate SSL setup
   if SSL_CERTIFICATE.get():
