@@ -31,7 +31,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
     </div>
     <h4>${_('Sqoop Jobs')}</h4>
-    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
+    <input id="filter-jobs" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
   </div>
 
   <div class="top-bar" data-bind="visible:shownSection() == 'links-list'">
@@ -42,7 +42,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
     </div>
     <h4>${_('Sqoop Links')}</h4>
-    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
+    <input id="filter-links" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
   </div>
 
   <!-- ko if: job -->
@@ -51,12 +51,14 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
     <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'fa fa-arrow-circle-o-down': type() == 'IMPORT', 'fa fa-upload': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
+    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
   </div>
+  <!-- /ko -->
 
-  <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: editLink">
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i data-bind="css:{'fa fa-arrow-circle-o-down': $root.job().type() == 'IMPORT', 'fa fa-upload': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
+  <!-- ko if: link -->
+  <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: link">
+    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span data-bind="text: $root.link().name"></span></a></h4>
   </div>
   <!-- /ko -->
 </div>
@@ -239,38 +241,41 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       </div>
     </div>
 
-    <div id="link-editor" class="row-fluid section hide" data-bind="with: editLink">
+    <div id="link-editor" class="row-fluid section hide" data-bind="with: link">
       <div id="link-forms" class="span12">
-        <form method="POST" class="form form-horizontal noPadding">
-          ${ csrf_token(request) | n,unicode }
-          <div class="control-group">
-            <label class="control-label">${ _('Name') }</label>
-            <div class="controls">
-              <input type="text" name="link-name" data-bind="value: name">
+        <div class="card">
+          <form method="POST" class="form form-horizontal noPadding">
+            ${ csrf_token(request) | n,unicode }
+            <div data-bind="template: {'name': 'link-editor-form-error', 'data': {'name': ko.observable('linkConfig')}}" class=""></div>
+            <div class="control-group">
+              <label class="control-label">${ _('Name') }</label>
+              <div class="controls">
+                <input type="text" name="link-name" data-bind="value: name">
+              </div>
             </div>
-          </div>
-          <div class="control-group" data-bind="visible: !persisted()">
-            <label class="control-label">${ _('Connector') }</label>
-            <div class="controls">
-              <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
-              </select>
+            <div class="control-group" data-bind="visible: !persisted()">
+              <label class="control-label">${ _('Connector') }</label>
+              <div class="controls">
+                <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
+                </select>
+              </div>
             </div>
-          </div>
-          <fieldset data-bind="foreach: connector">
-            <div data-bind="foreach: inputs">
-              <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
+            <fieldset data-bind="foreach: link_config_values">
+              <div data-bind="foreach: inputs">
+                <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
+              </div>
+            </fieldset>
+            <fieldset data-bind="foreach: driver">
+              <div data-bind="foreach: inputs">
+                <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
+              </div>
+            </fieldset>
+            <div class="form-actions">
+              <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
+              <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
             </div>
-          </fieldset>
-          <fieldset data-bind="foreach: driver">
-            <div data-bind="foreach: inputs">
-              <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
-            </div>
-          </fieldset>
-          <div class="form-actions">
-            <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
-            <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -326,25 +331,28 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 
 <script type="text/html" id="job-list-item">
 <h4 style="display: inline-block">
-  <!-- ko if: type() == 'IMPORT' -->
   <i class="fa fa-download"></i>&nbsp;
-  <span data-bind="text: type"></span>
-  <span>${_('from ')}</span>
-  <span data-bind="text: $root.getDatabaseByConnectionId(link_id())"></span>
-  <span>${_('to ')}</span>
-  <span data-bind="text: storageType"></span>
-  <span data-bind="text: name" class="muted"></span>
-  <!-- /ko -->
-  <!-- ko if: type() == 'EXPORT' -->
-  <i class="fa fa-upload"></i>&nbsp;
-  <span data-bind="text: type"></span>
-  <span>${_('from ')}</span>
-  <span data-bind="text: storageType"></span>
-  <span>${_('to ')}</span>
-  <span data-bind="text: $root.getDatabaseByConnectionId(link_id())"></span>
-  <span data-bind="text: name" class="muted"></span>
-  <!-- /ko -->
+  <span data-bind="text: fromLabel"></span>
+  <span>${_(' to ')}</span>
+  <span data-bind="text: toLabel"></span>
 </h4>
+</script>
+
+<script type="text/html" id="link-editor-form-error">
+<!-- ko if: name() in $root.errors() -->
+  <div class="alert alert-error">
+  <!-- ko foreach: $root.errors()[name()]  -->
+    <span data-bind="text: message"></span>
+  <!-- /ko -->
+  </div>
+<!-- /ko -->
+<!-- ko if: name() in $root.warnings() -->
+  <div class="alert">
+  <!-- ko foreach: $root.warnings()[name()]  -->
+    <span data-bind="text: message"></span>
+  <!-- /ko -->
+  </div>
+<!-- /ko -->
 </script>
 
 <script type="text/html" id="job-editor-form-error">
@@ -389,31 +397,38 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   </div>
 
   <div class="control-group">
-    <label class="control-label">${ _('Job type') }</label>
+    <label class="control-label">${ _('From link') }</label>
     <div class="controls">
-      <div title="${ _('Import from a Database to Hadoop') }" data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'IMPORT' }, click: setImport">
-        <i class="fa fa-download"></i><br/>
-        ${ _('Import') }
+      <select name="from-link" class="input-xlarge" data-bind="'options': $root.persistedLinks, 'optionsText': function(item) {return item.name();}, 'value': $root.from_link">
+      </select>
+      <!-- ko if: $root.editLink() -->
+      <div style="display:inline">
+        <a data-bind="routie: 'link/edit/' + $root.from_link().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+          <i class="fa fa-edit"></i> ${_('Edit')}
+        </a>
+        <a data-bind="click: $root.showDeleteLinkModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+          <i class="fa fa-times"></i> ${_('Delete')}
+        </a>
       </div>
-      <div title="${ _('Import from Hadoop to a Database') }"data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'EXPORT' }, click: setExport">
-        <i class="fa fa-upload"></i><br/>
-        ${ _('Export') }
-      </div>
-      <input name="type" type="hidden" data-bind="value: type" />
+      <!-- /ko -->
+      <div class="clearfix"></div>
+      <a data-bind="routie: 'link/new'" href="javascript:void(0);" style="margin: 5px; display: block">
+        <i class="fa fa-plus"></i> ${_('Add a new link')}
+      </a>
     </div>
   </div>
 
   <div class="control-group">
-    <label class="control-label">${ _('Connection') }</label>
+    <label class="control-label">${ _('To link') }</label>
     <div class="controls">
-      <select name="link" class="input-xlarge" data-bind="'options': $root.persistedLinks, 'optionsText': function(item) {return item.name();}, 'value': $root.link">
+      <select name="from-link" class="input-xlarge" data-bind="'options': $root.persistedLinks, 'optionsText': function(item) {return item.name();}, 'value': $root.to_link">
       </select>
-      <!-- ko if: $root.link() -->
+      <!-- ko if: $root.editLink() -->
       <div style="display:inline">
-        <a data-bind="routie: 'link/edit/' + $root.link().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+        <a data-bind="routie: 'link/edit/' + $root.to_link().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
           <i class="fa fa-edit"></i> ${_('Edit')}
         </a>
-        <a data-bind="click: $root.showDeleteConnectionModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+        <a data-bind="click: $root.showDeleteLinkModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
           <i class="fa fa-times"></i> ${_('Delete')}
         </a>
       </div>
@@ -427,16 +442,30 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </fieldset>
 </script>
 
-<script type="text/html" id="job-editor-connector">
-<fieldset data-bind="foreach: connector">
+<script type="text/html" id="job-editor-from">
+<fieldset data-bind="foreach: from_config_values">
   <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
   <div data-bind="foreach: inputs">
     <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
   </div>
 </fieldset>
+
+<fieldset data-bind="foreach: driver_config_values">
+  <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
+  <div data-bind="foreach: inputs">
+    <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
+  </div>
+</fieldset>
 </script>
 
-<script type="text/html" id="job-editor-driver">
+<script type="text/html" id="job-editor-to">
+<fieldset data-bind="foreach: to_config_values">
+  <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
+  <div data-bind="foreach: inputs">
+    <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
+  </div>
+</fieldset>
+
 <fieldset data-bind="foreach: driver">
   <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
   <div data-bind="foreach: inputs">
@@ -670,40 +699,40 @@ viewModel.job.subscribe(function(job) {
     viewModel.jobWizard.clearPages();
     if (job.persisted()) {
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-connector',
-        'caption': job.type() == 'IMPORT' ? '${_("Step 1: From")}' : '${_("Step 1: To")}',
+        'identifier': 'job-editor-from',
+        'caption': '${_("Step 1: From")}',
         'description': '${_("Database")}',
         'node': job,
-        'template': 'job-editor-connector'
+        'template': 'job-editor-from'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-driver',
-        'caption': job.type() == 'IMPORT' ? '${_("Step 2: To")}' : '${_("Step 2: From")}',
+        'identifier': 'job-editor-to',
+        'caption': '${_("Step 2: To")}',
         'description': '${_("HDFS")}',
         'node': job,
-        'template': 'job-editor-driver'
+        'template': 'job-editor-to'
       }));
     } else {
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-begin',
-        'caption': '${_("Step 1: Type")}',
+        'caption': '${_("Step 1: Information")}',
         'description': '${_("Connection")}',
         'node': job,
         'template': 'job-editor-begin'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-connector',
+        'identifier': 'job-editor-from',
         'caption': '${_("Step 2: From")}',
         'description': '${_("Database")}',
         'node': job,
-        'template': 'job-editor-connector'
+        'template': 'job-editor-from'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-driver',
+        'identifier': 'job-editor-to',
         'caption': '${_("Step 3: To")}',
         'description': '${_("HDFS")}',
         'node': job,
-        'template': 'job-editor-driver'
+        'template': 'job-editor-to'
       }));
     }
   }
@@ -720,37 +749,35 @@ function handle_form_errors(e, node, options, data) {
   var errors = data.errors;
   viewModel.errors({});
   viewModel.warnings({});
-  var first_error_component = null;
 
   switch(data.status) {
     case 1:
-    $.each(errors, function(component, err) {
+    $.each(errors, function(index, err) {
       $(document).trigger("error", err);
     });
     break;
     case 100:
-    $.each(errors, function(component, dict) {
-      $.each(dict['messages'], function(resource, message_dict) {
+    $.each(errors['errors'], function(index, message_dict) {
+      $.each(message_dict, function(resource, message_arr) {
         var el = $('*[name="' + resource + '"]');
         var has_error = false;
 
         switch(message_dict.status) {
-          case 'ACCEPTABLE':
-          $.setdefault(viewModel.warnings(), resource, []).push(message_dict);
-          has_error = true;
-          break;
+          case 'WARN':
+            viewModel.warnings()[resource] = message_arr;
+            has_error = true;
+            break;
 
           default:
-          case 'UNACCEPTABLE':
-          $.setdefault(viewModel.errors(), resource, []).push(message_dict);
-          has_error = true;
-          break;
+          case 'ERROR':
+            viewModel.errors()[resource] = message_arr;
+            has_error = true;
+            break;
         }
 
+        viewModel.errors.valueHasMutated();
+
         if (has_error) {
-          if (!first_error_component) {
-            first_error_component = component;
-          }
           if (el.length > 0) {
             ko.dataFor(el[0]).name.valueHasMutated();
           }
@@ -760,11 +787,7 @@ function handle_form_errors(e, node, options, data) {
     break;
   }
 
-  if (first_error_component == 'connector') {
-    routie('job/edit/wizard/job-editor-connector');
-  } else if (first_error_component == 'driver') {
-    routie('job/edit/wizard/job-editor-driver');
-  }
+  routie('job/edit/wizard/job-editor-from');
 }
 
 function link_missing_error(e, node) {
@@ -901,8 +924,8 @@ $(document).on('shown_section', (function(){
   };
 })());
 
-$(document).on('keyup', 'input#filter', function() {
-  viewModel.filter($('#filter').val());
+$(document).on('keyup', 'input.sqoop-filter', function(e) {
+  viewModel.filter($(e.target).val());
 });
 
 $("#jobs-list tbody").on('click', 'tr', function() {
@@ -953,17 +976,21 @@ var driver = new driver.Driver();
   $(document).one('loaded.jobs', check);
   $(document).one('loaded.driver', check);
   $(document).one('loaded.connectors', check);
+  $(document).one('loaded.connectors', function() {
+    links.fetchLinks();
+  });
   $(document).one('loaded.links', check);
+  $(document).one('loaded.links', function() {
+    jobs.fetchJobs();
+  });
   $(document).one('loaded.submissions', check);
   $(document).one('loaded.jobs', function() {
-    driver.load();
-    connectors.fetchConnectors();
-    links.fetchLinks();
     submissions.fetchSubmissions();
   });
   viewModel.isLoading(true);
   viewModel.isReady(false);
-  jobs.fetchJobs();
+  driver.load();
+  connectors.fetchConnectors();
 })();
 
 var fetch_links = function() {
@@ -1213,21 +1240,17 @@ $(document).ready(function () {
       });
     },
     "link/edit-cancel": function() {
-      if (viewModel.link() && !viewModel.link().persisted()) {
-        viewModel.links.pop();
-      }
-      // routie('job/edit');
       window.history.go(-2);
     },
     "link/new": function() {
       $(window).one('hashchange', function() {
-        viewModel.newConnection();
+        viewModel.newLink();
         routie('link/edit');
       });
       window.history.back();
     },
     "link/save": function() {
-      viewModel.saveConnection();
+      viewModel.saveLink();
       $(document).one('saved.link', function(){
         routie('job/edit');
       });
@@ -1236,13 +1259,13 @@ $(document).ready(function () {
       });
     },
     "link/copy": function() {
-      if (viewModel.link()) {
+      if (viewModel.editLink()) {
         viewModel.link().clone();
       }
       routie('job/edit');
     },
     "link/delete": function() {
-      if (viewModel.link()) {
+      if (viewModel.editLink()) {
         viewModel.link().delete();
         $(document).one('deleted.link', function(){
           routie('job/edit');

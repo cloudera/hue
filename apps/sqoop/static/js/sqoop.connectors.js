@@ -16,6 +16,8 @@
 
 
 var connectors = (function($) {
+  var CONNECTOR_NAMES = ["hdfs-connector", "generic-jdbc-connector"];
+
   var ConnectorModel = koify.Model.extend({
     'id': -1,
     'name': null,
@@ -87,6 +89,7 @@ var connectors = (function($) {
   return {
     'ConnectorModel': ConnectorModel,
     'Connector': Connector,
-    'fetchConnectors': fetch_connectors
+    'fetchConnectors': fetch_connectors,
+    'CONNECTOR_NAMES': CONNECTOR_NAMES
   };
 })($);
