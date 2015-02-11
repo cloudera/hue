@@ -3,9 +3,10 @@ package com.cloudera.hue.livy.server.sessions
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
+import com.cloudera.hue.livy.server.sessions.Session._
 import dispatch._
 import org.json4s.jackson.Serialization.write
-import org.json4s.{JValue, DefaultFormats, Formats}
+import org.json4s.{DefaultFormats, Formats}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer

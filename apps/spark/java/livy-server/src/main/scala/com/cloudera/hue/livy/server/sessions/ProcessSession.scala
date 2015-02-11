@@ -3,6 +3,7 @@ package com.cloudera.hue.livy.server.sessions
 import java.lang.ProcessBuilder.Redirect
 
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
