@@ -2032,6 +2032,23 @@ class TestHiveServer2API():
                   None, 1, 1, 1, None, None, None, 1, None, 1, None, 1, None, None, 1, None, None, 1, 1, None, None, None, None, None, None, 1, None, None, None],
                  HiveServerTColumnValue2.set_nulls(data, nulls))
 
+  def test_column_detect_if_values_nulls(self):
+    data = [1, 2, 3]
+
+    nulls = ''
+    assert_true(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+    nulls = '\x00'
+    assert_true(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+    nulls = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    assert_true(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+
+    nulls = 'aaaa'
+    assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+    nulls = '\x00\x01\x00'
+    assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+    nulls = '\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00'
+    assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+
 
 class MockDbms:
 

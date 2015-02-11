@@ -57,7 +57,7 @@ class HiveServerTable(Table):
     if beeswax_conf.THRIFT_VERSION.get() >= 7:
       if not table_results.columns:
         raise NoSuchObjectException()
-      self.table = table_results.columns or ''
+      self.table = table_results.columns
     else: # Deprecated. To remove in Hue 4.
       if not table_results.rows:
         raise NoSuchObjectException()
@@ -179,7 +179,7 @@ class HiveServerTRowSet2:
     cols = [rs.full_col(name) for name in col_names]
 
     for cols_row in itertools.izip(*cols):
-      cols_rows.append(dict(zip(col_names, cols_row)))
+      cols_rows.append(dict(itertools.izip(col_names, cols_row)))
 
     return cols_rows
 
@@ -263,10 +263,10 @@ class HiveServerTColumnValue2:
 
   @classmethod
   def set_nulls(cls, values, bytestring):
-    if bytestring == '' or bytestring == '\x00':
+    if bytestring == '' or re.match('^(\x00)+$', bytestring): # HS2 has just \x00 or '', Impala can have \x00\x00...
       return values
     else:
-      return [None if is_null else value for value, is_null in zip(values, cls.mark_nulls(values, bytestring))]
+      return [None if is_null else value for value, is_null in itertools.izip(values, cls.mark_nulls(values, bytestring))]
 
 
 class HiveServerDataTable(DataTable):
@@ -304,7 +304,7 @@ class HiveServerTTableSchema:
   def cols(self):
     try:
       return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
-    except Exception:
+    except:
       # Impala API is different
       cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
       for col in cols:
@@ -627,7 +627,7 @@ class HiveServerClient:
       query = 'DESCRIBE %s' % table_name
     else:
       query = 'DESCRIBE EXTENDED %s' % table_name
-    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000)
+    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
@@ -662,14 +662,14 @@ class HiveServerClient:
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
-  def execute_statement(self, statement, max_rows=1000, configuration={}):
+  def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST):
     if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
-    return self.fetch_result(res.operationHandle, max_rows=max_rows), res.operationHandle
+    return self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation), res.operationHandle
 
 
   def execute_async_statement(self, statement, confOverlay):
