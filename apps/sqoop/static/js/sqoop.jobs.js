@@ -33,17 +33,6 @@ var jobs = (function($) {
     'creation_user': null,
     'update_date': null,
     'update_user': null,
-    'setFrom': function(){
-      this.type("FROM");
-      // Huge hack for now
-      $('a').filter(function(index) { return $(this).text() === "Step 2: To"; }).text("Step 2: From");
-      $('a').filter(function(index) { return $(this).text() === "Step 3: From"; }).text("Step 3: To");
-    },
-    'setTo': function(){
-      this.type("TO");
-      $('a').filter(function(index) { return $(this).text() === "Step 2: From"; }).text("Step 2: To");
-      $('a').filter(function(index) { return $(this).text() === "Step 3: To"; }).text("Step 3: From");
-    },
     'initialize': function(attrs) {
       var self = this;
       var _attrs = $.extend(true, {}, attrs);
@@ -51,12 +40,19 @@ var jobs = (function($) {
         'from-connector-id': 'from_connector_id',
         'to-connector-id': 'to_connector_id',
         'from-link-id': 'from_link_id',
-        'to-link-id': 'to_link_id'
+        'to-link-id': 'to_link_id',
+        'from-config-values': 'from_config_values',
+        'to-config-values': 'to_config_values',
+        'driver-config-values': 'driver_config_values',
+        // 'creation-date': 'creation_date',
+        // 'creation-user': 'creation_user',
+        // 'update-date': 'update_date',
+        // 'update-user': 'update_user'
       });
       _attrs = transform_values(_attrs, {
-        'from-config-values': to_configs,
-        'to-config-values': to_configs,
-        'driver-config-values': to_configs
+        'from_config_values': to_configs,
+        'to_config_values': to_configs,
+        'driver_config_values': to_configs
       });
       return _attrs;
     }
@@ -70,6 +66,9 @@ var jobs = (function($) {
     'initialize': function() {
       var self = this;
       self.parent.initialize.apply(self, arguments);
+      self.selected = ko.observable();
+      self.connectors = ko.observableArray();
+      self.links = ko.observableArray();
       self.createdFormatted = ko.computed(function() {
         if (self.creation_date()) {
           return moment(self.creation_date()).configat('MM/DD/YYYY hh:mm A');
@@ -84,7 +83,6 @@ var jobs = (function($) {
           return 0;
         }
       });
-      self.selected = ko.observable();
       self.submission = ko.computed({
         owner: self,
         read: function () {
@@ -172,6 +170,50 @@ var jobs = (function($) {
         });
         return table;
       });
+      self.fromLink = ko.computed(function() {
+        var link = null;
+        $.each(self.links(), function(index, $link) {
+          if (self.from_link_id() == $link.id()) {
+            link = $link;
+          }
+        });
+        return link;
+      });
+      self.toLink = ko.computed(function() {
+        var link = null;
+        $.each(self.links(), function(index, $link) {
+          if (self.to_link_id() == $link.id()) {
+            link = $link;
+          }
+        });
+        return link;
+      });
+      self.fromLabel = ko.computed(function() {
+        if (self.fromLink()) {
+          if (self.fromLink().isHdfs()) {
+            return "HDFS";
+          }
+
+          if (self.fromLink().isRdbms()) {
+            return self.fromLink().type();
+          }
+        }
+
+        return null;
+      });
+      self.toLabel = ko.computed(function() {
+        if (self.toLink()) {
+          if (self.toLink().isHdfs()) {
+            return "HDFS";
+          }
+
+          if (self.toLink().isRdbms()) {
+            return self.toLink().type();
+          }
+        }
+
+        return null;
+      });
 
       self.runningInterval = 0;
     },
@@ -247,6 +289,22 @@ var jobs = (function($) {
         }
       }, options);
       self.request('/sqoop/api/jobs/' + self.id() + '/status', options);
+    },
+    'getData': function() {
+      var self = this;
+      var model = ko.sqoop.fixModel(self);
+      var data = {};
+      model = transform_keys(model, {
+        'from_connector_id': 'from-connector-id',
+        'to_connector_id': 'to-connector-id',
+        'from_link_id': 'from-link-id',
+        'to_link_id': 'to-link-id',
+        'from_config_values': 'from-config-values',
+        'to_config_values': 'to-config-values',
+        'driver_config_values': 'driver-config-values'
+      });
+      data[self.identifier] = ko.utils.stringifyJson(model);
+      return data;
     }
   });
 
