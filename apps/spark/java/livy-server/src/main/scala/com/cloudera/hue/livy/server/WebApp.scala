@@ -2,7 +2,8 @@ package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions.{SessionFailedToStart, Session}
+import com.cloudera.hue.livy.server.sessions.Session
+import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, Formats, MappingException}
 import org.scalatra._

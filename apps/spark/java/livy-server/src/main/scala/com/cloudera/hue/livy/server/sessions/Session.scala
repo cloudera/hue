@@ -5,7 +5,21 @@ import com.cloudera.hue.livy.server.Statement
 
 import scala.concurrent.Future
 
+object Session {
+  sealed trait State
+  case class Starting() extends State
+  case class Idle() extends State
+  case class Busy() extends State
+  case class Dead() extends State
+
+  class SessionFailedToStart(msg: String) extends Exception(msg)
+
+  class StatementNotFound extends Exception
+}
+
 trait Session {
+  import Session._
+
   def id: String
 
   def lastActivity: Long
@@ -25,12 +39,3 @@ trait Session {
   def stop(): Future[Unit]
 }
 
-sealed trait State
-case class Starting() extends State
-case class Idle() extends State
-case class Busy() extends State
-case class Dead() extends State
-
-class SessionFailedToStart(msg: String) extends Exception(msg)
-
-class StatementNotFound extends Exception
