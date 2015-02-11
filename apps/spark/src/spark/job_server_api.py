@@ -79,6 +79,9 @@ class JobServerApi(object):
       self._thread_local.user = user.username
     else:
       self._thread_local.user = user
+  
+  def get_status(self):
+    return self._root.get('sessions')
 
   def create_session(self, **kwargs):
     return self._root.post('sessions', data=json.dumps(kwargs), contenttype='application/json')
