@@ -14,6 +14,18 @@ trait SessionFactory {
   def close(): Unit = {}
 }
 
+class ThreadSessionFactory extends SessionFactory {
+
+  implicit def executor: ExecutionContext = ExecutionContext.global
+
+  override def createSession(lang: String): Future[Session] = {
+    Future {
+      val id = UUID.randomUUID().toString
+      ThreadSession.create(id, lang)
+    }
+  }
+}
+
 class ProcessSessionFactory extends SessionFactory {
 
   implicit def executor: ExecutionContext = ExecutionContext.global

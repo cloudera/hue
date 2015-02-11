@@ -30,12 +30,12 @@ class Command(BaseCommand):
     Starts livy server.
     """
 
-    args = '<process(default)|yarn>'
-    help = 'start livy server with process or yarn workers'
+    args = '<thread(default)|process|yarn>'
+    help = 'start livy server with thread, process, or yarn workers'
 
     def handle(self, *args, **kwargs):
         if not args:
-          session_kind = 'process'
+          session_kind = 'thread'
         else:
           session_kind = args[0].lower()
 
