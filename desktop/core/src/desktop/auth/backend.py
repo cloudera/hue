@@ -372,6 +372,11 @@ class LdapBackend(object):
       setattr(self._backend.settings, 'START_TLS', False)
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
+    if ldap_config.FOLLOW_REFERRALS.get():
+      ldap.set_option(ldap.OPT_REFERRALS, 1)
+    else:
+      ldap.set_option(ldap.OPT_REFERRALS, 0)
+
   def add_ldap_config_for_server(self, server):
     if desktop.conf.LDAP.LDAP_SERVERS.get():
       # Choose from multiple server configs
