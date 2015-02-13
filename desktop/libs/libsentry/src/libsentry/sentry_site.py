@@ -36,6 +36,11 @@ _CONF_SENTRY_SERVER_PRINCIPAL = 'sentry.service.server.principal'
 _CONF_SENTRY_SERVER_SECURITY_MODE = 'sentry.service.security.mode'
 _CONF_SENTRY_SERVER_ADMIN_GROUP = 'sentry.service.admin.group'
 
+_CONF_SENTRY_SERVER_HA_ENABLED = 'sentry.ha.enabled'
+_CONF_SENTRY_SERVER_HA_HAS_SECURITY = 'sentry.ha.zookeeper.security'
+_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES = 'sentry.ha.zookeeper.security.quorum'
+_CONF_SENTRY_SERVER_HA_ZOOKEEPER_NAMESPACE = 'sentry.ha.zookeeper.namespace'
+
 
 def reset():
   global _SITE_DICT
@@ -67,6 +72,19 @@ def get_sentry_server_authentication():
 
 def get_sentry_server_admin_groups():
   return get_conf().get(_CONF_SENTRY_SERVER_ADMIN_GROUP, '').split(',')
+
+
+def get_sentry_server_ha_enabled():
+  return get_conf().get(_CONF_SENTRY_SERVER_HA_ENABLED, 'FALSE').upper() == 'TRUE'
+
+def get_sentry_server_ha_has_security():
+  return get_conf().get(_CONF_SENTRY_SERVER_HA_HAS_SECURITY, 'FALSE').upper() == 'TRUE'
+
+def get_sentry_server_ha_zookeeper_quorum():
+  return get_conf().get(_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES)
+
+def get_sentry_server_ha_zookeeper_namespace():
+  return get_conf().get(_CONF_SENTRY_SERVER_HA_ZOOKEEPER_NAMESPACE, 'sentry')
 
 
 def _parse_sites():
