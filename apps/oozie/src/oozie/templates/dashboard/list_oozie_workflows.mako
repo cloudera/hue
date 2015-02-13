@@ -316,13 +316,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
-        if (data) {
+        if (data.jobs) {
           var nNodes = runningTable.fnGetNodes();
 
           // check for zombie nodes
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
-            $(data).each(function (iWf, currentItem) {
+            $(data.jobs).each(function (iWf, currentItem) {
               if ($(node).children("td").eq(7).text() == currentItem.id) {
                 nodeFound = true;
               }
@@ -333,7 +333,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             }
           });
 
-          $(data).each(function (iWf, item) {
+          $(data.jobs).each(function (iWf, item) {
             var wf = new Workflow(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
@@ -365,11 +365,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             }
           });
         }
-        if (data.length == 0) {
+        if (data.jobs.length == 0) {
           runningTable.fnClearTable();
         }
 
-        if (data.length != numRunning) {
+        if (data.jobs.length != numRunning) {
           refreshCompleted();
         }
         numRunning = data.length;
@@ -381,7 +381,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     function refreshCompleted() {
       $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
         completedTable.fnClearTable();
-        $(data).each(function (iWf, item) {
+        $(data.jobs).each(function (iWf, item) {
           var wf = new Workflow(item);
           try {
             completedTable.fnAddData([
@@ -404,7 +404,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     function refreshProgress() {
       $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
         var nNodes = runningTable.fnGetNodes();
-        $(data).each(function (iWf, item) {
+        $(data.jobs).each(function (iWf, item) {
             var wf = new Workflow(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
