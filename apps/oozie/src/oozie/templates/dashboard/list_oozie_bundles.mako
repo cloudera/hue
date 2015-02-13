@@ -315,13 +315,13 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
     refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
-        if (data) {
+        if (data.jobs) {
           var nNodes = runningTable.fnGetNodes();
 
           // check for zombie nodes
           $(nNodes).each(function (iNode, node) {
             var nodeFound = false;
-            $(data).each(function (iBundle, currentItem) {
+            $(data.jobs).each(function (iBundle, currentItem) {
               if ($(node).children("td").eq(7).text() == currentItem.id) {
                 nodeFound = true;
               }
@@ -332,7 +332,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
             }
           });
 
-          $(data).each(function (iBundle, item) {
+          $(data.jobs).each(function (iBundle, item) {
             var bundle = new Bundle(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
@@ -366,11 +366,11 @@ ${layout.menubar(section='bundles', dashboard=True)}
             }
           });
         }
-        if (data.length == 0) {
+        if (data.jobs.length == 0) {
           runningTable.fnClearTable();
         }
 
-        if (data.length != numRunning) {
+        if (data.jobs.length != numRunning) {
           refreshCompleted();
         }
         numRunning = data.length;
@@ -382,7 +382,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     function refreshCompleted() {
       $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
         completedTable.fnClearTable();
-        $(data).each(function (iWf, item) {
+        $(data.jobs).each(function (iWf, item) {
           var bundle = new Bundle(item);
           try {
             completedTable.fnAddData([
@@ -405,7 +405,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     function refreshProgress() {
       $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
         var nNodes = runningTable.fnGetNodes();
-        $(data).each(function (iWf, item) {
+        $(data.jobs).each(function (iWf, item) {
             var bundle = new Bundle(item);
             var foundRow = null;
             $(nNodes).each(function (iNode, node) {
