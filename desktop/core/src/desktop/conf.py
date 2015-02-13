@@ -496,6 +496,11 @@ LDAP = ConfigSection(
       help=_("Define the number of levels to search for nested members."),
       type=int,
       default=10),
+    FOLLOW_REFERRALS = Config("follow_referrals",
+      help=_("Whether or not to follow referrals."),
+      type=coerce_bool,
+      default=False),
+
 
     LDAP_SERVERS = UnspecifiedConfigSection(
       key="ldap_servers",
@@ -532,6 +537,10 @@ LDAP = ConfigSection(
                                             default=True,
                                             type=coerce_bool,
                                             help=_("Use search bind authentication.")),
+          FOLLOW_REFERRALS = Config("follow_referrals",
+                                    help=_("Whether or not to follow referrals."),
+                                    type=coerce_bool,
+                                    default=False),
 
           USERS = ConfigSection(
             key="users",
