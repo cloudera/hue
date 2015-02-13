@@ -80,7 +80,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
     <tbody data-bind="foreach: { data: jobs }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>          
+          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <!-- ko if: ! uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:open_old_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->
@@ -170,7 +170,13 @@ ${ commonshare() | n,unicode }
     self.datatable = null;
 
     self.showSubmitPopup = function () {
-      $.get("/oozie/editor/workflow/submit/" + self.selectedJobs()[0].id(), {
+      if (self.selectedJobs()[0].uuid()) {
+        var base_url = "/oozie/editor/workflow/submit/";
+      } else {
+        var base_url = "/oozie/submit_workflow/";
+      }
+
+      $.get(base_url + self.selectedJobs()[0].id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {

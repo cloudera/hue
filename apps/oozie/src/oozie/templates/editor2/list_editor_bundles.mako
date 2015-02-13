@@ -85,7 +85,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
           <!-- /ko -->
           <!-- ko if: uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:edit_bundle') }?bundle=' + id() }" data-row-selector="true"></a>
-          <!-- /ko -->                     
+          <!-- /ko -->
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: description"></td>
@@ -169,7 +169,13 @@ ${ commonshare() | n,unicode }
     self.datatable = null;
 
     self.showSubmitPopup = function () {
-      $.get("/oozie/editor/bundle/submit/" + self.selectedJobs()[0].id(), {
+      if (self.selectedJobs()[0].uuid()) {
+        var base_url = "/oozie/editor/bundle/submit/";
+      } else {
+        var base_url = "/oozie/submit_bundle/";
+      }
+
+      $.get(base_url + self.selectedJobs()[0].id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
