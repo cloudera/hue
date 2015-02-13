@@ -106,7 +106,10 @@ class LdapConnection(object):
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert_file)
 
-    ldap.set_option(ldap.OPT_REFERRALS, 0)
+    if self.ldap_config.FOLLOW_REFERRALS.get():
+      ldap.set_option(ldap.OPT_REFERRALS, 1)
+    else:
+      ldap.set_option(ldap.OPT_REFERRALS, 0)
 
     self.ldap_handle = ldap.initialize(ldap_url)
 
