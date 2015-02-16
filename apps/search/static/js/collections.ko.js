@@ -79,6 +79,10 @@ var SearchCollectionsModel = function (props) {
     });
   }, self);
 
+  self.atLeastOneSelected = ko.computed(function() {
+    return self.selectedCollections().length >= 1;
+  });
+
   self.selectedImportableCollections = ko.computed(function () {
     return ko.utils.arrayFilter(self.importableCollections(), function (imp) {
       return imp.selected();
@@ -115,34 +119,40 @@ var SearchCollectionsModel = function (props) {
   };
 
   self.markManyForDeletion = function (collections) {
-    self.collectionToDelete = collections;
-    $(document).trigger("confirmDelete")
+    if (self.atLeastOneSelected()){
+      self.collectionToDelete = collections;
+      $(document).trigger("confirmDelete")
+    }
   };
 
   self.deleteCollections = function () {
-    self.isLoading(true);
-    $(document).trigger("deleting");
-    $.post(self.DELETE_URL,
-      {
-        collections: ko.mapping.toJSON(self.selectedCollections())
-      },
-      function (data) {
-        self.updateCollections();
-      }, "json"
-    ).fail(function (xhr, textStatus, errorThrown) {});
-    $(document).trigger("collectionDeleted");
+    if (self.atLeastOneSelected()){
+      self.isLoading(true);
+      $(document).trigger("deleting");
+      $.post(self.DELETE_URL,
+        {
+          collections: ko.mapping.toJSON(self.selectedCollections())
+        },
+        function (data) {
+          self.updateCollections();
+        }, "json"
+      ).fail(function (xhr, textStatus, errorThrown) {});
+      $(document).trigger("collectionDeleted");
+    }
   };
 
   self.copyCollections = function (collections) {
-    $(document).trigger("copying");
-    $.post(self.COPY_URL,
-      {
-        collections: ko.mapping.toJSON(self.selectedCollections())
-      }, function (data) {
-        self.updateCollections();
-      }, "json"
-    ).fail(function (xhr, textStatus, errorThrown) {});
-    $(document).trigger("collectionCopied");
+    if (self.atLeastOneSelected()){
+      $(document).trigger("copying");
+      $.post(self.COPY_URL,
+        {
+          collections: ko.mapping.toJSON(self.selectedCollections())
+        }, function (data) {
+          self.updateCollections();
+        }, "json"
+      ).fail(function (xhr, textStatus, errorThrown) {});
+      $(document).trigger("collectionCopied");
+    }
   };
 
   self.updateCollections = function () {
