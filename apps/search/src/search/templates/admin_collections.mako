@@ -45,8 +45,8 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       </%def>
 
       <%def name="actions()">
-        <a class="btn" data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
-        <a class="btn" data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </%def>
 
       <%def name="creation()">
@@ -172,11 +172,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     $(document).on("collectionDeleted", function () {
       $("#deleteModal").modal("hide");
       $("#deleteModalBtn").button("reset");
-      $(document).trigger("info", "${ _("Dashboard deleted successfully.") }");
+      $(document).trigger("info", "${ _("Dashboard(s) deleted successfully.") }");
     });
 
     $(document).on("collectionCopied", function () {
-      $(document).trigger("info", "${ _("Dashboard copied successfully.") }");
+      $(document).trigger("info", "${ _("Dashboard(s) copied successfully.") }");
     });
 
     $(document).on("confirmDelete", function () {
