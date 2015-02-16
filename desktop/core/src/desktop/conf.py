@@ -176,6 +176,13 @@ LOG_REDACTION_FILE = Config(
   type=parse_redaction_policy_from_file,
   default=None)
 
+ALLOWED_HOSTS = Config(
+  key='allowed_hosts',
+  default=['*'],
+  type=coerce_csv,
+  help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
+)
+
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 

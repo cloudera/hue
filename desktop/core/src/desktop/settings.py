@@ -205,7 +205,6 @@ FILE_UPLOAD_HANDLERS = (
 # Wrap each request in a transaction.
 ATOMIC_REQUESTS = True
 
-
 ############################################################
 # Part 4: Installation of apps
 ############################################################
@@ -249,6 +248,9 @@ TEMPLATE_DEBUG = DEBUG
 # Part 4a: Django configuration that requires bound Desktop
 # configs.
 ############################################################
+
+# Configure allowed hosts
+ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
 
 # Configure hue admins
 ADMINS = []
