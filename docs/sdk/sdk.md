@@ -139,25 +139,18 @@ Download, Unpack, Build Distro
 The Hue SDK is available from [Github](http://github.com/cloudera/hue). Releases
 can be found on the [download page](https://github.com/cloudera/hue/downloads).
 Releases are missing a few dependencies that could not be included because of
-licencing issues (e.g. the werkzeug module). So if you prefer to have an
-environment ready from scratch, it is preferable to checkout a particular
-release tag instead.
+licencing issues. So if you prefer to have an environment ready from scratch,
+it is preferable to checkout a particular release tag instead.
 
     $ cd hue
     ## Build
     $ make apps
     ## Run
-    $ build/env/bin/hue runserver_plus
-    $ build/env/bin/hue beeswax_server
+    $ build/env/bin/hue runserver
     ## Alternative run
     $ build/env/bin/hue supervisor
     ## Visit http://localhost:8000/ with your web browser.
 
-<div class="note">
-  Why <code>runserver_plus</code>?   <code>runserver_plus</code>
-  enables the <a href="http://werkzeug.pocoo.org/">Werkzeug</a> debugger,
-  which is very handy.
-</div>
 
 Run "create_desktop_app" to Set up a New Source Tree
 --------------------------------------------
@@ -179,6 +172,14 @@ Run "create_desktop_app" to Set up a New Source Tree
     calculator/src/calculator/static/css/calculator.css
     calculator/src/calculator/static/js/calculator.js
 
+To download an app or browse dditional plugin apps available in the Hue app store:
+    ## Visit http://gethue.com/app-store/
+
+<div class="note">
+  Some apps are blacklisted on certain versions of CDH (such as the 'Spark' app) due to
+  certain incompatibilities, which prevent them loading from in Hue.
+  Check the hue.ini 'app_blacklist' parameter for details.
+</div>
 
 Install SDK Application
 -----------------------
@@ -221,7 +222,7 @@ Congrats, you've added a new app!
 You can now browse the new application.
 
     # If you haven't killed the old process, do so now.
-    $ build/env/bin/hue runserver_plus
+    $ build/env/bin/hue runserver
 
 And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
 You should see the app (with a boring "SDK" icon) in the dock, and clicking it
@@ -297,20 +298,6 @@ You can now go and try the calculator.  If you set everything up right, you
 should see something like:
 
 <img src="calculator_working.png">
-
-Debugging Django
-----------------
-
-<img src="calculator_error.png">
-
-If you enter a number only in the first text box and hit "Calculate", you'll
-hit an error. If you're using `runserver_plus`, you'll get a handy debugging
-page. You can click on any stack frame to get a debugging console:
-
-<img src="calculator_werkzeug.png">
-
-Great! Now that we've added a single application, we're going to
-delve further into the back-end.
 
 
 Integrate external Web applications in any language
@@ -622,7 +609,7 @@ Hue works in any WSGI-compliant container web server.
 The current recommended deployment server is the built-in CherryPy server.
 The CherryPy server, which is multi-threaded, is invoked by `runcpserver`
 and is configured to start when Hue's `supervisor` script is used.
-Meanwhile, `runserver` and `runserver_plus` start a single-threaded
+Meanwhile, `runserver` start a single-threaded
 testing server.
 
 Because multiple threads may be accessing your views
@@ -898,22 +885,20 @@ Debugging Tips and Tricks
 
 * Set `DESKTOP_DEBUG=1` as an environment variable if you want logs to go to stderr
   as well as to the respective log files.
-* Use runserver_plus.  If you want to set a CLI breakpoint, just insert
+* Use runserver.  If you want to set a CLI breakpoint, just insert
   `__import__("ipdb").set_trace()`
-  into your code.  If you want to inspect variables, you can simply insert
-  `raise None`, and visit the URL of the view you're interested in, activating
-  the Werkzeug debugger.
+  into your code.
 * Django tends to restart its server whenever it notices a file changes.  For
   certain things (like configuration changes), this is not sufficient.  Restart
   the server whole-heartedly.
 * If you find yourself writing a lot of JavaScript, you'll want to disable the
   JavaScript caching that the server does. At startup Hue reads all your
   dependencies and JS files into memory to make things faster. You can disable
-  this by executing the runserver_plus command with an environment variable
+  this by executing the runserver command with an environment variable
   set. Hue will be a little slower, but your JS will always represent what's on
   the disk. Here's what that looks like:
 
-    `$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver_plus`
+    `$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver`
 
 * We highly recommend developing with the [Firebug](http://getfirebug.com)
   debugging plugin for Firefox. With it enabled, you can use a utility called
@@ -928,8 +913,6 @@ Debugging Tips and Tricks
   re-enabled which makes element inspection a little easier in Firebug.
 
 <!--
-
-## runserver_plus
 
 ## testing with windmill
 
