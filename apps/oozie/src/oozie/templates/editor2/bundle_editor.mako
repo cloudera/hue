@@ -36,9 +36,15 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true}, visible: bundle.id() != null">
+    
+    <span data-bind="visible: bundle.isDirty() || bundle.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+    
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': bundle.isDirty()}, visible: bundle.id() != null">
       <i class="fa fa-play"></i>
     </a>
+
+    &nbsp;&nbsp;&nbsp;
+    
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
@@ -166,7 +172,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
         
       <h4>${ _('Submission Parameters') }</h4>
       <ul data-bind="foreach: bundle.properties.parameters" class="unstyled">
-        <!-- ko if: ['oozie.use.system.libpath', 'start_date', 'end_date'].indexOf(name()) == -1 -->
+        <!-- ko if: ['oozie.use.system.libpath', 'start_date', 'end_date'].indexOf(typeof name == 'function' ? name() : name) == -1 -->
         <li>
           <input data-bind="value: name"/>
           <input data-bind="value: value"/>
@@ -239,8 +245,10 @@ ${ dashboard.import_bindings() }
   }
 
   $(document).on("showSubmitPopup", function(event, data){
-    $('#submit-modal').html(data);
-    $('#submit-modal').modal('show');
+    if (! viewModel.bundle.isDirty()){
+      $('#submit-modal').html(data);
+      $('#submit-modal').modal('show');
+    }
   });
 
   $(document).ready(function() {
