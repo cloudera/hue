@@ -53,13 +53,6 @@
                   <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
                   <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
                   <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
-
-                  % if ENABLE_V2.get():
-                    <li class="inline alert alert-warn" style="margin-left:20px; margin-bottom:0px; margin-top:4px">
-                      ${ _('This is the old editor, please migrate your jobs to the ') }
-                      <a style="display:inline" href="${url('oozie:new_workflow') if utils.is_selected(section, 'workflows') else url('oozie:new_coordinator') if utils.is_selected(section, 'coordinators') else url('oozie:new_bundle')}">${ _('new editor.') }</a>
-                    </li>
-                  % endif
                 % endif
               % endif
             </ul>
@@ -67,5 +60,11 @@
         </div>
       </div>
   </div>
+  % if not dashboard and not is_editor and ENABLE_V2.get():
+    <div class="alert alert-warn" style="position: fixed; top: 28px; z-index: 1031; right: 0; height: 28px; line-height: 28px; border: none">
+      ${ _('This is the old editor, please migrate your jobs to the ') }
+      <a style="display:inline" href="${url('oozie:new_workflow') if utils.is_selected(section, 'workflows') else url('oozie:new_coordinator') if utils.is_selected(section, 'coordinators') else url('oozie:new_bundle')}">${ _('new editor.') }</a>
+    </div>
+  % endif
 </%def>
 
