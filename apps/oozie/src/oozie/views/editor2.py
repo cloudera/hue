@@ -384,12 +384,17 @@ def list_editor_coordinators(request):
 
 @check_document_access_permission()
 def edit_coordinator(request):
-  coordinator_id = request.GET.get('coordinator')
+  coordinator_id = request.GET.get('coordinator', request.GET.get('uuid'))
   doc = None
   
   if coordinator_id:
-    doc = Document2.objects.get(id=coordinator_id)
-    coordinator = Coordinator(document=doc)
+    cid = {}
+    if coordinator_id.isdigit():
+      cid['id'] = coordinator_id
+    else:
+      cid['uuid'] = coordinator_id    
+      doc = Document2.objects.get(**cid)
+      coordinator = Coordinator(document=doc)
   else:
     coordinator = Coordinator()
     coordinator.set_workspace(request.user)
