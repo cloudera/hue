@@ -314,7 +314,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">${_('No')}</a>
-        <a data-bind="click: removeTagFinal" class="btn btn-danger">${_('Yes')}</a>
+        <a id="tagRemoveBtn" class="pointer btn btn-danger disable-feedback">${_('Yes')}</a>
     </div>
 </div>
 
@@ -391,6 +391,10 @@ ${ commonshare() | n,unicode }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
       });
+    });
+
+    $("#tagRemoveBtn").on("click", function(){
+      removeTagFinal();
     });
 
     $("a[rel='tooltip']").tooltip();
