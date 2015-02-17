@@ -95,7 +95,7 @@ class HbaseApi(object):
                                   service_name="Hue HBase Thrift Client for %s" % name,
                                   kerberos_principal=_security['kerberos_principal_short_name'],
                                   use_sasl=_security['use_sasl'],
-                                  timeout_seconds=None,
+                                  timeout_seconds=30,
                                   transport=conf.THRIFT_TRANSPORT.get(),
                                   transport_mode=conf.TRANSPORT_MODE.get(),
                                   http_url=\
