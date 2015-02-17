@@ -227,7 +227,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
 
   self.gen_xml = function () {
 	$(".jHueNotify").hide();
-	logGA('gen_xml');
+	  logGA('gen_xml');
 
     $.post("/oozie/editor/coordinator/gen_xml/", {
         "coordinator": ko.mapping.toJSON(self.coordinator)
@@ -244,13 +244,17 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   };
   
   self.showSubmitPopup = function () {
-	$(".jHueNotify").hide();
-    $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
-      }, function (data) {
-        $(document).trigger("showSubmitPopup", data);
-    }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-    });
+	  $(".jHueNotify").hide();
+    
+    if (! self.coordinator.isDirty()){
+      logGA('submit');
+      $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
+        }, function (data) {
+          $(document).trigger("showSubmitPopup", data);
+      }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 };
 

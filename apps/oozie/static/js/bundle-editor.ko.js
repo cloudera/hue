@@ -16,6 +16,22 @@
 
 
 var Bundle = function (vm, bundle) {
+  function changeTracker(objectToTrack, hashFunction) {    
+      hashFunction = hashFunction || ko.toJSON;
+      var lastCleanState = ko.observable(hashFunction(objectToTrack));
+      
+      var result = {
+          somethingHasChanged : ko.dependentObservable(function() {
+              return hashFunction(objectToTrack) != lastCleanState()
+          }),
+          markCurrentStateAsClean : function() {
+              lastCleanState(hashFunction(objectToTrack));   
+          }
+      };
+      
+      return function() { return result }
+  }
+
   var self = this;
 
   self.id = ko.observable(typeof bundle.id != "undefined" && bundle.id != null ? bundle.id : null);
@@ -25,6 +41,11 @@ var Bundle = function (vm, bundle) {
   self.coordinators = ko.mapping.fromJS(typeof bundle.coordinators != "undefined" && bundle.coordinators != null ? bundle.coordinators : []);
   self.properties = ko.mapping.fromJS(typeof bundle.properties != "undefined" && bundle.properties != null ? bundle.properties : {});
 
+  self.tracker = new changeTracker(self);
+  
+  self.isDirty = ko.computed(function () {
+    return self.tracker().somethingHasChanged();
+  });
   
   self.addCoordinator = function(coordinator_uuid) {
     self.getCoordinatorParameters(coordinator_uuid);	  
@@ -112,15 +133,16 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
   
   self.showSubmitPopup = function () {
     // If self.bundle.id() == null, need to save wf for now
-	$(".jHueNotify").hide();
-	logGA('submit');
-
-    $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
-      }, function (data) {
-        $(document).trigger("showSubmitPopup", data);
-    }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-    });
+	  $(".jHueNotify").hide();
+    if (! self.bundle.isDirty()){
+      logGA('submit');
+      $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
+        }, function (data) {
+          $(document).trigger("showSubmitPopup", data);
+      }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 };
 
