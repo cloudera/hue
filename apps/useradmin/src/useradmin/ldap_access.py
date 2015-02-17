@@ -111,7 +111,10 @@ class LdapConnection(object):
     else:
       ldap.set_option(ldap.OPT_REFERRALS, 0)
 
-    self.ldap_handle = ldap.initialize(ldap_url)
+    if ldap_config.DEBUG.get():
+      ldap.set_option(ldap.OPT_DEBUG_LEVEL, ldap_config.DEBUG_LEVEL.get())
+
+    self.ldap_handle = ldap.initialize(uri=ldap_url, trace_level=ldap_config.TRACE_LEVEL.get())
 
     if bind_user is not None:
       try:
