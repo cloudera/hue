@@ -118,6 +118,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
     }, function (data) {
       if (data.status == 0) {
         self.bundle.id(data.id);
+        self.bundle.tracker().markCurrentStateAsClean();
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("bundle") == -1) {
           window.location.hash = '#bundle=' + data.id;
