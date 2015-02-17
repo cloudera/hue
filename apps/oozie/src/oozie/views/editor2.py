@@ -520,7 +520,7 @@ def coordinator_parameters(request):
   except Exception, e:
     response['message'] = str(e)
     
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
