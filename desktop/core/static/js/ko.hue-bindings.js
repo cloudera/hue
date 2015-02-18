@@ -824,8 +824,11 @@ ko.bindingHandlers.typeahead = {
       }
     }
 
-    function extractor(query) {
+    function extractor(query, extractorSeparator) {
       var result = /([^ ]+)$/.exec(query);
+      if (extractorSeparator){
+        result = new RegExp("([^\\" + extractorSeparator + "]+)$").exec(query);
+      }
       if (result && result[1])
         return result[1].trim();
       return "";
@@ -838,24 +841,24 @@ ko.bindingHandlers.typeahead = {
         if (valueAccessor.extraKeywords && valueAccessor.extraKeywords.split(" ").indexOf(item) > -1) {
           _separator = "";
         }
-        if (_val.indexOf(" ") > -1) {
-          return _val.substring(0, _val.lastIndexOf(" ")) + " " + item + _separator;
+        if (_val.indexOf((valueAccessor.multipleValuesExtractor || " ")) > -1) {
+          return _val.substring(0, _val.lastIndexOf((valueAccessor.multipleValuesExtractor || " "))) + (valueAccessor.multipleValuesExtractor || " ") + item + _separator;
         }
         else {
           return item + _separator;
         }
       }
       _options.matcher = function (item) {
-        var _tquery = extractor(this.query);
+        var _tquery = extractor(this.query, valueAccessor.multipleValuesExtractor);
         if (!_tquery) return false;
         return ~item.toLowerCase().indexOf(_tquery.toLowerCase());
       },
-          _options.highlighter = function (item) {
-            var _query = extractor(this.query).replace(/[\-\[\]{}()*+?.:\\\^$|#\s]/g, '\\$&');
-            return item.replace(new RegExp('(' + _query + ')', 'ig'), function ($1, match) {
-              return '<strong>' + match + '</strong>'
-            });
-          }
+      _options.highlighter = function (item) {
+        var _query = extractor(this.query, valueAccessor.multipleValuesExtractor).replace(/[\-\[\]{}()*+?.:\\\^$|#\s]/g, '\\$&');
+        return item.replace(new RegExp('(' + _query + ')', 'ig'), function ($1, match) {
+          return '<strong>' + match + '</strong>'
+        });
+      }
     }
 
     if (valueAccessor.completeSolrRanges) {
