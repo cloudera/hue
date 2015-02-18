@@ -16,15 +16,22 @@
 # limitations under the License.
 
 import re
+import sys
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
+
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access, add_to_group
+from desktop.models import Document
+
+from beeswax.design import hql_query
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
-from beeswax.design import hql_query
-from desktop.models import Document
+from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
+from beeswax.tests import _make_query
 
 
 class MockDbms:
@@ -55,7 +62,6 @@ class TestMockedImpala:
     response = self.client.get("/impala/execute/")
     assert_true('Query Editor' in response.content)
 
-
   def test_saved_queries(self):
     user = User.objects.get(username='test')
 
@@ -76,7 +82,7 @@ class TestMockedImpala:
 
       resp = self.client.get('/impala/my_queries')
       assert_equal(len(resp.context['q_page'].object_list), 1)
-      assert_equal(len(resp.context['h_page'].object_list), 1)
+      assert_equal(resp.context['h_page'].object_list[0].design.name, 'create_saved_query')
     finally:
       if beewax_query is not None:
         beewax_query.delete()
@@ -84,11 +90,82 @@ class TestMockedImpala:
         impala_query.delete()
 
 
+class TestImpalaIntegration:
+  DATABASE = 'test_hue_impala'
+
+  def setUp(self):
+    # We need a real Impala cluster currently
+    if not 'impala' in sys.argv:
+      raise SkipTest
+
+    self.client = make_logged_in_client()
+    self.user = User.objects.get(username='test')
+    add_to_group('test')
+    self.db = dbms.get(self.user, get_query_server_config(name='impala'))
+
+    hql = """
+      DROP TABLE IF EXISTS %(db)s.tweets;
+      DROP DATABASE IF EXISTS %(db)s;
+      CREATE DATABASE %(db)s;
+
+      USE %(db)s;
+    """ % {'db': self.DATABASE}
+
+    resp = _make_query(self.client, hql, local=False, server_name='impala') # Does not point to the database yet
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    hql = """
+      CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
+
+      INSERT INTO TABLE tweets VALUES (1, "531091827395682000", "My dad looks younger than costa");
+      INSERT INTO TABLE tweets VALUES (2, "531091827781550000", "There is a thin line between your partner being vengeful and you reaping the consequences of your bad actions towards your partner.");
+      INSERT INTO TABLE tweets VALUES (3, "531091827768979000", "@Mustang_Sally83 and they need to get into you :))))");
+      INSERT INTO TABLE tweets VALUES (4, "531091827114668000", "@RachelZJohnson thank you rach!xxx");
+      INSERT INTO TABLE tweets VALUES (5, "531091827949309000", "i think @WWERollins was robbed of the IC title match this week on RAW also i wonder if he will get a rematch i hope so @WWE");
+    """
+
+    resp = _make_query(self.client, hql, database=self.DATABASE, local=False, server_name='impala')
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+  def test_basic_flow(self):
+    dbs = self.db.get_databases()
+    assert_true('_impala_builtins' in dbs, dbs)
+    assert_true(self.DATABASE in dbs, dbs)
+
+    tables = self.db.get_tables(database=self.DATABASE)
+    assert_true('tweets' in tables, tables)
+
+    QUERY = """
+      SELECT * FROM tweets ORDER BY row_num;
+    """
+    response = _make_query(self.client, QUERY, database=self.DATABASE, local=False, server_name='impala')
+
+    response = wait_for_query_to_finish(self.client, response, max=180.0)
+
+    results = []
+
+    # Check that we multiple fetches get all the result set
+    while len(results) < 5:
+      content = fetch_query_result_data(self.client, response, n=len(results)) # We get less than 5 results most of the time, so increase offset
+      results += content['results']
+
+    assert_equal([1, 2, 3, 4, 5], [col[0] for col in results])
+
+    # Check start over
+    results_start_over = []
+
+    while len(results_start_over) < 5:
+      content = fetch_query_result_data(self.client, response, n=len(results_start_over))
+      results_start_over += content['results']
+
+    assert_equal(results_start_over, results)
+
+
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):
     query_type = SavedQuery.TYPES_MAPPING[app_name]
     design = SavedQuery(owner=owner, type=query_type)
-    design.name = SavedQuery.DEFAULT_NEW_DESIGN_NAME
+    design.name = 'create_saved_query'
     design.desc = ''
     design.data = hql_query('show $tables', database='db1').dumps()
     design.is_auto = False

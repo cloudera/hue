@@ -78,16 +78,16 @@ LOG = logging.getLogger(__name__)
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, **kwargs):
+                is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
 
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized, max, database, email_notify, params, **kwargs)
+                   wait, name, desc, local, is_parameterized, max, database, email_notify, params, server_name, **kwargs)
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
     fragment = collapse_whitespace(smart_str(escape(query[:20])))
-    verify_history(client, fragment=fragment)
+    verify_history(client, fragment=fragment, server_name=server_name)
 
   return res
 

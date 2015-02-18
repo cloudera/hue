@@ -205,11 +205,11 @@ def is_finished(response):
   return 'error' in status or status.get('isSuccess') or status.get('isFailure')
 
 
-def fetch_query_result_data(client, status_response):
+def fetch_query_result_data(client, status_response, n=0):
   # Take a wait_for_query_to_finish() response in input
   status = json.loads(status_response.content)
 
-  response = client.get("/beeswax/results/%s/0?format=json" % status.get('id'))
+  response = client.get("/beeswax/results/%(id)s/%(n)s?format=json" % {'id': status.get('id'), 'n': n})
   content = json.loads(response.content)
 
   return content
@@ -217,7 +217,7 @@ def fetch_query_result_data(client, status_response):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, **kwargs):
+               is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -276,12 +276,12 @@ def make_query(client, query, submission_type="Execute",
     parameters["parameterization-%s" % name] = value
 
   kwargs.setdefault('follow', True)
-  execute_url = reverse("beeswax:api_execute")
+  execute_url = reverse("%(server_name)s:api_execute" % {'server_name': server_name})
 
   if submission_type == 'Explain':
     execute_url += "?explain=true"
   if submission_type == 'Save':
-    execute_url = reverse("beeswax:api_save_design")
+    execute_url = reverse("%(server_name)s:api_save_design" % {'server_name': server_name})
 
   response = client.post(execute_url, parameters, **kwargs)
 
@@ -291,13 +291,13 @@ def make_query(client, query, submission_type="Execute",
   return response
 
 
-def verify_history(client, fragment, design=None, reverse=False):
+def verify_history(client, fragment, design=None, reverse=False, server_name='beeswax'):
   """
   Verify that the query fragment and/or design are in the query history.
   If reverse is True, verify the opposite.
   Return the size of the history; -1 if we fail to determine it.
   """
-  resp = client.get('/beeswax/query_history')
+  resp = client.get('/%(server_name)s/query_history' % {'server_name': server_name})
   my_assert = reverse and assert_false or assert_true
   my_assert(fragment in resp.content)
   if design:
