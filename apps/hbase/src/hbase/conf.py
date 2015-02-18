@@ -19,7 +19,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config, validate_thrift_transport
+from desktop.lib.conf import Config, validate_thrift_transport, coerce_str_lowercase
 
 
 HBASE_CLUSTERS = Config(
@@ -52,10 +52,12 @@ HBASE_CONF_DIR = Config(
   default=os.environ.get("HBASE_CONF_DIR", '/etc/hbase/conf')
 )
 
-TRANSPORT_MODE = Config(
-  key="transport_mode",
-  help=_t("Force the underlying mode of the Thrift Transport: socket|http. http is required for using the doAs impersonation."),
-  default='socket'
+# Hidden, just for making patching of older version of Hue easier. To remove in Hue 4.
+USE_DOAS = Config(
+  key='use_doas',
+  help=_t('Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),
+  default=False,
+  type=bool
 )
 
 

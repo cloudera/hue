@@ -29,7 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 
 from hbase.server.hbase_lib import get_thrift_type, get_client_type
 from hbase import conf
-from hbase.hbase_site import get_server_principal, get_server_authentication
+from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http
 
 LOG = logging.getLogger(__name__)
 
@@ -62,14 +62,14 @@ class HbaseApi(object):
     try:
       full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
     except:
-      full_config = [conf.HBASE_CLUSTERS.get()]
-    for config in full_config: #hack cause get() is weird
+      full_config = [conf.HBASE_CLUSTERS.get()] #hack cause get() is weird
 
-      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<protocol>https?://)?(?P<host>.+):(?P<port>[0-9]+)\)', config)
+    for config in full_config:
+      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
       if match:
         clusters += [{
           'name': match.group('name'),
-          'host': (match.group('protocol') + match.group('host')) if match.group('protocol') else match.group('host'),
+          'host': match.group('host'),
           'port': int(match.group('port'))
         }]
       else:
@@ -97,10 +97,8 @@ class HbaseApi(object):
                                   use_sasl=_security['use_sasl'],
                                   timeout_seconds=30,
                                   transport=conf.THRIFT_TRANSPORT.get(),
-                                  transport_mode=conf.TRANSPORT_MODE.get(),
-                                  http_url=\
-                                      ('http://' if (conf.TRANSPORT_MODE.get() == 'http' and not target['host'].startswith('http')) else '') \
-                                      + target['host'] + ':' + str(target['port'])
+                                  transport_mode='http' if is_using_thrift_http() else 'tcp',
+                                  http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port'])
     )
 
     if hasattr(client, 'setCustomHeaders'):
