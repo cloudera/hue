@@ -22,7 +22,7 @@ import os.path
 from hadoop import confparse
 from desktop.lib.security_util import get_components
 
-from hbase.conf import HBASE_CONF_DIR
+from hbase.conf import HBASE_CONF_DIR, USE_DOAS
 
 
 LOG = logging.getLogger(__name__)
@@ -33,6 +33,11 @@ SITE_DICT = None
 
 _CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL = 'hbase.thrift.kerberos.principal'
 _CNF_HBASE_AUTHENTICATION = 'hbase.security.authentication'
+
+_CNF_HBASE_IMPERSONATION_ENABLED = 'hbase.thrift.support.proxyuser'
+_CNF_HBASE_USE_THRIFT_HTTP = 'hbase.regionserver.thrift.http'
+_CNF_HBASE_USE_THRIFT_SSL = 'hbase.thrift.ssl.enabled'
+
 
 
 def reset():
@@ -55,6 +60,15 @@ def get_server_principal():
 
 def get_server_authentication():
   return get_conf().get(_CNF_HBASE_AUTHENTICATION, 'NOSASL').upper()
+
+def is_impersonation_enabled():
+  return get_conf().get(_CNF_HBASE_IMPERSONATION_ENABLED, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
+
+def is_using_thrift_http():
+  return get_conf().get(_CNF_HBASE_USE_THRIFT_HTTP, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
+
+def is_using_thrift_ssl():
+  return get_conf().get(_CNF_HBASE_USE_THRIFT_SSL, 'FALSE').upper() == 'TRUE'
 
 
 def _parse_site():

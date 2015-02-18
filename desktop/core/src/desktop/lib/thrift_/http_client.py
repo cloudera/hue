@@ -16,14 +16,7 @@
 # limitations under the License.
 #
 
-import httplib
 import logging
-import os
-import socket
-import sys
-import urllib
-import urlparse
-import warnings
 
 from cStringIO import StringIO
 

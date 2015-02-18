@@ -88,7 +88,7 @@ def get_query_server_config(name='beeswax', server=None):
             'port': hive_site.hiveserver2_thrift_http_port(),
             'end_point': hive_site.hiveserver2_thrift_http_path()
         },
-        'transport_mode': hive_site.hiveserver2_transport_mode(),
+        'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
     }
 
   LOG.debug("Query Server: %s" % query_server)

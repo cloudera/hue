@@ -200,6 +200,9 @@ def save_workflow(request):
   if workflow['properties'].get('imported'): # Old workflow format
     workflow['properties']['imported'] = False
     response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
+    workflow.set_workspace(request.user)
+    workflow.check_workspace(request.fs, request.user)
+
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})

@@ -248,26 +248,26 @@ def connect_to_thrift(conf):
 
   Returns a tuple of (service, protocol, transport)
   """
-  if conf.transport_mode == 'TCP':
+  if conf.transport_mode == 'http':
+    mode = THttpClient(conf.http_url)
+  else:
     if conf.use_ssl:
       mode = TSSLSocket(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
     else:
       mode = TSocket(conf.host, conf.port)
-  else:
-    mode = THttpClient(conf.http_url)
 
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)
     mode.setTimeout(conf.timeout_seconds * 1000.0)
 
-  if conf.transport_mode == 'HTTP':
+  if conf.transport_mode == 'http':
     if conf.use_sasl and conf.mechanism != 'PLAIN':
       mode.set_kerberos_auth()
     else:
       mode.set_basic_auth(conf.username, conf.password)
 
-  if conf.transport_mode == 'TCP' and conf.use_sasl:
+  if conf.transport_mode == 'socket' and conf.use_sasl:
     def sasl_factory():
       saslc = sasl.Client()
       saslc.setAttr("host", str(conf.host))
