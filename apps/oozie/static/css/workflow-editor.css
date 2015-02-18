@@ -528,3 +528,31 @@ canvas {
 ul.unstyled li {
   white-space: nowrap;
 }
+
+.widget-statusbar {
+  height: 2px;
+  border-radius: 3px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  width: 0;
+  -webkit-transition: width .6s ease;
+  -moz-transition: width .6s ease;
+  -o-transition: width .6s ease;
+  transition: width .6s ease;
+}
+
+.widget-statusbar-running {
+  background-color: #fbb450;
+}
+
+.widget-statusbar-failed {
+  background-color: #c13e2c;
+}
+
+.widget-statusbar-success {
+  background-color: #2f973f;
+}
+
+.widget-running {
+  opacity: .5;
+}

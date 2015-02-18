@@ -329,7 +329,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="widget-template">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (ooziePropertiesExpanded()?' expanded-widget':''),
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass() + (ooziePropertiesExpanded()?' expanded-widget':'') + ($root.isRunning() && status() == ''?' widget-running':''),
       draggable: {data: $data, isEnabled: true, options: {'handle': '.move-widget', 'opacity': 0.7, 'refreshPositions': true, 'start': function(event, ui){ $root.setCurrentlyDraggedWidget($data, event.toElement); $root.isDragging(true); }, 'stop': function(event, ui){ $root.enableSideDrop($data); $root.isDragging(false); }, 'helper': function(event){lastWindowScrollPosition = $(window).scrollTop();  var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.currentTarget).find('h2').text());_title.appendTo(_par);_par.css('minHeight', '10px');_par.width(120);return _par;}}}">
     <h2 class="card-heading simple" data-bind="visible: widgetType() != 'start-widget' && widgetType() != 'end-widget' &&
         id() != '17c9c895-5a16-7443-bb81-f34b30b21548' && (['fork-widget', 'join-widget', 'decision-widget'].indexOf(widgetType()) == -1 || $root.isEditing())">
@@ -429,6 +429,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       </div>
       <!-- /ko -->
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      <div data-bind="css: {'widget-statusbar': true, 'widget-statusbar-running': status() == 'running', 'widget-statusbar-failed': status() == 'failed', 'widget-statusbar-success': status() == 'success'}, style: {'width': progress() + '%'}"></div>
     </div>
   </div>
 </script>
@@ -2154,6 +2155,8 @@ ${ dashboard.import_bindings() }
     $.jHueScrollUp();
     $(".custom-popover").popover();
   });
+
+  }
 
 </script>
 
