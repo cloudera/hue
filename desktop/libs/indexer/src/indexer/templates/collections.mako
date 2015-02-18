@@ -180,7 +180,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
             <thead>
               <tr>
                 <th>
-                  <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
+                  <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(displayCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
                 </th>
                 <th width="100%">${_('Name')}</th>
               </tr>
@@ -188,7 +188,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
             <tbody data-bind="foreach: displayCollections">
               <tr data-bind="routie: 'edit/' + name()" class="pointer">
                 <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
-                  <span data-bind="css: {'fa-check': $parent.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
+                  <span data-bind="css: {'fa-check': $parent.displayCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
                 </td>
                 <td data-bind="text: name" style="cursor: pointer"></td>
               </tr>
