@@ -497,6 +497,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.isEditing(! self.isEditing());
   };
 
+  self.isRunning = ko.observable(false);
+
   self.newAction = ko.observable();
 
   self.columns = ko.observableArray([]);
@@ -1210,5 +1212,8 @@ var ExtendedWidget = function (params) {
 
   self.oozieExpanded = ko.observable(false);
   self.ooziePropertiesExpanded = ko.observable(false);
+  self.status = ko.observable("");
+  self.progress = ko.observable(0);
+  self.logs = ko.observable("");
   return self;
 }
