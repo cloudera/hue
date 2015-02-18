@@ -386,15 +386,15 @@ def list_editor_coordinators(request):
 def edit_coordinator(request):
   coordinator_id = request.GET.get('coordinator', request.GET.get('uuid'))
   doc = None
-  
+
   if coordinator_id:
     cid = {}
     if coordinator_id.isdigit():
       cid['id'] = coordinator_id
     else:
       cid['uuid'] = coordinator_id    
-      doc = Document2.objects.get(**cid)
-      coordinator = Coordinator(document=doc)
+    doc = Document2.objects.get(**cid)
+    coordinator = Coordinator(document=doc)
   else:
     coordinator = Coordinator()
     coordinator.set_workspace(request.user)
