@@ -153,7 +153,7 @@ ${ components.menubar() }
         }
         else {
           var rows = [];
-          $(data).each(function (cnt, job) {
+          $(data.jobs).each(function (cnt, job) {
             rows.push(getJobRow(job));
           });
           jobTable.fnAddData(rows);
