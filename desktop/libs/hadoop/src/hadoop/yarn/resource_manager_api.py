@@ -60,12 +60,11 @@ class ResourceManagerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
-    self._ssl_cert_ca_verify = ssl_cert_ca_verify
 
     if self._security_enabled:
       self._client.set_kerberos_auth()
-      if ssl_cert_ca_verify:
-        self._client.set_verify(True)
+
+    self._client.set_verify(ssl_cert_ca_verify)
 
   def __str__(self):
     return "ResourceManagerApi at %s" % (self._url,)

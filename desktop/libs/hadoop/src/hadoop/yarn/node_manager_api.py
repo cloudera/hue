@@ -33,11 +33,12 @@ _JSON_CONTENT_TYPE = 'application/json'
 
 
 def get_resource_manager_api(api_url):
-  return ResourceManagerApi(api_url, cluster.get_cluster_conf_for_job_submission().SECURITY_ENABLED.get())
+  yarn_cluster = cluster.get_cluster_conf_for_job_submission()
+  return ResourceManagerApi(api_url, yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
 
 
 class ResourceManagerApi(object):
-  def __init__(self, oozie_url, security_enabled=False):
+  def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=False):
     self._url = posixpath.join(oozie_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
@@ -45,6 +46,8 @@ class ResourceManagerApi(object):
 
     if self._security_enabled:
       self._client.set_kerberos_auth()
+
+    self._client.set_verify(ssl_cert_ca_verify)
 
   def __str__(self):
     return "NodeManagerApi at %s" % (self._url,)
