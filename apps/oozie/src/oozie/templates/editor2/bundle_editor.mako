@@ -94,7 +94,8 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
         <h1 class="card-heading simple">${ _('Which schedules to bundle?') }</h1>
 
         <div class="card-body">
-          <a class="pointer" data-bind="visible: ! isEditing(), click: function() { showChooseCoordinator(); }, visible: $root.isEditing">
+          <span class="muted" data-bind="visible: bundle.coordinators().length == 0 && ! isEditing()">${ _('This bundle has no defined coordinators.') }</span>
+          <a class="pointer" data-bind="click: function() { showChooseCoordinator(); }, visible: $root.isEditing">
             <i class="fa fa-plus"></i> ${ _('Add a coordinator') }
           </a>
         </div>

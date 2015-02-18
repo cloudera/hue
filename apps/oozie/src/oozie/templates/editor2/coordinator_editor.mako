@@ -204,7 +204,9 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
         <h1 class="card-heading simple">${ _('Workflow Parameters') }</h1>
 
         <div class="card-body">
-          <ul data-bind="foreach: coordinator.variables" class="unstyled">
+          <span class="muted" data-bind="visible: coordinator.variables().length == 0 && ! isEditing()">${ _('This coordinator has no defined parameters.') }</span>
+
+          <ul data-bind="foreach: coordinator.variables, visible: coordinator.variables().length > 0" class="unstyled">
             <li style="margin-bottom: 10px">
               <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _("Select a parameter") }', update: workflow_variable, type: 'parameter'}, visible: $root.isEditing" style="width: 250px"></select>
 
