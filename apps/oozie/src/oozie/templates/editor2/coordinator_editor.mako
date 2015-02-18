@@ -30,6 +30,8 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1);
     }
   }
+  var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
+
 </script>
 
 
@@ -253,7 +255,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' : 
                   dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' : 
                   '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
-                  valueUpdate: 'afterkeydown'" style="margin-bottom:0; width: 380px" />
+                  valueUpdate: 'afterkeydown', typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
               </span>
 
               <span data-bind="text: dataset_variable, visible: ! $root.isEditing()"></span>
@@ -554,7 +556,9 @@ ${ dashboard.import_bindings() }
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+  viewModel.isEditing(true)
   viewModel.coordinator.tracker().markCurrentStateAsClean();
+
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
@@ -586,10 +590,6 @@ ${ dashboard.import_bindings() }
   $(document).ready(function() {
     $("#chooseWorkflowDemiModal").modal({
       show: false
-    });
-    
-    $(".dataset-input").typeahead({
-      source: ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
     });
   });
 </script>
