@@ -351,7 +351,7 @@ def submit_workflow(request, doc_id):
                      'name': workflow.name,
                      'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
                    }, force_template=True).content
-    return JsonResponse(popup)
+    return JsonResponse(popup, safe=False)
 
 
 def _submit_workflow(user, fs, jt, workflow, mapping):
@@ -554,7 +554,7 @@ def submit_coordinator(request, doc_id):
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
                 }, force_template=True).content
-  return JsonResponse(popup)
+  return JsonResponse(popup, safe=False)
 
 
 def _submit_coordinator(request, coordinator, mapping):
@@ -711,7 +711,7 @@ def submit_bundle(request, doc_id):
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
                 }, force_template=True).content
-  return JsonResponse(popup)
+  return JsonResponse(popup, safe=False)
 
 
 def _submit_bundle(request, bundle, properties):
