@@ -3,7 +3,7 @@ package com.cloudera.hue.livy.server.sessions
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.{Utils, Logging}
 import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
 
 import scala.annotation.tailrec
@@ -11,9 +11,6 @@ import scala.concurrent.Future
 import scala.io.Source
 
 object ProcessSession extends Logging {
-  val LIVY_HOME = System.getenv("LIVY_HOME")
-  val LIVY_REPL = LIVY_HOME + "/bin/livy-repl"
-
   def create(id: String, lang: String): Session = {
     val process = startProcess(id, lang)
     new ProcessSession(id, process)
@@ -21,7 +18,11 @@ object ProcessSession extends Logging {
 
   // Loop until we've started a process with a valid port.
   private def startProcess(id: String, lang: String): Process = {
-    val pb = new ProcessBuilder(LIVY_REPL, lang)
+    val pb = new ProcessBuilder(
+      "spark-submit",
+      "--class", "com.cloudera.hue.livy.repl.Main",
+      Utils.jarOfClass(getClass).head,
+      lang)
 
     val callbackUrl = System.getProperty("livy.server.callback-url")
     pb.environment().put("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
