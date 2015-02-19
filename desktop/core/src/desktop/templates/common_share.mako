@@ -29,7 +29,7 @@ from django.utils.translation import ugettext as _
         <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
         <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
-          <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
+          <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id), css:{'notpretty': prettifyUsername(id) == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></li>
         </ul>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.groups">
           <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupReadShare"> <i class="fa fa-times"></i></li>
@@ -40,7 +40,7 @@ from django.utils.translation import ugettext as _
         <h4 class="muted" style="margin-top:0px">${_('Read and Modify')}</h4>
         <div data-bind="visible: (selectedDoc().perms.write.users.length == 0 && selectedDoc().perms.write.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.users">
-          <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id)"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></li>
+          <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsername(id), css:{'notpretty': prettifyUsername(id) == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></li>
         </ul>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.groups">
           <li><span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: removeGroupWriteShare"> <i class="fa fa-times"></i></li>

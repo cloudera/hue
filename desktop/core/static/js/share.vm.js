@@ -46,6 +46,9 @@ function openShareModal() {
     $("#documentShareAddBtn").removeClass("disabled");
     $("#documentShareCaret").removeClass("disabled");
     $("#documentShareTypeahead").removeAttr("disabled");
+    $(".notpretty").each(function(){
+      $(this).text(prettifyUsername($(this).attr("data-id")));
+    });
   });
 }
 
@@ -57,13 +60,15 @@ function isShared() {
 
 function prettifyUsername(userId) {
   var _user = null;
-  for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
-    if (JSON_USERS_GROUPS.users[i].id == userId) {
-      _user = JSON_USERS_GROUPS.users[i];
+  if (self.hasSetupBeenCalled) {
+    for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
+      if (JSON_USERS_GROUPS.users[i].id == userId) {
+        _user = JSON_USERS_GROUPS.users[i];
+      }
     }
-  }
-  if (_user != null) {
-    return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
+    if (_user != null) {
+      return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
+    }
   }
   return "";
 }
