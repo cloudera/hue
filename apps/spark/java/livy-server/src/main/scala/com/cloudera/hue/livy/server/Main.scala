@@ -2,7 +2,7 @@ package com.cloudera.hue.livy.server
 
 import javax.servlet.ServletContext
 
-import com.cloudera.hue.livy.{LivyConf, WebServer}
+import com.cloudera.hue.livy.{Utils, Logging, LivyConf, WebServer}
 import org.scalatra._
 import org.scalatra.servlet.ScalatraListener
 
@@ -14,32 +14,17 @@ object Main {
   val YARN_SESSION = "yarn"
 
   def main(args: Array[String]): Unit = {
-    val host = Option(System.getProperty("livy.server.host"))
-      .getOrElse("0.0.0.0")
+    val livyConf = new LivyConf()
+    Utils.loadDefaultLivyProperties(livyConf)
 
-    val port = Option(System.getProperty("livy.server.port"))
-      .getOrElse("8998").toInt
-
-    if (args.length != 1) {
-      println("Must specify either `thread`, `process`, or `yarn` for the session kind")
-      sys.exit(1)
-    }
-
-    val session_kind = args(0)
-
-    session_kind match {
-      case THREAD_SESSION | PROCESS_SESSION | YARN_SESSION =>
-      case _ =>
-        println("Unknown session kind: " + session_kind)
-        sys.exit(1)
-    }
+    val host = livyConf.get("livy.server.host", "0.0.0.0")
+    val port = livyConf.getInt("livy.server.port", 8998)
 
     val server = new WebServer(host, port)
 
     server.context.setResourceBase("src/main/com/cloudera/hue/livy/server")
     server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
     server.context.addEventListener(new ScalatraListener)
-    server.context.setInitParameter(SESSION_KIND, session_kind)
 
     server.start()
 
@@ -55,17 +40,24 @@ object Main {
   }
 }
 
-class ScalatraBootstrap extends LifeCycle {
+class ScalatraBootstrap extends LifeCycle with Logging {
 
   var sessionManager: SessionManager = null
 
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()
 
-    val sessionFactory = context.getInitParameter(Main.SESSION_KIND) match {
-      case Main.THREAD_SESSION => new ThreadSessionFactory
-      case Main.PROCESS_SESSION => new ProcessSessionFactory
-      case Main.YARN_SESSION => new YarnSessionFactory(livyConf)
+    val sessionFactoryKind = livyConf.get("livy.server.session.factory", "thread")
+
+    info(f"Using $sessionFactoryKind sessions")
+
+    val sessionFactory = sessionFactoryKind match {
+      case "thread" => new ThreadSessionFactory(livyConf)
+      case "process" => new ProcessSessionFactory(livyConf)
+      case "yarn" => new YarnSessionFactory(livyConf)
+      case _ =>
+        println(f"Unknown session factory: $sessionFactoryKind}")
+        sys.exit(1)
     }
 
     sessionManager = new SessionManager(sessionFactory)
