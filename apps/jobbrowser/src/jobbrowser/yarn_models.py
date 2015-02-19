@@ -339,7 +339,13 @@ class Attempt:
         response = root.get(link, params=params)
         log = html.fromstring(response).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
       except Exception, e:
-        log = _('Failed to retrieve log: %s') % e
+        log = _('Failed to retrieve log: %s' % e)
+        try:
+          debug_info = _('\nLog Link: %s' % log_link)
+          debug_info += _('\nHTML Response: %s' % response)
+          LOGGER.error(debug_info)
+        except:
+          pass
 
       logs.append(log)
 
