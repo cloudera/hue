@@ -47,6 +47,9 @@ from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, c
 import urllib2
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 def check_job_permission(view_func):
   """
   Ensure that the user has access to the job.
@@ -260,14 +263,20 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
     params['start'] = offset
 
   root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
-
+  debug_info = ''
   try:
     response = root.get(link, params=params)
     log = html.fromstring(response).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
   except Exception, e:
-    log = _('Failed to retrieve log: %s') % e
+    log = _('Failed to retrieve log: %s' % e)
+    try:
+      debug_info = _('\nLog Link: %s' % log_link)
+      debug_info += _('\nHTML Response: %s' % response)
+      LOGGER.error(debug_info)
+    except:
+      pass
 
-  response = {'log': log}
+  response = {'log': log, 'debug': debug_info}
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
