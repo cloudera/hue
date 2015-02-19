@@ -28,7 +28,7 @@ JAVA_LIB = $(SPARK_ROOT)/java-lib
 
 LIVY_DIR = $(SPARK_ROOT)/java
 LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
-LIVY_ASSEMBLY = livy-assembly-3.7.0-SNAPSHOT.jar
+LIVY_ASSEMBLY = livy-assembly-$(MAVEN_VERSION).jar
 LIVY = $(JAVA_LIB)/$(LIVY_ASSEMBLY)
 
 HAVE_JAVA_SRC = $(wildcard $(LIVY_DIR))

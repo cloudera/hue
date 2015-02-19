@@ -30,7 +30,6 @@
     <groupId>com.cloudera.hue.livy</groupId>
     <artifactId>livy-main</artifactId>
     <packaging>pom</packaging>
-    <version>3.7.0-cdh5.4.0-SNAPSHOT</version>
 
     <name>livy-main</name>
     <description>livy-main</description>
