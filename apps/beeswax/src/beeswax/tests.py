@@ -477,8 +477,8 @@ for x in sys.stdin:
       result_holder[i] = response
       lock.release()
       LOG.info("Finished: " + str(i))
-    except:
-      LOG.exception("Saw exception in child thread.")
+    except Exception, e:
+      LOG.exception("Saw exception in child thread: %s" % e)
 
   def test_multiple_statements_no_result_set(self):
     hql = """
