@@ -40,20 +40,24 @@ class Client(livyConf: LivyConf) extends Logging {
   yarnClient.start()
 
   def submitApplication(id: String, lang: String, callbackUrl: String): Future[Job] = {
+    val url = f"$callbackUrl/sessions/$id/callback"
+
+    val livyJar: String = livyConf.getOption("livy.yarn.jar")
+      .getOrElse(Utils.jarOfClass(classOf[Client]).head)
+
+    val builder: ProcessBuilder = new ProcessBuilder(
+      "spark-submit",
+      "--master", "yarn-cluster",
+      "--class", "com.cloudera.hue.livy.repl.Main",
+      "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0",
+      livyJar,
+      lang
+    )
+
+    builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(true)
+
     Future {
-      val url = f"$callbackUrl/sessions/$id/callback"
-
-      val builder: ProcessBuilder = new ProcessBuilder(
-        "spark-submit",
-        "--master", "yarn-cluster",
-        "--class", "com.cloudera.hue.livy.repl.Main",
-        "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0",
-        Utils.jarOfClass(classOf[Client]).head,
-        lang
-      )
-
-      builder.redirectOutput(Redirect.PIPE)
-      builder.redirectErrorStream(true)
 
       val process = builder.start()
 

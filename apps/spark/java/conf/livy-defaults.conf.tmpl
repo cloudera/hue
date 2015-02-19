@@ -1,0 +1,13 @@
+# What host address to start the server on. Defaults to 0.0.0.0. If using the
+# `yarn` factory mode, this address must be accessible from the YARN nodes.
+# livy.server.host = 0.0.0.0
+
+# What port to start the server on. Defaults to 8998.
+# livy.server.port = 8998
+
+# What session factory to use. The options are `thread`, `process`, and `yarn`.
+# livy.server.session.factory = thread
+
+# Location to find the livy assembly. If not specified, livy will determine the
+# assembly from the local jarfile. If using `yarn` sessions, this may be on HDFS.
+# livy.yarn.jar = hdfs://localhost:8020/user/hue/share/lib/livy-assembly.jar

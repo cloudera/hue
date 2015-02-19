@@ -14,7 +14,7 @@ trait SessionFactory {
   def close(): Unit = {}
 }
 
-class ThreadSessionFactory extends SessionFactory {
+class ThreadSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
   implicit def executor: ExecutionContext = ExecutionContext.global
 
@@ -26,7 +26,7 @@ class ThreadSessionFactory extends SessionFactory {
   }
 }
 
-class ProcessSessionFactory extends SessionFactory {
+class ProcessSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
   implicit def executor: ExecutionContext = ExecutionContext.global
 
