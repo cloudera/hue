@@ -556,7 +556,6 @@ ${ dashboard.import_bindings() }
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-  viewModel.isEditing(true)
   viewModel.coordinator.tracker().markCurrentStateAsClean();
 
 
