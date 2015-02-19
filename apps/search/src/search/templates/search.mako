@@ -386,13 +386,13 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
-                <a class="pointer" data-bind="text: $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+                <a class="pointer" data-bind="text: $data.label, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
                 <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
               <!-- /ko -->
               <!-- ko if: selected -->
                 <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
-                  <strong data-bind="text: $data.from + ' - ' + $data.to"></strong>
+                  <strong data-bind="text: $data.label"></strong>
                   <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
                   <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                 </span>

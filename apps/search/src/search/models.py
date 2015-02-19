@@ -434,10 +434,11 @@ def pairwise2(cat, fq_filter, iterable):
     })
   return pairs
 
-def range_pair(cat, fq_filter, iterable, end):
+def range_pair(cat, fq_filter, iterable, end, collection_facet):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
+  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap']))
   a, to = itertools.tee(iterable)
   next(to, None)
   for element in a:
@@ -445,7 +446,8 @@ def range_pair(cat, fq_filter, iterable, end):
     to_value = next(to, end)
     pairs.append({
         'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values,
-        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element])
+        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element]),
+        'label': element if is_single_unit_gap else '%s - %s' % (element, to_value)
     })
   return pairs
 
@@ -483,7 +485,7 @@ def augment_solr_response(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), []), counts, end)
+        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), []), counts, end, collection_facet)
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
         facet = {
