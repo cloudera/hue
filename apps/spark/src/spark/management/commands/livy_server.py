@@ -35,26 +35,22 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         if not args:
-          session_kind = 'thread'
+            session_kind = spark.conf.LIVY_SESSION_KIND.get()
         else:
-          session_kind = args[0].lower()
+            session_kind = args[0].lower()
 
+        jar = spark.conf.LIVY_ASSEMBLY_JAR.get()
         env = os.environ.copy()
+        classpath = jar + os.path.pathsep + env.get('CLASSPATH', '')
 
         args = [
-          os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "..",
-            "..",
-            "..",
             "java",
-            "bin",
-            "livy-server"),
-          session_kind,
+            "-cp", classpath,
+            "com.cloudera.hue.livy.server.Main",
+            session_kind,
         ]
 
         LOG.info("Executing %r (%r) (%r)" % (bin, args, env))
 
         # Use exec, so that this takes only one process.
-        os.execve(args[0], args, env)
+        os.execvpe(args[0], args, env)

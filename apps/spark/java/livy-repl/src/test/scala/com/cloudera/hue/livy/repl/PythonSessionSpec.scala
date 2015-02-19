@@ -1,8 +1,8 @@
 package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.repl.python.PythonSession
-import org.json4s.{DefaultFormats, Extraction}
-import org.scalatest._
+import org.json4s.{Extraction, DefaultFormats}
+import org.scalatest.{BeforeAndAfter, FunSpec}
 import org.scalatest.matchers.ShouldMatchers
 
 import _root_.scala.concurrent.Await

@@ -2,9 +2,9 @@ package com.cloudera.hue.livy.server
 
 import java.util.UUID
 
+import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.yarn.Client
-import org.apache.hadoop.yarn.conf.YarnConfiguration
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,12 +38,9 @@ class ProcessSessionFactory extends SessionFactory {
   }
 }
 
-class YarnSessionFactory extends SessionFactory {
+class YarnSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
-  val yarnConf = new YarnConfiguration()
-  yarnConf.set("yarn.resourcemanager.am.max-attempts", "1")
-
-  val client = new Client(yarnConf)
+  val client = new Client(livyConf)
 
   override def createSession(lang: String): Future[Session] = {
     val id = UUID.randomUUID().toString

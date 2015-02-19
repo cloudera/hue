@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy
 
-import javax.servlet.{Servlet, ServletContextListener}
+import java.net.{InetAddress, InetSocketAddress}
+import javax.servlet.ServletContextListener
 
 import ch.qos.logback.access.jetty.RequestLogImpl
 import org.eclipse.jetty.server.Server
@@ -11,8 +12,10 @@ import org.scalatra.servlet.AsyncSupport
 
 import scala.concurrent.ExecutionContext
 
-class WebServer(var port: Int) extends Logging {
-  val server = new Server(port)
+class WebServer(var host: String, var port: Int) extends Logging {
+  val address = new InetSocketAddress(host, port)
+  val server = new Server(address)
+
   server.setGracefulShutdown(1000)
   server.setStopAtShutdown(true)
 
@@ -40,13 +43,16 @@ class WebServer(var port: Int) extends Logging {
     context.addEventListener(listener)
   }
 
-  def addServlet(servlet: Servlet) = {
-
-  }
-
   def start() = {
     server.start()
-    port = server.getConnectors()(0).getLocalPort
+
+    val connector = server.getConnectors()(0)
+
+    host = connector.getHost
+    if (host == "0.0.0.0") {
+      host = InetAddress.getLocalHost.getHostAddress
+    }
+    port = connector.getLocalPort
 
     info("Starting server on %s" format port)
   }

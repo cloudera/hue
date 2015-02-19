@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
+import java.net.URL
+
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl.python.PythonSession
@@ -40,6 +42,10 @@ private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.
       case repl.Session.ShutDown() => Dead()
     }
   }
+
+  override def url: Option[URL] = None
+
+  override def url_=(url: URL): Unit = {}
 
   override def executeStatement(content: ExecuteRequest): Statement = {
     val statement = new Statement(executedStatements, content, session.execute(content.code))

@@ -24,28 +24,33 @@ APP_NAME = spark
 include $(ROOT)/Makefile.sdk
 
 SPARK_ROOT := $(realpath .)
-BLD_DIR_SPARK = $(SPARK_ROOT)/java/target
-SPARK_JAVA_LIB = $(SPARK_ROOT)/java-lib
+JAVA_LIB = $(SPARK_ROOT)/java-lib
 
-SPARK := $(SPARK_JAVA_LIB)/SparkServer.jar
-SPARK_JAVA_DIR := $(SPARK_ROOT)/java
+LIVY_DIR = $(SPARK_ROOT)/java
+LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
+LIVY_ASSEMBLY = livy-assembly-3.7.0-SNAPSHOT.jar
+LIVY = $(JAVA_LIB)/$(LIVY_ASSEMBLY)
 
-HAVE_JAVA_SRC = $(wildcard $(SPARK_JAVA_DIR))
+HAVE_JAVA_SRC = $(wildcard $(LIVY_DIR))
 
-compile: $(SPARK)
+compile: $(LIVY)
 
 ifneq (,$(HAVE_JAVA_SRC))
 
 clean::
-	rm -Rf $(SPARK_JAVA_LIB)
-	cd $(SPARK_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) || :
+	rm -Rf $(JAVA_LIB)
+	cd $(LIVY_DIR) && mvn clean $(MAVEN_OPTIONS) || :
 
-$(SPARK): $(shell find $(SPARK_JAVA_DIR) -type f)
+$(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY): $(shell find $(LIVY_DIR) -type f)
 	@echo "--- Building Desktop spark"
-	cd $(SPARK_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+	cd $(LIVY_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+
+$(LIVY): $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY)
+	mkdir -p $(JAVA_LIB)
+	cp $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY) $(LIVY)
 
 else
-$(SPARK):
+$(LIVY):
 	$(error Cannot build spark jars without source)
 endif
 

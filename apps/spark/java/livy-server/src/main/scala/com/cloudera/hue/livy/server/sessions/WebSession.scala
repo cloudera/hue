@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
+import java.net.URL
+
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
@@ -12,17 +14,32 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, _}
 
-abstract class WebSession(val id: String, hostname: String, port: Int) extends Session with Logging {
+class WebSession(val id: String) extends Session with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
 
+  protected[this] var _state: State = Starting()
+
   private[this] var _lastActivity = Long.MaxValue
-  private[this] var _state: State = Idle()
-  private[this] val svc = host(hostname, port)
+  private[this] var _url: Option[URL] = None
 
   private[this] var executedStatements = 0
   private[this] var statements_ = new ArrayBuffer[Statement]
+
+  override def url: Option[URL] = _url
+
+  override def url_=(url: URL) = {
+    ensureState(Session.Starting(), {
+      _state = Idle()
+      _url = Some(url)
+    })
+  }
+
+  private def svc = {
+    val url = _url.head
+    dispatch.url(url.toString)
+  }
 
   override def lastActivity: Long = _lastActivity
 
@@ -57,9 +74,7 @@ abstract class WebSession(val id: String, hostname: String, port: Int) extends S
   override def statements(): Seq[Statement] = statements_.toSeq
 
   override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = {
-    ensureRunning {
-      statements_.slice(fromIndex, toIndex).toSeq
-    }
+    statements_.slice(fromIndex, toIndex).toSeq
   }
 
   override def interrupt(): Future[Unit] = {
@@ -87,7 +102,7 @@ abstract class WebSession(val id: String, hostname: String, port: Int) extends S
           Future {
             waitForStateChangeFrom(Busy(), { stop() })
           }
-        case Dead() =>
+        case Error() | Dead() =>
           Future.successful(Unit)
       }
     }
@@ -111,14 +126,18 @@ abstract class WebSession(val id: String, hostname: String, port: Int) extends S
     _lastActivity = System.currentTimeMillis()
   }
 
-  private def ensureIdle[A](f: => A) = {
+  private def ensureState[A](state: State, f: => A) = {
     synchronized {
-      if (_state == Idle()) {
+      if (_state == state) {
         f
       } else {
         throw new IllegalStateException("Session is in state %s" format _state)
       }
     }
+  }
+
+  private def ensureIdle[A](f: => A) = {
+    ensureState(Idle(), f)
   }
 
   private def ensureRunning[A](f: => A) = {

@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
+import java.net.URL
+
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
 
@@ -10,6 +12,7 @@ object Session {
   case class Starting() extends State
   case class Idle() extends State
   case class Busy() extends State
+  case class Error() extends State
   case class Dead() extends State
 
   class SessionFailedToStart(msg: String) extends Exception(msg)
@@ -25,6 +28,10 @@ trait Session {
   def lastActivity: Long
 
   def state: State
+
+  def url: Option[URL]
+
+  def url_=(url: URL)
 
   def executeStatement(content: ExecuteRequest): Statement
 

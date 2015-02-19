@@ -1,6 +1,5 @@
 package com.cloudera.hue.livy.repl.scala
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl.Session
 import com.cloudera.hue.livy.repl.scala.interpreter.Interpreter
 import org.json4s.jackson.JsonMethods._
