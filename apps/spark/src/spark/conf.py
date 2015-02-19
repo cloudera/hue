@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import os
 import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -47,6 +48,16 @@ LANGUAGES = Config(
   ]"""
 )
 
+LIVY_SESSION_KIND = Config(
+  key="livy_session_kind",
+  help=_t("Configure livy to start with thread, process, or yarn workers"),
+  default="thread")
+
+LIVY_ASSEMBLY_JAR = Config(
+  key="livy_assembly_jar",
+  help=_t("Path to livy-assembly.jar"),
+  private=True,
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "livy-assembly-3.7.0-SNAPSHOT.jar"))
 
 def get_spark_status(user):
   from spark.job_server_api import get_api

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -22,9 +22,9 @@ set -e
 export LIVY_HOME=$(cd $(dirname $0)/.. && pwd)
 cd $LIVY_HOME
 
-CLASSPATH="$LIVY_HOME/livy-server/target/lib/*:$LIVY_HOME/livy-server/target/livy-server-3.7.0-SNAPSHOT.jar:$CLASSPATH"
+source ./bin/setup-classpath
 
 exec java \
-	-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 \
+	$LIVY_SERVER_JAVA_OPTS \
 	-cp "$CLASSPATH" \
 	com.cloudera.hue.livy.server.Main "$@"

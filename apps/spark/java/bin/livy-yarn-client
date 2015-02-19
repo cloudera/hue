@@ -25,4 +25,4 @@ CLASSPATH="$LIVY_HOME/livy-server/target/lib/*:$LIVY_HOME/livy-server/target/liv
 
 exec java \
 	-cp "$CLASSPATH" \
-	com.cloudera.hue.livy.yarn.Client "$@"
+	com.cloudera.hue.livy.yarn.Main "$@"

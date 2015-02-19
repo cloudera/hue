@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server
 
+import java.net.URL
+
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.Session
@@ -15,6 +17,8 @@ import scala.concurrent.duration._
 object WebApp extends Logging {
   case class CreateSessionRequest(lang: String)
 }
+
+case class CallbackRequest(url: String)
 
 class WebApp(sessionManager: SessionManager)
   extends ScalatraServlet
@@ -63,12 +67,27 @@ class WebApp(sessionManager: SessionManager)
     new AsyncResult { val is = rep }
   }
 
+  post("/sessions/:sessionId/callback") {
+    val callback = parsedBody.extract[CallbackRequest]
+
+    sessionManager.get(params("sessionId")) match {
+      case Some(session) =>
+        if (session.state == Session.Starting()) {
+          session.url = new URL(callback.url)
+          Accepted()
+        } else {
+          BadRequest("Session is in wrong state")
+        }
+      case None => NotFound("Session not found")
+    }
+  }
+
   post("/sessions/:sessionId/stop") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         val future = session.stop()
 
-        new AsyncResult() { val is = for { _ <- future } yield NoContent }
+        new AsyncResult() { val is = for { _ <- future } yield NoContent() }
       case None => NotFound("Session not found")
     }
   }
@@ -81,7 +100,7 @@ class WebApp(sessionManager: SessionManager)
         } yield Accepted()
 
         // FIXME: this is silently eating exceptions.
-        new AsyncResult() { val is = for { _ <- future } yield NoContent }
+        new AsyncResult() { val is = for { _ <- future } yield NoContent() }
       case None => NotFound("Session not found")
     }
   }
@@ -91,7 +110,7 @@ class WebApp(sessionManager: SessionManager)
       _ <- sessionManager.delete(params("sessionId"))
     } yield Accepted()
 
-    new AsyncResult() { val is = for { _ <- future } yield NoContent }
+    new AsyncResult() { val is = for { _ <- future } yield NoContent() }
   }
 
   get("/sessions/:sessionId/statements") {

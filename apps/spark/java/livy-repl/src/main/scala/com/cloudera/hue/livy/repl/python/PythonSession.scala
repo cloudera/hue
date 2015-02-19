@@ -5,12 +5,16 @@ import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
 import java.util.concurrent.SynchronousQueue
 
+import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.repl.Session
+import org.apache.spark.SparkContext
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, JValue}
+import py4j.GatewayServer
 
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
@@ -23,13 +27,41 @@ object PythonSession {
     create(createFakePySpark().toString)
   }
 
+  private def pythonPath = {
+    val pythonPath = new ArrayBuffer[String]
+    pythonPath ++= Utils.jarOfClass(classOf[SparkContext])
+    pythonPath
+  }
+
   private def create(driver: String) = {
+    val pythonExec = sys.env.getOrElse("PYSPARK_DRIVER_PYTHON", "python")
+
+    val gatewayServer = new GatewayServer(null, 0)
+    gatewayServer.start()
+
+    val builder = new ProcessBuilder(Seq(
+      pythonExec,
+      createFakeShell().toString
+    ))
+
+    val env = builder.environment()
+    env.put("PYTHONPATH", pythonPath.mkString(File.pathSeparator))
+    env.put("PYTHONUNBUFFERED", "YES")
+    env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
+    env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
+
+    builder.redirectError(Redirect.INHERIT)
+
+    val process = builder.start()
+
+    /*
     val fakeShell = createFakeShell()
     val pb = new ProcessBuilder(driver, fakeShell.toString)
     pb.redirectError(Redirect.INHERIT)
     val process = pb.start()
+    */
 
-    new PythonSession(process)
+    new PythonSession(process, gatewayServer)
   }
 
   private def createFakeShell(): File = {
@@ -77,7 +109,7 @@ object PythonSession {
   }
 }
 
-private class PythonSession(process: Process) extends Session {
+private class PythonSession(process: Process, gatewayServer: GatewayServer) extends Session {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   implicit val formats = DefaultFormats
@@ -180,7 +212,10 @@ private class PythonSession(process: Process) extends Session {
         synchronized {
           val promise = Promise[Unit]()
           queue.put(ShutdownRequest(promise))
-          promise.future.map({ case () => thread.join() })
+          promise.future.map({ case () =>
+            thread.join()
+            gatewayServer.shutdown()
+          })
         }
     }
   }

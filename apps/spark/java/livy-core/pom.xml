@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.cloudera.hue.livy</groupId>
         <artifactId>livy-main</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>3.7.0-cdh5.4.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>livy-core</artifactId>
+    <artifactId>livy-core_2.10</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -18,103 +18,60 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-access</artifactId>
-            <version>${logback.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>${jetty.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
-            <artifactId>scalatra_2.10</artifactId>
-            <version>${scalatra.version}</version>
+            <artifactId>scalatra_${scala.binary.version}</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>com.typesafe.akka</groupId>
-                    <artifactId>akka-actor_2.10</artifactId>
+                    <artifactId>akka-actor_${scala.binary.version}</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
-            <artifactId>scalatra-jetty_2.10</artifactId>
-            <version>${scalatra.version}</version>
+            <artifactId>scalatra-jetty_${scala.binary.version}</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
-            <artifactId>scalatra-scalatest_2.10</artifactId>
-            <version>${scalatra.version}</version>
+            <artifactId>scalatra-scalatest_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
             <artifactId>scalatra-json_2.10</artifactId>
-            <version>${scalatra.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s_2.10</artifactId>
-            <version>${json4s.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_2.10</artifactId>
-            <version>${json4s.version}</version>
         </dependency>
 
     </dependencies>
 
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-    </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <configuration>
-                    <scalaVersion>${scala.version}</scalaVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
 </project>
-

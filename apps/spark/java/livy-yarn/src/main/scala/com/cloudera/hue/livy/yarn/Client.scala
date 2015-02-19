@@ -1,151 +1,95 @@
 package com.cloudera.hue.livy.yarn
 
-import com.cloudera.hue.livy.Logging
-import org.apache.hadoop.fs.{FileSystem, Path}
-import org.apache.hadoop.yarn.api.ApplicationConstants
-import org.apache.hadoop.yarn.api.records._
+import java.io.{BufferedReader, InputStreamReader}
+import java.lang.ProcessBuilder.Redirect
+
+import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
+import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
-import org.apache.hadoop.yarn.util.{ConverterUtils, Records}
+import org.apache.hadoop.yarn.util.ConverterUtils
 
-import scala.collection.JavaConversions._
+import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContext, Future}
 
 object Client extends Logging {
+  private val LIVY_JAR = "__livy__.jar"
+  private val CONF_LIVY_JAR = "livy.yarn.jar"
+  private val LOCAL_SCHEME = "local"
+  private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def main(args: Array[String]): Unit = {
-    val packagePath = new Path(args(0))
-    val lang = args(1)
-
-    val yarnConf = new YarnConfiguration()
-    yarnConf.set("yarn.resourcemanager.am.max-attempts", "1")
-
-    val client = new Client(yarnConf)
-
-    try {
-      val job = client.submitApplication(
-        "livy " + lang,
-        packagePath,
-        List(
-          "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
-            lang,
-            ApplicationConstants.LOG_DIR_EXPANSION_VAR,
-            ApplicationConstants.LOG_DIR_EXPANSION_VAR
-          )
-        )
-      )
-
-      info("waiting for job to start")
-
-      job.waitForStatus(Running(), 100000) match {
-        case Some(Running()) => {
-          info("job started successfully on %s:%s" format(job.getHost, job.getPort))
-        }
-        case Some(appStatus) => {
-          warn("unable to start job successfully. job has status %s" format appStatus)
-        }
-        case None => {
-          warn("timed out waiting for job to start")
-        }
-      }
-
-    } finally {
-      client.close()
+  private def livyJar(conf: LivyConf) = {
+    if (conf.contains(CONF_LIVY_JAR)) {
+      conf.get(CONF_LIVY_JAR)
+    } else {
+      Utils.jarOfClass(classOf[Client]).head
     }
   }
 }
 
-class Client(yarnConf: YarnConfiguration) {
+class FailedToSubmitApplication extends Exception
 
+class Client(livyConf: LivyConf) extends Logging {
   import com.cloudera.hue.livy.yarn.Client._
 
+  protected implicit def executor: ExecutionContext = ExecutionContext.global
+
+  val yarnConf = new YarnConfiguration()
   val yarnClient = YarnClient.createYarnClient()
   yarnClient.init(yarnConf)
   yarnClient.start()
 
-  def submitApplication(name: String, packagePath: Path, cmds: List[String]): Job = {
-    val app = yarnClient.createApplication()
-    val newAppResponse = app.getNewApplicationResponse
+  def submitApplication(id: String, lang: String, callbackUrl: String): Future[Job] = {
+    Future {
+      val url = f"$callbackUrl/sessions/$id/callback"
 
-    val appId = newAppResponse.getApplicationId
+      val builder: ProcessBuilder = new ProcessBuilder(
+        "spark-submit",
+        "--master", "yarn-cluster",
+        "--class", "com.cloudera.hue.livy.repl.Main",
+        "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0",
+        Utils.jarOfClass(classOf[Client]).head,
+        lang
+      )
 
-    info("preparing to submit %s" format appId)
+      builder.redirectOutput(Redirect.PIPE)
+      builder.redirectErrorStream(true)
 
-    val appContext = app.getApplicationSubmissionContext
-    appContext.setApplicationName(name)
+      val process = builder.start()
 
-    val containerCtx = Records.newRecord(classOf[ContainerLaunchContext])
-    val resource = Records.newRecord(classOf[Resource])
+      val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
 
-    info("Copy app master jar from local filesystem and add to the local environment")
+      val applicationId = parseApplicationId(stdout).getOrElse(throw new FailedToSubmitApplication)
 
-    val packageResource = Records.newRecord(classOf[LocalResource])
+      // Application has been submitted, so we don't need to keep the process around anymore.
+      stdout.close()
+      process.destroy()
 
-    val packageUrl = ConverterUtils.getYarnUrlFromPath(packagePath)
-    val fileStatus = packagePath.getFileSystem(yarnConf).getFileStatus(packagePath)
-
-    packageResource.setResource(packageUrl)
-    info("set package url to %s for %s" format (packageUrl, appId))
-    packageResource.setSize(fileStatus.getLen)
-    info("set package size to %s for %s" format (fileStatus.getLen, appId))
-    packageResource.setTimestamp(fileStatus.getModificationTime)
-    packageResource.setType(LocalResourceType.ARCHIVE)
-    packageResource.setVisibility(LocalResourceVisibility.APPLICATION)
-
-    resource.setMemory(256)
-    resource.setVirtualCores(1)
-    appContext.setResource(resource)
-
-    containerCtx.setCommands(cmds)
-    containerCtx.setLocalResources(Map("__package" -> packageResource))
-
-    // FIXME: Spark needs the `MASTER` environment passed through to run on YARN. This needs a better approach.
-    val master = System.getenv("MASTER")
-    if (master != null) {
-      containerCtx.getEnvironment()("MASTER") = master
+      new Job(yarnClient, ConverterUtils.toApplicationId(applicationId))
     }
-
-    // FIXME: Spark needs the `SPARK_HOME` environment passed through to run on YARN. This needs a better approach.
-    val spark_home = System.getenv("SPARK_HOME")
-    if (spark_home != null) {
-      containerCtx.getEnvironment()("SPARK_HOME") = spark_home
-    }
-
-    appContext.setApplicationId(appId)
-    appContext.setAMContainerSpec(containerCtx)
-    appContext.setApplicationType("livy")
-
-    info("submitting application request for %s" format appId)
-
-    yarnClient.submitApplication(appContext)
-
-    new Job(yarnClient, appId)
   }
 
-  def close(): Unit = {
+  def close() = {
     yarnClient.close()
   }
 
-  private def addToLocalResources(fs: FileSystem, fileSrcPath: String, fileDstPath: String, appId: String): LocalResource = {
-    val appName = "livy"
-    val suffix = appName + "/" + appId + "/" + fileDstPath
+  @tailrec
+  private def parseApplicationId(stdout: BufferedReader): Option[String] = {
+    Option(stdout.readLine()) match {
+      case Some(line) =>
+        info(f"shell output: $line")
 
-    val dst = new Path(fs.getHomeDirectory, suffix)
-
-    fs.copyFromLocalFile(new Path(fileSrcPath), dst)
-
-    val srcFileStatus = fs.getFileStatus(dst)
-    LocalResource.newInstance(
-      ConverterUtils.getYarnUrlFromURI(dst.toUri),
-      LocalResourceType.FILE,
-      LocalResourceVisibility.APPLICATION,
-      srcFileStatus.getLen,
-      srcFileStatus.getModificationTime
-    )
+        line match {
+          case regex(applicationId) => Some(applicationId)
+          case _ => parseApplicationId(stdout)
+        }
+      case None =>
+        None
+    }
   }
 }
 
-class Job(client: YarnClient, appId: ApplicationId) {
-
+class Job(yarnClient: YarnClient, appId: ApplicationId) {
   def waitForFinish(timeoutMs: Long): Option[ApplicationStatus] = {
     val startTimeMs = System.currentTimeMillis()
 
@@ -184,7 +128,7 @@ class Job(client: YarnClient, appId: ApplicationId) {
     val startTimeMs = System.currentTimeMillis()
 
     while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      val statusResponse = client.getApplicationReport(appId)
+      val statusResponse = yarnClient.getApplicationReport(appId)
 
       (statusResponse.getHost, statusResponse.getRpcPort) match {
         case ("N/A", _) | (_, -1) =>
@@ -196,17 +140,17 @@ class Job(client: YarnClient, appId: ApplicationId) {
   }
 
   def getHost: String = {
-    val statusResponse = client.getApplicationReport(appId)
+    val statusResponse = yarnClient.getApplicationReport(appId)
     statusResponse.getHost
   }
 
   def getPort: Int = {
-    val statusResponse = client.getApplicationReport(appId)
+    val statusResponse = yarnClient.getApplicationReport(appId)
     statusResponse.getRpcPort
   }
 
   private def getStatus: ApplicationStatus = {
-    val statusResponse = client.getApplicationReport(appId)
+    val statusResponse = yarnClient.getApplicationReport(appId)
     convertState(statusResponse.getYarnApplicationState, statusResponse.getFinalApplicationStatus)
   }
 

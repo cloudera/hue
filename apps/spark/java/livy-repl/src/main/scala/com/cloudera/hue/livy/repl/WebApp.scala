@@ -55,6 +55,12 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     }
   }
 
+  delete("/") {
+    session.close().onComplete { _ =>
+      System.exit(0)
+    }
+  }
+
   error {
     case e: JsonParseException => BadRequest(e.getMessage)
     case e: MappingException => BadRequest(e.getMessage)

@@ -5,22 +5,38 @@ import javax.servlet.ServletContext
 import com.cloudera.hue.livy.repl.python.PythonSession
 import com.cloudera.hue.livy.repl.scala.SparkSession
 import com.cloudera.hue.livy.{Logging, WebServer}
+import dispatch._
+import org.json4s.jackson.Serialization.write
+import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
 
-import _root_.scala.concurrent.Await
-import _root_.scala.concurrent.duration.Duration
+import _root_.scala.concurrent.duration._
+import _root_.scala.concurrent.{Await, ExecutionContext}
 
 object Main extends Logging {
 
-  val SESSION_KIND = "livy-repl.session.kind"
+  protected implicit def executor: ExecutionContext = ExecutionContext.global
+  protected implicit def jsonFormats: Formats = DefaultFormats
+
+  val SESSION_KIND = "livy.repl.session.kind"
   val PYTHON_SESSION = "python"
   val PYSPARK_SESSION = "pyspark"
   val SCALA_SESSION = "scala"
   val SPARK_SESSION = "spark"
 
   def main(args: Array[String]): Unit = {
-    val port = sys.env.getOrElse("PORT", "8999").toInt
+
+    val host = Option(System.getProperty("livy.repl.host"))
+      .orElse(sys.env.get("LIVY_HOST"))
+      .getOrElse("0.0.0.0")
+
+    val port = Option(System.getProperty("livy.repl.port"))
+      .orElse(sys.env.get("LIVY_PORT"))
+      .getOrElse("8999").toInt
+
+    val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
+      .orElse(sys.env.get("LIVY_CALLBACK_URL"))
 
     if (args.length != 1) {
       println("Must specify either `python`/`pyspark`/`scala/`spark` for the session kind")
@@ -36,7 +52,7 @@ object Main extends Logging {
         sys.exit(1)
     }
 
-    val server = new WebServer(port)
+    val server = new WebServer(host, port)
 
     server.context.setResourceBase("src/main/com/cloudera/hue/livy/repl")
     server.context.addEventListener(new ScalatraListener)
@@ -44,9 +60,32 @@ object Main extends Logging {
     server.context.setInitParameter(SESSION_KIND, session_kind)
 
     server.start()
-    println("Starting livy-repl on port %s" format server.port)
 
-    server.join()
+    try {
+      println("Starting livy-repl on port %s" format server.port)
+
+      // See if we want to notify someone that we've started on a url
+      callbackUrl.foreach { case callbackUrl_ =>
+        info(f"Notifying $callbackUrl_ that we're up")
+
+        var req = url(callbackUrl_).setContentType("application/json", "UTF-8")
+        req = req << write(Map(
+          "url" -> s"http://${server.host}:${server.port}"
+        ))
+
+        val rep = Http(req OK as.String)
+        rep.onFailure { case _ => server.stop() }
+
+        Await.result(rep, 10 seconds)
+      }
+
+    } finally {
+      server.join()
+      server.stop()
+
+      // Make sure to close all our outstanding http requests.
+      Http.shutdown()
+    }
   }
 }
 

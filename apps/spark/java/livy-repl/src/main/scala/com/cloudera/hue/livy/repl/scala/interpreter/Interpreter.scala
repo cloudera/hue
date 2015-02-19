@@ -27,7 +27,7 @@ class Interpreter {
   // We start up the ILoop in it's own class loader because the SparkILoop store
   // itself in a global variable.
   private val iloop = {
-    val classLoader = new ClassLoader {}
+    val classLoader = new ILoopClassLoader(classOf[Interpreter].getClassLoader)
     val cls = classLoader.loadClass(classOf[ILoop].getName)
     val constructor = cls.getConstructor(classOf[SynchronousQueue[Request]])
     constructor.newInstance(queue).asInstanceOf[ILoop]
@@ -58,6 +58,8 @@ class Interpreter {
     promise.future.map({ case () => thread.join() })
   }
 }
+
+private class ILoopClassLoader(classLoader: ClassLoader) extends ClassLoader(classLoader) { }
 
 private sealed trait Request
 private case class ExecuteRequest(code: String, promise: Promise[ExecuteResponse]) extends Request

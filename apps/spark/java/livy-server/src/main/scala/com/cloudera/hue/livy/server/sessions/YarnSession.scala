@@ -1,54 +1,37 @@
 package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.yarn.{Client, Job}
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.yarn.api.ApplicationConstants
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future, TimeoutException}
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.duration._
 
 object YarnSession {
-  private val LIVY_YARN_PACKAGE = System.getenv("LIVY_YARN_PACKAGE")
-
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   def create(client: Client, id: String, lang: String): Future[Session] = {
-    val packagePath = new Path(LIVY_YARN_PACKAGE)
+    val callbackUrl = System.getProperty("livy.server.callback-url")
+    val job = client.submitApplication(id, lang, callbackUrl)
 
-    val job = client.submitApplication(
-      "livy " + lang,
-      packagePath,
-      List(
-        "__package/bin/run-am.sh %s 1>%s/stdout 2>%s/stderr" format (
-          lang,
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR,
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR
-          )
-      )
-    )
-
-    Future {
-      var x = job.waitForRPC(100000)
-
-      println("x: %s" format x)
-
-      x match {
-        case Some((hostname, port)) =>
-          new YarnSession(id, job, hostname, port)
-        case None =>
-          throw new TimeoutException()
-      }
-    }
+    Future.successful(new YarnSession(id, job))
   }
 }
 
-private class YarnSession(id: String, job: Job, hostname: String, port: Int)
-  extends WebSession(id, hostname, port) {
-
-  override def stop(): Future[Unit] = {
-    super.stop() andThen { case r =>
-      job.waitForFinish(10000)
-      r
-    }
+private class YarnSession(id: String, job: Future[Job]) extends WebSession(id) {
+  job.onFailure { case _ =>
+    _state = Session.Error()
   }
 
+  override def stop(): Future[Unit] = {
+    super.stop().andThen {
+      case _ =>
+        try {
+          val job_ = Await.result(job, 1 second)
+          job_.waitForFinish(10000)
+        } catch {
+          case e: Throwable =>
+            _state = Session.Error()
+            throw e
+        }
+    }
+  }
 }

@@ -53,6 +53,7 @@
         <json4s.version>3.2.11</json4s.version>
         <logback.version>1.1.2</logback.version>
         <scala.version>2.10.3</scala.version>
+        <scala.binary.version>2.10</scala.binary.version>
         <scalatra.version>2.2.1</scalatra.version>
         <dispatch.version>0.11.2</dispatch.version>
     </properties>
@@ -60,9 +61,119 @@
     <modules>
         <module>livy-core</module>
         <module>livy-repl</module>
-        <module>livy-server</module>
         <module>livy-yarn</module>
+        <module>livy-server</module>
+        <module>livy-assembly</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scalatra</groupId>
+                <artifactId>scalatra_${scala.binary.version}</artifactId>
+                <version>${scalatra.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scalatra</groupId>
+                <artifactId>scalatra-jetty_${scala.binary.version}</artifactId>
+                <version>${scalatra.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scalatra</groupId>
+                <artifactId>scalatra-scalatest_${scala.binary.version}</artifactId>
+                <version>${scalatra.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scalatra</groupId>
+                <artifactId>scalatra-json_${scala.binary.version}</artifactId>
+                <version>${scalatra.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-yarn_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.databinder.dispatch</groupId>
+                <artifactId>dispatch-core_${scala.binary.version}</artifactId>
+                <version>${dispatch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.databinder.dispatch</groupId>
+                <artifactId>dispatch-json4s-jackson_${scala.binary.version}</artifactId>
+                <version>${dispatch.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -138,6 +249,63 @@
                     <version>2.4.0</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scalaVersion>${scala.version}</scalaVersion>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.7</version>
+                    <configuration>
+                        <skipTests>true</skipTests>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest-maven-plugin</artifactId>
+                    <version>1.0</version>
+                    <configuration>
+                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                        <junitxml>.</junitxml>
+                        <filereports>WDF TestSuite.txt</filereports>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>test</id>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -193,20 +361,13 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
+
         </plugins>
 
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <configuration>
-                    <scalaVersion>${scala.version}</scalaVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
 </project>

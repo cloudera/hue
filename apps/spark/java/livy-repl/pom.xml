@@ -10,64 +10,58 @@
         <version>3.7.0-cdh5.4.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>livy-repl</artifactId>
+    <artifactId>livy-repl_2.10</artifactId>
     <packaging>jar</packaging>
-
-    <properties>
-        <PermGen>64m</PermGen>
-        <MaxPermGen>512m</MaxPermGen>
-    </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>com.cloudera.hue.livy</groupId>
-            <artifactId>livy-core</artifactId>
+            <artifactId>livy-core_${scala.binary.version}</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-repl_2.10</artifactId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                </exclusion>
+            <scope>provided</scope>
+        </dependency>
 
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-            </exclusions>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-repl_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
+
         </dependency>
 
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_2.10</artifactId>
-            <version>${json4s.version}</version>
+            <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.scalatra</groupId>
-            <artifactId>scalatra-scalatest_2.10</artifactId>
-            <version>${scalatra.version}</version>
+            <artifactId>scalatra-scalatest_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-client</artifactId>
-            <version>${hadoop.version}</version>
+            <groupId>net.sf.py4j</groupId>
+            <artifactId>py4j</artifactId>
+            <version>0.8.2.1</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-api</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>provided</scope>
+            <groupId>net.databinder.dispatch</groupId>
+            <artifactId>dispatch-core_${scala.binary.version}</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.databinder.dispatch</groupId>
+            <artifactId>dispatch-json4s-jackson_${scala.binary.version}</artifactId>
         </dependency>
 
     </dependencies>
@@ -76,44 +70,8 @@
         <plugins>
 
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.9</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -125,33 +83,21 @@
                 </configuration>
             </plugin>
 
-            <!-- disable surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
             </plugin>
-            <!-- enable scalatest -->
+
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
-                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                    <junitxml>.</junitxml>
-                    <filereports>WDF TestSuite.txt</filereports>
+                    <systemProperties>
+                        <spark.master>local</spark.master>
+                        <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
+                    </systemProperties>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>

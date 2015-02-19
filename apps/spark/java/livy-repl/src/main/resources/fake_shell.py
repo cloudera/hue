@@ -4,7 +4,6 @@ import datetime
 import decimal
 import json
 import logging
-import os
 import sys
 import traceback
 
@@ -257,20 +256,18 @@ sys.stdin = fake_stdin
 sys.stdout = fake_stdout
 sys.stderr = fake_stderr
 
-print >> sys_stdout, 'READY'
-sys_stdout.flush()
-
 try:
-    # Load any startup files
-    try:
-        startup = os.environ['PYTHONSTARTUP']
-    except KeyError:
-        pass
-    else:
-        execfile(startup, global_dict)
+    # Load spark into the context
+    exec 'from pyspark.shell import sc' in global_dict
+
+    print >> sys_stderr, fake_stdout.getvalue()
+    print >> sys_stderr, fake_stderr.getvalue()
 
     fake_stdout.truncate(0)
     fake_stderr.truncate(0)
+
+    print >> sys_stdout, 'READY'
+    sys_stdout.flush()
 
     while True:
         line = sys_stdin.readline()
