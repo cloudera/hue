@@ -299,7 +299,7 @@ class SparkApi():
   def check_status(self, notebook, snippet):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
-    cell = snippet['result']['handle']['id']    
+    cell = snippet['result']['handle']['id']
 
     try:
       response = api.fetch_data(session['id'], cell)
