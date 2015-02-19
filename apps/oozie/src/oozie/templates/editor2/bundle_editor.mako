@@ -90,7 +90,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
   <div class="row-fluid">
     <div class="span12 bundle">
 
-      <div class="card card-home" style="padding-bottom: 10px">
+      <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px" data-bind="visible: isEditing">
         <h1 class="card-heading simple">${ _('Which schedules to bundle?') }</h1>
 
         <div class="card-body">
@@ -102,7 +102,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
       </div>
           
       <div data-bind="foreach: bundle.coordinators">
-        <div class="card card-home" style="margin-top: 20px; padding-bottom: 10px">
+        <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px">
           <h1 class="card-heading simple">
             <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
             <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id() }" target="_blank" title="${ _('Open') }">
@@ -114,10 +114,10 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
           </h1>
 
           <div class="card-body">
-            <ul data-bind="foreach: properties" class="unstyled">
+            <ul data-bind="foreach: properties" class="unstyled with-margin">
               <li data-bind="visible: ! $root.isEditing()">
-                <span data-bind="text: name"></span>
-                <span data-bind="text: value"></span>
+                <strong data-bind="text: name"></strong>
+                <em data-bind="text: value"></em>
               </li>
               <li data-bind="visible: $root.isEditing">              
                 <input data-bind="value: name"/>
@@ -198,8 +198,6 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
 </div>
 
-
-<div id="exposeOverlay"></div>
 
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
