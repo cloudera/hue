@@ -483,8 +483,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 </div>
 
-<div id="exposeOverlay"></div>
-
 <link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
@@ -558,7 +556,6 @@ ${ dashboard.import_bindings() }
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-  viewModel.isEditing(true)
   viewModel.coordinator.tracker().markCurrentStateAsClean();
 
 

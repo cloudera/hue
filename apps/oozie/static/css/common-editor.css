@@ -48,10 +48,6 @@
   z-index: 1033;
 }
 
-.ribbon-wrapper {
-  top: 70px;
-}
-
 input[type="text"].filechooser-input {
   border-right: none;
   margin-bottom: 0;
@@ -113,4 +109,57 @@ input[type="text"].filechooser-input.input-xlarge {
   -moz-box-shadow: none;
   box-shadow: none;
 }
+
+ul.with-margin li {
+  margin-bottom: 4px;
+}
+
+.dropdown-menu li {
+  font-size: 14px;
+}
+
+.dropdown a.dropdown-toggle {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.search-bar {
+  background-color: #F5F5F5;
+  border-bottom: 1px solid #e3e3e3;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  margin: 0;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+  width: 100%;
+  position: fixed;
+  top: 28px;
+  z-index: 1000;
+}
+
+.fields-chooser li {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.fields-chooser li .badge {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.demi-modal {
+  min-height: 80px;
+}
+
+#settingsModal h4 {
+  margin-top: 30px;
+}
+
+#settingsModal ul.unstyled li {
+  margin-bottom: 4px;
+}
+
 
