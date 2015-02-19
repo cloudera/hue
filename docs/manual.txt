@@ -509,7 +509,7 @@ submit_to::
   But note that JobBrowser will not be able to show MR2 jobs.
 
 
-Beeswax Configuration
+Hive Configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
 In the `[beeswax]` section of the configuration file, you can

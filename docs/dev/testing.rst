@@ -54,6 +54,9 @@ E.g.
 Start up pdb on test failures:
   build/env/bin/hue test <args> --pdb --pdb-failure -s
 
+Point to an Impalad and trigger the Impala tests:
+  build/env/bin/hue test impala impalad-01.gethue.com
+
 
 Special environment variables
 =============================
@@ -79,6 +82,9 @@ DESKTOP_DB_CONFIG=<db engine:db name:test db name:username:password:host:port>
   Specify alternate DB connection parameters for HUE to use. Useful for
   testing your changes against, for example, MySQL instead of sqlite. String
   is a colon-delimited list.
+
+TEST_IMPALAD_HOST=impalad-01.gethue.com
+  Point to an Impalad and trigger the Impala tests.
 
 
 Writing tests that depend on Hadoop

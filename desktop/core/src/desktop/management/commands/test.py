@@ -91,9 +91,9 @@ class Command(BaseCommand):
       if len(args) > 1:
         from impala.conf import SERVER_HOST
         SERVER_HOST.set_for_testing(args[1])
-      nose_args = args + ["impala"]
+      nose_args = ["specific", "impala"]
+      args = ["specific"]
     elif args[0] == "fast":
-      test_apps = [ app.module.__name__ for app in appmanager.DESKTOP_MODULES ]
       nose_args = args + all_apps + ["-a", "!requires_hadoop"]
     elif args[0] == "windmill":
       args = args[1:]

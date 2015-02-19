@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import re
 import sys
 
@@ -32,6 +33,8 @@ from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
+
+from impala.conf import SERVER_HOST
 
 
 class MockDbms:
@@ -94,9 +97,14 @@ class TestImpalaIntegration:
   DATABASE = 'test_hue_impala'
 
   def setUp(self):
+    self.finish = []
+
     # We need a real Impala cluster currently
-    if not 'impala' in sys.argv:
+    if not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST'):
       raise SkipTest
+
+    if os.environ.get('TEST_IMPALAD_HOST'):
+      self.finish.append(SERVER_HOST.set_for_testing(os.environ.get('TEST_IMPALAD_HOST')))
 
     self.client = make_logged_in_client()
     self.user = User.objects.get(username='test')
@@ -104,6 +112,7 @@ class TestImpalaIntegration:
     self.db = dbms.get(self.user, get_query_server_config(name='impala'))
 
     hql = """
+      USE default;
       DROP TABLE IF EXISTS %(db)s.tweets;
       DROP DATABASE IF EXISTS %(db)s;
       CREATE DATABASE %(db)s;
@@ -111,7 +120,7 @@ class TestImpalaIntegration:
       USE %(db)s;
     """ % {'db': self.DATABASE}
 
-    resp = _make_query(self.client, hql, local=False, server_name='impala') # Does not point to the database yet
+    resp = _make_query(self.client, hql, database='default', local=False, server_name='impala')
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     hql = """
@@ -126,6 +135,10 @@ class TestImpalaIntegration:
 
     resp = _make_query(self.client, hql, database=self.DATABASE, local=False, server_name='impala')
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    def tearDown(self):
+      for f in self.finish:
+        f()
 
   def test_basic_flow(self):
     dbs = self.db.get_databases()
