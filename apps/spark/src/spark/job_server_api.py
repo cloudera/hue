@@ -23,7 +23,7 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from spark.conf import JOB_SERVER_URL
+from spark.conf import get_livy_server_url
 
 
 LOG = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ def get_api(user):
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
-        _api_cache = JobServerApi(JOB_SERVER_URL.get())
+        _api_cache = JobServerApi(get_livy_server_url())
     finally:
       _api_cache_lock.release()
   _api_cache.setuser(user)

@@ -7,7 +7,7 @@
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,39 +18,47 @@
 import logging
 import os
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 import spark.conf
 
 
 LOG = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
-    """
-    Starts livy server.
-    """
+class Command(NoArgsCommand):
+  """
+  Starts livy server.
+  """
 
-    args = '<thread(default)|process|yarn>'
-    help = 'start livy server with thread, process, or yarn workers'
+  help = 'start livy server'
 
-    def handle(self, *args, **kwargs):
-        if not args:
-            session_kind = spark.conf.LIVY_SESSION_KIND.get()
-        else:
-            session_kind = args[0].lower()
+  def handle(self, *args, **kwargs):
+    env = os.environ.copy()
 
-        jar = spark.conf.LIVY_ASSEMBLY_JAR.get()
-        env = os.environ.copy()
-        classpath = jar + os.path.pathsep + env.get('CLASSPATH', '')
+    args = [
+      "java",
+    ]
 
-        args = [
-            "java",
-            "-cp", classpath,
-            "com.cloudera.hue.livy.server.Main",
-            session_kind,
-        ]
+    jar = spark.conf.LIVY_ASSEMBLY_JAR.get()
+    classpath = jar + os.path.pathsep + env.get('CLASSPATH', '')
+    args.extend(("-cp", classpath))
 
-        LOG.info("Executing %r (%r) (%r)" % (bin, args, env))
+    server_host = spark.conf.LIVY_SERVER_HOST.get()
+    args.append("-Dlivy.server.host=" + server_host)
 
-        # Use exec, so that this takes only one process.
-        os.execvpe(args[0], args, env)
+    server_port = spark.conf.LIVY_SERVER_PORT.get()
+    args.append("-Dlivy.server.port=" + server_port)
+
+    session_factory = spark.conf.LIVY_SERVER_SESSION_KIND.get()
+    args.append("-Dlivy.server.session.factory=" + session_factory)
+
+    livy_yarn_jar = spark.conf.LIVY_YARN_JAR.get()
+    if livy_yarn_jar:
+      args.append("-Dlivy.yarn.jar=" + livy_yarn_jar)
+
+    args.append("com.cloudera.hue.livy.server.Main")
+
+    LOG.info("Executing %r (%r) (%r)" % (args[0], args, env))
+
+    # Use exec, so that this takes only one process.
+    os.execvpe(args[0], args, env)

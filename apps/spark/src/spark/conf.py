@@ -29,12 +29,6 @@ def coerce_json(j):
   return json.loads(j)
 
 
-JOB_SERVER_URL = Config(
-  key="server_url",
-  help=_t("URL of the Livy Spark Server."),
-  default="http://localhost:8998/"
-)
-
 LANGUAGES = Config(
   key="languages",
   help=_t("List of available types of snippets."),
@@ -48,16 +42,34 @@ LANGUAGES = Config(
   ]"""
 )
 
-LIVY_SESSION_KIND = Config(
-  key="livy_session_kind",
-  help=_t("Configure livy to start with thread, process, or yarn workers"),
-  default="thread")
-
 LIVY_ASSEMBLY_JAR = Config(
   key="livy_assembly_jar",
   help=_t("Path to livy-assembly.jar"),
   private=True,
   default=os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "livy-assembly-3.7.0-SNAPSHOT.jar"))
+
+LIVY_SERVER_HOST = Config(
+  key="livy_server_host",
+  help=_t("Host address of the Livy Server."),
+  default="0.0.0.0")
+
+LIVY_SERVER_PORT = Config(
+  key="livy_server_port",
+  help=_t("Port of the Livy Server."),
+  default="8998")
+
+LIVY_SERVER_SESSION_KIND = Config(
+  key="livy_server_session_kind",
+  help=_t("Configure livy to start with process, thread, or yarn workers"),
+  default="process")
+
+LIVY_YARN_JAR = Config(
+  key="livy_yarn_jar",
+  help=_t("Path to livy-assembly.jar inside HDFS"),
+  private=True)
+
+def get_livy_server_url():
+  return 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
 
 def get_spark_status(user):
   from spark.job_server_api import get_api
