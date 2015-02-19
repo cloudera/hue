@@ -332,7 +332,7 @@ ko.bindingHandlers.daterangepicker = {
             '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
             '<input type="text" class="input-large form-control start-date-custom" />' +
             '</div>' +
-            '<a class="custom-popover" href="javascript:void(0)" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover" data-html="true"' +
+            '<a class="custom-popover" href="javascript:void(0)" data-trigger="focus" data-toggle="popover" data-placement="right" rel="popover" data-html="true"' +
             '       title="' + KO_DATERANGEPICKER_LABELS.CUSTOM_POPOVER_TITLE + '"' +
             '       data-content="' + KO_DATERANGEPICKER_LABELS.CUSTOM_POPOVER_CONTENT + '">' +
             '&nbsp;&nbsp;<i class="fa fa-question-circle"></i>' +
