@@ -438,17 +438,44 @@ def range_pair(cat, fq_filter, iterable, end, collection_facet):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
-  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap']))
+  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap'])) is not None
+  is_up = collection_facet['properties']['sort'] == 'asc'
+
+  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] == 'range-up':
+    prev = None
+    n = []
+    for e in iterable:
+      if prev is not None:
+        n.append(e)
+        n.append(prev)
+        prev = None
+      else:
+        prev = e
+    iterable = n
+    iterable.reverse()
+
   a, to = itertools.tee(iterable)
   next(to, None)
+  counts = iterable[1::2]
+  total_counts = 0
+
   for element in a:
     next(to, None)
     to_value = next(to, end)
+    count = next(a)
+    total_counts += counts.pop(0)
+
     pairs.append({
-        'field': cat, 'from': element, 'value': next(a), 'to': to_value, 'selected': element in selected_values,
+        'field': cat, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
         'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element]),
-        'label': element if is_single_unit_gap else '%s - %s' % (element, to_value)
+        'is_single_unit_gap': is_single_unit_gap,
+        'total_counts': total_counts,
+        'is_up': is_up
     })
+
+  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up':
+    pairs.reverse()
+
   return pairs
 
 
@@ -477,17 +504,14 @@ def augment_solr_response(response, collection, query):
           'type': category,
           'label': collection_facet['label'],
           'counts': counts,
-          # add total result count?
         }
         normalized_facets.append(facet)
-      elif category == 'range' and response['facet_counts']['facet_ranges']:
+      elif (category == 'range' or category == 'range-up') and response['facet_counts']['facet_ranges']:
         name = facet['field']
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(name, selected_values.get((facet['id'], name, 'range'), []), counts, end, collection_facet)
-        if collection_facet['properties']['sort'] == 'asc':
-          counts.reverse()
+        counts = range_pair(name, selected_values.get((facet['id'], name, category), []), counts, end, collection_facet)
         facet = {
           'id': collection_facet['id'],
           'field': name,
@@ -554,7 +578,7 @@ def augment_solr_response(response, collection, query):
             for field, hls in highlighting.iteritems():
               _hls = [escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>') for hl in hls]
               escaped_highlighting[field] = _hls
-  
+
             doc.update(escaped_highlighting)
     else:
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
