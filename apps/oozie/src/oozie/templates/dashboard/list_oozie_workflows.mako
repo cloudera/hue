@@ -58,6 +58,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
         <a class="btn btn-status btn-danger disable-feedback" data-value='KILLED'>${ _('Killed') }</a>
       </span>
+      <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px">${ _('submitted') }</span>
+      <span class="btn-group" style="float:left;">
+        <a class="btn btn-submitted btn-info" data-value='MANUALLY'>${ _('Manually') }</a>
+        <a class="btn btn-submitted btn-info" data-value='COORDINATOR'>${ _('Coordinator') }</a>
+      </span>
     </span>
  </form>
 
@@ -74,11 +79,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="7%">${ _('Submitter') }</th>
           <th width="15%">${ _('Last Modified') }</th>
           <th width="20%">${ _('Id') }</th>
+          <th width="1%">${ _('parentId') }</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -104,11 +111,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="10%">${ _('Submitter') }</th>
           <th width="15%">${ _('Last Modified') }</th>
           <th width="25%">${ _('Id') }</th>
+          <th width="1%">${ _('parentId') }</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -163,7 +172,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       resumeUrl: wf.resumeUrl,
       created: wf.created,
       createdInMillis: wf.createdInMillis,
-      run: wf.run
+      run: wf.run,
+      parentId: wf.parentId,
     }
   }
 
@@ -183,7 +193,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
-        null
+        null,
+        { "bVisible":false }
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -218,7 +229,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
-        null
+        null,
+        { "bVisible":false }
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -256,6 +268,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 
     $("a.btn-status").click(function () {
+      $(this).toggleClass("active");
+      drawTable();
+    });
+
+    $("a.btn-submitted").click(function () {
+      $("a.btn-submitted").not(this).removeClass("active");
       $(this).toggleClass("active");
       drawTable();
     });
@@ -352,7 +370,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
                     '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
-                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
+                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+                    wf.parentId
                   ]);
                 }
                 catch (error) {
@@ -390,7 +409,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               '<span data-sort-value="'+ wf.durationInMillis +'">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
               '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
-              '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
+              '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+              wf.parentId
             ], false);
           }
           catch (error) {

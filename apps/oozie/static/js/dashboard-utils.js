@@ -76,5 +76,23 @@ var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
     dateFilter = _dateColumn * 1000 >= minAge;
   }
 
-  return statusFilter && dateFilter;
+  var submittedBtn = $("a.btn-submitted.active");
+  var submittedByFilter = true;
+  if (submittedBtn.length > 0) {
+    var statuses = [];
+    $.each(submittedBtn, function () {
+      statuses.push($(this).attr("data-value"));
+    });
+
+    var _statusColumn = aData[aData.length - 1];
+    if (statuses.length == 1) {
+      if(statuses[0] == 'MANUALLY') {
+        submittedByFilter = _statusColumn == null;
+      } else {
+        submittedByFilter = _statusColumn != null;
+      }
+    }
+  }
+
+  return statusFilter && dateFilter && submittedByFilter;
 }
