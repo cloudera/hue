@@ -510,7 +510,7 @@ submit_to::
 
 
 Hive Configuration
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 In the `[beeswax]` section of the configuration file, you can
 _optionally_ specify the following:
