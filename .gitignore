@@ -96,3 +96,6 @@ apps/logs
 
 # Sublime Text temp files
 *.subl*
+
+# Static files
+/static
