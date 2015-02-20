@@ -411,10 +411,6 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
         </a>
       </div>
       <!-- /ko -->
-      <div class="clearfix"></div>
-      <a data-bind="routie: 'link/new'" href="javascript:void(0);" style="margin: 5px; display: block">
-        <i class="fa fa-plus"></i> ${_('Add a new link')}
-      </a>
     </div>
   </div>
 
@@ -433,7 +429,11 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
         </a>
       </div>
       <!-- /ko -->
-      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
       <a data-bind="routie: 'link/new'" href="javascript:void(0);" style="margin: 5px; display: block">
         <i class="fa fa-plus"></i> ${_('Add a new link')}
       </a>
