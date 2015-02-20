@@ -24,8 +24,8 @@
 
 ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
 
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<link rel="stylesheet" href="/indexer/static/css/admin.css">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 <style type="text/css">
 .hueBreadcrumb {
   padding: 12px 14px;
@@ -464,14 +464,14 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
 <!--/ Edit collection page -->
 
 
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/indexer/static/js/lib.js" type="text/javascript" charset="utf-8"></script>
-<script src="/indexer/static/js/collections.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('indexer/js/lib.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('indexer/js/collections.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 function afterRender() {

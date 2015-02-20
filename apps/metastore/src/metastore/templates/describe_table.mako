@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
 
-<link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
+<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 
 <%def name="column_table(cols)">

@@ -154,8 +154,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
 </div>
 
-<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript" charset="utf-8">

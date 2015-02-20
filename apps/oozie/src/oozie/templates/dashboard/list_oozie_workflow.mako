@@ -342,33 +342,33 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   </div>
 </div>
 
-<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="/oozie/static/css/workflow.css">
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-xml.js"></script>
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('oozie/css/workflow.css') }">
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
 
 % if oozie_workflow.has_sla:
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.selection.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.time.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 %endif
 
 % if layout_json != '':
-<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
-<link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
+<link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
+<link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
 
 ${ dashboard.import_layout() }
 
-<script src="/oozie/static/js/workflow-editor.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/workflow-editor.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.curvedarrow.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
 %endif
 
 <style type="text/css">

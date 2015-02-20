@@ -56,7 +56,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             <div class="row-fluid">
               <div class="span10 offset1 center" style="padding: 30px">
                 <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-                <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
               </div>
             </div>
           </div>
@@ -325,25 +325,25 @@ ${ commonshare() | n,unicode }
 
 </style>
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/rdbms/static/js/rdbms.vm.js"></script>
-<script src="/static/js/share.vm.js"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-sql.js"></script>
-<script src="/static/js/codemirror-sql-hint.js"></script>
-<script src="/static/js/codemirror-show-hint.js"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-sql.js') }"></script>
+<script src="${ static('desktop/js/codemirror-sql-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
-<script src="/static/ext/js/bootstrap-editable.min.js"></script>
-<script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 
-<script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
-<script src="/rdbms/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
+<script src="${ static('rdbms/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   var codeMirror, viewModel;

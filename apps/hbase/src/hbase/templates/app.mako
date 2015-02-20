@@ -22,7 +22,7 @@
 
 ${ commonheader(None, "hbase", user) | n,unicode } 
 
-<link href="/hbase/static/css/hbase.css" rel="stylesheet" type="text/css" />
+<link href="${ static('hbase/css/hbase.css') }" rel="stylesheet" type="text/css" />
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
     <div class="navbar-inner">
@@ -31,7 +31,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <ul class="nav">
           <li class="currentApp">
             <a href="/${app_name}">
-              <img src="/hbase/static/art/icon_hbase_48.png" class="app-icon" />
+              <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" />
               ${ _('HBase Browser') }
             </a>
           </li>
@@ -58,7 +58,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <tr data-bind="visible: ${datasource}.isLoading() || ${datasource}.isReLoading()">
             <td colspan="8" class="left">
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </td>
         </tr>
         <tr data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading() && !${datasource}.isReLoading()">
@@ -75,7 +75,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 <%def name="smartview(datasource)">
   <div class="smartview" data-bind="foreach: ${datasource}.items(), css: { 'gridView': ${datasource}.showGrid() }">
     <div class="smartview-row" data-bind="css:{selected:$data.isSelected()}, visible: $data.items().length > 0 || $data.isLoading()">
-      <h5 data-bind="click: lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="fa fa-check-square" data-bind="visible:$data.isSelected()"></i> <img data-bind="visible: $data.isLoading()" src="/static/art/spinner.gif" />
+      <h5 data-bind="click: lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="fa fa-check-square" data-bind="visible:$data.isSelected()"></i> <img data-bind="visible: $data.isLoading()" src="${ static('desktop/art/spinner.gif') }" />
         <span class="smartview-row-controls controls-hover-bottom">
           <button class="btn" data-bind="click: $data.reload, clickBubble: false" data-toggle="tooltip" title="${_('Refresh Row')}"><i class="fa fa-refresh"></i></button>
           % if user.is_superuser:
@@ -107,7 +107,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <a class="corner-btn btn" data-bind="visible: $data.editing(), event: { mousedown: function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
             <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144)+'...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: !$data.isLoading() && !$data.editing()"></pre>
             <textarea data-bind="visible: !$data.isLoading() && $data.editing(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
-            <img src="/static/art/spinner.gif" data-bind="visible: $data.isLoading() " />
+            <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading() " />
           </div>
         </li>
         <!-- /ko -->
@@ -117,7 +117,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <br/>
   <center data-bind="visible: ${datasource}.isLoading()">
   <!--[if !IE]><!--><i class="fa fa-spinner fa-spin loader-main"></i><!--<![endif]-->
-  <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
+  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </center>
   <div class="alert" data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading()">
       ${_('No rows to display.')}
@@ -394,7 +394,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
                 <!-- ko foreach: $data.content.history.items() -->
                   <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
-                <li data-bind="visible: $data.content.history.loading()"><img src="/static/art/spinner.gif" /></li>
+                <li data-bind="visible: $data.content.history.loading()"><img src="${ static('desktop/art/spinner.gif') }" /></li>
               </ul>
             </div>
           </div>
@@ -481,20 +481,20 @@ function i18n(text) {
 
 canWrite = ${ str(can_write).lower() };
 </script>
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/mustache.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/ext/js/codemirror-xml.js"></script>
-<script src="/static/ext/js/codemirror-javascript.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/ext/js/codemirror-javascript.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
 
-<script src="/hbase/static/js/base.js" type="text/javascript" charset="utf-8"></script>
-<script src="/hbase/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/hbase/static/js/api.js" type="text/javascript" charset="utf-8"></script>
-<script src="/hbase/static/js/controls.js" type="text/javascript" charset="utf-8"></script>
-<script src="/hbase/static/js/nav.js" type="text/javascript" charset="utf-8"></script>
-<script src="/hbase/static/js/app.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/base.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/api.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/controls.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/nav.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('hbase/js/app.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ commonfooter(messages) | n,unicode }

@@ -84,7 +84,7 @@ ${ layout.menubar(section='workflows') }
 
 ${ utils.path_chooser_libs(True, True) }
 
-<link rel="stylesheet" href="/oozie/static/css/workflow.css">
+<link rel="stylesheet" href="${ static('oozie/css/workflow.css') }">
 
 <script>
   $(document).ready(function(){

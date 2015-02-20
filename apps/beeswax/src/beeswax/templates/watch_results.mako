@@ -71,7 +71,7 @@ ${layout.menubar(section='query')}
     height: 400px;
   }
 </style>
-<link href="/static/ext/css/leaflet.css" rel="stylesheet">
+<link href="${ static('desktop/ext/css/leaflet.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>
@@ -198,7 +198,7 @@ ${layout.menubar(section='query')}
              <div style="text-align: center; padding: 5px; height: 30px">
                <span class="noMore hide"
                      style="color:#999999">${ _('You have reached the last record for this query.') }</span><img
-                     src="/static/art/spinner.gif"
+                     src="${ static('desktop/art/spinner.gif') }"
                      class="spinner"
                      style="display: none;"/>
              </div>
@@ -338,10 +338,10 @@ ${layout.menubar(section='query')}
 </div>
 % endif.resultTable
 
-<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.categories.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.blueprint.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {

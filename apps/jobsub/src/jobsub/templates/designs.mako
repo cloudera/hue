@@ -25,19 +25,19 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(None, "jobsub", user) | n,unicode }
 
-<link rel="stylesheet" href="/jobsub/static/css/jobsub.css">
+<link rel="stylesheet" href="${ static('jobsub/css/jobsub.css') }">
 
-<script src="/static/ext/js/mustache.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/workflow.models.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/workflow.node-fields.js" type="text/javascript" charset="utf-8"></script>
-<script src="/jobsub/static/js/jobsub.templates.js" type="text/javascript" charset="utf-8"></script>
-<script src="/jobsub/static/js/jobsub.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/jobsub/static/js/jobsub.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow.models.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow.node-fields.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobsub/js/jobsub.templates.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobsub/js/jobsub.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobsub/js/jobsub.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -47,7 +47,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="/jobsub/static/art/icon_jobsub_48.png" class="app-icon" />
+                <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" />
                 ${ _('Job Designer') }
               </a>
             </li>
@@ -177,7 +177,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div class="hueOverlay" data-bind="visible: isLoading">
   <!--[if lte IE 9]>
-    <img src="/static/art/spinner-big.gif" />
+    <img src="${ static('desktop/art/spinner-big.gif') }" />
   <![endif]-->
   <!--[if !IE]> -->
     <i class="fa fa-spinner fa-spin"></i>

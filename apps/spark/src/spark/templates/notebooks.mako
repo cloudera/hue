@@ -94,7 +94,7 @@ ${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
 
 <div class="hueOverlay" data-bind="visible: isLoading">
   <!--[if lte IE 9]>
-    <img src="/static/art/spinner-big.gif" />
+    <img src="${ static('desktop/art/spinner-big.gif') }" />
   <![endif]-->
   <!--[if !IE]> -->
     <i class="fa fa-spinner fa-spin"></i>
@@ -124,10 +124,10 @@ ${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
 ${ commonshare() | n,unicode }
 
 
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/share.vm.js"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
 
 
 <script type="text/javascript" charset="utf-8">

@@ -86,7 +86,7 @@
 ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
 ${ comps.menubar() }
 
-<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+<link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">
 
 <style type="text/css">
   .killJob {
@@ -428,7 +428,7 @@ ${ comps.menubar() }
   </div>
 </div>
 
-<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {

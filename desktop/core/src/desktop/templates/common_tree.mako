@@ -27,7 +27,7 @@
 
 <%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None, itemChecked=None)">
 
-  <script src="/static/js/ko.tree.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/ko.tree.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/html" id="tree-template">
     <!-- ko if: nodes != null -->

@@ -24,7 +24,7 @@
 
 ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
-<link rel="stylesheet" href="/search/static/css/admin.css">
+<link rel="stylesheet" href="${ static('search/css/admin.css') }">
 
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
@@ -122,9 +122,9 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   </div>
 </div>
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/search/static/js/collections.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('search/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script>
   var appProperties = {

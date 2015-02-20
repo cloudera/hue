@@ -181,9 +181,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 </div>
 
 
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-xml.js"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
 
 <script type="text/javascript">
 

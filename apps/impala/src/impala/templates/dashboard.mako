@@ -161,7 +161,7 @@ ${ dashboard.layout_skeleton() }
 <div>
   <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
@@ -212,7 +212,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="facet-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
   <!-- ko if: $root.getFacetFromResult(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromResult(id())">
@@ -264,7 +264,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <!-- ko if: $root.getFacetFromResult(id()) -->
@@ -289,7 +289,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <!-- ko if: $root.getFacetFromResult(id()) -->
@@ -323,7 +323,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <!-- ko if: $root.getFacetFromResult(id()) -->
@@ -350,7 +350,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <!-- ko if: $root.getFacetFromResult(id()) -->
@@ -403,7 +403,7 @@ ${ dashboard.layout_skeleton() }
   <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 </script>
 
@@ -412,7 +412,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
   <!-- ko if: $root.getFacetFromResult(id()) -->
@@ -439,25 +439,25 @@ ${ dashboard.layout_skeleton() }
 
 
 
-<link rel="stylesheet" href="/impala/static/css/impala-dashboard.css">
-<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="${ static('impala/css/impala-dashboard.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout() }
 
-<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/mustache.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/shortcut.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 
-<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/impala/static/js/impala-dashboard.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('beeswax/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('impala/js/impala-dashboard.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_charts() }
 

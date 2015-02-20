@@ -49,21 +49,21 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                     draggable: {data: draggableHiveAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveAction());}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHive2Action(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHive2Action());}}}"
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="/oozie/static/art/icon_beeswax_48.png" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggablePigAction());}}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="/oozie/static/art/icon_pig_48.png" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -77,7 +77,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                     draggable: {data: draggableSqoopAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSqoopAction());}}}"
          title="${_('Sqoop 1')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="/oozie/static/art/icon_sqoop_48.png" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -342,30 +342,31 @@ ${ workflow.render() }
 
 <div id="exposeOverlay"></div>
 
-<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
-<link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
+<link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
 
 
 ${ dashboard.import_layout() }
 
 ${ commonshare() | n,unicode }
 
-<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.utils.js"></script>
-<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/share.vm.js"></script>
-<script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.utils.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 
-<script src="/oozie/static/js/workflow-editor.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/workflow-editor.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.curvedarrow.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
 
 <script type="text/javascript">
   ${ utils.slaGlobal() }

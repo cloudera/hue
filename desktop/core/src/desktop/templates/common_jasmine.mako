@@ -20,13 +20,13 @@
 <head>
     <title>Jasmine Spec Runner</title>
 
-    <link rel="stylesheet" type="text/css" href="/static/ext/css/jasmine.css">
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-1.2.0.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-html-1.2.0.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jquery/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.migration.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-jquery-1.3.1.js"></script>
-    <script type="text/javascript" src="/static/ext/js/knockout-min.js"></script>
+    <link rel="stylesheet" type="text/css" href="${ static('desktop/ext/css/jasmine.css') }">
+    <script type="text/javascript" src="${ static('desktop/ext/js/jasmine/jasmine-1.2.0.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/ext/js/jasmine/jasmine-html-1.2.0.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/ext/js/jasmine/jasmine-jquery-1.3.1.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/ext/js/knockout-min.js') }"></script>
 
     <%block name="specs"/>
 

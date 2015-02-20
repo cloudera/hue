@@ -57,7 +57,7 @@ ${layout.menubar(section='query')}
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader" class="center">
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
           </div>
         </div>
@@ -334,7 +334,7 @@ ${layout.menubar(section='query')}
           <div class="active tab-pane" id="recentTab">
             <div id="recentLoader">
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
             <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
@@ -366,7 +366,7 @@ ${layout.menubar(section='query')}
               <ul data-bind="foreach: $root.design.watch.jobUrls" class="unstyled jobs-overlay">
                 <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
               </ul>
-              <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="/static/art/spinner.gif" data-bind="visible: $root.design.isRunning()"/></pre>
+              <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $root.design.isRunning()"/></pre>
               <pre data-bind="visible: $root.design.watch.logs().length > 0, text: $root.design.watch.logs().join('\n')"></pre>
             </div>
           </div>
@@ -625,7 +625,7 @@ ${layout.menubar(section='query')}
     <div class="loader">
       <div class="overlay"></div>
       <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-      <!--[if IE]><img class="spinner" src="/static/art/spinner-big-inverted.gif"/><![endif]-->
+      <!--[if IE]><img class="spinner" src="${ static('desktop/art/spinner-big-inverted.gif') }"/><![endif]-->
     </div>
 
     <div class="modal-header">
@@ -711,7 +711,7 @@ ${layout.menubar(section='query')}
     <div class="modal-body" style="min-height: 100px">
       <div class="loader">
         <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-        <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
       </div>
       <div class="sample"></div>
     </div>
@@ -723,27 +723,27 @@ ${layout.menubar(section='query')}
 
 ${ commonshare() | n,unicode }
 
-<script src="/static/js/hue.json.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/beeswax/static/js/beeswax.vm.js"></script>
-<script src="/static/js/share.vm.js"></script>
+<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
 
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/js/codemirror-hql.js"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/js/codemirror-hql.js') }"></script>
 % if app_name == 'impala':
-  <script src="/static/js/codemirror-isql-hint.js"></script>
+  <script src="${ static('desktop/js/codemirror-isql-hint.js') }"></script>
 % else:
-  <script src="/static/js/codemirror-hql-hint.js"></script>
+  <script src="${ static('desktop/js/codemirror-hql-hint.js') }"></script>
 % endif
-<script src="/static/js/codemirror-show-hint.js"></script>
+<script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 
-<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
-<script src="/static/ext/js/bootstrap-editable.min.js"></script>
-<script src="/static/ext/js/moment-with-locales.min.js"></script>
+<link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 
 <style type="text/css">
   h1 {
@@ -966,14 +966,14 @@ ${ commonshare() | n,unicode }
 
 </style>
 
-<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 
-<script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
-<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
+<script src="${ static('beeswax/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_charts() }
 

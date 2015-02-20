@@ -75,7 +75,7 @@ ${ components.menubar() }
   </div>
 </div>
 
-<link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
+<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

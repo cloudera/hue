@@ -46,10 +46,10 @@ def is_selected(section, matcher):
 
 
 <%def name="menubar(section='')">
-  <link href="/security/static/css/security.css" rel="stylesheet">
+  <link href="${ static('security/css/security.css') }" rel="stylesheet">
 
-  <link rel="stylesheet" href="/static/ext/select2/select2.css">
-  <script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+  <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
   <div class="navbar navbar-inverse navbar-fixed-top">

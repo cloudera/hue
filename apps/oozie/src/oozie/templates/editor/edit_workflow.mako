@@ -437,27 +437,27 @@ ${ layout.menubar(section='workflows') }
 <div id="submit-wf-modal" class="modal hide"></div>
 
 
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-xml.js"></script>
-<script src="/static/ext/js/codemirror-closetag.js"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/ext/js/codemirror-closetag.js') }"></script>
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
-<link rel="stylesheet" href="/oozie/static/css/workflow.css">
-<script type="text/javascript" src="/oozie/static/js/workflow.utils.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.registry.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.modal.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.models.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.idgen.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.node-fields.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.node.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
-<script type="text/javascript" src="/oozie/static/js/workflow.import-node.js"></script>
+<link rel="stylesheet" href="${ static('oozie/css/workflow.css') }">
+<script type="text/javascript" src="${ static('oozie/js/workflow.utils.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.registry.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.modal.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.models.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.idgen.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.node-fields.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.node.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.js') }"></script>
+<script type="text/javascript" src="${ static('oozie/js/workflow.import-node.js') }"></script>
 
 
 % for form_info in action_forms:
@@ -728,7 +728,7 @@ var modal = new Modal($('#node-modal'));
 import_jobsub_action.fetchWorkflows({ success: import_jobsub_load_success });
 import_workflow_action.fetchWorkflows({ success: import_workflow_load_success });
 {
-  var spinner = $('<img src="/static/art/spinner.gif" />');
+  var spinner = $('<img src="${ static('desktop/art/spinner.gif') }" />');
   workflow.loading.subscribe(function(value) {
     if (value) {
       $('#graph').append(spinner);

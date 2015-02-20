@@ -412,8 +412,8 @@
 
 <%def name="decorate_datetime_fields(is_range=True)">
 
-  <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-  <link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
 
   <style type="text/css">
     .datepicker {
@@ -421,9 +421,9 @@
     }
   </style>
 
-  <script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/bootstrap-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript" charset="utf-8">
 

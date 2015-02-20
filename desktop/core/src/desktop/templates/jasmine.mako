@@ -21,18 +21,18 @@
 <%inherit file="common_jasmine.mako"/>
 
 <%block name="specs">
-  <link href="/static/css/hue3.css" rel="stylesheet">
+  <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
 
-  <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
-  <script src="/static/ext/js/bootstrap.min.js"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 
-  <script src="/static/js/jquery.selector.js"></script>
-  <script src="static/jasmine/jHueSelectorSpec.js"></script>
+  <script src="${ static('desktop/js/jquery.selector.js') }"></script>
+  <script src="${ static('desktop/jasmine/jHueSelectorSpec.js') }"></script>
 
-  <script src="/static/js/jquery.tableextender.js"></script>
-  <script src="static/jasmine/jHueTableExtenderSpec.js"></script>
+  <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
+  <script src="${ static('desktop/jasmine/jHueTableExtenderSpec.js') }"></script>
 
-  <script src="/static/js/jquery.tablescroller.js"></script>
-  <script src="static/jasmine/jHueTableScrollerSpec.js"></script>
+  <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
+  <script src="${ static('desktop/jasmine/jHueTableScrollerSpec.js') }"></script>
 </%block>
 
