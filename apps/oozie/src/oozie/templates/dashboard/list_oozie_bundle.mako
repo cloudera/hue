@@ -152,7 +152,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           <tfoot>
             <tr data-bind="visible: isLoading()">
               <td colspan="3" class="left">
-                <img src="/static/art/spinner.gif" />
+                <img src="${ static('desktop/art/spinner.gif') }" />
               </td>
             </tr>
             <tr data-bind="visible: actions().length == 0 && !isLoading()">
@@ -210,7 +210,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           <tfoot>
           <tr data-bind="visible: isLoading()">
             <td colspan="10" class="left">
-              <img src="/static/art/spinner.gif" />
+              <img src="${ static('desktop/art/spinner.gif') }" />
             </td>
           </tr>
           <tr data-bind="visible: !isLoading() && actions().length == 0">
@@ -293,11 +293,11 @@ ${ layout.menubar(section='bundles', dashboard=True) }
   </div>
 </div>
 
-<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-xml.js"></script>
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
 
 <style type="text/css">
   .CodeMirror.cm-s-default {

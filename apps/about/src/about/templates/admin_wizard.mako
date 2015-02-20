@@ -60,7 +60,7 @@ ${ header.menubar() }
                 <div id="check-config-section" style="margin-bottom:20px">
                   <div class="spinner">
                     <!--[if !IE]> --><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!-- <![endif]-->
-                    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
                   </div>
                   <div class="info hide"></div>
                 </div>
@@ -160,7 +160,7 @@ ${ header.menubar() }
                 <div class="card-body">
                   <p>
                     <a href="${ url('useradmin.views.list_users') }" target="_blank" style="padding-left: 2px"><img
-                        src="/useradmin/static/art/icon_useradmin_48.png" class="app-icon"
+                        src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon"
                         style="margin-right: 4px;"> ${ _('User Admin') }</a>
                   </p>
                 </div>
@@ -282,7 +282,7 @@ ${ header.menubar() }
 
 </style>
 
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 

@@ -42,7 +42,7 @@
       margin-left: auto;
       margin-right: auto;
       margin-bottom: 10px;
-      background: #FFF url("/static/art/hue-login-logo-ellie.png") 50% 14px no-repeat;
+      background: #FFF url("${ static('desktop/art/hue-login-logo-ellie.png') }") 50% 14px no-repeat;
       width: 130px;
       height: 130px;
     }
@@ -81,7 +81,7 @@
 
 <body>
 <div class="header">
-  <img src="/static/art/hue-logo-mini-white.png"/>
+  <img src="${ static('desktop/art/hue-logo-mini-white.png') }"/>
 </div>
 
 <div class="footer"></div>

@@ -26,12 +26,12 @@
 %>
 
 <%def name="import_layout()">
-  <link rel="stylesheet" href="/static/css/common_dashboard.css">
-  <script src="/static/js/ko.common-dashboard.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
+  <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 </%def>
 
 <%def name="layout_toolbar()">
@@ -82,12 +82,12 @@
 <%def name="layout_skeleton()">
   <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="/static/art/hint_arrow.png" />
+    <img src="${ static('desktop/art/hint_arrow.png') }" />
   </div>
 
   <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
     <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="/static/art/hint_arrow_horiz_flipped.png" />
+    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" />
   </div>
 
 
@@ -134,7 +134,7 @@
 
 <script type="text/html" id="row-template">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
-    <img src="/static/art/hint_arrow_flipped.png" style="float:left; margin-right: 10px"/>
+    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
   </div>
@@ -193,23 +193,23 @@
 
 
 <%def name="import_bindings()">
-  <link rel="stylesheet" href="/static/css/freshereditor.css">
-  <link rel="stylesheet" href="/static/ext/css/codemirror.css">
-  <link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
-  <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css">
-  <link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css">
-  <link rel="stylesheet" href="/static/css/bootstrap-spinedit.css">
-  <link rel="stylesheet" href="/static/css/bootstrap-slider.css">
+  <link rel="stylesheet" href="${ static('desktop/css/freshereditor.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
-  <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/bootstrap-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/bootstrap-spinedit.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/bootstrap-slider.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/freshereditor.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/codemirror-3.11.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/codemirror-xml.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/freshereditor.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/codemirror-3.11.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/codemirror-xml.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="/static/ext/js/less-1.7.0.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/less-1.7.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
   <script type="text/javascript">
@@ -223,39 +223,39 @@
       CUSTOM_POPOVER_CONTENT: "${_('Start')}: NOW-5DAYS<br/>${_('End')}: NOW<br/>${_('Interval')}: +1HOURS<br/><a href='http://lucene.apache.org/solr/4_10_2/solr-core/org/apache/solr/util/DateMathParser.html' target='_blank'>${_('Read more...')}</a>"
     };
   </script>
-  <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
 </%def>
 
 
 <%def name="import_charts()">
-  <link rel="stylesheet" href="/static/ext/css/leaflet.css">
-  <link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
-  <link rel="stylesheet" href="/static/css/nv.d3.css">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
-  <script src="/static/js/hue.geo.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/hue.colors.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topojson.v1.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/world.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/usa.topo.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.datamaps.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.legend.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.multiBarWithBrushChart.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.lineWithBrushChart.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingDiscreteBar.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingDiscreteBarChart.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingMultiBar.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingMultiBarChart.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/ko.charts.js') }" type="text/javascript" charset="utf-8"></script>
 
 </%def>
 

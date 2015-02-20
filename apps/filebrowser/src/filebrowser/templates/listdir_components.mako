@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _
 
 <%def name="_table(files, path, current_request_path, view)">
 
-  <link href="/filebrowser/static/css/listdir_components.css" rel="stylesheet" type="text/css">
+  <link href="${ static('filebrowser/css/listdir_components.css') }" rel="stylesheet" type="text/css">
   <table class="table table-condensed datatables tablescroller-disable">
     <thead>
       <tr>
@@ -52,7 +52,7 @@ from django.utils.translation import ugettext as _
     <tfoot>
       <tr data-bind="visible: isLoading()">
         <td colspan="8" class="left">
-          <img src="/static/art/spinner.gif" />
+          <img src="${ static('desktop/art/spinner.gif') }" />
         </td>
       </tr>
       <tr data-bind="visible: files().length === 0 && !isLoading()">
@@ -497,12 +497,12 @@ from django.utils.translation import ugettext as _
     </tr>
   </script>
 
-  <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/jquery.hdfstree.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/js/dropzone.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/jquery.hdfstree.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
 
 
   <script charset="utf-8">

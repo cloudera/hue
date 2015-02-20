@@ -55,7 +55,7 @@ def is_selected(section, matcher):
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="/useradmin/static/art/icon_useradmin_48.png" class="app-icon" />
+                  <img src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon" />
                   ${ _('User Admin') }
                 </a>
               </li>
@@ -75,7 +75,7 @@ def is_selected(section, matcher):
 
 <%def name="commons()">
 
-  <link href="/useradmin/static/css/useradmin.css" rel="stylesheet">
+  <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
 
   <script type="text/javascript">
     $(document).ready(function () {

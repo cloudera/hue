@@ -75,7 +75,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <div class="row-fluid" data-bind="if: isLoading">
     <div class="span10 offset1 center" style="margin-top: 30px">
       <!--[if lte IE 9]>
-        <img src="/static/art/spinner-big.gif" />
+        <img src="${ static('desktop/art/spinner-big.gif') }" />
       <![endif]-->
       <!--[if !IE]> -->
         <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
@@ -665,29 +665,29 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </div>
 </script>
 
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/bootstrap-editable.min.js"></script>
-<script src="/static/js/ko.editable.js"></script>
-<script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/cclass.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/koify.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.autocomplete.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.wizard.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.configs.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.driver.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.connectors.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.links.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.jobs.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.submissions.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/cclass.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/koify.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.wizard.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.configs.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.driver.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.connectors.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.links.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.jobs.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.submissions.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('sqoop/js/sqoop.js') }" type="text/javascript" charset="utf-8"></script>
 
-<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
-<link href="/sqoop/static/css/sqoop.css" rel="stylesheet">
+<link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
+<link href="${ static('sqoop/css/sqoop.css') }" rel="stylesheet">
 
 <script type="text/javascript" charset="utf-8">
 

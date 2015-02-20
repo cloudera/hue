@@ -23,7 +23,7 @@
 
 ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <style type="text/css">
   body {
     background-color: #FFF;
@@ -43,7 +43,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
-    background: #FFF url("/static/art/hue-login-logo-ellie.png") 50% 2px no-repeat;
+    background: #FFF url("${ static('desktop/art/hue-login-logo-ellie.png') }") 50% 2px no-repeat;
     width: 130px;
     height: 130px;
     -webkit-border-radius: 65px;
@@ -54,7 +54,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     #logo {
-      background: #FFF url("/static/art/hue-login-logo-ellie@2x.png") 50% 2px no-repeat;
+      background: #FFF url("${ static('desktop/art/hue-login-logo-ellie@2x.png') }") 50% 2px no-repeat;
       background-size: 114px 114px;
     }
   }
@@ -259,7 +259,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
   </div>
 </div>
 
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script>
   $(document).ready(function () {
     $("#id_server").chosen({

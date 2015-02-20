@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
 ${ layout.metastore_menubar() }
 
-<link rel="stylesheet" href="/metastore/static/css/metastore.css">
+<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }">
 
 <div class="container-fluid">
     <div class="row-fluid">
@@ -165,8 +165,8 @@ ${ layout.metastore_menubar() }
   }
 </style>
 
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

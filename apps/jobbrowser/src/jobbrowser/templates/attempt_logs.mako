@@ -122,7 +122,7 @@ ${ comps.menubar() }
   </div>
 </div>
 
-<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

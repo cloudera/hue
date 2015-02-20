@@ -31,7 +31,7 @@
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 ${ fb_components.menubar() }
 
-<link href="/filebrowser/static/css/display.css" rel="stylesheet" />
+<link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" />
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -79,7 +79,7 @@ ${ fb_components.menubar() }
             <div id="fileArea" data-bind="css: {'loading': isLoading}">
               <div id="loader" data-bind="visible: isLoading">
                 <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-                <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
               </div>
               % if 'contents' in view:
                 <pre></pre>
@@ -97,8 +97,8 @@ ${ fb_components.menubar() }
   </div>
 </div>
 
-<script src="/static/ext/js/jquery/plugins/jquery.visible.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.visible.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 (function () {
   <%

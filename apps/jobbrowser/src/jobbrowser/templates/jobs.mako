@@ -25,7 +25,7 @@
 ${ commonheader(None, "jobbrowser", user) | n,unicode }
 ${ components.menubar() }
 
-<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+<link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div class="card card-small">
@@ -34,7 +34,7 @@ ${ components.menubar() }
     <%def name="search()">
       ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
       &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for text')}" value="${ text_filter or '' }">
-      <img id="loading" src="/static/art/spinner.gif" />
+      <img id="loading" src="${ static('desktop/art/spinner.gif') }" />
     </%def>
 
     <%def name="creation()">
@@ -96,8 +96,8 @@ ${ components.menubar() }
   </div>
 </div>
 
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 

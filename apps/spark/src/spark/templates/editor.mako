@@ -30,82 +30,82 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </script>
 
 
-<link rel="stylesheet" href="/static/css/common_dashboard.css">
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<link rel="stylesheet" href="/spark/static/css/spark.css">
-<link rel="stylesheet" href="/static/ext/css/bootstrap-editable.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/static/ext/css/leaflet.css">
-<link rel="stylesheet" href="/static/ext/css/nv.d3.min.css">
-<link rel="stylesheet" href="/static/css/nv.d3.css">
-<link rel="stylesheet" href="/static/ext/select2/select2.css">
-<link rel="stylesheet" href="/static/ext/css/medium-editor.min.css">
-<link rel="stylesheet" href="/static/css/bootstrap-medium-editor.css">
+<link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<link rel="stylesheet" href="${ static('spark/css/spark.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 
 
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/js/codemirror-pig.js"></script>
-<script src="/static/js/codemirror-hql.js"></script>
-<script src="/static/js/codemirror-python.js"></script>
-<script src="/static/js/codemirror-clike.js"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<script src="${ static('desktop/js/codemirror-pig.js') }"></script>
+<script src="${ static('desktop/js/codemirror-hql.js') }"></script>
+<script src="${ static('desktop/js/codemirror-python.js') }"></script>
+<script src="${ static('desktop/js/codemirror-clike.js') }"></script>
 
-<script src="/static/js/codemirror-show-hint.js"></script>
+<script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 
-<script src="/static/js/codemirror-isql-hint.js"></script>
-<script src="/static/js/codemirror-hql-hint.js"></script>
-<script src="/static/js/codemirror-pig-hint.js"></script>
-<script src="/static/js/codemirror-python-hint.js"></script>
-<script src="/static/js/codemirror-clike-hint.js"></script>
+<script src="${ static('desktop/js/codemirror-isql-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-hql-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-pig-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-python-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-clike-hint.js') }"></script>
 
-<script src="/static/ext/js/markdown.min.js"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.hotkeys.js"></script>
+<script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
-<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.utils.js"></script>
-<script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
-<script src="/spark/static/js/assist.js" type="text/javascript" charset="utf-8"></script>
-<script src="/spark/static/js/spark.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.utils.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('spark/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('spark/js/spark.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<script src="/static/js/hue.geo.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.colors.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/d3.v3.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topojson.v1.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topo/world.topo.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/topo/usa.topo.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/topojson.v1.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/topo/world.topo.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/topo/usa.topo.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/js/nv.d3.datamaps.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.legend.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.multiBarWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.lineWithBrushChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingDiscreteBar.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingDiscreteBarChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingMultiBar.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingMultiBarChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingPie.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.growingPieChart.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.scatter.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/nv.d3.scatterChart.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.datamaps.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.legend.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.multiBarWithBrushChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.lineWithBrushChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingDiscreteBar.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingDiscreteBarChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingMultiBar.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingMultiBarChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.scatter.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.scatterChart.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/js/ko.charts.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.charts.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <!--[if IE 9]>
-  <script src="/static/ext/js/classList.min.js" type="text/javascript" charset="utf-8"></script>  
+  <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
 <![endif]-->
-<script src="/static/ext/js/medium-editor.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="search-bar">
@@ -192,7 +192,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     <div class="modal-body" style="min-height: 100px">
       <div class="loader">
         <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-        <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
       </div>
       <div class="sample"></div>
     </div>
@@ -235,7 +235,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
         <div id="navigatorLoader" class="center" data-bind="visible: $root.assistContent().isLoading">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
 
         <div class="center" data-bind="visible: $root.assistContent().hasErrors">
@@ -286,27 +286,27 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <!-- /ko -->
 
         <!-- ko if: type() == 'hive' -->
-        <img src="/beeswax/static/art/icon_beeswax_48.png" class="snippet-icon">
+        <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
         <!-- /ko -->
 
         <!-- ko if: type() == 'impala' -->
-        <img src="/impala/static/art/icon_impala_48.png" class="snippet-icon">
+        <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
         <!-- /ko -->
 
         <!-- ko if: type() == 'scala' -->
-        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
+        <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
         <!-- /ko -->
 
         <!-- ko if: type() == 'python' -->
-        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
+        <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
         <!-- /ko -->
 
         <!-- ko if: type() == 'sql' -->
-        <img src="/spark/static/art/icon_spark_48.png" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
+        <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
         <!-- /ko -->
 
         <!-- ko if: type() == 'pig' -->
-        <img src="/pig/static/art/icon_pig_48.png" class="snippet-icon">
+        <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon">
         <!-- /ko -->
 
 

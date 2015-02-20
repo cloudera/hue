@@ -86,7 +86,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
       <p>
         <div class="loader hide" style="text-align: center;margin-top: 20px">
           <!--[if lte IE 9]>
-              <img src="/static/art/spinner-big.gif" />
+              <img src="${ static('desktop/art/spinner-big.gif') }" />
           <![endif]-->
           <!--[if !IE]> -->
             <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
@@ -151,15 +151,15 @@ ${ layout.menubar(section='sla', dashboard=True) }
   </div>
 </div>
 
-<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.selection.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.time.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
 

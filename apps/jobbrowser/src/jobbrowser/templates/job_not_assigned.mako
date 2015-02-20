@@ -26,7 +26,7 @@
 ${ commonheader(_('Job'), "jobbrowser", user) | n,unicode }
 ${ comps.menubar() }
 
-<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+<link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div class="row-fluid">
@@ -51,7 +51,7 @@ ${ comps.menubar() }
               <br/>
 
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
             </p>
       </div>
     </div>

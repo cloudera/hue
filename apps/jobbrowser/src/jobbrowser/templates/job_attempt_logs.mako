@@ -52,21 +52,21 @@ ${ comps.menubar() }
               <div class="tab-pane active" id="stdout">
                 <pre id="stdout-container">
                   <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
                 </pre>
               </div>
 
               <div class="tab-pane" id="stderr">
                 <pre id="stderr-container">
                   <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
                 </pre>
               </div>
 
               <div class="tab-pane" id="syslog">
                 <pre id="syslog-container">
                   <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
                 </pre>
               </div>
             </div>
@@ -77,7 +77,7 @@ ${ comps.menubar() }
   </div>
 </div>
 
-<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

@@ -30,7 +30,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="/pig/static/art/icon_pig_48.png" class="app-icon"/>
+                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"/>
                   ${ _('Pig Editor') }
                 </a>
               </li>
@@ -79,7 +79,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <tfoot>
           <tr data-bind="visible: isLoading()">
             <td colspan="3" class="left">
-              <img src="/static/art/spinner.gif" />
+              <img src="${ static('desktop/art/spinner.gif') }" />
             </td>
           </tr>
           <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
@@ -530,7 +530,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 </div>
               </div>
             </script>
-            <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif" data-bind="visible: currentScript().isRunning()"/></pre>
+            <pre id="withoutLogs">${ _('No available logs.') } <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: currentScript().isRunning()"/></pre>
             <pre id="withLogs" class="hide scroll"></pre>
           </div>
         </div>
@@ -637,7 +637,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
       <h3>${_('Logs')}</h3>
     </div>
     <div class="modal-body">
-      <img src="/static/art/spinner.gif" class="hide" />
+      <img src="${ static('desktop/art/spinner.gif') }" class="hide" />
       <pre class="scroll hide"></pre>
     </div>
     <div class="modal-footer">
@@ -730,27 +730,27 @@ ${ commonshare() | n,unicode }
 
 <div class="bottomAlert alert"></div>
 
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/pig/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/share.vm.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('pig/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/js/codemirror-pig.js"></script>
-<script src="/static/js/codemirror-show-hint.js"></script>
-<script src="/static/js/codemirror-pig-hint.js"></script>
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<script src="${ static('desktop/js/codemirror-pig.js') }"></script>
+<script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
+<script src="${ static('desktop/js/codemirror-pig-hint.js') }"></script>
 % if autocomplete_base_url != '':
-<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('beeswax/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
 % else:
 <script type="text/javascript" charset="utf-8">
   var hac_getTables = function() {};
 </script>
 % endif
 
-<link rel="stylesheet" href="/pig/static/css/pig.css">
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<link rel="stylesheet" href="${ static('pig/css/pig.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
 
 <style type="text/css">
   .fileChooserBtn {

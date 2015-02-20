@@ -28,7 +28,7 @@
 ${ commonheader(_("Coordinator Dashboard"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators', dashboard=True) }
 
-<link rel="stylesheet" href="/oozie/static/css/coordinator.css" type="text/css" />
+<link rel="stylesheet" href="${ static('oozie/css/coordinator.css') }" type="text/css" />
 
 <div class="container-fluid">
   <div class="card card-small">
@@ -211,7 +211,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </tr>
                   <tr data-bind="visible: isLoading()">
                     <td colspan="2" class="left">
-                      <img src="/static/art/spinner.gif" />
+                      <img src="${ static('desktop/art/spinner.gif') }" />
                     </td>
                   </tr>
                   <tr data-bind="visible: actions().length == 0 && !isLoading()">
@@ -266,7 +266,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tfoot>
                 <tr data-bind="visible: isLoading()">
                   <td colspan="10" class="left">
-                    <img src="/static/art/spinner.gif" />
+                    <img src="${ static('desktop/art/spinner.gif') }" />
                   </td>
                 </tr>
                 <tr data-bind="visible: !isLoading() && actions().length == 0">
@@ -390,19 +390,19 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <div id="rerun-coord-modal" class="modal hide"></div>
 
-<script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-xml.js"></script>
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 % if oozie_coordinator.has_sla:
-<script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/jquery.blueprint.js"></script>
+<script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.selection.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.time.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 % endif
 
 <script>

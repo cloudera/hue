@@ -125,7 +125,7 @@ ${ layout.menubar(section='coordinators') }
 
 <div class="hueOverlay" data-bind="visible: isLoading">
   <!--[if lte IE 9]>
-    <img src="/static/art/spinner-big.gif" />
+    <img src="${ static('desktop/art/spinner-big.gif') }" />
   <![endif]-->
   <!--[if !IE]> -->
     <i class="fa fa-spinner fa-spin"></i>
@@ -168,8 +168,8 @@ ${ layout.menubar(section='coordinators') }
   </form>
 </div>
 
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript" charset="utf-8">

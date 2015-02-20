@@ -44,15 +44,15 @@ from django.utils.translation import ugettext as _
   <meta charset="utf-8">
   <title>Hue ${get_nice_name(current_app, section)} ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="/static/art/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
   <meta name="description" content="">
   <meta name="author" content="">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <link href="/static/ext/css/bootplus.css" rel="stylesheet">
-  <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/css/hue3.css" rel="stylesheet">
-  <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/fileuploader.css') }" rel="stylesheet">
 
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -144,28 +144,28 @@ from django.utils.translation import ugettext as _
     }
   </script>
 
-  <script src="/static/js/hue.utils.js"></script>
-  <script src="/static/ext/js/jquery/jquery-2.1.1.min.js"></script>
-  <script src="/static/js/jquery.migration.js"></script>
-  <script src="/static/js/jquery.filechooser.js"></script>
-  <script src="/static/js/jquery.selector.js"></script>
-  <script src="/static/js/jquery.delayedinput.js"></script>
-  <script src="/static/js/jquery.rowselector.js"></script>
-  <script src="/static/js/jquery.notify.js"></script>
-  <script src="/static/js/jquery.titleupdater.js"></script>
-  <script src="/static/js/jquery.tablescroller.js"></script>
-  <script src="/static/js/jquery.tableextender.js"></script>
-  <script src="/static/js/jquery.scrollup.js"></script>
-  <script src="/static/js/jquery.tour.js"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery.placeholder.min.js"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
-  <script src="/static/js/jquery.datatables.sorting.js"></script>
-  <script src="/static/ext/js/bootstrap.min.js"></script>
-  <script src="/static/ext/js/bootstrap-better-typeahead.min.js"></script>
-  <script src="/static/ext/js/fileuploader.js"></script>
-  <script src="/static/js/popover-extra-placements.js"></script>
+  <script src="${ static('desktop/js/hue.utils.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+  <script src="${ static('desktop/js/jquery.migration.js') }"></script>
+  <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
+  <script src="${ static('desktop/js/jquery.selector.js') }"></script>
+  <script src="${ static('desktop/js/jquery.delayedinput.js') }"></script>
+  <script src="${ static('desktop/js/jquery.rowselector.js') }"></script>
+  <script src="${ static('desktop/js/jquery.notify.js') }"></script>
+  <script src="${ static('desktop/js/jquery.titleupdater.js') }"></script>
+  <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
+  <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
+  <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
+  <script src="${ static('desktop/js/jquery.tour.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
+  <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
+  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
+  <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
 
   <script type="text/javascript" charset="utf-8">
 
@@ -351,7 +351,7 @@ from django.utils.translation import ugettext as _
   % endif
 
   </div>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png" /></a>
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /></a>
     % if user.is_authenticated() and section != 'login':
      <ul class="nav nav-pills pull-left">
        <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ url('desktop.views.home') }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
@@ -363,22 +363,22 @@ from django.utils.translation import ugettext as _
          <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Query Editors <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
-           <li><a href="/${apps['beeswax'].display_name}"><img src="${ apps['beeswax'].icon_path }" class="app-icon"/> ${_('Hive')}</a></li>
+             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
            % endif
            % if 'impala' in apps:
-           <li><a href="/${apps['impala'].display_name}"><img src="${ apps['impala'].icon_path }" class="app-icon"/> ${_('Impala')}</a></li>
+             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
            % endif
            % if 'rdbms' in apps:
-           <li><a href="/${apps['rdbms'].display_name}"><img src="${ apps['rdbms'].icon_path }" class="app-icon"/> ${_('DB Query')}</a></li>
+            <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
            % endif
            % if 'pig' in apps:
-           <li><a href="/${apps['pig'].display_name}"><img src="${ apps['pig'].icon_path }" class="app-icon"/> ${_('Pig')}</a></li>
+             <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
            % endif
            % if 'jobsub' in apps:
-           <li><a href="/${apps['jobsub'].display_name}"><img src="${ apps['jobsub'].icon_path }" class="app-icon"/> ${_('Job Designer')}</a></li>
+             <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
            % endif
            % if 'spark' in apps:
-           <li><a href="/${apps['spark'].display_name}"><img src="${ apps['spark'].icon_path }" class="app-icon"/> ${_('Spark')}</a></li>
+             <li><a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark')}</a></li>
            % endif
          </ul>
        </li>
@@ -393,16 +393,16 @@ from django.utils.translation import ugettext as _
          <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
-           <li><a href="/${apps['metastore'].display_name}"><img src="${ apps['metastore'].icon_path }" class="app-icon"/> ${_('Metastore Tables')}</a></li>
+             <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon"/> ${_('Metastore Tables')}</a></li>
            % endif
            % if 'hbase' in apps:
-           <li><a href="/${apps['hbase'].display_name}"><img src="${ apps['hbase'].icon_path }" class="app-icon"/> ${_('HBase')}</a></li>
+             <li><a href="/${apps['hbase'].display_name}"><img src="${ static(apps['hbase'].icon_path) }" class="app-icon"/> ${_('HBase')}</a></li>
            % endif
            % if 'sqoop' in apps:
-           <li><a href="/${apps['sqoop'].display_name}"><img src="${ apps['sqoop'].icon_path }" class="app-icon"/> ${_('Sqoop Transfer')}</a></li>
+             <li><a href="/${apps['sqoop'].display_name}"><img src="${ static(apps['sqoop'].icon_path) }" class="app-icon"/> ${_('Sqoop Transfer')}</a></li>
            % endif
            % if 'zookeeper' in apps:
-           <li><a href="/${apps['zookeeper'].display_name}"><img src="${ apps['zookeeper'].icon_path }" class="app-icon"/> ${_('ZooKeeper')}</a></li>
+             <li><a href="/${apps['zookeeper'].display_name}"><img src="${ static(apps['zookeeper'].icon_path) }" class="app-icon"/> ${_('ZooKeeper')}</a></li>
            % endif
          </ul>
        </li>
@@ -414,30 +414,30 @@ from django.utils.translation import ugettext as _
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:index') }"><img src="/oozie/static/art/icon_oozie_dashboard_48.png" class="app-icon" /> ${_('Dashboards')}</a>
+             <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${_('Dashboards')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_oozie_workflows')}"><img src="/oozie/static/art/icon_oozie_workflow_48.png" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_oozie_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_oozie_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_oozie_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_oozie_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            <% from oozie.conf import ENABLE_V2 %>
            % if not ENABLE_V2.get():
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:list_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" /> ${_('Editors')}</a>
+             <a href="${ url('oozie:list_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_workflows')}"><img src="/oozie/static/art/icon_oozie_workflow_48.png" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            % else:
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:list_editor_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_48.png" class="app-icon" /> ${_('Editors')}</a>
+             <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_editor_workflows')}"><img src="/oozie/static/art/icon_oozie_workflow_48.png" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_editor_coordinators')}"><img src="/oozie/static/art/icon_oozie_coordinator_48.png" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_editor_bundles')}"><img src="/oozie/static/art/icon_oozie_bundle_48.png" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            % endif
@@ -456,7 +456,7 @@ from django.utils.translation import ugettext as _
              <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Search')} <b class="caret"></b></a>
              <ul role="menu" class="dropdown-menu">
                % for collection in collections:
-               <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ collection.icon }" class="app-icon"/> ${ collection.label }</a></li>
+                 <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ static(collection.icon) }" class="app-icon"/> ${ collection.label }</a></li>
                % endfor
                % if 'indexer' in apps:
                  <li class="divider"></li>
@@ -480,7 +480,7 @@ from django.utils.translation import ugettext as _
          <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % for other in other_apps:
-             <li><a href="/${ other.display_name }"><img src="${ other.icon_path }" class="app-icon"/> ${ other.nice_name }</a></li>
+             <li><a href="/${ other.display_name }"><img src="${ static(other.icon_path) }" class="app-icon"/> ${ other.nice_name }</a></li>
            % endfor
          </ul>
        </li>

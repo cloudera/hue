@@ -483,34 +483,34 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
 </div>
 
-<link rel="stylesheet" href="/static/ext/css/hue-filetypes.css">
-<link rel="stylesheet" href="/static/ext/css/hue-charts.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
-<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
-<link rel="stylesheet" href="/oozie/static/css/coordinator-editor.css">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
+<link rel="stylesheet" href="${ static('oozie/css/coordinator-editor.css') }">
 
-<link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
-<script src="/static/js/jqCron.js" type="text/javascript"></script>
+<link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
+<script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 
-<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<link rel="stylesheet" href="/static/ext/select2/select2.css">
-<script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout() }
 
 ${ commonshare() | n,unicode }
 
-<script src="/static/ext/js/bootstrap-editable.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/hue.utils.js"></script>
-<script src="/static/js/ko.editable.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/js/share.vm.js"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.utils.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
 
 ${ dashboard.import_bindings() }
 
-<script src="/oozie/static/js/coordinator-editor.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript">
