@@ -34,7 +34,7 @@ ul#hbase-breadcrumbs li a {
 
 .isLoading {
   opacity: .5 !important;
-  background: url(/static/art/spinner.gif) center center no-repeat;
+  background: url(/static/desktop/art/spinner.gif) center center no-repeat;
 }
 
 .smartview {

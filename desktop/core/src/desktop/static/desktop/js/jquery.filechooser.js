@@ -101,7 +101,7 @@
     Plugin.prototype.navigateTo = function (path) {
         var _parent = this;
         if (navigator.userAgent.match(/msie/i)) {
-          $(_parent.element).html("<img src='/static/art/spinner.gif' />");
+          $(_parent.element).html("<img src='/static/desktop/art/spinner.gif' />");
         }
         else {
           $(_parent.element).html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");

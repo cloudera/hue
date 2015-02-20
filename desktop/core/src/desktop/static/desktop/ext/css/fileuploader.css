@@ -110,7 +110,7 @@
 
 .qq-upload-spinner {
     display: inline-block;
-    background: url("/static/ext/js/loading.gif");
+    background: url("/static/desktop/ext/js/loading.gif");
     width: 15px;
     height: 15px;
     vertical-align: text-bottom;

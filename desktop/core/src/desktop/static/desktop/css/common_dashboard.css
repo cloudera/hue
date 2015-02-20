@@ -260,7 +260,7 @@ body.modal-open {
 }
 
 .clearable {
-  background: url(/static/art/clearField.png) no-repeat right -10px center;
+  background: url(/static/desktop/art/clearField.png) no-repeat right -10px center;
   border: 1px solid #999;
   padding: 3px 18px 3px 4px;
   border-radius: 3px;
@@ -269,7 +269,7 @@ body.modal-open {
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .clearable {
-    background: url(/static/art/clearField@2x.png) no-repeat right -10px center;
+    background: url(/static/desktop/art/clearField@2x.png) no-repeat right -10px center;
     background-size: 10px 10px;
   }
 }

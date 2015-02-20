@@ -168,9 +168,9 @@ Run "create_desktop_app" to Set up a New Source Tree
     calculator/src/calculator/templates/shared_components.mako
 
     # Static resources
-    calculator/src/calculator/static/art/calculator.png # logo
-    calculator/src/calculator/static/css/calculator.css
-    calculator/src/calculator/static/js/calculator.js
+    calculator/src/static/calculator/art/calculator.png # logo
+    calculator/src/static/calculator/css/calculator.css
+    calculator/src/static/calculator/js/calculator.js
 
 To download an app or browse dditional plugin apps available in the Hue app store:
     ## Visit http://gethue.com/app-store/
