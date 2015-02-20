@@ -21,7 +21,7 @@ from desktop.lib.python_util import force_dict_to_strings
 
 class Config(object):
 
-  def __init__(self, id, name, type, inputs=[]):
+  def __init__(self, id, name, type, inputs=[], **kwargs):
     self.id = id
     self.name = name
     self.type = type
@@ -43,7 +43,7 @@ class Config(object):
 
 class Input(object):
 
-  def __init__(self, id, type, name, value=None, values=None, sensitive=False, size=-1):
+  def __init__(self, id, type, name, value=None, values=None, sensitive=False, size=-1, **kwargs):
     self.id = id
     self.type = type
     self.name = name
