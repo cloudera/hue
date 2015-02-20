@@ -687,7 +687,7 @@ ${ dashboard.layout_skeleton() }
   ${ _('Showing') }
   <span data-bind="text: ($data.response.start + 1)"></span>
   ${ _('to') }
-  <span data-bind="text: ($data.response.start + $root.collection.template.rows())"></span>
+  <span data-bind="text: Math.min(($data.response.start + $root.collection.template.rows()), $data.response.numFound)"></span>
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
   ${ _(' results') }
