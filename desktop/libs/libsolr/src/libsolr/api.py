@@ -87,6 +87,10 @@ class SolrApi(object):
       elif fq['type'] == 'range':
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
+      elif fq['type'] == 'range-up':
+        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
+                    utf_quoter('%s%s:[%s TO %s]' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
+                                                          for field, f in zip(fq['filter'], fq['properties'])])),)
     return params
 
   def query(self, collection, query):
@@ -121,7 +125,7 @@ class SolrApi(object):
       for facet in collection['facets']:
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
-        elif facet['type'] == 'range':
+        elif facet['type'] == 'range' or facet['type'] == 'range-up':
           params += tuple([
              ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
              ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),

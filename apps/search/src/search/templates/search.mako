@@ -234,9 +234,10 @@ ${ dashboard.layout_skeleton() }
 
     <div class="facet-field-cnt" data-bind="visible: properties.canRange">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle range or field facet') }" data-bind="click: $root.collection.toggleRangeFacet" data-loading-text="...">
-        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field' }, attr: { title: type() == 'range' ? 'Range' : 'Term' }"></i>
+      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet" data-loading-text="...">
+        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
         <span data-bind="visible: type() == 'range'">${_('range')}</span>
+        <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
         <span data-bind="visible: type() == 'field'">${_('field')}</span>
       </a>
     </div>
@@ -271,7 +272,7 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: type() == 'range' -->
+    <!-- ko if: type() == 'range' || type() == 'range-up' -->
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end}"></div>
       <!-- /ko -->
@@ -346,7 +347,7 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <!-- ko if: type() != 'range' -->
+      <!-- ko if: type() == 'field' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: $index() < $parent.properties.limit() -->
@@ -386,13 +387,31 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
-                <a class="pointer" data-bind="text: $data.label, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+                <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
                 <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
               <!-- /ko -->
               <!-- ko if: selected -->
                 <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
-                  <strong data-bind="text: $data.label"></strong>
+                  <strong data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to"></strong>
+                  <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                  <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+                </span>
+              <!-- /ko -->
+          </div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: type() == 'range-up' -->
+        <div data-bind="foreach: $parent.counts">
+          <div class="trigger-exclude">
+              <!-- ko if: ! selected -->
+                <a class="pointer" data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less'), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></a>
+                <span class="pointer counter" data-bind="text: ' (' + $data.total_counts + ')', click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></span>
+                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+              <!-- /ko -->
+              <!-- ko if: selected -->
+                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }">
+                  <strong data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less')"></strong>
                   <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
                   <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                 </span>
@@ -1011,7 +1030,7 @@ ${ dashboard.layout_skeleton() }
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $data.type() == 'range' -->
+    <!-- ko if: $data.type() == 'range' || $data.type() == 'range-up' -->
     <div class="filter-box">
       <div class="title">
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); $root.query.removeFilter($data); $root.search() }">
@@ -1025,8 +1044,16 @@ ${ dashboard.layout_skeleton() }
         <span data-bind="foreach: $data.properties" style="font-weight: normal">
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && ! f.exclude() }).length > 0 -->
           <span class="label label-info">
-            <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
-            <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+            <!-- ko if: $parent.type() == 'range' -->
+              <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
+              <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+            <!-- /ko -->
+
+            <!-- ko if: $parent.type() == 'range-up' -->
+              <strong data-bind="visible: ! $parent.is_up()">${ _('Until') }</strong>
+              <span data-bind="text: $data.from"></span>
+              <strong data-bind="visible: $parent.is_up()"> & Up</strong>
+            <!-- /ko -->
           </span>
           <!-- /ko -->
         </span>
