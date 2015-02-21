@@ -30,6 +30,7 @@ import desktop.monkey_patches
 
 from django.conf import settings
 from django.conf.urls import include, patterns
+from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
@@ -41,7 +42,7 @@ handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 
 
-# Set up /appname/static mappings for any apps that have static directories
+# Set up /static/appname mappings for any apps that have static directories
 def static_pattern(urlprefix, root):
   """
   First argument is the url mapping, and second argument is the
@@ -131,8 +132,6 @@ if settings.OAUTH_AUTHENTICATION:
 if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
   namespace = {'namespace': 'indexer', 'app_name': 'indexer'}
   dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls', **namespace))) )
-  static_patterns.append(static_pattern('indexer/static',
-                                        os.path.join(os.path.dirname(__file__), "..", '..', '..', "libs/indexer/static/")))
 
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:
@@ -144,19 +143,7 @@ for app in appmanager.DESKTOP_APPS:
     dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
     app.urls_imported = True
 
-  # Root a /appname/static if they have a static dir
-  if app.static_dir:
-    static_patterns.append(
-      static_pattern('%s/static' % app.name, app.static_dir))
-
-# TODO this stuff should probably be moved into a "ui" lib or such so it
-# is autodiscovered
-def buildpath(d):
-  return os.path.join(os.path.dirname(__file__), "..", '..', '..', d)
-static_patterns.append(static_pattern("static", buildpath("core/static")))
-static_patterns.append((r'^(?P<path>favicon.ico)$',
-                        'django.views.static.serve',
-                        { 'document_root': buildpath('core/static/art') }))
+static_patterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns = patterns('', *static_patterns) + dynamic_patterns
 
