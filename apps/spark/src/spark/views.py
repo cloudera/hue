@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
@@ -37,7 +38,13 @@ def editor(request):
     notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
   else:
     notebook = Notebook()
-    
+
+  autocomplete_base_url = ''
+  try:
+    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
+  except:
+    pass
+
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
@@ -49,7 +56,8 @@ def editor(request):
               'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
               'text': _('<h2>This is a text snippet</h2>Type your text here')
           }
-      })
+      }),
+      'autocomplete_base_url': autocomplete_base_url,
   })
 
 

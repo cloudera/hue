@@ -22,9 +22,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import force_unicode
 from desktop.models import Document2, Document
 
 from spark.models import get_api, Notebook, QueryExpired
@@ -98,7 +96,7 @@ def fetch_result_metadata(request):
   response['result'] = get_api(request.user, snippet).fetch_result_metadata(notebook, snippet)
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -111,7 +109,7 @@ def cancel_statement(request):
   response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -182,7 +180,7 @@ def close_notebook(request):
       pass
   response['message'] = _('Notebook closed !')
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
 
 
 def close_statement(request):
@@ -197,4 +195,4 @@ def close_statement(request):
     pass
   response['status'] = 0
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return JsonResponse(response)
