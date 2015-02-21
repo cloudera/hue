@@ -42,15 +42,6 @@ handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 
 
-# Set up /static/appname mappings for any apps that have static directories
-def static_pattern(urlprefix, root):
-  """
-  First argument is the url mapping, and second argument is the
-  directory to serve.
-  """
-  return (r'^%s/(?P<path>.*)$' % urlprefix, 'django.views.static.serve', { 'document_root': root, 'show_indexes': False })
-
-
 admin.autodiscover()
 
 # Some django-wide URLs
@@ -125,8 +116,6 @@ if settings.OPENID_AUTHENTICATION:
 
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append((r'^oauth/', include('liboauth.urls')))
-  static_patterns.append(static_pattern("liboauth_static",
-        os.path.join(os.path.dirname(__file__), "..", '..', '..', "libs/liboauth/src/liboauth/static/")))
 
 # Add indexer app
 if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
@@ -143,7 +132,11 @@ for app in appmanager.DESKTOP_APPS:
     dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
     app.urls_imported = True
 
-static_patterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+static_patterns.append(
+    (r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
+      'django.views.static.serve',
+      { 'document_root': settings.STATIC_ROOT })
+)
 
 urlpatterns = patterns('', *static_patterns) + dynamic_patterns
 
