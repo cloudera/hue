@@ -19,6 +19,6 @@ DJANGO_APPS = [ "indexer" ]
 NICE_NAME = "Solr Indexer"
 REQUIRES_HADOOP = False
 MENU_INDEX = 43
-ICON = "/search/static/art/icon_search_48.png"
+ICON = "search/art/icon_search_48.png"
 
 IS_URL_NAMESPACED = True

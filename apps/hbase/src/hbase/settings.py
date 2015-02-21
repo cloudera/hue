@@ -16,7 +16,7 @@
 DJANGO_APPS = ['hbase']
 NICE_NAME = 'HBase Browser'
 MENU_INDEX = 55
-ICON = '/hbase/static/art/icon_hbase_48.png'
+ICON = 'hbase/art/icon_hbase_48.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True

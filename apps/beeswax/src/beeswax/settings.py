@@ -16,7 +16,7 @@
 DJANGO_APPS = [ "beeswax" ]
 NICE_NAME = "Hive Editor"
 REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/icon_beeswax_48.png"
+ICON = "beeswax/art/icon_beeswax_48.png"
 MENU_INDEX = 10
 
 IS_URL_NAMESPACED = True

@@ -18,5 +18,5 @@
 DJANGO_APPS = ['filebrowser']
 NICE_NAME = "File Browser"
 REQUIRES_HADOOP = False
-ICON = "/filebrowser/static/art/icon_filebrowser_48.png"
+ICON = "filebrowser/art/icon_filebrowser_48.png"
 MENU_INDEX = 20

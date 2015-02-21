@@ -22,12 +22,13 @@ import uuid
 
 from itertools import chain
 
+from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
-from django.core.urlresolvers import reverse
-from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.i18n import force_unicode
@@ -453,23 +454,23 @@ class Document(models.Model):
     try:
       if self.content_type.app_label == 'beeswax':
         if self.extra == '0':
-          return apps['beeswax'].icon_path
+          return staticfiles_storage.url(apps['beeswax'].icon_path)
         elif self.extra == '3':
-          return apps['spark'].icon_path
+          return staticfiles_storage.url(apps['spark'].icon_path)
         else:
-          return apps['impala'].icon_path
+          return staticfiles_storage.url(apps['impala'].icon_path)
       elif self.content_type.app_label == 'oozie':
         if self.extra == 'jobsub':
-          return apps['jobsub'].icon_path
+          return staticfiles_storage.url(apps['jobsub'].icon_path)
         else:
-          return self.content_type.model_class().ICON
+          return staticfiles_storage.url(self.content_type.model_class().ICON)
       elif self.content_type.app_label in apps:
-        return apps[self.content_type.app_label].icon_path
+        return staticfiles_storage.url(apps[self.content_type.app_label].icon_path)
       else:
-        return '/static/art/icon_hue_48.png'
+        return staticfiles_storage.url('desktop/art/icon_hue_48.png')
     except Exception, e:
       LOG.warn(force_unicode(e))
-      return '/static/art/icon_hue_48.png'
+      return staticfiles_storage.url('desktop/art/icon_hue_48.png')
 
   def share(self, users, groups, name='read'):
     DocumentPermission.objects.filter(document=self, name=name).update(users=users, groups=groups, add=True)

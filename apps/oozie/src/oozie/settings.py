@@ -16,7 +16,7 @@
 
 DJANGO_APPS=['oozie']
 NICE_NAME = "Oozie Editor/Dashboard"
-ICON = "/oozie/static/art/icon_oozie_48.png"
+ICON = "oozie/art/icon_oozie_48.png"
 MENU_INDEX = 41
 
 REQUIRES_HADOOP = True

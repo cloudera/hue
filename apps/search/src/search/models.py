@@ -240,7 +240,7 @@ class Collection(models.Model):
   sorting = models.ForeignKey(Sorting)
 
   _ATTRIBUTES = ['collection', 'layout', 'autocomplete']
-  ICON = '/search/static/art/icon_search_48.png'
+  ICON = 'search/art/icon_search_48.png'
 
   objects = CollectionManager()
 
@@ -380,13 +380,13 @@ class Collection(models.Model):
   @property
   def icon(self):
     if self.name == 'twitter_demo':
-      return '/search/static/art/icon_twitter_48.png'
+      return 'search/art/icon_twitter_48.png'
     elif self.name == 'yelp_demo':
-      return '/search/static/art/icon_yelp_48.png'
+      return 'search/art/icon_yelp_48.png'
     elif self.name == 'log_analytics_demo':
-      return '/search/static/art/icon_logs_48.png'
+      return 'search/art/icon_logs_48.png'
     else:
-      return '/search/static/art/icon_search_48.png'
+      return 'search/art/icon_search_48.png'
 
   def _import_hue_3_5_collections(self, props, user):
     props['collection']['template']['template'] = self.result.get_template()

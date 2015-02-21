@@ -18,7 +18,7 @@
 DJANGO_APPS = ['metastore']
 NICE_NAME = "Metastore Manager"
 REQUIRES_HADOOP = True
-ICON = "/metastore/static/art/icon_metastore_48.png"
+ICON = "metastore/art/icon_metastore_48.png"
 MENU_INDEX = 20
 
 IS_URL_NAMESPACED = True
