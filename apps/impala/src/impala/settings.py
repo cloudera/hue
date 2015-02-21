@@ -17,7 +17,7 @@
 DJANGO_APPS = ['impala']
 NICE_NAME = 'Impala Editor'
 MENU_INDEX = 11
-ICON = '/impala/static/art/icon_impala_48.png'
+ICON = 'impala/art/icon_impala_48.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True

@@ -16,7 +16,7 @@
 DJANGO_APPS = ['sqoop']
 NICE_NAME = 'Sqoop'
 MENU_INDEX = 20
-ICON = '/sqoop/static/art/icon_sqoop_48.png'
+ICON = 'sqoop/art/icon_sqoop_48.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True
