@@ -17,18 +17,18 @@
 
 import json
 import re
+import time
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str, force_unicode
-from desktop.lib.rest.http_client import RestException
+from desktop.lib.i18n import force_unicode
 
-from beeswax import models as beeswax_models, data_export
+from beeswax import data_export
 from beeswax.design import hql_query
 from beeswax import conf as beeswax_conf
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
-from beeswax.views import safe_get_design, save_design, _parse_out_hadoop_jobs
+from beeswax.views import _parse_out_hadoop_jobs
 
 from spark.job_server_api import get_api as get_spark_api
 from spark.data_export import download as spark_download
@@ -274,6 +274,15 @@ class SparkApi():
   def create_session(self, lang='scala'):
     api = get_spark_api(self.user)
     response = api.create_session(lang=lang)
+
+    status = api.get_session(response['id'])
+    count = 0
+
+    while status['state'] == 'starting' or count < 60:
+      status = api.get_session(response['id'])
+      count += 1
+      time.sleep(1)
+
     return {
         'type': lang,
         'id': response['id']

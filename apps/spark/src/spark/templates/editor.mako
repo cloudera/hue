@@ -605,7 +605,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     app: "beeswax",
     user: "${user}",
     failsSilentlyOn: [500], // error codes from beeswax/views.py - autocomplete
-    baseURL: "${url('beeswax:api_autocomplete_databases')}"
+    baseURL: "${ autocomplete_base_url | n,unicode }"
   });
 
   Number.prototype.toHHMMSS = function () {
