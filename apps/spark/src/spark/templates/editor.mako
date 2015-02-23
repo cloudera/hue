@@ -1574,7 +1574,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
     $(document).on("snippetAdded", function(e, snippet) {
       var _handle = $("#snippet_" + snippet.id()).find(".resize-panel a");
-      _handle.draggable(getDraggableOptions(_handle.offset().top));
+      if (_handle.length > 0){
+        _handle.draggable(getDraggableOptions(_handle.offset().top));  
+      }
     });
 
     $(document).on("toggleAssist", function(){
