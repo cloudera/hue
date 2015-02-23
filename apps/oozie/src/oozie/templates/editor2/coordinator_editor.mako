@@ -492,7 +492,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 <link href="/static/css/jqCron.css" rel="stylesheet" type="text/css" />
 <script src="/static/js/jqCron.js" type="text/javascript"></script>
 
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/static/ext/select2/select2.css">
 <script src="/static/ext/select2/select2.min.js" type="text/javascript" charset="utf-8"></script>

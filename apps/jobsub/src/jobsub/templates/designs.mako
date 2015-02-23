@@ -32,7 +32,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/workflow.models.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/workflow.node-fields.js" type="text/javascript" charset="utf-8"></script>
 <script src="/jobsub/static/js/jobsub.templates.js" type="text/javascript" charset="utf-8"></script>

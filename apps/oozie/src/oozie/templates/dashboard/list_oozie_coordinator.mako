@@ -395,7 +395,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 
 % if oozie_coordinator.has_sla:
 <script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>

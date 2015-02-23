@@ -743,6 +743,7 @@ ${ commonshare() | n,unicode }
 
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/ext/js/moment-with-locales.min.js"></script>
 
 <style type="text/css">
   h1 {
@@ -1089,12 +1090,14 @@ $(document).ready(function () {
     $("#recentLoader").show();
     $("#recentQueries").hide();
     recentQueries.fnClearTable();
+    var locale = window.navigator.userLanguage || window.navigator.language;
+    moment.locale(locale);
     $.getJSON("${ url(app_name + ':list_query_history') }?format=json", function(data) {
       if (data && data.queries) {
         var _rows = [];
         $(data.queries).each(function(cnt, item){
           _rows.push([
-            '<span data-sort-value="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
+            '<span data-sort-value="' + item.timeInMs + '">' + moment(item.timeInMs*1000).format("L LTS") + '</span>',
             '<code style="cursor:pointer">' + hue.htmlEncode(item.query) + '</code>',
             (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
             (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')

@@ -1296,7 +1296,7 @@ ${ dashboard.layout_skeleton() }
 <link rel="stylesheet" href="/static/ext/css/hue-charts.css">
 <link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
 
-<script src="/static/ext/js/moment-with-langs.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout() }
 
