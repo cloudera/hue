@@ -219,7 +219,7 @@ class Submission(object):
       path = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', self.user.username).replace('$TIME', str(time.time())).replace('$JOBID', str(self.job.id))
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):
-        self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
+        self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user)
       else:
         self._create_dir(path)
     else:
@@ -227,7 +227,7 @@ class Submission(object):
       self._create_dir(path)
     return path
 
-  def _create_dir(self, path, perms=0711):
+  def _create_dir(self, path, perms=None):
     """
     Return the directory in HDFS, creating it if necessary.
     """
@@ -246,7 +246,8 @@ class Submission(object):
     if not self.fs.exists(path):
       self._do_as(self.user.username, self.fs.mkdir, path, perms)
 
-    self._do_as(self.user.username, self.fs.chmod, path, perms)
+    if perms is not None:
+      self._do_as(self.user.username, self.fs.chmod, path, perms)
 
     return path
 

@@ -205,9 +205,11 @@ def save_workflow(request):
   workflow_doc.update_data({'layout': layout})
   workflow_doc.name = workflow['name']
   workflow_doc.save()
-  
+
   workflow_instance = Workflow(document=workflow_doc)
-  
+  workflow_instance.set_workspace(request.user)
+  workflow_instance.check_workspace(request.fs, request.user)
+
   response['status'] = 0
   response['id'] = workflow_doc.id
   response['doc1_id'] = workflow_doc.doc.get().id
@@ -240,7 +242,7 @@ def _get_workflows(user):
         'owner': workflow.owner.username,
         'value': workflow.uuid,
         'id': workflow.id
-      } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2')]
+      } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
     ]  
 
 

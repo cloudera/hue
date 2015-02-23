@@ -1797,6 +1797,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
       <h4>${_("Workspace")}</h4>
       <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: {value: $root.workflow.properties.deployment_dir, displayJustLastBit: true}, filechooserOptions: globalFilechooserOptions" rel="tooltip"/>
+      <span data-bind='template: { name: "common-fs-link", data: {path: $root.workflow.properties.deployment_dir(), with_label: false}}'></span>
 
 	  <h4>${ _('Hadoop Properties') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
@@ -1820,6 +1821,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
       <h4>${ _("Job XML") }</h4>
       <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.job_xml, filechooserOptions: globalFilechooserOptions"/>
+      <span data-bind='template: { name: "common-fs-link", data: {path: $root.workflow.properties.job_xml(), with_label: false}}'></span>
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.workflow.properties">
