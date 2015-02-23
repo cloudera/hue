@@ -53,7 +53,7 @@ def app(request):
 
 
 def scripts(request):
-  return JsonResponse(get_scripts(request.user, is_design=True))
+  return JsonResponse(get_scripts(request.user, is_design=True), safe=False)
 
 
 @show_oozie_error
@@ -64,7 +64,7 @@ def dashboard(request):
   hue_jobs = Document.objects.available(PigScript, request.user, with_history=True)
   massaged_jobs = pig_api.massaged_jobs_for_json(request, jobs, hue_jobs)
 
-  return JsonResponse(massaged_jobs)
+  return JsonResponse(massaged_jobs, safe=False)
 
 
 def save(request):
