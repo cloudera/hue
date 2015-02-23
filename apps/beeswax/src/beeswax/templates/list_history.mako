@@ -125,7 +125,7 @@ ${ layout.menubar(section='history') }
             <tbody>
             % for query in page.object_list:
               <tr class="histRow">
-                <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
+                <td data-sort-value="${time.mktime(query.submission_date.timetuple())}"></td>
                 <td>${show_saved_query(query.design, query)}</td>
                 <td>
                   % if len(query.query) > 100:
@@ -156,8 +156,17 @@ ${ layout.menubar(section='history') }
     </div>
 </div>
 
+<script src="/static/ext/js/moment-with-locales.min.js"></script>
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+
+    var locale = window.navigator.userLanguage || window.navigator.language;
+    moment.locale(locale);
+    $("[data-sort-value]").each(function(){
+      $(this).text(moment($(this).attr("data-sort-value")*1000).format("L LTS"));
+    });
+
     $(".datatables").dataTable({
       "bPaginate": false,
       "bLengthChange": false,

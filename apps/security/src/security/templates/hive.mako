@@ -535,7 +535,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="/static/js/ko.hue-bindings.js" type="text/javascript" charset="utf-8"></script>
 <script src="/security/static/js/hive.ko.js" type="text/javascript" charset="utf-8"></script>
 
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.hiveautocomplete.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
 

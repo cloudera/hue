@@ -353,7 +353,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 <script src="/static/ext/js/codemirror-xml.js"></script>
 
 % if oozie_workflow.has_sla:
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
