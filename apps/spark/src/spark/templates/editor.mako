@@ -168,7 +168,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible(), click: $root.toggleAssist">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible() && $root.isAssistAvailable(), click: $root.toggleAssist">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -1116,8 +1116,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     assist.getData(null, force);
   }
 
-  loadAssistMain();
-
+  if (assist.options.baseURL != ""){
+    loadAssistMain();  
+  }
+  else {
+    viewModel.isAssistVisible(false);
+    viewModel.isAssistAvailable(false);
+  }
+  
   function reloadAssist() {
     loadAssistMain(true);
   }
