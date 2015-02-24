@@ -153,7 +153,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
 
     &nbsp;&nbsp;&nbsp;
-    
+
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-fw fa-pencil"></i>
     </a>
@@ -462,7 +462,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
 
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
-      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" 
+      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover"
         data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>
                 <br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
                 <br/>
@@ -470,7 +470,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
                 <br/>
                 <a href='http://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions'>${ _('Click for more') }</a>">
           <i class="fa fa-question-circle" title="${ _('Click for more info') }"></i>
-      </a>    
+      </a>
       <ul data-bind="foreach: children" class="unstyled">
         <li>
           ${ _('If') } <input type="text" data-bind="value: $data['condition']" />
@@ -733,7 +733,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
         &nbsp;&nbsp;
 
-        <span data-bind="text: $root.workflow_properties.hive_xml.label"></span>      
+        <span data-bind="text: $root.workflow_properties.hive_xml.label"></span>
         <input type="text" style="width:25%" class="input-large filechooser-input" data-bind="filechooser: properties.hive_xml, filechooserOptions: globalFilechooserOptions, attr: { placeholder: $root.workflow_properties.hive_xml.help_text }"/>
 
         <div class="row-fluid">
@@ -1039,7 +1039,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
             </a>
           </li>
         </ul>
-        
+
         <div class="span12" data-bind="template: { name: 'common-properties-files' }"></div>
       </div>
     </div>
@@ -1075,12 +1075,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 		    <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
 		      ${ _('Delete') } <i class="fa fa-plus"></i>
 		    </a>
-		
+
 		    <!-- ko if: properties.job_xml -->
 		      <h6>${ _('Job XML') }</h6>
 		      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, attr: { placeholder: $root.workflow_properties.job_xml.help_text }"/>
 		    <!-- /ko -->
-		
+
 		    <h6>
 		      <a class="pointer" data-bind="click: function(){ properties.archives.push(ko.mapping.fromJS({'name': ''})); $(document).trigger('drawArrows') }">
 		        ${ _('Archives') } <i class="fa fa-plus"></i>
@@ -1581,7 +1581,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <span data-bind="text: $root.workflow_properties.reducer.label"></span
         <input type="text" data-bind="value: properties.reducer" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
-        
+
         <div data-bind="template: { name: 'common-properties-files' }"></div>
       </div>
     </div>
@@ -1647,7 +1647,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       ${ _('Parameters') }
       <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
@@ -1684,7 +1684,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 		   <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
 		     ${ _('Delete') } <i class="fa fa-plus"></i>
 		   </a>
-		
+
 		   <h6>
 		     <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
 		       ${ _('Properties') } <i class="fa fa-plus"></i>
@@ -1701,8 +1701,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
            </ul>
            <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
 
-           <h6>             
-             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>             
+           <h6>
+             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
            </h6>
            <input type="text" class="input-xlarge" data-bind="value: properties.java_opts, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" />
         </div>
@@ -1813,7 +1813,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
         <i class="fa fa-plus"></i> ${ _('Add property') }
       </a>
 
-      <h4>${ _("Show graph arrows") }</h4>      
+      <h4>${ _("Show graph arrows") }</h4>
       <input type="checkbox" data-bind="checked: $root.workflow.properties.show_arrows" title="${ _('Toggle arrow showing') }" rel="tooltip" data-placement="bottom" />
 
       <h4>${ _("Version") }</h4>
@@ -1831,7 +1831,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </div>
 
 
-<div id="submit-wf-modal" class="modal hide"></div>
+<div class="submit-modal modal hide"></div>
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
@@ -1873,18 +1873,19 @@ ${ dashboard.import_bindings() }
 
 <script src="/oozie/static/js/workflow-editor.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.curvedarrow.js" type="text/javascript" charset="utf-8"></script>
-
+<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocId(${ doc1_id });
 
   viewModel.init();
+  viewModel.workflow.tracker().markCurrentStateAsClean();
   fullLayout(viewModel);
 
   var globalFilechooserOptions = {
@@ -1920,15 +1921,6 @@ ${ dashboard.import_bindings() }
       $(document).trigger("drawArrows");
     }
   }
-
-
-  $(document).on("showSubmitPopup", function(event, data){
-    if (! viewModel.workflow.isDirty()){
-      $('#submit-wf-modal').html(data);
-      $('#submit-wf-modal').modal('show');
-    }
-  });
-
 
   function showAddActionDemiModal(widget) {
     viewModel.newAction(widget);
@@ -2084,7 +2076,7 @@ ${ dashboard.import_bindings() }
           "width": _width
         });
         _el.width(500);
-        $("#exposeOverlay").fadeIn(300);  
+        $("#exposeOverlay").fadeIn(300);
         widget.oozieExpanded(true);
       }
       else {

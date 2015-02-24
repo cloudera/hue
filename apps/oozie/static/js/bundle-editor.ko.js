@@ -16,21 +16,6 @@
 
 
 var Bundle = function (vm, bundle) {
-  function changeTracker(objectToTrack, hashFunction) {    
-      hashFunction = hashFunction || ko.toJSON;
-      var lastCleanState = ko.observable(hashFunction(objectToTrack));
-      
-      var result = {
-          somethingHasChanged : ko.dependentObservable(function() {
-              return hashFunction(objectToTrack) != lastCleanState()
-          }),
-          markCurrentStateAsClean : function() {
-              lastCleanState(hashFunction(objectToTrack));   
-          }
-      };
-      
-      return function() { return result }
-  }
 
   var self = this;
 
@@ -41,27 +26,27 @@ var Bundle = function (vm, bundle) {
   self.coordinators = ko.mapping.fromJS(typeof bundle.coordinators != "undefined" && bundle.coordinators != null ? bundle.coordinators : []);
   self.properties = ko.mapping.fromJS(typeof bundle.properties != "undefined" && bundle.properties != null ? bundle.properties : {});
 
-  self.tracker = new changeTracker(self);
-  
+  self.tracker = new ChangeTracker(self);  // from ko.common-dashboard.js
+
   self.isDirty = ko.computed(function () {
     return self.tracker().somethingHasChanged();
   });
-  
-  self.addCoordinator = function(coordinator_uuid) {
-    self.getCoordinatorParameters(coordinator_uuid);	  
+
+  self.addCoordinator = function (coordinator_uuid) {
+    self.getCoordinatorParameters(coordinator_uuid);
   };
-  
-  self.getCoordinatorParameters = function(uuid) {
-	$.get("/oozie/editor/coordinator/parameters/", {
-	  "uuid": uuid,
-	}, function (data) {
-	   var _var = {       
-           'coordinator': uuid,
-		   'properties': data.parameters
-	   };
+
+  self.getCoordinatorParameters = function (uuid) {
+    $.get("/oozie/editor/coordinator/parameters/", {
+      "uuid": uuid,
+    }, function (data) {
+      var _var = {
+        'coordinator': uuid,
+        'properties': data.parameters
+      };
 
       self.coordinators.push(ko.mapping.fromJS(_var));
-	}).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -73,35 +58,35 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(bundle_json.id == null);
-  self.isEditing.subscribe(function(newVal){
+  self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });
   self.toggleEditing = function () {
-    self.isEditing(! self.isEditing());
+    self.isEditing(!self.isEditing());
   };
 
   self.bundle = new Bundle(self, bundle_json);
-  
+
   self.coordinators = ko.mapping.fromJS(coordinators_json);
 
   self.coordinatorModalFilter = ko.observable("");
-  self.filteredModalCoordinators = ko.computed(function() {
+  self.filteredModalCoordinators = ko.computed(function () {
     var _filter = self.coordinatorModalFilter().toLowerCase();
     if (!_filter) {
       return self.coordinators();
     }
     else {
-      return ko.utils.arrayFilter(self.coordinators(), function(coord) {
+      return ko.utils.arrayFilter(self.coordinators(), function (coord) {
         return coord.name().toLowerCase().indexOf(_filter.toLowerCase()) > -1;
       });
     }
   }, self);
 
   self.getCoordinatorById = function (uuid) {
-    var _coords = ko.utils.arrayFilter(self.coordinators(), function(coord) {
+    var _coords = ko.utils.arrayFilter(self.coordinators(), function (coord) {
       return coord.uuid() == uuid;
     });
-    if (_coords.length > 0){
+    if (_coords.length > 0) {
       return _coords[0];
     }
     return null;
@@ -111,10 +96,10 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
     self.bundle.addCoordinator(uuid);
   };
 
-  
+
   self.save = function () {
     $.post("/oozie/editor/bundle/save/", {
-        "bundle": ko.mapping.toJSON(self.bundle)
+      "bundle": ko.mapping.toJSON(self.bundle)
     }, function (data) {
       if (data.status == 0) {
         self.bundle.id(data.id);
@@ -126,22 +111,22 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
       }
       else {
         $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
-  
+
   self.showSubmitPopup = function () {
     // If self.bundle.id() == null, need to save wf for now
-	  $(".jHueNotify").hide();
-    if (! self.bundle.isDirty()){
+    $(".jHueNotify").hide();
+    if (!self.bundle.isDirty()) {
       logGA('submit');
       $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
-        }, function (data) {
-          $(document).trigger("showSubmitPopup", data);
+      }, function (data) {
+        $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+        $(document).trigger("error", xhr.responseText);
       });
     }
   };

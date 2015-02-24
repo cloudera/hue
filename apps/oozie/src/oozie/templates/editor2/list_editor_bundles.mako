@@ -108,7 +108,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
   <!-- <![endif]-->
 </div>
 
-<div id="submit-wf-modal" class="modal hide"></div>
+<div class="submit-modal modal hide"></div>
 
 <div id="deleteWf" class="modal hide fade">
   <form id="deleteWfForm" method="POST" data-bind="submit: delete2">
@@ -135,6 +135,7 @@ ${ commonshare() | n,unicode }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/share.vm.js"></script>
+<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -219,11 +220,6 @@ ${ commonshare() | n,unicode }
 
     shareViewModel = initSharing("#documentShareModal");
     shareViewModel.setDocId(-1);
-
-    $(document).on("showSubmitPopup", function(event, data){
-      $('#submit-wf-modal').html(data);
-      $('#submit-wf-modal').modal('show');
-    });
 
     var oTable = $("#workflowTable").dataTable({
       "sPaginationType":"bootstrap",

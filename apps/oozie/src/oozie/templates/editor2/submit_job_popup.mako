@@ -29,7 +29,7 @@
     <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
   </div>
   <div class="modal-body">
-    
+
       <div id="param-container">
 
        ${ params_form.management_form | n,unicode }
@@ -43,7 +43,7 @@
             % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
                 style="display: none"
             % endif
-          ">
+          >
             <label class="control-label">${ form['name'].form.initial.get('name') }</label>
             <div class="controls">
               ${ utils.render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
@@ -68,7 +68,7 @@
 
          % endfor
       </div>
-
+      <div class="clearfix"></div>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
@@ -99,7 +99,7 @@
     z-index: 4999;
   }
   #param-container input[type="text"].filechooser-input.input-xlarge {
-    width: 450px;
+    width: 430px;
   }
   #param-container .control-group {
     float: left;
@@ -107,7 +107,6 @@
   #param-container .btn-group {
     margin-left: 10px;
   }
-}
 </style>
 
 <script src="/static/ext/js/moment-with-locales.min.js" type="text/javascript" charset="utf-8"></script>
@@ -133,6 +132,5 @@
       _el.val(_el.val() + "T00:00Z");
     });
    _el.datepicker('show');
-  }); 
+  });
 </script>
-

@@ -67,8 +67,8 @@ var Row = function (widgets, vm, columns) {
   self.id = ko.observable(UUID());
   self.widgets = ko.observableArray(widgets);
   self.columns = ko.observableArray(columns ? columns : []);
-  self.columns.subscribe(function(val){
-    self.columns().forEach(function(col){
+  self.columns.subscribe(function (val) {
+    self.columns().forEach(function (col) {
       col.percWidth((100 - self.columns().length * 0.5) / self.columns().length);
     });
   });
@@ -78,11 +78,11 @@ var Row = function (widgets, vm, columns) {
   };
 
   self.addEmptyColumn = function (atBeginning) {
-    if (self.columns().length == 0){
+    if (self.columns().length == 0) {
       var _col = self.addColumn(null, atBeginning);
-      if (self.widgets().length > 0){
+      if (self.widgets().length > 0) {
         var _row = _col.addEmptyRow();
-        self.widgets().forEach(function(widget){
+        self.widgets().forEach(function (widget) {
           _row.addWidget(widget);
         });
         self.widgets([]);
@@ -95,11 +95,11 @@ var Row = function (widgets, vm, columns) {
     if (typeof column == "undefined" || column == null) {
       var _size = Math.max(1, Math.floor(12 / (self.columns().length + 1)));
       column = new self.columnPrototype(_size, []); // Hacky but needed when a new row is deleted
-      self.columns().forEach(function(col){
+      self.columns().forEach(function (col) {
         col.size(_size);
       });
     }
-    if (typeof atBeginning == "undefined" || atBeginning == null || ! atBeginning) {
+    if (typeof atBeginning == "undefined" || atBeginning == null || !atBeginning) {
       self.columns.push(column);
     }
     else {
@@ -160,7 +160,7 @@ var Row = function (widgets, vm, columns) {
 var Widget = function (params) {
   var self = this;
 
-  self.extend = function() {
+  self.extend = function () {
     return self;
   }
 
@@ -283,4 +283,22 @@ function setLayout(colSizes, vm) {
   vm.columns(_cols);
 
   $(document).trigger("setLayout");
+}
+
+function ChangeTracker(objectToTrack, hashFunction) {
+  hashFunction = hashFunction || ko.toJSON;
+  var lastCleanState = ko.observable(hashFunction(objectToTrack));
+
+  var result = {
+    somethingHasChanged: ko.dependentObservable(function () {
+      return hashFunction(objectToTrack) != lastCleanState()
+    }),
+    markCurrentStateAsClean: function () {
+      lastCleanState(hashFunction(objectToTrack));
+    }
+  };
+
+  return function () {
+    return result
+  }
 }

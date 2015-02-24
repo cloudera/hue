@@ -465,7 +465,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 </div>
 
 
-<div id="submit-coord-modal" class="modal hide"></div>
+<div class="submit-modal modal hide"></div>
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
@@ -510,6 +510,7 @@ ${ commonshare() | n,unicode }
 ${ dashboard.import_bindings() }
 
 <script src="/oozie/static/js/coordinator-editor.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript">
@@ -570,13 +571,6 @@ ${ dashboard.import_bindings() }
     viewModel.coordinator.properties.workflow(wf.uuid());
     $("#chooseWorkflowDemiModal").modal("hide");
   }
-
-  $(document).on("showSubmitPopup", function(event, data){
-    if (! viewModel.coordinator.isDirty()){
-      $('#submit-coord-modal').html(data);
-      $('#submit-coord-modal').modal('show');
-    }
-  });
 
   var firstToggled = true;
   $(document).on("editingToggled", function(){
