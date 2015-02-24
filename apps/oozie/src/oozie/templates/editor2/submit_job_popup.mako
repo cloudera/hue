@@ -99,7 +99,7 @@
     z-index: 4999;
   }
   #param-container input[type="text"].filechooser-input.input-xlarge {
-    width: 430px;
+    width: 450px;
   }
   #param-container .control-group {
     float: left;

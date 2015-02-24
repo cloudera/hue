@@ -19,9 +19,8 @@ $(document).ready(function () {
     $('.submit-modal').html(data);
     $('.submit-modal').modal('show');
     var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
-    console.log(_sel.length)
     if (_sel.length > 0) {
-      $('.submit-modal .modal-body').height(_sel.length * 65 + 100);
+      $('.submit-modal .modal-body').height($('.submit-modal .modal-body').height() + 60);
     }
   });
 });
