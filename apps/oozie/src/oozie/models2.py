@@ -942,7 +942,7 @@ class FsAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['deletes'], cls.FIELDS['mkdirs'], cls.FIELDS['moves'], cls.FIELDS['chmods']]
+    return []
 
 
 class EmailAction(Action):
