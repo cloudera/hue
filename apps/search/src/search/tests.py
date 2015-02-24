@@ -61,7 +61,7 @@ class TestSearchBase(object):
     grant_access('test_search', 'test_search', 'search')
     self.user = User.objects.get(username='test_search')
     try:
-      self.collection = Collection.objects.create2(name='collection_1', label='collection_1')
+      self.collection = Collection.objects.create2(name='collection_1', label='collection_1', owner=self.user)
     except:
       self.collection = Collection.objects.get(name='collection_1')
 

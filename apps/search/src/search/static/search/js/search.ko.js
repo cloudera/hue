@@ -392,7 +392,7 @@ var FieldAnalysis = function (vm, field_name) {
 var Collection = function (vm, collection) {
   var self = this;
 
-  self.id = collection.id;
+  self.id = ko.mapping.fromJS(collection.id);
   self.name = ko.mapping.fromJS(collection.name);
   self.label = ko.mapping.fromJS(collection.label);
   self.enabled = ko.mapping.fromJS(collection.enabled);
@@ -1058,6 +1058,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
   self.init = function (callback) {
+    self.isEditing(self.columns().length == 0);
     self.initial.init();
     self.collection.syncFields();
     self.search(callback);
@@ -1294,7 +1295,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       layout: ko.mapping.toJSON(self.columns)
     }, function (data) {
       if (data.status == 0) {
-        self.collection.id = data.id;
+        self.collection.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("collection") == -1) {
           window.location.hash = '#collection=' + data.id;

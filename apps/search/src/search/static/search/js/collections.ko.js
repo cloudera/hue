@@ -33,6 +33,8 @@ var Collection = function (coll) {
   self.enabled = ko.observable(coll.enabled);
   self.isCoreOnly = ko.observable(coll.isCoreOnly);
   self.absoluteUrl = ko.observable(coll.absoluteUrl);
+  self.owner = ko.observable(coll.owner);
+  self.isOwner = ko.observable(coll.isOwner);
   self.selected = ko.observable(false);
   self.hovered = ko.observable(false);
 
@@ -78,9 +80,14 @@ var SearchCollectionsModel = function (props) {
       return coll.selected();
     });
   }, self);
+  self.selectedOwnerCollections = ko.computed(function () {
+    return ko.utils.arrayFilter(self.selectedCollections(), function (coll) {
+      return coll.isOwner();
+    });
+  }, self);
 
   self.atLeastOneSelected = ko.computed(function() {
-    return self.selectedCollections().length >= 1;
+    return self.selectedCollections().length >= 1 && self.selectedCollections().length == self.selectedOwnerCollections().length;
   });
 
   self.selectedImportableCollections = ko.computed(function () {

@@ -18,6 +18,8 @@
 
 import logging
 
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from libsolr.api import SolrApi
@@ -37,13 +39,24 @@ class SearchController(object):
     self.user = user
 
   def get_search_collections(self):
-    # TODO perms
-    return Collection.objects.filter(enabled=True)
+    if self.user.is_superuser:
+      return Collection.objects.all().order_by('-id')
+    else:
+      return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True)).order_by('-id')
+
+  def get_shared_search_collections(self):
+    return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True, owner__in=User.objects.filter(is_superuser=True))).order_by('-id')
+
+  def get_owner_search_collections(self):
+    if self.user.is_superuser:
+      return Collection.objects.all()
+    else:
+      return Collection.objects.filter(Q(owner=self.user))
 
   def delete_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      Collection.objects.filter(id__in=collection_ids).delete()
+      self.get_owner_search_collections().filter(id__in=collection_ids).delete()
       result['status'] = 0
     except Exception, e:
       LOG.warn('Error deleting collection: %s' % e)
@@ -54,7 +67,7 @@ class SearchController(object):
   def copy_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      for collection in Collection.objects.filter(id__in=collection_ids):
+      for collection in self.get_shared_search_collections().filter(id__in=collection_ids):
         copy = collection
         copy.label += _(' (Copy)')
         copy.id = copy.pk = None
