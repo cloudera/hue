@@ -80,6 +80,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
               </th>
               <th>${ _('Name') }</th>
               <th>${ _('Solr Index') }</th>
+              <th width="15%">${ _('Owner') }</th>
               <th width="1%" class="center">${ _('Shared') }</th>
             </tr>
           </thead>
@@ -90,6 +91,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
               </td>
               <td><a data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
               <td><a data-bind="text: name, click: $root.editIndex" title="${ _('Click to edit the index') }" class="pointer"></a></td>
+              <td><span data-bind="text: owner"></span></td>
               <td class="center"><span data-bind="css: { 'fa fa-check': enabled }"></span></td>
             </tr>
           </tbody>

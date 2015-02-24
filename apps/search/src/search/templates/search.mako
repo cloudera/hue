@@ -33,20 +33,35 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    % if user.is_superuser:
-      <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></button>
-      <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}"><i class="fa fa-save"></i></button>
-      <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
-          data-bind="css: {'btn': true}">
-        <i class="fa fa-cog"></i>
-      </button>
+    <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+      <i class="fa fa-pencil"></i>
+    </button>
+    % if is_owner:
+    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-save"></i>
+    </button>
     % endif
-      <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}"><i class="fa fa-link"></i></button>
-    % if user.is_superuser:
-      &nbsp;&nbsp;&nbsp;
-      <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
-      <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-tags"></i></a>
-    % endif
+    <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
+        data-bind="css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-cog"></i>
+    </button>
+
+    <span style="padding-left:85px" data-bind="visible: columns().length == 0"></span>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
+      <i class="fa fa-link"></i>
+    </button>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-file-o"></i>
+    </a>
+    <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-tags"></i>
+    </a>
   </div>
 
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
@@ -54,7 +69,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- ko if: columns().length == 0 -->
     <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections">
     </select>
-    <label class="checkbox" style="display:inline-block; margin-left: 10px"><input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') } <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i></label>
+    <label class="checkbox" style="display:inline-block; margin-left: 10px">
+      <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
+      <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
+    </label>
     <!-- /ko -->
   </form>
 

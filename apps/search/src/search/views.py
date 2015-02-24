@@ -34,10 +34,9 @@ from indexer.management.commands import indexer_setup
 from search.api import _guess_gap, _zoom_range_facet, _new_range_facet
 from search.conf import SOLR_URL
 from search.data_export import download as export_download
-from search.decorators import allow_admin_only
+from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
-from search.models import Collection, augment_solr_response, augment_solr_exception,\
-  pairwise2
+from search.models import Collection, augment_solr_response, augment_solr_exception, pairwise2
 from search.search_controller import SearchController
 
 
@@ -49,15 +48,12 @@ def index(request):
   collection_id = request.GET.get('collection')
 
   if not hue_collections or not collection_id:
-    if request.user.is_superuser:
-      return admin_collections(request, True)
-    else:
-      return no_collections(request)
+    return admin_collections(request, True)
 
   try:
-    collection = Collection.objects.get(id=collection_id) # TODO perms HUE-1987
+    collection = hue_collections.get(id=collection_id)
   except Exception, e:
-    raise PopupException(e, title=_('Error while accessing the collection'))
+    raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
 
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
@@ -65,10 +61,10 @@ def index(request):
     'collection': collection,
     'query': query,
     'initial': json.dumps({'collections': [], 'layout': []}),
+    'is_owner': request.user == collection.owner
   })
 
 
-@allow_admin_only
 def new_search(request):
   collections = SearchController(request.user).get_all_indexes()
   if not collections:
@@ -90,6 +86,7 @@ def new_search(request):
               "drops":["temp"],"klass":"card card-home card-column span10"}
          ]
      }),
+    'is_owner': True
   })
 
 
@@ -114,19 +111,17 @@ def browse(request, name):
               "drops":["temp"],"klass":"card card-home card-column span10"}
          ]
      }),
+     'is_owner': True
   })
 
 
+@allow_viewer_only
 def search(request):
   response = {}
 
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
   query['download'] = 'download' in request.POST
-  # todo: remove the selected histo facet if multiq
-
-  if collection['id']:
-    hue_collection = Collection.objects.get(id=collection['id']) # TODO perms
 
   if collection:
     try:
@@ -150,11 +145,11 @@ def search(request):
   return JsonResponse(response)
 
 
-@allow_admin_only
+@allow_owner_only
 def save(request):
   response = {'status': -1}
 
-  collection = json.loads(request.POST.get('collection', '{}')) # TODO perms
+  collection = json.loads(request.POST.get('collection', '{}'))
   layout = json.loads(request.POST.get('layout', '{}'))
 
   collection['template']['extracode'] = escape(collection['template']['extracode'])
@@ -163,7 +158,7 @@ def save(request):
     if collection['id']:
       hue_collection = Collection.objects.get(id=collection['id'])
     else:
-      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'])
+      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'], owner=request.user)
     hue_collection.update_properties({'collection': collection})
     hue_collection.update_properties({'layout': layout})
     hue_collection.name = collection['name']
@@ -179,6 +174,7 @@ def save(request):
   return JsonResponse(response)
 
 
+@allow_viewer_only
 def download(request):
   try:
     file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
@@ -200,9 +196,8 @@ def no_collections(request):
   return render('no_collections.mako', request, {})
 
 
-@allow_admin_only
 def admin_collections(request, is_redirect=False):
-  existing_hue_collections = Collection.objects.all()
+  existing_hue_collections = SearchController(request.user).get_search_collections()
 
   if request.GET.get('format') == 'json':
     collections = []
@@ -213,7 +208,9 @@ def admin_collections(request, is_redirect=False):
         'label': collection.label,
         'enabled': collection.enabled,
         'isCoreOnly': collection.is_core_only,
-        'absoluteUrl': collection.get_absolute_url()
+        'absoluteUrl': collection.get_absolute_url(),
+        'owner': collection.owner.username,
+        'isOwner': collection.owner == request.user or request.user.is_superuser
       }
       collections.append(massaged_collection)
     return JsonResponse(collections, safe=False)
@@ -224,7 +221,6 @@ def admin_collections(request, is_redirect=False):
   })
 
 
-@allow_admin_only
 def admin_collection_delete(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -238,7 +234,7 @@ def admin_collection_delete(request):
   return JsonResponse(response)
 
 
-@allow_admin_only
+@allow_owner_only
 def admin_collection_copy(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -275,7 +271,6 @@ def index_fields_dynamic(request):
 
   try:
     name = request.POST['name']
-
     hue_collection = Collection(name=name, label=name)
 
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
@@ -292,6 +287,7 @@ def index_fields_dynamic(request):
   return JsonResponse(result)
 
 
+@allow_viewer_only
 def get_document(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -317,6 +313,7 @@ def get_document(request):
   return JsonResponse(result)
 
 
+@allow_viewer_only
 def get_stats(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -341,6 +338,7 @@ def get_stats(request):
   return JsonResponse(result)
 
 
+@allow_viewer_only
 def get_terms(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -372,6 +370,7 @@ def get_terms(request):
   return JsonResponse(result)
 
 
+@allow_viewer_only
 def get_timeline(request):
   result = {'status': -1, 'message': 'Error'}
 
@@ -418,11 +417,12 @@ def get_timeline(request):
   return JsonResponse(result)
 
 
+@allow_viewer_only
 def new_facet(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    collection = json.loads(request.POST.get('collection', '{}')) # Perms
+    collection = json.loads(request.POST.get('collection', '{}'))
 
     facet_id = request.POST['id']
     facet_label = request.POST['label']
@@ -485,11 +485,13 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'properties': properties
   }
 
+
+@allow_viewer_only
 def get_range_facet(request):
   result = {'status': -1, 'message': ''}
 
   try:
-    collection = json.loads(request.POST.get('collection', '{}')) # Perms
+    collection = json.loads(request.POST.get('collection', '{}'))
     facet = json.loads(request.POST.get('facet', '{}'))
     action = request.POST.get('action', 'select')
 
@@ -547,6 +549,9 @@ def get_collections(request):
 
 def install_examples(request):
   result = {'status': -1, 'message': ''}
+
+  if not request.user.is_superuser:
+    return PopupException(_("You must be a superuser."))
 
   if request.method != 'POST':
     result['message'] = _('A POST request is required.')

@@ -21,10 +21,12 @@ import logging
 import numbers
 import re
 
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.html import escape
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
-from django.core.urlresolvers import reverse
+
 
 from desktop.lib.i18n import smart_unicode
 
@@ -205,7 +207,7 @@ class Sorting(models.Model):
 
 class CollectionManager(models.Manager):
 
-  def create2(self, name, label, is_core_only=False):
+  def create2(self, name, label, is_core_only=False, owner=None):
     facets = Facet.objects.create()
     result = Result.objects.create()
     sorting = Sorting.objects.create()
@@ -213,6 +215,8 @@ class CollectionManager(models.Manager):
     collection = Collection.objects.create(
         name=name,
         label=label,
+        owner=owner,
+        enabled=False,
         cores=json.dumps({'version': 2}),
         is_core_only=is_core_only,
         facets=facets,
@@ -225,7 +229,7 @@ class CollectionManager(models.Manager):
 
 class Collection(models.Model):
   """All the data is now saved into the properties field"""
-  enabled = models.BooleanField(default=True)
+  enabled = models.BooleanField(default=False) # Aka shared
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
   is_core_only = models.BooleanField(default=False)
@@ -238,6 +242,8 @@ class Collection(models.Model):
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
+
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who created the job.'), default=None, null=True)
 
   _ATTRIBUTES = ['collection', 'layout', 'autocomplete']
   ICON = 'search/art/icon_search_48.png'

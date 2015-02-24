@@ -446,7 +446,7 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'search' in apps:
          <% from search.search_controller import SearchController %>
-         <% collections = SearchController(user).get_search_collections() %>
+         <% collections = SearchController(user).get_shared_search_collections() %>
          % if not collections:
            <li>
              <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">Search</a>
@@ -458,9 +458,14 @@ from django.utils.translation import ugettext as _
                % for collection in collections:
                  <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ static(collection.icon) }" class="app-icon"/> ${ collection.label }</a></li>
                % endfor
-               % if 'indexer' in apps:
+               % if 'indexer' in apps or 'search' in apps:
                  <li class="divider"></li>
+                 % if 'search' in apps:
+                 <li><a href="${ url('search:new_search') }"><i class="fa fa-plus"></i>${ _('Dashboard') }</a></li>
+                 % endif
+                 % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }"><i class="fa fa-database"></i> ${ _('Indexes') }</a></li>
+                 % endif
                % endif
              </ul>
            </li>
