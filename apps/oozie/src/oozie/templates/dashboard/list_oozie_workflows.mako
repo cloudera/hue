@@ -37,13 +37,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
       <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-      <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i> ${ _('Resume') }</button>
-      <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i> ${ _('Suspend') }</button>
-      <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i> ${ _('Kill') }</button>
+      <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span></button>
+      <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span></button>
+      <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span></button>
     </div>
 
     <span class="pull-right">
-      <span style="padding-right:10px;float:left;margin-top:3px">
+      <span style="padding-right:10px;float:left;margin-top:3px" class="hide-smaller">
       ${ _('Show only') }
       </span>
       <span class="btn-group" style="float:left">
@@ -52,13 +52,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <a class="btn btn-date btn-info" data-value="15">${ _('15') }</a>
         <a class="btn btn-date btn-info" data-value="30">${ _('30') }</a>
       </span>
-      <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px">${ _('days with status') }</span>
+      <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px" class="hide-smaller">${ _('days with status') }</span>
       <span class="btn-group" style="float:left;">
         <a class="btn btn-status btn-success" data-value='SUCCEEDED'>${ _('Succeeded') }</a>
         <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
         <a class="btn btn-status btn-danger disable-feedback" data-value='KILLED'>${ _('Killed') }</a>
       </span>
-      <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px">${ _('submitted') }</span>
+      <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px" class="hide-smaller">${ _('submitted') }</span>
       <span class="btn-group" style="float:left;">
         <a class="btn btn-submitted btn-info" data-value='MANUALLY'>${ _('Manually') }</a>
         <a class="btn btn-submitted btn-info" data-value='COORDINATOR'>${ _('Coordinator') }</a>
@@ -144,6 +144,21 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   </div>
 </div>
 
+<style type="text/css">
+@media (max-width: 1360px) {
+  .hide-small {
+    display: none;
+  }
+}
+@media (max-width: 1240px) {
+  .hide-smaller {
+    display: none;
+  }
+  .btn-group {
+    margin-left: 10px;
+  }
+}
+</style>
 
 <script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
