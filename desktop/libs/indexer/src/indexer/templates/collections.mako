@@ -182,15 +182,17 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
                 <th>
                   <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(displayCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
                 </th>
-                <th width="100%">${_('Name')}</th>
+                <th width="60%">${_('Name')}</th>
+                <th width="40%">${_('Collections')}</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: displayCollections">
               <tr data-bind="routie: 'edit/' + name()" class="pointer">
                 <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
-                  <span data-bind="css: {'fa-check': $parent.displayCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
+                  <span data-bind="css: {'fa-check': $parent.displayCollections()[$index()].selected(), 'hueCheckbox fa': ! isAlias()}"></span>
                 </td>
                 <td data-bind="text: name" style="cursor: pointer"></td>
+                <td data-bind="text: collections" style="cursor: pointer"></td>
               </tr>
             </tbody>
           </table>

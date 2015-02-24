@@ -113,6 +113,11 @@ class SearchController(object):
     except:
       pass
 
+    try:
+      indexes += SolrApi(SOLR_URL.get(), self.user).aliases().keys()
+    except:
+      pass
+
     if show_all or not indexes:
       return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
     else:
