@@ -16,9 +16,6 @@ import _root_.scala.concurrent.{Await, ExecutionContext}
 
 object Main extends Logging {
 
-  protected implicit def executor: ExecutionContext = ExecutionContext.global
-  protected implicit def jsonFormats: Formats = DefaultFormats
-
   val SESSION_KIND = "livy.repl.session.kind"
   val PYTHON_SESSION = "python"
   val PYSPARK_SESSION = "pyspark"
@@ -35,8 +32,6 @@ object Main extends Logging {
       .orElse(sys.env.get("LIVY_PORT"))
       .getOrElse("8999").toInt
 
-    val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
-      .orElse(sys.env.get("LIVY_CALLBACK_URL"))
 
     if (args.length != 1) {
       println("Must specify either `python`/`pyspark`/`scala/`spark` for the session kind")
@@ -61,35 +56,23 @@ object Main extends Logging {
 
     server.start()
 
+    println("Starting livy-repl on port %s" format server.port)
+    System.setProperty("livy.repl.url", s"http://${server.host}:${server.port}")
+
     try {
-      println("Starting livy-repl on port %s" format server.port)
-
-      // See if we want to notify someone that we've started on a url
-      callbackUrl.foreach { case callbackUrl_ =>
-        info(f"Notifying $callbackUrl_ that we're up")
-
-        var req = url(callbackUrl_).setContentType("application/json", "UTF-8")
-        req = req << write(Map(
-          "url" -> s"http://${server.host}:${server.port}"
-        ))
-
-        val rep = Http(req OK as.String)
-        rep.onFailure { case _ => server.stop() }
-
-        Await.result(rep, 10 seconds)
-      }
-
-    } finally {
       server.join()
       server.stop()
-
+    } finally {
       // Make sure to close all our outstanding http requests.
       Http.shutdown()
     }
   }
 }
 
-class ScalatraBootstrap extends LifeCycle {
+class ScalatraBootstrap extends LifeCycle with Logging {
+
+  protected implicit def executor: ExecutionContext = ExecutionContext.global
+  protected implicit def jsonFormats: Formats = DefaultFormats
 
   var session: Session = null
 
@@ -102,6 +85,29 @@ class ScalatraBootstrap extends LifeCycle {
     }
 
     context.mount(new WebApp(session), "/*")
+
+    val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
+      .orElse(sys.env.get("LIVY_CALLBACK_URL"))
+
+    // See if we want to notify someone that we've started on a url
+    callbackUrl.foreach { case callbackUrl_ =>
+      info(s"Notifying $callbackUrl_ that we're up")
+
+      Future {
+        session.waitForStateChange(Session.Starting())
+
+        val replUrl = System.getProperty("livy.repl.url")
+        var req = url(callbackUrl_).setContentType("application/json", "UTF-8")
+        req = req << write(Map("url" -> replUrl))
+
+        val rep = Http(req OK as.String)
+        rep.onFailure {
+          case _ => System.exit(1)
+        }
+
+        Await.result(rep, 10 seconds)
+      }
+    }
   }
 
   override def destroy(context: ServletContext): Unit = {
