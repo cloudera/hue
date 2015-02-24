@@ -28,10 +28,6 @@
   display: inline-block;
 }
 
-#submit-coord-modal .modal-body {
-  overflow: visible;
-}
-
 .datepicker {
   z-index: 1300;
 }

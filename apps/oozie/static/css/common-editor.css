@@ -162,4 +162,6 @@ ul.with-margin li {
   margin-bottom: 4px;
 }
 
-
+.submit-modal .dropdown-menu {
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2) !important;
+}

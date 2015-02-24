@@ -193,7 +193,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 </div>
 
 
-<div id="submit-modal" class="modal hide"></div>
+<div class="submit-modal modal hide"></div>
 
 
 </div>
@@ -218,7 +218,7 @@ ${ commonshare() | n,unicode }
 ${ dashboard.import_bindings() }
 
 <script src="/oozie/static/js/bundle-editor.ko.js" type="text/javascript" charset="utf-8"></script>
-
+<script src="/oozie/static/js/editor2-utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
   var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode }, ${ can_edit_json | n,unicode });
@@ -247,13 +247,6 @@ ${ dashboard.import_bindings() }
     }
     $("#chooseCoordinatorDemiModal").modal("hide");
   }
-
-  $(document).on("showSubmitPopup", function(event, data){
-    if (! viewModel.bundle.isDirty()){
-      $('#submit-modal').html(data);
-      $('#submit-modal').modal('show');
-    }
-  });
 
   $(document).ready(function() {
     $("#chooseCoordinatorDemiModal").modal({

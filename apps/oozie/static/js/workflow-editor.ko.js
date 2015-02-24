@@ -85,19 +85,21 @@ var Node = function (node) {
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
   self.actionParameters = ko.observableArray([]);
-  self.actionParametersUI = ko.computed(function() {
-	if (typeof self.properties.parameters != "undefined") {
-      var _vars = $.map(self.properties.parameters(), function(p, i) { return p.value().split('=', 1)[0]; });
-      if (typeof self.actionParameters() == "undefined"){
+  self.actionParametersUI = ko.computed(function () {
+    if (typeof self.properties.parameters != "undefined") {
+      var _vars = $.map(self.properties.parameters(), function (p, i) {
+        return p.value().split('=', 1)[0];
+      });
+      if (typeof self.actionParameters() == "undefined") {
         return _vars;
       }
-      return $.grep(self.actionParameters(), function(param) {
+      return $.grep(self.actionParameters(), function (param) {
         return _vars.indexOf(param) == -1;
       });
-	}
+    }
   });
   self.actionParametersFetched = ko.observable(false);
-  
+
   self.get_link = function (name) {
     var _link = null;
     $.each(self.children(), function (index, link) {
@@ -133,33 +135,33 @@ var Node = function (node) {
       self.children.remove(_link);
     }
   };
-  
-  self.fetch_parameters = function() {
-    if (typeof self.properties.parameters != "undefined" && ! self.actionParametersFetched()) { // Fetch once the possible variable when they exist 
+
+  self.fetch_parameters = function () {
+    if (typeof self.properties.parameters != "undefined" && !self.actionParametersFetched()) { // Fetch once the possible variable when they exist
       $.post("/oozie/editor/workflow/action/parameters/", {
-         "node": ko.mapping.toJSON(self),
-	  }, function (data) {
-	    self.actionParametersFetched(true);
-	    self.actionParameters(data.parameters);
-	    if (data.parameters && data.parameters.length > 0 && self.properties.parameters().length == 0) { // If new node with variables, give a hint by adding a parameter
-	      self.properties.parameters.push(ko.mapping.fromJS({'value': ''}));
-	    }
-	  }).fail(function (xhr, textStatus, errorThrown) {
-	    $(document).trigger("error", xhr.responseText);
+        "node": ko.mapping.toJSON(self),
+      }, function (data) {
+        self.actionParametersFetched(true);
+        self.actionParameters(data.parameters);
+        if (data.parameters && data.parameters.length > 0 && self.properties.parameters().length == 0) { // If new node with variables, give a hint by adding a parameter
+          self.properties.parameters.push(ko.mapping.fromJS({'value': ''}));
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
       });
     }
-  };  
-  
-  if (typeof self.properties.parameters != "undefined") { 
-    self.properties.parameters.subscribe(function(newVal) {
+  };
+
+  if (typeof self.properties.parameters != "undefined") {
+    self.properties.parameters.subscribe(function (newVal) {
       if (newVal) {
-	    self.fetch_parameters();
-	  }
-    });  
+        self.fetch_parameters();
+      }
+    });
   }
-  
+
   if (typeof self.properties.script_path != "undefined") {
-    self.properties.script_path.subscribe(function() {
+    self.properties.script_path.subscribe(function () {
       self.actionParametersFetched(false);
     });
   }
@@ -167,13 +169,18 @@ var Node = function (node) {
 
 
 var Workflow = function (vm, workflow) {
+
   var self = this;
 
   self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
-  self.isDirty = ko.observable(false);
+  self.tracker = new ChangeTracker(self); // from ko.common-dashboard.js
+
+  self.isDirty = ko.computed(function () {
+    return self.tracker().somethingHasChanged();
+  });
 
   self.properties = ko.mapping.fromJS(typeof workflow.properties != "undefined" && workflow.properties != null ? workflow.properties : {});
   self.nodes = ko.observableArray([]);
@@ -181,40 +188,11 @@ var Workflow = function (vm, workflow) {
   self.versions = ko.mapping.fromJS(['uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.4.5', 'uri:oozie:workflow:0.5']);
   self.movedNode = null;
   self.properties.show_arrows.subscribe(function (newVal) {
-    if (newVal){
+    if (newVal) {
       $(document).trigger("drawArrows");
     }
     else {
       $(document).trigger("removeArrows");
-    }
-  });
-
-  self.nodesProperties = ko.computed(function () {
-    var isDirtyContainer = [];
-    $.each(self.nodes(), function (index, node) {
-      for(var property in node.properties) {
-        if (typeof node.properties[property] == "function"){
-          var _obs = node.properties[property]();
-           isDirtyContainer.push(_obs);
-           if ($.isArray(_obs)){
-             _obs.forEach(function(item){
-               isDirtyContainer.push(typeof item.value == "function" ? item.value() : item.value);
-             });
-           }
-        }
-      }
-    });
-    return isDirtyContainer;
-  });
-
-  self.oldNodesPropertiesHash = "";
-  self.nodesProperties.subscribe(function(newVal){
-    if (self.oldNodesPropertiesHash == ""){
-      self.oldNodesPropertiesHash = JSON.stringify(newVal);
-    }
-    if (JSON.stringify(newVal) !== self.oldNodesPropertiesHash){
-      self.oldNodesPropertiesHash = JSON.stringify(newVal);
-      self.isDirty(true);
     }
   });
 
@@ -275,10 +253,10 @@ var Workflow = function (vm, workflow) {
       success: function (data) {
         if (data.status == 0) {
           viewModel.addActionProperties.removeAll();
-          $.each(data.properties, function(i, prop) {
-        	viewModel.addActionProperties.push(ko.mapping.fromJS(prop));  
+          $.each(data.properties, function (i, prop) {
+            viewModel.addActionProperties.push(ko.mapping.fromJS(prop));
           });
-          
+
           if (data.workflows.length > 0) {
             viewModel.subworfklows(data.workflows);
           }
@@ -286,7 +264,6 @@ var Workflow = function (vm, workflow) {
           if (callback) {
             callback(widget, sourceNode);
           }
-          self.isDirty(true);
         }
       },
       async: false
@@ -333,10 +310,10 @@ var Workflow = function (vm, workflow) {
             var forkParent = self.getNodeById(vm.getWidgetPredecessor(parentWidget.id()).id());
 
             // In case of Fork of Fork, we need to pick the link of the neighbor of new node instead of just the first forkParent.get_link('to')
-            var newParentLink = $.grep(forkParent.children(), function(link) {
+            var newParentLink = $.grep(forkParent.children(), function (link) {
               return vm.getWidgetPredecessor(ko.mapping.toJS(link)['to']).id() == fork.id();
-            })[0];  
- 
+            })[0];
+
             var afterParentId = ko.mapping.toJS(newParentLink).to;
             var afterParent = self.getNodeById(afterParentId);
             fork.children.push({'to': afterParentId, 'condition': '${ 1 gt 0 }'});
@@ -377,7 +354,7 @@ var Workflow = function (vm, workflow) {
             node.set_link('to', child.id());
             node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
           } else {
-            // Parent is regular node        	
+            // Parent is regular node
             node.set_link('to', parent.get_link('to')['to']);
             node.set_link('error', '17c9c895-5a16-7443-bb81-f34b30b21548');
 
@@ -386,8 +363,6 @@ var Workflow = function (vm, workflow) {
         }
 
         vm.currentlyCreatingFork = false;
-        self.isDirty(true);
-
       } else {
         $(document).trigger("error", data.message);
       }
@@ -443,7 +418,6 @@ var Workflow = function (vm, workflow) {
       } else if (parent.type() == 'decision-widget') {
         parent.remove_link('to', childId);
       }
-      self.isDirty(true);
     }
     else {
       self.nodes.remove(node);
@@ -494,7 +468,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     $(document).trigger("editingToggled");
   });
   self.toggleEditing = function () {
-    self.isEditing(! self.isEditing());
+    self.isEditing(!self.isEditing());
   };
 
   self.isRunning = ko.observable(false);
@@ -516,11 +490,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.addActionProperties = ko.observableArray([]);
-  self.addActionPropertiesFilledOut = ko.computed(function (){
+  self.addActionPropertiesFilledOut = ko.computed(function () {
     var _filledInternalValues = function (val) {
       var _iAllFilled = true;
-      val.forEach(function(iVal){
-        if (iVal.value() == ''){
+      val.forEach(function (iVal) {
+        if (iVal.value() == '') {
           _iAllFilled = false;
         }
       });
@@ -529,16 +503,16 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     var _allFilled = true;
     ko.utils.arrayForEach(self.addActionProperties(), function (property) {
       var _val = property.value();
-      if (($.isArray(_val) && !_filledInternalValues(_val) ) || _val == ''){
+      if (($.isArray(_val) && !_filledInternalValues(_val) ) || _val == '') {
         _allFilled = false;
       }
     });
     return _allFilled;
   });
   self.subworfklows = ko.observableArray(subworkflows_json);
-  self.getSubWorkflow = function(uuid) {
-    var wf = $.grep(self.subworfklows(), function(wf, i) {
-        return wf.value == uuid;
+  self.getSubWorkflow = function (uuid) {
+    var wf = $.grep(self.subworfklows(), function (wf, i) {
+      return wf.value == uuid;
     });
     if (wf[0]) {
       return ko.mapping.fromJS(wf[0]);
@@ -558,13 +532,14 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.enableSideDrop = function (widget) {
     toggleSideDrop(widget, true);
-    sideDropsTouched.forEach(function(row) {
+    sideDropsTouched.forEach(function (row) {
       row.enableOozieDropOnSide(true);
     });
     sideDropsTouched = [];
   }
 
   var sideDropsTouched = [];
+
   function toggleSideDrop(widget, enable) {
     if (widget != null && widget.id() != "" && self.currentlyDraggedOp() == "move") {
       var _row = self.getWidgetParentRow(widget.id());
@@ -1051,24 +1026,24 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
-	$(".jHueNotify").hide();
+    $(".jHueNotify").hide();
     $.post("/oozie/editor/workflow/save/", {
       "layout": ko.mapping.toJSON(self.oozieColumns),
       "workflow": ko.mapping.toJSON(self.workflow)
     }, function (data) {
       if (data.status == 0) {
-    	if (data.url) { 
+        if (data.url) {
           window.location.replace(data.url);
-    	}
-    	if (self.workflow.id() == null) {
-    	  shareViewModel.setDocId(data.doc1_id);
-    	}
+        }
+        if (self.workflow.id() == null) {
+          shareViewModel.setDocId(data.doc1_id);
+        }
         self.workflow.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("workflow") == -1) {
           window.location.hash = '#workflow=' + data.id;
         }
-        self.workflow.isDirty(false);
+        self.workflow.tracker().markCurrentStateAsClean();
       }
       else {
         $(document).trigger("error", data.message);
@@ -1095,7 +1070,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.showSubmitPopup = function () {
-	$(".jHueNotify").hide();
+    $(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
@@ -1103,7 +1078,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       $(document).trigger("error", xhr.responseText);
     });
   };
-  
+
   self.schedule = function () {
     window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
@@ -1194,7 +1169,7 @@ var ExtendedColumn = function (size, rows) {
 var ExtendedRow = function (widgets, vm, columns) {
   var self = new Row(widgets, vm, columns);
   self.columnPrototype = ExtendedColumn;
-  self.enableOozieDrop = ko.computed(function(){
+  self.enableOozieDrop = ko.computed(function () {
     return vm.isEditing && vm.isEditing() && self.widgets && self.widgets().length < 1
   });
 
@@ -1206,8 +1181,8 @@ var ExtendedRow = function (widgets, vm, columns) {
 
 var ExtendedWidget = function (params) {
   var self = new Widget(params);
-  self.oozieMovable = ko.computed(function() {
-    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "join-widget"].indexOf(self.widgetType()) == - 1
+  self.oozieMovable = ko.computed(function () {
+    return ["end-widget", "start-widget", "fork-widget", "decision-widget", "join-widget"].indexOf(self.widgetType()) == -1
   });
 
   self.oozieExpanded = ko.observable(false);
