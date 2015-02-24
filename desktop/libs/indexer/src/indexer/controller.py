@@ -77,21 +77,33 @@ class CollectionManagerController(object):
   def get_collections(self):
     try:
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+
       if self.is_solr_cloud_mode():
         solr_collections = api.collections()
         for name in solr_collections:
           solr_collections[name]['isCoreOnly'] = False
       else:
         solr_collections = {}
+
       solr_cores = api.cores()
       for name in solr_cores:
         solr_cores[name]['isCoreOnly'] = True
+
+      solr_aliases = api.aliases()
+      for name in solr_aliases:
+        solr_aliases[name] = {
+            'isCoreOnly': False,
+            'isAlias': True,
+            'collections': solr_aliases[name]
+        }
     except Exception, e:
       LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
       solr_collections = {}
       solr_cores = {}
+      solr_aliases = {}
 
     solr_cores.update(solr_collections)
+    solr_cores.update(solr_aliases)
     return solr_cores
 
   def get_fields(self, collection_or_core_name):

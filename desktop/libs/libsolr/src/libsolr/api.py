@@ -186,7 +186,6 @@ class SolrApi(object):
         )
 
     response = self._root.get('%(collection)s/select' % solr_query, params)
-
     return self._get_json(response)
 
 
@@ -197,9 +196,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       response = self._root.get('%(collection)s/suggest' % solr_query, params)
-      if type(response) != dict:
-        response = json.loads(response)
-      return response
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -212,6 +209,18 @@ class SolrApi(object):
       )
       response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode'].get('data', '{}'))
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def aliases(self):
+    try:
+      params = self._get_params() + (
+          ('detail', 'true'),
+          ('path', '/aliases.json'),
+      )
+      response = self._root.get('zookeeper', params=params)
+      return json.loads(response['znode'].get('data', '{}')).get('collection', {})
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 

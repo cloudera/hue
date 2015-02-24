@@ -93,11 +93,15 @@ def collections(request):
   searcher = CollectionManagerController(request.user)
   solr_collections = searcher.get_collections()
   massaged_collections = []
+
   for collection in solr_collections:
     massaged_collections.append({
       'name': collection,
-      'isCoreOnly': solr_collections[collection]['isCoreOnly']
+      'isCoreOnly': solr_collections[collection]['isCoreOnly'],
+      'isAlias': solr_collections[collection].get('isAlias', False),
+      'collections': solr_collections[collection].get('collections', []),
     })
+
   response = {
     'status': 0,
     'collections': massaged_collections

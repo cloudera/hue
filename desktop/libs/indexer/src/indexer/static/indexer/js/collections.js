@@ -421,18 +421,18 @@ var ManageCollectionsViewModel = function() {
   });
   self.selectedCloudCollections = ko.computed(function() {
     return ko.utils.arrayFilter(self.selectedCollections(), function(collection) {
-      return !ko.unwrap(collection).isCoreOnly();
+      return ! ko.unwrap(collection).isCoreOnly();
     });
   });
   self.hasCloudCollections = ko.computed(function() {
     var _arr = ko.utils.arrayFilter(self.collections(), function(collection) {
-      return !ko.unwrap(collection).isCoreOnly();
+      return ! ko.unwrap(collection).isCoreOnly();
     });
     return _arr.length > 0;
   });
 
   self.toggleSelectAll = function() {
-    var direction = !self.selectedCollections().length;
+    var direction = ! self.selectedCollections().length;
     ko.utils.arrayForEach(self.filteredCollections(), function(collection) {
       collection.selected(direction);
     });
@@ -440,8 +440,8 @@ var ManageCollectionsViewModel = function() {
 
   self.toggleCollectionSelect = function(collection, e) {
     ko.utils.arrayForEach(self.collections(), function(other_collection) {
-      if(ko.unwrap(other_collection).name() == collection.name()) {
-        other_collection.selected(!other_collection.selected());
+      if (ko.unwrap(other_collection).name() == collection.name()) {
+        other_collection.selected(! other_collection.selected());
       }
     });
   };
@@ -475,6 +475,8 @@ var ManageCollectionsViewModel = function() {
           new_collection().hasHueCollection(collection.hue);
           new_collection().hasSolrCollection(collection.solr);
           new_collection().isCoreOnly(collection.isCoreOnly);
+          new_collection().isAlias(collection.isAlias);
+          new_collection().collections(collection.collections);
           collections.push(new_collection);
         });
         self.collections(collections);
