@@ -63,9 +63,9 @@ function drawArrows() {
   $("canvas").remove();
   if (viewModel.oozieColumns()[0].rows().length > 3) {
     var _links = viewModel.workflow.linkMapping();
-    Object.keys(_links).forEach(function(id) {
+    Object.keys(_links).forEach(function (id) {
       if (_links[id].length > 0) {
-        _links[id].forEach(function(nextId) {
+        _links[id].forEach(function (nextId) {
           linkWidgets(id, nextId);
         });
       }
@@ -93,13 +93,13 @@ function toggleProperties(widget) {
 }
 
 var _linkMappingTimeout = -1;
-$(document).on("drawArrows", function(){
+$(document).on("drawArrows", function () {
   window.clearTimeout(_linkMappingTimeout);
-  if (typeof renderChangeables != 'undefined'){
-  	_linkMappingTimeout = window.setTimeout(renderChangeables, 25);	
+  if (typeof renderChangeables != 'undefined') {
+    _linkMappingTimeout = window.setTimeout(renderChangeables, 25);
   }
 });
 
-$(document).on("removeArrows", function(){
+$(document).on("removeArrows", function () {
   $("canvas").remove();
 });

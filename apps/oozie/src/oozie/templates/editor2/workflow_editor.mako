@@ -213,17 +213,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 </div>
 
 
-<div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && oozieColumns().length == 0">
-  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-  <img src="/static/art/hint_arrow.png" />
-</div>
-
-<div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && oozieColumns().length == 0 && previewColumns() == ''">
-  <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-  <img src="/static/art/hint_arrow_horiz_flipped.png" />
-</div>
-
-
 ${ workflow.render() }
 
 

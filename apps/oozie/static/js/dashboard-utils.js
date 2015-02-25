@@ -86,7 +86,7 @@ var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
 
     var _statusColumn = aData[aData.length - 1];
     if (statuses.length == 1) {
-      if(statuses[0] == 'MANUALLY') {
+      if (statuses[0] == 'MANUALLY') {
         submittedByFilter = _statusColumn == null;
       } else {
         submittedByFilter = _statusColumn != null;
