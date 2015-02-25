@@ -110,7 +110,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStora
 # For Django admin interface
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
