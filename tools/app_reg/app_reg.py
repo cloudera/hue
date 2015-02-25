@@ -60,6 +60,7 @@ DO_INSTALL = 'do_install'
 DO_REMOVE = 'do_remove'
 DO_LIST = 'do_list'
 DO_SYNC = 'do_sync'
+DO_COLLECTSTATIC = 'do_collectstatic'
 
 
 def usage(msg=None):
@@ -132,7 +133,7 @@ def do_install(app_loc_list, relative_paths=False):
       return False
   reg.save()
 
-  return do_sync(reg)
+  return do_sync(reg) and do_collectstatic()
 
 
 def do_list():
@@ -192,6 +193,17 @@ def do_sync(reg=None):
     return False
 
 
+def do_collectstatic():
+  """Collects the static files. Returns True/False."""
+  try:
+    build.make_collectstatic()
+    return True
+  except (OSError, SystemError), ex:
+    LOG.error("Failed to collect the static files. Please fix any problem and run "
+              "`%s --collectstatic'\n%s" % (PROG_NAME, ex))
+    return False
+
+
 def main():
   action = None
   app = None
@@ -219,6 +231,8 @@ def main():
       action = verify_action(action, DO_LIST)
     elif opt in ('-s', '--sync'):
       action = verify_action(action, DO_SYNC)
+    elif opt in ('-c', '--collectstatic'):
+      action = verify_action(action, DO_COLLECTSTATIC)
     elif opt in ('-d', '--debug'):
       global LOG_LEVEL
       LOG_LEVEL = logging.DEBUG
@@ -246,6 +260,8 @@ def main():
     ok = do_list()
   elif action == DO_SYNC:
     ok = do_sync()
+  elif action == DO_COLLECTSTATIC:
+    ok = do_collectstatic()
 
   if ok:
     return 0
