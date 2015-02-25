@@ -133,7 +133,7 @@ class DesktopModuleInfo(object):
 
     # Look for static directory in two places:
     new_style, old_style = [ os.path.abspath(p) for p in [
-      os.path.join(module_root, "static"),
+      os.path.join(module_root, "static", self.name),
       os.path.join(self.root_dir, "static")
     ]]
 
