@@ -74,6 +74,18 @@ function BeeswaxViewModel(server) {
 
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
+  self.design.inlineErrors = ko.computed(function() {
+    return ko.utils.arrayFilter(self.design.errors(), function(err) {
+        return err.toLowerCase().indexOf("line") > -1;
+    });
+  });
+
+  self.design.watch.inlineErrors = ko.computed(function() {
+    return ko.utils.arrayFilter(self.design.watch.errors(), function(err) {
+        return err.toLowerCase().indexOf("line") > -1;
+    });
+  });
+
   self.chartType = ko.observable("bars");
   self.chartSorting = ko.observable("none");
   self.chartData = ko.observableArray();
