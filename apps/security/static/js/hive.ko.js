@@ -1191,7 +1191,7 @@ var HiveViewModel = function (initial) {
   }
 
   self.updatePathHash = function (path) {
-    var _hash = window.location.hash;
+    var _hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (_hash.indexOf("@") == -1) {
       window.location.hash = path;
     }
@@ -1201,7 +1201,7 @@ var HiveViewModel = function (initial) {
   }
 
   self.updateSectionHash = function (section) {
-    var _hash = window.location.hash;
+    var _hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (_hash == "") {
       window.location.hash = "@" + section;
     }
@@ -1215,7 +1215,7 @@ var HiveViewModel = function (initial) {
 
   self.getPathHash = function () {
     if (window.location.hash != "") {
-      var _hash = window.location.hash.substr(1);
+      var _hash = window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
       if (_hash.indexOf("@") > -1) {
         return _hash.split("@")[0];
       }
@@ -1228,7 +1228,7 @@ var HiveViewModel = function (initial) {
 
   self.getSectionHash = function () {
     if (window.location.hash != "") {
-      var _hash = window.location.hash.substr(1);
+      var _hash = window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
       if (_hash.indexOf("@") > -1) {
         return _hash.split("@")[1];
       }

@@ -300,7 +300,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       drawTable();
     });
 
-    var hash = window.location.hash;
+    var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (hash != "" && hash.indexOf("=") > -1) {
       $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
     }

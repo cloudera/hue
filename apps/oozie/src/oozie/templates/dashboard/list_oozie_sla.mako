@@ -284,7 +284,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
     });
 
     if (window.location.hash != "") {
-      $("input[name='job_name']").val(window.location.hash.substr(1));
+      $("input[name='job_name']").val(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, ""));
       performSearch(window.location.hash.substr(1));
     }
   });

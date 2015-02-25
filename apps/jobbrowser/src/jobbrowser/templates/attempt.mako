@@ -188,7 +188,7 @@ ${ comps.menubar() }
     });
 
     if (window.location.hash != null && window.location.hash.length > 1) {
-      $('#tabs a[href="#' + window.location.hash.substring(2) + '"]').tab('show');
+      $('#tabs a[href="#' + window.location.hash.substring(2).replace(/(<([^>]+)>)/ig, "") + '"]').tab('show');
     }
 
     hellipsify();
