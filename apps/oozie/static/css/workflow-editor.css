@@ -32,6 +32,7 @@
   text-align: center;
   padding: 4px;
 }
+
 .drop-target-dragging {
   background-color: #F0F0F0;
   border-color: #DDD;
@@ -203,8 +204,8 @@
 }
 
 .readonly .drop-target-side {
-  min-height: 10px!important;
-  height: 10px!important;
+  min-height: 10px !important;
+  height: 10px !important;
 }
 
 textarea {
