@@ -209,7 +209,7 @@ def admin_collections(request, is_redirect=False):
         'enabled': collection.enabled,
         'isCoreOnly': collection.is_core_only,
         'absoluteUrl': collection.get_absolute_url(),
-        'owner': collection.owner.username,
+        'owner': collection.owner and collection.owner.username,
         'isOwner': collection.owner == request.user or request.user.is_superuser
       }
       collections.append(massaged_collection)
@@ -445,8 +445,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'stacked': False,
     'limit': 10,
     'mincount': 0,
-    'isDate': False,
-    'andUp': False,  # Not used yet
+    'isDate': False
   }
 
   if widget_type in ('tree-widget', 'heatmap-widget'):
