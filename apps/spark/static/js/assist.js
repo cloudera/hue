@@ -61,7 +61,7 @@ var Assist = function (options) {
 
     if (options.onError) {
       $.ajaxSetup({
-        error: function(x, e) {
+        error: function (x, e) {
           if (x.status == 500) {
             self.hasErrors(true);
             options.onError(e);
@@ -70,13 +70,13 @@ var Assist = function (options) {
       });
     }
 
-    if (! _returnCached){
+    if (!_returnCached) {
       $.ajax({
         type: "GET",
         url: _url + "?" + Math.random(),
         success: function (data) {
-          if (data.error){
-            if (typeof options.failsSilentlyOn == "undefined" || (data.code != null && options.failsSilentlyOn.indexOf(data.code) == -1)){
+          if (data.error) {
+            if (typeof options.failsSilentlyOn == "undefined" || (data.code != null && options.failsSilentlyOn.indexOf(data.code) == -1)) {
               $.jHueNotify.error(data.error);
             }
           }
@@ -122,11 +122,11 @@ var Assist = function (options) {
   self.selectedMainObject = ko.observable();
   self.mainObjects = ko.observableArray([]);
   self.firstLevelObjects = ko.observable({});
-  
+
   self.filter = ko.observable("");
   self.filter.extend({ rateLimit: 150 });
-  self.filteredFirstLevelObjects  = ko.computed(function(){
-    return ko.utils.arrayFilter(Object.keys(self.firstLevelObjects()), function(item) {
+  self.filteredFirstLevelObjects = ko.computed(function () {
+    return ko.utils.arrayFilter(Object.keys(self.firstLevelObjects()), function (item) {
       return item.toLowerCase().indexOf(self.filter()) > -1;
     });
   });
