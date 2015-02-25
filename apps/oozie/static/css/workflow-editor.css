@@ -75,11 +75,11 @@
   margin-left: 0.5%;
 }
 
-.row-fluid .span10 {
+.dashboard .row-fluid .span10 {
   width: 90%;
 }
 
-.row-fluid .span1 {
+.dashboard .row-fluid .span1 {
   width: 4.5%;
 }
 
@@ -180,10 +180,6 @@
   font-size: 40px;
   text-align: center;
   padding: 5px;
-}
-
-body {
-  background-color: #FFFFFF;
 }
 
 .ui-sortable {

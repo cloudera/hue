@@ -23,6 +23,8 @@
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
+<%namespace name="workflow" file="../editor2/common_workflow.mako" />
+<%namespace name="dashboard" file="/common_dashboard.mako" />
 
 ${ commonheader(_("Workflow Dashboard"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
@@ -133,7 +135,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </div>
     </div>
 
-    <div class="span10">
+    <div class="span10" style="margin-left: 2.127659574468085%;">
       <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
         % if oozie_bundle:
           ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
@@ -145,12 +147,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         ${ _('Workflow') } ${ oozie_workflow.appName }
       </h1>
       <ul class="nav nav-tabs">
-        % if workflow_graph:
-            <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
-            <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
-        % else:
-            <li class="active"><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
-        % endif
+        <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
+        <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
         <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
         <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
         <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
@@ -160,15 +158,15 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % endif
       </ul>
 
-      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
-
-        % if workflow_graph:
-            <div id="graph" class="tab-pane active">
-            ${ workflow_graph | n,unicode }
-            </div>
+      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">    
+        <div id="graph" class="tab-pane active">
+        % if layout_json == '':
+        ${ workflow_graph | n,unicode }
+        % else:
+        ${ workflow.render() }
         % endif
-
-        <div id="actions" class="tab-pane ${ utils.if_false(workflow_graph, 'active') }">
+        </div>
+        <div id="actions" class="tab-pane">
           <table class="table table-striped table-condensed selectable">
             <thead>
             <tr>
@@ -347,6 +345,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 <script src="/oozie/static/js/dashboard-utils.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/oozie/static/css/workflow.css">
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
@@ -359,6 +358,17 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 <script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js"></script>
+%endif
+
+% if layout_json != '':
+<link rel="stylesheet" href="/oozie/static/css/common-editor.css">
+<link rel="stylesheet" href="/oozie/static/css/workflow-editor.css">
+
+${ dashboard.import_layout() }
+
+<script src="/oozie/static/js/workflow-editor.ko.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/workflow-editor.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.curvedarrow.js" type="text/javascript" charset="utf-8"></script>
 %endif
 
 <style type="text/css">
@@ -383,9 +393,27 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   #slaTable {
     margin-top: 20px;
   }
+
+  % if not workflow_graph:
+  #graph {
+    margin-top: 0;
+  }
+  #graph, #new-node {
+    text-align: left;
+  }
+  % endif
+
 </style>
 
 <script type="text/javascript">
+
+${ utils.slaGlobal() }
+
+  ko.bindingHandlers.editable = { // overwrite the editable bindings with a simple text filler
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+      $(element).text(valueAccessor()());
+    }
+  }
 
   var Action = function (action) {
     return {
@@ -416,8 +444,16 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
   };
 
-  var viewModel = new RunningWorkflowActionsModel([]);
-  ko.applyBindings(viewModel);
+  var actionsViewModel = new RunningWorkflowActionsModel([]);
+  ko.applyBindings(actionsViewModel, $("#actions")[0]);
+
+  % if layout_json != '':
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
+  ko.applyBindings(viewModel, $("#graph")[0]);
+  viewModel.isViewer = ko.observable(true);
+  viewModel.init();
+  fullLayout(viewModel);
+  %endif
 
   var CHART_LABELS = {
     NOMINAL_TIME: "${_('Nominal Time')}",
@@ -430,6 +466,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   var slaTable;
 
   $(document).ready(function() {
+    % if layout_json != '':
+    drawArrows();
+    %endif
+
     var CURRENT_ZOOM = 1;
     $(document).keydown(function(e) {
       if (e.ctrlKey){
@@ -602,7 +642,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
 
         if (data.actions){
-          viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
+          actionsViewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
             return new Action(action);
           }));
         }
@@ -630,8 +670,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         }
 
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
-
+        %if layout_json == '':
         $("#graph").html(data.graph);
+        %endif
 
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;

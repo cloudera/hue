@@ -37,15 +37,17 @@ from desktop.lib.i18n import smart_str, smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
+from desktop.models import Document, Document2
 
 from liboozie.oozie_api import get_oozie
+from liboozie.credentials import Credentials
 from liboozie.submittion import Submission
 from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateEndTimeForm
-from oozie.models import Workflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
-from oozie.models2 import History
+from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
+from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
 
 
@@ -54,6 +56,12 @@ def get_history():
     return History
   else:
     return OldHistory
+
+def get_workflow():
+  if ENABLE_V2.get():
+    return Workflow
+  else:
+    return OldWorkflow
 
 
 LOG = logging.getLogger(__name__)
@@ -71,6 +79,15 @@ Permissions checking happens by calling:
   * check_job_access_permission()
   * check_job_edition_permission()
 """
+
+def _get_workflows(user):
+  return [{
+        'name': workflow.name,
+        'owner': workflow.owner.username,
+        'value': workflow.uuid,
+        'id': workflow.id
+      } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2')]
+    ]  
 
 
 def manage_oozie_jobs(request, job_id, action):
@@ -232,6 +249,10 @@ def list_oozie_workflow(request, job_id):
   if oozie_bundle is not None:
     setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
 
+  workflow_data = None
+  credentials = None
+  doc = None
+
   if ENABLE_V2.get():
     # To update with the new History document model
     hue_coord = get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
@@ -243,8 +264,16 @@ def list_oozie_workflow(request, job_id):
     if hue_workflow:
       workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
       full_node_list = hue_workflow.nodes
+      workflow_id = hue_workflow.id  
+      wid = {
+        'id': workflow_id
+      }
+      doc = Document2.objects.get(type='oozie-workflow2', **wid)
+      new_workflow = get_workflow()(document=doc)
+      workflow_data = new_workflow.get_data()
+      credentials = Credentials()
     else:
-      workflow_graph, full_node_list = '', None    
+      workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
@@ -258,7 +287,7 @@ def list_oozie_workflow(request, job_id):
       workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
       full_node_list = hue_workflow.node_list
     else:
-      workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+      workflow_graph, full_node_list = get_workflow().gen_status_graph_from_xml(request.user, oozie_workflow)
 
   parameters = oozie_workflow.conf_dict.copy()
 
@@ -295,7 +324,14 @@ def list_oozie_workflow(request, job_id):
     'hue_coord': hue_coord,
     'parameters': parameters,
     'has_job_edition_permission': has_job_edition_permission,
-    'workflow_graph': workflow_graph
+    'workflow_graph': workflow_graph,
+    'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML) if workflow_data else '',
+    'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML) if workflow_data else '',
+    'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML) if credentials else '',
+    'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
+    'doc1_id': doc.doc.get().id if doc else -1,
+    'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
+    'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
 
@@ -688,7 +724,7 @@ def submit_external_job(request, application_path):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       application_name = os.path.basename(application_path)
-      application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else Workflow
+      application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else get_workflow()
       mapping[application_class.get_application_path_key()] = application_path
 
       try:
