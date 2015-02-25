@@ -448,7 +448,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'isDate': False
   }
 
-  if widget_type in ('tree-widget', 'heatmap-widget'):
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
   else:
     solr_api = SolrApi(SOLR_URL.get(), user)
@@ -465,15 +465,17 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-  if widget_type == 'map-widget':
-    properties['scope'] = 'world'
-    properties['mincount'] = 1
-    properties['limit'] = 100
-  elif widget_type in ('tree-widget', 'heatmap-widget'):
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
     properties['facets'] = []
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
-    properties['scope'] = 'stack' if widget_type == 'heatmap-widget' else 'tree'
+
+    if widget_type == 'map-widget':
+      properties['scope'] = 'world'
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 1}
+      properties['limit'] = 100
+    else:
+      properties['scope'] = 'stack' if widget_type == 'heatmap-widget' else 'tree'
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
 
   return {
     'id': facet_id,

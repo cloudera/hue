@@ -140,7 +140,7 @@ class SolrApi(object):
               ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
           )
         elif facet['type'] == 'pivot':
-          if facet['properties']['facets']:
+          if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
             for f in facet['properties']['facets']:
               params += (('f.%s.facet.limit' % f['field'], f['limit']),)
