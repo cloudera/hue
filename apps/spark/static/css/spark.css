@@ -178,7 +178,7 @@
 }
 
 .editable-empty, .editable-empty:hover {
-  color: #DDD!important;
+  color: #DDD !important;
 }
 
 .results table tr td {
@@ -186,11 +186,11 @@
 }
 
 [contenteditable]:focus {
-  outline:none;
+  outline: none;
 }
 
 .text-snippet h2 {
-  padding-left: 0!important;
+  padding-left: 0 !important;
 }
 
 .span12.nomargin {
@@ -285,16 +285,21 @@ h1.empty {
 }
 
 .medium-editor-toolbar li button {
-  padding: 0!important;
-  height: 40px!important;
-  min-width: 40px!important;
+  padding: 0 !important;
+  height: 40px !important;
+  min-width: 40px !important;
 }
 
 .medium-toolbar-arrow-under:after {
-  top: 40px!important;
+  top: 40px !important;
 }
 
-@media print { 
- .navigator, .assist-container, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet { display: none !important; }
- .CodeMirror { border: none; }
+@media print {
+  .navigator, .assist-container, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet {
+    display: none !important;
+  }
+
+  .CodeMirror {
+    border: none;
+  }
 }

@@ -23,15 +23,15 @@ var Result = function (snippet, result) {
   self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true);
   self.handle = ko.observable({});
   self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
-  self.cleanedMeta = ko.computed(function(){
-    return ko.utils.arrayFilter(self.meta(), function(item) {
+  self.cleanedMeta = ko.computed(function () {
+    return ko.utils.arrayFilter(self.meta(), function (item) {
       return item.name != ''
     });
   });
   self.fetchedOnce = ko.observable(typeof result.fetchedOnce != "undefined" && result.fetchedOnce != null ? result.fetchedOnce : false);
   self.startTime = ko.observable(typeof result.startTime != "undefined" && result.startTime != null ? new Date(result.startTime) : new Date());
   self.endTime = ko.observable(typeof result.endTime != "undefined" && result.endTime != null ? new Date(result.endTime) : new Date());
-  self.executionTime = ko.computed(function() {
+  self.executionTime = ko.computed(function () {
     return self.endTime().getTime() - self.startTime().getTime();
   });
 
@@ -44,23 +44,23 @@ var Result = function (snippet, result) {
   }
 
   function isStringColumn(type) {
-    return ! isNumericColumn(type) && ! isDateTimeColumn(type);
+    return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
 
-  self.cleanedNumericMeta = ko.computed(function(){
-    return ko.utils.arrayFilter(self.meta(), function(item) {
+  self.cleanedNumericMeta = ko.computed(function () {
+    return ko.utils.arrayFilter(self.meta(), function (item) {
       return item.name != '' && isNumericColumn(item.type)
     });
   });
 
-  self.cleanedStringMeta = ko.computed(function(){
-    return ko.utils.arrayFilter(self.meta(), function(item) {
+  self.cleanedStringMeta = ko.computed(function () {
+    return ko.utils.arrayFilter(self.meta(), function (item) {
       return item.name != '' && isStringColumn(item.type)
     });
   });
 
-  self.cleanedDateTimeMeta = ko.computed(function(){
-    return ko.utils.arrayFilter(self.meta(), function(item) {
+  self.cleanedDateTimeMeta = ko.computed(function () {
+    return ko.utils.arrayFilter(self.meta(), function (item) {
       return item.name != '' && isDateTimeColumn(item.type)
     });
   });
@@ -69,18 +69,18 @@ var Result = function (snippet, result) {
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
   self.errors = ko.observable('');
-  self.hasSomeResults = ko.computed(function(){
+  self.hasSomeResults = ko.computed(function () {
     return self.hasResultset() && self.data().length > 0; // status() == 'available'
   });
 
   if (typeof result.handle != "undefined" && result.handle != null) {
-    $.each(result.handle, function(key, val) {
+    $.each(result.handle, function (key, val) {
       self.handle()[key] = val;
     });
   }
 
-  self.clear = function() {
-    $.each(self.handle, function(key, val) {
+  self.clear = function () {
+    $.each(self.handle, function (key, val) {
       delete self.handle()[key];
     });
     self.fetchedOnce(false);
@@ -133,7 +133,7 @@ var Snippet = function (vm, notebook, snippet) {
       var match = ko.utils.arrayFirst(self.variables(), function (_var) {
         return _var.name() == name;
       });
-      if (! match) {
+      if (!match) {
         toAdd.push(name);
       }
     });
@@ -141,7 +141,7 @@ var Snippet = function (vm, notebook, snippet) {
       var match = ko.utils.arrayFirst(newVal, function (name) {
         return _var.name() == name;
       });
-      if (! match) {
+      if (!match) {
         toDelete.push(_var);
       }
     });
@@ -170,49 +170,49 @@ var Snippet = function (vm, notebook, snippet) {
   self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
-  self.progress =  ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
+  self.progress = ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
 
-  self.progress.subscribe(function (val){
+  self.progress.subscribe(function (val) {
     $(document).trigger("progress", {data: val, snippet: self});
   });
 
-  self.showGrid.subscribe(function (val){
-    if (val){
+  self.showGrid.subscribe(function (val) {
+    if (val) {
       self.showChart(false);
       $(document).trigger("gridShown", self);
     }
   });
-  self.showChart.subscribe(function (val){
-    if (val){
+  self.showChart.subscribe(function (val) {
+    if (val) {
       self.showGrid(false);
       self.isLeftPanelVisible(true);
       $(document).trigger("forceChartDraw", self);
       $(document).trigger("chartShown", self);
     }
   });
-  self.showLogs.subscribe(function (val){
-    if (val){
+  self.showLogs.subscribe(function (val) {
+    if (val) {
       self.getLogs();
     }
   });
   self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
   self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
-  self.isLoading = ko.computed(function(){
+  self.isLoading = ko.computed(function () {
     return self.status() == "loading";
   });
   self.klass = ko.computed(function () {
     return "snippet card card-widget";
   });
 
-  self.editorKlass = ko.computed(function(){
+  self.editorKlass = ko.computed(function () {
     return "editor span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
   });
 
-  self.resultsKlass = ko.computed(function(){
+  self.resultsKlass = ko.computed(function () {
     return "results " + self.type();
   });
 
-  self.errorsKlass = ko.computed(function(){
+  self.errorsKlass = ko.computed(function () {
     return self.resultsKlass + " alert alert-error";
   });
 
@@ -226,7 +226,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
   self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
 
-  self.chartType.subscribe(function(val){
+  self.chartType.subscribe(function (val) {
     $(document).trigger("forceChartDraw", self);
   });
 
@@ -234,7 +234,7 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : false);
   self.toggleLeftPanel = function () {
-    self.isLeftPanelVisible(! self.isLeftPanelVisible());
+    self.isLeftPanelVisible(!self.isLeftPanelVisible());
     $(document).trigger("toggleLeftPanel", self);
   };
 
@@ -262,7 +262,7 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.checkStatusTimeout = null;
 
-  self._ajax_error = function(data, callback) {
+  self._ajax_error = function (data, callback) {
     if (data.status == -2) {
       self.create_session(callback);
     }
@@ -278,23 +278,23 @@ var Snippet = function (vm, notebook, snippet) {
     }
   };
 
-  self.create_session = function(callback) {
+  self.create_session = function (callback) {
     self.status('loading');
     $.post("/spark/api/create_session", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
-      }, function (data) {
-        if (data.status == 0) {
-          notebook.addSession(ko.mapping.fromJS(data.session));
-          self.status('ready');
-          if (callback) {
-            setTimeout(callback, 500);
-          }
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
+    }, function (data) {
+      if (data.status == 0) {
+        notebook.addSession(ko.mapping.fromJS(data.session));
+        self.status('ready');
+        if (callback) {
+          setTimeout(callback, 500);
         }
-        else {
-          self.status('failed');
-          $(document).trigger("error", data.message);
-        }
+      }
+      else {
+        self.status('failed');
+        $(document).trigger("error", data.message);
+      }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
@@ -333,7 +333,7 @@ var Snippet = function (vm, notebook, snippet) {
     });
   };
 
-  self.fetchResult = function(rows, startOver) {
+  self.fetchResult = function (rows, startOver) {
     if (typeof startOver == "undefined") {
       startOver = true;
     }
@@ -341,7 +341,7 @@ var Snippet = function (vm, notebook, snippet) {
     //self.fetchResultMetadata(rows);
   };
 
-  self.fetchResultData = function(rows, startOver) {
+  self.fetchResultData = function (rows, startOver) {
     $.post("/spark/api/fetch_result_data", {
       notebook: ko.mapping.toJSON(notebook),
       snippet: ko.mapping.toJSON(self),
@@ -361,7 +361,7 @@ var Snippet = function (vm, notebook, snippet) {
 
         $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
-        if (! self.result.fetchedOnce()) {
+        if (!self.result.fetchedOnce()) {
           data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
           self.result.meta(data.result.meta);
           self.result.type(data.result.type);
@@ -374,8 +374,8 @@ var Snippet = function (vm, notebook, snippet) {
           }, 500);
         }
       } else {
-       self._ajax_error(data);
-       $(document).trigger("renderDataError", {snippet: self});
+        self._ajax_error(data);
+        $(document).trigger("renderDataError", {snippet: self});
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
@@ -384,92 +384,92 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.fetchResultMetadata = function () {
     $.post("/spark/api/fetch_result_metadata", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self),
-      }, function (data) {
-        if (data.status == 0) {
-          self.result.meta(data.result.meta);
-        } else {
-          $(document).trigger("error", data.message);
-        }
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self),
+    }, function (data) {
+      if (data.status == 0) {
+        self.result.meta(data.result.meta);
+      } else {
+        $(document).trigger("error", data.message);
+      }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
       self.status('failed');
     });
   };
 
-  self.checkStatus = function() {
+  self.checkStatus = function () {
     $.post("/spark/api/check_status", {
-       notebook: ko.mapping.toJSON(notebook),
-       snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
-          self.status(data.query_status.status);
-          self.getLogs();
+        self.status(data.query_status.status);
+        self.getLogs();
 
-          if (self.status() == 'running') {
-            self.result.endTime(new Date());
-            self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
-          }
-          else if (self.status() == 'available') {
-            self.fetchResult(100);
-            self.progress(100);
-          }
+        if (self.status() == 'running') {
+          self.result.endTime(new Date());
+          self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
+        }
+        else if (self.status() == 'available') {
+          self.fetchResult(100);
+          self.progress(100);
+        }
       } else {
         self._ajax_error(data);
       }
-  }).fail(function (xhr, textStatus, errorThrown) {
-     $(document).trigger("error", xhr.responseText);
-     self.status('failed');
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+      self.status('failed');
     });
   };
 
-  self.cancel = function() {
+  self.cancel = function () {
     if (self.checkStatusTimeout != null) {
       clearTimeout(self.checkStatusTimeout);
       self.checkStatusTimeout = null;
     }
 
     $.post("/spark/api/cancel_statement", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         self.status('canceled');
       } else {
         self._ajax_error(data);
       }
-  }).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
       self.status('failed');
     });
   };
 
-  self.close = function() {
+  self.close = function () {
     if (self.checkStatusTimeout != null) {
       clearTimeout(self.checkStatusTimeout);
       self.checkStatusTimeout = null;
     }
 
     $.post("/spark/api/close_statement", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
       } else {
         self._ajax_error(data);
       }
-  }).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
       self.status('failed');
     });
   };
 
-  self.getLogs = function() {
+  self.getLogs = function () {
     $.post("/spark/api/get_logs", {
-        notebook: ko.mapping.toJSON(notebook),
-        snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook),
+      snippet: ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         self.result.logs(data.logs); // Way to append?
@@ -477,13 +477,13 @@ var Snippet = function (vm, notebook, snippet) {
       } else {
         self._ajax_error(data);
       }
-  }).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
       self.status('failed');
     });
   };
 
-  self.init = function() {
+  self.init = function () {
     if (self.status() == 'running') {
       self.checkStatus();
     }
@@ -500,7 +500,6 @@ var Snippet = function (vm, notebook, snippet) {
 }
 
 
-
 var Notebook = function (vm, notebook) {
   var self = this;
 
@@ -511,7 +510,7 @@ var Notebook = function (vm, notebook) {
   self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []);
 
-  self.getSession = function(session_type) {
+  self.getSession = function (session_type) {
     var _s = null;
     $.each(self.sessions(), function (index, s) {
       if (s.type() == session_type) {
@@ -522,11 +521,11 @@ var Notebook = function (vm, notebook) {
     return _s;
   };
 
-  self.addSession = function(session) {
+  self.addSession = function (session) {
     var toRemove = []
     $.each(self.sessions(), function (index, s) {
       if (s.type() == session.type()) {
-      toRemove.push(s);
+        toRemove.push(s);
       }
     });
 
@@ -537,7 +536,7 @@ var Notebook = function (vm, notebook) {
     self.sessions.push(session);
   };
 
-  self.addSnippet = function(snippet) {
+  self.addSnippet = function (snippet) {
     var _snippet = new Snippet(vm, self, snippet);
     self.snippets.push(_snippet);
 
@@ -548,9 +547,9 @@ var Notebook = function (vm, notebook) {
     _snippet.init();
   };
 
-  self.newSnippet = function() {
-   var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), result: {}});
-   self.snippets.push(_snippet);
+  self.newSnippet = function () {
+    var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), result: {}});
+    self.snippets.push(_snippet);
 
     if (self.getSession(self.selectedSnippet()) == null) {
       _snippet.create_session();
@@ -562,14 +561,14 @@ var Notebook = function (vm, notebook) {
   };
 
   if (notebook.snippets) {
-    $.each(notebook.snippets, function(index, snippet) {
+    $.each(notebook.snippets, function (index, snippet) {
       self.addSnippet(snippet);
     });
   }
 
   self.save = function () {
     $.post("/spark/api/notebook/save", {
-        "notebook": ko.mapping.toJSON(self)
+      "notebook": ko.mapping.toJSON(self)
     }, function (data) {
       if (data.status == 0) {
         self.id(data.id);
@@ -580,8 +579,8 @@ var Notebook = function (vm, notebook) {
       }
       else {
         $(document).trigger("error", data.message);
-     }
-   }).fail(function (xhr, textStatus, errorThrown) {
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -589,13 +588,13 @@ var Notebook = function (vm, notebook) {
   self.close = function () {
     if (self.id() != null) {
       $.post("/spark/api/notebook/close", {
-          "notebook": ko.mapping.toJSON(self)
+        "notebook": ko.mapping.toJSON(self)
       });
     }
   };
 
   self.clearResults = function () {
-    $.each(self.snippets(), function(index, snippet) {
+    $.each(self.snippets(), function (index, snippet) {
       snippet.result.clear();
       snippet.status('ready');
     });
@@ -610,18 +609,18 @@ function EditorViewModel(notebooks, options) {
   self.selectedNotebook = ko.observable();
 
   self.isEditing = ko.observable(false);
-  self.isEditing.subscribe(function(newVal){
+  self.isEditing.subscribe(function (newVal) {
     $(document).trigger("editingToggled");
   });
   self.toggleEditing = function () {
-    self.isEditing(! self.isEditing());
+    self.isEditing(!self.isEditing());
   };
 
   self.isAssistAvailable = ko.observable(true);
-  
+
   self.isAssistVisible = ko.observable(options.assistVisible);
   self.toggleAssist = function () {
-    self.isAssistVisible(! self.isAssistVisible());
+    self.isAssistVisible(!self.isAssistVisible());
     $(document).trigger("toggleAssist");
   };
 
@@ -631,29 +630,29 @@ function EditorViewModel(notebooks, options) {
   self.availableSnippets = ko.mapping.fromJS(options.languages);
   self.snippetPlaceholders = options.snippet_placeholders;
 
-  self.init = function() {
-    $.each(notebooks, function(index, notebook) {
+  self.init = function () {
+    $.each(notebooks, function (index, notebook) {
       self.loadNotebook(notebook);
-      if (self.selectedNotebook() == null){
+      if (self.selectedNotebook() == null) {
         self.selectedNotebook(self.notebooks()[0]);
       }
     });
   };
 
-  self.loadNotebook = function(notebook) {
+  self.loadNotebook = function (notebook) {
     var _n = new Notebook(self, notebook);
     self.notebooks.push(_n);
-    if (_n.snippets().length > 0){
+    if (_n.snippets().length > 0) {
       _n.selectedSnippet(_n.snippets()[_n.snippets().length - 1].type());
     }
   };
 
-  self.newNotebook = function() {
+  self.newNotebook = function () {
     self.notebooks.push(new Notebook(self, {}));
     self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
   };
 
-  self.saveNotebook = function() {
+  self.saveNotebook = function () {
     self.selectedNotebook().save();
   };
 }
