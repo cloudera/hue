@@ -80,7 +80,7 @@ def get_acls(request):
     print e
     acls = None
 
-  return JsonResponse(acls is not None and acls['AclStatus'] or None)
+  return JsonResponse(acls is not None and acls['AclStatus'] or None, safe=False)
 
 
 def update_acls(request):
