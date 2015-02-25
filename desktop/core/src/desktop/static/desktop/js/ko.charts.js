@@ -282,8 +282,9 @@ ko.bindingHandlers.mapChart = {
             fillKey: "fill_" + (Math.floor(item.value / _chunk) - 1),
             id: _place,
             cat: item.obj.cat,
-            value: item.obj.value,
-            selected: item.obj.selected
+            value: item.obj.values ? item.obj.values : item.obj.value,
+            selected: item.obj.selected,
+            fields: item.obj.fields ? item.obj.fields : null
           };
           _maphovers[_place] = item.value;
         }
@@ -302,8 +303,9 @@ ko.bindingHandlers.mapChart = {
             fillKey: "selected",
             id: _place,
             cat: item.obj.cat,
-            value: item.obj.value,
-            selected: item.obj.selected
+            value: item.obj.values ? item.obj.values : item.obj.value,
+            selected: item.obj.selected,
+            fields: item.obj.fields ? item.obj.fields : null,
           };
           _maphovers[_place] = item.value;
         }

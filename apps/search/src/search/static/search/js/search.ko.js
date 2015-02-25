@@ -651,6 +651,9 @@ var Collection = function (vm, collection) {
     else if (self.template.fieldsModalType() == 'line-widget') {
       return vm.availableNumberFields();
     }
+    else if (self.template.fieldsModalType() == 'map-widget') {
+      return vm.availableStringFields();
+    }
     else if (self.template.fieldsModalType() == 'tree-widget' || self.template.fieldsModalType() == 'heatmap-widget') {
       return vm.availablePivotFields();
     }
@@ -1032,6 +1035,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availablePivotFields = ko.computed(function() {
     return self.collection.fields();
   });
+  self.availableStringFields = ko.computed(function() {
+    return $.grep(self.collection.availableFacetFields(), function(field) { return NUMBER_TYPES.indexOf(field.type()) == -1 && DATE_TYPES.indexOf(field.type()) == -1; });
+  });
 
   function getWidgets(equalsTo) {
     return $.map(self.columns(), function (col){return $.map(col.rows(), function(row){ return $.grep(row.widgets(), function(widget){ return equalsTo(widget); });}) ;})
@@ -1055,6 +1061,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.availableDraggableChart = ko.computed(function() {
     return self.collection.availableFacetFields().length > 0;
   });
+  self.availableDraggableMap = ko.computed(function() {
+    return self.availableStringFields().length > 0;
+  })
 
 
   self.init = function (callback) {

@@ -202,7 +202,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="fa fa-th"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableHistogram() },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -211,12 +211,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
-                    draggable: {data: draggableMap(), isEnabled: availableDraggableChart,
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+                    draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
@@ -270,7 +270,6 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <!-- ko if: type() == 'pivot' -->
-
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">
@@ -1108,13 +1107,49 @@ ${ dashboard.layout_skeleton() }
       </select>
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
+
+      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
+        <div class="filter-box">
+          <div class="title">
+            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+              <i class="fa fa-times"></i>
+            </a>
+            <span data-bind="text: field"></span>
+            &nbsp;
+          </div>
+
+          <div class="content">
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Limit') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+              </span>
+            </div>
+
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Min Count') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.counts, scope: $root.collection.getFacetById($parent.id).properties.scope()},
+      <div data-bind="mapChart: {data: {counts: $parent.count, scope: $root.collection.getFacetById($parent.id).properties.scope()},
         transformer: mapChartDataTransformer,
         maxWidth: 750,
         isScale: true,
-        onClick: function(d){ viewModel.query.toggleFacet({facet: d, widget_id: $parent.id}) },
+        onClick: function(d) {
+          $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
+        },
         onComplete: function(){ var widget = viewModel.getWidgetById($parent.id); if (widget != null) {widget.isLoading(false)};} }" />
     </div>
   </div>
@@ -1124,6 +1159,7 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 </script>
+
 
 <script type="text/html" id="leafletmap-widget">
   <div class="row-fluid">
@@ -1554,9 +1590,13 @@ function timelineChartDataTransformer(rawDatum) {
 function mapChartDataTransformer(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
+    item.fields = item.pivot ? item.pivot[0].fq_fields : item.fq_fields;
+    item.values = item.pivot ? item.pivot[0].fq_values : item.fq_values;
+    item.counts = item.pivot ? item.pivot[0].count : item.count; // unused yet
+    item.is2d = item.pivot ? true : false; // unused yet
     _data.push({
       label: item.value,
-      value: item.count,
+      value: item.pivot ? item.pivot[0].fq_values : item.count,
       obj: item
     });
   });

@@ -289,6 +289,11 @@ class Collection(models.Model):
       if 'end' in properties and not 'initial_end' in properties:
         properties['initial_end'] = properties['end']
 
+      if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
+        facet['type'] = 'pivot'
+        properties['facets'] = []
+        properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 1}
+
     return json.dumps(props)
 
   def get_default(self, user):
