@@ -249,7 +249,7 @@ ${layout.menubar(section='query')}
         <div class="tab-content">
           <div id="queryPane">
 
-            <div data-bind="css: {'hide': design.errors().length == 0}" class="alert alert-error">
+            <div data-bind="css: {'hide': design.errors().length == 0 || design.inlineErrors().length > 0}" class="alert alert-error">
               <!-- ko if: $root.getQueryErrors().length > 0 -->
               <p><strong>${_('Please provide a query')}</strong></p>
               <!-- /ko -->
@@ -262,7 +262,7 @@ ${layout.menubar(section='query')}
               <!-- /ko -->
             </div>
 
-            <div data-bind="css: {'hide': design.watch.errors().length == 0}" class="alert alert-error">
+            <div data-bind="css: {'hide': design.watch.errors().length == 0 || design.watch.inlineErrors().length > 0}" class="alert alert-error">
               <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
               <div data-bind="foreach: design.watch.errors">
@@ -2128,8 +2128,8 @@ $(document).on('error.query', function () {
 
   // Move error to codeMirror if we know the line number
   $.each($(".queryErrorMessage"), function(index, el) {
-    var err = $(el).text().toLowerCase();
-    var firstPos = err.indexOf("line");
+    var err = $(el).text();
+    var firstPos = err.toLowerCase().indexOf("line");
     if (firstPos > -1) {
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
       errorWidgets.push(
@@ -2144,10 +2144,6 @@ $(document).on('error.query', function () {
       $(el).hide();
     }
   });
-
-  if ($(".queryErrorMessage:hidden").length == $(".queryErrorMessage").length) {
-    $(".queryErrorMessage").parent().parent().hide();
-  }
 
   reinitializeTableExtenders();
 });
