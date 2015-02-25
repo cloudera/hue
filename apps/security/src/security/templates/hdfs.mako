@@ -309,7 +309,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     var _initialPath = "/";
     if (window.location.hash != "") {
-      _initialPath = window.location.hash.substr(1);
+      _initialPath = window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
     viewModel.init(_initialPath);
 

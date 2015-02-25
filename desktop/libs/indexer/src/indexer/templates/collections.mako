@@ -548,7 +548,7 @@ routie({
     vm.page('manage-page');
   },
   "manage": function() {
-    vm.breadcrumb(window.location.hash.substring(1));
+    vm.breadcrumb(window.location.hash.substring(1).replace(/(<([^>]+)>)/ig, ""));
     vm.page('manage-page');
   },
   "create": function() {
@@ -560,7 +560,7 @@ routie({
     vm.breadcrumb("create/wizard/" + vm.create.wizard.currentPage().url());
   },
   "create/wizard/:step": function(step) {
-    vm.breadcrumb(window.location.hash.substring(1));
+    vm.breadcrumb(window.location.hash.substring(1).replace(/(<([^>]+)>)/ig, ""));
     vm.page('create-page');
     vm.create.wizard.setPageByUrl(step);
     routie('create/wizard/' + vm.create.wizard.currentPage().url());

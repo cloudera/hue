@@ -27,7 +27,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("coordinator") > -1) {
-      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1);
+      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
   var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]

@@ -25,7 +25,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("bundle") > -1) {
-      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1);
+      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
 </script>

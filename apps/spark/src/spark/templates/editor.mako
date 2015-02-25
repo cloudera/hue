@@ -24,7 +24,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("notebook") > -1) {
-      location.href = "/spark/editor?" + window.location.hash.substr(1);
+      location.href = "/spark/editor?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
 </script>

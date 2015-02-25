@@ -26,7 +26,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("collection") > -1) {
-      location.href = "/search/?" + window.location.hash.substr(1);
+      location.href = "/search/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
 </script>
