@@ -45,7 +45,7 @@ class SearchController(object):
       return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True)).order_by('-id')
 
   def get_shared_search_collections(self):
-    return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True, owner__in=User.objects.filter(is_superuser=True))).order_by('-id')
+    return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True, owner__in=User.objects.filter(is_superuser=True)) | Q(id__in=[20000000, 20000001, 20000002, 20000003])).order_by('-id')
 
   def get_owner_search_collections(self):
     if self.user.is_superuser:
