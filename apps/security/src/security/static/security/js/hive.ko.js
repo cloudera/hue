@@ -690,7 +690,9 @@ var Assist = function (vm, initial) {
 
   self.fetchHivePath = function (optionalPath, loadCallback) {
     self.isLoadingTree(true);
+
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
+
     if (_originalPath.split(".").length < 3) {
       var _path = _originalPath.replace('.', '/');
       var request = {
@@ -926,11 +928,12 @@ var HiveViewModel = function (initial) {
           });
           self.roles(_roles);
           self.originalRoles(_originalRoles);
-          self.isLoadingRoles(false);
         }
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function() {
+      self.isLoadingRoles(false);
     });
   };
 
@@ -1062,6 +1065,7 @@ var HiveViewModel = function (initial) {
     self.isLoadingPrivileges(true);
     self.assist.roles.removeAll();
     self.assist.privileges.removeAll();
+
     $.ajax({
       type: "POST",
       url: "/security/api/hive/list_sentry_privileges_by_authorizable",
@@ -1098,7 +1102,6 @@ var HiveViewModel = function (initial) {
           if (typeof skipList == "undefined" || (skipList != null && typeof skipList == "Boolean" && !skipList)) {
             self.assist.privileges(_privileges);
           }
-          self.isLoadingPrivileges(false);
           self.assist.loadData(self.assist.growingTree());
     	} else {
     	  $(document).trigger("error", data.message);
@@ -1106,6 +1109,8 @@ var HiveViewModel = function (initial) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function() {
+      self.isLoadingPrivileges(false);
     });
   };
 
