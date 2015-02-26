@@ -78,7 +78,7 @@
   top: 70px;
   position: fixed;
   width: 100%;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .row-header {
@@ -391,4 +391,20 @@ body.modal-open {
   font-size: 11px;
   font-weight: bold;
   margin-bottom: 3px;
+}
+
+.break-on-small-column {
+  display: none;
+}
+
+.card-column.span2 .break-on-small-column {
+  display: block;
+}
+
+.leaflet-align {
+  text-align: center;
+}
+
+.card-column.span2 .leaflet-align {
+  text-align: left;
 }
