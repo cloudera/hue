@@ -1,0 +1,12 @@
+include CHANGES.rst
+include CONTRIBUTING.rst
+include README.rst
+include LICENSE
+include MANIFEST.in
+exclude .gitignore
+exclude .travis.yml
+exclude Makefile
+exclude run_failure.py
+recursive-include kazoo *
+recursive-exclude sw *
+global-exclude *pyc *pyo
