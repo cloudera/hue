@@ -251,12 +251,18 @@ def _get_server_properties():
 
     try:
       if _api_cache is None:
-        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True)
 
         if get_sentry_server_ha_has_security():
-          # TODO zk.add_kerb
-          # TODO get principal name PRINCIPAL_NAME.get()
-          from zookeeper.conf import PRINCIPAL_NAME
+          try:
+            from zookeeper.conf import CLUSTERS
+            sasl_server_principal = CLUSTERS.get()['default'].PRINCIPAL_NAME.get()
+          except Exception, e:
+            LOG.error("Could not get principal name from ZooKeeper app config: %s. Using 'zookeeper' as principal name." % e)
+            sasl_server_principal = 'zookeeper'
+        else:
+          sasl_server_principal = None
+
+        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True, sasl_server_principal=sasl_server_principal)
 
         zk.start()
 
