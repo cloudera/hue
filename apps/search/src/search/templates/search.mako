@@ -1104,14 +1104,6 @@ ${ dashboard.layout_skeleton() }
         <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
         </span>
       </div>
-      <div class="pull-right">
-        <span class="facet-field-label">${ _('Scope') }</span>
-        <select data-bind="selectedOptions: properties.scope" class="input-small">
-          <option value="world">${ _("World") }</option>
-          <option value="usa">${ _("USA") }</option>
-        </select>
-      </div>
-
       <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
         <span class="muted">${ _('Selected dimension') }</span>
       </div>
@@ -1148,6 +1140,13 @@ ${ dashboard.layout_skeleton() }
       </div>
       <div class="clearfix"></div>
 
+    </div>
+    <div class="pull-left" data-bind="visible: $root.isEditing" style="margin-left: 51px; margin-top: -48px">
+      <span class="facet-field-label">${ _('Scope') }</span>
+      <select data-bind="selectedOptions: $root.collection.getFacetById($parent.id()).properties.scope" class="input-small" style="margin-left: 9px">
+        <option value="world">${ _("World") }</option>
+        <option value="usa">${ _("USA") }</option>
+      </select>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.count, scope: $root.collection.getFacetById($parent.id).properties.scope()},
