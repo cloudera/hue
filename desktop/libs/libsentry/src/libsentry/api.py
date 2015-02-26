@@ -251,10 +251,12 @@ def _get_server_properties():
 
     try:
       if _api_cache is None:
-        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True) #TODO hardcoded principal name
+        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True)
 
         if get_sentry_server_ha_has_security():
-          pass #TODO zk.add_kerb
+          # TODO zk.add_kerb
+          # TODO get principal name PRINCIPAL_NAME.get()
+          from zookeeper.conf import PRINCIPAL_NAME
 
         zk.start()
 

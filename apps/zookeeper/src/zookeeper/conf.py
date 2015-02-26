@@ -43,6 +43,12 @@ CLUSTERS = UnspecifiedConfigSection(
           default="http://localhost:9998",
           type=str,
       ),
+      PRINCIPAL_NAME=Config(
+          "principal_name",
+          help="Name of Kerberos principal when using security",
+          default="zookeeper",
+          type=str,
+      ),
     )
   )
 )
