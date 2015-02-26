@@ -461,7 +461,7 @@ from django.utils.translation import ugettext as _
                % if 'indexer' in apps or 'search' in apps:
                  <li class="divider"></li>
                  % if 'search' in apps:
-                 <li><a href="${ url('search:new_search') }"><i class="fa fa-plus"></i>${ _('Dashboard') }</a></li>
+                 <li><a href="${ url('search:new_search') }"><i class="fa fa-plus"></i> ${ _('Dashboard') }</a></li>
                  % endif
                  % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }"><i class="fa fa-database"></i> ${ _('Indexes') }</a></li>

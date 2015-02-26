@@ -257,9 +257,11 @@ ko.bindingHandlers.mapChart = {
 
     var _scope = typeof _options.data.scope != "undefined" ? String(_options.data.scope) : "world";
     var _data = _options.transformer(_options.data);
+    var _is2d = false;
     var _maxWeight = 0;
     $(_data).each(function (cnt, item) {
       if (item.value > _maxWeight) _maxWeight = item.value;
+      if (item.obj.is2d) _is2d = true;
     });
 
     var _chunk = _maxWeight / _data.length;
@@ -271,7 +273,7 @@ ko.bindingHandlers.mapChart = {
 
     if (_options.isScale) {
       _fills["defaultFill"] = HueColors.WHITE;
-      var _colors = HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
+      var _colors = _is2d ? HueColors.d3Scale() : HueColors.scale(HueColors.LIGHT_BLUE, HueColors.DARK_BLUE, _data.length);
       $(_colors).each(function (cnt, item) {
         _fills["fill_" + cnt] = item;
       });
@@ -279,10 +281,11 @@ ko.bindingHandlers.mapChart = {
         var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
           _mapdata[_place] = {
-            fillKey: "fill_" + (Math.floor(item.value / _chunk) - 1),
+            fillKey: "fill_" + (_is2d ? cnt : (Math.floor(item.value / _chunk) - 1)),
             id: _place,
             cat: item.obj.cat,
             value: item.obj.values ? item.obj.values : item.obj.value,
+            pivot: _is2d ? item.obj.pivot : [],
             selected: item.obj.selected,
             fields: item.obj.fields ? item.obj.fields : null
           };
@@ -304,8 +307,9 @@ ko.bindingHandlers.mapChart = {
             id: _place,
             cat: item.obj.cat,
             value: item.obj.values ? item.obj.values : item.obj.value,
+            pivot: [],
             selected: item.obj.selected,
-            fields: item.obj.fields ? item.obj.fields : null,
+            fields: item.obj.fields ? item.obj.fields : null
           };
           _maphovers[_place] = item.value;
         }
@@ -363,7 +367,15 @@ ko.bindingHandlers.mapChart = {
           popupTemplate: function (geography, data) {
             var _hover = '';
             if (data != null) {
-              _hover = '<br/>' + mapHovers[data.id];
+              _hover = '<br/>';
+              if (data.pivot.length > 0){
+                data.pivot.forEach(function(piv){
+                  _hover += piv.value + ": " + piv.count + "<br/>";
+                });
+              }
+              else {
+                _hover += mapHovers[data.id];
+              }
             }
             return '<div class="hoverinfo" style="text-align: center"><strong>' + geography.properties.name + '</strong>' + _hover + '</div>'
           }
