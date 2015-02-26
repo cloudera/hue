@@ -27,7 +27,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 <%def name="render()">
-  
+
 <div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
   <!-- ko if: $root.workflow.properties.imported -->
     <div class="alert alert-warn" style="margin-top: 93px; margin-bottom: 0; border: none; text-align: center">
@@ -204,6 +204,10 @@
       <a class="widget-icon"><i class="fa fa-files-o"></i></a>
       <!-- /ko -->
 
+      <!-- ko if: widgetType() == 'spark-widget' -->
+      <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon">
+      <!-- /ko -->
+
       <!-- ko if: widgetType() == 'kill-widget' -->
       <a class="widget-icon"><i class="fa fa-stop"></i></a>
       <!-- /ko -->
@@ -273,7 +277,7 @@
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
 
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
-      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" 
+      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover"
         data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>
                 <br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
                 <br/>
@@ -281,7 +285,7 @@
                 <br/>
                 <a href='http://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions'>${ _('Click for more') }</a>">
           <i class="fa fa-question-circle" title="${ _('Click for more info') }"></i>
-      </a>    
+      </a>
       <ul data-bind="foreach: children" class="unstyled">
         <li>
           ${ _('If') } <input type="text" data-bind="value: $data['condition']" />
@@ -380,6 +384,7 @@
     </ul>
     <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
 
+    <!-- ko if: properties.archives -->
     <h6>
       <a class="pointer" data-bind="click: function(){ properties.archives.push(ko.mapping.fromJS({'name': ''})); $(document).trigger('drawArrows') }">
         ${ _('Archives') } <i class="fa fa-plus"></i>
@@ -395,6 +400,7 @@
       </li>
     </ul>
     <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -544,7 +550,7 @@
 
         &nbsp;&nbsp;
 
-        <span data-bind="text: $root.workflow_properties.hive_xml.label"></span>      
+        <span data-bind="text: $root.workflow_properties.hive_xml.label"></span>
         <input type="text" style="width:25%" class="input-large filechooser-input" data-bind="filechooser: properties.hive_xml, filechooserOptions: globalFilechooserOptions, attr: { placeholder: $root.workflow_properties.hive_xml.help_text }"/>
 
         <div class="row-fluid">
@@ -698,12 +704,107 @@
 </script>
 
 
+<script type="text/html" id="spark-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="text: properties.app_name" />
+      &nbsp;&nbsp;&nbsp;
+      <span data-bind="text: properties.spark_master" />
+      <span data-bind="text: properties.mode" />
+      </br>
+      <span data-bind="text: properties.class" />
+      <span data-bind="text: properties.jars" />
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+
+        <div class="row-fluid">
+          <div class="span6">
+        <span data-bind="text: $root.workflow_properties.spark_master.label" style="display: inline-block"></span>
+        <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
+
+          </div>
+          <div class="span6">
+                 <span data-bind="text: $root.workflow_properties.mode.label" style="display: inline-block"></span>
+        <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
+
+          </div>
+        </div>
+
+        <span data-bind="text: $root.workflow_properties.app_name.label" style="display: inline-block; width: 75px"></span>
+        <input type="text" class="input-xlarge" data-bind="value: properties.app_name, attr: { placeholder: $root.workflow_properties.app_name.help_text }" />
+
+        <br/>
+
+        <span data-bind="text: $root.workflow_properties.class.label" style="display: inline-block; width: 75px"></span>
+        <input type="text" class="input-xlarge" data-bind="value: properties.class, attr: { placeholder: $root.workflow_properties.class.help_text }" />
+
+        <br/>
+
+        <span data-bind="text: $root.workflow_properties.jars.label" style="display: inline-block; width: 75px"></span>
+        <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" />
+        <span data-bind='template: { name: "common-fs-link", data: {path: properties.jars(), with_label: false}}'></span>
+
+  <h6>
+    <a class="pointer" data-bind="click: function(){ properties.spark_arguments.push({'value': ''}); $(document).trigger('drawArrows') }">
+      ${ _('Arguments') } <i class="fa fa-plus"></i>
+    </a>
+  </h6>
+  <ul class="unstyled" data-bind="visible: properties.spark_arguments().length > 0, foreach: properties.spark_arguments">
+    <li>
+      <input type="text" class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.spark_arguments.help_text }"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.spark_arguments.remove(this); $(document).trigger('drawArrows') }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
+  <em data-bind="visible: properties.spark_arguments().length == 0">${ _('No arguments defined.') }</em>
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="text: $root.workflow_properties.spark_opts.label" style="display: inline-block; width: 75px"></span>
+          <input type="text" class="input-xlarge" data-bind="value: properties.spark_opts, attr: { placeholder: $root.workflow_properties.spark_opts.help_text }" />
+
+          <br/>
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="java-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
-      <pan data-bind="text: properties.main_class" />
+      <span data-bind="text: properties.main_class" />
     </div>
 
     <div data-bind="visible: $root.isEditing">
@@ -850,7 +951,7 @@
             </a>
           </li>
         </ul>
-        
+
         <div class="span12" data-bind="template: { name: 'common-properties-files' }"></div>
       </div>
     </div>
@@ -886,12 +987,12 @@
         <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
           ${ _('Delete') } <i class="fa fa-plus"></i>
         </a>
-    
+
         <!-- ko if: properties.job_xml -->
           <h6>${ _('Job XML') }</h6>
           <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, attr: { placeholder: $root.workflow_properties.job_xml.help_text }"/>
         <!-- /ko -->
-    
+
         <h6>
           <a class="pointer" data-bind="click: function(){ properties.archives.push(ko.mapping.fromJS({'name': ''})); $(document).trigger('drawArrows') }">
             ${ _('Archives') } <i class="fa fa-plus"></i>
@@ -1392,7 +1493,7 @@
         <span data-bind="text: $root.workflow_properties.reducer.label"></span
         <input type="text" data-bind="value: properties.reducer" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
-        
+
         <div data-bind="template: { name: 'common-properties-files' }"></div>
       </div>
     </div>
@@ -1458,7 +1559,7 @@
 
       </div>
     </div>
-    
+
     <div data-bind="visible: ! $root.isEditing()">
       ${ _('Parameters') }
       <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
@@ -1495,7 +1596,7 @@
        <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
          ${ _('Delete') } <i class="fa fa-plus"></i>
        </a>
-    
+
        <h6>
          <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
            ${ _('Properties') } <i class="fa fa-plus"></i>
@@ -1512,8 +1613,8 @@
            </ul>
            <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
 
-           <h6>             
-             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>             
+           <h6>
+             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
            </h6>
            <input type="text" class="input-xlarge" data-bind="value: properties.java_opts, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" />
         </div>
