@@ -49,6 +49,9 @@ var HueColors = {
     }
     return _bands;
   },
+  d3Scale: function () {
+    return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
+  },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
   DARK_BLUE: "#338BB8",
