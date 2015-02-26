@@ -470,6 +470,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+  self.isSaving = ko.observable(false);
 
   self.isRunning = ko.observable(false);
 
@@ -1026,31 +1027,35 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
-    $(".jHueNotify").hide();
-    $.post("/oozie/editor/workflow/save/", {
-      "layout": ko.mapping.toJSON(self.oozieColumns),
-      "workflow": ko.mapping.toJSON(self.workflow)
-    }, function (data) {
-      if (data.status == 0) {
-        if (data.url) {
-          window.location.replace(data.url);
+    if (! self.isSaving()) {
+      self.isSaving(true);
+      $(".jHueNotify").hide();
+      $.post("/oozie/editor/workflow/save/", {
+        "layout": ko.mapping.toJSON(self.oozieColumns),
+        "workflow": ko.mapping.toJSON(self.workflow)
+      }, function (data) {
+        if (data.status == 0) {
+          if (data.url) {
+            window.location.replace(data.url);
+          }
+          if (self.workflow.id() == null) {
+            shareViewModel.setDocId(data.doc1_id);
+          }
+          self.workflow.id(data.id);
+          $(document).trigger("info", data.message);
+          if (window.location.search.indexOf("workflow") == -1) {
+            window.location.hash = '#workflow=' + data.id;
+          }
+          self.workflow.tracker().markCurrentStateAsClean();
         }
-        if (self.workflow.id() == null) {
-          shareViewModel.setDocId(data.doc1_id);
+        else {
+          $(document).trigger("error", data.message);
         }
-        self.workflow.id(data.id);
-        $(document).trigger("info", data.message);
-        if (window.location.search.indexOf("workflow") == -1) {
-          window.location.hash = '#workflow=' + data.id;
-        }
-        self.workflow.tracker().markCurrentStateAsClean();
-      }
-      else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+        self.isSaving(false);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 
   self.gen_xml = function () {

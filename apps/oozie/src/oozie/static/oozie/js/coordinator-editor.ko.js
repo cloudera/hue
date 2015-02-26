@@ -153,6 +153,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+  self.isSaving = ko.observable(false);
 
   self.workflows = ko.mapping.fromJS(workflows_json);
   self.coordinator = new Coordinator(self, coordinator_json);
@@ -190,24 +191,28 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
 
 
   self.save = function () {
-    $(".jHueNotify").hide();
-    $.post("/oozie/editor/coordinator/save/", {
-      "coordinator": ko.mapping.toJSON(self.coordinator)
-    }, function (data) {
-      if (data.status == 0) {
-        self.coordinator.id(data.id);
-        self.coordinator.tracker().markCurrentStateAsClean();
-        $(document).trigger("info", data.message);
-        if (window.location.search.indexOf("coordinator") == -1) {
-          window.location.hash = '#coordinator=' + data.id;
+    if (! self.isSaving()) {
+      self.isSaving(true);
+      $(".jHueNotify").hide();
+      $.post("/oozie/editor/coordinator/save/", {
+        "coordinator": ko.mapping.toJSON(self.coordinator)
+      }, function (data) {
+        if (data.status == 0) {
+          self.coordinator.id(data.id);
+          self.coordinator.tracker().markCurrentStateAsClean();
+          $(document).trigger("info", data.message);
+          if (window.location.search.indexOf("coordinator") == -1) {
+            window.location.hash = '#coordinator=' + data.id;
+          }
         }
-      }
-      else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+        else {
+          $(document).trigger("error", data.message);
+        }
+        self.isSaving(false);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 
   self.gen_xml = function () {
