@@ -26,7 +26,9 @@ from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_serve
 
 import logging
 import json
+import random
 import threading
+import time
 
 
 LOG = logging.getLogger(__name__)
@@ -36,63 +38,31 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
+def ha_error_handler(func):
+  def decorator(*args, **kwargs):
+    retries = 15
 
-class SentryException(Exception):
-  def __init__(self, e):
-    super(SentryException, self).__init__(e)
-    self.message = e.status.message
+    while retries > 0:
+      try:
+        return func(*args, **kwargs)
+      except:
+        # Right now retries on any Thrift error and pull a fresh list of servers from ZooKeeper
+        LOG.info('Retrying fetching an available client in ZooKeeper.')
+        global _api_cache
+        _api_cache = None
+        time.sleep(1)
+        retries -= 1
+        args[0].client = _get_client(args[0].client.username)
+      else:
+        retries = 0
 
-  def __str__(self):
-    return self.message
+  return decorator
 
 
 def get_api(user):
-  if get_sentry_server_ha_enabled():
-    servers = _get_server_properties()
-    if servers:
-      server = servers[0]
-    else:
-      raise PopupException(_('No Sentry servers are available.'))    
-  else:
-    server = {
-        'hostname': HOSTNAME.get(),
-        'port': PORT.get()
-    }
-  
-  return SentryApi(SentryClient(HOSTNAME.get(), PORT.get(), user.username))
+  client = _get_client(user.username)
 
-  
-def _get_server_properties():
-  global _api_cache
-
-  if _api_cache is None:
-    _api_cache_lock.acquire()  
-    
-    try:
-      if _api_cache is None:
-        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True)
-        
-        if get_sentry_server_ha_has_security():
-          pass # zk.add_kerb
-
-        zk.start()
-        
-        servers = []
-        namespace = get_sentry_server_ha_zookeeper_namespace()
-        
-        children = zk.get_children("/%s/sentry-service/sentry-service/" % namespace)
-        for server in children:        
-          data, stat = zk.get("/%s/sentry-service/sentry-service/%s" % (namespace, server))
-          server = json.loads(data.decode("utf-8"))
-          servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
-
-        zk.stop()
-
-        _api_cache = servers
-    finally:
-      _api_cache_lock.release()
-
-  return _api_cache
+  return SentryApi(client)
 
 
 class SentryApi(object):
@@ -100,7 +70,7 @@ class SentryApi(object):
   def __init__(self, client):
     self.client = client
 
-
+  @ha_error_handler
   def create_sentry_role(self, roleName):
     response = self.client.create_sentry_role(roleName)
 
@@ -109,7 +79,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def drop_sentry_role(self, roleName):
     response = self.client.drop_sentry_role(roleName)
 
@@ -118,7 +88,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
     response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege)
 
@@ -127,7 +97,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
     response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege)
 
@@ -136,7 +106,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def alter_sentry_role_add_groups(self, roleName, groups):
     response = self.client.alter_sentry_role_add_groups(roleName, groups)
 
@@ -145,7 +115,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def alter_sentry_role_delete_groups(self, roleName, groups):
     response = self.client.alter_sentry_role_delete_groups(roleName, groups)
 
@@ -154,7 +124,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def list_sentry_roles_by_group(self, groupName=None):
     response = self.client.list_sentry_roles_by_group(groupName)
 
@@ -169,7 +139,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
     response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
 
@@ -178,7 +148,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def list_sentry_privileges_for_provider(self, groups, roleSet=None, authorizableHierarchy=None):
     response = self.client.list_sentry_privileges_for_provider(groups, roleSet, authorizableHierarchy)
 
@@ -187,7 +157,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
     response = self.client.list_sentry_privileges_by_authorizable(authorizableSet, groups, roleSet)
 
@@ -204,7 +174,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def drop_sentry_privileges(self, authorizableHierarchy):
     response = self.client.drop_sentry_privilege(authorizableHierarchy)
 
@@ -213,7 +183,7 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
+  @ha_error_handler
   def rename_sentry_privileges(self, oldAuthorizable, newAuthorizable):
     response = self.client.rename_sentry_privilege(oldAuthorizable, newAuthorizable)
 
@@ -243,3 +213,64 @@ class SentryApi(object):
         'table': authorizable.table,
         'URI': authorizable.uri,
     }
+
+
+class SentryException(Exception):
+  def __init__(self, e):
+    super(SentryException, self).__init__(e)
+    self.message = e.status.message
+
+  def __str__(self):
+    return self.message
+
+
+def _get_client(username):
+  if get_sentry_server_ha_enabled():
+    servers = _get_server_properties()
+    if servers:
+      server = random.choice(servers)
+    else:
+      raise PopupException(_('No Sentry servers are available.'))
+  else:
+    server = {
+        'hostname': HOSTNAME.get(),
+        'port': PORT.get()
+    }
+
+  return SentryClient(server['hostname'], server['port'], username)
+
+
+# To move to a libzookeeper with decorator
+
+
+def _get_server_properties():
+  global _api_cache
+
+  if _api_cache is None:
+    _api_cache_lock.acquire()
+
+    try:
+      if _api_cache is None:
+        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True) #TODO hardcoded principal name
+
+        if get_sentry_server_ha_has_security():
+          pass #TODO zk.add_kerb
+
+        zk.start()
+
+        servers = []
+        namespace = get_sentry_server_ha_zookeeper_namespace()
+
+        children = zk.get_children("/%s/sentry-service/sentry-service/" % namespace)
+        for node in children:
+          data, stat = zk.get("/%s/sentry-service/sentry-service/%s" % (namespace, node))
+          server = json.loads(data.decode("utf-8"))
+          servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
+
+        zk.stop()
+
+        _api_cache = servers
+    finally:
+      _api_cache_lock.release()
+
+  return _api_cache
