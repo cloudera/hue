@@ -153,15 +153,15 @@
       </span>
 
       <!-- ko if: widgetType() == 'hive-widget' -->
-      <img src="/oozie/static/art/icon_beeswax_48.png" class="widget-icon">
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'hive2-widget' -->
-      <img src="/oozie/static/art/icon_beeswax_48.png" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'pig-widget' -->
-      <img src="/oozie/static/art/icon_pig_48.png" class="widget-icon">
+      <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'java-widget' -->
@@ -169,7 +169,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'sqoop-widget' -->
-      <img src="/oozie/static/art/icon_sqoop_48.png" class="widget-icon">
+      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="widget-icon">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'mapreduce-widget' -->
