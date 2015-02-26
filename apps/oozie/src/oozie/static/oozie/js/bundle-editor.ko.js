@@ -99,7 +99,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
 
 
   self.save = function () {
-    if (! self.isSaving()) {
+    if (!self.isSaving()) {
       self.isSaving(true);
       $.post("/oozie/editor/bundle/save/", {
         "bundle": ko.mapping.toJSON(self.bundle)
@@ -115,9 +115,10 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
         else {
           $(document).trigger("error", data.message);
         }
-        self.isSaving(false);
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function () {
+        self.isSaving(false);
       });
     }
   };
