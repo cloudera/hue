@@ -1100,14 +1100,21 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()) -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Scope') }:
-      <select data-bind="selectedOptions: properties.scope" class="input-small">
-        <option value="world">${ _("World") }</option>
-        <option value="usa">${ _("USA") }</option>
-      </select>
-      <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
+      <div class="floating-facet-toggle-section">
+        <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+        </span>
+      </div>
+      <div class="pull-right">
+        <span class="facet-field-label">${ _('Scope') }</span>
+        <select data-bind="selectedOptions: properties.scope" class="input-small">
+          <option value="world">${ _("World") }</option>
+          <option value="usa">${ _("USA") }</option>
+        </select>
+      </div>
 
+      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
+        <span class="muted">${ _('Selected dimension') }</span>
+      </div>
       <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
         <div class="filter-box">
           <div class="title">
