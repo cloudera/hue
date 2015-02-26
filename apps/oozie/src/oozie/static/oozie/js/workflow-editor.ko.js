@@ -1027,7 +1027,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
-    if (! self.isSaving()) {
+    if (!self.isSaving()) {
       self.isSaving(true);
       $(".jHueNotify").hide();
       $.post("/oozie/editor/workflow/save/", {
@@ -1051,9 +1051,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         else {
           $(document).trigger("error", data.message);
         }
-        self.isSaving(false);
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function () {
+        self.isSaving(false);
       });
     }
   };

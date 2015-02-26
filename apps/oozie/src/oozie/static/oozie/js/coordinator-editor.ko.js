@@ -191,7 +191,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
 
 
   self.save = function () {
-    if (! self.isSaving()) {
+    if (!self.isSaving()) {
       self.isSaving(true);
       $(".jHueNotify").hide();
       $.post("/oozie/editor/coordinator/save/", {
@@ -208,9 +208,10 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
         else {
           $(document).trigger("error", data.message);
         }
-        self.isSaving(false);
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function () {
+        self.isSaving(false);
       });
     }
   };
