@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with python2,sphinxdoc --buildsystem=python_distutils
+
+.PHONY: override_dh_installchangelogs
+override_dh_installchangelogs:
+	dh_installchangelogs CHANGES.rst
+
+.PHONY: override_dh_auto_build
+override_dh_auto_build:
+	sphinx-build -b html docs build/html
+	dh_auto_build
+
+.PHONY: override_dh_clean
+override_dh_clean:
+	rm -rf build
+	dh_clean

@@ -1,0 +1,13 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: kazoo
+Source: https://github.com/python-zk/kazoo
+
+Files: *
+Copyright: 2012 Kazoo Team
+License: Apache-2.0
+ See /usr/share/common-licenses/Apache-2.0
+
+Files: debian/*
+Copyright: 2012 Neil Williams <neil@spladug.net>
+License: Apache-2.0
+ See /usr/share/common-licenses/Apache-2.0
