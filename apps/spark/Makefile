@@ -23,39 +23,39 @@ endif
 APP_NAME = spark
 include $(ROOT)/Makefile.sdk
 
-SPARK_ROOT := $(realpath .)
-JAVA_LIB = $(SPARK_ROOT)/java-lib
-
-LIVY_DIR = $(SPARK_ROOT)/java
-LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
-LIVY_ASSEMBLY = livy-assembly-$(MAVEN_VERSION).jar
-LIVY = $(JAVA_LIB)/$(LIVY_ASSEMBLY)
-
-HAVE_JAVA_SRC = $(wildcard $(LIVY_DIR))
-
-compile: $(LIVY)
-
-ifneq (,$(HAVE_JAVA_SRC))
-
-clean::
-	rm -Rf $(JAVA_LIB)
-	cd $(LIVY_DIR) && mvn clean $(MAVEN_OPTIONS) || :
-
-$(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY): $(shell find $(LIVY_DIR) -type f)
-	@echo "--- Building Desktop spark"
-	cd $(LIVY_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
-
-$(LIVY): $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY)
-	mkdir -p $(JAVA_LIB)
-	cp $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY) $(LIVY)
-
-else
-$(LIVY):
-	$(error Cannot build spark jars without source)
-endif
-
-BDIST_EXCLUDES += \
-	--exclude=java
-
-SDIST_EXCLUDES += \
-	--exclude=java-lib
+#SPARK_ROOT := $(realpath .)
+#JAVA_LIB = $(SPARK_ROOT)/java-lib
+#
+#LIVY_DIR = $(SPARK_ROOT)/java
+#LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
+#LIVY_ASSEMBLY = livy-assembly-$(MAVEN_VERSION).jar
+#LIVY = $(JAVA_LIB)/$(LIVY_ASSEMBLY)
+#
+#HAVE_JAVA_SRC = $(wildcard $(LIVY_DIR))
+#
+#compile: $(LIVY)
+#
+#ifneq (,$(HAVE_JAVA_SRC))
+#
+#clean::
+#	rm -Rf $(JAVA_LIB)
+#	cd $(LIVY_DIR) && mvn clean $(MAVEN_OPTIONS) || :
+#
+#$(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY): $(shell find $(LIVY_DIR) -type f)
+#	@echo "--- Building Desktop spark"
+#	cd $(LIVY_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+#
+#$(LIVY): $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY)
+#	mkdir -p $(JAVA_LIB)
+#	cp $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY) $(LIVY)
+#
+#else
+#$(LIVY):
+#	$(error Cannot build spark jars without source)
+#endif
+#
+#BDIST_EXCLUDES += \
+#	--exclude=java
+#
+#SDIST_EXCLUDES += \
+#	--exclude=java-lib
