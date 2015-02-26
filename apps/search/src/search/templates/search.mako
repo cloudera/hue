@@ -1109,14 +1109,16 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="leafletmap-widget">
   <div class="row-fluid">
-    <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px; text-align: center">
-      ${_('Latitude')}
+    <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
+      ${_('Latitude')}<div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
-      ${_('Longitude')}
+      <div class="break-on-small-column"></div>
+      ${_('Longitude')}<div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
-      ${_('Label')}
+      <div class="break-on-small-column"></div>
+      ${_('Label')}<div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
