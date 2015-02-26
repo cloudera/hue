@@ -1074,6 +1074,87 @@ class DistCpAction(Action):
     return [cls.FIELDS['distcp_parameters']]
 
 
+class SparkAction(Action):
+  TYPE = 'spark'
+  FIELDS = {
+     'spark_master': {
+          'name': 'spark_master',
+          'label': _('Spark Master'),
+          'value': 'local[*]',
+          'help_text': _('Ex: spark://host:port, mesos://host:port, yarn, or local.'),
+          'type': ''
+     },
+     'mode': {
+          'name': 'mode',
+          'label': _('Mode'),
+          'value': 'client',
+          'help_text': _('Where to run spark driver. Ex: client,cluster.'),
+          'type': ''
+     },
+     'app_name': {
+          'name': 'app_name',
+          'label': _('App name'),
+          'value': 'MySpark',
+          'help_text': _('The name of the spark application'),
+          'type': ''
+     },
+    'class': {
+          'name': 'class',
+          'label': _('Main class'),
+          'value': '',
+          'help_text': _("e.g. org.apache.spark.examples.mllib.JavaALS."),
+          'type': ''
+     },
+     'jars': {
+          'name': 'jars',
+          'label': _('Jars/py files'),
+          'value': '',
+          'help_text': _('Comma separated list of jars or python HDFS files.'),
+          'type': ''
+     },
+     'spark_opts': {
+          'name': 'spark_opts',
+          'label': _('Options list'),
+          'value': '',
+          'help_text': _('Ex: --executor-memory 20G --num-executors 50'),
+          'type': ''
+     },
+     'spark_arguments': {
+          'name': 'spark_arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('Arguments, one by one, e.g. 1000, /path/a.'),
+          'type': ''
+     },
+     # Common
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production'),
+          'type': ''
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.'),
+          'type': ''
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['class'], cls.FIELDS['jars']]
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -1138,6 +1219,7 @@ NODES = {
   'join-widget': JoinAction,
   'fork-widget': ForkNode,
   'decision-widget': DecisionNode,
+  'spark-widget': SparkAction
 }
 
 
