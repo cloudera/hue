@@ -43,6 +43,12 @@ class WriterNotClosedException(KazooException):
     """
 
 
+class SaslException(KazooException):
+    """Raised if SASL encountered an error.
+    .. versionadded:: 2.1
+    """
+
+
 def _invalid_error_code():
     raise RuntimeError('Invalid error code')
 
