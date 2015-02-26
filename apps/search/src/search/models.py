@@ -292,7 +292,7 @@ class Collection(models.Model):
       if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
         facet['type'] = 'pivot'
         properties['facets'] = []
-        properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 1}
+        properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
 
     return json.dumps(props)
 
