@@ -490,3 +490,13 @@ em {
 .card-column {
   min-height: 400px !important;
 }
+
+.map-scope {
+  position:absolute;
+  margin-left: 51px;
+  margin-top: 130px;
+}
+
+.card-column.span2 .map-scope {
+  margin-left: 0;
+}
