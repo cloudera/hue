@@ -309,6 +309,20 @@ ${ dashboard.layout_skeleton() }
         </span>
       </div>
     <!-- /ko -->
+
+    <!-- ko if: widgetType() == 'map-widget' -->
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Scope') }
+          </span>
+          <select data-bind="selectedOptions: properties.scope" class="input-small">
+            <option value="world">${ _("World") }</option>
+            <option value="usa">${ _("USA") }</option>
+          </select>
+        </span>
+      </div>
+    <!-- /ko -->
     </div>
 
     <!-- ko if: type() == 'pivot' -->
@@ -1140,13 +1154,6 @@ ${ dashboard.layout_skeleton() }
       </div>
       <div class="clearfix"></div>
 
-    </div>
-    <div class="pull-left" data-bind="visible: $root.isEditing" style="margin-left: 51px; margin-top: -48px">
-      <span class="facet-field-label">${ _('Scope') }</span>
-      <select data-bind="selectedOptions: $root.collection.getFacetById($parent.id()).properties.scope" class="input-small" style="margin-left: 9px">
-        <option value="world">${ _("World") }</option>
-        <option value="usa">${ _("USA") }</option>
-      </select>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.count, scope: $root.collection.getFacetById($parent.id).properties.scope()},
