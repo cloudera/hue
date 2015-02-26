@@ -64,6 +64,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+  self.isSaving = ko.observable(false);
 
   self.bundle = new Bundle(self, bundle_json);
 
@@ -98,23 +99,27 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
 
 
   self.save = function () {
-    $.post("/oozie/editor/bundle/save/", {
-      "bundle": ko.mapping.toJSON(self.bundle)
-    }, function (data) {
-      if (data.status == 0) {
-        self.bundle.id(data.id);
-        self.bundle.tracker().markCurrentStateAsClean();
-        $(document).trigger("info", data.message);
-        if (window.location.search.indexOf("bundle") == -1) {
-          window.location.hash = '#bundle=' + data.id;
+    if (! self.isSaving()) {
+      self.isSaving(true);
+      $.post("/oozie/editor/bundle/save/", {
+        "bundle": ko.mapping.toJSON(self.bundle)
+      }, function (data) {
+        if (data.status == 0) {
+          self.bundle.id(data.id);
+          self.bundle.tracker().markCurrentStateAsClean();
+          $(document).trigger("info", data.message);
+          if (window.location.search.indexOf("bundle") == -1) {
+            window.location.hash = '#bundle=' + data.id;
+          }
         }
-      }
-      else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+        else {
+          $(document).trigger("error", data.message);
+        }
+        self.isSaving(false);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
 
   self.showSubmitPopup = function () {

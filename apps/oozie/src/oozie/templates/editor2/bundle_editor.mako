@@ -57,7 +57,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
     &nbsp;&nbsp;&nbsp;
 
-    <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}, visible: canEdit() && bundle.coordinators().length > 0">
+    <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit() && bundle.coordinators().length > 0">
       <i class="fa fa-save"></i>
     </a>
 
