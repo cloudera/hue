@@ -84,12 +84,12 @@ var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
       statuses.push($(this).attr("data-value"));
     });
 
-    var _statusColumn = aData[aData.length - 1];
+    var _parentUrlColumn = aData[aData.length - 1];
     if (statuses.length == 1) {
-      if (statuses[0] == 'MANUALLY') {
-        submittedByFilter = _statusColumn == null;
+      if (statuses[0] == 'COORDINATOR') {
+        submittedByFilter = _parentUrlColumn.indexOf('icon_oozie_coordinator') > -1;
       } else {
-        submittedByFilter = _statusColumn != null;
+        submittedByFilter = _parentUrlColumn.indexOf('icon_oozie_coordinator') == -1;
       }
     }
   }

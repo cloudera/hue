@@ -77,9 +77,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="21%">${ _('Name') }</th>
           <th width="7%">${ _('Progress') }</th>
           <th width="7%">${ _('Submitter') }</th>
-          <th width="15%">${ _('Last Modified') }</th>
+          <th width="7%">${ _('Last Modified') }</th>
           <th width="20%">${ _('Id') }</th>
-          <th width="1%">${ _('parentId') }</th>
+          <th width="5%">${ _('Parent') }</th>
         </tr>
       </thead>
       <tbody>
@@ -109,15 +109,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="25%">${ _('Name') }</th>
           <th width="7%">${ _('Duration') }</th>
           <th width="10%">${ _('Submitter') }</th>
-          <th width="15%">${ _('Last Modified') }</th>
           <th width="25%">${ _('Id') }</th>
-          <th width="1%">${ _('parentId') }</th>
+          <th width="5%">${ _('Parent') }</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
-          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -188,7 +186,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       created: wf.created,
       createdInMillis: wf.createdInMillis,
       run: wf.run,
-      parentId: wf.parentId,
+      parentUrl: wf.parentUrl,
     }
   }
 
@@ -209,7 +207,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        { "bVisible":false }
+        null
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -243,9 +241,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        { "bVisible":false }
+        null
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -384,9 +381,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     wf.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
-                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
+                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeInMillis) + '</span>',
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    wf.parentId
+                    ''
                   ]);
                 }
                 catch (error) {
@@ -423,9 +420,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', decodeURIComponent(wf.appName),
               '<span data-sort-value="'+ wf.durationInMillis +'">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
-              '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTime) + '</span>',
               '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-              wf.parentId
+              wf.parentUrl == ''? '':
+              wf.parentUrl[wf.parentUrl.length-2] == 'W' ?
+                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_workflow_24.png")}"/> </a>' :
+              wf.parentUrl[wf.parentUrl.length-2] == 'C' ?
+                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_coordinator_24.png")}"/> </a>' :
+              wf.parentUrl[wf.parentUrl.length-2] == 'B' ?
+                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_bundle_24.png")}"/> </a>' : ''
             ], false);
           }
           catch (error) {
