@@ -876,7 +876,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
       massaged_job = {
         'id': job.id,
         'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-        'lastModTimeInMillis': hasattr(job, 'lastModTime') and job.lastModTime and time.mktime(job.lastModTime) or 0,
+        'lastModTimeInMillis': hasattr(job, 'lastModTime') and job.lastModTime and format_duration_in_millis(time.mktime(job.lastModTime)) or 0,
         'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime and format_time(job.kickoffTime) or '',
         'kickoffTimeInMillis': hasattr(job, 'kickoffTime') and job.kickoffTime and time.mktime(catch_unicode_time(job.kickoffTime)) or 0,
         'nextMaterializedTime': hasattr(job, 'nextMaterializedTime') and job.nextMaterializedTime and format_time(job.nextMaterializedTime) or '',
@@ -903,7 +903,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'run': hasattr(job, 'run') and job.run or 0,
         'frequency': hasattr(job, 'frequency') and Coordinator.CRON_MAPPING.get(job.frequency, job.frequency) or None,
         'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
-        'parentId': hasattr(job, 'parentId') and job.parentId or None,
+        'parentUrl': hasattr(job, 'parentId') and job.parentId and get_link(job.parentId) or ''
       }
       jobs.append(massaged_job)
 
