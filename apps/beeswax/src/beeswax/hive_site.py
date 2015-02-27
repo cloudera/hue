@@ -46,6 +46,8 @@ _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.prin
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
 _CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.doAs'
 
+_CNF_HIVESERVER2_USE_SSL = 'hive.server2.use.SSL'
+
 _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
@@ -129,6 +131,9 @@ def hiveserver2_impersonation_enabled():
 
 def hiveserver2_jdbc_url():
   return 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+
+def hiveserver2_use_ssl():
+  return get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE'
 
 def hiveserver2_transport_mode():
   return get_conf().get(_CNF_HIVESERVER2_TRANSPORT_MODE, 'TCP').upper()

@@ -97,16 +97,16 @@ SSL = ConfigSection(
 
     KEY = Config(
       key="key",
-      help=_t("Path to the private key file."),
+      help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
       type=str,
-      default="/etc/hue/key.pem"
+      default=None
     ),
 
     CERT = Config(
       key="cert",
-      help=_t("Path to the public certificate file."),
+      help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
       type=str,
-      default="/etc/hue/cert.pem"
+      default=None
     ),
 
     VALIDATE = Config(

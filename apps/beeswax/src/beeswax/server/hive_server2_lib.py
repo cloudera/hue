@@ -38,9 +38,11 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
 
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
+from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
+
 
 LOG = logging.getLogger(__name__)
 
@@ -450,7 +452,7 @@ class HiveServerClient:
       validate = impala_conf.SSL.VALIDATE.get()
       timeout = impala_conf.SERVER_CONN_TIMEOUT.get()
     else:
-      ssl_enabled = beeswax_conf.SSL.ENABLED.get()
+      ssl_enabled = hiveserver2_use_ssl()
       ca_certs = beeswax_conf.SSL.CACERTS.get()
       keyfile = beeswax_conf.SSL.KEY.get()
       certfile = beeswax_conf.SSL.CERT.get()
