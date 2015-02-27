@@ -258,18 +258,54 @@ ko.bindingHandlers.mapChart = {
     var _scope = typeof _options.data.scope != "undefined" ? String(_options.data.scope) : "world";
     var _data = _options.transformer(_options.data);
     var _is2d = false;
+    var _pivotCategories = [];
     var _maxWeight = 0;
+
+    function comparePivotValues(a, b) {
+      if (a.count < b.count)
+        return 1;
+      if (a.count > b.count)
+        return -1;
+      return 0;
+    }
+
     $(_data).each(function (cnt, item) {
       if (item.value > _maxWeight) _maxWeight = item.value;
       if (item.obj.is2d) _is2d = true;
+      if (item.obj.pivot && item.obj.pivot.length > 0) {
+        item.obj.pivot.forEach(function (piv) {
+
+          var _category = null;
+          _pivotCategories.forEach(function (category) {
+            if (category.value == piv.value) {
+              _category = category;
+              if (piv.count > _category.count) {
+                _category.count = piv.count;
+              }
+            }
+          });
+
+          if (_category == null) {
+            _category = {
+              value: piv.value,
+              count: -1
+            };
+            _pivotCategories.push(_category);
+          }
+
+        });
+      }
     });
 
-    var _chunk = _maxWeight / _data.length;
+    _pivotCategories.sort(comparePivotValues);
 
+    var _chunk = _maxWeight / _data.length;
     var _mapdata = {};
     var _maphovers = {};
     var _fills = {};
+
     var _noncountries = [];
+
 
     if (_options.isScale) {
       _fills["defaultFill"] = HueColors.WHITE;
@@ -277,11 +313,34 @@ ko.bindingHandlers.mapChart = {
       $(_colors).each(function (cnt, item) {
         _fills["fill_" + cnt] = item;
       });
+
+      function getHighestCategoryValue(cnt, item) {
+        var _cat = "";
+        var _max = -1;
+        if (item.obj.pivot && item.obj.pivot.length > 0) {
+          item.obj.pivot.forEach(function (piv) {
+            if (piv.count > _max) {
+              _max = piv.count;
+              _cat = piv.value;
+            }
+          });
+        }
+        var _found = cnt;
+        if (_cat != "") {
+          _pivotCategories.forEach(function (cat, i) {
+            if (cat.value == _cat) {
+              _found = i;
+            }
+          });
+        }
+        return _found;
+      }
+
       $(_data).each(function (cnt, item) {
         var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
           _mapdata[_place] = {
-            fillKey: "fill_" + (_is2d ? cnt : (Math.floor(item.value / _chunk) - 1)),
+            fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item) : (Math.floor(item.value / _chunk) - 1)),
             id: _place,
             cat: item.obj.cat,
             value: item.obj.values ? item.obj.values : item.obj.value,
@@ -368,9 +427,10 @@ ko.bindingHandlers.mapChart = {
             var _hover = '';
             if (data != null) {
               _hover = '<br/>';
-              if (data.pivot.length > 0){
-                data.pivot.forEach(function(piv){
-                  _hover += piv.value + ": " + piv.count + "<br/>";
+              if (data.pivot && data.pivot.length > 0) {
+                data.pivot.sort(comparePivotValues);
+                data.pivot.forEach(function (piv, cnt) {
+                  _hover += (cnt == 0 ? "<strong>" : "") + piv.value + ": " + piv.count + (cnt == 0 ? "</strong>" : "") + "<br/>";
                 });
               }
               else {
@@ -398,7 +458,7 @@ ko.bindingHandlers.mapChart = {
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
   },
   update: function (element, valueAccessor, allBindingsAccessor) {
-    if (typeof allBindingsAccessor().mapChart.visible != "undefined"){
+    if (typeof allBindingsAccessor().mapChart.visible != "undefined") {
       if ((typeof allBindingsAccessor().mapChart.visible == "boolean" && allBindingsAccessor().mapChart.visible) || (typeof allBindingsAccessor().mapChart.visible == "function" && allBindingsAccessor().mapChart.visible())) {
         $(element).show();
         ko.bindingHandlers.mapChart.render(element, valueAccessor);
@@ -407,7 +467,7 @@ ko.bindingHandlers.mapChart = {
         $(element).hide();
       }
     }
-    
+
   }
 };
 
