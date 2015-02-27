@@ -64,9 +64,10 @@ ko.bindingHandlers.pieChart = {
             .transition().duration(150)
             .each("end", _options.onComplete != null ? _options.onComplete : void(0))
             .call(_chart);
+
         if (_options.fqs) {
           $.each(_options.fqs(), function (cnt, item) {
-            if (item.field() == _options.field()) {
+            if (item.id() == _options.data.widget_id && item.field() == _options.field()) {
               _chart.selectSlices($.map(item.filter(), function (it) {
                 return it.value();
               }));
@@ -732,18 +733,20 @@ function barChartBuilder(element, options, isTimeline) {
 
       if (_chart.selectBars) {
         $.each(options.fqs(), function (cnt, item) {
-          if (item.field() == options.field) {
-            _chart.selectBars($.map(item.filter(), function (it) {
-              return it.value();
-            }));
-          }
-          if (item.field().indexOf(":") > -1) {
-            _chart.selectBars({
-              field: item.field(),
-              selected: $.map(item.filter(), function (it) {
+          if (item.id() == options.datum.widget_id) {
+            if (item.field() == options.field) {
+              _chart.selectBars($.map(item.filter(), function (it) {
                 return it.value();
-              })
-            });
+              }));
+            }
+            if (item.field().indexOf(":") > -1) {
+              _chart.selectBars({
+                field: item.field(),
+                selected: $.map(item.filter(), function (it) {
+                  return it.value();
+                })
+              });
+            }
           }
         });
       }

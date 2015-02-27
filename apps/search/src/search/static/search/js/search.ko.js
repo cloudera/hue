@@ -481,12 +481,7 @@ var Collection = function (vm, collection) {
   self.fields = ko.mapping.fromJS(collection.fields);
 
   self.availableFacetFields = ko.computed(function() {
-    var facetFieldNames = $.map(self.facets(), function(facet) {
-      return facet.field();
-    });
-    return $.grep(self.fields(), function(field) {
-      return facetFieldNames.indexOf(field.name()) == -1;
-    });
+    return self.fields();
   });
 
   self.selectedDocument = ko.observable({});

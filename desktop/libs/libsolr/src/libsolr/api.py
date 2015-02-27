@@ -20,6 +20,8 @@ import json
 import logging
 import urllib
 
+from itertools import groupby
+
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -65,8 +67,18 @@ class SolrApi(object):
 
   def _get_fq(self, query):
     params = ()
+    
+    # Merge facets queries on same fields
+    grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
+    merged_fqs = []
+    for key, group in grouped_fqs:
+      field_fq = next(group)
+      for fq in group:
+        for f in fq['filter']:
+          field_fq['filter'].append(f)
+      merged_fqs.append(field_fq)
 
-    for fq in query['fqs']:
+    for fq in merged_fqs:
       if fq['type'] == 'field':
         # This does not work if spaces in Solr:
         # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
@@ -134,10 +146,14 @@ class SolrApi(object):
              ('f.%s.facet.mincount' % facet['field'], facet['properties']['mincount']),]
           )
         elif facet['type'] == 'field':
+          keys = {
+              'field': facet['field'],
+              'key': '%(field)s-%(id)s' % facet,
+              'limit': int(facet['properties'].get('limit', 10)) + 1,
+              'mincount': int(facet['properties']['mincount'])
+          }
           params += (
-              ('facet.field', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-              ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10)) + 1),
-              ('f.%s.facet.mincount' % facet['field'], int(facet['properties']['mincount'])),
+              ('facet.field', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s }%(field)s' % keys),
           )
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
