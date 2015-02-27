@@ -1942,6 +1942,10 @@ def get_link(oozie_id):
     link = reverse('oozie:list_oozie_workflow', kwargs={'job_id': oozie_id})
   elif oozie_id.endswith('C'):
     link = reverse('oozie:list_oozie_coordinator', kwargs={'job_id': oozie_id})
+  elif 'C@' in oozie_id:
+    link = reverse('oozie:list_oozie_coordinator', kwargs={'job_id': oozie_id.split('@')[0]})
+  elif 'B@' in oozie_id:
+    link = reverse('oozie:list_oozie_bundle', kwargs={'job_id': oozie_id.split('@')[0]})
 
   return link
 
