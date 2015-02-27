@@ -1196,6 +1196,6 @@ var ExtendedWidget = function (params) {
   self.ooziePropertiesExpanded = ko.observable(false);
   self.status = ko.observable("");
   self.progress = ko.observable(0);
-  self.logs = ko.observable("");
+  self.logsURL = ko.observable("");
   return self;
 }

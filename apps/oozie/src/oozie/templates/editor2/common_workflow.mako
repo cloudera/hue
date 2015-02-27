@@ -214,6 +214,10 @@
 
       <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
 
+      <!-- ko if: logsURL() != '' -->
+        <a class="pull-right pointer" data-bind="click: function(){ location.href = logsURL(); }"><i class="fa fa-tasks"></i></a>
+      <!-- /ko -->
+
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded() && ! ooziePropertiesExpanded()">
           <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>
