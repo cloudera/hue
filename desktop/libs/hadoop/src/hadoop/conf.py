@@ -149,7 +149,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   help="URL of the HistoryServer API"),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
-                  default=False,
+                  default=True,
                   type=coerce_bool)
     )
   )
