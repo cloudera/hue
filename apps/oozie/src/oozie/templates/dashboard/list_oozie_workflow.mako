@@ -530,6 +530,12 @@ ${ utils.slaGlobal() }
 
     // force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#graph") {
+        drawArrows();
+      }
+      else {
+        $("canvas").remove();
+      }
       if ($(e.target).attr("href") == "#definition") {
         codeMirror.refresh();
       }
@@ -681,8 +687,15 @@ ${ utils.slaGlobal() }
       });
     }
 
-    $(window).resize(function () {
-      resizeLogs();
+    var resizeTimeout = -1;
+    $(window).on("resize", function () {
+      window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(function () {
+        resizeLogs();
+        if ($("#graph").is(":visible")){
+          drawArrows();
+        }
+      }, 200);
     });
 
     $("a[href='#log']").on("shown", function () {
