@@ -821,21 +821,9 @@
   # Thrift version to use when communicating with HiveServer2.
   ## thrift_version=7
 
-  # The underlying mode of the Thrift Transport: socket or http
-  ## transport_mode=socket
-
   [[ssl]]
-    # SSL communication enabled for this server.
-    ## enabled=false
-
     # Path to Certificate Authority certificates.
     ## cacerts=/etc/hue/cacerts.pem
-
-    # Path to the private key file.
-    ## key=/etc/hue/key.pem
-
-    # Path to the public certificate file.
-    ## cert=/etc/hue/cert.pem
 
     # Choose whether Hue should validate certificates received from the server.
     ## validate=true
@@ -880,12 +868,6 @@
 
     # Path to Certificate Authority certificates.
     ## cacerts=/etc/hue/cacerts.pem
-
-    # Path to the private key file.
-    ## key=/etc/hue/key.pem
-
-    # Path to the public certificate file.
-    ## cert=/etc/hue/cert.pem
 
     # Choose whether Hue should validate certificates received from the server.
     ## validate=true

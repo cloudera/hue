@@ -100,13 +100,6 @@ SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),
   members=dict(
-    ENABLED = Config(
-      key="enabled",
-      help=_t("SSL communication enabled for this server."),
-      type=coerce_bool,
-      default=False
-    ),
-
     CACERTS = Config(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
@@ -116,16 +109,16 @@ SSL = ConfigSection(
 
     KEY = Config(
       key="key",
-      help=_t("Path to the private key file."),
+      help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
       type=str,
-      default="/etc/hue/key.pem"
+      default=None
     ),
 
     CERT = Config(
       key="cert",
-      help=_t("Path to the public certificate file."),
+      help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
       type=str,
-      default="/etc/hue/cert.pem"
+      default=None
     ),
 
     VALIDATE = Config(
