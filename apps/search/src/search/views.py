@@ -81,9 +81,12 @@ def new_search(request):
          'layout': [
               {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+                  {"size":12,"name":"Filter Bar","widgetType":"filter-widget",
+                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
+                                 {"widgets":[
+                  {"size":12,"name":"Grid Results","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-              "drops":["temp"],"klass":"card card-home card-column span10"}
+                 "drops":["temp"],"klass":"card card-home card-column span10"},
          ]
      }),
     'is_owner': True
