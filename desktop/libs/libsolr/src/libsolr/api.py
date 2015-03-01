@@ -149,7 +149,7 @@ class SolrApi(object):
           keys = {
               'field': facet['field'],
               'key': '%(field)s-%(id)s' % facet,
-              'limit': int(facet['properties'].get('limit', 10)) + 1,
+              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
               'mincount': int(facet['properties']['mincount'])
           }
           params += (
