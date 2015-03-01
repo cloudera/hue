@@ -445,7 +445,7 @@ def pairwise2(field, cat, fq_filter, iterable):
     })
   return pairs
 
-def range_pair(cat, fq_filter, iterable, end, collection_facet):
+def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
@@ -477,7 +477,7 @@ def range_pair(cat, fq_filter, iterable, end, collection_facet):
     total_counts += counts.pop(0)
 
     pairs.append({
-        'field': cat, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
+        'field': field, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
         'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element]),
         'is_single_unit_gap': is_single_unit_gap,
         'total_counts': total_counts,
@@ -518,14 +518,14 @@ def augment_solr_response(response, collection, query):
         }
         normalized_facets.append(facet)
       elif (category == 'range' or category == 'range-up') and response['facet_counts']['facet_ranges']:
-        name = facet['field']
+        name = NAME % facet
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(name, selected_values.get((facet['id'], name, category), []), counts, end, collection_facet)
+        counts = range_pair(facet['field'], name, selected_values.get((facet['id'], name, category), []), counts, end, collection_facet)
         facet = {
           'id': collection_facet['id'],
-          'field': name,
+          'field': facet['field'],
           'type': category,
           'label': collection_facet['label'],
           'counts': counts,
