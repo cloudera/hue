@@ -67,7 +67,7 @@ class SolrApi(object):
 
   def _get_fq(self, query):
     params = ()
-    
+
     # Merge facets queries on same fields
     grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
     merged_fqs = []
@@ -138,12 +138,16 @@ class SolrApi(object):
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
         elif facet['type'] == 'range' or facet['type'] == 'range-up':
-          params += tuple([
-             ('facet.range', '{!ex=%s}%s' % (facet['field'], facet['field'])),
-             ('f.%s.facet.range.start' % facet['field'], facet['properties']['start']),
-             ('f.%s.facet.range.end' % facet['field'], facet['properties']['end']),
-             ('f.%s.facet.range.gap' % facet['field'], facet['properties']['gap']),
-             ('f.%s.facet.mincount' % facet['field'], facet['properties']['mincount']),]
+          keys = {
+              'field': facet['field'],
+              'key': '%(field)s-%(id)s' % facet,
+              'start': facet['properties']['start'],
+              'end': facet['properties']['end'],
+              'gap': facet['properties']['gap'],
+              'mincount': int(facet['properties']['mincount'])
+          }
+          params += (
+             ('facet.range', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'field':
           keys = {
@@ -153,7 +157,7 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
           params += (
-              ('facet.field', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s }%(field)s' % keys),
+              ('facet.field', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
