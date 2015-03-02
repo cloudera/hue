@@ -49,7 +49,7 @@ class Credentials(object):
 
   def get_properties(self, metastore=None):
     credentials = {}
-    from beeswax import hive_site
+    from beeswax import hive_site, conf
 
     if metastore is None:
       metastore = hive_site.get_metastore()
@@ -70,7 +70,7 @@ class Credentials(object):
       'xml_name': self.hiveserver2_name,
       'properties': [
          ('hive2.jdbc.url', hive_site.hiveserver2_jdbc_url()),
-         ('hive2.server.principal', metastore.get('kerberos_principal')),
+         ('hive2.server.principal', hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())),
       ]
     }
 
