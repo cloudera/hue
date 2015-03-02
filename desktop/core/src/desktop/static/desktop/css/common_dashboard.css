@@ -173,9 +173,9 @@
 }
 
 .layout-box i {
-  color: #333;
+  color: #666;
   font-size: 28px;
-  line-height: 48px;
+  line-height: 54px;
 }
 
 .layout-container:hover .layout-box {
