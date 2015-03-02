@@ -54,13 +54,6 @@ object PythonSession {
 
     val process = builder.start()
 
-    /*
-    val fakeShell = createFakeShell()
-    val pb = new ProcessBuilder(driver, fakeShell.toString)
-    pb.redirectError(Redirect.INHERIT)
-    val process = pb.start()
-    */
-
     new PythonSession(process, gatewayServer)
   }
 
@@ -226,58 +219,3 @@ private case class ExecuteRequest(code: String, promise: Promise[JValue]) extend
 private case class ShutdownRequest(promise: Promise[Unit]) extends Request
 
 case class ExecuteResponse(content: JValue)
-
-/*
-private class Interpreter(process: Process, in: InputStream, out: OutputStream) extends Session {
-  private implicit def executor: ExecutionContext = ExecutionContext.global
-
-  implicit val formats = DefaultFormats
-
-  private val stdin = new PrintWriter(out)
-  private val stdout = new BufferedReader(new InputStreamReader(in), 1)
-
-  private var _history = ArrayBuffer[JValue]()
-  private var _state: Session.State = Session.Starting()
-
-  override def state = _state
-
-  override def history(): Seq[JValue] = _history
-
-  override def history(id: Int): Option[JValue] = {
-    if (id < _history.length) {
-      Some(_history(id))
-    } else {
-      None
-    }
-  }
-
-  override def execute(executeRequest: ExecuteRequest): Future[JValue] = {
-    _state = Session.Busy()
-
-    val msg = Map(
-      "msg_type" -> "execute_request",
-      "content" -> executeRequest)
-
-    stdin.println(write(msg))
-    stdin.flush()
-
-    Future {
-      val line = stdout.readLine()
-      val rep = parse(line)
-      assert((rep \ "msg_type").extract[String] == "execute_reply")
-
-      val content = rep \ "content"
-      _history += content
-      content
-    }
-  }
-
-  override def close(): Future[Unit] = {
-    _state = Session.ShuttingDown()
-    process.getInputStream.close()
-    process.getOutputStream.close()
-    process.destroy()
-    Future.successful(())
-  }
-}
-*/
