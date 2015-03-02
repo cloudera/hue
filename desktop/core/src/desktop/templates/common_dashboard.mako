@@ -53,7 +53,7 @@
     </a>
     <a data-bind="visible: columns().length == 0" href="javascript: magicLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px;"><i class="fa fa-magic"></i></div>
+        <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
     </a>
   </div>
@@ -95,16 +95,24 @@
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneSixthLeft'">
       <div class="span2 preview-row"></div>
-      <div class="span10 preview-row"></div>
+      <div class="span10 preview-row">
+        <div style="font-size: 80px; padding-top: 120px">${ _('Two columns layout') }</div>
+      </div>
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
       <div class="span12 preview-row">
+        <div style="font-size: 80px; padding-top: 120px">${ _('One column layout') }</div>
       </div>
     </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
-      <div class="span12 preview-row">
-        <div style="text-align: center; color:#EEE; font-size: 180px; margin-top: 80px">
-          <i class="fa fa-magic"></i>
+      <div class="span2 preview-row"></div>
+      <div class="span10">
+        <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
+          <i class="fa fa-filter"></i>
+        </div>
+        <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
+          <i class="fa fa-table" style="font-size: 120px"></i><br/>
+          <div style="font-size: 80px; padding-top: 20px">${ _('Grid results') }</div>
         </div>
       </div>
     </div>

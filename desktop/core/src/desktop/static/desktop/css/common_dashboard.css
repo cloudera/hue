@@ -122,6 +122,8 @@
   background-color: #f9f9f9;
   min-height: 400px !important;
   margin-top: 30px;
+  text-align: center;
+  color:#EEE;
 }
 
 .toolbar-label {
