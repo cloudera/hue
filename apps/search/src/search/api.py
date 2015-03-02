@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
-def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
+def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None, use_today=False):
   try:
     if widget_type == 'pie-widget':
       SLOTS = 5
@@ -71,7 +71,10 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     elif re.match('\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d?\d?)?Z', stat_facet['min']):
       is_date = True
       stats_min = stat_facet['min']
-      stats_max = stat_facet['max']
+      if use_today:
+        stats_max = datetime.today().strftime('%Y-%m-%dT%H:%M:%SZ')
+      else:
+        stats_max = stat_facet['max']
       if start is None:
         start = stats_min
       start = re.sub('\.\d\d?\d?Z$', 'Z', start)
@@ -128,7 +131,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
     properties.update({
       'min': stats_min,
-      'max': stats_max,
+      'max': max(stats_max, end),
       'start': start,
       'end': end,
       'gap': gap,
@@ -169,9 +172,9 @@ def _guess_gap(solr_api, collection, facet, start=None, end=None):
   return properties
 
 
-def _new_range_facet(solr_api, collection, facet_field, widget_type):
+def _new_range_facet(solr_api, collection, facet_field, widget_type, use_today=False):
   properties = {}
-  _guess_range_facet(widget_type, solr_api, collection, facet_field, properties)
+  _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, use_today=use_today)
   return properties
 
 

@@ -328,11 +328,12 @@ ko.bindingHandlers.daterangepicker = {
             '</div>' +
             '<div class="facet-field-cnt picker">' +
             '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.INTERVAL + '</div>' +
-            '<div class="input-prepend input-group"><span class="add-on input-group-addon"><i class="fa fa-repeat"></i></span></div>&nbsp;' +
+            '<div class="input-prepend input-group"><span class="add-on input-group-addon"><i class="fa fa-repeat"></i></span>&nbsp;' +
             '<select class="input-small interval-select" style="margin-right: 6px">' +
             renderOptions(_intervalOptions) +
             '</select>' +
             '<input class="input interval hide" type="hidden" value="" />' +
+            '</div>' +
             '</div>' +
             '<div class="facet-field-cnt picker">' +
             '<div class="facet-field-label facet-field-label-fixed-width"></div>' +

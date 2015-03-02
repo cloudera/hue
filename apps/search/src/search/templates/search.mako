@@ -162,6 +162,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+                    draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Text Facet')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-calendar"></i>
+         </a>
+    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -293,7 +302,7 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: type() == 'range' || type() == 'range-up' -->
+    <!-- ko if: type() == 'range' || (type() == 'range-up' && ! properties.isMathDate())-->
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
@@ -301,6 +310,33 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
         <br/>
       <!-- /ko -->
+    <!-- /ko -->
+    
+    <!-- ko if: properties.isDate() && type() == 'range-up' -->
+      Show from today <input type="checkbox" data-bind="checked: properties.isMathDate" />
+      
+      <!-- ko if: properties.isMathDate() -->  
+      <br/>
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('intervals') }
+          </span>
+        </span>
+      </div>      
+ of
+      <input type="text" class="input-medium" data-bind="spinedit: properties.math_gap"/>
+      <input type="text" class="input-medium" data-bind="value: properties.math_interval"/>      
+      <br/>
+      custom format <input type="checkbox" data-bind="checked: properties.isCustom" />
+      
+      <span data-bind="visible: properties.isCustom">
+        Start <input type="text" class="input-medium" data-bind="value: properties.math_start"/>
+        End <input type="text" class="input-medium" data-bind="value: properties.math_end"/>
+      </span>
+    <!-- /ko -->  
+
     <!-- /ko -->
 
     <!-- ko if: type() == 'field' -->
@@ -421,36 +457,56 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
-              <!-- ko if: ! selected -->
-                <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
-                <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
-                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
-              <!-- /ko -->
-              <!-- ko if: selected -->
-                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
-                  <strong data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to"></strong>
-                  <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
-                  <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
-                </span>
-              <!-- /ko -->
+            <!-- ko if: ! selected -->
+              <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+              <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+              <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+            <!-- /ko -->
+            <!-- ko if: selected -->
+              <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+                <strong data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to"></strong>
+                <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+              </span>
+            <!-- /ko -->
           </div>
         </div>
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
-              <!-- ko if: ! selected -->
-                <a class="pointer" data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less'), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></a>
-                <span class="pointer counter" data-bind="text: ' (' + $data.total_counts + ')', click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></span>
-                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
-              <!-- /ko -->
-              <!-- ko if: selected -->
-                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }">
-                  <strong data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less')"></strong>
-                  <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
-                  <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
-                </span>
-              <!-- /ko -->
+            <!-- ko if: ! selected -->
+              <a class="pointer" data-bind="attr: {title: $data.from}, text: function() {
+                 if ($parent.properties.math_gap() != 1 || ! $parent.properties.isMathDate()) {
+                   return $data.from + ($data.is_up ? ' & Up' : ' & Less');
+                 } else {
+                   if ($parent.properties.sort() == 'desc') {
+                     return 'More than ' + ($parents[1].counts.length - $index() - 1) + ' ' + $parent.properties.math_interval() + ' ago';
+                   } else {
+                     return 'Past ' + ($index() + 1) + ' ' + $parent.properties.math_interval();
+                   }
+                 }
+               }(), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></a>
+              <span class="pointer counter" data-bind="text: ' (' + $data.total_counts + ')', click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></span>
+              <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+            <!-- /ko -->
+            <!-- ko if: selected -->
+              <span class="pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }">
+                <strong data-bind="text: function() {
+                 if (! $parent.properties.math_gap() != 1 || ! $parent.properties.isMathDate()) {
+                   return $data.from + ($data.is_up ? ' & Up' : ' & Less');
+                 } else {
+                   if ($parent.properties.sort() == 'desc') {
+                     return 'More than ' + ($parents[1].counts.length - $index() - 1) + ' ' + $parent.properties.math_interval() + ' ago';
+                   } else {
+                     return 'Past ' + ($index() + 1) + ' ' + $parent.properties.math_interval();
+                   }
+                 }
+               }()"></strong>
+                <a class="pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                <a class="pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+              </span>
+            <!-- /ko -->
           </div>
         </div>
       <!-- /ko -->

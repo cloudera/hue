@@ -1270,7 +1270,7 @@
           <span data-bind="text: permissions"/>
           <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
           <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _('recursivelt') }'"/>
+          <span data-bind="visible: recursive, text: '${ _('recursively') }'"/>
         </li>
       </ul>
 
