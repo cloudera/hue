@@ -409,6 +409,24 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       });
     }
 
+    function getParentImage(parentUrl) {
+      var _sub = parentUrl[parentUrl.length - 2];
+      switch (_sub) {
+        case "W":
+          return "${static("oozie/art/icon_oozie_workflow_48.png")}"
+          break;
+        case "C":
+          return "${static("oozie/art/icon_oozie_coordinator_48.png")}"
+          break;
+        case "B":
+          return "${static("oozie/art/icon_oozie_bundle_48.png")}"
+          break;
+        default:
+          return "${static("oozie/art/icon_oozie_48.png")}";
+          break;
+      }
+    }
+
     function refreshCompleted() {
       $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
         completedTable.fnClearTable();
@@ -416,18 +434,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           var wf = new Workflow(item);
           try {
             completedTable.fnAddData([
-              '<span data-sort-value="'+ wf.endTimeInMillis +'" data-type="date">' + emptyStringIfNull(wf.endTime) + '</span>',
-              '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', decodeURIComponent(wf.appName),
-              '<span data-sort-value="'+ wf.durationInMillis +'">' + emptyStringIfNull(wf.duration) + '</span>',
+                  '<span data-sort-value="' + wf.endTimeInMillis + '" data-type="date">' + emptyStringIfNull(wf.endTime) + '</span>',
+                  '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', decodeURIComponent(wf.appName),
+                  '<span data-sort-value="' + wf.durationInMillis + '">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
-              '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-              wf.parentUrl == ''? '':
-              wf.parentUrl[wf.parentUrl.length-2] == 'W' ?
-                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_workflow_24.png")}"/> </a>' :
-              wf.parentUrl[wf.parentUrl.length-2] == 'C' ?
-                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_coordinator_24.png")}"/> </a>' :
-              wf.parentUrl[wf.parentUrl.length-2] == 'B' ?
-                '<a href="' + wf.parentUrl + '"> <img src="${static("oozie/art/icon_oozie_bundle_24.png")}"/> </a>' : ''
+                  '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+                  wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>'
             ], false);
           }
           catch (error) {
