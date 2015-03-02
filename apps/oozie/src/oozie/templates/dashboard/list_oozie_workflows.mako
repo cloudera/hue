@@ -74,11 +74,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
           <th width="14%">${ _('Submission') }</th>
           <th width="5%">${ _('Status') }</th>
-          <th width="21%">${ _('Name') }</th>
+          <th width="31%">${ _('Name') }</th>
           <th width="7%">${ _('Progress') }</th>
           <th width="7%">${ _('Submitter') }</th>
           <th width="7%">${ _('Last Modified') }</th>
-          <th width="20%">${ _('Id') }</th>
+          <th width="23%">${ _('Id') }</th>
           <th width="5%">${ _('Parent') }</th>
         </tr>
       </thead>
@@ -106,7 +106,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <tr>
           <th width="15%">${ _('Completion') }</th>
           <th width="7%">${ _('Status') }</th>
-          <th width="25%">${ _('Name') }</th>
+          <th width="31%">${ _('Name') }</th>
           <th width="7%">${ _('Duration') }</th>
           <th width="10%">${ _('Submitter') }</th>
           <th width="25%">${ _('Id') }</th>
