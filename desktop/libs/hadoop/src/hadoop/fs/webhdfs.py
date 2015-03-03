@@ -34,7 +34,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from hadoop.hdfs_site import get_nn_sentry_prefixes
+from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode
 
 import hadoop.conf
 import desktop.conf
@@ -86,7 +86,7 @@ class WebHdfs(Hdfs):
                logical_name=hdfs_config.LOGICAL_NAME.get(),
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
                temp_dir=hdfs_config.TEMP_DIR.get(),
-               umask=hdfs_config.UMASK.get())
+               umask=get_umask_mode())
 
   def __str__(self):
     return "WebHdfs at %s" % self._url
