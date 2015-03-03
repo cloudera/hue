@@ -728,12 +728,6 @@ SEND_DBUG_MESSAGES = Config(
   default=False
 )
 
-DATABASE_LOGGING = Config(
-  key="database_logging",
-  help=_("If true, log all database requests."),
-  type=coerce_bool,
-  default=False)
-
 DJANGO_ADMINS = UnspecifiedConfigSection(
   key="django_admins",
   help=_("Administrators that should receive error emails."),
