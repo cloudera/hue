@@ -18,6 +18,8 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+
+  from oozie.conf import ENABLE_V2
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -64,16 +66,26 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
         % if bundle:
             <li class="nav-header">${ _('Coordinators') }</li>
-          % for bundled in bundle.coordinators.distinct():
-            <li rel="tooltip" title="${ bundled.coordinator.name }" class="white">
-              <a href="${ bundled.coordinator.get_absolute_url() }">
-                <i class="fa fa-eye"></i> <span class="dataset">${ bundled.coordinator.name }</span>
-              </a>
-            </li>
-          % endfor
+          % if not ENABLE_V2.get():
+            % for bundled in bundle.coordinators.distinct():
+              <li rel="tooltip" title="${ bundled.coordinator.name }" class="white">
+                <a href="${ bundled.coordinator.get_absolute_url() }">
+                  <i class="fa fa-eye"></i> <span class="dataset">${ bundled.coordinator.name }</span>
+                </a>
+              </li>
+            % endfor
+          % else:
+             % for coord in bundle.get_coordinator_objects():
+              <li rel="tooltip" title="${ coord.name }" class="white">
+                <a href="${ coord.get_absolute_url() }">
+                  <i class="fa fa-eye"></i> <span class="dataset">${ coord.name }</span>
+                </a>
+              </li>
+            % endfor
+          % endif
         % endif
 
-        % if has_job_edition_permission(oozie_bundle, user):
+        % if has_job_edition_permission(oozie_bundle, user) and oozie_bundle.status not in ('KILLED', 'FAILED'):
           <li class="nav-header">${ _('Manage') }</li>
           <li class="white">
             <button title="${_('Kill %(bundle)s') % dict(bundle=oozie_bundle.id)}"
@@ -91,7 +103,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
                 ${_('Kill')}
             </button>
             <button class="btn btn-small
-               % if oozie_bundle.is_running() or oozie_bundle.status in ('KILLED', 'FAILED'):
+               % if oozie_bundle.status in ('KILLED', 'FAILED'):
                  hide
                % endif
             "

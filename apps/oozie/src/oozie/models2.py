@@ -1881,13 +1881,20 @@ class Bundle(Job):
     if mapping is None:
       mapping = {}
 
-    mapping.update(dict(list(Document2.objects.filter(type='oozie-coordinator2', uuid__in=self.data['coordinators']).values('uuid', 'name'))))
+    mapping.update(dict(list(self.get_coordinator_docs().values('uuid', 'name'))))
     tmpl = "editor2/gen/bundle.xml.mako"
     return force_unicode(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping
            })))
+
+  def get_coordinator_docs(self):
+    coordinator_ids = [coordinator['coordinator'] for coordinator in self.data['coordinators']]
+    return Document2.objects.filter(type='oozie-coordinator2', uuid__in=coordinator_ids)
+
+  def get_coordinator_objects(self):
+    return [Coordinator(document=doc) for doc in self.get_coordinator_docs()]
 
   @property
   def name(self):
@@ -1909,7 +1916,21 @@ class Bundle(Job):
     return self.data['properties']['deployment_dir']
 
   def find_parameters(self):
-    return {}
+    params = set()
+
+    for param in find_dollar_braced_variables(self.name):
+      params.add(param)
+
+    for coord in self.get_coordinator_objects():
+      params.update(coord.find_parameters())
+
+    for param in find_json_parameters([self.data['properties']]):
+      params.add(param)
+
+    return dict([(param, '') for param in list(params)])
+
+  def get_absolute_url(self):
+    return reverse('oozie:edit_bundle') + '?bundle=%s' % self.id
 
   @classmethod
   def get_application_path_key(cls):
@@ -1931,5 +1952,13 @@ class History(object):
     try:
       doc = Document2.objects.get(type='oozie-coordinator2', id=conf_dict.get(Coordinator.HUE_ID))
       return Coordinator(document=doc)
+    except Document2.DoesNotExist:
+      pass
+
+  @classmethod
+  def get_bundle_from_config(self, conf_dict):
+    try:
+      doc = Document2.objects.get(type='oozie-bundle2', id=conf_dict.get(Bundle.HUE_ID))
+      return Bundle(document=doc)
     except Document2.DoesNotExist:
       pass
