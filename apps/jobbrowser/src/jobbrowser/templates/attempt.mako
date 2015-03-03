@@ -132,6 +132,26 @@ ${ comps.menubar() }
                   <td>${_('Output Size')}</td>
                   <td>${attempt.outputSize}</td>
                 </tr>
+                % if not attempt.is_mr2:
+                <tr>
+                  <td>${_('Shuffle Finish')}</td>
+                  <td>${attempt.shuffleFinishTimeFormatted}</td>
+                </tr>
+                <tr>
+                  <td>${_('Sort Finish')}</td>
+                  <td>${attempt.sortFinishTimeFormatted}</td>
+                </tr>
+                <tr>
+                  <td>${_('Map Finish')}</td>
+                  <td>${attempt.mapFinishTimeFormatted}</td>
+                </tr>
+                % endif
+                % if attempt.is_mr2:
+                  <tr>
+                    <td>${_('Node Address')}</td>
+                    <td>${attempt.nodeHttpAddress}</td>
+                  </tr>
+                % endif
                 </tbody>
               </table>
             </div>
