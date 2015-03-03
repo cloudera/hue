@@ -121,7 +121,6 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = [
     # The order matters
     'desktop.middleware.EnsureSafeMethodMiddleware',
-    'desktop.middleware.DatabaseLoggingMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

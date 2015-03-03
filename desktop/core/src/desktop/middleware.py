@@ -365,26 +365,6 @@ class AuditLoggingMiddleware(object):
     return response
 
 
-class DatabaseLoggingMiddleware(object):
-  """
-  If configured, logs database queries for every request.
-  """
-  DATABASE_LOG = logging.getLogger("desktop.middleware.DatabaseLoggingMiddleware")
-
-  def __init__(self):
-    if not desktop.conf.DATABASE_LOGGING.get():
-      LOG.info('Unloading DatabaseLoggingMiddleware')
-      raise exceptions.MiddlewareNotUsed
-
-  def process_response(self, request, response):
-    if desktop.conf.DATABASE_LOGGING.get():
-      if self.DATABASE_LOG.isEnabledFor(logging.INFO):
-          # This only exists if desktop.settings.DEBUG is true, hence the use of getattr
-          for query in getattr(django.db.connection, "queries", []):
-            self.DATABASE_LOG.info("(%s) %s" % (query["time"], query["sql"]))
-    return response
-
-
 try:
   import tidylib
   _has_tidylib = True
