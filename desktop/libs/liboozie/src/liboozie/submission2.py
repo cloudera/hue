@@ -146,7 +146,7 @@ class Submission(object):
       self._update_properties(jt_address) # Needed for coordinator deploying workflows with credentials
 
     oozie_xml = self.job.to_xml(self.properties)
-    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
+    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml, self.properties)
 
     if hasattr(self.job, 'actions'):
       for action in self.job.actions:
@@ -255,7 +255,7 @@ class Submission(object):
 
     return path
 
-  def _copy_files(self, deployment_dir, oozie_xml):
+  def _copy_files(self, deployment_dir, oozie_xml, oozie_properties):
     """
     Copy XML and the jar_path files from Java or MR actions to the deployment directory.
     This should run as the workflow user.
@@ -263,6 +263,10 @@ class Submission(object):
     xml_path = self.fs.join(deployment_dir, self.job.XML_FILE_NAME)
     self.fs.create(xml_path, overwrite=True, permission=0644, data=smart_str(oozie_xml))
     LOG.debug("Created %s" % (xml_path,))
+
+    properties_path = self.fs.join(deployment_dir, 'job.properties')
+    self.fs.create(properties_path, overwrite=True, permission=0644, data=smart_str('\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()])))
+    LOG.debug("Created %s" % (properties_path,))
 
     # List jar files
     files = []
