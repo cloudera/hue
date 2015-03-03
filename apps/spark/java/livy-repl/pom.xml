@@ -96,6 +96,7 @@
                     <systemProperties>
                         <spark.master>local</spark.master>
                         <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
+                        <settings.usejavacp.value>true</settings.usejavacp.value>
                     </systemProperties>
                 </configuration>
             </plugin>

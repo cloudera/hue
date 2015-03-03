@@ -11,6 +11,7 @@ import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
 
+import _root_.scala.annotation.tailrec
 import _root_.scala.concurrent.duration._
 import _root_.scala.concurrent.{Await, ExecutionContext}
 
@@ -56,10 +57,11 @@ object Main extends Logging {
 
     server.start()
 
-    println("Starting livy-repl on port %s" format server.port)
-    System.setProperty("livy.repl.url", s"http://${server.host}:${server.port}")
-
     try {
+      val replUrl = s"http://${server.host}:${server.port}"
+      println(s"Starting livy-repl on $replUrl")
+      System.setProperty("livy.repl.url", replUrl)
+
       server.join()
       server.stop()
     } finally {
@@ -90,29 +92,45 @@ class ScalatraBootstrap extends LifeCycle with Logging {
       .orElse(sys.env.get("LIVY_CALLBACK_URL"))
 
     // See if we want to notify someone that we've started on a url
-    callbackUrl.foreach { case callbackUrl_ =>
-      info(s"Notifying $callbackUrl_ that we're up")
-
-      Future {
-        session.waitForStateChange(Session.Starting())
-
-        val replUrl = System.getProperty("livy.repl.url")
-        var req = url(callbackUrl_).setContentType("application/json", "UTF-8")
-        req = req << write(Map("url" -> replUrl))
-
-        val rep = Http(req OK as.String)
-        rep.onFailure {
-          case _ => System.exit(1)
-        }
-
-        Await.result(rep, 10 seconds)
-      }
-    }
+    callbackUrl.foreach(notifyCallback)
   }
 
   override def destroy(context: ServletContext): Unit = {
     if (session != null) {
       Await.result(session.close(), Duration.Inf)
+    }
+  }
+
+  private def notifyCallback(callbackUrl: String): Unit = {
+    info(s"Notifying $callbackUrl that we're up")
+
+    Future {
+      session.waitForStateChange(Session.Starting())
+
+      // Wait for our url to be discovered.
+      val replUrl = waitForReplUrl()
+
+      var req = url(callbackUrl).setContentType("application/json", "UTF-8")
+      req = req << write(Map("url" -> replUrl))
+
+      val rep = Http(req OK as.String)
+      rep.onFailure {
+        case _ => System.exit(1)
+      }
+
+      Await.result(rep, 10 seconds)
+    }
+  }
+
+  /** Spin until The server may start up  */
+  @tailrec
+  private def waitForReplUrl(): String = {
+    val replUrl = System.getProperty("livy.repl.url")
+    if (replUrl == null) {
+      Thread.sleep(10)
+      waitForReplUrl()
+    } else {
+      replUrl
     }
   }
 }

@@ -1,14 +1,12 @@
 package com.cloudera.hue.livy.server.sessions
 
 import java.lang.ProcessBuilder.Redirect
-import java.net.URL
 
-import com.cloudera.hue.livy.{Utils, Logging}
-import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
+import com.cloudera.hue.livy.{Logging, Utils}
 
-import scala.annotation.tailrec
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
-import scala.io.Source
 
 object ProcessSession extends Logging {
   def create(id: String, lang: String): Session = {
@@ -18,15 +16,26 @@ object ProcessSession extends Logging {
 
   // Loop until we've started a process with a valid port.
   private def startProcess(id: String, lang: String): Process = {
-    val pb = new ProcessBuilder(
+    val args = ArrayBuffer(
       "spark-submit",
-      "--class", "com.cloudera.hue.livy.repl.Main",
-      Utils.jarOfClass(getClass).head,
-      lang)
+      "--class",
+      "com.cloudera.hue.livy.repl.Main"
+    )
+
+    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach { case javaOpts =>
+      args += "--driver-java-options"
+      args += javaOpts
+    }
+
+    args += Utils.jarOfClass(getClass).head
+    args += lang
+
+    val pb = new ProcessBuilder(args)
 
     val callbackUrl = System.getProperty("livy.server.callback-url")
     pb.environment().put("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
     pb.environment().put("LIVY_PORT", "0")
+
 
     pb.redirectOutput(Redirect.INHERIT)
     pb.redirectError(Redirect.INHERIT)

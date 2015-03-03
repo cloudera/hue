@@ -35,6 +35,7 @@ private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.
 
   override def state: State = {
     session.state match {
+      case repl.Session.NotStarted() => NotStarted()
       case repl.Session.Starting() => Starting()
       case repl.Session.Idle() => Idle()
       case repl.Session.Busy() => Busy()

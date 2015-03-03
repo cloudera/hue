@@ -1,189 +1,98 @@
 package com.cloudera.hue.livy.repl.scala.interpreter
 
-import java.io.{StringWriter, BufferedReader, StringReader}
-import java.util.concurrent.SynchronousQueue
+import java.io._
 
-import org.apache.spark.repl.SparkILoop
+import org.apache.spark.repl.SparkIMain
 
-import scala.annotation.tailrec
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.tools.nsc.SparkHelper
-import scala.tools.nsc.interpreter.{Formatting, JPrintWriter}
-import scala.tools.nsc.util.ClassPath
+import scala.concurrent.ExecutionContext
+import scala.tools.nsc.Settings
+import scala.tools.nsc.interpreter.{JPrintWriter, Results}
+
 
 object Interpreter {
   sealed trait State
+  case class NotStarted() extends State
   case class Starting() extends State
   case class Idle() extends State
   case class Busy() extends State
   case class ShuttingDown() extends State
 }
 
+sealed abstract class ExecuteResponse(executeCount: Int)
+case class ExecuteComplete(executeCount: Int, output: String) extends ExecuteResponse(executeCount)
+case class ExecuteIncomplete(executeCount: Int, output: String) extends ExecuteResponse(executeCount)
+case class ExecuteError(executeCount: Int, output: String) extends ExecuteResponse(executeCount)
+
 class Interpreter {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
-  private val queue = new SynchronousQueue[Request]()
-
-  // We start up the ILoop in it's own class loader because the SparkILoop store
-  // itself in a global variable.
-  private val iloop = {
-    val classLoader = new ILoopClassLoader(classOf[Interpreter].getClassLoader)
-    val cls = classLoader.loadClass(classOf[ILoop].getName)
-    val constructor = cls.getConstructor(classOf[SynchronousQueue[Request]])
-    constructor.newInstance(queue).asInstanceOf[ILoop]
-  }
-
-  // We also need to start the ILoop in it's own thread because it wants to run
-  // inside a loop.
-  private val thread = new Thread {
-    override def run() = {
-      val args = Array("-usejavacp")
-      iloop.process(args)
-    }
-  }
-
-  thread.start()
-
-  def state = iloop.state
-
-  def execute(code: String): Future[ExecuteResponse] = {
-    val promise = Promise[ExecuteResponse]()
-    queue.put(ExecuteRequest(code, promise))
-    promise.future
-  }
-
-  def shutdown(): Future[Unit] = {
-    val promise = Promise[Unit]()
-    queue.put(ShutdownRequest(promise))
-    promise.future.map({ case () => thread.join() })
-  }
-}
-
-private class ILoopClassLoader(classLoader: ClassLoader) extends ClassLoader(classLoader) { }
-
-private sealed trait Request
-private case class ExecuteRequest(code: String, promise: Promise[ExecuteResponse]) extends Request
-private case class ShutdownRequest(promise: Promise[Unit]) extends Request
-
-case class ExecuteResponse(executionCount: Int, data: String)
-
-private class ILoop(queue: SynchronousQueue[Request], outWriter: StringWriter) extends SparkILoop(
-  new BufferedReader(new StringReader("")),
-  new JPrintWriter(outWriter)
-) {
-  def this(queue: SynchronousQueue[Request]) = this(queue, new StringWriter)
-
-  var _state: Interpreter.State = Interpreter.Starting()
-
-  var _executionCount = 0
+  private var _state: Interpreter.State = Interpreter.NotStarted()
+  private val outputStream = new ByteArrayOutputStream()
+  private var sparkIMain: SparkIMain = _
+  private var executeCount = 0
 
   def state = _state
 
-  org.apache.spark.repl.Main.interp = this
+  def start() = {
+    require(_state == Interpreter.NotStarted() && sparkIMain == null)
 
-  private class ILoopInterpreter extends SparkILoopInterpreter {
-    override lazy val formatting = new Formatting {
-      def prompt = ILoop.this.prompt
-    }
-    override protected def parentClassLoader = SparkHelper.explicitParentLoader(settings).getOrElse(classOf[SparkILoop].getClassLoader)
+    _state = Interpreter.Starting()
+
+    class InterpreterClassLoader(classLoader: ClassLoader) extends ClassLoader(classLoader) {}
+    val classLoader = new InterpreterClassLoader(classOf[Interpreter].getClassLoader)
+
+    val settings = new Settings()
+    settings.usejavacp.value = true
+
+    sparkIMain = createSparkIMain(classLoader, settings)
+
+    _state = Interpreter.Idle()
   }
 
-  /** Create a new interpreter. */
-  override def createInterpreter() {
-    require(settings != null)
-
-    if (addedClasspath != "") settings.classpath.append(addedClasspath)
-    // work around for Scala bug
-    val totalClassPath = SparkILoop.getAddedJars.foldLeft(
-      settings.classpath.value)((l, r) => ClassPath.join(l, r))
-    this.settings.classpath.value = totalClassPath
-
-    intp = new ILoopInterpreter
+  private def createSparkIMain(classLoader: ClassLoader, settings: Settings) = {
+    val out = new JPrintWriter(outputStream, true)
+    val cls = classLoader.loadClass(classOf[SparkIMain].getName)
+    val constructor = cls.getConstructor(classOf[Settings], classOf[JPrintWriter], java.lang.Boolean.TYPE)
+    constructor.newInstance(settings, out, false: java.lang.Boolean).asInstanceOf[SparkIMain]
   }
 
-  private val replayQuestionMessage =
-    """|That entry seems to have slain the compiler.  Shall I replay
-      |your session? I can re-run each line except the last one.
-      |[y/n]
-    """.trim.stripMargin
+  def execute(code: String): ExecuteResponse = {
+    synchronized {
+      executeCount += 1
 
-  private def crashRecovery(ex: Throwable): Boolean = {
-    echo(ex.toString)
-    ex match {
-      case _: NoSuchMethodError | _: NoClassDefFoundError =>
-        echo("\nUnrecoverable error.")
-        throw ex
-      case _  =>
-        def fn(): Boolean =
-          try in.readYesOrNo(replayQuestionMessage, { echo("\nYou must enter y or n.") ; fn() })
-          catch { case _: RuntimeException => false }
-
-        if (fn()) replay()
-        else echo("\nAbandoning crashed session.")
-    }
-    true
-  }
-
-  override def prompt = ""
-
-  override def loop(): Unit = {
-    def readOneLine() = queue.take()
-
-    // return false if repl should exit
-    def processLine(request: Request): Boolean = {
       _state = Interpreter.Busy()
 
-      if (isAsync) {
-        if (!awaitInitialized()) return false
-        runThunks()
+      val result = sparkIMain.interpret(code) match {
+        case Results.Success =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
+
+          ExecuteComplete(executeCount - 1, output)
+
+        case Results.Incomplete =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
+
+          ExecuteIncomplete(executeCount - 1, output)
+
+        case Results.Error =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
+          ExecuteError(executeCount - 1, output)
       }
 
-      request match {
-        case ExecuteRequest(statement, promise) =>
-          _executionCount += 1
-
-          command(statement) match {
-            case Result(false, _) => false
-            case Result(true, finalLine) =>
-              finalLine match {
-                case Some(line) => addReplay(line)
-                case None =>
-              }
-
-              var output = outWriter.getBuffer.toString
-
-              // Strip the trailing '\n'
-              output = output.stripSuffix("\n")
-
-              outWriter.getBuffer.setLength(0)
-
-              promise.success(ExecuteResponse(_executionCount - 1, output))
-
-              true
-          }
-        case ShutdownRequest(promise) =>
-          promise.success(())
-          false
-      }
-    }
-
-    @tailrec
-    def innerLoop() {
       _state = Interpreter.Idle()
 
-      outWriter.getBuffer.setLength(0)
-
-      val shouldContinue = try {
-        processLine(readOneLine())
-      } catch {
-        case t: Throwable => crashRecovery(t)
-      }
-
-      if (shouldContinue) {
-        innerLoop()
-      }
+      result
     }
+  }
 
-    innerLoop()
+  def shutdown(): Unit = {
+    _state = Interpreter.ShuttingDown()
+
+    if (sparkIMain != null) {
+      sparkIMain.close()
+      sparkIMain = null
+    }
   }
 }
