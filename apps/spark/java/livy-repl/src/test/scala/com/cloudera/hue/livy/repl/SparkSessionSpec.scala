@@ -79,5 +79,18 @@ class SparkSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
 
       result should equal (expectedResult)
     }
+
+    it("should capture stdout") {
+      val result = Await.result(session.execute("""println("Hello World")"""), Duration.Inf)
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "ok",
+        "execution_count" -> 0,
+        "data" -> Map(
+          "text/plain" -> "Hello World"
+        )
+      ))
+
+      result should equal (expectedResult)
+    }
   }
  }

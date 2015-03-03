@@ -62,23 +62,25 @@ class Interpreter {
 
       _state = Interpreter.Busy()
 
-      val result = sparkIMain.interpret(code) match {
-        case Results.Success =>
-          val output = outputStream.toString("UTF-8").trim
-          outputStream.reset()
+      val result = scala.Console.withOut(outputStream) {
+        sparkIMain.interpret(code) match {
+          case Results.Success =>
+            val output = outputStream.toString("UTF-8").trim
+            outputStream.reset()
 
-          ExecuteComplete(executeCount - 1, output)
+            ExecuteComplete(executeCount - 1, output)
 
-        case Results.Incomplete =>
-          val output = outputStream.toString("UTF-8").trim
-          outputStream.reset()
+          case Results.Incomplete =>
+            val output = outputStream.toString("UTF-8").trim
+            outputStream.reset()
 
-          ExecuteIncomplete(executeCount - 1, output)
+            ExecuteIncomplete(executeCount - 1, output)
 
-        case Results.Error =>
-          val output = outputStream.toString("UTF-8").trim
-          outputStream.reset()
-          ExecuteError(executeCount - 1, output)
+          case Results.Error =>
+            val output = outputStream.toString("UTF-8").trim
+            outputStream.reset()
+            ExecuteError(executeCount - 1, output)
+        }
       }
 
       _state = Interpreter.Idle()
