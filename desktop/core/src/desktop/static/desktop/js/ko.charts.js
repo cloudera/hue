@@ -303,6 +303,7 @@ ko.bindingHandlers.mapChart = {
     var _mapdata = {};
     var _maphovers = {};
     var _fills = {};
+    var _legend = [];
 
     var _noncountries = [];
 
@@ -333,14 +334,30 @@ ko.bindingHandlers.mapChart = {
             }
           });
         }
-        return _found;
+        return {
+          idx: _found,
+          cat: _cat
+        };
+      }
+
+      function addToLegend(category) {
+        var _found = false;
+        _legend.forEach(function (lg) {
+          if (lg.cat == category.cat) {
+            _found = true;
+          }
+        });
+        if (!_found) {
+          _legend.push(category);
+        }
       }
 
       $(_data).each(function (cnt, item) {
+        addToLegend(getHighestCategoryValue(cnt, item));
         var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
           _mapdata[_place] = {
-            fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item) : (Math.floor(item.value / _chunk) - 1)),
+            fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item).idx : (Math.floor(item.value / _chunk) - 1)),
             id: _place,
             cat: item.obj.cat,
             value: item.obj.values ? item.obj.values : item.obj.value,
@@ -386,6 +403,7 @@ ko.bindingHandlers.mapChart = {
         fills: fills,
         scope: _scope,
         data: mapData,
+        legendData: _legend,
         onClick: function (data) {
           if (typeof options.onClick != "undefined") {
             chartsUpdatingState();
@@ -443,6 +461,9 @@ ko.bindingHandlers.mapChart = {
       });
       if (options.onComplete != null) {
         options.onComplete();
+      }
+      if (_is2d) {
+        _map.legend();
       }
     }
 
