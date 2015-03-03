@@ -269,12 +269,12 @@ class TestRemoteUserLogin(object):
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO4"})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
-    assert_equal('FOO4', User.objects.all()[1].username)
+    assert_equal('foo4', User.objects.all()[1].username)
 
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo4"})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
-    assert_equal('FOO4', User.objects.all()[1].username)
+    assert_equal('foo4', User.objects.all()[1].username)
 
   def test_force_lower_case(self):
     self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
@@ -294,10 +294,14 @@ class TestRemoteUserLogin(object):
     assert_equal('foo3', User.objects.all()[0].username)
 
   def test_ignore_case_and_force_lower_case(self):
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_equal(1, len(User.objects.all()))
-    assert_equal('FOO3', User.objects.all()[0].username)
+    reset = conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(False)
+    try:
+      response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_equal(1, len(User.objects.all()))
+      assert_equal('FOO3', User.objects.all()[0].username)
+    finally:
+      reset()
 
     self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
     self.reset.append( conf.AUTH.IGNORE_USERNAME_CASE.set_for_testing(True) )
