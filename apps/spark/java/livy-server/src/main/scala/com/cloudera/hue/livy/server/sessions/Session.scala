@@ -9,6 +9,7 @@ import scala.concurrent.Future
 
 object Session {
   sealed trait State
+  case class NotStarted() extends State
   case class Starting() extends State
   case class Idle() extends State
   case class Busy() extends State

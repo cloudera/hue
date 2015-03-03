@@ -27,6 +27,7 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
 
   get("/") {
     val state = session.state match {
+      case Session.NotStarted() => "not_started"
       case Session.Starting() => "starting"
       case Session.Idle() => "idle"
       case Session.Busy() => "busy"
