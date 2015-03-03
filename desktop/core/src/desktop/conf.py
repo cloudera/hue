@@ -458,11 +458,11 @@ AUTH = ConfigSection(
     IGNORE_USERNAME_CASE = Config("ignore_username_case",
                                   help=_("Ignore the case of usernames when searching for existing users in Hue."),
                                   type=coerce_bool,
-                                  default=False),
+                                  default=True),
     FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
                                       help=_("Force usernames to lowercase when creating new users from LDAP."),
                                       type=coerce_bool,
-                                      default=False),
+                                      default=True),
     EXPIRES_AFTER = Config("expires_after",
                             help=_("Users will expire after they have not logged in for 'n' amount of seconds."
                                    "A negative number means that users will never expire."),
