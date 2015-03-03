@@ -118,6 +118,9 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
   private val thread = new Thread {
     override def run() = {
       waitUntilReady()
+
+      _state = Session.Idle()
+
       loop()
     }
 
@@ -132,10 +135,14 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
 
     @tailrec
     def loop(): Unit = {
-      _state = Session.Idle()
+      (_state, queue.take()) match {
+        case (Session.Error(), ExecuteRequest(code, promise)) =>
+          promise.failure(new Exception("session has been terminated"))
+          loop()
 
-      queue.take() match {
-        case ExecuteRequest(code, promise) =>
+        case (state, ExecuteRequest(code, promise)) =>
+          require(state == Session.Idle())
+
           _state = Session.Busy()
 
           val msg = Map(
@@ -148,6 +155,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
           val line = stdout.readLine()
           // The python process shut down
           if (line == null) {
+            _state = Session.Error()
             promise.failure(new Exception("session has been terminated"))
           } else {
             val rep = parse(line)
@@ -156,12 +164,16 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
             val content: JValue = rep \ "content"
             _history += content
 
-            promise.success(content)
+            _state = Session.Idle()
 
-            loop()
+            promise.success(content)
           }
 
-        case ShutdownRequest(promise) =>
+          loop()
+
+        case (_, ShutdownRequest(promise)) =>
+          require(state == Session.Idle() || state == Session.Error())
+
           _state = Session.ShuttingDown()
           process.getInputStream.close()
           process.getOutputStream.close()
@@ -192,7 +204,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
     promise.future
   }
 
-  override def close(): Future[Unit] = {
+  override def close(): Future[Unit] = synchronized {
     _state match {
       case Session.ShutDown() =>
         Future.successful(())
@@ -202,14 +214,12 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
           Future.successful(())
         }
       case _ =>
-        synchronized {
-          val promise = Promise[Unit]()
-          queue.put(ShutdownRequest(promise))
-          promise.future.map({ case () =>
-            thread.join()
-            gatewayServer.shutdown()
-          })
-        }
+        val promise = Promise[Unit]()
+        queue.put(ShutdownRequest(promise))
+        promise.future.map({ case () =>
+          thread.join()
+          gatewayServer.shutdown()
+        })
     }
   }
 }

@@ -30,6 +30,7 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
       case Session.Starting() => "starting"
       case Session.Idle() => "idle"
       case Session.Busy() => "busy"
+      case Session.Error() => "error"
       case Session.ShuttingDown() => "shutting_down"
       case Session.ShutDown() => "shut_down"
     }
