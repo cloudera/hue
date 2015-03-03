@@ -69,11 +69,15 @@ ${ comps.menubar() }
                       <th>${_('Task Tracker')}</th>
                       <th>${_('Start Time')}</th>
                       <th>${_('End Time')}</th>
-                      <th>${_('Output Size')}</th>
+                      % if task.is_mr2:
+                        <th>${_('Node Address')}</th>
+                      %endif
                       <th>${_('Phase')}</th>
-                      <th>${_('Shuffle Finish')}</th>
-                      <th>${_('Sort Finish')}</th>
-                      <th>${_('Map Finish')}</th>
+                      % if not task.is_mr2:
+                        <th>${_('Shuffle Finish')}</th>
+                        <th>${_('Sort Finish')}</th>
+                        <th>${_('Map Finish')}</th>
+                      % endif
                     </tr>
                   </thead>
                   <tbody>
@@ -92,11 +96,15 @@ ${ comps.menubar() }
                       </td>
                       <td>${attempt.startTimeFormatted}</td>
                       <td>${attempt.finishTimeFormatted}</td>
-                      <td>${attempt.outputSize}</td>
+                      % if task.is_mr2:
+                        <td>${attempt.nodeHttpAddress}</td>
+                      % endif
                       <td>${attempt.phase}</td>
-                      <td>${attempt.shuffleFinishTimeFormatted}</td>
-                      <td>${attempt.sortFinishTimeFormatted}</td>
-                      <td>${attempt.mapFinishTimeFormatted}</td>
+                      % if not task.is_mr2:
+                        <td>${attempt.shuffleFinishTimeFormatted}</td>
+                        <td>${attempt.sortFinishTimeFormatted}</td>
+                        <td>${attempt.mapFinishTimeFormatted}</td>
+                      % endif
                     </tr>
                   % endfor
                   </tbody>
