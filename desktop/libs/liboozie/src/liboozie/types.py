@@ -435,7 +435,7 @@ class Workflow(Job):
     return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self, full_node_list=None):
-    if self.status == 'SUCCEEDED':
+    if self.status in ('SUCCEEDED', 'KILLED'):
       return 100 # Case of decision nodes
     else:
       if full_node_list is not None:            # Should remove the un-reached branches if decision node

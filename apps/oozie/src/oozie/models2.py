@@ -65,10 +65,10 @@ class Job(object):
 
     for c in self.name[:40]:
       if not good_name:
-        if not re.match('[a-zA-Z_]', c):
+        if not re.match('[a-zA-Z_\{\$\}]', c):
           c = '_'
       else:
-        if not re.match('[\-_a-zA-Z0-9]', c):
+        if not re.match('[\-_a-zA-Z0-9\{\$\}]', c):
           c = '_'
       good_name.append(c)
 
@@ -227,6 +227,9 @@ class Workflow(Job):
   def find_parameters(self):
     params = set()
 
+    for param in find_dollar_braced_variables(self.name):
+      params.add(param)
+
     if self.sla_enabled:
       for param in find_json_parameters(self.sla):
         params.add(param)
@@ -257,6 +260,10 @@ class Workflow(Job):
 
   def get_absolute_url(self):
     return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
+
+  @classmethod
+  def get_application_path_key(cls):
+    return 'oozie.wf.application.path'
 
 
 class Node():
@@ -1625,6 +1632,9 @@ class Coordinator(Job):
   def find_parameters(self):
     params = set()
 
+    for param in find_dollar_braced_variables(self.name):
+      params.add(param)
+
     for param in find_json_parameters([self.data['properties']]):
       params.add(param)
 
@@ -1721,6 +1731,10 @@ class Coordinator(Job):
 
   def get_absolute_url(self):
     return reverse('oozie:edit_coordinator') + '?coordinator=%s' % self.id
+
+  @classmethod
+  def get_application_path_key(cls):
+    return 'oozie.coord.application.path'
 
 
 class Dataset():
@@ -1896,6 +1910,10 @@ class Bundle(Job):
 
   def find_parameters(self):
     return {}
+
+  @classmethod
+  def get_application_path_key(cls):
+    return 'oozie.bundle.application.path'
 
 
 class History(object):
