@@ -322,19 +322,31 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <h4 style="display: inline-block">
   <i class="fa fa-cog"></i>&nbsp;
   <span data-bind="text: name" class="muted"></span>
+
+  <!-- ko if: type() && hostAndPort() -->
   &nbsp;&nbsp;
   <span data-bind="text: type"></span>
   <span>${_("server at ")}</span>
   <span data-bind="text: hostAndPort"></span>
+  <!-- /ko -->
 </h4>
 </script>
 
 <script type="text/html" id="job-list-item">
 <h4 style="display: inline-block">
   <i class="fa fa-download"></i>&nbsp;
+
+  <!-- ko if: fromLabel() && toLabel() -->
   <span data-bind="text: fromLabel"></span>
   <span>${_(' to ')}</span>
   <span data-bind="text: toLabel"></span>
+  <!-- /ko -->
+
+  <!-- ko if: (!fromLabel() || !toLabel()) && (fromLink() && toLink()) -->
+  <span data-bind="text: fromLink().name()"></span>
+  <span>${_(' to ')}</span>
+  <span data-bind="text: toLink().name()"></span>
+  <!-- /ko -->
 </h4>
 </script>
 
