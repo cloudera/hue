@@ -10,6 +10,7 @@ object Session {
   case class Starting() extends State
   case class Idle() extends State
   case class Busy() extends State
+  case class Error() extends State
   case class ShuttingDown() extends State
   case class ShutDown() extends State
 }
