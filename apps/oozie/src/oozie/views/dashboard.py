@@ -403,7 +403,10 @@ def list_oozie_bundle(request, job_id):
   # Cross reference the submission history (if any)
   bundle = None
   try:
-    bundle = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
+    if ENABLE_V2.get():
+      bundle = get_history().get_bundle_from_config(oozie_bundle.conf_dict)
+    else:
+      bundle = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
   except:
     pass
 
