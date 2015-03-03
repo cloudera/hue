@@ -27,7 +27,10 @@ LOG = logging.getLogger(__name__)
 
 _HDFS_SITE_DICT = None
 
+
+_CNF_NN_PERMISSIONS_UMASK_MODE = 'fs.permissions.umask-mode'
 _CNF_NN_SENTRY_PREFIX = 'sentry.authorization-provider.hdfs-path-prefixes'
+
 
 def reset():
   global _HDFS_SITE_DICT
@@ -38,6 +41,17 @@ def get_conf():
   if _HDFS_SITE_DICT is None:
     _parse_hdfs_site()
   return _HDFS_SITE_DICT
+
+
+def get_umask_mode():
+  umask = get_conf().get(_CNF_NN_PERMISSIONS_UMASK_MODE, '022')
+  if len(umask) < 4:
+    umask = "1" + umask
+
+  return int(umask, 8)
+
+def get_nn_sentry_prefixes():
+  return get_conf().get(_CNF_NN_SENTRY_PREFIX, '')
 
 
 def _parse_hdfs_site():
@@ -57,7 +71,3 @@ def _parse_hdfs_site():
     data = ""
 
   _HDFS_SITE_DICT = confparse.ConfParse(data)
-
-
-def get_nn_sentry_prefixes():
-  return get_conf().get(_CNF_NN_SENTRY_PREFIX, '')
