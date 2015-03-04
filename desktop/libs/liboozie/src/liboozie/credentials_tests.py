@@ -54,9 +54,10 @@ class TestCredentials():
   def test_gen_properties(self):
     creds = Credentials(credentials=TestCredentials.CREDENTIALS.copy())
 
-    metastore = {
+    hive_properties = {
       'thrift_uri': 'thrift://hue-koh-chang:9999',
       'kerberos_principal': 'hive',
+      'hive2.server.principal': 'hive',
     }
 
     finish = (
@@ -82,7 +83,7 @@ class TestCredentials():
              'xml_name': 'hbase',
              'properties': []
           }
-        }, creds.get_properties(metastore))
+        }, creds.get_properties(hive_properties))
     finally:
       for f in finish:
         f()
