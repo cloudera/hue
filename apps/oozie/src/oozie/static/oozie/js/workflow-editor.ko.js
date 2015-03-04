@@ -744,6 +744,51 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
+  self.getWidgetById = function (widget_id) {
+    var _widget = null;
+
+    for (var i = 0; i < self.oozieColumns().length; i++) {
+      _widget = self.deeplyGetWidgetById(widget_id, self.oozieColumns()[i]);
+      if (_widget != null) {
+        break;
+      }
+    }
+
+    return _widget;
+  }
+
+  self.deeplyGetWidgetById = function (widget_id, col) {
+    var _widget = null;
+    if (col) {
+      for (var j = 0; j < col.rows().length; j++) {
+        var row = col.rows()[j];
+        if (row && row.widgets()) {
+          for (var z = 0; z < row.widgets().length; z++) {
+            var widget = row.widgets()[z];
+            if (widget.id() == widget_id) {
+              _widget = widget;
+            }
+            if (_widget != null) {
+              break;
+            }
+          }
+        }
+        if (_widget != null) {
+          break;
+        }
+        if (row && row.columns() && _widget == null) {
+          for (var i = 0; i < row.columns().length; i++) {
+            _widget = self.deeplyGetWidgetById(widget_id, row.columns()[i]);
+            if (_widget != null) {
+              break;
+            }
+          }
+        }
+      }
+    }
+    return _widget;
+  }
+
   self.removeWidget = function (widget_json) {
     self.workflow.removeNode(widget_json.id());
     self.removeWidgetById(widget_json.id());
@@ -1196,6 +1241,7 @@ var ExtendedWidget = function (params) {
   self.ooziePropertiesExpanded = ko.observable(false);
   self.status = ko.observable("");
   self.progress = ko.observable(0);
+  self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
   return self;
 }

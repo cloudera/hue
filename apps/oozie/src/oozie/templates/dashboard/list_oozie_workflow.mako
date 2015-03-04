@@ -531,7 +531,9 @@ ${ utils.slaGlobal() }
     // force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#graph") {
+        % if layout_json != '':
         drawArrows();
+        %endif
       }
       else {
         $("canvas").remove();
@@ -651,6 +653,27 @@ ${ utils.slaGlobal() }
           actionsViewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
             return new Action(action);
           }));
+          % if layout_json != '':
+          ko.utils.arrayForEach(actionsViewModel.actions(), function(action) {
+            var _w = viewModel.getWidgetById($("[id^=wdg_" + action.id.substr(action.id.length - 4) + "]").attr("id").substr(4));
+            if (_w != null) {
+              if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
+                _w.status("success");
+                _w.progress(100);
+              }
+              else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(action.status) > -1) {
+                _w.status("running");
+                _w.progress(50);
+              }
+              else {
+                _w.status("failed");
+                _w.progress(100);
+              }
+              _w.actionURL(action.url);
+              _w.logsURL(action.log);
+            }
+          });
+          %endif
         }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
@@ -693,7 +716,9 @@ ${ utils.slaGlobal() }
       resizeTimeout = window.setTimeout(function () {
         resizeLogs();
         if ($("#graph").is(":visible")){
+          % if layout_json != '':
           drawArrows();
+          %endif
         }
       }, 200);
     });
