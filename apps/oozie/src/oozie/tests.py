@@ -2141,6 +2141,21 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('uri:oozie:workflow:0.4', workflow.schema_version)
     workflow.delete(skip_trash=True)
 
+  def test_import_workflow_credentials(self):
+    """
+    Validates import for workflow with credentials.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-credentials.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    credentials = Node.objects.get(workflow=workflow, node_type='hive').credentials
+    assert_equal(1, len(credentials))
+    assert_equal('hcat', credentials[0]['name'])
+    assert_equal(True, credentials[0]['value'])
+    workflow.delete(skip_trash=True)
+
 
   def test_import_workflow_basic_global_config(self):
     """
