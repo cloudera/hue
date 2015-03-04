@@ -138,6 +138,10 @@ def _save_links(workflow, root):
     if child_el.tag.endswith('global'):
       continue
 
+    # Skip credentials configuration.
+    if child_el.tag.endswith('credentials'):
+      continue
+
     tag = etree.QName(child_el).localname
     name = child_el.attrib.get('name', tag)
     LOG.debug("Getting node with data - XML TAG: %(tag)s\tLINK NAME: %(node_name)s\tWORKFLOW NAME: %(workflow_name)s" % {
@@ -520,10 +524,18 @@ def _prepare_nodes(workflow, root):
 def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, nodes, fs=None):
   """
   preprocess nodes
+  Sets credentials keys for actions.
   Resolve start name and subworkflow dependencies.
   Looks at path and interrogates all workflows until the proper deployment path is found.
   If the proper deployment path is never found, then
   """
+
+  for action_el in workflow_definition_root:
+    if 'cred' in action_el.attrib:
+      for full_node in nodes:
+        if full_node.name == action_el.attrib['name']:
+          full_node.credentials = [{"name": cred, "value": True} for cred in action_el.attrib['cred'].split(',')];
+
   for full_node in nodes:
     if full_node.node_type is 'start':
       full_node.name = 'start'
