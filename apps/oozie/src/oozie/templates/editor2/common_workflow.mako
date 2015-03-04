@@ -212,10 +212,11 @@
       <a class="widget-icon"><i class="fa fa-stop"></i></a>
       <!-- /ko -->
 
-      <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
+      <span data-bind="visible: ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
+      <a class="pointer" data-bind="visible: $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name"></a>
 
       <!-- ko if: logsURL() != '' -->
-        <a class="pull-right pointer" data-bind="click: function(){ location.href = logsURL(); }"><i class="fa fa-tasks"></i></a>
+        <a class="pull-right pointer" data-bind="click: function(){ location.href = logsURL(); }" style="margin-top: 34px;font-size: 20px;margin-right: 7px;"><i class="fa fa-tasks"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'decision-widget' -->
