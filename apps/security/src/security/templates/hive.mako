@@ -54,20 +54,20 @@ ${ layout.menubar(section='hive') }
     </div>
 
     <div class="inline-block" style="vertical-align: middle">
-      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); }">
+      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions()[0]) }">
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i>
       </a>
     </div>
     <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
 
     <div class="inline-block" style="vertical-align: middle">
-      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); }">
+      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
       </a>
     </div>
     <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
 
-    <select data-bind="options: $root.availableActions, select2: { update: $data.action, type: 'action', readonly: (privilegeType() == 'uri'), readonlySetTo: function(){ (privilegeType() == 'uri') ? $data.action($root.availableActions()[0]) : $data.action('ALL') }}" style="width: 100px"></select>
+    <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
 
     <div class="new-line-if-small">
       <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
