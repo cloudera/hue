@@ -88,7 +88,7 @@ LIMIT $limit"""))
     assert_equal(len('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), len(job.validated_name))
     
     job.update_name('My <...> 1st W$rkflow [With] (Bad) letter$')
-    assert_equal('My_______1st_W_rkflow__With___Bad__lette', job.validated_name)
+    assert_equal('My_______1st_W$rkflow__With___Bad__lette', job.validated_name)
 
 
 #  def test_workflow_name(self):

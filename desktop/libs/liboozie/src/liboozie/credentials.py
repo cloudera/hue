@@ -47,22 +47,23 @@ class Credentials(object):
   def class_to_name_credentials(self):
     return dict((v,k) for k, v in self.credentials.iteritems())
 
-  def get_properties(self, metastore=None):
+  def get_properties(self, hive_properties=None):
     credentials = {}
     from beeswax import hive_site, conf
 
-    if metastore is None:
-      metastore = hive_site.get_metastore()
+    if hive_properties is None:
+      hive_properties = hive_site.get_metastore()
+      hive_properties['hive2.server.principal'] = hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())
 
-    if not metastore:
-      metastore = {}
+    if not hive_properties:
+      hive_properties = {}
       LOG.warn('Could not get all the Oozie credentials: hive-site.xml required on the Hue host.')
 
     credentials[self.hive_name] = {
       'xml_name': self.hive_name,
       'properties': [
-         ('hcat.metastore.uri', metastore.get('thrift_uri')),
-         ('hcat.metastore.principal', metastore.get('kerberos_principal')),
+         ('hcat.metastore.uri', hive_properties.get('thrift_uri')),
+         ('hcat.metastore.principal', hive_properties.get('kerberos_principal')),
       ]
     }
 
@@ -70,7 +71,7 @@ class Credentials(object):
       'xml_name': self.hiveserver2_name,
       'properties': [
          ('hive2.jdbc.url', hive_site.hiveserver2_jdbc_url()),
-         ('hive2.server.principal', hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())),
+         ('hive2.server.principal', hive_properties.get('hive2.server.principal')),
       ]
     }
 
