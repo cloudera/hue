@@ -212,8 +212,8 @@
       <a class="widget-icon"><i class="fa fa-stop"></i></a>
       <!-- /ko -->
 
-      <span data-bind="visible: ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
-      <a class="pointer" data-bind="visible: $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name"></a>
+      <span data-bind="visible: typeof $root.isViewer == 'undefined' || ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
+      <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name"></a>
 
       <!-- ko if: logsURL() != '' -->
         <a class="pull-right pointer" data-bind="click: function(){ location.href = logsURL(); }" style="margin-top: 34px;font-size: 20px;margin-right: 7px;"><i class="fa fa-tasks"></i></a>
