@@ -130,8 +130,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <!-- ko template: { name: 'tag-template', data: history } -->
-           <!-- /ko -->
            <!-- ko template: { name: 'tag-template', data: trash } -->
            <!-- /ko -->
            <li class="nav-header tag-mine-header">
