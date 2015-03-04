@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
 import logging
 import json
 import time
@@ -37,35 +36,9 @@ LOG = logging.getLogger(__name__)
 
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
-  trash_tag = DocumentTag.objects.get_trash_tag(user)
-  docs = itertools.chain(
-      Document.objects.get_docs(user)
-        .exclude(tags__in=[trash_tag])
-        .filter(tags__in=[history_tag])
-        .select_related(
-          'owner',
-          'content_type',
-        )
-        .prefetch_related(
-          'tags',
-          'documentpermission_set',
-        )
-        .defer(None)
-        .order_by('-last_modified')[:50],
-      Document.objects.get_docs(user)
-        .exclude(tags__in=[history_tag])
-        .select_related(
-          'owner',
-          'content_type',
-        )
-        .prefetch_related(
-          'tags',
-          'documentpermission_set',
-        )
-        .defer(None)
-        .order_by('-last_modified')[:100]
-  )
-  return list(docs)
+
+  return Document.objects.get_docs(user).exclude(tags__in=[history_tag]).select_related('owner', 'content_type') \
+        .prefetch_related('tags','documentpermission_set').defer(None).order_by('-last_modified')[:100]
 
 
 def massaged_tags_for_json(docs, user):
