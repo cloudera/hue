@@ -417,6 +417,11 @@ class Workflow(Job):
   def type(self):
     return 'Workflow'
 
+  def get_parent_job_id(self):
+    if self.parentId and '@' in self.parentId:
+      return self.parentId.split('@')[0]
+    return self.parentId
+
   def get_absolute_url(self, format='html'):
     extra_params = []
 

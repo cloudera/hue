@@ -249,6 +249,10 @@ def list_oozie_workflow(request, job_id):
   if oozie_bundle is not None:
     setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
 
+  oozie_parent = oozie_workflow.get_parent_job_id()
+  if oozie_parent:
+    oozie_parent = check_job_access_permission(request, oozie_parent)
+
   workflow_data = None
   credentials = None
   doc = None
@@ -319,6 +323,7 @@ def list_oozie_workflow(request, job_id):
     'oozie_workflow': oozie_workflow,
     'oozie_coordinator': oozie_coordinator,
     'oozie_bundle': oozie_bundle,
+    'oozie_parent': oozie_parent,
     'oozie_slas': oozie_slas,
     'hue_workflow': hue_workflow,
     'hue_coord': hue_coord,
@@ -446,11 +451,16 @@ def list_oozie_workflow_action(request, action):
   workflow.oozie_coordinator = oozie_coordinator
   workflow.oozie_bundle = oozie_bundle
 
+  oozie_parent = workflow.get_parent_job_id()
+  if oozie_parent:
+    oozie_parent = check_job_access_permission(request, oozie_parent)
+
   return render('dashboard/list_oozie_workflow_action.mako', request, {
     'action': action,
     'workflow': workflow,
     'oozie_coordinator': oozie_coordinator,
     'oozie_bundle': oozie_bundle,
+    'oozie_parent': oozie_parent,
   })
 
 
