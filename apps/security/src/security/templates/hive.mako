@@ -86,8 +86,8 @@ ${ layout.menubar(section='hive') }
     <!-- ko ifnot: $root.isApplyingBulk() -->
     <div class="pull-right privilege-actions" data-bind="visible: grantOption() || $root.is_sentry_admin">
       <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
-      <a data-bind="visible: $root.is_sentry_admin" title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
-      <a data-bind="visible: $root.is_sentry_admin" title="${ _('Delete this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
+      <a title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: $root.is_sentry_admin, click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
+      <a title="${ _('Delete this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: $root.is_sentry_admin, click: remove"><i class="fa fa-times"></i></a>
     </div>
     <!-- /ko -->
 
