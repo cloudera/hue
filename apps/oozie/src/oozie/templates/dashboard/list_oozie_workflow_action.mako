@@ -70,6 +70,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % if oozie_coordinator:
           ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
         % endif
+        % if oozie_parent and (oozie_coordinator is None or oozie_parent.id != oozie_coordinator.id):
+          ${ _('Parent') } <a href="${ oozie_parent.get_absolute_url() }">${ oozie_parent.appName }</a> :
+        % endif
         ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
         ${ _('Action') } ${ action.name }
       </h1>
