@@ -85,4 +85,4 @@ class THttpClient(TTransportBase):
 
     # POST
     self._root = Resource(self._client)
-    self._data = self._root.post('', data=data)
+    self._data = self._root.post('', data=data, headers=self._headers)

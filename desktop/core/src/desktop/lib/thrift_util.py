@@ -158,8 +158,7 @@ class ConnectionPooler(object):
     self.poolsize = poolsize
     self.dictlock = threading.Lock()
 
-  def get_client(self, conf,
-                 get_client_timeout=None):
+  def get_client(self, conf, get_client_timeout=None):
     """
     Could block while we wait for the pool to become non-empty.
 
@@ -344,7 +343,7 @@ class PooledClient(object):
         try:
           # Poke it to see if it's closed on the other end. This can happen if a connection
           # sits in the connection pool longer than the read timeout of the server.
-          sock = self.conf.transport_mode == 'TCP' and _grab_transport_from_wrapper(superclient.transport).handle
+          sock = self.conf.transport_mode != 'http' and _grab_transport_from_wrapper(superclient.transport).handle
           if sock and create_synchronous_io_multiplexer().read([sock]):
             # the socket is readable, meaning there is either data from a previous call
             # (i.e our protocol is out of sync), or the connection was shut down on the
