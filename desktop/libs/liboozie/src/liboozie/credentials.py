@@ -53,7 +53,8 @@ class Credentials(object):
 
     if hive_properties is None:
       hive_properties = hive_site.get_metastore()
-      hive_properties['hive2.server.principal'] = hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())
+      if hive_properties:
+        hive_properties['hive2.server.principal'] = hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())
 
     if not hive_properties:
       hive_properties = {}
