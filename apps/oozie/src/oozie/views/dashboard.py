@@ -779,13 +779,13 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
 
     massaged_action = {
       'id': action.id,
-      'log': action.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': action.externalId}) or '',
+      'log': action.get_absolute_log_url(),
       'url': action.get_absolute_url(),
       'name': action.name,
       'type': action.type,
       'status': action.status,
-      'externalIdUrl': action.externalId and reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}) or '',
-      'externalId': action.externalId and '_'.join(action.externalId.split('_')[-2:]) or '',
+      'externalIdUrl': action.get_externalId_url(),
+      'externalId': action.externalId,
       'startTime': format_time(action.startTime),
       'endTime': format_time(action.endTime),
       'retries': action.retries,
