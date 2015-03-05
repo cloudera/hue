@@ -84,10 +84,19 @@ class RedactionRule(object):
   for the sensitive information and replace it with the `redaction_mask`.
   """
 
-  def __init__(self, trigger, search, replace):
-    self.trigger = trigger
-    self.regex = re.compile(search)
-    self.replace = replace
+  def __init__(self, trigger, search, replace, case_sensitive=True):
+    if case_sensitive:
+      flags = 0
+    else:
+      flags = re.IGNORECASE
+
+    if trigger is not None:
+      self.trigger = re.compile(re.escape(trigger), flags)
+    else:
+      self.trigger = None
+
+    self.regex = re.compile(search, flags)
+    self.replace = _convert_java_pattern_to_python(replace)
 
   def redact(self, message):
     """
@@ -95,7 +104,7 @@ class RedactionRule(object):
     `trigger` string then it will return the original string unmodified.
     """
 
-    if not self.trigger or self.trigger in message:
+    if self.trigger is None or self.trigger.search(message):
       return self.regex.sub(self.replace, message)
     else:
       return message
@@ -124,22 +133,31 @@ def parse_redaction_policy_from_file(filename):
   """
 
   with open(filename) as f:
-    scheme = json.load(f)
+    s = f.read().strip()
+
+    # We treat empty files as allowing everything.
+    if not s:
+      return RedactionPolicy([])
+
+    scheme = json.loads(s)
 
     try:
-      version = scheme['version']
+      version = str(scheme.pop('version'))
     except KeyError:
       raise ValueError('Redaction policy is missing `version` field')
 
-    if version != 1:
-      raise ValueError('unknown version %s' % version)
+    if version != '1':
+      raise ValueError('unknown version `%s`' % version)
 
     try:
-      rules = scheme['rules']
+      rules = scheme.pop('rules')
     except KeyError:
       raise ValueError('Redaction policy is missing `rules` field')
 
     rules = [parse_one_rule_from_dict(rule) for rule in rules]
+
+    if scheme:
+      raise ValueError('Redaction policy contains unknown field(s): %s' % scheme.keys())
 
     return RedactionPolicy(rules)
 
@@ -159,16 +177,45 @@ def parse_one_rule_from_dict(rule):
   regular expression.
   """
 
-  trigger = rule.get('trigger')
+  rule.pop('description', None)
+
+  trigger = rule.pop('trigger', None)
+  case_sensitive = rule.pop('caseSensitive', True)
+
+  if case_sensitive == 'false':
+    case_sensitive = False
+  elif case_sensitive == 'true':
+    case_sensitive = True
 
   try:
-    search = rule['search']
+    search = rule.pop('search')
   except KeyError:
     raise ValueError('Redaction rule is missing `search` field')
 
   try:
-    replace = rule['replace']
+    replace = rule.pop('replace')
   except KeyError:
     raise ValueError('Redaction rule is missing `replace` field')
 
-  return RedactionRule(trigger, search, replace)
+  if rule:
+    raise ValueError('Redaction rule contains unknown field(s): %s' % rule.keys())
+
+  return RedactionRule(trigger, search, replace, case_sensitive)
+
+def _convert_java_pattern_to_python(pattern):
+  """Convert a replacement pattern from the Java-style `$5` to the Python-style `\\5`."""
+
+  s = list(pattern)
+
+  i = 0
+  while i < len(s) - 1:
+    c = s[i]
+    if c == '$' and s[i + 1] in '0123456789':
+      s[i] = '\\'
+    elif c == '\\' and s[i + 1] == '$':
+      s[i] = ''
+      i += 1
+
+    i += 1
+
+  return pattern[:0].join(s)
