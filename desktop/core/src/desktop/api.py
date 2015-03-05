@@ -26,6 +26,7 @@ from django.core.urlresolvers import reverse
 from django.utils import html
 from django.utils.translation import ugettext as _
 
+import desktop.conf
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document, DocumentTag
@@ -37,8 +38,24 @@ LOG = logging.getLogger(__name__)
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
 
-  return Document.objects.get_docs(user).exclude(tags__in=[history_tag]).select_related('owner', 'content_type') \
-        .prefetch_related('tags','documentpermission_set').defer(None).order_by('-last_modified')[:100]
+  query = Document.objects.get_docs(user) \
+      .exclude(tags__in=[history_tag]). \
+      select_related('owner', 'content_type') \
+      .prefetch_related('tags','documentpermission_set')
+
+  # Work around Oracle not supporting SELECT DISTINCT with the CLOB type.
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
+    query = query.only('id')
+  else:
+    query = query.defer(None)
+
+  docs = query.order_by('-last_modified')[:100]
+
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
+    ids = [doc.id for doc in docs]
+    return Document.objects.filter(id__in=ids).defer(None)
+  else:
+    return docs
 
 
 def massaged_tags_for_json(docs, user):
