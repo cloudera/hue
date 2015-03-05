@@ -43,13 +43,16 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <li class="nav-header">${ _('Name') }</li>
           <li class="white">${ action.name }</li>
 
-          % if action.externalId:
-            <li class="nav-header">${ _('External Id') }</li>
-            <li><a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a></li>
-
+          <li class="nav-header">${ _('External Id') }</li>
+          % if action.get_externalId_url():
+            <li><a href="${ action.get_externalId_url() }">${ action.externalId }</a></li>
+          % else:
+            <li>${ action.externalId } </li>
+          % endif
+          %  if action.get_absolute_log_url():
             <li class="nav-header">${ _('Logs') }</li>
             <li>
-              <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" title="${ _('View the logs') }" rel="tooltip"><i class="fa fa-tasks"></i></a>
+              <a href="${ action.get_absolute_log_url() }" title="${ _('View the logs') }" rel="tooltip"><i class="fa fa-tasks"></i></a>
             </li>
           % endif
 

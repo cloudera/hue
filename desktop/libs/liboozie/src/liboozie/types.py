@@ -152,9 +152,6 @@ class WorkflowAction(Action):
     else:
       self.conf_dict = {}
 
-    if self.externalId is not None and not re.match('job_.*', self.externalId):
-      self.externalId = None
-
   def get_absolute_url(self):
     related_job_ids = []
 
@@ -169,6 +166,20 @@ class WorkflowAction(Action):
       extra_params = ''
 
     return reverse('oozie:list_oozie_workflow_action', kwargs={'action': self.id}) + extra_params
+
+  def get_absolute_log_url(self):
+    url = None
+    if self.externalId and re.match('job_.*', self.externalId):
+      url = self.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': self.externalId}) or ''
+    return url
+
+  def get_externalId_url(self):
+    url = None
+    if self.externalId and self.externalId.endswith('W'):
+      url = reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.externalId}) or ''
+    elif self.externalId and re.match('job_.*', self.externalId):
+      url = reverse('jobbrowser.views.single_job', kwargs={'job': self.externalId}) or ''
+    return url
 
 
 class CoordinatorAction(Action):
