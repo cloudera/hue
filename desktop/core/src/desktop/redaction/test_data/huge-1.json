@@ -1,0 +1,4530 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "Testing 1000 rules.  Ugh.",
+      "search": "first",
+      "replace": "xxx"
+    },
+    {
+      "search": "VHlC",
+      "replace": "tKdV"
+    },
+    {
+      "search": "yEtu",
+      "replace": "cOBG"
+    },
+    {
+      "search": "JYoi",
+      "replace": "ZJQv"
+    },
+    {
+      "search": "wfPZ",
+      "replace": "LkZk"
+    },
+    {
+      "search": "Fhtf",
+      "replace": "DKfw"
+    },
+    {
+      "search": "JrCk",
+      "replace": "wkqw"
+    },
+    {
+      "search": "zpEZ",
+      "replace": "UaRL"
+    },
+    {
+      "search": "EmoG",
+      "replace": "QEMo"
+    },
+    {
+      "search": "BLuV",
+      "replace": "vwFp"
+    },
+    {
+      "search": "JMoz",
+      "replace": "rXTR"
+    },
+    {
+      "search": "kMNk",
+      "replace": "LGdn"
+    },
+    {
+      "search": "uKwZ",
+      "replace": "nGsV"
+    },
+    {
+      "search": "ZROP",
+      "replace": "SEVH"
+    },
+    {
+      "search": "Ubwv",
+      "replace": "DKbD"
+    },
+    {
+      "search": "TyiQ",
+      "replace": "BUoO"
+    },
+    {
+      "search": "cNZM",
+      "replace": "UUtz"
+    },
+    {
+      "search": "zrJB",
+      "replace": "vaNX"
+    },
+    {
+      "search": "Evfk",
+      "replace": "kJhh"
+    },
+    {
+      "search": "rRnI",
+      "replace": "enZA"
+    },
+    {
+      "search": "pDzc",
+      "replace": "Korn"
+    },
+    {
+      "search": "Dliv",
+      "replace": "bVcW"
+    },
+    {
+      "search": "cJLs",
+      "replace": "MgHJ"
+    },
+    {
+      "search": "QrKD",
+      "replace": "BOfn"
+    },
+    {
+      "search": "unWW",
+      "replace": "UTfp"
+    },
+    {
+      "search": "sdlb",
+      "replace": "SbBc"
+    },
+    {
+      "search": "VfPO",
+      "replace": "SYLp"
+    },
+    {
+      "search": "gHPL",
+      "replace": "nMOJ"
+    },
+    {
+      "search": "Hwzn",
+      "replace": "TQFm"
+    },
+    {
+      "search": "kQkh",
+      "replace": "vWmV"
+    },
+    {
+      "search": "CUxw",
+      "replace": "Kgjr"
+    },
+    {
+      "search": "Kjjg",
+      "replace": "kwWB"
+    },
+    {
+      "search": "zLKG",
+      "replace": "TVyp"
+    },
+    {
+      "search": "NuMx",
+      "replace": "IEkD"
+    },
+    {
+      "search": "rOsC",
+      "replace": "WWeK"
+    },
+    {
+      "search": "VCAu",
+      "replace": "smnh"
+    },
+    {
+      "search": "WEWW",
+      "replace": "LAqK"
+    },
+    {
+      "search": "RkBc",
+      "replace": "GFQr"
+    },
+    {
+      "search": "VfJt",
+      "replace": "rdVc"
+    },
+    {
+      "search": "pdQa",
+      "replace": "uSYB"
+    },
+    {
+      "search": "ZfwK",
+      "replace": "iNWv"
+    },
+    {
+      "search": "OgHo",
+      "replace": "oAmQ"
+    },
+    {
+      "search": "tdvf",
+      "replace": "cGcS"
+    },
+    {
+      "search": "fait",
+      "replace": "aGdX"
+    },
+    {
+      "search": "AYVn",
+      "replace": "ywDP"
+    },
+    {
+      "search": "sntm",
+      "replace": "QAKp"
+    },
+    {
+      "search": "uRlT",
+      "replace": "ccxL"
+    },
+    {
+      "search": "RSVC",
+      "replace": "Skel"
+    },
+    {
+      "search": "BWYv",
+      "replace": "TATT"
+    },
+    {
+      "search": "OEOk",
+      "replace": "jvlO"
+    },
+    {
+      "search": "lFpO",
+      "replace": "SMMK"
+    },
+    {
+      "search": "BchF",
+      "replace": "IMoQ"
+    },
+    {
+      "search": "CUeC",
+      "replace": "SgGc"
+    },
+    {
+      "search": "uxEJ",
+      "replace": "ZpCd"
+    },
+    {
+      "search": "MIHi",
+      "replace": "PEAf"
+    },
+    {
+      "search": "EGQB",
+      "replace": "GQjd"
+    },
+    {
+      "search": "rZrZ",
+      "replace": "iPBp"
+    },
+    {
+      "search": "fkaP",
+      "replace": "UfGf"
+    },
+    {
+      "search": "ijfp",
+      "replace": "nFoF"
+    },
+    {
+      "search": "zIJX",
+      "replace": "STIh"
+    },
+    {
+      "search": "SyuV",
+      "replace": "vfZI"
+    },
+    {
+      "search": "KGCn",
+      "replace": "coOp"
+    },
+    {
+      "search": "qHAa",
+      "replace": "aYLX"
+    },
+    {
+      "search": "kODh",
+      "replace": "sxnz"
+    },
+    {
+      "search": "fkcF",
+      "replace": "IifR"
+    },
+    {
+      "search": "kqVj",
+      "replace": "eeLD"
+    },
+    {
+      "search": "HhKi",
+      "replace": "JAlo"
+    },
+    {
+      "search": "GEBH",
+      "replace": "mKJX"
+    },
+    {
+      "search": "Vjfa",
+      "replace": "Okhd"
+    },
+    {
+      "search": "SNYJ",
+      "replace": "CxRB"
+    },
+    {
+      "search": "hcbI",
+      "replace": "gHZp"
+    },
+    {
+      "search": "tLbV",
+      "replace": "AoNv"
+    },
+    {
+      "search": "LZen",
+      "replace": "IxxT"
+    },
+    {
+      "search": "LAKb",
+      "replace": "fMOL"
+    },
+    {
+      "search": "VBZg",
+      "replace": "vIGt"
+    },
+    {
+      "search": "VxLM",
+      "replace": "Cdmw"
+    },
+    {
+      "search": "SSbq",
+      "replace": "bHMY"
+    },
+    {
+      "search": "aDHr",
+      "replace": "zuwi"
+    },
+    {
+      "search": "LdkL",
+      "replace": "aZud"
+    },
+    {
+      "search": "oGoP",
+      "replace": "Bhvz"
+    },
+    {
+      "search": "HEYg",
+      "replace": "rVbC"
+    },
+    {
+      "search": "PEDt",
+      "replace": "NBHZ"
+    },
+    {
+      "search": "ZEnK",
+      "replace": "YvtN"
+    },
+    {
+      "search": "PFWn",
+      "replace": "bhYt"
+    },
+    {
+      "search": "ukQY",
+      "replace": "OYWV"
+    },
+    {
+      "search": "VdEs",
+      "replace": "suLr"
+    },
+    {
+      "search": "LaMm",
+      "replace": "ERps"
+    },
+    {
+      "search": "ppbB",
+      "replace": "wkwt"
+    },
+    {
+      "search": "jqXc",
+      "replace": "Rfrd"
+    },
+    {
+      "search": "Cayh",
+      "replace": "hvwW"
+    },
+    {
+      "search": "whOs",
+      "replace": "EiLO"
+    },
+    {
+      "search": "ZNGC",
+      "replace": "zfws"
+    },
+    {
+      "search": "SNVi",
+      "replace": "gwZp"
+    },
+    {
+      "search": "DwOi",
+      "replace": "mEjO"
+    },
+    {
+      "search": "rdkI",
+      "replace": "MpwC"
+    },
+    {
+      "search": "wZGH",
+      "replace": "flVU"
+    },
+    {
+      "search": "JAVO",
+      "replace": "qSwN"
+    },
+    {
+      "search": "CuDG",
+      "replace": "XGYu"
+    },
+    {
+      "search": "nbUT",
+      "replace": "fhGY"
+    },
+    {
+      "search": "HEAL",
+      "replace": "ZUMD"
+    },
+    {
+      "search": "bgFP",
+      "replace": "zuqg"
+    },
+    {
+      "search": "ChdV",
+      "replace": "fSeF"
+    },
+    {
+      "search": "CScI",
+      "replace": "HuEZ"
+    },
+    {
+      "search": "rVgh",
+      "replace": "gFCi"
+    },
+    {
+      "search": "BOlG",
+      "replace": "BMKQ"
+    },
+    {
+      "search": "aFSK",
+      "replace": "eorI"
+    },
+    {
+      "search": "COSg",
+      "replace": "Disl"
+    },
+    {
+      "search": "xKsy",
+      "replace": "kVFY"
+    },
+    {
+      "search": "iufq",
+      "replace": "XCVN"
+    },
+    {
+      "search": "cYTd",
+      "replace": "eiXC"
+    },
+    {
+      "search": "tFxY",
+      "replace": "YbkD"
+    },
+    {
+      "search": "wotV",
+      "replace": "MnAU"
+    },
+    {
+      "search": "Mmtk",
+      "replace": "leSf"
+    },
+    {
+      "search": "MTXQ",
+      "replace": "fILB"
+    },
+    {
+      "search": "eLNy",
+      "replace": "zAZy"
+    },
+    {
+      "search": "OLqI",
+      "replace": "GSVD"
+    },
+    {
+      "search": "XaKo",
+      "replace": "VeGP"
+    },
+    {
+      "search": "Wrtk",
+      "replace": "PjMe"
+    },
+    {
+      "search": "qZvL",
+      "replace": "TyNC"
+    },
+    {
+      "search": "xlCO",
+      "replace": "uvMP"
+    },
+    {
+      "search": "DLIO",
+      "replace": "rIhy"
+    },
+    {
+      "search": "musg",
+      "replace": "YOye"
+    },
+    {
+      "search": "nbMF",
+      "replace": "OWRZ"
+    },
+    {
+      "search": "czdr",
+      "replace": "FQtd"
+    },
+    {
+      "search": "wxUG",
+      "replace": "HIGZ"
+    },
+    {
+      "search": "onYn",
+      "replace": "XxYr"
+    },
+    {
+      "search": "qnGl",
+      "replace": "gaNS"
+    },
+    {
+      "search": "tjEP",
+      "replace": "ydRB"
+    },
+    {
+      "search": "OKdx",
+      "replace": "uOwk"
+    },
+    {
+      "search": "yQCc",
+      "replace": "GLmm"
+    },
+    {
+      "search": "hNap",
+      "replace": "Zlie"
+    },
+    {
+      "search": "kDPU",
+      "replace": "Sdvf"
+    },
+    {
+      "search": "MwWa",
+      "replace": "SVQW"
+    },
+    {
+      "search": "nKkB",
+      "replace": "ZRrs"
+    },
+    {
+      "search": "kEQR",
+      "replace": "vlPb"
+    },
+    {
+      "search": "xkmX",
+      "replace": "rXBJ"
+    },
+    {
+      "search": "Ztex",
+      "replace": "JvVZ"
+    },
+    {
+      "search": "GEEc",
+      "replace": "iTZg"
+    },
+    {
+      "search": "MeEx",
+      "replace": "kAbV"
+    },
+    {
+      "search": "dTRB",
+      "replace": "hqTP"
+    },
+    {
+      "search": "XrYo",
+      "replace": "jCgB"
+    },
+    {
+      "search": "gKov",
+      "replace": "JXWo"
+    },
+    {
+      "search": "ZPnM",
+      "replace": "JZBT"
+    },
+    {
+      "search": "MaeI",
+      "replace": "EjMS"
+    },
+    {
+      "search": "qZqU",
+      "replace": "AOsT"
+    },
+    {
+      "search": "lcIw",
+      "replace": "caCx"
+    },
+    {
+      "search": "TnbM",
+      "replace": "JfnW"
+    },
+    {
+      "search": "YRwh",
+      "replace": "pxws"
+    },
+    {
+      "search": "hdFP",
+      "replace": "TBao"
+    },
+    {
+      "search": "EXzN",
+      "replace": "HAan"
+    },
+    {
+      "search": "GLYB",
+      "replace": "Guhe"
+    },
+    {
+      "search": "RUhT",
+      "replace": "sRvH"
+    },
+    {
+      "search": "MRRF",
+      "replace": "JbtJ"
+    },
+    {
+      "search": "RYBe",
+      "replace": "NUBz"
+    },
+    {
+      "search": "agld",
+      "replace": "ilIn"
+    },
+    {
+      "search": "ZHCq",
+      "replace": "eUPn"
+    },
+    {
+      "search": "uZYB",
+      "replace": "kbka"
+    },
+    {
+      "search": "CemR",
+      "replace": "SBzE"
+    },
+    {
+      "search": "RnKp",
+      "replace": "qQbA"
+    },
+    {
+      "search": "RckX",
+      "replace": "frbh"
+    },
+    {
+      "search": "IHMP",
+      "replace": "kyIu"
+    },
+    {
+      "search": "NNgl",
+      "replace": "sFXU"
+    },
+    {
+      "search": "GFRT",
+      "replace": "NxFr"
+    },
+    {
+      "search": "hhdO",
+      "replace": "jCHN"
+    },
+    {
+      "search": "cCFa",
+      "replace": "AEFV"
+    },
+    {
+      "search": "hbYa",
+      "replace": "HzUS"
+    },
+    {
+      "search": "dgIM",
+      "replace": "wKHL"
+    },
+    {
+      "search": "maYq",
+      "replace": "OoYZ"
+    },
+    {
+      "search": "aEfg",
+      "replace": "vZkb"
+    },
+    {
+      "search": "kfAG",
+      "replace": "DjIQ"
+    },
+    {
+      "search": "LZul",
+      "replace": "eOVw"
+    },
+    {
+      "search": "dUbh",
+      "replace": "pfOV"
+    },
+    {
+      "search": "wbUN",
+      "replace": "QsnY"
+    },
+    {
+      "search": "KqKj",
+      "replace": "uiMS"
+    },
+    {
+      "search": "ZhHH",
+      "replace": "DOZl"
+    },
+    {
+      "search": "CstM",
+      "replace": "gzAL"
+    },
+    {
+      "search": "XvuC",
+      "replace": "Lqjp"
+    },
+    {
+      "search": "ELni",
+      "replace": "WWyT"
+    },
+    {
+      "search": "mesH",
+      "replace": "NebJ"
+    },
+    {
+      "search": "DWSA",
+      "replace": "UQTL"
+    },
+    {
+      "search": "vRYN",
+      "replace": "TudL"
+    },
+    {
+      "search": "sJIN",
+      "replace": "VVCX"
+    },
+    {
+      "search": "HnBL",
+      "replace": "pOad"
+    },
+    {
+      "search": "CeBP",
+      "replace": "dhVG"
+    },
+    {
+      "search": "nBHj",
+      "replace": "whMe"
+    },
+    {
+      "search": "jTlJ",
+      "replace": "bcoV"
+    },
+    {
+      "search": "wzJq",
+      "replace": "vMpa"
+    },
+    {
+      "search": "ewyu",
+      "replace": "TnUN"
+    },
+    {
+      "search": "hDhA",
+      "replace": "hRTZ"
+    },
+    {
+      "search": "Ibxk",
+      "replace": "gqhd"
+    },
+    {
+      "search": "xfjr",
+      "replace": "IWiN"
+    },
+    {
+      "search": "VnhT",
+      "replace": "iZrJ"
+    },
+    {
+      "search": "txGx",
+      "replace": "ErbB"
+    },
+    {
+      "search": "fGaz",
+      "replace": "GizK"
+    },
+    {
+      "search": "PhQc",
+      "replace": "xKzY"
+    },
+    {
+      "search": "LrWh",
+      "replace": "NHea"
+    },
+    {
+      "search": "CkCD",
+      "replace": "NZUS"
+    },
+    {
+      "search": "HHel",
+      "replace": "lpbm"
+    },
+    {
+      "search": "NdtZ",
+      "replace": "XQcw"
+    },
+    {
+      "search": "QbEr",
+      "replace": "pFSB"
+    },
+    {
+      "search": "RWAO",
+      "replace": "RXGh"
+    },
+    {
+      "search": "TaHC",
+      "replace": "feyH"
+    },
+    {
+      "search": "ImEr",
+      "replace": "ssxK"
+    },
+    {
+      "search": "KApK",
+      "replace": "YgVk"
+    },
+    {
+      "search": "vlAf",
+      "replace": "tZNv"
+    },
+    {
+      "search": "yRou",
+      "replace": "nltA"
+    },
+    {
+      "search": "wnFQ",
+      "replace": "sxII"
+    },
+    {
+      "search": "Yzdf",
+      "replace": "QKdA"
+    },
+    {
+      "search": "OTVv",
+      "replace": "XvWT"
+    },
+    {
+      "search": "oqaX",
+      "replace": "ZzWw"
+    },
+    {
+      "search": "COPh",
+      "replace": "CEdk"
+    },
+    {
+      "search": "slnp",
+      "replace": "PtqZ"
+    },
+    {
+      "search": "zDgl",
+      "replace": "ugAa"
+    },
+    {
+      "search": "DMtu",
+      "replace": "nuEn"
+    },
+    {
+      "search": "ADxd",
+      "replace": "wjtM"
+    },
+    {
+      "search": "jyyO",
+      "replace": "bPqP"
+    },
+    {
+      "search": "kQMS",
+      "replace": "WOdV"
+    },
+    {
+      "search": "rbqa",
+      "replace": "WuVj"
+    },
+    {
+      "search": "bqjp",
+      "replace": "dpuY"
+    },
+    {
+      "search": "yZkJ",
+      "replace": "Phyv"
+    },
+    {
+      "search": "hwlf",
+      "replace": "oSIm"
+    },
+    {
+      "search": "BeuE",
+      "replace": "UMro"
+    },
+    {
+      "search": "Ewvj",
+      "replace": "CgUa"
+    },
+    {
+      "search": "JetF",
+      "replace": "xKCK"
+    },
+    {
+      "search": "jtsE",
+      "replace": "xpTy"
+    },
+    {
+      "search": "qjEn",
+      "replace": "MAHs"
+    },
+    {
+      "search": "LQqu",
+      "replace": "HOpn"
+    },
+    {
+      "search": "BTYa",
+      "replace": "LhvM"
+    },
+    {
+      "search": "hkLl",
+      "replace": "XuxO"
+    },
+    {
+      "search": "WTgO",
+      "replace": "ObxJ"
+    },
+    {
+      "search": "KDpV",
+      "replace": "buNI"
+    },
+    {
+      "search": "YcXz",
+      "replace": "JzMK"
+    },
+    {
+      "search": "yLhT",
+      "replace": "sVaC"
+    },
+    {
+      "search": "Xisn",
+      "replace": "imPV"
+    },
+    {
+      "search": "TXye",
+      "replace": "BhHl"
+    },
+    {
+      "search": "VVon",
+      "replace": "KrEr"
+    },
+    {
+      "search": "oBpR",
+      "replace": "ipes"
+    },
+    {
+      "search": "SaFa",
+      "replace": "aQvU"
+    },
+    {
+      "search": "bnGE",
+      "replace": "ZLMt"
+    },
+    {
+      "search": "FQga",
+      "replace": "pJiw"
+    },
+    {
+      "search": "VcZC",
+      "replace": "lMnT"
+    },
+    {
+      "search": "GyWB",
+      "replace": "nLWa"
+    },
+    {
+      "search": "ZkdE",
+      "replace": "YAmj"
+    },
+    {
+      "search": "bnFl",
+      "replace": "yDId"
+    },
+    {
+      "search": "XkJe",
+      "replace": "uXhH"
+    },
+    {
+      "search": "SsGN",
+      "replace": "sQcs"
+    },
+    {
+      "search": "WSJc",
+      "replace": "RriA"
+    },
+    {
+      "search": "svrT",
+      "replace": "Oiyb"
+    },
+    {
+      "search": "iGEk",
+      "replace": "RuxC"
+    },
+    {
+      "search": "ahHF",
+      "replace": "RJgS"
+    },
+    {
+      "search": "zjyO",
+      "replace": "fHUS"
+    },
+    {
+      "search": "Efjx",
+      "replace": "eqMI"
+    },
+    {
+      "search": "dgSA",
+      "replace": "cpMP"
+    },
+    {
+      "search": "iEtp",
+      "replace": "nYiZ"
+    },
+    {
+      "search": "gQzh",
+      "replace": "lqnm"
+    },
+    {
+      "search": "bdXZ",
+      "replace": "SeyP"
+    },
+    {
+      "search": "FIyO",
+      "replace": "cdoM"
+    },
+    {
+      "search": "RMjb",
+      "replace": "dAKp"
+    },
+    {
+      "search": "eOgQ",
+      "replace": "QCxo"
+    },
+    {
+      "search": "Dmtm",
+      "replace": "puLo"
+    },
+    {
+      "search": "NoqX",
+      "replace": "cTnm"
+    },
+    {
+      "search": "lppo",
+      "replace": "jdSP"
+    },
+    {
+      "search": "ynAW",
+      "replace": "eAjc"
+    },
+    {
+      "search": "FQJO",
+      "replace": "YsFt"
+    },
+    {
+      "search": "ziNG",
+      "replace": "Uhkt"
+    },
+    {
+      "search": "GPNr",
+      "replace": "inTp"
+    },
+    {
+      "search": "PDoH",
+      "replace": "KWRg"
+    },
+    {
+      "search": "Joiu",
+      "replace": "Rorp"
+    },
+    {
+      "search": "XCSu",
+      "replace": "AeRx"
+    },
+    {
+      "search": "Upzp",
+      "replace": "hqfS"
+    },
+    {
+      "search": "ToGN",
+      "replace": "dWFC"
+    },
+    {
+      "search": "TXST",
+      "replace": "EOJd"
+    },
+    {
+      "search": "dpub",
+      "replace": "cuPD"
+    },
+    {
+      "search": "pkbU",
+      "replace": "ZdKK"
+    },
+    {
+      "search": "ejDo",
+      "replace": "npLq"
+    },
+    {
+      "search": "MkPz",
+      "replace": "OCCy"
+    },
+    {
+      "search": "vGdz",
+      "replace": "uSfZ"
+    },
+    {
+      "search": "zgqu",
+      "replace": "xBka"
+    },
+    {
+      "search": "TYCI",
+      "replace": "SYnu"
+    },
+    {
+      "search": "UZoa",
+      "replace": "NPtG"
+    },
+    {
+      "search": "WpTO",
+      "replace": "gGaG"
+    },
+    {
+      "search": "NXzQ",
+      "replace": "AYli"
+    },
+    {
+      "search": "WCQF",
+      "replace": "kZbl"
+    },
+    {
+      "search": "xQgO",
+      "replace": "hoYl"
+    },
+    {
+      "search": "adfr",
+      "replace": "mcCJ"
+    },
+    {
+      "search": "KTam",
+      "replace": "jlHA"
+    },
+    {
+      "search": "vXsU",
+      "replace": "kGkL"
+    },
+    {
+      "search": "voxg",
+      "replace": "QpZV"
+    },
+    {
+      "search": "BHAE",
+      "replace": "LICr"
+    },
+    {
+      "search": "RNJX",
+      "replace": "ErBO"
+    },
+    {
+      "search": "zCdc",
+      "replace": "myfZ"
+    },
+    {
+      "search": "Rkgy",
+      "replace": "yZoD"
+    },
+    {
+      "search": "vibe",
+      "replace": "ZKpU"
+    },
+    {
+      "search": "NnAw",
+      "replace": "wJwl"
+    },
+    {
+      "search": "ZTZp",
+      "replace": "nTKn"
+    },
+    {
+      "search": "QKiP",
+      "replace": "hPKN"
+    },
+    {
+      "search": "DveK",
+      "replace": "nLWM"
+    },
+    {
+      "search": "XRBP",
+      "replace": "icTj"
+    },
+    {
+      "search": "GtMk",
+      "replace": "BcUJ"
+    },
+    {
+      "search": "tFhF",
+      "replace": "pZWJ"
+    },
+    {
+      "search": "QBKh",
+      "replace": "vWZi"
+    },
+    {
+      "search": "uqOS",
+      "replace": "hCVD"
+    },
+    {
+      "search": "ItUv",
+      "replace": "IRlg"
+    },
+    {
+      "search": "XGKU",
+      "replace": "elUp"
+    },
+    {
+      "search": "ymtO",
+      "replace": "kFxs"
+    },
+    {
+      "search": "osOh",
+      "replace": "kVjI"
+    },
+    {
+      "search": "xIIL",
+      "replace": "hYFz"
+    },
+    {
+      "search": "zmra",
+      "replace": "Timl"
+    },
+    {
+      "search": "kowX",
+      "replace": "ZdVl"
+    },
+    {
+      "search": "WEcV",
+      "replace": "wXUY"
+    },
+    {
+      "search": "ARoh",
+      "replace": "hynB"
+    },
+    {
+      "search": "JxdI",
+      "replace": "qSIF"
+    },
+    {
+      "search": "FkvJ",
+      "replace": "ksyU"
+    },
+    {
+      "search": "EkrT",
+      "replace": "lANu"
+    },
+    {
+      "search": "KsIV",
+      "replace": "VBPD"
+    },
+    {
+      "search": "TuBS",
+      "replace": "jAtG"
+    },
+    {
+      "search": "hVpy",
+      "replace": "WJXz"
+    },
+    {
+      "search": "bGAR",
+      "replace": "lSml"
+    },
+    {
+      "search": "sXOi",
+      "replace": "eidL"
+    },
+    {
+      "search": "JSuN",
+      "replace": "FjdG"
+    },
+    {
+      "search": "BKUT",
+      "replace": "YnDM"
+    },
+    {
+      "search": "xuss",
+      "replace": "mKWz"
+    },
+    {
+      "search": "cKWk",
+      "replace": "YcSh"
+    },
+    {
+      "search": "WIOc",
+      "replace": "xkek"
+    },
+    {
+      "search": "MBtY",
+      "replace": "nyoE"
+    },
+    {
+      "search": "uPZr",
+      "replace": "APik"
+    },
+    {
+      "search": "Chgh",
+      "replace": "PIrD"
+    },
+    {
+      "search": "CIyW",
+      "replace": "WOAH"
+    },
+    {
+      "search": "yoSW",
+      "replace": "BpEL"
+    },
+    {
+      "search": "aGwt",
+      "replace": "tBsg"
+    },
+    {
+      "search": "Zxyg",
+      "replace": "BVxF"
+    },
+    {
+      "search": "Zmkt",
+      "replace": "PRES"
+    },
+    {
+      "search": "nGlB",
+      "replace": "WbhP"
+    },
+    {
+      "search": "dOTv",
+      "replace": "gdtV"
+    },
+    {
+      "search": "bknU",
+      "replace": "DgdH"
+    },
+    {
+      "search": "Fdrp",
+      "replace": "FBPP"
+    },
+    {
+      "search": "PgVc",
+      "replace": "xCRC"
+    },
+    {
+      "search": "NqnP",
+      "replace": "yBYo"
+    },
+    {
+      "search": "LASb",
+      "replace": "OVoA"
+    },
+    {
+      "search": "FdJQ",
+      "replace": "vUEP"
+    },
+    {
+      "search": "Ymlg",
+      "replace": "bxgN"
+    },
+    {
+      "search": "hRmU",
+      "replace": "GlSX"
+    },
+    {
+      "search": "tuyq",
+      "replace": "dppF"
+    },
+    {
+      "search": "zbRO",
+      "replace": "bZoa"
+    },
+    {
+      "search": "ETLq",
+      "replace": "ZbIe"
+    },
+    {
+      "search": "UDdb",
+      "replace": "GWYQ"
+    },
+    {
+      "search": "NFZw",
+      "replace": "Uphq"
+    },
+    {
+      "search": "UTBE",
+      "replace": "YrhB"
+    },
+    {
+      "search": "IUdM",
+      "replace": "tELM"
+    },
+    {
+      "search": "dsiV",
+      "replace": "drGH"
+    },
+    {
+      "search": "aTZi",
+      "replace": "DJjQ"
+    },
+    {
+      "search": "oYwL",
+      "replace": "xugT"
+    },
+    {
+      "search": "wbDB",
+      "replace": "OdgN"
+    },
+    {
+      "search": "qhyi",
+      "replace": "UZyy"
+    },
+    {
+      "search": "idmT",
+      "replace": "DMKH"
+    },
+    {
+      "search": "weuT",
+      "replace": "mBvd"
+    },
+    {
+      "search": "iSsP",
+      "replace": "XeVl"
+    },
+    {
+      "search": "DzjS",
+      "replace": "vDVl"
+    },
+    {
+      "search": "ZcBr",
+      "replace": "mgkj"
+    },
+    {
+      "search": "phpw",
+      "replace": "tKHp"
+    },
+    {
+      "search": "poWd",
+      "replace": "eYXu"
+    },
+    {
+      "search": "UDBN",
+      "replace": "uNPf"
+    },
+    {
+      "search": "QryT",
+      "replace": "Vtil"
+    },
+    {
+      "search": "CNEC",
+      "replace": "SkEF"
+    },
+    {
+      "search": "nKnt",
+      "replace": "VQsI"
+    },
+    {
+      "search": "TvAD",
+      "replace": "OQEm"
+    },
+    {
+      "search": "HSwi",
+      "replace": "nXPz"
+    },
+    {
+      "search": "GPYA",
+      "replace": "CVFb"
+    },
+    {
+      "search": "vmJx",
+      "replace": "SYeY"
+    },
+    {
+      "search": "GCjo",
+      "replace": "NKxB"
+    },
+    {
+      "search": "zqLE",
+      "replace": "MqRw"
+    },
+    {
+      "search": "VRZz",
+      "replace": "ajUl"
+    },
+    {
+      "search": "qDRR",
+      "replace": "otVO"
+    },
+    {
+      "search": "SsjO",
+      "replace": "PqnB"
+    },
+    {
+      "search": "pauG",
+      "replace": "ofXv"
+    },
+    {
+      "search": "NKxK",
+      "replace": "IlEQ"
+    },
+    {
+      "search": "ZnCB",
+      "replace": "zrkZ"
+    },
+    {
+      "search": "ycOC",
+      "replace": "bDpx"
+    },
+    {
+      "search": "dsqZ",
+      "replace": "ABTh"
+    },
+    {
+      "search": "oZHm",
+      "replace": "SSiW"
+    },
+    {
+      "search": "ibuS",
+      "replace": "fnjE"
+    },
+    {
+      "search": "PdQD",
+      "replace": "HqGu"
+    },
+    {
+      "search": "xYpo",
+      "replace": "YUoU"
+    },
+    {
+      "search": "NlQs",
+      "replace": "fqTN"
+    },
+    {
+      "search": "JGnC",
+      "replace": "wVKu"
+    },
+    {
+      "search": "olEE",
+      "replace": "XOMT"
+    },
+    {
+      "search": "WyWQ",
+      "replace": "FSMT"
+    },
+    {
+      "search": "rlHZ",
+      "replace": "NppY"
+    },
+    {
+      "search": "GqRV",
+      "replace": "XzMm"
+    },
+    {
+      "search": "KgLL",
+      "replace": "IXho"
+    },
+    {
+      "search": "lYFl",
+      "replace": "pdmn"
+    },
+    {
+      "search": "jAcq",
+      "replace": "iHMf"
+    },
+    {
+      "search": "nLMg",
+      "replace": "pFMF"
+    },
+    {
+      "search": "aaaa",
+      "replace": "aaab"
+    },
+    {
+      "search": "aaac",
+      "replace": "aaad"
+    },
+    {
+      "search": "aaae",
+      "replace": "aaaf"
+    },
+    {
+      "search": "aaba",
+      "replace": "aabb"
+    },
+    {
+      "search": "aabc",
+      "replace": "aabd"
+    },
+    {
+      "search": "aabe",
+      "replace": "aabf"
+    },
+    {
+      "search": "keIb",
+      "replace": "aaca"
+    },
+    {
+      "search": "aacb",
+      "replace": "aacc"
+    },
+    {
+      "search": "aacd",
+      "replace": "aace"
+    },
+    {
+      "search": "aacf",
+      "replace": "aada"
+    },
+    {
+      "search": "aadb",
+      "replace": "aadc"
+    },
+    {
+      "search": "aadd",
+      "replace": "aade"
+    },
+    {
+      "search": "aadf",
+      "replace": "aaea"
+    },
+    {
+      "search": "aaeb",
+      "replace": "aaec"
+    },
+    {
+      "search": "aaed",
+      "replace": "aaee"
+    },
+    {
+      "search": "aaef",
+      "replace": "aafa"
+    },
+    {
+      "search": "aafb",
+      "replace": "aafc"
+    },
+    {
+      "search": "aafd",
+      "replace": "aafe"
+    },
+    {
+      "search": "aaff",
+      "replace": "ZoLa"
+    },
+    {
+      "search": "iQnr",
+      "replace": "EHDP"
+    },
+    {
+      "search": "FVXn",
+      "replace": "BlVD"
+    },
+    {
+      "search": "vBPA",
+      "replace": "abaa"
+    },
+    {
+      "search": "AlPT",
+      "replace": "abac"
+    },
+    {
+      "search": "abad",
+      "replace": "abae"
+    },
+    {
+      "search": "abaf",
+      "replace": "abba"
+    },
+    {
+      "search": "abbb",
+      "replace": "abbc"
+    },
+    {
+      "search": "abbd",
+      "replace": "abbe"
+    },
+    {
+      "search": "abbf",
+      "replace": "abca"
+    },
+    {
+      "search": "abcb",
+      "replace": "abcc"
+    },
+    {
+      "search": "abcd",
+      "replace": "abce"
+    },
+    {
+      "search": "abcf",
+      "replace": "abda"
+    },
+    {
+      "search": "abdb",
+      "replace": "abdc"
+    },
+    {
+      "search": "abdd",
+      "replace": "abde"
+    },
+    {
+      "search": "abdf",
+      "replace": "abea"
+    },
+    {
+      "search": "abeb",
+      "replace": "abec"
+    },
+    {
+      "search": "abed",
+      "replace": "abee"
+    },
+    {
+      "search": "abef",
+      "replace": "abfa"
+    },
+    {
+      "search": "abfb",
+      "replace": "abfc"
+    },
+    {
+      "search": "abfd",
+      "replace": "abfe"
+    },
+    {
+      "search": "abff",
+      "replace": "BcjF"
+    },
+    {
+      "search": "JDjV",
+      "replace": "sTix"
+    },
+    {
+      "search": "acaa",
+      "replace": "acab"
+    },
+    {
+      "search": "acac",
+      "replace": "acad"
+    },
+    {
+      "search": "acae",
+      "replace": "acaf"
+    },
+    {
+      "search": "rZbE",
+      "replace": "hSyB"
+    },
+    {
+      "search": "acba",
+      "replace": "acbb"
+    },
+    {
+      "search": "acbc",
+      "replace": "acbd"
+    },
+    {
+      "search": "acbe",
+      "replace": "acbf"
+    },
+    {
+      "search": "acca",
+      "replace": "accb"
+    },
+    {
+      "search": "accc",
+      "replace": "accd"
+    },
+    {
+      "search": "acce",
+      "replace": "accf"
+    },
+    {
+      "search": "UTZq",
+      "replace": "acda"
+    },
+    {
+      "search": "pzLq",
+      "replace": "acdc"
+    },
+    {
+      "search": "acdd",
+      "replace": "acde"
+    },
+    {
+      "search": "acdf",
+      "replace": "acea"
+    },
+    {
+      "search": "aceb",
+      "replace": "acec"
+    },
+    {
+      "search": "aced",
+      "replace": "acee"
+    },
+    {
+      "search": "acef",
+      "replace": "acfa"
+    },
+    {
+      "search": "acfb",
+      "replace": "acfc"
+    },
+    {
+      "search": "acfd",
+      "replace": "acfe"
+    },
+    {
+      "search": "acff",
+      "replace": "hprF"
+    },
+    {
+      "search": "adaa",
+      "replace": "adab"
+    },
+    {
+      "search": "adac",
+      "replace": "adad"
+    },
+    {
+      "search": "adae",
+      "replace": "adaf"
+    },
+    {
+      "search": "adba",
+      "replace": "adbb"
+    },
+    {
+      "search": "adbc",
+      "replace": "adbd"
+    },
+    {
+      "search": "adbe",
+      "replace": "adbf"
+    },
+    {
+      "search": "adca",
+      "replace": "adcb"
+    },
+    {
+      "search": "adcc",
+      "replace": "adcd"
+    },
+    {
+      "search": "adce",
+      "replace": "adcf"
+    },
+    {
+      "search": "adda",
+      "replace": "addb"
+    },
+    {
+      "search": "addc",
+      "replace": "addd"
+    },
+    {
+      "search": "adde",
+      "replace": "addf"
+    },
+    {
+      "search": "adea",
+      "replace": "adeb"
+    },
+    {
+      "search": "adec",
+      "replace": "aded"
+    },
+    {
+      "search": "adee",
+      "replace": "adef"
+    },
+    {
+      "search": "adfa",
+      "replace": "adfb"
+    },
+    {
+      "search": "adfc",
+      "replace": "adfd"
+    },
+    {
+      "search": "adfe",
+      "replace": "adff"
+    },
+    {
+      "search": "ZRic",
+      "replace": "MrQd"
+    },
+    {
+      "search": "aeaa",
+      "replace": "aeab"
+    },
+    {
+      "search": "aeac",
+      "replace": "aead"
+    },
+    {
+      "search": "aeae",
+      "replace": "aeaf"
+    },
+    {
+      "search": "aeba",
+      "replace": "aebb"
+    },
+    {
+      "search": "aebc",
+      "replace": "aebd"
+    },
+    {
+      "search": "aebe",
+      "replace": "aebf"
+    },
+    {
+      "search": "aeca",
+      "replace": "aecb"
+    },
+    {
+      "search": "aecc",
+      "replace": "aecd"
+    },
+    {
+      "search": "aece",
+      "replace": "aecf"
+    },
+    {
+      "search": "aeda",
+      "replace": "aedb"
+    },
+    {
+      "search": "aedc",
+      "replace": "aedd"
+    },
+    {
+      "search": "aede",
+      "replace": "aedf"
+    },
+    {
+      "search": "aeea",
+      "replace": "aeeb"
+    },
+    {
+      "search": "aeec",
+      "replace": "aeed"
+    },
+    {
+      "search": "aeee",
+      "replace": "aeef"
+    },
+    {
+      "search": "aefa",
+      "replace": "aefb"
+    },
+    {
+      "search": "aefc",
+      "replace": "aefd"
+    },
+    {
+      "search": "aefe",
+      "replace": "aeff"
+    },
+    {
+      "search": "YKwT",
+      "replace": "unpL"
+    },
+    {
+      "search": "oTWu",
+      "replace": "UtAw"
+    },
+    {
+      "search": "afaa",
+      "replace": "afab"
+    },
+    {
+      "search": "afac",
+      "replace": "afad"
+    },
+    {
+      "search": "afae",
+      "replace": "afaf"
+    },
+    {
+      "search": "afba",
+      "replace": "afbb"
+    },
+    {
+      "search": "afbc",
+      "replace": "NGBw"
+    },
+    {
+      "search": "afbe",
+      "replace": "afbf"
+    },
+    {
+      "search": "afca",
+      "replace": "afcb"
+    },
+    {
+      "search": "afcc",
+      "replace": "afcd"
+    },
+    {
+      "search": "afce",
+      "replace": "afcf"
+    },
+    {
+      "search": "afda",
+      "replace": "afdb"
+    },
+    {
+      "search": "afdc",
+      "replace": "afdd"
+    },
+    {
+      "search": "afde",
+      "replace": "afdf"
+    },
+    {
+      "search": "KQrP",
+      "replace": "afea"
+    },
+    {
+      "search": "afeb",
+      "replace": "afec"
+    },
+    {
+      "search": "afed",
+      "replace": "afee"
+    },
+    {
+      "search": "afef",
+      "replace": "rNpJ"
+    },
+    {
+      "search": "affa",
+      "replace": "affb"
+    },
+    {
+      "search": "affc",
+      "replace": "affd"
+    },
+    {
+      "search": "affe",
+      "replace": "afff"
+    },
+    {
+      "search": "sbzA",
+      "replace": "nvrG"
+    },
+    {
+      "search": "yaut",
+      "replace": "npkv"
+    },
+    {
+      "search": "jKRo",
+      "replace": "NWCU"
+    },
+    {
+      "search": "ebxh",
+      "replace": "pqZS"
+    },
+    {
+      "search": "TVly",
+      "replace": "Vqiy"
+    },
+    {
+      "search": "KRkY",
+      "replace": "Sels"
+    },
+    {
+      "search": "ShWx",
+      "replace": "hzCx"
+    },
+    {
+      "search": "yRFi",
+      "replace": "Eqrp"
+    },
+    {
+      "search": "NwGe",
+      "replace": "FVkZ"
+    },
+    {
+      "search": "IlbL",
+      "replace": "ynbx"
+    },
+    {
+      "search": "AmIf",
+      "replace": "ebFJ"
+    },
+    {
+      "search": "KBbE",
+      "replace": "oaqE"
+    },
+    {
+      "search": "LQGu",
+      "replace": "MwwQ"
+    },
+    {
+      "search": "Vpzr",
+      "replace": "dRhR"
+    },
+    {
+      "search": "GdQo",
+      "replace": "ofVF"
+    },
+    {
+      "search": "ScrI",
+      "replace": "WmnW"
+    },
+    {
+      "search": "aIJY",
+      "replace": "ylOw"
+    },
+    {
+      "search": "EWwE",
+      "replace": "jeRE"
+    },
+    {
+      "search": "Qblt",
+      "replace": "hHEj"
+    },
+    {
+      "search": "pKAM",
+      "replace": "ZNMH"
+    },
+    {
+      "search": "TxFM",
+      "replace": "RUfA"
+    },
+    {
+      "search": "FiZG",
+      "replace": "kIoH"
+    },
+    {
+      "search": "bkNp",
+      "replace": "wFum"
+    },
+    {
+      "search": "cOUC",
+      "replace": "Izes"
+    },
+    {
+      "search": "zbEl",
+      "replace": "cGSp"
+    },
+    {
+      "search": "HRUm",
+      "replace": "KxtU"
+    },
+    {
+      "search": "Zjvl",
+      "replace": "QffD"
+    },
+    {
+      "search": "rnTG",
+      "replace": "mYwK"
+    },
+    {
+      "search": "baaa",
+      "replace": "baab"
+    },
+    {
+      "search": "baac",
+      "replace": "baad"
+    },
+    {
+      "search": "baae",
+      "replace": "baaf"
+    },
+    {
+      "search": "baba",
+      "replace": "babb"
+    },
+    {
+      "search": "babc",
+      "replace": "babd"
+    },
+    {
+      "search": "babe",
+      "replace": "babf"
+    },
+    {
+      "search": "baca",
+      "replace": "bacb"
+    },
+    {
+      "search": "bacc",
+      "replace": "bacd"
+    },
+    {
+      "search": "bace",
+      "replace": "bacf"
+    },
+    {
+      "search": "bada",
+      "replace": "badb"
+    },
+    {
+      "search": "badc",
+      "replace": "badd"
+    },
+    {
+      "search": "bade",
+      "replace": "badf"
+    },
+    {
+      "search": "uccR",
+      "replace": "baea"
+    },
+    {
+      "search": "baeb",
+      "replace": "baec"
+    },
+    {
+      "search": "baed",
+      "replace": "baee"
+    },
+    {
+      "search": "baef",
+      "replace": "bafa"
+    },
+    {
+      "search": "bafb",
+      "replace": "bafc"
+    },
+    {
+      "search": "bafd",
+      "replace": "bafe"
+    },
+    {
+      "search": "baff",
+      "replace": "yJHd"
+    },
+    {
+      "search": "lgDe",
+      "replace": "bbaa"
+    },
+    {
+      "search": "bbab",
+      "replace": "bbac"
+    },
+    {
+      "search": "bbad",
+      "replace": "bbae"
+    },
+    {
+      "search": "bbaf",
+      "replace": "bbba"
+    },
+    {
+      "search": "bbbb",
+      "replace": "bbbc"
+    },
+    {
+      "search": "bbbd",
+      "replace": "bbbe"
+    },
+    {
+      "search": "bbbf",
+      "replace": "bbca"
+    },
+    {
+      "search": "bbcb",
+      "replace": "bbcc"
+    },
+    {
+      "search": "bbcd",
+      "replace": "bbce"
+    },
+    {
+      "search": "bbcf",
+      "replace": "bbda"
+    },
+    {
+      "search": "bbdb",
+      "replace": "bbdc"
+    },
+    {
+      "search": "bbdd",
+      "replace": "bbde"
+    },
+    {
+      "search": "bbdf",
+      "replace": "bbea"
+    },
+    {
+      "search": "bbeb",
+      "replace": "bbec"
+    },
+    {
+      "search": "bbed",
+      "replace": "bbee"
+    },
+    {
+      "search": "bbef",
+      "replace": "bbfa"
+    },
+    {
+      "search": "bbfb",
+      "replace": "bbfc"
+    },
+    {
+      "search": "bbfd",
+      "replace": "bbfe"
+    },
+    {
+      "search": "bbff",
+      "replace": "gmjJ"
+    },
+    {
+      "search": "rDPL",
+      "replace": "seNz"
+    },
+    {
+      "search": "LIcB",
+      "replace": "bcaa"
+    },
+    {
+      "search": "bcab",
+      "replace": "bcac"
+    },
+    {
+      "search": "bcad",
+      "replace": "bcae"
+    },
+    {
+      "search": "mOkN",
+      "replace": "dlir"
+    },
+    {
+      "search": "bcba",
+      "replace": "bcbb"
+    },
+    {
+      "search": "bcbc",
+      "replace": "bcbd"
+    },
+    {
+      "search": "bcbe",
+      "replace": "bcbf"
+    },
+    {
+      "search": "wMod",
+      "replace": "bcca"
+    },
+    {
+      "search": "bccb",
+      "replace": "bccc"
+    },
+    {
+      "search": "bccd",
+      "replace": "bcce"
+    },
+    {
+      "search": "bccf",
+      "replace": "bcda"
+    },
+    {
+      "search": "bcdb",
+      "replace": "bcdc"
+    },
+    {
+      "search": "bcdd",
+      "replace": "bcde"
+    },
+    {
+      "search": "bcdf",
+      "replace": "bcea"
+    },
+    {
+      "search": "bceb",
+      "replace": "bcec"
+    },
+    {
+      "search": "bced",
+      "replace": "bcee"
+    },
+    {
+      "search": "bcef",
+      "replace": "bcfa"
+    },
+    {
+      "search": "bcfb",
+      "replace": "bcfc"
+    },
+    {
+      "search": "bcfd",
+      "replace": "bcfe"
+    },
+    {
+      "search": "bcff",
+      "replace": "bdaa"
+    },
+    {
+      "search": "bdab",
+      "replace": "bdac"
+    },
+    {
+      "search": "bdad",
+      "replace": "bdae"
+    },
+    {
+      "search": "bdaf",
+      "replace": "bdba"
+    },
+    {
+      "search": "bdbb",
+      "replace": "bdbc"
+    },
+    {
+      "search": "bdbd",
+      "replace": "bdbe"
+    },
+    {
+      "search": "bdbf",
+      "replace": "bdca"
+    },
+    {
+      "search": "bdcb",
+      "replace": "bdcc"
+    },
+    {
+      "search": "bdcd",
+      "replace": "bdce"
+    },
+    {
+      "search": "bdcf",
+      "replace": "bdda"
+    },
+    {
+      "search": "bddb",
+      "replace": "bddc"
+    },
+    {
+      "search": "bddd",
+      "replace": "bdde"
+    },
+    {
+      "search": "bddf",
+      "replace": "bdea"
+    },
+    {
+      "search": "bdeb",
+      "replace": "bdec"
+    },
+    {
+      "search": "bded",
+      "replace": "bdee"
+    },
+    {
+      "search": "bdef",
+      "replace": "bdfa"
+    },
+    {
+      "search": "bdfb",
+      "replace": "bdfc"
+    },
+    {
+      "search": "bdfd",
+      "replace": "bdfe"
+    },
+    {
+      "search": "bdff",
+      "replace": "gsQq"
+    },
+    {
+      "search": "TRox",
+      "replace": "beaa"
+    },
+    {
+      "search": "beab",
+      "replace": "beac"
+    },
+    {
+      "search": "bead",
+      "replace": "beae"
+    },
+    {
+      "search": "beaf",
+      "replace": "cOtf"
+    },
+    {
+      "search": "ygzZ",
+      "replace": "beba"
+    },
+    {
+      "search": "bebb",
+      "replace": "bebc"
+    },
+    {
+      "search": "bebd",
+      "replace": "bebe"
+    },
+    {
+      "search": "bebf",
+      "replace": "IBCS"
+    },
+    {
+      "search": "beca",
+      "replace": "becb"
+    },
+    {
+      "search": "becc",
+      "replace": "becd"
+    },
+    {
+      "search": "bece",
+      "replace": "becf"
+    },
+    {
+      "search": "beda",
+      "replace": "bedb"
+    },
+    {
+      "search": "bedc",
+      "replace": "bedd"
+    },
+    {
+      "search": "bede",
+      "replace": "bedf"
+    },
+    {
+      "search": "beea",
+      "replace": "beeb"
+    },
+    {
+      "search": "beec",
+      "replace": "beed"
+    },
+    {
+      "search": "beee",
+      "replace": "beef"
+    },
+    {
+      "search": "befa",
+      "replace": "befb"
+    },
+    {
+      "search": "befc",
+      "replace": "befd"
+    },
+    {
+      "search": "befe",
+      "replace": "beff"
+    },
+    {
+      "search": "sRoR",
+      "replace": "dhIO"
+    },
+    {
+      "search": "bfaa",
+      "replace": "bfab"
+    },
+    {
+      "search": "bfac",
+      "replace": "bfad"
+    },
+    {
+      "search": "bfae",
+      "replace": "bfaf"
+    },
+    {
+      "search": "bfba",
+      "replace": "bfbb"
+    },
+    {
+      "search": "bfbc",
+      "replace": "bfbd"
+    },
+    {
+      "search": "bfbe",
+      "replace": "bfbf"
+    },
+    {
+      "search": "bfca",
+      "replace": "bfcb"
+    },
+    {
+      "search": "bfcc",
+      "replace": "bfcd"
+    },
+    {
+      "search": "bfce",
+      "replace": "bfcf"
+    },
+    {
+      "search": "bfda",
+      "replace": "bfdb"
+    },
+    {
+      "search": "bfdc",
+      "replace": "bfdd"
+    },
+    {
+      "search": "bfde",
+      "replace": "bfdf"
+    },
+    {
+      "search": "TLgs",
+      "replace": "tLco"
+    },
+    {
+      "search": "bfea",
+      "replace": "bfeb"
+    },
+    {
+      "search": "bfec",
+      "replace": "bfed"
+    },
+    {
+      "search": "bfee",
+      "replace": "bfef"
+    },
+    {
+      "search": "bffa",
+      "replace": "bffb"
+    },
+    {
+      "search": "bffc",
+      "replace": "bffd"
+    },
+    {
+      "search": "bffe",
+      "replace": "bfff"
+    },
+    {
+      "search": "MWph",
+      "replace": "IPeA"
+    },
+    {
+      "search": "rLEc",
+      "replace": "DVum"
+    },
+    {
+      "search": "NHmS",
+      "replace": "IGOB"
+    },
+    {
+      "search": "RrOB",
+      "replace": "GkAC"
+    },
+    {
+      "search": "ZZfl",
+      "replace": "pDaf"
+    },
+    {
+      "search": "RwpH",
+      "replace": "PRcr"
+    },
+    {
+      "search": "NhSV",
+      "replace": "pEZk"
+    },
+    {
+      "search": "joun",
+      "replace": "WWjH"
+    },
+    {
+      "search": "ncAa",
+      "replace": "CAly"
+    },
+    {
+      "search": "qZWu",
+      "replace": "oVtV"
+    },
+    {
+      "search": "JJGl",
+      "replace": "KJlz"
+    },
+    {
+      "search": "TFJt",
+      "replace": "ZneZ"
+    },
+    {
+      "search": "yeWi",
+      "replace": "FocS"
+    },
+    {
+      "search": "QiNl",
+      "replace": "Luzy"
+    },
+    {
+      "search": "nnSO",
+      "replace": "sJhI"
+    },
+    {
+      "search": "pBXI",
+      "replace": "luAB"
+    },
+    {
+      "search": "OLbQ",
+      "replace": "sDDE"
+    },
+    {
+      "search": "vGrT",
+      "replace": "AKaA"
+    },
+    {
+      "search": "fPYx",
+      "replace": "RPQf"
+    },
+    {
+      "search": "ZxLU",
+      "replace": "Zuak"
+    },
+    {
+      "search": "pCJf",
+      "replace": "VQhX"
+    },
+    {
+      "search": "Enqc",
+      "replace": "VGLT"
+    },
+    {
+      "search": "amqB",
+      "replace": "ZQWi"
+    },
+    {
+      "search": "VDlG",
+      "replace": "wjRY"
+    },
+    {
+      "search": "qdlj",
+      "replace": "bRXj"
+    },
+    {
+      "search": "pYjg",
+      "replace": "OqDT"
+    },
+    {
+      "search": "kEaI",
+      "replace": "bMKe"
+    },
+    {
+      "search": "PNat",
+      "replace": "ulEp"
+    },
+    {
+      "search": "baFW",
+      "replace": "ppEW"
+    },
+    {
+      "search": "lnIm",
+      "replace": "DrqU"
+    },
+    {
+      "search": "LCsP",
+      "replace": "BCNf"
+    },
+    {
+      "search": "ivwJ",
+      "replace": "GDFK"
+    },
+    {
+      "search": "caaa",
+      "replace": "caab"
+    },
+    {
+      "search": "caac",
+      "replace": "caad"
+    },
+    {
+      "search": "caae",
+      "replace": "caaf"
+    },
+    {
+      "search": "caba",
+      "replace": "cabb"
+    },
+    {
+      "search": "cabc",
+      "replace": "cabd"
+    },
+    {
+      "search": "cabe",
+      "replace": "cabf"
+    },
+    {
+      "search": "caca",
+      "replace": "cacb"
+    },
+    {
+      "search": "cacc",
+      "replace": "cacd"
+    },
+    {
+      "search": "cace",
+      "replace": "cacf"
+    },
+    {
+      "search": "QNzN",
+      "replace": "cada"
+    },
+    {
+      "search": "iQHq",
+      "replace": "vRZv"
+    },
+    {
+      "search": "cadd",
+      "replace": "cade"
+    },
+    {
+      "search": "cadf",
+      "replace": "caea"
+    },
+    {
+      "search": "caeb",
+      "replace": "caec"
+    },
+    {
+      "search": "DKui",
+      "replace": "caee"
+    },
+    {
+      "search": "caef",
+      "replace": "cafa"
+    },
+    {
+      "search": "cafb",
+      "replace": "cafc"
+    },
+    {
+      "search": "cafd",
+      "replace": "cafe"
+    },
+    {
+      "search": "caff",
+      "replace": "VXSX"
+    },
+    {
+      "search": "CdpM",
+      "replace": "kAPH"
+    },
+    {
+      "search": "hfWc",
+      "replace": "cbaa"
+    },
+    {
+      "search": "cbab",
+      "replace": "cbac"
+    },
+    {
+      "search": "cbad",
+      "replace": "cbae"
+    },
+    {
+      "search": "cbaf",
+      "replace": "cbba"
+    },
+    {
+      "search": "cbbb",
+      "replace": "cbbc"
+    },
+    {
+      "search": "cbbd",
+      "replace": "cbbe"
+    },
+    {
+      "search": "cbbf",
+      "replace": "cbca"
+    },
+    {
+      "search": "cbcb",
+      "replace": "cbcc"
+    },
+    {
+      "search": "cbcd",
+      "replace": "cbce"
+    },
+    {
+      "search": "cbcf",
+      "replace": "cbda"
+    },
+    {
+      "search": "cbdb",
+      "replace": "cbdc"
+    },
+    {
+      "search": "cbdd",
+      "replace": "cbde"
+    },
+    {
+      "search": "cbdf",
+      "replace": "cbea"
+    },
+    {
+      "search": "cbeb",
+      "replace": "cbec"
+    },
+    {
+      "search": "cbed",
+      "replace": "cbee"
+    },
+    {
+      "search": "cbef",
+      "replace": "cbfa"
+    },
+    {
+      "search": "cbfb",
+      "replace": "cbfc"
+    },
+    {
+      "search": "cbfd",
+      "replace": "cbfe"
+    },
+    {
+      "search": "cbff",
+      "replace": "KfAY"
+    },
+    {
+      "search": "sVyk",
+      "replace": "mkGY"
+    },
+    {
+      "search": "lnhM",
+      "replace": "OMqW"
+    },
+    {
+      "search": "zqFy",
+      "replace": "ccaa"
+    },
+    {
+      "search": "ccab",
+      "replace": "ccac"
+    },
+    {
+      "search": "ccad",
+      "replace": "ccae"
+    },
+    {
+      "search": "ccaf",
+      "replace": "ccba"
+    },
+    {
+      "search": "ccbb",
+      "replace": "ccbc"
+    },
+    {
+      "search": "ccbd",
+      "replace": "ccbe"
+    },
+    {
+      "search": "ccbf",
+      "replace": "ccca"
+    },
+    {
+      "search": "cccb",
+      "replace": "cccc"
+    },
+    {
+      "search": "cccd",
+      "replace": "ccce"
+    },
+    {
+      "search": "cccf",
+      "replace": "hHxT"
+    },
+    {
+      "search": "wJhY",
+      "replace": "ccda"
+    },
+    {
+      "search": "ccdb",
+      "replace": "ccdc"
+    },
+    {
+      "search": "ccdd",
+      "replace": "ccde"
+    },
+    {
+      "search": "ccdf",
+      "replace": "ccea"
+    },
+    {
+      "search": "cceb",
+      "replace": "ccec"
+    },
+    {
+      "search": "cced",
+      "replace": "ccee"
+    },
+    {
+      "search": "ccef",
+      "replace": "ccfa"
+    },
+    {
+      "search": "ccfb",
+      "replace": "ccfc"
+    },
+    {
+      "search": "ccfd",
+      "replace": "ccfe"
+    },
+    {
+      "search": "ccff",
+      "replace": "lrPm"
+    },
+    {
+      "search": "NTOO",
+      "replace": "cdaa"
+    },
+    {
+      "search": "cdab",
+      "replace": "cdac"
+    },
+    {
+      "search": "cdad",
+      "replace": "sjRP"
+    },
+    {
+      "search": "cdaf",
+      "replace": "cdba"
+    },
+    {
+      "search": "cdbb",
+      "replace": "cdbc"
+    },
+    {
+      "search": "cdbd",
+      "replace": "cdbe"
+    },
+    {
+      "search": "drDh",
+      "replace": "cdca"
+    },
+    {
+      "search": "cdcb",
+      "replace": "cdcc"
+    },
+    {
+      "search": "cdcd",
+      "replace": "cdce"
+    },
+    {
+      "search": "cdcf",
+      "replace": "gpcG"
+    },
+    {
+      "search": "cdda",
+      "replace": "cddb"
+    },
+    {
+      "search": "cddc",
+      "replace": "cddd"
+    },
+    {
+      "search": "cdde",
+      "replace": "cddf"
+    },
+    {
+      "search": "cdea",
+      "replace": "HvbU"
+    },
+    {
+      "search": "cdec",
+      "replace": "cded"
+    },
+    {
+      "search": "cdee",
+      "replace": "cdef"
+    },
+    {
+      "search": "cdfa",
+      "replace": "cdfb"
+    },
+    {
+      "search": "cdfc",
+      "replace": "cdfd"
+    },
+    {
+      "search": "cdfe",
+      "replace": "cdff"
+    },
+    {
+      "search": "xmJw",
+      "replace": "Uqpb"
+    },
+    {
+      "search": "RyGN",
+      "replace": "JSgy"
+    },
+    {
+      "search": "RjPI",
+      "replace": "yzsU"
+    },
+    {
+      "search": "ceaa",
+      "replace": "ceab"
+    },
+    {
+      "search": "ceac",
+      "replace": "cead"
+    },
+    {
+      "search": "ceae",
+      "replace": "ceaf"
+    },
+    {
+      "search": "Himh",
+      "replace": "fYJM"
+    },
+    {
+      "search": "dJGe",
+      "replace": "cebb"
+    },
+    {
+      "search": "cebc",
+      "replace": "cebd"
+    },
+    {
+      "search": "cebe",
+      "replace": "cebf"
+    },
+    {
+      "search": "ceca",
+      "replace": "cecb"
+    },
+    {
+      "search": "cecc",
+      "replace": "cecd"
+    },
+    {
+      "search": "cece",
+      "replace": "cecf"
+    },
+    {
+      "search": "ceda",
+      "replace": "cedb"
+    },
+    {
+      "search": "cedc",
+      "replace": "cedd"
+    },
+    {
+      "search": "cede",
+      "replace": "cedf"
+    },
+    {
+      "search": "ceea",
+      "replace": "ceeb"
+    },
+    {
+      "search": "ceec",
+      "replace": "ceed"
+    },
+    {
+      "search": "ceee",
+      "replace": "ceef"
+    },
+    {
+      "search": "cefa",
+      "replace": "cefb"
+    },
+    {
+      "search": "cefc",
+      "replace": "cefd"
+    },
+    {
+      "search": "cefe",
+      "replace": "ceff"
+    },
+    {
+      "search": "Jgoj",
+      "replace": "OTQz"
+    },
+    {
+      "search": "pdaQ",
+      "replace": "mxhy"
+    },
+    {
+      "search": "cfaa",
+      "replace": "cfab"
+    },
+    {
+      "search": "cfac",
+      "replace": "cfad"
+    },
+    {
+      "search": "cfae",
+      "replace": "cfaf"
+    },
+    {
+      "search": "cfba",
+      "replace": "cfbb"
+    },
+    {
+      "search": "cfbc",
+      "replace": "cfbd"
+    },
+    {
+      "search": "cfbe",
+      "replace": "cfbf"
+    },
+    {
+      "search": "cfca",
+      "replace": "sNTh"
+    },
+    {
+      "search": "cfcc",
+      "replace": "cfcd"
+    },
+    {
+      "search": "cfce",
+      "replace": "cfcf"
+    },
+    {
+      "search": "cfda",
+      "replace": "cfdb"
+    },
+    {
+      "search": "cfdc",
+      "replace": "cfdd"
+    },
+    {
+      "search": "cfde",
+      "replace": "cfdf"
+    },
+    {
+      "search": "QNhp",
+      "replace": "cfea"
+    },
+    {
+      "search": "cfeb",
+      "replace": "cfec"
+    },
+    {
+      "search": "cfed",
+      "replace": "cfee"
+    },
+    {
+      "search": "cfef",
+      "replace": "cffa"
+    },
+    {
+      "search": "cffb",
+      "replace": "cffc"
+    },
+    {
+      "search": "cffd",
+      "replace": "cffe"
+    },
+    {
+      "search": "cfff",
+      "replace": "NvJM"
+    },
+    {
+      "search": "iCpq",
+      "replace": "OwDk"
+    },
+    {
+      "search": "Vmqy",
+      "replace": "YzaP"
+    },
+    {
+      "search": "PYWq",
+      "replace": "Wnky"
+    },
+    {
+      "search": "hLjp",
+      "replace": "mbRj"
+    },
+    {
+      "search": "xDYE",
+      "replace": "IRXp"
+    },
+    {
+      "search": "uDfP",
+      "replace": "NVyb"
+    },
+    {
+      "search": "kstX",
+      "replace": "gFac"
+    },
+    {
+      "search": "YmOF",
+      "replace": "PKHU"
+    },
+    {
+      "search": "Hchd",
+      "replace": "bfoN"
+    },
+    {
+      "search": "RlON",
+      "replace": "TgmV"
+    },
+    {
+      "search": "IQcr",
+      "replace": "roPM"
+    },
+    {
+      "search": "PCjo",
+      "replace": "JOdM"
+    },
+    {
+      "search": "YbhB",
+      "replace": "nHls"
+    },
+    {
+      "search": "dKJF",
+      "replace": "SVsf"
+    },
+    {
+      "search": "hBxX",
+      "replace": "eGtc"
+    },
+    {
+      "search": "plPF",
+      "replace": "EYRU"
+    },
+    {
+      "search": "EKjW",
+      "replace": "Mzbz"
+    },
+    {
+      "search": "bfnT",
+      "replace": "HUmP"
+    },
+    {
+      "search": "rWun",
+      "replace": "hEIN"
+    },
+    {
+      "search": "rJiG",
+      "replace": "RwuW"
+    },
+    {
+      "search": "xpvS",
+      "replace": "wzWD"
+    },
+    {
+      "search": "sBox",
+      "replace": "UMqj"
+    },
+    {
+      "search": "EmnN",
+      "replace": "gUjv"
+    },
+    {
+      "search": "NeNE",
+      "replace": "jgDu"
+    },
+    {
+      "search": "EDMd",
+      "replace": "daaa"
+    },
+    {
+      "search": "daab",
+      "replace": "daac"
+    },
+    {
+      "search": "daad",
+      "replace": "daae"
+    },
+    {
+      "search": "daaf",
+      "replace": "daba"
+    },
+    {
+      "search": "dabb",
+      "replace": "dabc"
+    },
+    {
+      "search": "dabd",
+      "replace": "dabe"
+    },
+    {
+      "search": "dabf",
+      "replace": "daca"
+    },
+    {
+      "search": "dacb",
+      "replace": "dacc"
+    },
+    {
+      "search": "dacd",
+      "replace": "dace"
+    },
+    {
+      "search": "dacf",
+      "replace": "vFjT"
+    },
+    {
+      "search": "dada",
+      "replace": "dadb"
+    },
+    {
+      "search": "dadc",
+      "replace": "dadd"
+    },
+    {
+      "search": "dade",
+      "replace": "dadf"
+    },
+    {
+      "search": "daea",
+      "replace": "daeb"
+    },
+    {
+      "search": "daec",
+      "replace": "daed"
+    },
+    {
+      "search": "daee",
+      "replace": "daef"
+    },
+    {
+      "search": "dafa",
+      "replace": "dafb"
+    },
+    {
+      "search": "dafc",
+      "replace": "dafd"
+    },
+    {
+      "search": "dafe",
+      "replace": "daff"
+    },
+    {
+      "search": "dbaa",
+      "replace": "dbab"
+    },
+    {
+      "search": "dbac",
+      "replace": "dbad"
+    },
+    {
+      "search": "dbae",
+      "replace": "dbaf"
+    },
+    {
+      "search": "dbba",
+      "replace": "dbbb"
+    },
+    {
+      "search": "dbbc",
+      "replace": "dbbd"
+    },
+    {
+      "search": "Wwjm",
+      "replace": "dbbf"
+    },
+    {
+      "search": "dbca",
+      "replace": "dbcb"
+    },
+    {
+      "search": "dbcc",
+      "replace": "dbcd"
+    },
+    {
+      "search": "dbce",
+      "replace": "dbcf"
+    },
+    {
+      "search": "yqwz",
+      "replace": "dbdb"
+    },
+    {
+      "search": "dbdc",
+      "replace": "dbdd"
+    },
+    {
+      "search": "dbde",
+      "replace": "dbdf"
+    },
+    {
+      "search": "Lswi",
+      "replace": "dbea"
+    },
+    {
+      "search": "dbeb",
+      "replace": "dbec"
+    },
+    {
+      "search": "dbed",
+      "replace": "dbee"
+    },
+    {
+      "search": "dbef",
+      "replace": "dbfa"
+    },
+    {
+      "search": "dbfb",
+      "replace": "dbfc"
+    },
+    {
+      "search": "dbfd",
+      "replace": "dbfe"
+    },
+    {
+      "search": "dbff",
+      "replace": "fpzP"
+    },
+    {
+      "search": "piYb",
+      "replace": "Vtkj"
+    },
+    {
+      "search": "Uxff",
+      "replace": "QTbg"
+    },
+    {
+      "search": "dcaa",
+      "replace": "dcab"
+    },
+    {
+      "search": "dcac",
+      "replace": "dcad"
+    },
+    {
+      "search": "dcae",
+      "replace": "dcaf"
+    },
+    {
+      "search": "dcba",
+      "replace": "dcbb"
+    },
+    {
+      "search": "dcbc",
+      "replace": "dcbd"
+    },
+    {
+      "search": "dcbe",
+      "replace": "dcbf"
+    },
+    {
+      "search": "dcca",
+      "replace": "dccb"
+    },
+    {
+      "search": "dccc",
+      "replace": "dccd"
+    },
+    {
+      "search": "dcce",
+      "replace": "dccf"
+    },
+    {
+      "search": "dcda",
+      "replace": "dcdb"
+    },
+    {
+      "search": "dcdc",
+      "replace": "dcdd"
+    },
+    {
+      "search": "dcde",
+      "replace": "dcdf"
+    },
+    {
+      "search": "dcea",
+      "replace": "dceb"
+    },
+    {
+      "search": "dcec",
+      "replace": "dced"
+    },
+    {
+      "search": "dcee",
+      "replace": "dcef"
+    },
+    {
+      "search": "dcfa",
+      "replace": "dcfb"
+    },
+    {
+      "search": "dcfc",
+      "replace": "dcfd"
+    },
+    {
+      "search": "dcfe",
+      "replace": "dcff"
+    },
+    {
+      "search": "LsUp",
+      "replace": "ddaa"
+    },
+    {
+      "search": "ddab",
+      "replace": "ddac"
+    },
+    {
+      "search": "ddad",
+      "replace": "ddae"
+    },
+    {
+      "search": "ddaf",
+      "replace": "ddba"
+    },
+    {
+      "search": "uYad",
+      "replace": "ddbc"
+    },
+    {
+      "search": "ddbd",
+      "replace": "ddbe"
+    },
+    {
+      "search": "ddbf",
+      "replace": "ddca"
+    },
+    {
+      "search": "ddcb",
+      "replace": "ddcc"
+    },
+    {
+      "search": "ddcd",
+      "replace": "ddce"
+    },
+    {
+      "search": "ddcf",
+      "replace": "ddda"
+    },
+    {
+      "search": "dddb",
+      "replace": "dddc"
+    },
+    {
+      "search": "dddd",
+      "replace": "ddde"
+    },
+    {
+      "search": "dddf",
+      "replace": "ddea"
+    },
+    {
+      "search": "ddeb",
+      "replace": "ddec"
+    },
+    {
+      "search": "dded",
+      "replace": "ddee"
+    },
+    {
+      "search": "ddef",
+      "replace": "ddfa"
+    },
+    {
+      "search": "ddfb",
+      "replace": "ddfc"
+    },
+    {
+      "search": "Jpxq",
+      "replace": "ddfe"
+    },
+    {
+      "search": "ddff",
+      "replace": "GtiW"
+    },
+    {
+      "search": "pruJ",
+      "replace": "ATef"
+    },
+    {
+      "search": "fAzU",
+      "replace": "tzyX"
+    },
+    {
+      "search": "CwvY",
+      "replace": "deaa"
+    },
+    {
+      "search": "deab",
+      "replace": "deac"
+    },
+    {
+      "search": "dead",
+      "replace": "deae"
+    },
+    {
+      "search": "deaf",
+      "replace": "deba"
+    },
+    {
+      "search": "debb",
+      "replace": "debc"
+    },
+    {
+      "search": "debd",
+      "replace": "debe"
+    },
+    {
+      "search": "debf",
+      "replace": "deca"
+    },
+    {
+      "search": "decb",
+      "replace": "decc"
+    },
+    {
+      "search": "decd",
+      "replace": "dece"
+    },
+    {
+      "search": "decf",
+      "replace": "deda"
+    },
+    {
+      "search": "dedb",
+      "replace": "dedc"
+    },
+    {
+      "search": "dedd",
+      "replace": "dede"
+    },
+    {
+      "search": "dedf",
+      "replace": "deea"
+    },
+    {
+      "search": "deeb",
+      "replace": "deec"
+    },
+    {
+      "search": "deed",
+      "replace": "deee"
+    },
+    {
+      "search": "deef",
+      "replace": "defa"
+    },
+    {
+      "search": "defb",
+      "replace": "defc"
+    },
+    {
+      "search": "defd",
+      "replace": "defe"
+    },
+    {
+      "search": "deff",
+      "replace": "kyss"
+    },
+    {
+      "search": "dfaa",
+      "replace": "dfab"
+    },
+    {
+      "search": "dfac",
+      "replace": "dfad"
+    },
+    {
+      "search": "dfae",
+      "replace": "dfaf"
+    },
+    {
+      "search": "EMqC",
+      "replace": "dfba"
+    },
+    {
+      "search": "dfbb",
+      "replace": "dfbc"
+    },
+    {
+      "search": "dfbd",
+      "replace": "dfbe"
+    },
+    {
+      "search": "dfbf",
+      "replace": "dfca"
+    },
+    {
+      "search": "dfcb",
+      "replace": "dfcc"
+    },
+    {
+      "search": "dfcd",
+      "replace": "dfce"
+    },
+    {
+      "search": "dfcf",
+      "replace": "dfda"
+    },
+    {
+      "search": "dfdb",
+      "replace": "dfdc"
+    },
+    {
+      "search": "dfdd",
+      "replace": "dfde"
+    },
+    {
+      "search": "dfdf",
+      "replace": "dfea"
+    },
+    {
+      "search": "dfeb",
+      "replace": "dfec"
+    },
+    {
+      "search": "dfed",
+      "replace": "dfee"
+    },
+    {
+      "search": "dfef",
+      "replace": "dffa"
+    },
+    {
+      "search": "dffb",
+      "replace": "dffc"
+    },
+    {
+      "search": "dffd",
+      "replace": "dffe"
+    },
+    {
+      "search": "dfff",
+      "replace": "rrDC"
+    },
+    {
+      "search": "RbHe",
+      "replace": "bmeW"
+    },
+    {
+      "search": "PgPU",
+      "replace": "QgPX"
+    },
+    {
+      "search": "muhu",
+      "replace": "WIyb"
+    },
+    {
+      "search": "ECkJ",
+      "replace": "tsNz"
+    },
+    {
+      "search": "WNzp",
+      "replace": "qOkX"
+    },
+    {
+      "search": "Igqi",
+      "replace": "ppKN"
+    },
+    {
+      "search": "YFsO",
+      "replace": "KKcy"
+    },
+    {
+      "search": "MLPb",
+      "replace": "BgxD"
+    },
+    {
+      "search": "pXnC",
+      "replace": "akmo"
+    },
+    {
+      "search": "jtms",
+      "replace": "zeiw"
+    },
+    {
+      "search": "HCbF",
+      "replace": "kQLh"
+    },
+    {
+      "search": "gMqm",
+      "replace": "DROQ"
+    },
+    {
+      "search": "GWvX",
+      "replace": "OBXC"
+    },
+    {
+      "search": "mPzl",
+      "replace": "kBbc"
+    },
+    {
+      "search": "BYck",
+      "replace": "NRZm"
+    },
+    {
+      "search": "Dpsh",
+      "replace": "BBCb"
+    },
+    {
+      "search": "moxW",
+      "replace": "ItNN"
+    },
+    {
+      "search": "QmHc",
+      "replace": "neNn"
+    },
+    {
+      "search": "blqr",
+      "replace": "yYCV"
+    },
+    {
+      "search": "gucA",
+      "replace": "LbTg"
+    },
+    {
+      "search": "FpyO",
+      "replace": "INZp"
+    },
+    {
+      "search": "JJJg",
+      "replace": "vATf"
+    },
+    {
+      "search": "ZRif",
+      "replace": "mJWc"
+    },
+    {
+      "search": "GgCV",
+      "replace": "vrdR"
+    },
+    {
+      "search": "MHeG",
+      "replace": "cHBi"
+    },
+    {
+      "search": "KXMO",
+      "replace": "xGug"
+    },
+    {
+      "search": "IENi",
+      "replace": "GWyB"
+    },
+    {
+      "search": "JBkc",
+      "replace": "AVcH"
+    },
+    {
+      "search": "XIxb",
+      "replace": "hGIb"
+    },
+    {
+      "search": "jwNf",
+      "replace": "yWpL"
+    },
+    {
+      "search": "Lcbr",
+      "replace": "YDud"
+    },
+    {
+      "search": "BmKc",
+      "replace": "OwJS"
+    },
+    {
+      "search": "jALO",
+      "replace": "UZNV"
+    },
+    {
+      "search": "eaab",
+      "replace": "eaac"
+    },
+    {
+      "search": "eaad",
+      "replace": "eaae"
+    },
+    {
+      "search": "eaaf",
+      "replace": "eaba"
+    },
+    {
+      "search": "eabb",
+      "replace": "eabc"
+    },
+    {
+      "search": "eabd",
+      "replace": "eabe"
+    },
+    {
+      "search": "eabf",
+      "replace": "eaca"
+    },
+    {
+      "search": "eacb",
+      "replace": "eacc"
+    },
+    {
+      "search": "eacd",
+      "replace": "eace"
+    },
+    {
+      "search": "eacf",
+      "replace": "eada"
+    },
+    {
+      "search": "eadb",
+      "replace": "eadc"
+    },
+    {
+      "search": "eadd",
+      "replace": "eade"
+    },
+    {
+      "search": "eadf",
+      "replace": "MopR"
+    },
+    {
+      "search": "eaea",
+      "replace": "jXHN"
+    },
+    {
+      "search": "eaec",
+      "replace": "eaed"
+    },
+    {
+      "search": "eaee",
+      "replace": "eaef"
+    },
+    {
+      "search": "eafa",
+      "replace": "dMOG"
+    },
+    {
+      "search": "eafc",
+      "replace": "eafd"
+    },
+    {
+      "search": "eafe",
+      "replace": "eaff"
+    },
+    {
+      "search": "Pggb",
+      "replace": "ebaa"
+    },
+    {
+      "search": "ebab",
+      "replace": "ebac"
+    },
+    {
+      "search": "ebad",
+      "replace": "ebae"
+    },
+    {
+      "search": "ebaf",
+      "replace": "ebba"
+    },
+    {
+      "search": "ebbb",
+      "replace": "ebbc"
+    },
+    {
+      "search": "ebbd",
+      "replace": "ebbe"
+    },
+    {
+      "search": "ebbf",
+      "replace": "ebca"
+    },
+    {
+      "search": "ebcb",
+      "replace": "ebcc"
+    },
+    {
+      "search": "zEvC",
+      "replace": "ebce"
+    },
+    {
+      "search": "ebcf",
+      "replace": "zcXA"
+    },
+    {
+      "search": "ebda",
+      "replace": "ebdb"
+    },
+    {
+      "search": "ebdc",
+      "replace": "ebdd"
+    },
+    {
+      "search": "ebde",
+      "replace": "ebdf"
+    },
+    {
+      "search": "ebea",
+      "replace": "ebeb"
+    },
+    {
+      "search": "ebec",
+      "replace": "ebed"
+    },
+    {
+      "search": "ebee",
+      "replace": "ebef"
+    },
+    {
+      "search": "XrHS",
+      "replace": "ebfa"
+    },
+    {
+      "search": "ebfb",
+      "replace": "ebfc"
+    },
+    {
+      "search": "ebfd",
+      "replace": "ebfe"
+    },
+    {
+      "search": "ebff",
+      "replace": "DGLJ"
+    },
+    {
+      "search": "TXzI",
+      "replace": "eciQ"
+    },
+    {
+      "search": "aPLX",
+      "replace": "ecaa"
+    },
+    {
+      "search": "ecab",
+      "replace": "ecac"
+    },
+    {
+      "search": "ecad",
+      "replace": "ecae"
+    },
+    {
+      "search": "ecaf",
+      "replace": "ecba"
+    },
+    {
+      "search": "ecbb",
+      "replace": "ecbc"
+    },
+    {
+      "search": "ecbd",
+      "replace": "ecbe"
+    },
+    {
+      "search": "ecbf",
+      "replace": "ecca"
+    },
+    {
+      "search": "eccb",
+      "replace": "eccc"
+    },
+    {
+      "search": "eccd",
+      "replace": "ecce"
+    },
+    {
+      "search": "eccf",
+      "replace": "yGQt"
+    },
+    {
+      "search": "ecda",
+      "replace": "ecdb"
+    },
+    {
+      "search": "ecdc",
+      "replace": "ecdd"
+    },
+    {
+      "search": "ecde",
+      "replace": "ecdf"
+    },
+    {
+      "search": "ecea",
+      "replace": "eceb"
+    },
+    {
+      "search": "ecec",
+      "replace": "eced"
+    },
+    {
+      "search": "ecee",
+      "replace": "ecef"
+    },
+    {
+      "search": "ecfa",
+      "replace": "ecfb"
+    },
+    {
+      "search": "ecfc",
+      "replace": "ecfd"
+    },
+    {
+      "search": "ecfe",
+      "replace": "ecff"
+    },
+    {
+      "search": "MniO",
+      "replace": "IqVu"
+    },
+    {
+      "search": "RXMQ",
+      "replace": "ZysA"
+    },
+    {
+      "search": "CIgU",
+      "replace": "zwJc"
+    },
+    {
+      "search": "edaa",
+      "replace": "edab"
+    },
+    {
+      "search": "edac",
+      "replace": "edad"
+    },
+    {
+      "search": "edae",
+      "replace": "edaf"
+    },
+    {
+      "search": "edba",
+      "replace": "edbb"
+    },
+    {
+      "search": "edbc",
+      "replace": "edbd"
+    },
+    {
+      "search": "edbe",
+      "replace": "edbf"
+    },
+    {
+      "search": "edca",
+      "replace": "edcb"
+    },
+    {
+      "search": "edcc",
+      "replace": "edcd"
+    },
+    {
+      "search": "edce",
+      "replace": "edcf"
+    },
+    {
+      "search": "edda",
+      "replace": "eddb"
+    },
+    {
+      "search": "eddc",
+      "replace": "eddd"
+    },
+    {
+      "search": "edde",
+      "replace": "eddf"
+    },
+    {
+      "search": "xPwx",
+      "replace": "edea"
+    },
+    {
+      "search": "edeb",
+      "replace": "edec"
+    },
+    {
+      "search": "eded",
+      "replace": "edee"
+    },
+    {
+      "search": "edef",
+      "replace": "edfa"
+    },
+    {
+      "search": "edfb",
+      "replace": "edfc"
+    },
+    {
+      "search": "edfd",
+      "replace": "edfe"
+    },
+    {
+      "search": "edff",
+      "replace": "xuUj"
+    },
+    {
+      "search": "eeaa",
+      "replace": "eeab"
+    },
+    {
+      "search": "eeac",
+      "replace": "eead"
+    },
+    {
+      "search": "eeae",
+      "replace": "eeaf"
+    },
+    {
+      "search": "eeba",
+      "replace": "eebb"
+    },
+    {
+      "search": "eebc",
+      "replace": "eebd"
+    },
+    {
+      "search": "eebe",
+      "replace": "eebf"
+    },
+    {
+      "search": "eeca",
+      "replace": "eecb"
+    },
+    {
+      "search": "eecc",
+      "replace": "eecd"
+    },
+    {
+      "search": "eece",
+      "replace": "eecf"
+    },
+    {
+      "search": "TJOL",
+      "replace": "eeda"
+    },
+    {
+      "search": "eedb",
+      "replace": "eedc"
+    },
+    {
+      "search": "eedd",
+      "replace": "eede"
+    },
+    {
+      "search": "eedf",
+      "replace": "eeea"
+    },
+    {
+      "search": "eeeb",
+      "replace": "eeec"
+    },
+    {
+      "search": "eeed",
+      "replace": "eeee"
+    },
+    {
+      "search": "eeef",
+      "replace": "lrfs"
+    },
+    {
+      "search": "eefa",
+      "replace": "eefb"
+    },
+    {
+      "search": "eefc",
+      "replace": "eefd"
+    },
+    {
+      "search": "eefe",
+      "replace": "eeff"
+    },
+    {
+      "search": "JHVn",
+      "replace": "VEIm"
+    },
+    {
+      "search": "efaa",
+      "replace": "efab"
+    },
+    {
+      "search": "efac",
+      "replace": "efad"
+    },
+    {
+      "search": "efae",
+      "replace": "efaf"
+    },
+    {
+      "search": "efba",
+      "replace": "efbb"
+    },
+    {
+      "search": "efbc",
+      "replace": "efbd"
+    },
+    {
+      "search": "efbe",
+      "replace": "efbf"
+    },
+    {
+      "search": "efca",
+      "replace": "efcb"
+    },
+    {
+      "search": "efcc",
+      "replace": "efcd"
+    },
+    {
+      "search": "efce",
+      "replace": "efcf"
+    },
+    {
+      "search": "efda",
+      "replace": "efdb"
+    },
+    {
+      "search": "efdc",
+      "replace": "efdd"
+    },
+    {
+      "search": "efde",
+      "replace": "efdf"
+    },
+    {
+      "search": "SpIW",
+      "replace": "efea"
+    },
+    {
+      "search": "efeb",
+      "replace": "efec"
+    },
+    {
+      "search": "efed",
+      "replace": "efee"
+    },
+    {
+      "search": "efef",
+      "replace": "effa"
+    },
+    {
+      "search": "effb",
+      "replace": "effc"
+    },
+    {
+      "search": "effd",
+      "replace": "effe"
+    },
+    {
+      "search": "efff",
+      "replace": "xfYC"
+    },
+    {
+      "search": "TNXC",
+      "replace": "JuAx"
+    },
+    {
+      "search": "XeKi",
+      "replace": "KHDm"
+    },
+    {
+      "search": "ERQO",
+      "replace": "Zopd"
+    },
+    {
+      "search": "vlaK",
+      "replace": "PLbT"
+    },
+    {
+      "search": "sLvA",
+      "replace": "LJLq"
+    },
+    {
+      "search": "KioP",
+      "replace": "nlji"
+    },
+    {
+      "search": "cOxt",
+      "replace": "xnaP"
+    },
+    {
+      "search": "kmcY",
+      "replace": "Crhr"
+    },
+    {
+      "search": "jaaO",
+      "replace": "EFFl"
+    },
+    {
+      "search": "VoUI",
+      "replace": "AxCE"
+    },
+    {
+      "search": "ghxU",
+      "replace": "xJMM"
+    },
+    {
+      "search": "bWtf",
+      "replace": "LWIK"
+    },
+    {
+      "search": "hRAi",
+      "replace": "NDCr"
+    },
+    {
+      "search": "vWoC",
+      "replace": "MtdF"
+    },
+    {
+      "search": "hCUq",
+      "replace": "pUVK"
+    },
+    {
+      "search": "Hixl",
+      "replace": "UBen"
+    },
+    {
+      "search": "tfzE",
+      "replace": "cnoU"
+    },
+    {
+      "search": "DojR",
+      "replace": "OiGR"
+    },
+    {
+      "search": "uXGh",
+      "replace": "EZPK"
+    },
+    {
+      "search": "LaOC",
+      "replace": "GZPz"
+    },
+    {
+      "search": "FDef",
+      "replace": "BrCv"
+    },
+    {
+      "search": "PzUr",
+      "replace": "pWZa"
+    },
+    {
+      "search": "JfmD",
+      "replace": "lekW"
+    },
+    {
+      "search": "eNMZ",
+      "replace": "dncQ"
+    },
+    {
+      "search": "gGuI",
+      "replace": "mHpW"
+    },
+    {
+      "search": "NOHP",
+      "replace": "xxxx"
+    }
+  ]
+}

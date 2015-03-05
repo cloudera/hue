@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "description": "No more vowels",
+      "search": "[aeiou]",
+      "replace": "x"
+    },
+    {
+      "description": "Passwords",
+      "trigger": "password",
+      "search": "password=.*",
+      "replace": "password=xxxxx"
+    }
+  ]
+}
