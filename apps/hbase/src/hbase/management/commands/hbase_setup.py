@@ -17,15 +17,16 @@
 
 import logging
 import os
-import pwd
 
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
 from desktop.lib.paths import get_apps_root
+
+from useradmin.models import install_sample_user
 
 from hbased.ttypes import AlreadyExists
 from hbase.api import HbaseApi
@@ -34,11 +35,16 @@ from hbase.api import HbaseApi
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   help = 'Create and fill some demo tables in the first configured cluster.'
+  args = '<username>'
 
-  def handle_noargs(self, **options):
-    user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
+  def handle(self, *args, **options):
+    if args:
+      user = args[0]
+    else:
+      user = install_sample_user()
+
     api = HbaseApi(user=user)
     cluster_name = api.getClusters()[0]['name'] # Currently pick first configured cluster
 

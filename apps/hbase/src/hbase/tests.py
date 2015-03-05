@@ -27,8 +27,8 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
 from hbase.api import HbaseApi
-from hbase.conf import HBASE_CONF_DIR, USE_DOAS
-from hbase.hbase_site import get_server_authentication, get_server_principal, reset
+from hbase.conf import HBASE_CONF_DIR
+from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
 
 
 def test_security_plain():
@@ -114,25 +114,27 @@ def test_impersonation():
   proto = MockProtocol()
   client = thrift_hbase.Client(proto)
 
-  reset = USE_DOAS.set_for_testing(False)
+  impersonation_enabled = is_impersonation_enabled()
+
+  get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = 'FALSE'
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
     pass # We don't mock everything
   finally:
-    reset()
+    get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
   assert_equal({}, proto.get_headers())
 
 
-  reset = USE_DOAS.set_for_testing(True)
+  get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = 'TRUE'
 
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
     pass # We don't mock everything
   finally:
-    reset()
+    get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
   assert_equal({'doAs': u'test_hbase'}, proto.get_headers())
 
