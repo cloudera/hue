@@ -97,7 +97,7 @@ class HbaseApi(object):
                                   use_sasl=_security['use_sasl'],
                                   timeout_seconds=30,
                                   transport=conf.THRIFT_TRANSPORT.get(),
-                                  transport_mode='http' if is_using_thrift_http() else 'tcp',
+                                  transport_mode='http' if is_using_thrift_http() else 'socket',
                                   http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port'])
     )
 
