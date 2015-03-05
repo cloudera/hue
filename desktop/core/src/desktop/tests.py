@@ -127,7 +127,7 @@ def test_home():
   tags = json.loads(response.context['json_tags'])
   assert_equal([], tags['mine'][0]['docs'], tags)
   assert_equal([], tags['trash']['docs'], tags)
-  assert_equal([doc.id], tags['history']['docs'], tags)
+  assert_equal([], tags['history']['docs'], tags) # We currently don't fetch [doc.id]
 
 
 def test_skip_wizard():
