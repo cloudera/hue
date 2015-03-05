@@ -108,18 +108,18 @@ class Resource(object):
     return self.invoke("DELETE", relpath, params)
 
 
-  def post(self, relpath=None, params=None, data=None, contenttype=None):
+  def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
     @param contenttype: Optional.
+    @param headers: Optional. Base set of headers.
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("POST", relpath, params, data,
-                       self._make_headers(contenttype))
+    return self.invoke("POST", relpath, params, data, self._make_headers(contenttype, headers))
 
 
   def put(self, relpath=None, params=None, data=None, contenttype=None):
@@ -132,11 +132,14 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("PUT", relpath, params, data,
-                       self._make_headers(contenttype))
+    return self.invoke("PUT", relpath, params, data, self._make_headers(contenttype))
 
 
-  def _make_headers(self, contenttype=None):
+  def _make_headers(self, contenttype=None, headers=None):
+    if headers is None:
+      headers = {}
+
     if contenttype:
-      return { 'Content-Type': contenttype }
-    return None
+      headers.update({'Content-Type': contenttype})
+
+    return headers

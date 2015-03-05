@@ -27,9 +27,10 @@ from django.utils.encoding import smart_str
 from desktop.lib import thrift_util
 from desktop.lib.exceptions_renderable import PopupException
 
-from hbase.server.hbase_lib import get_thrift_type, get_client_type
 from hbase import conf
-from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http
+from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http, is_impersonation_enabled
+from hbase.server.hbase_lib import get_thrift_type, get_client_type
+
 
 LOG = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class HbaseApi(object):
   def queryCluster(self, action, cluster, *args):
     client = self.connectCluster(cluster)
     method = getattr(client, action)
-    return method(*args)
+    return method(*args, doas=self.user.username)
 
   def getClusters(self):
     clusters = []
@@ -101,9 +102,6 @@ class HbaseApi(object):
                                   http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port'])
     )
 
-    if hasattr(client, 'setCustomHeaders'):
-      client.setCustomHeaders({'doAs': self.user.username})
-
     return client
 
   @classmethod
@@ -125,29 +123,29 @@ class HbaseApi(object):
 
   def get(self, cluster, tableName, row, column, attributes):
     client = self.connectCluster(cluster)
-    return client.get(tableName, smart_str(row), smart_str(column), attributes)
+    return client.get(tableName, smart_str(row), smart_str(column), attributes, doas=self.user.username)
 
   def getVerTs(self, cluster, tableName, row, column, timestamp, numVersions, attributesargs):
     client = self.connectCluster(cluster)
-    return client.getVerTs(tableName, smart_str(row), smart_str(column), timestamp, numVersions, attributesargs)
+    return client.getVerTs(tableName, smart_str(row), smart_str(column), timestamp, numVersions, attributesargs, doas=self.user.username)
 
   def createTable(self, cluster, tableName, columns):
     client = self.connectCluster(cluster)
-    client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(**column['properties']) for column in columns])
+    client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(**column['properties']) for column in columns], doas=self.user.username)
     return "%s successfully created" % tableName
 
   def getTableList(self, cluster):
     client = self.connectCluster(cluster)
-    return [{'name': name, 'enabled': client.isTableEnabled(name)} for name in client.getTableNames()]
+    return [{'name': name, 'enabled': client.isTableEnabled(name, doas=self.user.username)} for name in client.getTableNames(doas=self.user.username)]
 
   def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix=False):
     client = self.connectCluster(cluster)
     if prefix == False:
-      scanner = client.scannerOpen(tableName, smart_str(startRowKey), columns, None)
+      scanner = client.scannerOpen(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)
     else:
-      scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None)
-    data = client.scannerGetList(scanner, numRows)
-    client.scannerClose(scanner)
+      scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)
+    data = client.scannerGetList(scanner, numRows, doas=self.user.username)
+    client.scannerClose(scanner, doas=self.user.username)
     return data
 
   def getAutocompleteRows(self, cluster, tableName, numRows, query):
@@ -155,8 +153,8 @@ class HbaseApi(object):
     try:
       client = self.connectCluster(cluster)
       scan = get_thrift_type('TScan')(startRow=query, stopRow=None, timestamp=None, columns=[], caching=None, filterString="PrefixFilter('" + query + "') AND ColumnPaginationFilter(1,0)", batchSize=None)
-      scanner = client.scannerOpenWithScan(tableName, scan, None)
-      return [result.row for result in client.scannerGetList(scanner, numRows)]
+      scanner = client.scannerOpenWithScan(tableName, scan, None, doas=self.user.username)
+      return [result.row for result in client.scannerGetList(scanner, numRows, doas=self.user.username)]
     except Exception, e:
       LOG.error('Autocomplete error: %s' % smart_str(e))
       return []
@@ -169,7 +167,7 @@ class HbaseApi(object):
 
   def getRowsFull(self, cluster, tableName, startRowKey, numRows):
     client = self.connectCluster(cluster)
-    return self.getRows(cluster, tableName, [smart_str(column) for column in client.getColumnDescriptors(tableName)], smart_str(startRowKey), numRows)
+    return self.getRows(cluster, tableName, [smart_str(column) for column in client.getColumnDescriptors(tableName, aaa=11, doas=self.user.username)], smart_str(startRowKey), numRows)
 
   def getRowFull(self, cluster, tableName, startRowKey, numRows):
     row = self.getRowsFull(cluster, tableName, smart_str(startRowKey), 1)
@@ -180,21 +178,21 @@ class HbaseApi(object):
   def getRowPartial(self, cluster, tableName, rowKey, offset, number):
     client = self.connectCluster(cluster)
     scan = get_thrift_type('TScan')(startRow=rowKey, stopRow=None, timestamp=None, columns=[], caching=None, filterString="ColumnPaginationFilter(%i, %i)" % (number, offset), batchSize=None)
-    scanner = client.scannerOpenWithScan(tableName, scan, None)
-    return client.scannerGetList(scanner, 1)
+    scanner = client.scannerOpenWithScan(tableName, scan, None, doas=self.user.username)
+    return client.scannerGetList(scanner, 1, doas=self.user.username)
 
   def deleteColumns(self, cluster, tableName, row, columns):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
     mutations = [Mutation(isDelete = True, column=smart_str(column)) for column in columns]
-    return client.mutateRow(tableName, smart_str(row), mutations, None)
+    return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def deleteColumn(self, cluster, tableName, row, column):
-    return self.deleteColumns(cluster, tableName, smart_str(row), [smart_str(column)])
+    return self.deleteColumns(cluster, tableName, smart_str(row), [smart_str(column)], doas=self.user.username)
 
   def deleteAllRow(self, cluster, tableName, row, attributes):
     client = self.connectCluster(cluster)
-    return client.deleteAllRow(tableName, smart_str(row), attributes)
+    return client.deleteAllRow(tableName, smart_str(row), attributes, doas=self.user.username)
 
   def putRow(self, cluster, tableName, row, data):
     client = self.connectCluster(cluster)
@@ -202,7 +200,7 @@ class HbaseApi(object):
     Mutation = get_thrift_type('Mutation')
     for column in data.keys():
       mutations.append(Mutation(column=smart_str(column), value=smart_str(data[column]))) # must use str for API, does thrift coerce by itself?
-    return client.mutateRow(tableName, smart_str(row), mutations, None)
+    return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def putColumn(self, cluster, tableName, row, column, value):
     return self.putRow(cluster, tableName, smart_str(row), {column: value})
@@ -210,7 +208,7 @@ class HbaseApi(object):
   def putUpload(self, cluster, tableName, row, column, value):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
-    return client.mutateRow(tableName, smart_str(row), [Mutation(column=smart_str(column), value=value.file.read(value.size))], None)
+    return client.mutateRow(tableName, smart_str(row), [Mutation(column=smart_str(column), value=value.file.read(value.size))], None, doas=self.user.username)
 
   def getRowQuerySet(self, cluster, tableName, columns, queries):
     client = self.connectCluster(cluster)
@@ -227,8 +225,8 @@ class HbaseApi(object):
       filterstring = "(ColumnPaginationFilter(%i,0) AND PageFilter(%i))" % (limit, limit) + (fs or "")
       scan_columns = [smart_str(column.strip(':')) for column in query['columns']] or [smart_str(column.strip(':')) for column in columns]
       scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=scan_columns, caching=None, filterString=filterstring, batchSize=None)
-      scanner = client.scannerOpenWithScan(tableName, scan, None)
-      aggregate_data += client.scannerGetList(scanner, query['scan_length'])
+      scanner = client.scannerOpenWithScan(tableName, scan, None, doas=self.user.username)
+      aggregate_data += client.scannerGetList(scanner, query['scan_length'], doas=self.user.username)
     return aggregate_data
 
   def bulkUpload(self, cluster, tableName, data):
@@ -249,5 +247,5 @@ class HbaseApi(object):
         if str(row[column_index]) != "":
           mutations.append(Mutation(column=smart_str(columns[column_index]), value=smart_str(row[column_index])))
       batches += [BatchMutation(row=row_key, mutations=mutations)]
-    client.mutateRows(tableName, batches, None)
+    client.mutateRows(tableName, batches, None, doas=self.user.username)
     return True
