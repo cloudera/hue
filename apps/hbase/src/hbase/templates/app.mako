@@ -61,13 +61,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </td>
         </tr>
-        <tr data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading() && !${datasource}.isReLoading()">
-            <td colspan="8">
-                <div class="alert">
-                    ${_('There are no tables matching the search criteria.')}
-                </div>
-          </td>
-        </tr>
       </tfoot>
   </table>
 </%def>

@@ -167,7 +167,7 @@ class HbaseApi(object):
 
   def getRowsFull(self, cluster, tableName, startRowKey, numRows):
     client = self.connectCluster(cluster)
-    return self.getRows(cluster, tableName, [smart_str(column) for column in client.getColumnDescriptors(tableName, aaa=11, doas=self.user.username)], smart_str(startRowKey), numRows)
+    return self.getRows(cluster, tableName, [smart_str(column) for column in client.getColumnDescriptors(tableName, doas=self.user.username)], smart_str(startRowKey), numRows)
 
   def getRowFull(self, cluster, tableName, startRowKey, numRows):
     row = self.getRowsFull(cluster, tableName, smart_str(startRowKey), 1)
@@ -188,7 +188,7 @@ class HbaseApi(object):
     return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def deleteColumn(self, cluster, tableName, row, column):
-    return self.deleteColumns(cluster, tableName, smart_str(row), [smart_str(column)], doas=self.user.username)
+    return self.deleteColumns(cluster, tableName, smart_str(row), [smart_str(column)])
 
   def deleteAllRow(self, cluster, tableName, row, attributes):
     client = self.connectCluster(cluster)

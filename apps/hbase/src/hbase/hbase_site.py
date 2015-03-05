@@ -62,10 +62,10 @@ def get_server_authentication():
   return get_conf().get(_CNF_HBASE_AUTHENTICATION, 'NOSASL').upper()
 
 def is_impersonation_enabled():
-  return get_conf().get(_CNF_HBASE_IMPERSONATION_ENABLED, 'FALSE').upper() == 'TRUE' and USE_DOAS.get()
+  return get_conf().get(_CNF_HBASE_IMPERSONATION_ENABLED, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
 
 def is_using_thrift_http():
-  return get_conf().get(_CNF_HBASE_USE_THRIFT_HTTP, 'FALSE').upper() == 'TRUE' and USE_DOAS.get()
+  return get_conf().get(_CNF_HBASE_USE_THRIFT_HTTP, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
 
 def is_using_thrift_ssl():
   return get_conf().get(_CNF_HBASE_USE_THRIFT_SSL, 'FALSE').upper() == 'TRUE'

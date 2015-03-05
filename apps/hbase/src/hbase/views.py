@@ -132,7 +132,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      hbase_setup.Command().handle_noargs()
+      hbase_setup.Command().handle(user=request.user)
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)
