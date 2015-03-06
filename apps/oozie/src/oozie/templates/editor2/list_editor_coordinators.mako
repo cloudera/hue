@@ -50,7 +50,7 @@ ${ layout.menubar(section='coordinators', is_editor=True) }
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
-        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
+        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelectedNoV1()}">
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
 
@@ -146,6 +146,9 @@ ${ commonshare() | n,unicode }
     self.selectedJobs = ko.computed(function() {
       return $.grep(self.jobs(), function(job) { return job.isSelected(); });
     });
+    self.selectedV1Jobs = ko.computed(function() {
+      return $.grep(self.selectedJobs(), function(job) { return job.uuid() == null; });
+    });
     self.isLoading = ko.observable(false);
 
     self.oneSelected = ko.computed(function() {
@@ -153,6 +156,9 @@ ${ commonshare() | n,unicode }
     });
     self.atLeastOneSelected = ko.computed(function() {
       return self.selectedJobs().length >= 1;
+    });
+    self.atLeastOneSelectedNoV1 = ko.computed(function() {
+      return self.selectedJobs().length >= 1 && self.selectedV1Jobs().length == 0;
     });
     self.allSelected = ko.observable(false);
 
@@ -171,12 +177,12 @@ ${ commonshare() | n,unicode }
 
     self.showSubmitPopup = function () {
       if (self.selectedJobs()[0].uuid()) {
-        var base_url = "/oozie/editor/coordinator/submit/";
+        var url = "/oozie/editor/coordinator/submit/" + self.selectedJobs()[0].id();
       } else {
-        var base_url = "/oozie/submit_coordinator/";
+        var url = "/oozie/submit_coordinator/" + self.selectedJobs()[0].object_id();
       }
 
-      $.get(base_url + self.selectedJobs()[0].id(), {
+      $.get(url, {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {

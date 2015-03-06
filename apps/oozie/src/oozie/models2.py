@@ -256,7 +256,7 @@ class Workflow(Job):
     Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
 
   def import_workspace(self, fs, source_deployment_dir, owner):
-    try:    
+    try:
       fs.copy_remote_dir(source_deployment_dir, self.deployment_dir, owner=owner)
     except WebHdfsException, e:
       msg = _('The copy of the deployment directory failed: %s.') % e
@@ -1337,7 +1337,6 @@ def import_workflow_from_hue_3_7(old_wf):
   data['workflow']['properties']['sla'] = old_wf.sla
   data['workflow']['properties']['sla_enabled'] = old_wf.sla_enabled
   data['workflow']['properties']['imported'] = True
-  data['workflow']['properties']['old_deployment_dir'] = old_wf.deployment_dir
   data['workflow']['properties']['wf1_id'] = old_wf.id
 
   # Layout
