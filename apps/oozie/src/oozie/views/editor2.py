@@ -47,13 +47,13 @@ LOG = logging.getLogger(__name__)
 
 
 
-def list_editor_workflows(request):  
+def list_editor_workflows(request):
   workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   workflows_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldWorklow, request.user) if job.managed]
   if workflows_v1:
     workflows.extend(workflows_v1)
-  
+
   return render('editor2/list_editor_workflows.mako', request, {
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
   })
@@ -62,7 +62,7 @@ def list_editor_workflows(request):
 def open_old_workflow(request):
   doc_id = request.GET.get('workflow')
   workflow = Document.objects.get(id=doc_id).content_object.get_full_node()
-  
+
   try:
     _workflow = import_workflow_from_hue_3_7(workflow)
     return _edit_workflow(request, None, _workflow)
@@ -74,7 +74,7 @@ def open_old_workflow(request):
 @check_document_access_permission()
 def edit_workflow(request):
   workflow_id = request.GET.get('workflow')
-  
+
   wid = {}
   if workflow_id.isdigit():
     wid['id'] = workflow_id
@@ -91,8 +91,8 @@ def _edit_workflow(request, doc, workflow):
 
   api = get_oozie(request.user)
   credentials = Credentials()
-  
-  try:  
+
+  try:
     credentials.fetch(api)
   except Exception, e:
     LOG.error(smart_str(e))
@@ -113,7 +113,7 @@ def new_workflow(request):
   workflow = Workflow()
   workflow.set_workspace(request.user)
   workflow.check_workspace(request.fs, request.user)
-      
+
   return _edit_workflow(request, doc, workflow)
 
 
@@ -128,17 +128,17 @@ def delete_job(request):
       doc2 = Document2.objects.get(id=job['id'])
       doc = doc2.doc.get()
       doc.can_write_or_exception(request.user)
-      
+
       doc.delete()
       doc2.delete()
     else: # Old version
       job = Job.objects.can_read_or_exception(request, job['object_id'])
       Job.objects.can_edit_or_exception(request, job)
-      OldWorklow.objects.destroy(job, request.fs)      
+      OldWorklow.objects.destroy(job, request.fs)
 
   response = {}
   request.info(_('Document deleted.') if len(jobs) > 1 else _('Document deleted.'))
-  
+
   return JsonResponse(response)
 
 
@@ -151,32 +151,41 @@ def copy_workflow(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-workflow2', id=job['id'])
-    
+
     name = doc2.name + '-copy'
     copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
-  
+
     doc2.pk = None
     doc2.id = None
     doc2.uuid = str(uuid.uuid4())
     doc2.name = name
-    doc2.owner = request.user    
+    doc2.owner = request.user
     doc2.save()
-  
+
     doc2.doc.all().delete()
     doc2.doc.add(copy_doc)
-    
+    doc2.save()
+
     workflow = Workflow(document=doc2)
     workflow.update_name(name)
+
+    _import_workspace(request.fs, request.user, workflow)
+
     doc2.update_data({'workflow': workflow.get_data()['workflow']})
     doc2.save()
 
-    workflow.set_workspace(request.user)
-    workflow.check_workspace(request.fs, request.user)
-
-  response = {}  
+  response = {}
   request.info(_('Workflows copied.') if len(jobs) > 1 else _('Workflow copied.'))
 
   return JsonResponse(response)
+
+
+def _import_workspace(fs, user, workflow):
+  source_workspace_dir = workflow.deployment_dir
+
+  workflow.set_workspace(user)
+  workflow.check_workspace(fs, user)
+  workflow.import_workspace(fs, source_workspace_dir, user)
 
 
 @check_document_modify_permission()
@@ -188,7 +197,7 @@ def save_workflow(request):
 
   if workflow.get('id'):
     workflow_doc = Document2.objects.get(id=workflow['id'])
-  else:      
+  else:
     workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user, description=workflow['properties']['description'])
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
@@ -197,18 +206,17 @@ def save_workflow(request):
     dependencies = Document2.objects.filter(uuid__in=subworkflows)
     workflow_doc.dependencies = dependencies
 
-  if workflow['properties'].get('imported'): # Old workflow format
+  if workflow['properties'].get('imported'): # We save and old format workflow to the latest
     workflow['properties']['imported'] = False
+    workflow_instance = Workflow(workflow=workflow)
+    _import_workspace(request.fs, request.user, workflow_instance)
+    workflow['properties']['deployment_dir'] = workflow_instance.deployment_dir
     response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
   workflow_doc.name = workflow['name']
   workflow_doc.save()
-
-  workflow_instance = Workflow(document=workflow_doc)
-  workflow_instance.set_workspace(request.user)
-  workflow_instance.check_workspace(request.fs, request.user)
 
   response['status'] = 0
   response['id'] = workflow_doc.id
@@ -230,9 +238,9 @@ def new_node(request):
     workflows = _get_workflows(request.user)
 
   response['status'] = 0
-  response['properties'] = properties 
+  response['properties'] = properties
   response['workflows'] = workflows
-  
+
   return JsonResponse(response)
 
 
@@ -243,7 +251,7 @@ def _get_workflows(user):
         'value': workflow.uuid,
         'id': workflow.id
       } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
-    ]  
+    ]
 
 
 def add_node(request):
@@ -272,26 +280,26 @@ def action_parameters(request):
 
   try:
     node_data = json.loads(request.POST.get('node', '{}'))
-    
+
     parameters = parameters.union(set(Node(node_data).find_parameters()))
-    
+
     script_path = node_data.get('properties', {}).get('script_path', {})
     if script_path:
       script_path = script_path.replace('hdfs://', '')
 
       if request.fs.do_as_user(request.user, request.fs.exists, script_path):
-        data = request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024 ** 2)  
+        data = request.fs.do_as_user(request.user, request.fs.read, script_path, 0, 16 * 1024 ** 2)
 
         if node_data['type'] in ('hive', 'hive2'):
           parameters = parameters.union(set(find_dollar_braced_variables(data)))
         elif node_data['type'] == 'pig':
           parameters = parameters.union(set(find_dollar_variables(data)))
-                
+
     response['status'] = 0
     response['parameters'] = list(parameters)
   except Exception, e:
     response['message'] = str(e)
-    
+
   return JsonResponse(response)
 
 
@@ -300,13 +308,13 @@ def workflow_parameters(request):
   response = {'status': -1}
 
   try:
-    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid'))) 
+    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid')))
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
   except Exception, e:
     response['message'] = str(e)
-    
+
   return JsonResponse(response)
 
 
@@ -315,14 +323,14 @@ def gen_xml_workflow(request):
 
   try:
     workflow_json = json.loads(request.POST.get('workflow', '{}'))
-  
+
     workflow = Workflow(workflow=workflow_json)
-  
+
     response['status'] = 0
     response['xml'] = workflow.to_xml()
   except Exception, e:
     response['message'] = str(e)
-    
+
   return JsonResponse(response)
 
 
@@ -332,7 +340,7 @@ def submit_workflow(request, doc_id):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
-    params_form = ParametersFormSet(request.POST)    
+    params_form = ParametersFormSet(request.POST)
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
@@ -394,7 +402,7 @@ def edit_coordinator(request):
     if coordinator_id.isdigit():
       cid['id'] = coordinator_id
     else:
-      cid['uuid'] = coordinator_id    
+      cid['uuid'] = coordinator_id
     doc = Document2.objects.get(**cid)
     coordinator = Coordinator(document=doc)
   else:
@@ -407,8 +415,8 @@ def edit_coordinator(request):
 
   api = get_oozie(request.user)
   credentials = Credentials()
-  
-  try:  
+
+  try:
     credentials.fetch(api)
   except Exception, e:
     LOG.error(smart_str(e))
@@ -435,7 +443,7 @@ def new_coordinator(request):
 def open_old_coordinator(request):
   doc_id = request.GET.get('coordinator')
   coordinator_id = Document.objects.get(id=doc_id).object_id
-  
+
   return old_edit_coordinator(request, coordinator=coordinator_id)
 
 
@@ -448,26 +456,26 @@ def copy_coordinator(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-coordinator2', id=job['id'])
-    
+
     name = doc2.name + '-copy'
     copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
-  
+
     doc2.pk = None
     doc2.id = None
     doc2.uuid = str(uuid.uuid4())
     doc2.name = name
-    doc2.owner = request.user    
+    doc2.owner = request.user
     doc2.save()
-  
+
     doc2.doc.all().delete()
     doc2.doc.add(copy_doc)
-    
+
     coordinator_data = Coordinator(document=doc2).get_data_for_json()
     coordinator_data['name'] = name
     doc2.update_data(coordinator_data)
     doc2.save()
 
-  response = {}  
+  response = {}
   request.info(_('Coordinator copied.') if len(jobs) > 1 else _('Coordinator copied.'))
 
   return JsonResponse(response)
@@ -481,7 +489,7 @@ def save_coordinator(request):
 
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
-  else:      
+  else:
     coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
@@ -494,7 +502,7 @@ def save_coordinator(request):
   coordinator_doc.update_data(coordinator_data)
   coordinator_doc.name = coordinator_data['name']
   coordinator_doc.save()
-  
+
   response['status'] = 0
   response['id'] = coordinator_doc.id
   response['message'] = _('Saved !')
@@ -511,8 +519,8 @@ def gen_xml_coordinator(request):
 
   response['status'] = 0
   response['xml'] = coordinator.to_xml()
-    
-  return JsonResponse(response) 
+
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
@@ -520,19 +528,19 @@ def coordinator_parameters(request):
   response = {'status': -1}
 
   try:
-    coordinator = Coordinator(document=Document2.objects.get(type='oozie-coordinator2', uuid=request.GET.get('uuid'))) 
+    coordinator = Coordinator(document=Document2.objects.get(type='oozie-coordinator2', uuid=request.GET.get('uuid')))
 
     response['status'] = 0
     response['parameters'] = coordinator.find_all_parameters(with_lib_path=False)
   except Exception, e:
     response['message'] = str(e)
-    
+
   return JsonResponse(response)
 
 
 @check_document_access_permission()
 def submit_coordinator(request, doc_id):
-  coordinator = Coordinator(document=Document2.objects.get(id=doc_id))  
+  coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -574,9 +582,9 @@ def _submit_coordinator(request, coordinator, mapping):
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
                          detail=ex._headers.get('oozie-error-message', ex))
-    
-    
-    
+
+
+
 
 def list_editor_bundles(request):
   bundles = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
@@ -594,7 +602,7 @@ def list_editor_bundles(request):
 def edit_bundle(request):
   bundle_id = request.GET.get('bundle')
   doc = None
-  
+
   if bundle_id:
     doc = Document2.objects.get(id=bundle_id)
     bundle = Bundle(document=doc)
@@ -609,7 +617,7 @@ def edit_bundle(request):
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))      
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
 
@@ -620,7 +628,7 @@ def new_bundle(request):
 def open_old_bundle(request):
   doc_id = request.GET.get('bundle')
   bundle_id = Document.objects.get(id=doc_id).object_id
-  
+
   return old_edit_bundle(request, bundle=bundle_id)
 
 
@@ -632,20 +640,20 @@ def save_bundle(request):
 
   if bundle_data.get('id'):
     bundle_doc = Document2.objects.get(id=bundle_data['id'])
-  else:      
+  else:
     bundle_doc = Document2.objects.create(name=bundle_data['name'], uuid=bundle_data['uuid'], type='oozie-bundle2', owner=request.user)
     Document.objects.link(bundle_doc, owner=bundle_doc.owner, name=bundle_doc.name, description=bundle_doc.description, extra='bundle2')
 
   if bundle_data['coordinators']:
     dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']])
     for doc in dependencies:
-      doc.doc.get().can_read_or_exception(request.user)    
+      doc.doc.get().can_read_or_exception(request.user)
     bundle_doc.dependencies = dependencies
 
   bundle_doc.update_data(bundle_data)
   bundle_doc.name = bundle_data['name']
   bundle_doc.save()
-  
+
   response['status'] = 0
   response['id'] = bundle_doc.id
   response['message'] = _('Saved !')
@@ -662,26 +670,26 @@ def copy_bundle(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-bundle2', id=job['id'])
-    
+
     name = doc2.name + '-copy'
     copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
-  
+
     doc2.pk = None
     doc2.id = None
     doc2.uuid = str(uuid.uuid4())
     doc2.name = name
-    doc2.owner = request.user    
+    doc2.owner = request.user
     doc2.save()
-  
+
     doc2.doc.all().delete()
     doc2.doc.add(copy_doc)
-    
+
     bundle_data = Bundle(document=doc2).get_data_for_json()
     bundle_data['name'] = name
     doc2.update_data(bundle_data)
     doc2.save()
 
-  response = {}  
+  response = {}
   request.info(_('Bundle copied.') if len(jobs) > 1 else _('Bundle copied.'))
 
   return JsonResponse(response)
@@ -689,7 +697,7 @@ def copy_bundle(request):
 
 @check_document_access_permission()
 def submit_bundle(request, doc_id):
-  bundle = Bundle(document=Document2.objects.get(id=doc_id))  
+  bundle = Bundle(document=Document2.objects.get(id=doc_id))
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -720,20 +728,20 @@ def _submit_bundle(request, bundle, properties):
   try:
     deployment_mapping = {}
     coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])])
-    
+
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]
       workflow = Workflow(document=coord.dependencies.all()[0])
-      wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()      
+      wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()
       deployment_mapping['wf_%s_dir' % i] = request.fs.get_hdfs_path(wf_dir)
-      
+
       coordinator = Coordinator(document=coord)
       coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
       deployment_mapping['coord_%s_dir' % i] = coord_dir
       deployment_mapping['coord_%s' % i] = coord
 
     properties.update(deployment_mapping)
-    
+
     submission = Submission(request.user, bundle, request.fs, request.jt, properties=properties)
     job_id = submission.run()
 

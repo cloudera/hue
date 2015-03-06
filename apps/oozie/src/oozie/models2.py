@@ -40,6 +40,7 @@ from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
+from hadoop.fs.exceptions import WebHdfsException
 
 
 LOG = logging.getLogger(__name__)
@@ -247,16 +248,23 @@ class Workflow(Job):
     self.data = json.dumps(_data)
 
   def check_workspace(self, fs, user):
-    # Create optional root workspace for the first submission
-    root = REMOTE_SAMPLE_DIR.get().rsplit('/', 1)
-    if len(root) > 1 and '$' not in root[0]:
-      create_directories(fs, [root[0]])
+    # Create optional default root workspace for the first submission
+    if REMOTE_SAMPLE_DIR.get() == REMOTE_SAMPLE_DIR.config.default_value:
+      create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
 
     Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
     Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
 
+  def import_workspace(self, fs, source_deployment_dir, owner):
+    try:    
+      fs.copy_remote_dir(source_deployment_dir, self.deployment_dir, owner=owner)
+    except WebHdfsException, e:
+      msg = _('The copy of the deployment directory failed: %s.') % e
+      LOG.error(msg)
+      raise PopupException(msg)
+
   def gen_status_graph(self, oozie_workflow):
-    return '' # TODO
+    return ''
 
   def get_absolute_url(self):
     return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
@@ -1329,6 +1337,7 @@ def import_workflow_from_hue_3_7(old_wf):
   data['workflow']['properties']['sla'] = old_wf.sla
   data['workflow']['properties']['sla_enabled'] = old_wf.sla_enabled
   data['workflow']['properties']['imported'] = True
+  data['workflow']['properties']['old_deployment_dir'] = old_wf.deployment_dir
   data['workflow']['properties']['wf1_id'] = old_wf.id
 
   # Layout
