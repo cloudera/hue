@@ -28,7 +28,7 @@ from desktop.lib.test_utils import grant_access
 
 from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
-from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
+from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
 
 
 def test_security_plain():
