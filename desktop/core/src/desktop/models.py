@@ -505,7 +505,7 @@ class Document(models.Model):
       'owner': self.owner.username,
       'name': self.name,
       'description': self.description,
-      'uuid': None,
+      'uuid': None, # no uuid == v1
       'id': self.id,
       'doc1_id': self.id,
       'object_id': self.object_id,
