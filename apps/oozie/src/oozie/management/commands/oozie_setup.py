@@ -26,8 +26,7 @@ from hadoop import cluster
 
 from desktop.models import Document
 from liboozie.submittion import create_directories
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR,\
-  REMOTE_SAMPLE_DIR
+from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 from oozie.models import Workflow, Coordinator, Bundle
 from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
