@@ -63,7 +63,11 @@ def list_sentry_roles_by_group(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    if "couldn't be retrieved." in str(e):
+      result['roles'] = []
+      result['status'] = 0
+    else:
+      result['message'] = unicode(str(e), "utf8")
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
