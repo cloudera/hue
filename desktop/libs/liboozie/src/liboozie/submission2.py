@@ -27,10 +27,15 @@ from desktop.lib.i18n import smart_str
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 
+from desktop.models import Document2
+
+from jobsub.parameterization import find_variables
+
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
-from jobsub.parameterization import find_variables
 from liboozie.credentials import Credentials
+
+
 
 LOG = logging.getLogger(__name__)
 
@@ -148,11 +153,12 @@ class Submission(object):
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml, self.properties)
 
-    if hasattr(self.job, 'actions'):
-      for action in self.job.actions:
+    if hasattr(self.job, 'nodes'):
+      for action in self.job.nodes:
         # Make sure XML is there
         # Don't support shared sub-worfklow, ore more than one level sub-workflow
         if action.data['type'] == 'subworkflow':
+          from oozie.models2 import Workflow
           workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           sub_deploy.deploy()
