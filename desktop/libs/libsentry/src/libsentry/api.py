@@ -45,16 +45,20 @@ def ha_error_handler(func):
     while retries > 0:
       try:
         return func(*args, **kwargs)
-      except:
-        # Right now retries on any Thrift error and pull a fresh list of servers from ZooKeeper
-        LOG.info('Retrying fetching an available client in ZooKeeper.')
-        global _api_cache
-        _api_cache = None
-        time.sleep(1)
+      except SentryException, e:
+        raise e
+      except Exception, e:
         retries -= 1
-        args[0].client = _get_client(args[0].client.username)
-      else:
-        retries = 0
+        if not get_sentry_server_ha_enabled() or retries == 0:
+          raise e
+        else:
+          # Right now retries on any error and pull a fresh list of servers from ZooKeeper
+          LOG.info('Retrying fetching an available client in ZooKeeper.')
+          global _api_cache
+          _api_cache = None
+          time.sleep(1)
+          args[0].client = _get_client(args[0].client.username)
+          LOG.info('Picked %s' % args[0].client)
 
   return decorator
 
