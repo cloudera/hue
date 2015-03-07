@@ -58,8 +58,10 @@ class SentryClient(object):
 
   def __init__(self, host, port, username):
     self.username = username
+    self.host = host
+    self.port = port
     self.security = self._get_security()
-    
+
     self.client = thrift_util.get_client(
         SentryPolicyService.Client,
         host,
@@ -73,6 +75,9 @@ class SentryClient(object):
         mechanism=self.security['mechanism']
     )
 
+  def __str__(self):
+    return ', '.join(map(str, [self.host, self.port, self.username, self.security]))
+
 
   def _get_security(self):
     principal = get_sentry_server_principal()
@@ -82,7 +87,7 @@ class SentryClient(object):
       kerberos_principal_short_name = None
     use_sasl = get_sentry_server_authentication() == 'KERBEROS'
     mechanism = SentryClient.SENTRY_MECHANISMS[get_sentry_server_authentication()]
-    
+
     return {
         'kerberos_principal_short_name': kerberos_principal_short_name,
         'use_sasl': use_sasl,
@@ -172,7 +177,7 @@ class SentryClient(object):
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
     authorizableSet = [TSentryAuthorizable(**authorizable) for authorizable in authorizableSet]
     if roleSet is not None:
-      roleSet = TSentryActiveRoleSet(**roleSet)    
+      roleSet = TSentryActiveRoleSet(**roleSet)
 
     request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)
