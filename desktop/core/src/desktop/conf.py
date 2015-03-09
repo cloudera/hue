@@ -94,6 +94,17 @@ SSL_CIPHER_LIST = Config(
   help=_("List of allowed and disallowed ciphers"),
   default="DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2")
 
+SSL_PASSWORD = Config(
+  key="ssl_password",
+  help=_("SSL password of the the certificate"),
+  default=None)
+
+SSL_PASSWORD_SCRIPT = Config(
+  key="ssl_password_script",
+  help=_("Execute this script to produce the SSL password. This will be used when `ssl_password` is not set."),
+  type=coerce_password_from_script,
+  default=None)
+
 LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
@@ -947,6 +958,14 @@ def get_redaction_policy():
   """
 
   return LOG_REDACTION_FILE.get()
+
+
+def get_ssl_password():
+  password = SSL_PASSWORD.get()
+  if password is None:
+    password = SSL_PASSWORD_SCRIPT.get()
+
+  return password
 
 
 def get_database_password():

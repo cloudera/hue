@@ -83,6 +83,11 @@ def start_server(options):
         server.ssl_certificate = options['ssl_certificate']
         server.ssl_private_key = options['ssl_private_key']
         server.ssl_cipher_list = options['ssl_cipher_list']
+
+        ssl_password = conf.get_ssl_password()
+        if ssl_password:
+            server.ssl_password_cb = lambda *unused: ssl_password
+
     try:
         server.bind_server()
         drop_privileges_if_necessary(options)
