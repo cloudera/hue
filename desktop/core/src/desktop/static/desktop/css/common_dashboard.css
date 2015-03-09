@@ -123,7 +123,7 @@
   min-height: 400px !important;
   margin-top: 30px;
   text-align: center;
-  color:#EEE;
+  color:#DDD;
 }
 
 .toolbar-label {
@@ -173,7 +173,7 @@
 }
 
 .layout-box i {
-  color: #666;
+  color: #999;
   font-size: 28px;
   line-height: 54px;
 }
