@@ -28,6 +28,7 @@ from django.core.urlresolvers import reverse
 from django.utils import html
 from django.utils.translation import ugettext as _
 
+import desktop.conf
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document, DocumentTag
 
@@ -38,33 +39,47 @@ LOG = logging.getLogger(__name__)
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
   trash_tag = DocumentTag.objects.get_trash_tag(user)
-  docs = itertools.chain(
-      Document.objects.get_docs(user)
-        .exclude(tags__in=[trash_tag])
-        .filter(tags__in=[history_tag])
-        .select_related(
-          'owner',
-          'content_type',
-        )
-        .prefetch_related(
-          'tags',
-          'documentpermission_set',
-        )
-        .defer(None)
-        .order_by('-last_modified')[:500],
-      Document.objects.get_docs(user)
-        .exclude(tags__in=[history_tag])
-        .select_related(
-          'owner',
-          'content_type',
-        )
-        .prefetch_related(
-          'tags',
-          'documentpermission_set',
-        )
-        .defer(None)
-        .order_by('-last_modified')[:100]
-  )
+
+  query1 = Document.objects.get_docs(user) \
+    .exclude(tags__in=[trash_tag]) \
+    .filter(tags__in=[history_tag]) \
+    .select_related(
+      'owner',
+      'content_type',
+    ) \
+    .prefetch_related(
+      'tags',
+      'documentpermission_set',
+    )
+
+  query2 = Document.objects.get_docs(user) \
+    .exclude(tags__in=[history_tag]) \
+    .select_related(
+      'owner',
+      'content_type',
+    ) \
+    .prefetch_related(
+      'tags',
+      'documentpermission_set',
+    )
+
+  # Work around Oracle not supporting SELECT DISTINCT with the CLOB type.
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
+    query1 = query1.only('id')
+    query2 = query2.only('id')
+  else:
+    query1 = query1.defer(None)
+    query2 = query2.defer(None)
+
+  query1 = query1.order_by('-last_modified')[:500]
+  query2 = query2.order_by('-last_modified')[:100]
+
+  docs = itertools.chain(query1, query2)
+
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
+    ids = [doc.id for doc in docs]
+    docs = Document.objects.filter(id__in=ids).defer(None)
+
   return list(docs)
 
 
