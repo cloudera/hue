@@ -94,6 +94,10 @@ class WebSession(val id: String) extends Session with Logging {
 
             Unit
           }
+        case NotStarted() =>
+          Future {
+            waitForStateChangeFrom(NotStarted(), { stop() })
+          }
         case Starting() =>
           Future {
             waitForStateChangeFrom(Starting(), { stop() })
