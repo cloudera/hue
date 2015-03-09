@@ -150,8 +150,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         ${ _('Workflow') } ${ oozie_workflow.appName }
       </h1>
       <ul class="nav nav-tabs">
+        % if workflow_graph != 'MISSING':
         <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
         <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+        % else:
+        <li class="active"><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+        % endif
         <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
         <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
         <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
@@ -161,7 +165,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % endif
       </ul>
 
-      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">    
+      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
+        % if workflow_graph != 'MISSING':
         <div id="graph" class="tab-pane active">
         % if layout_json == '':
         ${ workflow_graph | n,unicode }
@@ -170,6 +175,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % endif
         </div>
         <div id="actions" class="tab-pane">
+        % else:
+        <div id="actions" class="tab-pane active">
+        % endif
           <table class="table table-striped table-condensed selectable">
             <thead>
             <tr>
@@ -703,7 +711,9 @@ ${ utils.slaGlobal() }
 
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
         %if layout_json == '':
-        $("#graph").html(data.graph);
+          if (data.graph != "MISSING") { // constant from dashboard.py
+            $("#graph").html(data.graph);
+          }
         %endif
 
         if (data.status != "RUNNING" && data.status != "PREP"){
