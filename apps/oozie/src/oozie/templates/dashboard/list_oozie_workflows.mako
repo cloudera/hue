@@ -383,7 +383,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     wf.user,
                     '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeInMillis) + '</span>',
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    ''
+                    wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>'
                   ]);
                 }
                 catch (error) {
