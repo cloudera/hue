@@ -53,7 +53,8 @@ def coerce_port(port):
 
 
 def coerce_password_from_script(script):
-  password = subprocess.check_output(script, shell=True)
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
+  password = p.communicate()[0]
 
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
