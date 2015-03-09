@@ -41,6 +41,7 @@ private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.
       case repl.Session.Busy() => Busy()
       case repl.Session.ShuttingDown() => Dead()
       case repl.Session.ShutDown() => Dead()
+      case repl.Session.Error() => Error()
     }
   }
 
