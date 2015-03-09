@@ -39,23 +39,23 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': ! oneSelected()}">
+        <a data-bind="click: function(e){ oneSelected() ? showSubmitPopup(e) : void(0) } , css: {'btn': true, 'disabled': ! oneSelected()}">
           <i class="fa fa-play"></i> ${ _('Submit') }
         </a>
 
         <span style="padding-right:40px"></span>
 
-        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ oneSelected() ? prepareShareModal(e) : void(0) },
           attr: {'data-original-title': '${ _("Share") } ' + name},
           css: {'disabled': ! oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
-        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelectedNoV1()}">
+        <a data-bind="click: function(e) { atLeastOneSelectedNoV1() ? copy(e) : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelectedNoV1()}">
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
 
-        <a data-bind="click: function() { $('#deleteWf').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteWf').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
 
