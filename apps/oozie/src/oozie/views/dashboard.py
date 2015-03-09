@@ -256,28 +256,34 @@ def list_oozie_workflow(request, job_id):
   workflow_data = None
   credentials = None
   doc = None
+  hue_workflow = None
+  workflow_graph = 'MISSING'  # default to prevent loading the graph tab for deleted workflows
+  full_node_list = None
 
   if ENABLE_V2.get():
-    # To update with the new History document model
-    hue_coord = get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
-    hue_workflow = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(oozie_workflow.conf_dict)
-  
-    if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
-    if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
-    
-    if hue_workflow:
-      workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
-      full_node_list = hue_workflow.nodes
-      workflow_id = hue_workflow.id  
-      wid = {
-        'id': workflow_id
-      }
-      doc = Document2.objects.get(type='oozie-workflow2', **wid)
-      new_workflow = get_workflow()(document=doc)
-      workflow_data = new_workflow.get_data()
-      credentials = Credentials()
-    else:
-      workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+    try:
+      # To update with the new History document model
+      hue_coord = get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
+      hue_workflow = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(oozie_workflow.conf_dict)
+
+      if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
+      if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
+
+      if hue_workflow:
+        workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+        full_node_list = hue_workflow.nodes
+        workflow_id = hue_workflow.id
+        wid = {
+          'id': workflow_id
+        }
+        doc = Document2.objects.get(type='oozie-workflow2', **wid)
+        new_workflow = get_workflow()(document=doc)
+        workflow_data = new_workflow.get_data()
+        credentials = Credentials()
+      else:
+        workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+    except:
+      pass
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
@@ -945,7 +951,7 @@ def check_job_access_permission(request, job_id):
       oozie_job = get_job(job_id)
     except RestException, ex:
       raise PopupException(_("Error accessing Oozie job %s.") % (job_id,),
-                           detail=ex._headers['oozie-error-message'])
+                           detail=ex._headers['oozie-error-message', ''])
 
   if request.user.is_superuser \
       or oozie_job.user == request.user.username \
