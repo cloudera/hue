@@ -531,11 +531,8 @@ ${ utils.slaGlobal() }
 
     var definitionEditor = $("#definitionEditor")[0];
 
-    var codeMirror = CodeMirror(function (elt) {
-      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
-    }, {
-      value:definitionEditor.value,
-      readOnly:true,
+    var codeMirror = CodeMirror.fromTextArea(definitionEditor, {
+      readOnly: true,
       lineNumbers:true
     });
 
