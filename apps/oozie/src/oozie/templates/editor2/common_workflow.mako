@@ -213,11 +213,7 @@
       <!-- /ko -->
 
       <span data-bind="visible: typeof $root.isViewer == 'undefined' || ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
-      <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name"></a>
-
-      <!-- ko if: logsURL() != '' -->
-        <a class="pull-right pointer" data-bind="click: function(){ location.href = logsURL(); }" style="margin-top: 34px;font-size: 20px;margin-right: 7px;"><i class="fa fa-tasks"></i></a>
-      <!-- /ko -->
+      <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
 
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded() && ! ooziePropertiesExpanded()">
@@ -538,6 +534,11 @@
   <!-- /ko -->
 </script>
 
+<script type="text/html" id="logs-icon">
+  <!-- ko if: $parent.logsURL() != '' -->
+    <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+  <!-- /ko -->
+</script>
 
 
 <script type="text/html" id="hive-widget">
@@ -545,6 +546,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true} }'></span>
     </div>
 
@@ -602,6 +604,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true} }'></span>
     </div>
 
@@ -661,6 +664,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.script_path(), with_label: true} }'></span>
     </div>
 
@@ -714,11 +718,12 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: properties.app_name" />
       &nbsp;&nbsp;&nbsp;
       <span data-bind="text: properties.spark_master" />
       <span data-bind="text: properties.mode" />
-      </br>
+      <br/>
       <span data-bind="text: properties.class" />
       <span data-bind="text: properties.jars" />
     </div>
@@ -809,6 +814,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: properties.main_class" />
     </div>
 
@@ -898,6 +904,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <a href="javascript:void(0)">
         <span type="text" data-bind="text: properties.command().slice(0, 70), attr: { title: properties.command() }" />...
       </a>
@@ -962,6 +969,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.jar_path(), with_label: true} }'></span>
     </div>
 
@@ -1049,6 +1057,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
           <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
@@ -1124,7 +1133,8 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind='template: { name: "common-fs-link", data: {path: properties.shell_command(), with_label: true} }'></span>
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <span data-bind="template: { name: 'common-fs-link', data: {path: properties.shell_command(), with_label: true} }"></span>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
@@ -1194,6 +1204,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: properties.host" />
       <span data-bind="text: properties.ssh_command().slice(0, 75)" />
     </div>
@@ -1234,6 +1245,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: '${ _("Delete") }', visible: properties.deletes().length > 0"></span>
       <ul data-bind="foreach: properties.deletes" class="unstyled">
         <li>
@@ -1447,6 +1459,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       ${ _('To') }
       <span data-bind="text: properties.to"/>
       <br/>
@@ -1504,9 +1517,10 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: $root.workflow_properties.mapper.label, visible: properties.mapper().length > 0"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: true} }, visible: properties.mapper().length > 0'></span>
-      </br>
+      <br/>
       <span data-bind="text: $root.workflow_properties.reducer.label, visible: properties.reducer().length > 0"></span>
       <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: true} }, visible: properties.reducer().length > 0'></span>
     </div>
@@ -1566,6 +1580,7 @@
     </div>
 
     <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
       ${ _('Parameters') }
       <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
         <li>
