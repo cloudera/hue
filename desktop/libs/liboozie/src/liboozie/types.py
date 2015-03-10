@@ -173,7 +173,7 @@ class WorkflowAction(Action):
       url = self.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': self.externalId}) or ''
     return url
 
-  def get_externalId_url(self):
+  def get_external_id_url(self):
     url = None
     if self.externalId and self.externalId.endswith('W'):
       url = reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.externalId}) or ''
