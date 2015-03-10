@@ -892,10 +892,13 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
 
   for job in oozie_jobs:
     if not just_sla or (just_sla and job.has_sla) and job.appName != 'pig-app-hue-script':
+      last_modified_time_millis = hasattr(job, 'lastModTime') and job.lastModTime and (time.time() - time.mktime(job.lastModTime)) * 1000 or 0
+      duration_millis = job.endTime and job.startTime and ((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or 0
       massaged_job = {
         'id': job.id,
         'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-        'lastModTimeInMillis': hasattr(job, 'lastModTime') and job.lastModTime and format_duration_in_millis(time.mktime(job.lastModTime)) or 0,
+        'lastModTimeInMillis': last_modified_time_millis,
+        'lastModTimeFormatted': last_modified_time_millis and format_duration_in_millis(last_modified_time_millis) or None,
         'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime and format_time(job.kickoffTime) or '',
         'kickoffTimeInMillis': hasattr(job, 'kickoffTime') and job.kickoffTime and time.mktime(catch_unicode_time(job.kickoffTime)) or 0,
         'nextMaterializedTime': hasattr(job, 'nextMaterializedTime') and job.nextMaterializedTime and format_time(job.nextMaterializedTime) or '',
@@ -905,8 +908,8 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'endTimeInMillis': job.endTime and time.mktime(job.endTime) or 0,
         'status': job.status,
         'isRunning': job.is_running(),
-        'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-        'durationInMillis': job.endTime and job.startTime and ((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or 0,
+        'duration': duration_millis and format_duration_in_millis(duration_millis) or None,
+        'durationInMillis': duration_millis,
         'appName': job.appName,
         'progress': job.get_progress(),
         'user': job.user,
