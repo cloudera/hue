@@ -61,6 +61,10 @@ input[type="text"].seventy {
   width: 70%;
 }
 
+input[type="text"].thirty {
+  width: 30%;
+}
+
 .fileChooserBtn {
   height: 31px;
 }

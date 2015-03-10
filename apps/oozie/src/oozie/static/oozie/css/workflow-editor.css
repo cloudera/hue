@@ -254,6 +254,7 @@ canvas {
 }
 
 ul.unstyled li {
+  margin-bottom: 2px;
   white-space: nowrap;
 }
 
