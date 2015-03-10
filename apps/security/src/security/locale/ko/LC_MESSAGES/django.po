@@ -5,16 +5,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Type: 텍스트/일반; charset=utf-8\n"
+"Content-Transfer-Encoding: 8비트\n"
 "Generated-By: Babel 0.9.6\n"
 
 #: src/security/forms.py:51 src/security/forms.py:121
@@ -56,7 +56,7 @@ msgstr "새 사용자를 생성할 때 암호를 지정해야 합니다."
 
 #: src/security/forms.py:123
 msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "필수 입력 항목입니다. 사용자 이름에는 30자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
+msgstr "필수 입력 항목입니다. 사용자 이름은 30자 이하로 입력하십시오. DN은 64자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
 
 #: src/security/forms.py:125 src/security/forms.py:168
 msgid "Distinguished name"
@@ -116,7 +116,7 @@ msgstr "구성원을 가져올 경우 가져온 모든 구성원의 홈 디렉�
 
 #: src/security/forms.py:181
 msgid "Import new members from all subgroups"
-msgstr "모든 하위 그룹에서 새 구성원을 가져옵니다."
+msgstr "모든 하위 그룹에서 새 구성원 가져오기"
 
 #: src/security/forms.py:182
 msgid "Import unimported or new users from the all subgroups."
@@ -125,7 +125,7 @@ msgstr "모든 하위 그룹에서 새 사용자 또는 가져오지 않은 사�
 #: src/security/forms.py:198
 #, python-format
 msgid "Too long: 80 characters or fewer and not %s"
-msgstr "너무 깁니다. 80자 이하여야 하며, %s은(는) 사용할 수 없습니다."
+msgstr "너무 깁니다. 80자 이하여야 하며, %s는 허용되지 않습니다."
 
 #: src/security/forms.py:220
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
@@ -202,7 +202,7 @@ msgstr "자신을 비활성화할 수는 없습니다."
 
 #: src/security/views.py:207
 msgid "You cannot make yourself a superuser."
-msgstr "자신을 수퍼 사용자로 지정할 수는 없습니다."
+msgstr "자신을 superuser로 지정할 수는 없습니다."
 
 #: src/security/views.py:211
 msgid "User information updated"
@@ -241,7 +241,7 @@ msgstr "LDAP와 통신하는 중 오류가 발생했습니다."
 #: src/security/views.py:333
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
-msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져오지 못했습니다."
+msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져올 수 없습니다."
 
 #: src/security/views.py:353
 msgid "You must be a superuser to add another group."
@@ -255,7 +255,7 @@ msgstr "LDAP 예외: %s"
 #: src/security/views.py:374
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
-msgstr "패턴이 %s인 그룹의 LDAP 세부 정보를 가져오지 못했습니다."
+msgstr "패턴이 %s인 그룹의 LDAP 세부 정보를 가져올 수 없습니다."
 
 #: src/security/views.py:391
 msgid "You must be a superuser to sync the LDAP users/groups."
@@ -271,7 +271,7 @@ msgstr "구성된 활성 superuser가 없습니다."
 
 #: src/security/views.py:443
 msgid "You cannot remove the last active superuser from the configuration."
-msgstr "구성에서 마지막 활성 수퍼 사용자를 제거할 수 없습니다."
+msgstr "구성에서 마지막 활성 superuser를 제거할 수 없습니다."
 
 #: src/security/views.py:501
 #, python-format
@@ -294,11 +294,11 @@ msgstr "그룹에서 사용자를 가져옵니다."
 
 #: src/security/management/commands/import_ldap_group.py:45
 msgid "Import users from the group, but also do so recursively."
-msgstr "그룹에서 사용자를 가져올 뿐만 아니라 반복 적용합니다."
+msgstr "그룹에서 사용자를 가져올 뿐만 아니라 반복적으로 수행합니다."
 
 #: src/security/management/commands/import_ldap_group.py:48
 msgid "Sync users in the group."
-msgstr "그룹에 있는 사용자를 동기화합니다."
+msgstr "그룹에 있는 사용자를 동기화하십시오."
 
 #: src/security/management/commands/import_ldap_group.py:51
 #: src/security/management/commands/import_ldap_user.py:42
@@ -308,7 +308,7 @@ msgstr "연결할 서버입니다."
 
 #: src/security/management/commands/import_ldap_group.py:60
 msgid "A group name must be provided."
-msgstr "그룹 이름은 반드시 입력해야 합니다."
+msgstr "그룹 이름을 제공해야 합니다."
 
 #: src/security/management/commands/import_ldap_user.py:39
 msgid "Sync groups of the users."
@@ -316,7 +316,7 @@ msgstr "사용자의 그룹을 동기화합니다."
 
 #: src/security/management/commands/import_ldap_user.py:51
 msgid "A username must be provided."
-msgstr "사용자 이름은 반드시 입력해야 합니다."
+msgstr "사용자 이름을 제공해야 합니다."
 
 #: src/security/management/commands/security_sync_with_unix.py:31
 msgid "Minimum UID to import (Inclusive)."
@@ -404,7 +404,7 @@ msgstr "예"
 
 #: src/security/templates/delete_group.mako:22
 msgid "Are you sure you want to delete"
-msgstr "삭제하시겠습니까"
+msgstr "삭제하시겠습니까?"
 
 #: src/security/templates/delete_group.mako:22
 msgid "?"
@@ -457,7 +457,7 @@ msgstr "지금 새 사용자 생성"
 
 #: src/security/templates/edit_group.mako:95
 msgid "No permissions found."
-msgstr "권한을 찾을 수 없습니다."
+msgstr "권한이 없습니다."
 
 #: src/security/templates/edit_permissions.mako:23
 #: src/security/templates/list_permissions.mako:26
@@ -518,7 +518,7 @@ msgstr "이 필드는 필수 항목입니다."
 
 #: src/security/templates/layout.mako:59
 msgid "User Admin"
-msgstr "사용자 관리자"
+msgstr "관리 사용자"
 
 #: src/security/templates/layout.mako:63
 msgid "Users"
@@ -621,7 +621,7 @@ msgstr "성"
 
 #: src/security/templates/list_users.mako:74
 msgid "E-mail"
-msgstr "E-maill"
+msgstr "이메일"
 
 #: src/security/templates/list_users.mako:76
 msgid "Last Login"
@@ -650,7 +650,7 @@ msgstr "Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP
 
 #: src/security/templates/sync_ldap_users_groups.mako:44
 msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태에 따라 업데이트됩니다."
+msgstr "모든 사용자 정보 및 그룹 구성원은 LDAP 서버의 현재 상태에 따라 업데이트됩니다."
 
 #: src/security/templates/sync_ldap_users_groups.mako:52
 msgid "Sync"

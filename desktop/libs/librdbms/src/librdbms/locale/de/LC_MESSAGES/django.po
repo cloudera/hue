@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -55,7 +55,7 @@ msgstr "Datenbank-Port."
 
 #: src/librdbms/conf.py:74
 msgid "Database options to send to the server when connecting."
-msgstr "Datenbankoptionen zum Senden an den Server, wenn die Verbindung hergestellt wird."
+msgstr "Beim Herstellen der Verbindung an den Server zu sendende Datenbankoptionen."
 
 #: src/librdbms/conf.py:90
 msgid "Database name should not be empty for the SQLite backend."

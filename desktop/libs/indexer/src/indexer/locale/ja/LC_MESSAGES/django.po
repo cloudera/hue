@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: プロジェクトバージョン\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: フルネーム <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,146 +17,156 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/indexer/api.py:50
-msgid "Must be a superuser to access this module."
-msgstr "このモジュールにアクセスするにはスーパーユーザーであることが必要です。"
-
-#: src/indexer/api.py:58 src/indexer/api.py:132 src/indexer/api.py:181
-#: src/indexer/api.py:210 src/indexer/api.py:254 src/indexer/api.py:275
+#: src/indexer/api.py:39 src/indexer/api.py:111 src/indexer/api.py:159
+#: src/indexer/api.py:187 src/indexer/api.py:229 src/indexer/api.py:250
 msgid "POST request required."
 msgstr "POST 要求が必要です。"
 
-#: src/indexer/api.py:91
+#: src/indexer/api.py:73
 msgid "Could not detect any fields."
 msgstr "フィールドを検出できませんでした。"
 
-#: src/indexer/api.py:100
+#: src/indexer/api.py:82
 #, python-format
 msgid "Type %s not supported."
 msgstr "タイプ %s はサポートされていません。"
 
-#: src/indexer/api.py:105
+#: src/indexer/api.py:87
 #, python-format
 msgid "Source type %s not supported."
 msgstr "ソースタイプ %s はサポートされていません。"
 
-#: src/indexer/api.py:168 src/indexer/api.py:200
+#: src/indexer/api.py:147 src/indexer/api.py:178
 msgid "Collection created!"
 msgstr "コレクションが作成されました。"
 
-#: src/indexer/api.py:173 src/indexer/api.py:202
+#: src/indexer/api.py:152 src/indexer/api.py:180
 msgid "Collection missing."
 msgstr "コレクションがありません。"
 
-#: src/indexer/api.py:217
+#: src/indexer/api.py:194
 msgid "No collections to remove."
 msgstr "削除するコレクションがありません。"
 
-#: src/indexer/api.py:229
+#: src/indexer/api.py:206
 msgid "Collections removed!"
 msgstr "コレクションが削除されました。"
 
-#: src/indexer/api.py:237
+#: src/indexer/api.py:213
 msgid "GET request required."
 msgstr "GET 要求が必要です。"
 
-#: src/indexer/api.py:261
+#: src/indexer/api.py:236
 msgid "No collection to update."
 msgstr "更新するコレクションがありません。"
 
-#: src/indexer/api.py:268
+#: src/indexer/api.py:243
 msgid "Collection updated!"
 msgstr "コレクションが更新されました。"
 
-#: src/indexer/api.py:293
+#: src/indexer/api.py:268
 msgid "Index imported!"
 msgstr "インデックスがインポートされました。"
 
-#: src/indexer/api.py:295
+#: src/indexer/api.py:270
 #, python-format
 msgid "Unsupported source %s"
 msgstr "サポートされていないソース %s"
 
-#: src/indexer/conf.py:50
+#: src/indexer/conf.py:59
 msgid "Batch indexer path in HDFS."
 msgstr "HDFS のバッチインデクサパス。"
 
-#: src/indexer/conf.py:56
-msgid "The contents of this directory will be copied over to the solrctl host to its temporary directory."
-msgstr "このディレクトリの内容は、solrctl ホストの一時ディレクトリにコピーされます。"
+#: src/indexer/conf.py:65
+msgid "Local path to Hue folder where Solr instance directories will be created in non-solrcloud mode."
+msgstr "Solr インスタンスディレクトリが non-solrcloud モードで作成される Hue フォルダのローカルパスです。"
 
-#: src/indexer/conf.py:63
+#: src/indexer/conf.py:71
+msgid "Default template used at collection creation."
+msgstr "Collection Manager"
+
+#: src/indexer/conf.py:77
 msgid "Location of the solrctl binary."
 msgstr "solrctl バイナリの場所。"
 
-#: src/indexer/conf.py:69
-msgid "Location of the solr home."
-msgstr "solr ホームの場所。"
-
-#: src/indexer/conf.py:75
+#: src/indexer/conf.py:83
 msgid "Zookeeper ensemble."
 msgstr "ZooKeeper アンサンブル。"
 
-#: src/indexer/controller.py:70
+#: src/indexer/controller.py:93
 #, python-format
 msgid "Could not fetch fields for collection %s."
 msgstr "コレクション %s のフィールドをフェッチできませんでした。"
 
-#: src/indexer/controller.py:71
+#: src/indexer/controller.py:94
 #, python-format
 msgid "Could not fetch fields for collection %s. See logs for more info."
 msgstr "コレクション %s のフィールドをフェッチできませんでした。詳細はログを参照してください。"
 
-#: src/indexer/controller.py:76
+#: src/indexer/controller.py:99
 #, python-format
 msgid "Could not fetch unique key for collection %s."
 msgstr "コレクション %s の一意キーをフェッチできませんでした。"
 
-#: src/indexer/controller.py:77
+#: src/indexer/controller.py:100
 #, python-format
 msgid "Could not fetch unique key for collection %s. See logs for more info."
 msgstr "コレクション %s の一意キーをフェッチできませんでした。詳細はログを参照してください。"
 
-#: src/indexer/controller.py:104 src/indexer/controller.py:136
-msgid "Could not create instance directory. Check error logs for more info."
-msgstr "インスタンスディレクトリを作成できませんでした。詳細はエラーログを確認してください。"
+#: src/indexer/controller.py:129
+msgid "Could not create instance directory. Check if solr_zk_ensemble and solrctl_path are correct in Hue config [indexer]."
+msgstr "インスタンスディレクトリを作成できませんでした。solr_zk_ensemble and solrctl_path Hue 設定 [indexer] が正しいかどうかを確認してください。"
 
-#: src/indexer/controller.py:118 src/indexer/controller.py:138
+#: src/indexer/controller.py:143 src/indexer/controller.py:158
 msgid "Could not create collection. Check error logs for more info."
 msgstr "コレクションを作成できませんでした。詳細はエラーログを確認してください。"
 
+#: src/indexer/controller.py:149
+#, python-format
+msgid "Instance directory %s already exists! Please remove it from the file system."
+msgstr "インスタンスディレクトリ %s はすでに存在します。このディレクトリをファイルシステムから削除してください。"
+
 #: src/indexer/controller.py:166
+msgid "Cannot remove Solr cores."
+msgstr "Solr コアを削除できません。"
+
+#: src/indexer/controller.py:178
+msgid "Could not create instance directory. Check error logs for more info."
+msgstr "インスタンスディレクトリを作成できませんでした。詳細はエラーログを確認してください。"
+
+#: src/indexer/controller.py:180
+
+msgid "Could not remove collection. Check error logs for more info."
+msgstr "コレクションを削除できませんでした。詳細はエラーログを確認してください。"
+
+#: src/indexer/controller.py:209
 msgid "File size is too large to handle!"
 msgstr "ファイルサイズが大きすぎるため処理できません。"
 
-#: src/indexer/controller.py:181
+#: src/indexer/controller.py:224
 #, python-format
 msgid "Could not update index. Unknown type %s"
 msgstr "インデックスを更新できませんでした。不明なタイプ %s"
 
-#: src/indexer/controller.py:184 src/indexer/controller.py:213
+#: src/indexer/controller.py:227 src/indexer/controller.py:256
 msgid "Could not update index. Check error logs for more info."
 msgstr "インデックスを更新できませんでした。詳細はエラーログを確認してください。"
 
-#: src/indexer/controller.py:186 src/indexer/controller.py:217
+#: src/indexer/controller.py:229 src/indexer/controller.py:260
 #, python-format
 msgid "Could not update index. Indexing strategy %s not supported."
-msgstr "インデックスを更新できませんでした。インデックス作成方法 %s はサポートされていません。"
+msgstr "インデックスを更新できませんでした。インデックス戦略 %s はサポートされていません。"
 
-#: src/indexer/controller.py:215
+#: src/indexer/controller.py:258
 msgid "Could not update index. Could not fetch any data from Hive."
-msgstr "インデックスを更新できませんでした。Hive からデータをフェッチできませんでした。"
+msgstr "インデックスを更新できませんでした。Hive からデータを取得できませんでした。"
 
-#: src/indexer/submission.py:191
-msgid "Unsaved script"
-msgstr "未保存のスクリプト"
-
-#: src/indexer/utils.py:91
+#: src/indexer/utils.py:118
 #, python-format
 msgid "%s is not a boolean value"
-msgstr "%s はブール値ではありません"
+msgstr "%s  はブール値ではありません"
 
-#: src/indexer/views.py:39
+#: src/indexer/views.py:40
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
@@ -164,40 +174,39 @@ msgstr "POST 要求が必要です。"
 msgid "Installing twitter collection"
 msgstr "Twitter コレクションをインストールしています"
 
-#: src/indexer/management/commands/indexer_setup.py:51
+#: src/indexer/management/commands/indexer_setup.py:52
 msgid "Twitter collection successfully installed"
 msgstr "Twitter コレクションが正常にインストールされました"
 
-#: src/indexer/management/commands/indexer_setup.py:53
+#: src/indexer/management/commands/indexer_setup.py:54
 msgid "Installing yelp collection"
 msgstr "Yelp コレクションをインストールしています"
 
-#: src/indexer/management/commands/indexer_setup.py:60
+#: src/indexer/management/commands/indexer_setup.py:62
 msgid "Yelp collection successfully installed"
 msgstr "Yelp コレクションが正常にインストールされました"
 
-#: src/indexer/management/commands/indexer_setup.py:62
+#: src/indexer/management/commands/indexer_setup.py:64
 msgid "Installing jobs collection"
 msgstr "Job コレクションをインストールしています"
 
-#: src/indexer/management/commands/indexer_setup.py:69
+#: src/indexer/management/commands/indexer_setup.py:72
 msgid "Jobs collection successfully installed"
 msgstr "Job コレクションが正常にインストールされました"
 
-#: src/indexer/management/commands/indexer_setup.py:71
+#: src/indexer/management/commands/indexer_setup.py:74
 msgid "Installing logs collection"
 msgstr "Log コレクションをインストールしています"
 
-#: src/indexer/management/commands/indexer_setup.py:81
+#: src/indexer/management/commands/indexer_setup.py:85
 msgid "Logs collection successfully installed"
 msgstr "Log コレクションが正常にインストールされました"
 
 #: src/indexer/templates/collections.mako:25
-msgid "Collection Manager"
-msgstr "Collection Manager"
+msgid "Search Indexes"
+msgstr "インデックスを検索"
 
 #: src/indexer/templates/collections.mako:61
-#: src/indexer/templates/collections.mako:512
 msgid "Collections"
 msgstr "コレクション"
 
@@ -206,16 +215,18 @@ msgid "Dashboards"
 msgstr "ダッシュボード"
 
 #: src/indexer/templates/collections.mako:65
-msgid "Solr Indexer"
-msgstr "Solr Indexer"
+#: src/indexer/templates/collections.mako:520
+
+msgid "Indexes"
+msgstr "インデックス"
 
 #: src/indexer/templates/collections.mako:88
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
 #: src/indexer/templates/collections.mako:102
-msgid "Delete collections"
-msgstr "コレクションを削除"
+msgid "Delete indexes"
+msgstr "インデックスを削除"
 
 #: src/indexer/templates/collections.mako:110
 #: src/indexer/templates/collections.mako:123
@@ -228,172 +239,181 @@ msgid "Confirm"
 msgstr "確認"
 
 #: src/indexer/templates/collections.mako:119
-msgid "Delete collection "
-msgstr "コレクションを削除 "
+msgid "Delete index "
+msgstr "インデックスを削除 "
 
-#: src/indexer/templates/collections.mako:156
-msgid "Filter collections..."
-msgstr "コレクションをフィルタ処理..."
+#: src/indexer/templates/collections.mako:155
+msgid "Filter indexes..."
+msgstr "インデックスのフィルタ処理..."
+
+#: src/indexer/templates/collections.mako:157
+msgid "Delete the selected indexes. These must be solr cloud collections. Cores cannot be deleted currently."
+msgstr "選択したインデックスを削除します。これらは solr クラウド コレクションでなければなりません。コアは現在削除できません。"
 
 #: src/indexer/templates/collections.mako:158
-msgid "Delete the selected collections"
-msgstr "選択したコレクションを削除"
-
-#: src/indexer/templates/collections.mako:159
-#: src/indexer/templates/collections.mako:342
+#: src/indexer/templates/collections.mako:350
 msgid "Delete"
 msgstr "削除"
 
-#: src/indexer/templates/collections.mako:162
+#: src/indexer/templates/collections.mako:160
+msgid "Show cores"
+msgstr "コアを表示"
+
+#: src/indexer/templates/collections.mako:166
 msgid "Create"
 msgstr "作成"
 
-#: src/indexer/templates/collections.mako:173
-msgid "There are currently no collections defined."
-msgstr "現在、定義されているコレクションはありません。"
+#: src/indexer/templates/collections.mako:174
 
-#: src/indexer/templates/collections.mako:173
+msgid "There are currently no indexes defined."
+msgstr "現在、定義されているインデックスはありません。"
+
+#: src/indexer/templates/collections.mako:174
 msgid "Click here to add"
 msgstr "ここをクリックして追加"
 
-#: src/indexer/templates/collections.mako:173
+#: src/indexer/templates/collections.mako:174
 msgid "one or more."
 msgstr "1 つまたは複数です。"
 
-#: src/indexer/templates/collections.mako:184
-#: src/indexer/templates/collections.mako:229
-#: src/indexer/templates/collections.mako:291
-#: src/indexer/templates/collections.mako:354
+#: src/indexer/templates/collections.mako:185
+#: src/indexer/templates/collections.mako:230
+#: src/indexer/templates/collections.mako:292
+#: src/indexer/templates/collections.mako:362
 msgid "Name"
 msgstr "名前"
 
-#: src/indexer/templates/collections.mako:214
-#: src/indexer/templates/collections.mako:409
+#: src/indexer/templates/collections.mako:215
+#: src/indexer/templates/collections.mako:417
 msgid "Previous"
 msgstr "前"
 
-#: src/indexer/templates/collections.mako:215
-#: src/indexer/templates/collections.mako:410
+#: src/indexer/templates/collections.mako:216
+#: src/indexer/templates/collections.mako:418
 msgid "Next"
 msgstr "次"
 
-#: src/indexer/templates/collections.mako:216
-#: src/indexer/templates/collections.mako:411
+#: src/indexer/templates/collections.mako:217
+#: src/indexer/templates/collections.mako:419
 msgid "Finish"
 msgstr "終了"
 
-#: src/indexer/templates/collections.mako:226
+#: src/indexer/templates/collections.mako:227
 msgid "Pick a name and a CSV or Tab separated file with header to index from HDFS"
 msgstr "HDFSから名前、およびインデックスを作成するヘッダー付き CSV ファイルまたはタブ区切りファイルを選択"
 
-#: src/indexer/templates/collections.mako:231
-msgid "Name of collection"
-msgstr "コレクションの名前"
+#: src/indexer/templates/collections.mako:232
+msgid "Name of index"
+msgstr "インデックスの名前"
 
-#: src/indexer/templates/collections.mako:236
-#: src/indexer/templates/collections.mako:423
+#: src/indexer/templates/collections.mako:237
+#: src/indexer/templates/collections.mako:431
 msgid "Files"
 msgstr "ファイル"
 
-#: src/indexer/templates/collections.mako:243
-#: src/indexer/templates/collections.mako:430
+#: src/indexer/templates/collections.mako:244
+#: src/indexer/templates/collections.mako:438
 msgid "Source type"
 msgstr "ソースタイプ"
 
-#: src/indexer/templates/collections.mako:252
-#: src/indexer/templates/collections.mako:439
+#: src/indexer/templates/collections.mako:253
+#: src/indexer/templates/collections.mako:447
 msgid "Format of the selected file to index"
 msgstr "インデックスを作成する選択済みファイルの形式"
 
-#: src/indexer/templates/collections.mako:255
-#: src/indexer/templates/collections.mako:442
+#: src/indexer/templates/collections.mako:256
+#: src/indexer/templates/collections.mako:450
 msgid "Separator"
 msgstr "区切り文字"
 
-#: src/indexer/templates/collections.mako:262
-#: src/indexer/templates/collections.mako:449
+#: src/indexer/templates/collections.mako:263
+#: src/indexer/templates/collections.mako:457
 msgid "Quote character"
 msgstr "引用文字"
 
-#: src/indexer/templates/collections.mako:271
+#: src/indexer/templates/collections.mako:272
 msgid "Morphlines config name"
 msgstr "Morphline コンフィグ名"
 
-#: src/indexer/templates/collections.mako:279
+#: src/indexer/templates/collections.mako:280
 msgid "Morphlines config expression"
 msgstr "Morphline コンフィグ式"
 
-#: src/indexer/templates/collections.mako:292
-#: src/indexer/templates/collections.mako:355
+#: src/indexer/templates/collections.mako:293
+#: src/indexer/templates/collections.mako:363
 msgid "Type"
 msgstr "タイプ"
 
-#: src/indexer/templates/collections.mako:293
-#: src/indexer/templates/collections.mako:357
+#: src/indexer/templates/collections.mako:294
+#: src/indexer/templates/collections.mako:365
 msgid "Required"
 msgstr "必須"
 
-#: src/indexer/templates/collections.mako:294
-#: src/indexer/templates/collections.mako:358
+#: src/indexer/templates/collections.mako:295
+#: src/indexer/templates/collections.mako:366
 msgid "Indexed"
 msgstr "インデックス作成済み"
 
-#: src/indexer/templates/collections.mako:295
-#: src/indexer/templates/collections.mako:359
+#: src/indexer/templates/collections.mako:296
+#: src/indexer/templates/collections.mako:367
 msgid "Stored"
 msgstr "保存済み"
 
-#: src/indexer/templates/collections.mako:296
+#: src/indexer/templates/collections.mako:297
 msgid "Unique Key"
 msgstr "一意キー"
 
-#: src/indexer/templates/collections.mako:329
-#: src/indexer/templates/collections.mako:388
+#: src/indexer/templates/collections.mako:298
+msgid "Default Field"
+msgstr "デフォルトのフィールド"
+
+#: src/indexer/templates/collections.mako:337
+#: src/indexer/templates/collections.mako:396
 msgid "Add"
 msgstr "追加"
 
-#: src/indexer/templates/collections.mako:339
+#: src/indexer/templates/collections.mako:347
 msgid "Actions"
 msgstr "アクション"
 
-#: src/indexer/templates/collections.mako:340
+#: src/indexer/templates/collections.mako:348
 msgid "Search"
 msgstr "検索"
 
-#: src/indexer/templates/collections.mako:341
+#: src/indexer/templates/collections.mako:349
 msgid "Index file"
 msgstr "インデックスファイル"
 
-#: src/indexer/templates/collections.mako:356
+#: src/indexer/templates/collections.mako:364
 msgid "Unique key field"
 msgstr "一意キーフィールド"
 
-#: src/indexer/templates/collections.mako:392
+#: src/indexer/templates/collections.mako:400
 msgid "Update"
 msgstr "更新"
 
-#: src/indexer/templates/collections.mako:420
+#: src/indexer/templates/collections.mako:428
 msgid "CSV or TSV file to index"
 msgstr "インデックスを作成する CSV または TSV ファイル"
 
-#: src/indexer/templates/collections.mako:485
+#: src/indexer/templates/collections.mako:493
 msgid "Name is missing"
 msgstr "名前がありません"
 
-#: src/indexer/templates/collections.mako:486
-#: src/indexer/templates/collections.mako:528
+#: src/indexer/templates/collections.mako:494
+#: src/indexer/templates/collections.mako:536
 msgid "File path is missing"
-msgstr "ファイルパスがありません"
+msgstr "ファイルパスが見つかりません"
 
-#: src/indexer/templates/collections.mako:503
+#: src/indexer/templates/collections.mako:511
 msgid "Field name is missing"
 msgstr "フィールド名がありません"
 
-#: src/indexer/templates/collections.mako:504
+#: src/indexer/templates/collections.mako:512
 msgid "Field type is missing"
 msgstr "フィールドタイプがありません"
 
-#: src/indexer/templates/collections.mako:513
+#: src/indexer/templates/collections.mako:521
 msgid "Upload data"
 msgstr "データをアップロード"
 
@@ -410,3 +430,28 @@ msgstr "リプライ"
 msgid "Retweet"
 msgstr "リツイート"
 
+#~ msgid "Must be a superuser to access this module."
+#~ msgstr "このモジュールにアクセスするにはスーパーユーザーであることが必要です。"
+#~ msgid ""
+#~ "The contents of this directory will "
+#~ "be copied over to the solrctl host"
+#~ " to its temporary directory."
+#~ msgstr "このディレクトリの内容は、solrctl ホストの一時ディレクトリにコピーされます。"
+#~ msgid "Location of the solr home."
+#~ msgstr "solr ホームの場所。"
+#~ msgid "Unsaved script"
+#~ msgstr "未保存のスクリプト"
+#~ msgid "Collection Manager"
+#~ msgstr "Collection Manager"
+#~ msgid "Solr Indexer"
+#~ msgstr "Solr Indexer"
+#~ msgid "Delete collections"
+#~ msgstr "コレクションを削除"
+#~ msgid "Delete collection "
+#~ msgstr "コレクションを削除 "
+#~ msgid "Filter collections..."
+#~ msgstr "コレクションをフィルタ処理..."
+#~ msgid "Delete the selected collections"
+#~ msgstr "選択したコレクションを削除"
+#~ msgid "Name of collection"
+#~ msgstr "コレクションの名前"

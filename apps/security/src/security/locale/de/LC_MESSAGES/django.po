@@ -5,11 +5,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Project-Id-Version: PROJEKTVERSION\n"
+"Report-Msgid-Bugs-To: E-MAIL@ADRESSE\n"
 "POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: VOLLSTÄNDIGER NAME <E-MAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "Erforderlich. 30 Zeichen oder weniger. Keine Leerzeichen oder Doppelpunk
 
 #: src/security/forms.py:55 src/security/forms.py:124
 msgid "Whitespaces and ':' not allowed"
-msgstr "Leerzeichen und ':' nicht erlaubt"
+msgstr "Leerzeichen und \":\" nicht zugelassen"
 
 #: src/security/forms.py:56
 msgid "Password"
@@ -44,7 +44,7 @@ msgstr "Home-Verzeichnis erstellen"
 
 #: src/security/forms.py:59
 msgid "Create home directory if one doesn't already exist."
-msgstr "Home-Verzeichnis für erstellen, falls noch keines vorhanden ist."
+msgstr "Home-Verzeichnis erstellen, falls noch keines vorhanden ist."
 
 #: src/security/forms.py:79
 msgid "Passwords do not match."
@@ -56,17 +56,17 @@ msgstr "Sie müssen ein Kennwort angeben, wenn Sie einen neuen Benutzer erstelle
 
 #: src/security/forms.py:123
 msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "Erforderlich. Höchstens 30 Zeichen mit Benutzernamen. Höchstens 64 Zeichen mit DN. Keine Leerzeichen oder Doppelpunkte."
+msgstr "Erforderlich. Höchstens 30 Zeichen mit Benutzername. Höchstens 64 Zeichen mit DN. Keine Leerzeichen oder Doppelpunkte."
 
 #: src/security/forms.py:125 src/security/forms.py:168
 msgid "Distinguished name"
-msgstr "Hervorgehobener Name"
+msgstr "Definierter Name"
 
 #: src/security/forms.py:126
 #: src/security/management/commands/import_ldap_group.py:38
 #: src/security/management/commands/import_ldap_user.py:35
 msgid "Whether or not the user should be imported by distinguished name."
-msgstr "Ob der Benutzer nach hervorgehobenem Namen importiert werden soll oder nicht."
+msgstr "Ob der Benutzer nach definiertem Namen importiert werden soll oder nicht."
 
 #: src/security/forms.py:131
 msgid "Create home directory for user if one doesn't already exist."
@@ -75,12 +75,12 @@ msgstr "Home-Verzeichnis für den Benutzer erstellen, falls noch keines vorhande
 #: src/security/forms.py:147
 #, python-format
 msgid "Too long: 64 characters or fewer and not %s."
-msgstr "Zu lang: Höchstens 64 Zeichen und nicht %s."
+msgstr "Zu lang: höchstens 64 Zeichen und nicht %s."
 
 #: src/security/forms.py:153
 #, python-format
 msgid "Too long: 30 characters or fewer and not %s."
-msgstr "Zu lang: Höchstens 30 Zeichen und nicht %s."
+msgstr "Zu lang: höchstens 30 Zeichen und nicht %s."
 
 #: src/security/forms.py:163
 msgid "Name"
@@ -88,15 +88,15 @@ msgstr "Name"
 
 #: src/security/forms.py:166
 msgid "Required. 80 characters or fewer."
-msgstr "Erforderlich. 80 Zeichen oder weniger."
+msgstr "Erforderlich. Höchstens 80 Zeichen."
 
 #: src/security/forms.py:167
 msgid "80 characters or fewer."
-msgstr "80 Zeichen oder weniger."
+msgstr "Höchstens 80 Zeichen."
 
 #: src/security/forms.py:169
 msgid "Whether or not the group should be imported by distinguished name."
-msgstr "Ob die Gruppe nach hervorgehobenem Namen importiert werden soll oder nicht."
+msgstr "Ob die Gruppe nach definiertem Namen importiert werden soll oder nicht."
 
 #: src/security/forms.py:173
 msgid "Import new members"
@@ -129,7 +129,7 @@ msgstr "Zu lang: Höchstens 80 Zeichen und nicht %s"
 
 #: src/security/forms.py:220
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr "Gruppenname darf nur Buchstaben, Ziffern, Bindestriche oder Unterstriche enthalten."
+msgstr "Der Gruppenname darf nur Buchstaben, Ziffern, Bindestriche oder Unterstriche enthalten."
 
 #: src/security/forms.py:235
 msgid "members"
@@ -178,7 +178,7 @@ msgstr "Sie müssen ein Superuser sein, um Gruppen zu löschen."
 
 #: src/security/views.py:150
 msgid "The default user group may not be deleted."
-msgstr "Die Standard-Benutzergruppe kann nicht gelöscht werden."
+msgstr "Die Standardbenutzergruppe darf nicht gelöscht werden."
 
 #: src/security/views.py:155
 msgid "The group was deleted."
@@ -245,7 +245,7 @@ msgstr "LDAP-Details für Benutzer in Muster %s konnten nicht abgerufen werden."
 
 #: src/security/views.py:353
 msgid "You must be a superuser to add another group."
-msgstr "Sie müssen ein Superuser sein, um eine andere Gruppe hinzufügen zu können."
+msgstr "Sie müssen ein Superuser sein, um eine Gruppe hinzufügen zu können."
 
 #: src/security/views.py:367
 #, python-format
@@ -255,15 +255,15 @@ msgstr "LDAP-Ausnahme: %s"
 #: src/security/views.py:374
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
-msgstr "LDAP-Details für Gruppe in Muster %s konnten nicht abgerufen werden"
+msgstr "LDAP-Details für Gruppen in Muster %s konnten nicht abgerufen werden"
 
 #: src/security/views.py:391
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr "Sie müssen ein Superuser sein, um die LDAP-Benutzer/-Gruppen zu synchronisieren."
+msgstr "Sie müssen ein Superuser sein, um die LDAP-Benutzer/-Gruppen synchronisieren zu können."
 
 #: src/security/views.py:420
 msgid "The import may not be complete, sync again."
-msgstr "Der Import wurde möglicherweise nicht abgeschlossen. Erneut synchronisieren."
+msgstr "Der Import ist möglicherweise nicht vollständig. Wiederholen Sie die Synchronisierung."
 
 #: src/security/views.py:441
 msgid "No active superuser configured."
@@ -281,12 +281,12 @@ msgstr "Benutzer %s von Unix synchronisiert"
 #: src/security/views.py:530
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
-msgstr "Es gab einen Namenskonflikt beim Importieren des Benutzers %(username)s."
+msgstr "Beim Importieren von Benutzer %(username)s ist ein Namenskonflikt aufgetreten."
 
 #: src/security/views.py:672 src/security/views.py:721
 #, python-format
 msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Beim Importieren von Gruppe %(groupname)s in Muster %(groupname_pattern)s ist ein Namenskonflikt aufgetreten"
+msgstr "Beim Importieren der Gruppe %(groupname)s in das Muster %(groupname_pattern)s ist ein Namenskonflikt aufgetreten."
 
 #: src/security/management/commands/import_ldap_group.py:42
 msgid "Import users from the group."
@@ -294,11 +294,11 @@ msgstr "Benutzer aus der Gruppe importieren."
 
 #: src/security/management/commands/import_ldap_group.py:45
 msgid "Import users from the group, but also do so recursively."
-msgstr "Importieren Sie Benutzer aus der Gruppe, aber auch rekursiv."
+msgstr "Benutzer aus der Gruppe importieren, aber auch rekursiv."
 
 #: src/security/management/commands/import_ldap_group.py:48
 msgid "Sync users in the group."
-msgstr "Synchronisieren Sie Benutzer in der Gruppe."
+msgstr "Benutzer in der Gruppe synchronisieren."
 
 #: src/security/management/commands/import_ldap_group.py:51
 #: src/security/management/commands/import_ldap_user.py:42
@@ -320,19 +320,19 @@ msgstr "Es muss ein Benutzername angegeben werden."
 
 #: src/security/management/commands/security_sync_with_unix.py:31
 msgid "Minimum UID to import (Inclusive)."
-msgstr "Minimale UID zu importieren (Inklusiv)."
+msgstr "Minimale zu importierende UID (inklusiv)."
 
 #: src/security/management/commands/security_sync_with_unix.py:32
 msgid "Maximum UID to import (Exclusive)."
-msgstr "Maximale UID zu importieren (Exklusiv)."
+msgstr "Maximale zu importierende UID (exklusiv)."
 
 #: src/security/management/commands/security_sync_with_unix.py:33
 msgid "Minimum GID to import (Inclusive)."
-msgstr "Minimale GID zu importieren (Inklusiv)."
+msgstr "Minimale GID zu importieren (inklusiv)."
 
 #: src/security/management/commands/security_sync_with_unix.py:34
 msgid "Maximum GID to import (Exclusive)."
-msgstr "Maximale GID zu importieren (Exklusiv)."
+msgstr "Maximale zu importierende GID (exklusiv)."
 
 #: src/security/management/commands/security_sync_with_unix.py:35
 msgid "Whether or not to check that the user's shell is not /bin/false."
@@ -457,7 +457,7 @@ msgstr "Jetzt einen neuen Benutzer erstellen"
 
 #: src/security/templates/edit_group.mako:95
 msgid "No permissions found."
-msgstr "Keine Berechtigungen gefunden."
+msgstr "Keine Genehmigungen gefunden."
 
 #: src/security/templates/edit_permissions.mako:23
 #: src/security/templates/list_permissions.mako:26
@@ -518,7 +518,7 @@ msgstr "Dieses Feld ist erforderlich."
 
 #: src/security/templates/layout.mako:59
 msgid "User Admin"
-msgstr "Benutzeradministration"
+msgstr "Benutzeradministrator"
 
 #: src/security/templates/layout.mako:63
 msgid "Users"
@@ -638,7 +638,7 @@ msgstr "Es gibt keine Benutzer, die den Suchkriterien entsprechen."
 
 #: src/security/templates/list_users.mako:124
 msgid "Are you sure you want to delete the selected user(s)?"
-msgstr "Möchten Sie den/die ausgewählten Benutzer wirklich löschen?"
+msgstr "Sind Sie sicher, dass Sie den/die ausgewählten Benutzer löschen möchten?"
 
 #: src/security/templates/sync_ldap_users_groups.mako:39
 msgid "Sync LDAP users and groups"
@@ -646,13 +646,13 @@ msgstr "LDAP-Benutzer und -Gruppen synchronisieren"
 
 #: src/security/templates/sync_ldap_users_groups.mako:43
 msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Hiermit werden keine Benutzer oder Gruppen importiert, die nicht bereits in Hue vorhanden sind. Synchronisation ist nur mit Benutzern und Gruppen möglich, die bereits aus LDAP importiert wurden."
+msgstr "Hiermit werden nur Benutzer oder Gruppen importiert, die bereits in Hue vorhanden sind. Nur aus LDAP importierte Benutzer und Gruppen können synchronisiert werden."
 
 #: src/security/templates/sync_ldap_users_groups.mako:44
 msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Alle Benutzerinformationen und Gruppenmitgliedschaften werden entsprechend dem aktuellen Status des LDAP-Servers aktualisiert."
+msgstr "Alle Benutzerdaten und Gruppenmitgliedschaften werden entsprechend dem aktuellen Status des LDAP-Servers aktualisiert."
 
 #: src/security/templates/sync_ldap_users_groups.mako:52
 msgid "Sync"
-msgstr "Sync"
+msgstr "Synchronisieren"
 

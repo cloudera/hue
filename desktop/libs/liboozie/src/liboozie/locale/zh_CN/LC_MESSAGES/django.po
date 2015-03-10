@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,50 +18,52 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:27
-msgid "URL of Oozie server. This is required for job submission."
-msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。"
+
+msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。空值将禁用配置检查。"
 
 #: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证。"
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。"
 
-#: src/liboozie/conf.py:68
+msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。参数是 $TIME、$USER 和 $JOBID，例如 /user/$USER/hue/deployments/$JOBID-$TIME"
+
+#: src/liboozie/conf.py:71
 msgid "The Oozie server is not available"
 msgstr "Oozie Server 不适用"
 
-#: src/liboozie/conf.py:77
+#: src/liboozie/conf.py:80
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 分享库 (Oozie Share Lib) 无法安装到默认位置。"
 
-#: src/liboozie/submittion.py:74
+#: src/liboozie/submission2.py:74 src/liboozie/submittion.py:75
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "已提交提交（Oozie 作业 ID %s）"
 
-#: src/liboozie/submittion.py:140
+#: src/liboozie/submission2.py:140 src/liboozie/submittion.py:141
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "无法创建部署目录：%s"
 
-#: src/liboozie/submittion.py:236
+#: src/liboozie/submission2.py:237 src/liboozie/submittion.py:242
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "路径不是目录：%s。"
 
-#: src/liboozie/submittion.py:241
+#: src/liboozie/submission2.py:242 src/liboozie/submittion.py:247
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "访问目录 '%s' 时出错：%s。"
 
-#: src/liboozie/types.py:366
+#: src/liboozie/types.py:361
 msgid "Insufficient permission."
 msgstr "无足够权限。"
 
-#: src/liboozie/types.py:367
+#: src/liboozie/types.py:362
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "权限被拒绝。用户 %(username)s 无法修改用户 %(user)s 的作业。"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -38,11 +38,10 @@ msgid "No databases are available. Permissions could be missing."
 msgstr "无可用数据库。可能缺少权限。"
 
 #: src/rdbms/forms.py:23 src/rdbms/templates/common.mako:30
-#: src/rdbms/templates/execute.mako:62
 msgid "Query Editor"
 msgstr "查询编辑器"
 
-#: src/rdbms/views.py:98
+#: src/rdbms/views.py:101
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "无效设计类型 %(type)s"
@@ -75,127 +74,147 @@ msgstr "当前没有已配置的数据库。"
 msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
 msgstr "请转到您的 Hue 配置并在“rdbms”部分下方添加数据库。"
 
-#: src/rdbms/templates/execute.mako:33
-msgid "Server"
-msgstr "服务器"
+#: src/rdbms/templates/execute.mako:32
+msgid "Assist"
+msgstr "辅助"
 
-#: src/rdbms/templates/execute.mako:46
-msgid "Database"
-msgstr "数据库"
-
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
-msgid "Query name"
-msgstr "查询名称"
-
-#: src/rdbms/templates/execute.mako:82
-msgid "Query description"
-msgstr "查询描述"
-
-#: src/rdbms/templates/execute.mako:93
-msgid "Your query has the following error(s):"
-msgstr "您的查询有下列错误："
-
-#: src/rdbms/templates/execute.mako:102
-msgid "Execute"
-msgstr "执行"
-
-#: src/rdbms/templates/execute.mako:103 src/rdbms/templates/execute.mako:196
-msgid "Save"
-msgstr "保存"
-
-#: src/rdbms/templates/execute.mako:104
-msgid "Save as..."
-msgstr "另存为..."
-
-#: src/rdbms/templates/execute.mako:105
-msgid "Explain"
-msgstr "解释"
-
-#: src/rdbms/templates/execute.mako:106
-msgid "or create a"
-msgstr "或创建一个"
-
-#: src/rdbms/templates/execute.mako:106
-msgid "New query"
-msgstr "新查询"
-
-#: src/rdbms/templates/execute.mako:132
-msgid "The server returned no results."
-msgstr "服务器未返回结果。"
-
-#: src/rdbms/templates/execute.mako:152
+#: src/rdbms/templates/execute.mako:39
 msgid "Double click on a table name or field to insert it in the editor"
 msgstr "双击表名或字段以将其插入编辑器中"
 
-#: src/rdbms/templates/execute.mako:153
+#: src/rdbms/templates/execute.mako:40
 msgid "Manually refresh the table list"
 msgstr "手动刷新表列表"
 
-#: src/rdbms/templates/execute.mako:154
-msgid "Navigator"
-msgstr "Navigator"
+#: src/rdbms/templates/execute.mako:43
 
-#: src/rdbms/templates/execute.mako:157
+msgid "server"
+msgstr "服务器"
+
+#: src/rdbms/templates/execute.mako:46 src/rdbms/templates/execute.mako:52
+msgid "Choose a database..."
+msgstr "选择数据库..."
+
+#: src/rdbms/templates/execute.mako:49
+
+msgid "database"
+msgstr "数据库"
+
+#: src/rdbms/templates/execute.mako:54
 msgid "Table name..."
 msgstr "表名..."
 
-#: src/rdbms/templates/execute.mako:158
+#: src/rdbms/templates/execute.mako:55
 msgid "The selected database has no tables."
 msgstr "所选数据库没有表。"
 
-#: src/rdbms/templates/execute.mako:176
+#: src/rdbms/templates/execute.mako:79
+msgid "Share"
+msgstr "共享"
+
+#: src/rdbms/templates/execute.mako:88 src/rdbms/templates/execute.mako:787
+msgid "Query name"
+msgstr "查询名称"
+
+#: src/rdbms/templates/execute.mako:96
+msgid "Query description"
+msgstr "查询描述"
+
+#: src/rdbms/templates/execute.mako:107
+msgid "Your query has the following error(s):"
+msgstr "您的查询有下列错误："
+
+#: src/rdbms/templates/execute.mako:116
+msgid "Execute"
+msgstr "执行"
+
+#: src/rdbms/templates/execute.mako:117 src/rdbms/templates/execute.mako:192
+msgid "Save"
+msgstr "保存"
+
+#: src/rdbms/templates/execute.mako:118
+msgid "Save as..."
+msgstr "另存为..."
+
+#: src/rdbms/templates/execute.mako:119
+msgid "Explain"
+msgstr "解释"
+
+#: src/rdbms/templates/execute.mako:120
+msgid "or create a"
+msgstr "或创建一个"
+
+#: src/rdbms/templates/execute.mako:120
+msgid "New query"
+msgstr "新查询"
+
+#: src/rdbms/templates/execute.mako:146
+msgid "The server returned no results."
+msgstr "服务器未返回结果。"
+
+#: src/rdbms/templates/execute.mako:172
 msgid "Save your query"
 msgstr "保存您的查询"
 
-#: src/rdbms/templates/execute.mako:181
+#: src/rdbms/templates/execute.mako:177
 msgid "Name"
 msgstr "名称"
 
-#: src/rdbms/templates/execute.mako:187
+#: src/rdbms/templates/execute.mako:183
 msgid "Description"
 msgstr "描述"
 
-#: src/rdbms/templates/execute.mako:195
+#: src/rdbms/templates/execute.mako:191
 msgid "Cancel"
 msgstr "取消"
 
-#: src/rdbms/templates/execute.mako:333
+#: src/rdbms/templates/execute.mako:357
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/rdbms/templates/execute.mako:526
+#: src/rdbms/templates/execute.mako:550
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/rdbms/templates/execute.mako:607
+#: src/rdbms/templates/execute.mako:636
 msgid "No query provided to save."
 msgstr "没有提供要保存的查询。"
 
-#: src/rdbms/templates/execute.mako:727
+#: src/rdbms/templates/execute.mako:658
+msgid "Oops, no server found!"
+msgstr "很抱歉，找不到服务器！"
+
+#: src/rdbms/templates/execute.mako:664
+msgid "Oops, no database found!"
+msgstr "很抱歉，找不到数据库！"
+
+#: src/rdbms/templates/execute.mako:781
 msgid "This field is required."
 msgstr "此字段为必填字段。"
 
-#: src/rdbms/templates/execute.mako:740
+#: src/rdbms/templates/execute.mako:794
 msgid "Empty description"
 msgstr "空描述"
 
-#: src/rdbms/templates/execute.mako:746
+#: src/rdbms/templates/execute.mako:800
 msgid "Query saved successfully!"
 msgstr "查询已成功保存！"
 
-#: src/rdbms/templates/execute.mako:782
+#: src/rdbms/templates/execute.mako:836
 msgid "No data available"
 msgstr "没有可用数据"
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:837
 msgid "No matching records"
 msgstr "没有匹配记录"
 
-#: src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:875
 msgid "Server error occured: "
-msgstr "发生服务器错误： "
+msgstr "出现服务器错误： "
 
-#: src/rdbms/templates/execute.mako:824
+#: src/rdbms/templates/execute.mako:878
 msgid "Unmanageable server error occured: "
-msgstr "发生无法管理的服务器错误： "
+msgstr "出现无法管理的服务器错误： "
 
+#~ msgid "Navigator"
+#~ msgstr "Navigator"

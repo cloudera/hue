@@ -390,7 +390,7 @@ from django.utils.translation import ugettext as _
        %>
        % if data_apps[1] > 1:
        <li class="dropdown">
-         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
+         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Data Browsers <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
              <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon"/> ${_('Metastore Tables')}</a></li>
@@ -411,7 +411,7 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'oozie' in apps:
        <li class="dropdown">
-         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Workflows <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
              <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${_('Dashboards')}</a>
@@ -473,7 +473,7 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'security' in apps:
          <li class="dropdown">
-           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Security')} <b class="caret"></b></a>
+           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Security <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">
              <li><a href="${ url('security:hive') }">&nbsp;<i class="fa fa-database"></i>&nbsp;&nbsp;${_('Sentry Tables')}</a></li>
              <li><a href="${ url('security:hdfs') }">&nbsp;<i class="fa fa-file"></i>&nbsp;&nbsp;${_('File ACLs')}</a></li>

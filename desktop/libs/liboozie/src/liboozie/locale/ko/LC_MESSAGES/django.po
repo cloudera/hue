@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,50 +18,52 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:27
-msgid "URL of Oozie server. This is required for job submission."
-msgstr "Oozie 서버의 URL입니다. 작업 제출 시 필요합니다."
+
+msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgstr "Oozie 서버의 URL입니다. 작업 제출 시 필요합니다. 빈 값은 구성 확인을 해제합니다."
 
 #: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-msgstr "소유자가 아닌 사용자가 제출할 경우 workflow/Coordinator가 배포되는 HDFS상의 위치입니다."
 
-#: src/liboozie/conf.py:68
+msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr "비소유자가 제출했을 경우 Workflow/Coordinator가 배포되는 HDFS상의 위치입니다. 매개변수는 $TIME, $USER 및 $JOBID(예: /user/$USER/hue/deployments/$JOBID-$TIME)입니다."
+
+#: src/liboozie/conf.py:71
 msgid "The Oozie server is not available"
 msgstr "Oozie Server를 사용할 수 없습니다."
 
-#: src/liboozie/conf.py:77
+#: src/liboozie/conf.py:80
 msgid "Oozie Share Lib not installed in default location."
 msgstr "기본 위치에 Oozie Share Lib가 설치되어 있지 않습니다."
 
-#: src/liboozie/submittion.py:74
+#: src/liboozie/submission2.py:74 src/liboozie/submittion.py:75
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "이미 제출됨(Oozie Job ID %s)"
 
-#: src/liboozie/submittion.py:140
+#: src/liboozie/submission2.py:140 src/liboozie/submittion.py:141
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "배포 디렉토리 %s을(를) 생성하지 못했습니다."
 
-#: src/liboozie/submittion.py:236
+#: src/liboozie/submission2.py:237 src/liboozie/submittion.py:242
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "경로가 디렉토리가 아닙니다: %s."
 
-#: src/liboozie/submittion.py:241
+#: src/liboozie/submission2.py:242 src/liboozie/submittion.py:247
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"
 
-#: src/liboozie/types.py:366
+#: src/liboozie/types.py:361
 msgid "Insufficient permission."
 msgstr "권한 부족."
 
-#: src/liboozie/types.py:367
+#: src/liboozie/types.py:362
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."

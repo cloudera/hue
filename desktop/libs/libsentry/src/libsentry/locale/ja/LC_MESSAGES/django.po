@@ -5,11 +5,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: プロジェクトのバージョン\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 15:04-0800\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: フルネーム<EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
@@ -17,73 +17,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/librdbms/conf.py:26
-msgid "RDBMS server configurations."
-msgstr "RDBMS サーバーの設定です。"
-
-#: src/librdbms/conf.py:28
-msgid "RDBMS server configuration."
-msgstr "RDBMS サーバーの設定です。"
-
-#: src/librdbms/conf.py:32
-msgid "Nice name of server."
-msgstr "サーバーの適切な名前です。"
-
-#: src/librdbms/conf.py:38
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
-msgstr "データベース名、またはデータベースファイルへのパスです。指定されている場合、その他のデータベースを選択することは許可されません。"
-
-#: src/librdbms/conf.py:44
-msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
-msgstr "postgresql_psycopg2、mysql、sqlite3 などのデータベースエンジンです。"
-
-#: src/librdbms/conf.py:50
-msgid "Database username."
-msgstr "データベースのユーザー名です。"
-
-#: src/librdbms/conf.py:56
-msgid "Database password."
-msgstr "データベースのパスワードです。"
-
-#: src/librdbms/conf.py:62
-msgid "Database host."
-msgstr "データベースのホストです。"
-
-#: src/librdbms/conf.py:68
-msgid "Database port."
-msgstr "データベースのポートです。"
-
-#: src/librdbms/conf.py:74
-msgid "Database options to send to the server when connecting."
-msgstr "接続時にサーバーに送信するデータベースオプションです。"
-
-#: src/librdbms/conf.py:90
-msgid "Database name should not be empty for the SQLite backend."
-msgstr "SQLite バックエンドのデータベース名は空にできません。"
-
-#: src/librdbms/conf.py:92
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
-msgstr "Oracle バックエンドのデータベース名は空にできません。データベースの SID にする必要があります。"
-
-#: src/librdbms/conf.py:94
-msgid "Database name should not be empty for the PostgreSQL backend."
-msgstr "PostgreSQL バックエンドのデータベース名は空にできません。"
-
-#: src/librdbms/design.py:110
-msgid "No server!"
-msgstr "サーバーがありません。"
-
-#: src/librdbms/design.py:112
-msgid "No database!"
-msgstr "データベースがありません。"
-
-#: src/librdbms/server/mysql_lib.py:80
-#, python-format
-msgid "Database '%s' is not allowed. Please use database '%s'."
-msgstr "データベース '%s' は使用できません。データベース '%s' を使用してください。"
-
-#: src/librdbms/server/mysql_lib.py:107
-#, python-format
-msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
-msgstr "%s データベースが見つかりません。設定は正しいですか？"
-
+#~ msgid "RDBMS server configurations."
+#~ msgstr "RDBMS サーバーの設定です。"
+#~ msgid "RDBMS server configuration."
+#~ msgstr "RDBMS サーバーの設定です。"
+#~ msgid "Nice name of server."
+#~ msgstr "サーバーの適切な名前です。"
+#~ msgid ""
+#~ "Database name or path to database "
+#~ "file. If provided, then choosing other"
+#~ " databases will not be permitted."
+#~ msgstr "データベース名、またはデータベースファイルへのパスです。指定されている場合、その他のデータベースを選択することは許可されません。"
+#~ msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+#~ msgstr "postgresql_psycopg2、mysql、sqlite3 などのデータベースエンジンです。"
+#~ msgid "Database username."
+#~ msgstr "データベースのユーザー名です。"
+#~ msgid "Database password."
+#~ msgstr "データベースのパスワードです。"
+#~ msgid "Database host."
+#~ msgstr "データベースのホストです。"
+#~ msgid "Database port."
+#~ msgstr "データベースのポートです。"
+#~ msgid "Database options to send to the server when connecting."
+#~ msgstr "接続時にサーバーに送信するデータベースオプションです。"
+#~ msgid "Database name should not be empty for the SQLite backend."
+#~ msgstr "SQLite バックエンドのデータベース名は空にできません。"
+#~ msgid ""
+#~ "Database name should not be empty "
+#~ "for the Oracle backend. It should "
+#~ "be the SID of your database."
+#~ msgstr "Oracle バックエンドのデータベース名は空にできません。データベースの SID にする必要があります。"
+#~ msgid "Database name should not be empty for the PostgreSQL backend."
+#~ msgstr "PostgreSQL バックエンドのデータベース名は空にできません。"
+#~ msgid "No server!"
+#~ msgstr "サーバーがありません。"
+#~ msgid "No database!"
+#~ msgstr "データベースがありません。"
+#~ msgid "Database '%s' is not allowed. Please use database '%s'."
+#~ msgstr "データベース '%s' は使用できません。データベース '%s' を使用してください。"
+#~ msgid ""
+#~ "Cannot locate the %s database. Are "
+#~ "you sure your configuration is correct?"
+#~ msgstr "%s データベースが見つかりません。設定は正しいですか？"

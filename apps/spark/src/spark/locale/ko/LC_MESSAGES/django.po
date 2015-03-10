@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:11-0700\n"
+"POT-Creation-Date: 2015-02-04 18:48-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,330 +17,511 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/spark/api.py:61 src/spark/views.py:109
-msgid "Requires a POST"
-msgstr "POST 필요"
+#: src/spark/api.py:152 src/spark/api.py:165
+msgid "Notebook saved !"
+msgstr "노트북이 저장되었습니다!"
 
-#: src/spark/api.py:84
-msgid "Requires a DELETE"
-msgstr "DELETE 필요"
+#: src/spark/api.py:182
+msgid "Notebook closed !"
+msgstr "노트북이 닫혔습니다!"
 
-#: src/spark/api.py:120 src/spark/api.py:175
-msgid "A POST request is required."
-msgstr "POST 요청이 필요합니다."
-
-#: src/spark/api.py:162
-#, python-format
-msgid "There was an error with your query: %s"
-msgstr "쿼리 %s에 오류가 있습니다."
-
-#: src/spark/api.py:205
-msgid "A GET request is required."
-msgstr "GET 요청이 필요합니다."
-
-#: src/spark/api.py:234
-msgid "Missing application jar list."
-msgstr "애플리케이션 jar 목록이 없습니다."
-
-#: src/spark/conf.py:28
+#: src/spark/conf.py:34
 msgid "URL of the Spark Job Server."
 msgstr "Spark Job Server의 URL입니다."
 
-#: src/spark/conf.py:56
+#: src/spark/conf.py:40
+msgid "List of available types of snippets."
+msgstr "사용 가능한 스니펫 유형 목록입니다."
+
+#: src/spark/conf.py:73
 msgid "The app won't work without a running Job Server"
 msgstr "Job Server를 실행하지 않으면 이 앱을 사용할 수 없습니다."
 
-#: src/spark/decorators.py:34
-msgid "An error happened with the Spark Server"
-msgstr "Spark Server에 오류 발생"
+#: src/spark/views.py:46 src/spark/views.py:47
+msgid "Example: 1 + 1, or press CTRL + space"
+msgstr "예: 1 + 1, 또는 CTRL + space를 누름"
 
-#: src/spark/forms.py:25
-msgid "Script parameters"
-msgstr "스크립트 매개변수"
+#: src/spark/views.py:48 src/spark/views.py:49
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 
-#: src/spark/forms.py:27 src/spark/templates/editor.mako:80
-#: src/spark/templates/list_jobs.mako:36
-msgid "Class path"
-msgstr "클래스 경로"
+#: src/spark/views.py:50
+msgid "<h2>This is a text snippet</h2>Type your text here"
+msgstr "<h2>텍스트 스니펫</h2>여기에 텍스트 입력"
 
-#: src/spark/views.py:94
-msgid "Delete context(s)?"
-msgstr "컨텍스트를 삭제하시겠습니까?"
-
-#: src/spark/templates/common.mako:38
-msgid "Spark Igniter"
-msgstr "Spark Igniter"
-
-#: src/spark/templates/common.mako:41
-msgid "Editor"
-msgstr "편집기"
-
-#: src/spark/templates/common.mako:43
-#: src/spark/templates/list_applications.mako:23
-#: src/spark/templates/list_applications.mako:29
-msgid "Applications"
-msgstr "애플리케이션"
-
-#: src/spark/templates/common.mako:45
-msgid "Dashboard"
-msgstr "대시보드"
-
-#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
-msgid "Contexts"
-msgstr "컨텍스트"
-
-#: src/spark/templates/common.mako:47
-msgid "Uploads"
-msgstr "업로드"
-
-#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
-#: src/spark/templates/list_contexts.mako:41
-msgid "Create context"
-msgstr "컨텍스트 생성"
-
-#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:133
-#: src/spark/templates/editor.mako:221
-#: src/spark/templates/list_applications.mako:45
-#: src/spark/templates/list_contexts.mako:48
-msgid "Name"
-msgstr "이름"
-
-#: src/spark/templates/common.mako:70
-msgid "Num cpu cores"
-msgstr "cpu 코어 수"
-
-#: src/spark/templates/common.mako:76
-msgid "Memory per node"
-msgstr "노드당 메모리"
-
-#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
-#: src/spark/templates/editor.mako:235
-#: src/spark/templates/list_contexts.mako:85
-msgid "Cancel"
-msgstr "취소"
-
-#: src/spark/templates/common.mako:85
-msgid "Create"
-msgstr "생성"
-
-#: src/spark/templates/common.mako:96
-msgid "Upload application"
-msgstr "애플리케이션 업로드"
-
-#: src/spark/templates/common.mako:99
-msgid "One class of the jar should implement SparkJob."
-msgstr "jar의 한 개 클래스에서 SparkJob을 구현해야 합니다."
-
-#: src/spark/templates/common.mako:101
-msgid "Local jar file"
-msgstr "로컬 jar 파일"
-
-#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:64
-msgid "App name"
-msgstr "앱 이름"
-
-#: src/spark/templates/common.mako:115
-msgid "Upload"
-msgstr "업로드"
-
-#: src/spark/templates/editor.mako:23
+#: src/spark/templates/editor.mako:22
 msgid "Query"
 msgstr "쿼리"
 
-#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:487
-msgid "Application name"
-msgstr "애플리케이션 이름"
-
-#: src/spark/templates/editor.mako:48
-msgid "Application description"
-msgstr "애플리케이션 설명"
-
-#: src/spark/templates/editor.mako:58
-#: src/spark/templates/list_applications.mako:36
-msgid "Upload app"
-msgstr "앱 업로드"
-
-#: src/spark/templates/editor.mako:67
-msgid "Missing, add one?"
-msgstr "누락되었습니다. 추가하시겠습니까?"
-
-#: src/spark/templates/editor.mako:84 src/spark/templates/list_contexts.mako:23
-#: src/spark/templates/list_jobs.mako:37
-msgid "Context"
-msgstr "컨텍스트"
-
-#: src/spark/templates/editor.mako:87
-msgid "Automatic"
-msgstr "자동"
-
-#: src/spark/templates/editor.mako:93
-msgid "Create one?"
-msgstr "생성하시겠습니까?"
-
-#: src/spark/templates/editor.mako:116
-msgid "Parameters"
-msgstr "매개변수"
-
 #: src/spark/templates/editor.mako:122
-msgid "Your application has the following error(s):"
-msgstr "애플리케이션에 다음 오류가 있습니다."
+msgid "Execute all snippets"
+msgstr "모든 스니펫 실행"
 
-#: src/spark/templates/editor.mako:128
-msgid "No parameters defined yet."
-msgstr "매개변수가 아직 정의되지 않았습니다."
+#: src/spark/templates/editor.mako:127
+msgid "Clear all results"
+msgstr "모든 결과 지우기"
 
-#: src/spark/templates/editor.mako:134 src/spark/templates/editor.mako:177
-msgid "Value"
-msgstr "값"
+#: src/spark/templates/editor.mako:135
 
-#: src/spark/templates/editor.mako:148
-msgid "Delete"
-msgstr "삭제"
+msgid "Edit"
+msgstr "편집"
 
-#: src/spark/templates/editor.mako:154
-msgid "Add"
-msgstr "추가"
-
-#: src/spark/templates/editor.mako:160
-msgid "Executing..."
-msgstr "실행 중..."
-
-#: src/spark/templates/editor.mako:161
-msgid "Execute"
-msgstr "실행"
-
-#: src/spark/templates/editor.mako:163 src/spark/templates/editor.mako:236
+#: src/spark/templates/editor.mako:141
 msgid "Save"
 msgstr "저장"
 
-#: src/spark/templates/editor.mako:164
-msgid "Save as..."
-msgstr "다른 이름으로 저장..."
+#: src/spark/templates/editor.mako:141
+msgid "Saving..."
+msgstr "저장하는 중..."
+
+#: src/spark/templates/editor.mako:148
+msgid "Brand New"
+msgstr "새로 만들기"
+
+#: src/spark/templates/editor.mako:152 src/spark/templates/notebooks.mako:22
+msgid "Notebooks"
+msgstr "노트북"
 
 #: src/spark/templates/editor.mako:165
-msgid "or create a"
-msgstr "또는 생성"
+msgid "Add a new notebook"
+msgstr "새 노트북 추가"
 
-#: src/spark/templates/editor.mako:165
-msgid "New application"
-msgstr "새 애플리케이션"
+#: src/spark/templates/editor.mako:171 src/spark/templates/editor.mako:209
+msgid "Toggle Assist"
+msgstr "지원 전환"
 
-#: src/spark/templates/editor.mako:167
-msgid "Download"
-msgstr "다운로드"
+#: src/spark/templates/editor.mako:190
+msgid "Data sample for"
+msgstr "데이터 샘플"
 
-#: src/spark/templates/editor.mako:176
-msgid "Key"
-msgstr "키"
+#: src/spark/templates/editor.mako:200
+msgid "Ok"
+msgstr "확인"
 
-#: src/spark/templates/editor.mako:189
-msgid "The server returned no results."
-msgstr "서버에서 반환된 결과가 없습니다."
+#: src/spark/templates/editor.mako:212
+msgid "Manually refresh the table list"
+msgstr "테이블 목록을 수동으로 새로 고침"
 
 #: src/spark/templates/editor.mako:216
-msgid "Save your query"
-msgstr "쿼리 저장"
+msgid "database"
+msgstr "데이터베이스"
 
-#: src/spark/templates/editor.mako:227
-msgid "Description"
-msgstr "설명"
+#: src/spark/templates/editor.mako:219
+msgid "Choose a database..."
+msgstr "데이터베이스 선택..."
 
-#: src/spark/templates/editor.mako:243
-msgid "Choose a file"
-msgstr "파일 선택"
+#: src/spark/templates/editor.mako:220
 
-#: src/spark/templates/editor.mako:379
-msgid "Did you know?"
-msgstr "유용한 정보"
+msgid "Table name..."
+msgstr "테이블 이름..."
 
-#: src/spark/templates/editor.mako:481
-msgid "This field is required."
-msgstr "이 필드는 필수 항목입니다."
+#: src/spark/templates/editor.mako:221
+msgid "The selected database has no tables."
+msgstr "선택한 데이터베이스에 테이블이 없습니다."
 
-#: src/spark/templates/editor.mako:494
-msgid "Empty description"
-msgstr "설명 없음"
+#: src/spark/templates/editor.mako:242
+msgid "The database list cannot be loaded."
+msgstr "데이터베이스 목록을 로드할 수 없습니다."
 
-#: src/spark/templates/editor.mako:500
-msgid "Application saved successfully!"
-msgstr "애플리케이션이 저장되었습니다!"
+#: src/spark/templates/editor.mako:255
+msgid "Add a snippet to start your new notebook"
+msgstr "스니펫을 추가하여 새 노트북 시작"
 
-#: src/spark/templates/editor.mako:528
-#: src/spark/templates/list_applications.mako:93
-#: src/spark/templates/list_contexts.mako:131
-#: src/spark/templates/list_jobs.mako:96
+#: src/spark/templates/editor.mako:261
+msgid "Add a new snippet"
+msgstr "새 스니펫 추가"
+
+#: src/spark/templates/editor.mako:285
+
+msgid "Text"
+msgstr "텍스트"
+
+#: src/spark/templates/editor.mako:331
+msgid "Creating session"
+msgstr "세션 생성 중"
+
+#: src/spark/templates/editor.mako:333
+msgid "CTRL + ENTER"
+msgstr "CTRL + ENTER"
+
+#: src/spark/templates/editor.mako:336
+msgid "Cancel"
+msgstr "취소"
+
+#: src/spark/templates/editor.mako:345
+msgid "Grid"
+msgstr "눈금선"
+
+#: src/spark/templates/editor.mako:363
+msgid "Bars"
+msgstr "막대"
+
+#: src/spark/templates/editor.mako:368
+msgid "Lines"
+msgstr "줄"
+
+#: src/spark/templates/editor.mako:373
+msgid "Pie"
+msgstr "파이"
+
+#: src/spark/templates/editor.mako:378
+msgid "Scatter"
+msgstr "분산"
+
+#: src/spark/templates/editor.mako:383
+msgid "Marker Map"
+msgstr "Marker Map"
+
+#: src/spark/templates/editor.mako:388
+msgid "Gradient Map"
+msgstr "경사도 Map"
+
+#: src/spark/templates/editor.mako:399
+msgid "Show Logs"
+msgstr "로그 표시"
+
+#: src/spark/templates/editor.mako:418
+msgid "Download first rows as CSV"
+msgstr "첫 번째 행을 CSV로 다운로드"
+
+#: src/spark/templates/editor.mako:419
+msgid "CSV"
+msgstr "CSV"
+
+#: src/spark/templates/editor.mako:423
+msgid "Download first rows as XLS"
+msgstr "첫 번째 행을 XLS로 다운로드"
+
+#: src/spark/templates/editor.mako:424
+msgid "Excel"
+msgstr "Excel"
+
+#: src/spark/templates/editor.mako:435 src/spark/templates/editor.mako:452
+msgid "Loading..."
+msgstr "로드 중..."
+
+#: src/spark/templates/editor.mako:444
+msgid "Success."
+msgstr "성공."
+
+#: src/spark/templates/editor.mako:448
+msgid "Success but empty results."
+msgstr "성공했지만 결과가 없습니다."
+
+#: src/spark/templates/editor.mako:465
+msgid "Hide columns"
+msgstr "열 숨기기"
+
+#: src/spark/templates/editor.mako:465
+msgid "columns"
+msgstr "열"
+
+#: src/spark/templates/editor.mako:477
+msgid "Show columns"
+msgstr "열 표시"
+
+#: src/spark/templates/editor.mako:480
+msgid "Hide"
+msgstr "숨기기"
+
+#: src/spark/templates/editor.mako:501
+msgid "Hide settings"
+msgstr "설정 숨기기"
+
+#: src/spark/templates/editor.mako:507
+msgid "x-axis"
+msgstr "X축"
+
+#: src/spark/templates/editor.mako:508
+msgid "region"
+msgstr "영역"
+
+#: src/spark/templates/editor.mako:509
+msgid "latitude"
+msgstr "위도"
+
+#: src/spark/templates/editor.mako:510
+msgid "legend"
+msgstr "범례"
+
+#: src/spark/templates/editor.mako:513 src/spark/templates/editor.mako:529
+#: src/spark/templates/editor.mako:536 src/spark/templates/editor.mako:543
+#: src/spark/templates/editor.mako:550
+msgid "Choose a column..."
+msgstr "열 선택..."
+
+#: src/spark/templates/editor.mako:517
+msgid "y-axis"
+msgstr "Y축"
+
+#: src/spark/templates/editor.mako:518 src/spark/templates/editor.mako:520
+
+msgid "value"
+msgstr "값"
+
+#: src/spark/templates/editor.mako:519
+msgid "longitude"
+msgstr "경도"
+
+#: src/spark/templates/editor.mako:533
+msgid "label"
+msgstr "레이블"
+
+#: src/spark/templates/editor.mako:540
+msgid "scatter group"
+msgstr "그룹 분산"
+
+#: src/spark/templates/editor.mako:547
+msgid "scatter size"
+msgstr "크기 분산"
+
+#: src/spark/templates/editor.mako:554
+msgid "sorting"
+msgstr "정렬"
+
+#: src/spark/templates/editor.mako:557
+msgid "No sorting"
+msgstr "정렬되지 않음"
+
+#: src/spark/templates/editor.mako:558
+msgid "Sort ascending"
+msgstr "오름차순으로 정렬"
+
+#: src/spark/templates/editor.mako:559
+msgid "Sort descending"
+msgstr "내림차순으로 정렬"
+
+#: src/spark/templates/editor.mako:566
+msgid "Show settings"
+msgstr "설정 표시"
+
+#: src/spark/templates/editor.mako:651
+msgid "Paste or type a link"
+msgstr "링크 붙여넣기 또는 입력"
+
+#: src/spark/templates/editor.mako:652
+msgid "Open in new window"
+msgstr "새 창에서 열기"
+
+#: src/spark/templates/editor.mako:1168 src/spark/templates/notebooks.mako:228
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/spark/templates/editor.mako:529
-#: src/spark/templates/list_applications.mako:94
-#: src/spark/templates/list_contexts.mako:132
-#: src/spark/templates/list_jobs.mako:97
+#: src/spark/templates/editor.mako:1169 src/spark/templates/notebooks.mako:232
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
-#: src/spark/templates/editor.mako:580
-msgid "Server error occured: "
-msgstr "서버 오류 발생: "
+#: src/spark/templates/editor.mako:1484
 
-#: src/spark/templates/editor.mako:583
-msgid "Unmanageable server error occured: "
-msgstr "관리할 수 없는 서버 오류 발생: "
+msgid "Distribution"
+msgstr "배포"
 
-#: src/spark/templates/list_applications.mako:33
-#: src/spark/templates/list_contexts.mako:33
-msgid "Search for name"
-msgstr "이름 검색"
+#: src/spark/templates/editor.mako:1511
+msgid "There was a problem loading the table preview."
+msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
 
-#: src/spark/templates/list_applications.mako:46
-msgid "Upload time"
-msgstr "업로드 시간"
+#: src/spark/templates/notebooks.mako:28
 
-#: src/spark/templates/list_applications.mako:53
-msgid "Click to open and execute"
-msgstr "열어서 실행하려면 클릭"
+msgid "Spark Editor"
+msgstr "Spark 편집기"
 
-#: src/spark/templates/list_contexts.mako:36
-msgid "Delete forever"
-msgstr "영구적으로 삭제"
+#: src/spark/templates/notebooks.mako:33
+msgid "Search for name, description, etc..."
+msgstr "이름, 설명 등을 검색합니다."
 
-#: src/spark/templates/list_contexts.mako:37
-msgid "Delete selected"
-msgstr "선택 항목 삭제"
+#: src/spark/templates/notebooks.mako:39
+msgid "Submit"
+msgstr "제출"
 
-#: src/spark/templates/list_contexts.mako:82
-msgid "Confirm action"
-msgstr "작업 확인"
+#: src/spark/templates/notebooks.mako:45 src/spark/templates/notebooks.mako:47
+msgid "Share"
+msgstr "공유"
 
-#: src/spark/templates/list_contexts.mako:86
+#: src/spark/templates/notebooks.mako:51
+msgid "Copy"
+msgstr "복사"
+
+#: src/spark/templates/notebooks.mako:55
+msgid "Delete"
+msgstr "삭제"
+
+#: src/spark/templates/notebooks.mako:60
+msgid "Create"
+msgstr "생성"
+
+#: src/spark/templates/notebooks.mako:67
+msgid "Name"
+msgstr "이름"
+
+#: src/spark/templates/notebooks.mako:68
+msgid "Description"
+msgstr "설명"
+
+#: src/spark/templates/notebooks.mako:69
+msgid "Owner"
+msgstr "소유자"
+
+#: src/spark/templates/notebooks.mako:70
+msgid "Last Modified"
+msgstr "최종 수정 날짜"
+
+#: src/spark/templates/notebooks.mako:107
+
+msgid "Delete the selected notebook(s)?"
+msgstr "선택한 노트북을 삭제하시겠습니까?"
+
+#: src/spark/templates/notebooks.mako:110
+msgid "No"
+msgstr "아니요"
+
+#: src/spark/templates/notebooks.mako:111
 msgid "Yes"
 msgstr "예"
 
-#: src/spark/templates/list_contexts.mako:208
-msgid "Delete the selected contexts?"
-msgstr "선택한 컨텍스트를 삭제하시겠습니까?"
+#: src/spark/templates/notebooks.mako:229
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
 
-#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
-msgid "Jobs"
-msgstr "Job"
+#: src/spark/templates/notebooks.mako:230
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "0~0개(전체 0개 중) 항목 표시"
 
-#: src/spark/templates/list_jobs.mako:34
-msgid "Status"
-msgstr "상태"
+#: src/spark/templates/notebooks.mako:231
+msgid "(filtered from _MAX_ total entries)"
+msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
-#: src/spark/templates/list_jobs.mako:35
-msgid "Job id"
-msgstr "Job ID"
+#: src/spark/templates/notebooks.mako:234
+msgid "First"
+msgstr "처음"
 
-#: src/spark/templates/list_jobs.mako:38
-msgid "Start time"
-msgstr "시작 시간"
+#: src/spark/templates/notebooks.mako:235
+msgid "Last"
+msgstr "마지막"
 
-#: src/spark/templates/list_jobs.mako:39
-msgid "Duration"
-msgstr "소요 시간"
+#: src/spark/templates/notebooks.mako:236
 
-#: src/spark/templates/list_jobs.mako:51
-msgid "Click to open"
-msgstr "열려면 클릭"
+msgid "Next"
+msgstr "다음"
 
+#: src/spark/templates/notebooks.mako:237
+msgid "Previous"
+msgstr "이전"
+
+#~ msgid "Requires a POST"
+#~ msgstr "POST 필요"
+#~ msgid "Requires a DELETE"
+#~ msgstr "DELETE 필요"
+#~ msgid "A POST request is required."
+#~ msgstr "POST 요청이 필요합니다."
+#~ msgid "There was an error with your query: %s"
+#~ msgstr "쿼리 %s에 오류가 있습니다."
+#~ msgid "A GET request is required."
+#~ msgstr "GET 요청이 필요합니다."
+#~ msgid "Missing application jar list."
+#~ msgstr "애플리케이션 jar 목록이 없습니다."
+#~ msgid "An error happened with the Spark Server"
+#~ msgstr "Spark Server에 오류 발생"
+#~ msgid "Script parameters"
+#~ msgstr "스크립트 매개변수"
+#~ msgid "Class path"
+#~ msgstr "클래스 경로"
+#~ msgid "Delete context(s)?"
+#~ msgstr "컨텍스트를 삭제하시겠습니까?"
+#~ msgid "Applications"
+#~ msgstr "애플리케이션"
+#~ msgid "Dashboard"
+#~ msgstr "대시보드"
+#~ msgid "Contexts"
+#~ msgstr "컨텍스트"
+#~ msgid "Uploads"
+#~ msgstr "업로드"
+#~ msgid "Create context"
+#~ msgstr "컨텍스트 생성"
+#~ msgid "Num cpu cores"
+#~ msgstr "cpu 코어 수"
+#~ msgid "Memory per node"
+#~ msgstr "노드당 메모리"
+#~ msgid "Upload application"
+#~ msgstr "애플리케이션 업로드"
+#~ msgid "One class of the jar should implement SparkJob."
+#~ msgstr "jar의 한 개 클래스에서 SparkJob을 구현해야 합니다."
+#~ msgid "Local jar file"
+#~ msgstr "로컬 jar 파일"
+#~ msgid "App name"
+#~ msgstr "앱 이름"
+#~ msgid "Upload"
+#~ msgstr "업로드"
+#~ msgid "Application name"
+#~ msgstr "애플리케이션 이름"
+#~ msgid "Application description"
+#~ msgstr "애플리케이션 설명"
+#~ msgid "Upload app"
+#~ msgstr "앱 업로드"
+#~ msgid "Missing, add one?"
+#~ msgstr "누락되었습니다. 추가하시겠습니까?"
+#~ msgid "Automatic"
+#~ msgstr "자동"
+#~ msgid "Create one?"
+#~ msgstr "생성하시겠습니까?"
+#~ msgid "Parameters"
+#~ msgstr "매개변수"
+#~ msgid "Your application has the following error(s):"
+#~ msgstr "애플리케이션에 다음 오류가 있습니다."
+#~ msgid "No parameters defined yet."
+#~ msgstr "매개변수가 아직 정의되지 않았습니다."
+#~ msgid "Add"
+#~ msgstr "추가"
+#~ msgid "Executing..."
+#~ msgstr "실행 중..."
+#~ msgid "Execute"
+#~ msgstr "실행"
+#~ msgid "or create a"
+#~ msgstr "또는 생성"
+#~ msgid "New application"
+#~ msgstr "새 애플리케이션"
+#~ msgid "Download"
+#~ msgstr "다운로드"
+#~ msgid "Key"
+#~ msgstr "키"
+#~ msgid "The server returned no results."
+#~ msgstr "서버에서 반환된 결과가 없습니다."
+#~ msgid "Save your query"
+#~ msgstr "쿼리 저장"
+#~ msgid "Choose a file"
+#~ msgstr "파일 선택"
+#~ msgid "Did you know?"
+#~ msgstr "유용한 정보"
+#~ msgid "This field is required."
+#~ msgstr "이 필드는 필수 항목입니다."
+#~ msgid "Empty description"
+#~ msgstr "설명 없음"
+#~ msgid "Application saved successfully!"
+#~ msgstr "애플리케이션이 저장되었습니다!"
+#~ msgid "Server error occured: "
+#~ msgstr "서버 오류 발생: "
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr "관리할 수 없는 서버 오류 발생: "
+#~ msgid "Search for name"
+#~ msgstr "이름 검색"
+#~ msgid "Upload time"
+#~ msgstr "업로드 시간"
+#~ msgid "Click to open and execute"
+#~ msgstr "열어서 실행하려면 클릭"
+#~ msgid "Delete forever"
+#~ msgstr "영구적으로 삭제"
+#~ msgid "Delete selected"
+#~ msgstr "선택 항목 삭제"
+#~ msgid "Confirm action"
+#~ msgstr "작업 확인"
+#~ msgid "Jobs"
+#~ msgstr "Job"
+#~ msgid "Status"
+#~ msgstr "상태"
+#~ msgid "Job id"
+#~ msgstr "Job ID"
+#~ msgid "Start time"
+#~ msgstr "시작 시간"
+#~ msgid "Duration"
+#~ msgstr "소요 시간"
+#~ msgid "Click to open"
+#~ msgstr "열려면 클릭"

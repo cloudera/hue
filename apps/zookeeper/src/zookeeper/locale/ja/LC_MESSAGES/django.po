@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2013-08-26 11:01-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -67,11 +67,11 @@ msgstr "ホーム"
 msgid "New Znode"
 msgstr "新規 Znode"
 
-#: src/zookeeper/templates/create.mako:45
+#: src/zookeeper/templates/create.mako:46
 msgid "Create Znode"
 msgstr "Znode を作成"
 
-#: src/zookeeper/templates/create.mako:46 src/zookeeper/templates/edit.mako:46
+#: src/zookeeper/templates/create.mako:47 src/zookeeper/templates/edit.mako:47
 #: src/zookeeper/templates/tree.mako:125
 msgid "Cancel"
 msgstr "キャンセル"
@@ -80,7 +80,7 @@ msgstr "キャンセル"
 msgid "Edit Znode"
 msgstr "ノードを編集"
 
-#: src/zookeeper/templates/edit.mako:45
+#: src/zookeeper/templates/edit.mako:46
 msgid "Save"
 msgstr "保存"
 

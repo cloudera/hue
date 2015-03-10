@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr "Emplacement sur le système de fichiers local où des données échantil
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:159
-#: src/jobsub/templates/designs.mako:322 src/jobsub/templates/designs.mako:351
+#: src/jobsub/templates/designs.mako:326 src/jobsub/templates/designs.mako:355
 msgid "Name"
 msgstr "Nom"
 
@@ -36,37 +36,37 @@ msgid "Allows letters, digits, '_', and '-'. The first character must be a lette
 msgstr "Autorise les lettres, chiffres, '_' et '-'. Le premier caractère doit être une lettre ou '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/designs.mako:160 src/jobsub/templates/designs.mako:329
+#: src/jobsub/templates/designs.mako:160 src/jobsub/templates/designs.mako:333
 msgid "Description"
 msgstr "Description"
 
-#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:388
-#: src/jobsub/templates/designs.mako:389
+#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:392
+#: src/jobsub/templates/designs.mako:393
 msgid "Main class"
 msgstr "Classe principale"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
-#: src/jobsub/templates/designs.mako:384
+#: src/jobsub/templates/designs.mako:388
 msgid "Jar path"
 msgstr "Chemin des fichiers Jar"
 
-#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:392
-#: src/jobsub/templates/designs.mako:393
+#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:396
+#: src/jobsub/templates/designs.mako:397
 msgid "Args"
 msgstr "Arguments"
 
-#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:396
-#: src/jobsub/templates/designs.mako:397
+#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:400
+#: src/jobsub/templates/designs.mako:401
 msgid "Java opts"
 msgstr "Opts Java"
 
-#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:400
-#: src/jobsub/templates/designs.mako:401
+#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:404
+#: src/jobsub/templates/designs.mako:405
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:404
-#: src/jobsub/templates/designs.mako:405
+#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:408
+#: src/jobsub/templates/designs.mako:409
 msgid "Reducer"
 msgstr "Reducer"
 
@@ -82,42 +82,42 @@ msgstr "Liste de chemins aux fichiers à ajouter au cache distribué."
 msgid "List of paths to archives to be added to the distributed cache."
 msgstr "Liste de chemins aux archives à ajouter au cache distribué."
 
-#: src/jobsub/models.py:199 src/jobsub/templates/designs.mako:385
+#: src/jobsub/models.py:199 src/jobsub/templates/designs.mako:389
 msgid "Path to jar files on HDFS."
 msgstr "Chemin vers les fichiers Jar sur HDFS."
 
-#: src/jobsub/views.py:116
+#: src/jobsub/views.py:117
 msgid "Workflow not found"
 msgstr "Workflow introuvable."
 
-#: src/jobsub/views.py:125
+#: src/jobsub/views.py:126
 msgid "Permission denied. You are not the owner."
 msgstr "Autorisation refusée. Vous n'êtes pas le propriétaire."
 
-#: src/jobsub/views.py:130 src/jobsub/views.py:154 src/jobsub/views.py:234
+#: src/jobsub/views.py:131 src/jobsub/views.py:155 src/jobsub/views.py:235
 msgid "Must be POST request."
 msgstr "Doit être une requête POST."
 
-#: src/jobsub/views.py:137 src/jobsub/views.py:159
+#: src/jobsub/views.py:138 src/jobsub/views.py:160
 #, python-format
 msgid "Access denied: delete design %(id)s."
 msgstr "Accès refusé : supprimer la conception %(id)s."
 
-#: src/jobsub/views.py:145 src/jobsub/views.py:165
+#: src/jobsub/views.py:146 src/jobsub/views.py:166
 #, python-format
 msgid "Could not find design %s."
 msgstr "Conception %s introuvable."
 
-#: src/jobsub/views.py:186
+#: src/jobsub/views.py:187
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "Accès refusé : modifier la conception %(id)s."
 
-#: src/jobsub/views.py:192 src/jobsub/views.py:241
+#: src/jobsub/views.py:193 src/jobsub/views.py:242
 msgid "Error saving design"
 msgstr "Erreur lors de l'enregistrement de la conception"
 
-#: src/jobsub/views.py:273
+#: src/jobsub/views.py:274
 msgid "Must be a POST request."
 msgstr "Doit être une requête POST."
 
@@ -133,7 +133,7 @@ msgstr "Impossible d'effectuer une migration arrière de cette modification."
 
 #: src/jobsub/templates/designs.mako:51
 msgid "Job Designer"
-msgstr "Job Designer"
+msgstr "Concepteur de jobs"
 
 #: src/jobsub/templates/designs.mako:63
 msgid "Designs"
@@ -239,10 +239,10 @@ msgstr "Afficher la corbeille"
 msgid "Owner"
 msgstr "Propriétaire"
 
-#: src/jobsub/templates/designs.mako:162 src/jobsub/templates/designs.mako:443
-#: src/jobsub/templates/designs.mako:467 src/jobsub/templates/designs.mako:534
-#: src/jobsub/templates/designs.mako:562 src/jobsub/templates/designs.mako:666
-#: src/jobsub/templates/designs.mako:687 src/jobsub/templates/designs.mako:714
+#: src/jobsub/templates/designs.mako:162 src/jobsub/templates/designs.mako:447
+#: src/jobsub/templates/designs.mako:471 src/jobsub/templates/designs.mako:538
+#: src/jobsub/templates/designs.mako:566 src/jobsub/templates/designs.mako:670
+#: src/jobsub/templates/designs.mako:691 src/jobsub/templates/designs.mako:718
 msgid "Type"
 msgstr "Type"
 
@@ -258,348 +258,348 @@ msgstr "Dernière modification"
 msgid "Trashed"
 msgstr "Placé dans la corbeille"
 
-#: src/jobsub/templates/designs.mako:215
+#: src/jobsub/templates/designs.mako:216
 msgid "Move the selected designs to trash?"
 msgstr "Déplacer les conceptions sélectionnées vers la corbeille ?"
 
-#: src/jobsub/templates/designs.mako:218 src/jobsub/templates/designs.mako:231
-#: src/jobsub/templates/designs.mako:244 src/jobsub/templates/designs.mako:257
+#: src/jobsub/templates/designs.mako:219 src/jobsub/templates/designs.mako:233
+#: src/jobsub/templates/designs.mako:247 src/jobsub/templates/designs.mako:261
 msgid "No"
 msgstr "Non"
 
-#: src/jobsub/templates/designs.mako:219 src/jobsub/templates/designs.mako:232
-#: src/jobsub/templates/designs.mako:245 src/jobsub/templates/designs.mako:258
+#: src/jobsub/templates/designs.mako:220 src/jobsub/templates/designs.mako:234
+#: src/jobsub/templates/designs.mako:248 src/jobsub/templates/designs.mako:262
 msgid "Yes"
 msgstr "Oui"
 
-#: src/jobsub/templates/designs.mako:228
+#: src/jobsub/templates/designs.mako:230
 msgid "Delete selected designs?"
 msgstr "Supprimer les conceptions sélectionnées ?"
 
-#: src/jobsub/templates/designs.mako:241
+#: src/jobsub/templates/designs.mako:244
 msgid "Delete all trashed designs?"
 msgstr "Supprimer toutes les conceptions placées dans la corbeille ?"
 
-#: src/jobsub/templates/designs.mako:254
+#: src/jobsub/templates/designs.mako:258
 msgid "Restore selected designs?"
 msgstr "Restaurer les conceptions sélectionnées ?"
 
-#: src/jobsub/templates/designs.mako:266
+#: src/jobsub/templates/designs.mako:270
 msgid "Choose a file"
 msgstr "Choisir un fichier"
 
-#: src/jobsub/templates/designs.mako:279
+#: src/jobsub/templates/designs.mako:283
 msgid "Choose a directory"
 msgstr "Choisir un répertoire"
 
-#: src/jobsub/templates/designs.mako:292
+#: src/jobsub/templates/designs.mako:296
 msgid "Choose a path"
 msgstr "Choisir un chemin"
 
-#: src/jobsub/templates/designs.mako:309
+#: src/jobsub/templates/designs.mako:313
 msgid "You can parameterize the values, using"
 msgstr "Vous pouvez paramétrer les valeurs, en utilisant"
 
-#: src/jobsub/templates/designs.mako:309
+#: src/jobsub/templates/designs.mako:313
 msgid "or"
 msgstr "ou"
 
-#: src/jobsub/templates/designs.mako:309
+#: src/jobsub/templates/designs.mako:313
 msgid "When the design is submitted, you will be prompted for the actual value of "
 msgstr "Une fois la conception envoyée, vous serez invité à indiquer la valeur réelle de "
 
-#: src/jobsub/templates/designs.mako:310
+#: src/jobsub/templates/designs.mako:314
 msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
-msgstr "Tous les chemins d'accès sont relatifs au répertoire de déploiement. Ils peuvent être absolus mais cela n'est pas recommandé."
+msgstr "Tous les chemins d'accès sont relatifs par rapport au répertoire de déploiement. Ils peuvent être absolus mais cela n'est pas recommandé."
 
-#: src/jobsub/templates/designs.mako:311
+#: src/jobsub/templates/designs.mako:315
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
 msgstr "Nécessite la présence d'une configuration de serveur SMTP (dans le fichier oozie-site.xml)"
 
-#: src/jobsub/templates/designs.mako:312
+#: src/jobsub/templates/designs.mako:316
 msgid "The ssh server requires passwordless login."
 msgstr "Le serveur ssh requiert une connexion sans mot de passe."
 
-#: src/jobsub/templates/designs.mako:314
+#: src/jobsub/templates/designs.mako:318
 msgid "Save"
 msgstr "Enregistrer"
 
-#: src/jobsub/templates/designs.mako:318
+#: src/jobsub/templates/designs.mako:322
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/jobsub/templates/designs.mako:323
+#: src/jobsub/templates/designs.mako:327
 msgid "Name of the design."
 msgstr "Nom de la conception."
 
-#: src/jobsub/templates/designs.mako:330
+#: src/jobsub/templates/designs.mako:334
 msgid "Description of the design."
 msgstr "Description de la conception."
 
-#: src/jobsub/templates/designs.mako:336
+#: src/jobsub/templates/designs.mako:340
 msgid "Is shared"
 msgstr "Est partagé"
 
-#: src/jobsub/templates/designs.mako:337
+#: src/jobsub/templates/designs.mako:341
 msgid "Enable other users to have access to this job."
 msgstr "Autorisez d'autres utilisateurs à accéder à ce job."
 
-#: src/jobsub/templates/designs.mako:343
+#: src/jobsub/templates/designs.mako:347
 msgid "Capture output"
 msgstr "Résultat de capture"
 
-#: src/jobsub/templates/designs.mako:344
+#: src/jobsub/templates/designs.mako:348
 msgid "Capture the output of this job."
 msgstr "Capturez les résultats de ce job."
 
-#: src/jobsub/templates/designs.mako:350
+#: src/jobsub/templates/designs.mako:354
 msgid "Oozie parameters"
 msgstr "Paramètres Oozie"
 
-#: src/jobsub/templates/designs.mako:352 src/jobsub/templates/designs.mako:426
-#: src/jobsub/templates/designs.mako:444 src/jobsub/templates/designs.mako:468
-#: src/jobsub/templates/designs.mako:535 src/jobsub/templates/designs.mako:563
-#: src/jobsub/templates/designs.mako:667 src/jobsub/templates/designs.mako:688
-#: src/jobsub/templates/designs.mako:715
+#: src/jobsub/templates/designs.mako:356 src/jobsub/templates/designs.mako:430
+#: src/jobsub/templates/designs.mako:448 src/jobsub/templates/designs.mako:472
+#: src/jobsub/templates/designs.mako:539 src/jobsub/templates/designs.mako:567
+#: src/jobsub/templates/designs.mako:671 src/jobsub/templates/designs.mako:692
+#: src/jobsub/templates/designs.mako:719
 msgid "Value"
 msgstr "Valeur"
 
-#: src/jobsub/templates/designs.mako:354 src/jobsub/templates/designs.mako:428
-#: src/jobsub/templates/designs.mako:446 src/jobsub/templates/designs.mako:470
-#: src/jobsub/templates/designs.mako:486 src/jobsub/templates/designs.mako:502
-#: src/jobsub/templates/designs.mako:537 src/jobsub/templates/designs.mako:565
-#: src/jobsub/templates/designs.mako:584 src/jobsub/templates/designs.mako:600
-#: src/jobsub/templates/designs.mako:616 src/jobsub/templates/designs.mako:632
-#: src/jobsub/templates/designs.mako:648 src/jobsub/templates/designs.mako:669
-#: src/jobsub/templates/designs.mako:690 src/jobsub/templates/designs.mako:717
+#: src/jobsub/templates/designs.mako:358 src/jobsub/templates/designs.mako:432
+#: src/jobsub/templates/designs.mako:450 src/jobsub/templates/designs.mako:474
+#: src/jobsub/templates/designs.mako:490 src/jobsub/templates/designs.mako:506
+#: src/jobsub/templates/designs.mako:541 src/jobsub/templates/designs.mako:569
+#: src/jobsub/templates/designs.mako:588 src/jobsub/templates/designs.mako:604
+#: src/jobsub/templates/designs.mako:620 src/jobsub/templates/designs.mako:636
+#: src/jobsub/templates/designs.mako:652 src/jobsub/templates/designs.mako:673
+#: src/jobsub/templates/designs.mako:694 src/jobsub/templates/designs.mako:721
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/jobsub/templates/designs.mako:358
+#: src/jobsub/templates/designs.mako:362
 msgid "Add"
 msgstr "Ajouter"
 
-#: src/jobsub/templates/designs.mako:368
+#: src/jobsub/templates/designs.mako:372
 msgid "User"
 msgstr "Utilisateur"
 
-#: src/jobsub/templates/designs.mako:369
+#: src/jobsub/templates/designs.mako:373
 msgid "User to authenticate with."
 msgstr "Utilisateur servant à l'authentification."
 
-#: src/jobsub/templates/designs.mako:372
+#: src/jobsub/templates/designs.mako:376
 msgid "Host"
 msgstr "Hôte"
 
-#: src/jobsub/templates/designs.mako:373
+#: src/jobsub/templates/designs.mako:377
 msgid "Host to execute command on."
 msgstr "Hôte sur lequel la commande est exécutée."
 
-#: src/jobsub/templates/designs.mako:376 src/jobsub/templates/designs.mako:557
+#: src/jobsub/templates/designs.mako:380 src/jobsub/templates/designs.mako:561
 msgid "Command"
 msgstr "Commande"
 
-#: src/jobsub/templates/designs.mako:377 src/jobsub/templates/designs.mako:558
+#: src/jobsub/templates/designs.mako:381 src/jobsub/templates/designs.mako:562
 msgid "Command to execute."
 msgstr "Commande à exécuter."
 
-#: src/jobsub/templates/designs.mako:380
+#: src/jobsub/templates/designs.mako:384
 msgid "Script name"
 msgstr "Nom du script"
 
-#: src/jobsub/templates/designs.mako:381
+#: src/jobsub/templates/designs.mako:385
 msgid "Path to the script to execute."
 msgstr "Chemin d'accès vers le script à exécuter."
 
-#: src/jobsub/templates/designs.mako:408 src/jobsub/templates/designs.mako:409
+#: src/jobsub/templates/designs.mako:412 src/jobsub/templates/designs.mako:413
 msgid "TO addresses"
 msgstr "Adresses des destinataires"
 
-#: src/jobsub/templates/designs.mako:412 src/jobsub/templates/designs.mako:413
+#: src/jobsub/templates/designs.mako:416 src/jobsub/templates/designs.mako:417
 msgid "CC addresses (optional)"
 msgstr "Adresses des destinataires en copie (facultatif)"
 
-#: src/jobsub/templates/designs.mako:416 src/jobsub/templates/designs.mako:417
+#: src/jobsub/templates/designs.mako:420 src/jobsub/templates/designs.mako:421
 msgid "Subject"
 msgstr "Objet"
 
-#: src/jobsub/templates/designs.mako:420 src/jobsub/templates/designs.mako:421
+#: src/jobsub/templates/designs.mako:424 src/jobsub/templates/designs.mako:425
 msgid "Body"
 msgstr "Corps"
 
-#: src/jobsub/templates/designs.mako:424
+#: src/jobsub/templates/designs.mako:428
 msgid "Job properties"
 msgstr "Propriétés du job"
 
-#: src/jobsub/templates/designs.mako:425
+#: src/jobsub/templates/designs.mako:429
 msgid "Property name"
 msgstr "Nom de la propriété"
 
-#: src/jobsub/templates/designs.mako:432
+#: src/jobsub/templates/designs.mako:436
 msgid "Add property"
 msgstr "Ajouter une propriété"
 
-#: src/jobsub/templates/designs.mako:442
+#: src/jobsub/templates/designs.mako:446
 msgid "Prepare"
 msgstr "Préparer"
 
-#: src/jobsub/templates/designs.mako:451
+#: src/jobsub/templates/designs.mako:455
 msgid "Add delete"
 msgstr "Ajouter une suppression"
 
-#: src/jobsub/templates/designs.mako:455
+#: src/jobsub/templates/designs.mako:459
 msgid "Add mkdir"
 msgstr "Ajouter une commande mkdir"
 
-#: src/jobsub/templates/designs.mako:466 src/jobsub/templates/designs.mako:533
-#: src/jobsub/templates/designs.mako:561 src/jobsub/templates/designs.mako:665
-#: src/jobsub/templates/designs.mako:686 src/jobsub/templates/designs.mako:713
+#: src/jobsub/templates/designs.mako:470 src/jobsub/templates/designs.mako:537
+#: src/jobsub/templates/designs.mako:565 src/jobsub/templates/designs.mako:669
+#: src/jobsub/templates/designs.mako:690 src/jobsub/templates/designs.mako:717
 msgid "Params"
 msgstr "Paramètres"
 
-#: src/jobsub/templates/designs.mako:474 src/jobsub/templates/designs.mako:541
+#: src/jobsub/templates/designs.mako:478 src/jobsub/templates/designs.mako:545
 msgid "Add param"
 msgstr "Ajouter un paramètre"
 
-#: src/jobsub/templates/designs.mako:484
+#: src/jobsub/templates/designs.mako:488
 msgid "Files"
 msgstr "Fichiers"
 
-#: src/jobsub/templates/designs.mako:490
+#: src/jobsub/templates/designs.mako:494
 msgid "Add file"
 msgstr "Ajouter un fichier"
 
-#: src/jobsub/templates/designs.mako:500
+#: src/jobsub/templates/designs.mako:504
 msgid "Archives"
 msgstr "Archives"
 
-#: src/jobsub/templates/designs.mako:506
+#: src/jobsub/templates/designs.mako:510
 msgid "Add archive"
 msgstr "Ajouter une archive"
 
-#: src/jobsub/templates/designs.mako:519
+#: src/jobsub/templates/designs.mako:523
 msgid "Job Design (mapreduce type)"
 msgstr "Conception de job (de type MapReduce)"
 
-#: src/jobsub/templates/designs.mako:522
+#: src/jobsub/templates/designs.mako:526
 msgid "Job Design (java type)"
 msgstr "Conception de job (de type java)"
 
-#: src/jobsub/templates/designs.mako:525
+#: src/jobsub/templates/designs.mako:529
 msgid "Job Design (streaming type)"
 msgstr "Conception de job (de type diffusion)"
 
-#: src/jobsub/templates/designs.mako:528
+#: src/jobsub/templates/designs.mako:532
 msgid "Job Design (hive type)"
 msgstr "Conception de job (de type hive)"
 
-#: src/jobsub/templates/designs.mako:531
+#: src/jobsub/templates/designs.mako:535
 msgid "Job Design (pig type)"
 msgstr "Conception de job (de type pig)"
 
-#: src/jobsub/templates/designs.mako:544 src/jobsub/templates/designs.mako:694
-#: src/jobsub/templates/designs.mako:721
+#: src/jobsub/templates/designs.mako:548 src/jobsub/templates/designs.mako:698
+#: src/jobsub/templates/designs.mako:725
 msgid "Add argument"
 msgstr "Ajouter un argument"
 
-#: src/jobsub/templates/designs.mako:555
+#: src/jobsub/templates/designs.mako:559
 msgid "Job Design (sqoop type)"
 msgstr "Conception de job (de type sqoop)"
 
-#: src/jobsub/templates/designs.mako:569 src/jobsub/templates/designs.mako:673
+#: src/jobsub/templates/designs.mako:573 src/jobsub/templates/designs.mako:677
 msgid "Add arg"
 msgstr "Ajouter un argument"
 
-#: src/jobsub/templates/designs.mako:580
+#: src/jobsub/templates/designs.mako:584
 msgid "Job Design (fs type)"
 msgstr "Conception de job (de type fs)"
 
-#: src/jobsub/templates/designs.mako:582
+#: src/jobsub/templates/designs.mako:586
 msgid "Delete path"
 msgstr "Supprimer le chemin d'accès"
 
-#: src/jobsub/templates/designs.mako:588 src/jobsub/templates/designs.mako:604
-#: src/jobsub/templates/designs.mako:620
+#: src/jobsub/templates/designs.mako:592 src/jobsub/templates/designs.mako:608
+#: src/jobsub/templates/designs.mako:624
 msgid "Add path"
 msgstr "Ajouter un chemin d'accès"
 
-#: src/jobsub/templates/designs.mako:598
+#: src/jobsub/templates/designs.mako:602
 msgid "Create directory"
 msgstr "Créer un répertoire"
 
-#: src/jobsub/templates/designs.mako:614
+#: src/jobsub/templates/designs.mako:618
 msgid "Create or touch file"
 msgstr "Créer un fichier ou y accéder via la commande touch"
 
-#: src/jobsub/templates/designs.mako:630
+#: src/jobsub/templates/designs.mako:634
 msgid "Change permissions"
 msgstr "Modifier les autorisations"
 
-#: src/jobsub/templates/designs.mako:636
+#: src/jobsub/templates/designs.mako:640
 msgid "Add chmod"
 msgstr "Ajouter une commande chmod"
 
-#: src/jobsub/templates/designs.mako:646
+#: src/jobsub/templates/designs.mako:650
 msgid "Move file"
 msgstr "Déplacer un fichier"
 
-#: src/jobsub/templates/designs.mako:652
+#: src/jobsub/templates/designs.mako:656
 msgid "Add move"
 msgstr "Ajouter une commande move"
 
-#: src/jobsub/templates/designs.mako:663
+#: src/jobsub/templates/designs.mako:667
 msgid "Job Design (ssh type)"
 msgstr "Conception de job (de type ssh)"
 
-#: src/jobsub/templates/designs.mako:684
+#: src/jobsub/templates/designs.mako:688
 msgid "Job Design (shell type)"
 msgstr "Conception de job (de type shell)"
 
-#: src/jobsub/templates/designs.mako:697
+#: src/jobsub/templates/designs.mako:701
 msgid "Add env-var"
 msgstr "Ajouter une variable d'envir."
 
-#: src/jobsub/templates/designs.mako:708
+#: src/jobsub/templates/designs.mako:712
 msgid "Job Design (email type)"
 msgstr "Conception de job (de type email)"
 
-#: src/jobsub/templates/designs.mako:711
+#: src/jobsub/templates/designs.mako:715
 msgid "Job Design (distcp type)"
 msgstr "Conception de job (de type distcp)"
 
-#: src/jobsub/templates/designs.mako:757
+#: src/jobsub/templates/designs.mako:761
 msgid "No data available"
 msgstr "Aucune donnée disponible"
 
-#: src/jobsub/templates/designs.mako:758
+#: src/jobsub/templates/designs.mako:762
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr "Entrées Showing _START_ to _END_ of _TOTAL_"
+msgstr "Affichage des entrées _START_ to _END_ of _TOTAL_"
 
-#: src/jobsub/templates/designs.mako:759
+#: src/jobsub/templates/designs.mako:763
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "Affichage des entrées 0 à 0 sur 0"
 
-#: src/jobsub/templates/designs.mako:760
+#: src/jobsub/templates/designs.mako:764
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(filtrées à partir des entrées totales _MAX_)"
 
-#: src/jobsub/templates/designs.mako:761
+#: src/jobsub/templates/designs.mako:765
 msgid "No matching records"
 msgstr "Aucun enregistrement correspondant"
 
-#: src/jobsub/templates/designs.mako:763
+#: src/jobsub/templates/designs.mako:767
 msgid "First"
 msgstr "Premier"
 
-#: src/jobsub/templates/designs.mako:764
+#: src/jobsub/templates/designs.mako:768
 msgid "Last"
 msgstr "Dernier"
 
-#: src/jobsub/templates/designs.mako:765
+#: src/jobsub/templates/designs.mako:769
 msgid "Next"
 msgstr "Suivant"
 
-#: src/jobsub/templates/designs.mako:766
+#: src/jobsub/templates/designs.mako:770
 msgid "Previous"
 msgstr "Précédent"
 

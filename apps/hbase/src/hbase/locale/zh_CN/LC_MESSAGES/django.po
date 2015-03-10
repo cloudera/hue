@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2013-07-13 20:35-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,25 +17,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hbase/api.py:48
+#: src/hbase/api.py:49
 #, python-format
 msgid "HBase Thrift 1 server cannot be contacted: %s"
 msgstr "无法联系到 HBase Thrift 1 服务器：%s"
 
-#: src/hbase/api.py:50
+#: src/hbase/api.py:51
 #, python-format
 msgid "Api Error: %s"
 msgstr "Api 错误：%s"
 
-#: src/hbase/api.py:72
+#: src/hbase/api.py:73
 #, python-format
 msgid "Cluster configuration %s isn't formatted correctly."
 msgstr "集群配置 %s 的格式设置不正确。"
 
-#: src/hbase/api.py:83
+#: src/hbase/api.py:84
 #, python-format
 msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "配置中不存在名为 %s 的集群。"
+
+#: src/hbase/api.py:107
+msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgstr "hbase-site.xml 配置文件中缺少 kerberos 主体名称。"
+
+#: src/hbase/conf.py:28
+msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security."
+msgstr "用于群集的 HBase Thrift server 的逗号分隔列表，使用“(name|host:port) ”的格式。使用带有加密的完整主机名。"
+
+#: src/hbase/conf.py:34
+msgid "Hard limit of rows or columns per row fetched before truncating."
+msgstr "截断前对于提取的行数或每行列数的硬限制。"
+
+#: src/hbase/conf.py:40
+msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
+msgstr "“buffered”是 HBase Thrift Server 的默认值，支持加密。“framed”可用于停止响应，这在配合 Thrift 中的 nonblocking server 使用时非常有效。"
+
+#: src/hbase/conf.py:48
+msgid "HBase configuration directory, where hbase-site.xml is located."
+msgstr "HBase 配置目录，即 hive-site.xml 的所在位置。"
 
 #: src/hbase/views.py:129
 msgid "A POST request is required."
@@ -45,89 +65,90 @@ msgstr "需要 POST 请求。"
 msgid "HBase Browser"
 msgstr "HBase Browser"
 
-#: src/hbase/templates/app.mako:66
+#: src/hbase/templates/app.mako:67
 msgid "There are no tables matching the search criteria."
 msgstr "没有符合搜索条件的表。"
 
-#: src/hbase/templates/app.mako:79
+#: src/hbase/templates/app.mako:80
 msgid "Refresh Row"
 msgstr "刷新行"
 
-#: src/hbase/templates/app.mako:81
+#: src/hbase/templates/app.mako:82
 msgid "Delete Row"
 msgstr "删除行"
 
-#: src/hbase/templates/app.mako:85 src/hbase/templates/app.mako:251
+#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:281
 msgid "Toggle Collapse Selected"
 msgstr "切换折叠所选项"
 
-#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:252
+#: src/hbase/templates/app.mako:87 src/hbase/templates/app.mako:282
 msgid "Select All Visible"
 msgstr "选择所有可见项"
 
-#: src/hbase/templates/app.mako:93
+#: src/hbase/templates/app.mako:94
 msgid "Add New Column/Cell"
 msgstr "添加新列/单元格"
 
-#: src/hbase/templates/app.mako:106
+#: src/hbase/templates/app.mako:107
 msgid "Full Editor"
-msgstr "全屏编辑器"
+msgstr "完整编辑器"
 
-#: src/hbase/templates/app.mako:122
+#: src/hbase/templates/app.mako:123
 msgid "No rows to display."
 msgstr "没有要显示的行。"
 
-#: src/hbase/templates/app.mako:128
+#: src/hbase/templates/app.mako:129
 msgid "Sort By"
 msgstr "排序方式"
 
-#: src/hbase/templates/app.mako:142
+#: src/hbase/templates/app.mako:143
 msgid "Home"
 msgstr "主页"
 
-#: src/hbase/templates/app.mako:147
+#: src/hbase/templates/app.mako:148
 msgid "Switch Cluster"
 msgstr "交换机集群"
 
-#: src/hbase/templates/app.mako:166
+#: src/hbase/templates/app.mako:167
 msgid "Search for Table Name"
 msgstr "搜索表名"
 
-#: src/hbase/templates/app.mako:169
+#: src/hbase/templates/app.mako:170
 msgid "Enable"
 msgstr "启用"
 
-#: src/hbase/templates/app.mako:171
+#: src/hbase/templates/app.mako:172
 msgid "Disable"
 msgstr "禁用"
 
-#: src/hbase/templates/app.mako:174
+#: src/hbase/templates/app.mako:175
 msgid "Drop"
-msgstr "删除"
+msgstr "丢弃"
 
-#: src/hbase/templates/app.mako:178
+#: src/hbase/templates/app.mako:179
 msgid "New Table"
 msgstr "新建表"
 
-#: src/hbase/templates/app.mako:198
+#: src/hbase/templates/app.mako:200
 msgid "Create New Table"
 msgstr "创建新表"
 
-#: src/hbase/templates/app.mako:202
+#: src/hbase/templates/app.mako:204
 msgid "Table Name"
 msgstr "表名"
 
-#: src/hbase/templates/app.mako:203
+#: src/hbase/templates/app.mako:205
 msgid "Column Families"
 msgstr "列族"
 
 #: src/hbase/templates/app.mako:207
-msgid "Additional Column Family"
-msgstr "其他列族"
 
-#: src/hbase/templates/app.mako:210 src/hbase/templates/app.mako:311
-#: src/hbase/templates/app.mako:334 src/hbase/templates/app.mako:375
-#: src/hbase/templates/app.mako:407
+msgid "Add an additional column family"
+msgstr "添加其他列族"
+
+#: src/hbase/templates/app.mako:210 src/hbase/templates/app.mako:341
+#: src/hbase/templates/app.mako:364 src/hbase/templates/app.mako:405
+#: src/hbase/templates/app.mako:437
 msgid "Cancel"
 msgstr "取消"
 
@@ -135,207 +156,224 @@ msgstr "取消"
 msgid "Submit"
 msgstr "提交"
 
-#: src/hbase/templates/app.mako:223
+#: src/hbase/templates/app.mako:218
+msgid "Remove Column Family"
+msgstr "删除列族"
+
+#: src/hbase/templates/app.mako:236
+msgid "Remove column property"
+msgstr "删除列属性"
+
+#: src/hbase/templates/app.mako:237
+
+msgid "Additional column property"
+msgstr "其他列属性"
+
+#: src/hbase/templates/app.mako:241
+msgid "Add a column property"
+msgstr "添加列属性"
+
+#: src/hbase/templates/app.mako:253
 msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
 msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
 
-#: src/hbase/templates/app.mako:233
+#: src/hbase/templates/app.mako:263
 msgid "Autocomplete Suggestions:"
 msgstr "自动完成建议："
 
-#: src/hbase/templates/app.mako:245
+#: src/hbase/templates/app.mako:275
 msgid "Toggle Grid"
 msgstr "切换网格"
 
-#: src/hbase/templates/app.mako:247
+#: src/hbase/templates/app.mako:277
 msgid "Toggle Select All Rows"
 msgstr "切换选择所有行"
 
-#: src/hbase/templates/app.mako:247
+#: src/hbase/templates/app.mako:277
 msgid "All"
 msgstr "所有"
 
-#: src/hbase/templates/app.mako:254
+#: src/hbase/templates/app.mako:284
 msgid "Drop Columns"
 msgstr "删除列"
 
-#: src/hbase/templates/app.mako:269
+#: src/hbase/templates/app.mako:299
 msgid "Fetched"
 msgstr "已提取"
 
-#: src/hbase/templates/app.mako:272
+#: src/hbase/templates/app.mako:302
 msgid "starting from"
 msgstr "开始时间"
 
-#: src/hbase/templates/app.mako:277
+#: src/hbase/templates/app.mako:307
 msgid "in"
 msgstr "以"
 
-#: src/hbase/templates/app.mako:277
+#: src/hbase/templates/app.mako:307
 msgid "seconds"
-msgstr "秒为单位"
+msgstr "秒"
 
-#: src/hbase/templates/app.mako:278
+#: src/hbase/templates/app.mako:308
 msgid "Entries after"
 msgstr "之后的条目"
 
-#: src/hbase/templates/app.mako:278
+#: src/hbase/templates/app.mako:308
 msgid "were truncated."
 msgstr "被截断。"
 
-#: src/hbase/templates/app.mako:283
+#: src/hbase/templates/app.mako:313
 msgid "Drop Rows"
 msgstr "删除行"
 
-#: src/hbase/templates/app.mako:286
+#: src/hbase/templates/app.mako:316
 msgid ".CSV, .TSV, etc..."
 msgstr ".CSV、.TSV 等..."
 
-#: src/hbase/templates/app.mako:286
+#: src/hbase/templates/app.mako:316
 msgid "Bulk Upload"
 msgstr "批量上传"
 
-#: src/hbase/templates/app.mako:287
+#: src/hbase/templates/app.mako:317
 msgid "New Row"
 msgstr "新建行"
 
-#: src/hbase/templates/app.mako:299
+#: src/hbase/templates/app.mako:329
 msgid "Insert New Row"
 msgstr "插入新行"
 
-#: src/hbase/templates/app.mako:304
+#: src/hbase/templates/app.mako:334
 msgid "Row Key"
 msgstr "行键"
 
-#: src/hbase/templates/app.mako:308
+#: src/hbase/templates/app.mako:338
 msgid "Add Field"
 msgstr "添加字段"
 
-#: src/hbase/templates/app.mako:322
+#: src/hbase/templates/app.mako:352
 msgid "Create New Column"
 msgstr "创建新列"
 
-#: src/hbase/templates/app.mako:328
+#: src/hbase/templates/app.mako:358
 msgid "Column Name"
 msgstr "列名称"
 
-#: src/hbase/templates/app.mako:330 src/hbase/templates/app.mako:331
+#: src/hbase/templates/app.mako:360 src/hbase/templates/app.mako:361
 msgid "Cell Value"
 msgstr "单元格值"
 
-#: src/hbase/templates/app.mako:335 src/hbase/templates/app.mako:376
+#: src/hbase/templates/app.mako:365 src/hbase/templates/app.mako:406
 msgid "Upload"
 msgstr "上传"
 
-#: src/hbase/templates/app.mako:347
+#: src/hbase/templates/app.mako:377
 msgid "Edit Cell"
 msgstr "编辑单元格"
 
-#: src/hbase/templates/app.mako:363
+#: src/hbase/templates/app.mako:393
 msgid "Cell History:"
 msgstr "单元格历史记录："
 
-#: src/hbase/templates/app.mako:377
+#: src/hbase/templates/app.mako:407
 msgid "Save"
 msgstr "保存"
 
-#: src/hbase/templates/app.mako:379
+#: src/hbase/templates/app.mako:409
 msgid "OK"
 msgstr "确定"
 
-#: src/hbase/templates/app.mako:408 src/hbase/templates/app.mako:426
+#: src/hbase/templates/app.mako:438 src/hbase/templates/app.mako:456
 msgid "Confirm"
 msgstr "确认"
 
-#: src/hbase/templates/app.mako:420
+#: src/hbase/templates/app.mako:450
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: src/hbase/templates/app.mako:421
+#: src/hbase/templates/app.mako:451
 msgid "Delete row "
 msgstr "删除行 "
 
-#: src/hbase/templates/app.mako:422
+#: src/hbase/templates/app.mako:452
 msgid "? (This cannot be undone)"
 msgstr "？（此操作无法撤消）"
 
-#: src/hbase/templates/app.mako:423
+#: src/hbase/templates/app.mako:453
 msgid "Are you sure you want to drop this column?"
 msgstr "是否确定要删除此列？"
 
-#: src/hbase/templates/app.mako:424
+#: src/hbase/templates/app.mako:454
 msgid "enable"
 msgstr "启用"
 
-#: src/hbase/templates/app.mako:425
+#: src/hbase/templates/app.mako:455
 msgid "disable"
 msgstr "禁用"
 
-#: src/hbase/templates/app.mako:427
+#: src/hbase/templates/app.mako:457
 msgid "Are you sure you want to"
 msgstr "是否确定要"
 
-#: src/hbase/templates/app.mako:428
+#: src/hbase/templates/app.mako:458
 msgid "this table?"
 msgstr "此表？"
 
-#: src/hbase/templates/app.mako:429
+#: src/hbase/templates/app.mako:459
 msgid "End Query"
 msgstr "结束查询"
 
-#: src/hbase/templates/app.mako:430
+#: src/hbase/templates/app.mako:460
 msgid "Prefix Scan"
 msgstr "前缀扫描"
 
-#: src/hbase/templates/app.mako:431
+#: src/hbase/templates/app.mako:461
 msgid "Start Scan"
 msgstr "开始扫描"
 
-#: src/hbase/templates/app.mako:432
+#: src/hbase/templates/app.mako:462
 msgid "Start Select Columns"
 msgstr "开始选择列"
 
-#: src/hbase/templates/app.mako:433
+#: src/hbase/templates/app.mako:463
 msgid "End Column/Family"
 msgstr "结束列/族"
 
-#: src/hbase/templates/app.mako:434
+#: src/hbase/templates/app.mako:464
 msgid "End Select Columns"
 msgstr "结束列选择"
 
-#: src/hbase/templates/app.mako:435
+#: src/hbase/templates/app.mako:465
 msgid "Start FilterString"
 msgstr "开始 FilterString"
 
-#: src/hbase/templates/app.mako:436
+#: src/hbase/templates/app.mako:466
 msgid "End FilterString"
 msgstr "结束 FilterString"
 
-#: src/hbase/templates/app.mako:437
+#: src/hbase/templates/app.mako:467
 msgid "Row Key Value"
 msgstr "行键值"
 
-#: src/hbase/templates/app.mako:438
+#: src/hbase/templates/app.mako:468
 msgid "Length of Scan or Row Key"
 msgstr "扫描或行键长度"
 
-#: src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:469
 msgid "Column Family: Column Name"
 msgstr "列族：列名称"
 
-#: src/hbase/templates/app.mako:440
+#: src/hbase/templates/app.mako:470
 msgid "Rows starting with"
 msgstr "行开始于"
 
-#: src/hbase/templates/app.mako:441
+#: src/hbase/templates/app.mako:471
 msgid "String"
 msgstr "字符串"
 
-#: src/hbase/templates/app.mako:442
+#: src/hbase/templates/app.mako:472
 msgid "Integer"
 msgstr "整数"
 
-#: src/hbase/templates/app.mako:443
+#: src/hbase/templates/app.mako:473
 msgid "Column Range"
 msgstr "列范围"
 
