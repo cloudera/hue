@@ -31,10 +31,25 @@ LOG = logging.getLogger(__name__)
 
 
 def test_valid_external_id():
-  assert_equal('job_201208072118_0044', WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[0]).externalId)
-  assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[1]).externalId)
-  assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[2]).externalId)
-  assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[3]).externalId)
+  action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[0])
+  assert_equal('job_201208072118_0044', action.externalId)
+  assert_equal('/jobbrowser/jobs/job_201208072118_0044/single_logs', action.get_absolute_log_url())
+  assert_equal('/jobbrowser/jobs/job_201208072118_0044', action.get_external_id_url())
+
+  action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[1])
+  assert_equal('-', action.externalId)
+  assert_equal(None, action.get_absolute_log_url())
+  assert_equal(None, action.get_external_id_url())
+
+  action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[2])
+  assert_equal('', action.externalId)
+  assert_equal(None, action.get_absolute_log_url())
+  assert_equal(None, action.get_external_id_url())
+
+  action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[3])
+  assert_equal(None, action.externalId)
+  assert_equal(None, action.get_absolute_log_url())
+  assert_equal(None, action.get_external_id_url())
 
 
 def aggregate_coordinator_instances():

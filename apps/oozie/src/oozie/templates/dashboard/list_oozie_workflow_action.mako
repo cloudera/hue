@@ -44,8 +44,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <li class="white">${ action.name }</li>
 
           <li class="nav-header">${ _('External Id') }</li>
-          % if action.get_externalId_url():
-            <li><a href="${ action.get_externalId_url() }">${ action.externalId }</a></li>
+          % if action.get_external_id_url():
+            <li><a href="${ action.get_external_id_url() }">${ action.externalId }</a></li>
           % else:
             <li>${ action.externalId } </li>
           % endif
