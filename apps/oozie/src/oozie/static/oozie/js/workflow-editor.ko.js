@@ -258,7 +258,7 @@ var Workflow = function (vm, workflow) {
           });
 
           if (data.workflows.length > 0) {
-            viewModel.subworfklows(data.workflows);
+            viewModel.subworkflows(getOtherSubworkflows(viewModel, data.workflows));
           }
 
           if (callback) {
@@ -504,15 +504,18 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     var _allFilled = true;
     ko.utils.arrayForEach(self.addActionProperties(), function (property) {
       var _val = property.value();
-      if (($.isArray(_val) && !_filledInternalValues(_val) ) || _val == '') {
+      if (($.isArray(_val) && !_filledInternalValues(_val) ) || _val == '' || _val == null || typeof _val == 'undefined') {
         _allFilled = false;
       }
     });
     return _allFilled;
   });
-  self.subworfklows = ko.observableArray(subworkflows_json);
+
+
+  self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
+
   self.getSubWorkflow = function (uuid) {
-    var wf = $.grep(self.subworfklows(), function (wf, i) {
+    var wf = $.grep(self.subworkflows(), function (wf, i) {
       return wf.value == uuid;
     });
     if (wf[0]) {
@@ -1161,6 +1164,16 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 
+
+function getOtherSubworkflows(vm, workflows) {
+  var _cleanedSubworkflows = [];
+  workflows.forEach(function(sub){
+    if (sub.id != vm.workflow.id()){
+      _cleanedSubworkflows.push(sub);
+    }
+  });
+  return _cleanedSubworkflows;
+}
 
 function logGA(page) {
   if (typeof trackOnGA == 'function') {
