@@ -210,6 +210,15 @@ class Workflow(Job):
     _data = self.get_data()
     return _data['workflow']['properties']['parameters']
 
+  def override_subworkflow_id(self, sub_wf_action, workflow_id):
+    _data = self.get_data()
+
+    action = [_action for _action in _data['workflow']['nodes'] if _action['id'] == sub_wf_action.id]
+    if action:
+      action[0]['properties']['job_properties'].append({'name': Workflow.HUE_ID, 'value': workflow_id})
+
+    self.data = json.dumps(_data)
+
   @property
   def sla_enabled(self):
     _data = self.get_data()
