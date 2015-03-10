@@ -150,9 +150,6 @@ class Submission(object):
       jt_address = cluster.get_cluster_addr_for_job_submission()
       self._update_properties(jt_address) # Needed for coordinator deploying workflows with credentials
 
-    oozie_xml = self.job.to_xml(self.properties)
-    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml, self.properties)
-
     if hasattr(self.job, 'nodes'):
       for action in self.job.nodes:
         # Make sure XML is there
@@ -162,6 +159,11 @@ class Submission(object):
           workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           sub_deploy.deploy()
+
+          self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
+
+    oozie_xml = self.job.to_xml(self.properties)
+    self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
 
     return deployment_dir
 
