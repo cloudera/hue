@@ -125,11 +125,23 @@
   $(".calendar-link").on("click", function(){
     var DATE_FORMAT = "YYYY-MM-DD";
     var _el = $(this).parents(".controls").find("input[type='text']");
+    _el.off("keyup");
+    _el.on("keyup", function(){
+      _el.data("lastValue", _el.val());
+    });
+    _el.data("lastValue", _el.val());
     _el.datepicker({
       format: DATE_FORMAT.toLowerCase()
      }).on("changeDate", function () {
-      _el.datepicker('hide');
-      _el.val(_el.val() + "T00:00Z");
+      _el.datepicker("hide");
+    }).on("hide", function () {
+      var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
+      if (_val.indexOf("T") == -1){
+        _el.val(_el.val() + "T00:00Z");
+      }
+      else if (_el.val().indexOf("T") == "-1") {
+        _el.val(_el.val() + "T" +  _val.split("T")[1]);
+      }
     });
    _el.datepicker('show');
   });
