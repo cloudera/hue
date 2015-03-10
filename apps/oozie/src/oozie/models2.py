@@ -1103,7 +1103,7 @@ class SparkAction(Action):
           'name': 'mode',
           'label': _('Mode'),
           'value': 'client',
-          'help_text': _('Where to run spark driver. Ex: client,cluster.'),
+          'help_text': _('e.g. client,cluster'),
           'type': ''
      },
      'app_name': {

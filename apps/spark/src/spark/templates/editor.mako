@@ -162,7 +162,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </li>
     <!-- /ko -->
     <li>
-      <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
+      ## <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
     </li>
   </ul>
 </div>
