@@ -615,14 +615,14 @@ class Document2Manager(models.Manager):
 
 
 def uuid_default():
-  return uuid.uuid4().hex
+  return str(uuid.uuid4())
 
 
 class Document2(models.Model):    
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
-  uuid = models.CharField(default=uuid_default, max_length=32, db_index=True)
+  uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
   type = models.CharField(default='', max_length=32, db_index=True, help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...'))
 
   data = models.TextField(default='{}')
