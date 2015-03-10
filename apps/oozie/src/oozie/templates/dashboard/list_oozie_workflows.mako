@@ -165,7 +165,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   var Workflow = function (wf) {
     return {
       id: wf.id,
-      lastModTime: wf.lastModTime,
+      lastModTimeFormatted: wf.lastModTimeFormatted,
       lastModTimeInMillis: wf.lastModTimeInMillis,
       endTime: wf.endTime,
       endTimeInMillis: wf.endTimeInMillis,
@@ -376,12 +376,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                 try {
                   runningTable.fnAddData([
                     wf.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>':'',
-                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'" data-type="date">' + emptyStringIfNull(wf.lastModTime) + '</span>',
+                    '<span data-sort-value="'+ wf.createdInMillis +'" data-type="date">' + emptyStringIfNull(wf.created) + '</span>',
                     '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>',
                     wf.appName,
                     '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
                     wf.user,
-                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeInMillis) + '</span>',
+                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeFormatted) + '</span>',
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
                     wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>'
                   ]);
