@@ -152,7 +152,7 @@ ROOT_URLCONF = 'desktop.urls'
 WSGI_APPLICATION = None
 
 TEMPLATE_DIRS = (
-    get_desktop_root("core/templates")
+    get_desktop_root("core/templates"),
 )
 
 INSTALLED_APPS = [
