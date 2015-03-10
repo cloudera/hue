@@ -1303,7 +1303,7 @@
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.deletes.push(ko.mapping.fromJS({'value': ''})); }">
+          <a class="pointer" data-bind="click: function(){ properties.deletes.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             <span data-bind="text: $root.workflow_properties.deletes.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
@@ -1311,14 +1311,14 @@
           <li>
             <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, value: value, attr: { placeholder: $root.workflow_properties.deletes.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-            <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); }">
+            <a href="#" data-bind="click: function(){ $parent.properties.deletes.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
         </ul>
 
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.mkdirs.push(ko.mapping.fromJS({'value': ''})); }">
+          <a class="pointer" data-bind="click: function(){ properties.mkdirs.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             <span data-bind="text: $root.workflow_properties.mkdirs.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
@@ -1326,14 +1326,14 @@
           <li>
             <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, value: value, attr: { placeholder: $root.workflow_properties.mkdirs.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-            <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); }">
+            <a href="#" data-bind="click: function(){ $parent.properties.mkdirs.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
         </ul>
 
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.touchzs.push(ko.mapping.fromJS({'value': ''})); }">
+          <a class="pointer" data-bind="click: function(){ properties.touchzs.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             <span data-bind="text: $root.workflow_properties.touchzs.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
@@ -1341,25 +1341,25 @@
           <li>
             <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, value: value, attr: { placeholder: $root.workflow_properties.touchzs.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-            <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); }">
+            <a href="#" data-bind="click: function(){ $parent.properties.touchzs.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
         </ul>
 
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.moves.push(ko.mapping.fromJS({'source': '', 'destination': ''})); }">
+          <a class="pointer" data-bind="click: function(){ properties.moves.push(ko.mapping.fromJS({'source': '', 'destination': ''})); $(document).trigger('drawArrows') }">
             <span data-bind="text: $root.workflow_properties.moves.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
         <ul data-bind="foreach: properties.moves" class="unstyled">
           <li>
-            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: source, filechooserOptions: globalFilechooserOptions, value: source" placeholder="${ _('Source path') }"/>
+            <input type="text" class="filechooser-input thirty" data-bind="filechooser: source, filechooserOptions: globalFilechooserOptions, value: source" placeholder="${ _('Source path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: false} }, visible: source().length > 0'></span>
 
-            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: destination, filechooserOptions: globalFilechooserOptions, value: destination" placeholder="${ _('New destination path') }"/>
+            <input type="text" class="filechooser-input thirty" data-bind="filechooser: destination, filechooserOptions: globalFilechooserOptions, value: destination" placeholder="${ _('New destination path') }"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: destination(), with_label: false} }, visible: destination().length > 0'></span>
-            <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); }">
+            <a href="#" data-bind="click: function(){ $parent.properties.moves.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
             </a>
           </li>
@@ -1503,15 +1503,18 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <span data-bind="text: $root.workflow_properties.mapper.label"></span>
-        <input type="text" data-bind="value: properties.mapper" />
-        <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: false} }'></span>
-        <br/>
-
-        <span data-bind="text: $root.workflow_properties.reducer.label"></span
-        <input type="text" data-bind="value: properties.reducer" />
-        <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
-
+        <ul class="unstyled">
+          <li>
+            <span data-bind="text: $root.workflow_properties.mapper.label"></span>
+            <input type="text" data-bind="value: properties.mapper" />
+            <span data-bind='template: { name: "common-fs-link", data: {path: properties.mapper(), with_label: false} }'></span>
+          </li>
+          <li>
+            <span data-bind="text: $root.workflow_properties.reducer.label"></span>
+            <input type="text" data-bind="value: properties.reducer" />
+            <span data-bind='template: { name: "common-fs-link", data: {path: properties.reducer(), with_label: false} }'></span>
+          </li>
+        </ul>
         <div data-bind="template: { name: 'common-properties-files' }"></div>
       </div>
     </div>
