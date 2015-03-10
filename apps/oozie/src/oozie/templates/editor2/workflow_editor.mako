@@ -239,7 +239,7 @@ ${ workflow.render() }
           <textarea data-bind="value: value, valueUpdate:'afterkeydown'" class="input-xlarge"></textarea>
           <!-- /ko -->
           <!-- ko if: type() == 'workflow' -->
-          <select data-bind="options: $root.subworfklows, optionsText: 'name', optionsValue: 'value', value: value"></select>
+          <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
 
           <!-- ko if: type() == 'distcp' -->
