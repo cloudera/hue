@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 项目版本\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,10 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8 位\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsolr/api.py:79 src/libsolr/api.py:90 src/libsolr/api.py:103
-#: src/libsolr/api.py:123 src/libsolr/api.py:141 src/libsolr/api.py:150
-#: src/libsolr/api.py:159 src/libsolr/api.py:169 src/libsolr/api.py:179
-#: src/libsolr/api.py:192 src/libsolr/api.py:202 src/libsolr/api.py:227
+#: src/libsolr/api.py:200 src/libsolr/api.py:212 src/libsolr/api.py:227
+#: src/libsolr/api.py:247 src/libsolr/api.py:269 src/libsolr/api.py:287
+#: src/libsolr/api.py:305 src/libsolr/api.py:312 src/libsolr/api.py:321
+#: src/libsolr/api.py:331 src/libsolr/api.py:341 src/libsolr/api.py:354
+#: src/libsolr/api.py:364 src/libsolr/api.py:374 src/libsolr/api.py:395
+#: src/libsolr/api.py:411 src/libsolr/api.py:422 src/libsolr/api.py:444
+#: src/libsolr/api.py:467
 msgid "Error while accessing Solr"
 msgstr "访问 Solr 时出错"
 

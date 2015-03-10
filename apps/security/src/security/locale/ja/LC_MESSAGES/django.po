@@ -5,11 +5,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: プロジェクトのバージョン\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: フルネーム<EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr "ユーザー名"
 
 #: src/security/forms.py:54
 msgid "Required. 30 characters or fewer. No whitespaces or colons."
-msgstr "必須。文字数は 30以下。スペースとコロンは使用できません。"
+msgstr "必須。文字数は 30 以下。スペースとコロンは使用できません。"
 
 #: src/security/forms.py:55 src/security/forms.py:124
 msgid "Whitespaces and ':' not allowed"
@@ -36,7 +36,7 @@ msgstr "パスワード"
 
 #: src/security/forms.py:57
 msgid "Password confirmation"
-msgstr "パスワードの設定"
+msgstr "パスワードの確認"
 
 #: src/security/forms.py:58 src/security/forms.py:130
 msgid "Create home directory"
@@ -52,7 +52,7 @@ msgstr "パスワードが一致しません。"
 
 #: src/security/forms.py:85
 msgid "You must specify a password when creating a new user."
-msgstr "新規ユーザーの作成ではパスワードを指定する必要があります。"
+msgstr "新しいユーザーを作成するときにはパスワードを指定する必要があります。"
 
 #: src/security/forms.py:123
 msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
@@ -75,12 +75,12 @@ msgstr "ユーザーのホームディレクトリを作成してください（
 #: src/security/forms.py:147
 #, python-format
 msgid "Too long: 64 characters or fewer and not %s."
-msgstr "長すぎます。64 文字以下で %s ではないことが必要です。"
+msgstr "長すぎます。64 文字以下で  %s ではないことが必要です。"
 
 #: src/security/forms.py:153
 #, python-format
 msgid "Too long: 30 characters or fewer and not %s."
-msgstr "長すぎます。30 文字以下で %s ではないことが必要です。"
+msgstr "長すぎます。30 文字以下で  %s ではないことが必要です。"
 
 #: src/security/forms.py:163
 msgid "Name"
@@ -255,11 +255,11 @@ msgstr "LDAP 例外：%s"
 #: src/security/views.py:374
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
-msgstr "パターン %s のグループの LDAP 詳細を取得できませんでした"
+msgstr "パターン %s  のグループの LDAP 詳細を取得できませんでした"
 
 #: src/security/views.py:391
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr "LDAP ユーザー/グループの同期化ではスーパーユーザーであることが必要です。"
+msgstr "LDAP ユーザー／グループの同期化ではスーパーユーザーであることが必要です。"
 
 #: src/security/views.py:420
 msgid "The import may not be complete, sync again."
@@ -271,7 +271,7 @@ msgstr "アクティブなスーパーユーザーが未設定です。"
 
 #: src/security/views.py:443
 msgid "You cannot remove the last active superuser from the configuration."
-msgstr "設定からアクティブな最後のスーパーユーザーを削除することはできません。"
+msgstr "最後のアクティブなスーパーユーザーを設定から削除することはできません。"
 
 #: src/security/views.py:501
 #, python-format
@@ -286,7 +286,7 @@ msgstr "ユーザー %(username)s のインポート中に名前の競合が発�
 #: src/security/views.py:672 src/security/views.py:721
 #, python-format
 msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "パターン %(groupname_pattern)s のグループ %(groupname)s をインポートしている間に名前の競合が発生しました"
+msgstr "パターン %(groupname_pattern)s のグループ %(groupname)s のインポート中に名前の競合が発生しました"
 
 #: src/security/management/commands/import_ldap_group.py:42
 msgid "Import users from the group."
@@ -404,7 +404,7 @@ msgstr "はい"
 
 #: src/security/templates/delete_group.mako:22
 msgid "Are you sure you want to delete"
-msgstr "次を削除してよろしいですか"
+msgstr "削除してよろしいですか？"
 
 #: src/security/templates/delete_group.mako:22
 msgid "?"
@@ -428,7 +428,7 @@ msgstr "Hue グループ - グループの編集：%(name)s"
 
 #: src/security/templates/edit_group.mako:51
 msgid "Hue Groups - Add/Sync LDAP group"
-msgstr "Hue グループ - グループを追加／同期"
+msgstr "Hue グループ - LDAP グループを追加／同期"
 
 #: src/security/templates/edit_group.mako:53
 msgid "Hue Groups - Create group"
@@ -505,7 +505,7 @@ msgstr "戻る"
 
 #: src/security/templates/edit_user.mako:75
 msgid "Next"
-msgstr "次へ"
+msgstr "次"
 
 #: src/security/templates/edit_user.mako:80
 #: src/security/templates/list_users.mako:45
@@ -625,7 +625,7 @@ msgstr "電子メール"
 
 #: src/security/templates/list_users.mako:76
 msgid "Last Login"
-msgstr "最終ログイン"
+msgstr "最後のログイン"
 
 #: src/security/templates/list_users.mako:90
 #, python-format
@@ -638,7 +638,7 @@ msgstr "検索条件に一致するユーザーが存在しません。"
 
 #: src/security/templates/list_users.mako:124
 msgid "Are you sure you want to delete the selected user(s)?"
-msgstr "選択したユーザーを削除しますか?"
+msgstr "選択したユーザーを削除してもよろしいですか?"
 
 #: src/security/templates/sync_ldap_users_groups.mako:39
 msgid "Sync LDAP users and groups"
@@ -650,7 +650,7 @@ msgstr "Hue にまだ存在しないユーザーおよびグループはイン�
 
 #: src/security/templates/sync_ldap_users_groups.mako:44
 msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "すべてのユーザー情報とグループメンバーシップは、LDAP サーバーの現在の状態に基づいて更新されます。"
+msgstr "LDAP サーバーの現在の状態を基にしてすべてのユーザー情報とグループメンバーシップが更新されます。"
 
 #: src/security/templates/sync_ldap_users_groups.mako:52
 msgid "Sync"

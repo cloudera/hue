@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,50 +18,52 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:27
-msgid "URL of Oozie server. This is required for job submission."
-msgstr "URL des Oozie-Servers. Diese ist erforderlich für die Jobübermittlung."
+
+msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgstr "URL des Oozie Server. Diese ist erforderlich für die Jobübermittlung. Durch einen Leerwert wird die Konfigurationsprüfung deaktiviert."
 
 #: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Ob Oozie für die Durchführung der Kerberos-Authentifizierung einen Client benötigt"
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-msgstr "Speicherort auf dem HDFS, an dem Workflows/Coordinators bereitgestellt werden, wenn sie von einem Nicht-Eigentümer übermittelt werden."
 
-#: src/liboozie/conf.py:68
+msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr "Speicherort auf dem HDFS, an dem Workflows/Coordinators bereitgestellt werden, wenn sie von einem Nicht-Eigentümer übermittelt werden. Mögliche Parameter:$TIME, $USER und $JOBID, z.B. /user/$USER/hue/deployments/$JOBID-$TIME"
+
+#: src/liboozie/conf.py:71
 msgid "The Oozie server is not available"
 msgstr "Der Oozie-Server ist nicht verfügbar."
 
-#: src/liboozie/conf.py:77
+#: src/liboozie/conf.py:80
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie-Freigabebibliothek ist nicht am Standardspeicherort installiert."
 
-#: src/liboozie/submittion.py:74
+#: src/liboozie/submission2.py:74 src/liboozie/submittion.py:75
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "Übermittlung bereits übermittelt (Oozie-Job-ID %s)"
 
-#: src/liboozie/submittion.py:140
+#: src/liboozie/submission2.py:140 src/liboozie/submittion.py:141
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "Auf Bereitstellungsverzeichnis konnte nicht zugegriffen werden: %s"
 
-#: src/liboozie/submittion.py:236
+#: src/liboozie/submission2.py:237 src/liboozie/submittion.py:242
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "Pfad ist kein Verzeichnis: %s."
 
-#: src/liboozie/submittion.py:241
+#: src/liboozie/submission2.py:242 src/liboozie/submittion.py:247
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "Fehler beim Zugriff auf Verzeichnis '%s': %s."
 
-#: src/liboozie/types.py:366
+#: src/liboozie/types.py:361
 msgid "Insufficient permission."
 msgstr "Unzureichende Berechtigung."
 
-#: src/liboozie/types.py:367
+#: src/liboozie/types.py:362
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "Berechtigung abgelehnt. Benutzer %(username)s kann den Job von Benutzer %(user)s nicht ändern."

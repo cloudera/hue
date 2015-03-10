@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:05-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,150 +17,159 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hadoop/conf.py:59
+#: src/hadoop/conf.py:66
 msgid "NameNode logical name."
 msgstr "Nombre lógico de NameNode."
 
-#: src/hadoop/conf.py:90
+#: src/hadoop/conf.py:105
 msgid "JobTracker logical name."
 msgstr "Nombre lógico de JobTracker."
 
-#: src/hadoop/fs/hadoopfs.py:282
+#: src/hadoop/conf.py:134
+
+msgid "Resource Manager logical name."
+msgstr "Nombre lógico de Resource Manager."
+
+#: src/hadoop/fs/hadoopfs.py:281
 #, python-format
 msgid "%(remote_dst)s already exists. Skipping."
 msgstr "%(remote_dst)s ya existe. Omitiendo."
 
-#: src/hadoop/fs/hadoopfs.py:285
+#: src/hadoop/fs/hadoopfs.py:284
 #, python-format
 msgid "%(remote_dst)s does not exist. Trying to copy."
 msgstr "%(remote_dst)s no existe. Intentando copiar"
 
-#: src/hadoop/fs/hadoopfs.py:295
+#: src/hadoop/fs/hadoopfs.py:294
 #, python-format
 msgid "Copied %s -> %s."
 msgstr "Copiado %s -> %s."
 
-#: src/hadoop/fs/hadoopfs.py:297
+#: src/hadoop/fs/hadoopfs.py:296
 #, python-format
 msgid "Copying %s -> %s failed."
 msgstr "Error al copiar %s -> %s."
 
-#: src/hadoop/fs/hadoopfs.py:302
+#: src/hadoop/fs/hadoopfs.py:301
 #, python-format
 msgid "Skipping %s (not a file)."
 msgstr "Omitiendo %s (no es un archivo)."
 
-#: src/hadoop/fs/hadoopfs.py:338 src/hadoop/fs/hadoopfs.py:341
-#: src/hadoop/fs/hadoopfs.py:344 src/hadoop/fs/hadoopfs.py:347
-#: src/hadoop/fs/hadoopfs.py:350 src/hadoop/fs/hadoopfs.py:353
-#: src/hadoop/fs/hadoopfs.py:356
+#: src/hadoop/fs/hadoopfs.py:337 src/hadoop/fs/hadoopfs.py:340
+#: src/hadoop/fs/hadoopfs.py:343 src/hadoop/fs/hadoopfs.py:346
+#: src/hadoop/fs/hadoopfs.py:349 src/hadoop/fs/hadoopfs.py:352
+#: src/hadoop/fs/hadoopfs.py:355
 #, python-format
 msgid "%(function)s has not been implemented."
 msgstr "%(function)s no se ha implementado."
 
-#: src/hadoop/fs/webhdfs.py:208 src/hadoop/fs/webhdfs.py:241
+#: src/hadoop/fs/webhdfs.py:222 src/hadoop/fs/webhdfs.py:255
 #, python-format
 msgid "File %s not found"
 msgstr "Archivo %s no encontrado"
 
-#: src/hadoop/fs/webhdfs.py:244
+#: src/hadoop/fs/webhdfs.py:258
 #, python-format
 msgid "File %s is a directory"
 msgstr "El archivo %s es un directorio"
 
-#: src/hadoop/fs/webhdfs.py:247
+#: src/hadoop/fs/webhdfs.py:261
 #, python-format
 msgid "File %s is already trashed"
 msgstr "El archivo %s ya se ha eliminado"
 
-#: src/hadoop/fs/webhdfs.py:274
+#: src/hadoop/fs/webhdfs.py:288
 #, python-format
 msgid "Delete failed: %s"
 msgstr "Error al eliminar: %s"
 
-#: src/hadoop/fs/webhdfs.py:303
+#: src/hadoop/fs/webhdfs.py:317
 #, python-format
 msgid "File %s is not in trash"
 msgstr "El archivo %s no se encuentra en la papelera"
 
-#: src/hadoop/fs/webhdfs.py:317
+#: src/hadoop/fs/webhdfs.py:331
 #, python-format
 msgid "Path %s already exists."
 msgstr "La ruta %s ya existe."
 
-#: src/hadoop/fs/webhdfs.py:342
+#: src/hadoop/fs/webhdfs.py:359
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Error en Mkdir: %s"
 
-#: src/hadoop/fs/webhdfs.py:356
+#: src/hadoop/fs/webhdfs.py:373
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "Error al cambiar de nombre: %s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:362 src/hadoop/fs/webhdfs.py:366
+#: src/hadoop/fs/webhdfs.py:379 src/hadoop/fs/webhdfs.py:383
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "'%s' no es un directorio"
 
-#: src/hadoop/fs/webhdfs.py:480
+#: src/hadoop/fs/webhdfs.py:552
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "La copia de origen '%s' no existe"
 
-#: src/hadoop/fs/webhdfs.py:482
+#: src/hadoop/fs/webhdfs.py:554
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "La copia de origen '%s' es un directorio"
 
-#: src/hadoop/fs/webhdfs.py:484
+#: src/hadoop/fs/webhdfs.py:556
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "La copia de destino '%s' es un directorio"
 
-#: src/hadoop/fs/webhdfs.py:552
+#: src/hadoop/fs/webhdfs.py:633
 #, python-format
 msgid "File not found: %s"
 msgstr "Archivo no encontrado: %s"
 
-#: src/hadoop/fs/webhdfs.py:568
+#: src/hadoop/fs/webhdfs.py:649
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "El archivo de destino %s existe y no es un directorio."
 
-#: src/hadoop/fs/webhdfs.py:611
+#: src/hadoop/fs/webhdfs.py:692
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "Error al crear '%s'. HDFS no ha devuelto un redireccionamiento"
 
-#: src/hadoop/fs/webhdfs.py:678
+#: src/hadoop/fs/webhdfs.py:769
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "Es un directorio: '%s'"
 
-#: src/hadoop/fs/webhdfs.py:696
+#: src/hadoop/fs/webhdfs.py:787
 msgid "Invalid argument to seek for whence"
 msgstr "Argumento de búsqueda de ubicación no válido"
 
-#: src/hadoop/fs/webhdfs.py:716
+#: src/hadoop/fs/webhdfs.py:807
 msgid "File not open for writing"
 msgstr "Archivo no abierto para escritura"
 
-#: src/hadoop/fs/webhdfs.py:762
+#: src/hadoop/fs/webhdfs.py:853
 msgid "Filesystem root '/' should be owned by 'hdfs'"
 msgstr "El propietario de la raíz del sistema de archivos '/' debe ser 'hdfs'"
 
-#: src/hadoop/fs/webhdfs.py:765
+#: src/hadoop/fs/webhdfs.py:856
 msgid "Failed to access filesystem root"
 msgstr "Error al acceder a la raíz del sistema de archivos"
 
-#: src/hadoop/fs/webhdfs.py:774
+#: src/hadoop/fs/webhdfs.py:865
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "Error al crear el archivo temporal \"%s\""
 
-#: src/hadoop/fs/webhdfs.py:791
+#: src/hadoop/fs/webhdfs.py:882
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "Error al eliminar el archivo temporal \"%s\""
+
+#: src/hadoop/yarn/resource_manager_api.py:50
+msgid "No Resource Manager are available."
+msgstr "No hay ningún Resource Manager disponible."
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -18,50 +18,52 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:27
-msgid "URL of Oozie server. This is required for job submission."
-msgstr "Oozie サーバーの URL です。これはジョブのサブミッションに必要です。"
+
+msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgstr "Oozie サーバーの URL です。これはジョブのサブミットに必要です。空白の値を指定すると、設定チェックが無効になります。"
 
 #: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/liboozie/conf.py:40
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-msgstr "非所有者によるサブミット時に Workflow／Coordinator が配置される HDFS 上の場所です。"
 
-#: src/liboozie/conf.py:68
+msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr "非所有者によるサブミット時に Workflow／Coordinator が配置される HDFS 上の場所です。パラメータは、$TIME、$USER、および$JOBIDです（たとえば、/user/$USER/hue/deployments/$JOBID-$TIMEのようになります）"
+
+#: src/liboozie/conf.py:71
 msgid "The Oozie server is not available"
 msgstr "Oozie サーバーが利用できません"
 
-#: src/liboozie/conf.py:77
+#: src/liboozie/conf.py:80
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 共有ライブラリがデフォルトの場所にインストールされていません。"
 
-#: src/liboozie/submittion.py:74
+#: src/liboozie/submission2.py:74 src/liboozie/submittion.py:75
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "サブミット済みのサブミッションです（Oozie ジョブ ID %s）"
 
-#: src/liboozie/submittion.py:140
+#: src/liboozie/submission2.py:140 src/liboozie/submittion.py:141
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "配置ディレクトリを作成できませんでした：%s"
 
-#: src/liboozie/submittion.py:236
+#: src/liboozie/submission2.py:237 src/liboozie/submittion.py:242
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "パスはディレクトリではありません：%s。"
 
-#: src/liboozie/submittion.py:241
+#: src/liboozie/submission2.py:242 src/liboozie/submittion.py:247
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "ディレクトリ '%s' へのアクセス中にエラーが発生しました：%s。"
 
-#: src/liboozie/types.py:366
+#: src/liboozie/types.py:361
 msgid "Insufficient permission."
 msgstr "パーミッションが不十分です。"
 
-#: src/liboozie/types.py:367
+#: src/liboozie/types.py:362
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"

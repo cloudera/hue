@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:68
+#: src/about/views.py:67
 msgid "POST request required."
 msgstr "需要 POST 请求。"
 
@@ -177,16 +177,16 @@ msgstr "在以下位置了解有关 Hue 和 Hadoop 的更多信息"
 msgid "Sign in now!"
 msgstr "立即注册！"
 
-#: src/about/templates/admin_wizard.mako:299
+#: src/about/templates/admin_wizard.mako:300
 msgid "Check config failed: "
 msgstr "检查配置失败： "
 
-#: src/about/templates/admin_wizard.mako:308
-#: src/about/templates/admin_wizard.mako:326
+#: src/about/templates/admin_wizard.mako:310
+#: src/about/templates/admin_wizard.mako:332
 msgid "Examples refreshed"
 msgstr "示例已刷新"
 
-#: src/about/templates/admin_wizard.mako:390
+#: src/about/templates/admin_wizard.mako:396
 msgid "Configuration updated"
 msgstr "配置已更新"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -131,21 +131,21 @@ msgstr "Visite gethue.com"
 
 #: src/liboauth/templates/oauth-login.mako:155
 msgid "Fell asleep? Visit us on gethue.com instead!"
-msgstr "¿Se ha dormido? ¡Venga a vernos a gethue.com!"
+msgstr "¿Se ha dormido? ¡Visite gethue.com!"
 
-#: src/liboauth/templates/oauth-login.mako:169
+#: src/liboauth/templates/oauth-login.mako:170
 msgid "Error!"
 msgstr "Error."
 
-#: src/liboauth/templates/oauth-login.mako:169
+#: src/liboauth/templates/oauth-login.mako:170
 msgid "Invalid username or password."
 msgstr "Nombre de usuario o contraseña no válido."
 
-#: src/liboauth/templates/oauth-login.mako:176
+#: src/liboauth/templates/oauth-login.mako:177
 msgid "This is your first time logging in."
 msgstr "Es la primera vez que inicia sesión."
 
-#: src/liboauth/templates/oauth-login.mako:177
+#: src/liboauth/templates/oauth-login.mako:178
 msgid "You will become Hue superuser."
 msgstr "Se convertirá en un superusuario de Hue."
 

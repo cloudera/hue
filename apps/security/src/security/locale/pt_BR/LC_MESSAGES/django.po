@@ -5,16 +5,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: VERSÃO DO PROJETO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-05-29 17:10-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8 bits\n"
 "Generated-By: Babel 0.9.6\n"
 
 #: src/security/forms.py:51 src/security/forms.py:121
@@ -28,7 +28,7 @@ msgstr "Obrigatório. 30 caracteres ou menos. Sem espaços em branco ou dois pon
 
 #: src/security/forms.py:55 src/security/forms.py:124
 msgid "Whitespaces and ':' not allowed"
-msgstr "Espaços em branco e ':' não são permitidos"
+msgstr "Espaços em branco e ':' não permitidos"
 
 #: src/security/forms.py:56
 msgid "Password"
@@ -36,7 +36,7 @@ msgstr "Senha"
 
 #: src/security/forms.py:57
 msgid "Password confirmation"
-msgstr "Confirmação de senha"
+msgstr "Confirmação da senha"
 
 #: src/security/forms.py:58 src/security/forms.py:130
 msgid "Create home directory"
@@ -52,7 +52,7 @@ msgstr "As senhas não coincidem."
 
 #: src/security/forms.py:85
 msgid "You must specify a password when creating a new user."
-msgstr "Você deve especificar uma senha quando criar um novo usuário."
+msgstr "Você deve especificar uma senha ao criar um novo usuário."
 
 #: src/security/forms.py:123
 msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
@@ -75,12 +75,12 @@ msgstr "Criar diretório inicial para o usuário se ainda não existir um."
 #: src/security/forms.py:147
 #, python-format
 msgid "Too long: 64 characters or fewer and not %s."
-msgstr "Longo demais: 64 caracteres ou menos e não %s."
+msgstr "Muito longo: 64 caracteres ou menos, e não %s."
 
 #: src/security/forms.py:153
 #, python-format
 msgid "Too long: 30 characters or fewer and not %s."
-msgstr "Longo demais: 30 caracteres ou menos e não %s."
+msgstr "Muito longo: 30 caracteres ou menos, e não %s."
 
 #: src/security/forms.py:163
 msgid "Name"
@@ -125,11 +125,11 @@ msgstr "Importar usuários não importados ou novos de todos os subgrupos."
 #: src/security/forms.py:198
 #, python-format
 msgid "Too long: 80 characters or fewer and not %s"
-msgstr "Longo demais: 80 caracteres ou menos e não %s"
+msgstr "Muito longo: 80 caracteres ou menos, e não %s"
 
 #: src/security/forms.py:220
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr "O nome do grupo pode conter somente letras, números, hífens ou sublinhados."
+msgstr "O nome do grupo pode conter somente letras, números, hífens e sublinhados."
 
 #: src/security/forms.py:235
 msgid "members"
@@ -241,7 +241,7 @@ msgstr "Ocorreu um erro ao comunicar com o LDAP"
 #: src/security/views.py:333
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
-msgstr "Não foi possível obter os detalhes do LDAP para os usuários no padrão %s."
+msgstr "Não foi possível obter detalhes do LDAP para os usuários no padrão %s."
 
 #: src/security/views.py:353
 msgid "You must be a superuser to add another group."
@@ -255,15 +255,15 @@ msgstr "Exceção de LDAP: %s"
 #: src/security/views.py:374
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
-msgstr "Não foi possível obter detalhes de LDAP grupos no padrão %s"
+msgstr "Não foi possível obter detalhes do LDAP para grupos no padrão %s"
 
 #: src/security/views.py:391
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr "Você deve ser um superusuário para sincronizar os usuários/grupos do LDAP."
+msgstr "Você deve ser um superusuário para sincronizar os usuários/grupos de LDAP."
 
 #: src/security/views.py:420
 msgid "The import may not be complete, sync again."
-msgstr "A importação pode não estar completa, sincronize novamente."
+msgstr "A importação pode não ter sido concluída. Sincronize novamente."
 
 #: src/security/views.py:441
 msgid "No active superuser configured."
@@ -281,34 +281,34 @@ msgstr "Usuário %s sincronizado no Unix"
 #: src/security/views.py:530
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
-msgstr "Ocorreu um conflito de nomes ao importar o usuário %(username)s"
+msgstr "Ocorreu um conflito de nomenclatura durante a importação do usuário %(username)s"
 
 #: src/security/views.py:672 src/security/views.py:721
 #, python-format
 msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Houve um conflito de nomes durante a importação do grupo %(groupname)s no padrão %(groupname_pattern)s"
+msgstr "Ocorreu um conflito de nomenclatura durante a importação do grupo %(groupname)s no padrão %(groupname_pattern)s"
 
 #: src/security/management/commands/import_ldap_group.py:42
 msgid "Import users from the group."
-msgstr "Importar usuários do grupo."
+msgstr "Importe usuários do grupo."
 
 #: src/security/management/commands/import_ldap_group.py:45
 msgid "Import users from the group, but also do so recursively."
-msgstr "Importar usuários do grupo, de maneira recorrente."
+msgstr "Importe usuários do grupo, mas também faça isso de forma recursiva."
 
 #: src/security/management/commands/import_ldap_group.py:48
 msgid "Sync users in the group."
-msgstr "usuários Sync no grupo."
+msgstr "Sincronize usuários no grupo."
 
 #: src/security/management/commands/import_ldap_group.py:51
 #: src/security/management/commands/import_ldap_user.py:42
 #: src/security/management/commands/sync_ldap_users_and_groups.py:37
 msgid "Server to connect to."
-msgstr "Conectar servidor a."
+msgstr "Servidor ao qual conectar."
 
 #: src/security/management/commands/import_ldap_group.py:60
 msgid "A group name must be provided."
-msgstr "Deve ser fornecido um nome de grupo."
+msgstr "Um nome de grupo deve ser fornecido."
 
 #: src/security/management/commands/import_ldap_user.py:39
 msgid "Sync groups of the users."
@@ -316,7 +316,7 @@ msgstr "Grupos Sync dos usuários"
 
 #: src/security/management/commands/import_ldap_user.py:51
 msgid "A username must be provided."
-msgstr "Deve ser fornecido um nome de usuário."
+msgstr "Um nome de usuário deve ser fornecido."
 
 #: src/security/management/commands/security_sync_with_unix.py:31
 msgid "Minimum UID to import (Inclusive)."
@@ -428,7 +428,7 @@ msgstr "Grupos de Hue - Editar grupo: %(name)s"
 
 #: src/security/templates/edit_group.mako:51
 msgid "Hue Groups - Add/Sync LDAP group"
-msgstr "Grupos de Hue - Adicionar/sincronizar grupo de LDAP"
+msgstr "Grupos de Hue - Adicionar/Sincronizar grupo de LDAP"
 
 #: src/security/templates/edit_group.mako:53
 msgid "Hue Groups - Create group"
@@ -440,7 +440,7 @@ msgstr "Atualizar grupo"
 
 #: src/security/templates/edit_group.mako:72
 msgid "Add/Sync group"
-msgstr "Adicionar/sincronizar grupo"
+msgstr "Adicionar/Sincronizar grupo"
 
 #: src/security/templates/edit_group.mako:74
 #: src/security/templates/list_groups.mako:46
@@ -485,7 +485,7 @@ msgstr "Usuários de Hue - Criar usuário"
 
 #: src/security/templates/edit_user.mako:38
 msgid "Step 1: Credentials (required)"
-msgstr "Etapa 1: Credenciais (obrigatório)"
+msgstr "Etapa 1: Credenciais (obrigatória)"
 
 #: src/security/templates/edit_user.mako:39
 msgid "Step 2: Names and Groups"
@@ -548,11 +548,11 @@ msgstr "Excluir"
 
 #: src/security/templates/list_groups.mako:49
 msgid "Add/Sync LDAP group"
-msgstr "Adicionar/sincronizar grupo de LDAP"
+msgstr "Adicionar/Sincronizar grupo de LDAP"
 
 #: src/security/templates/list_groups.mako:67
 msgid "Group Name"
-msgstr "Nome do grupo"
+msgstr "Nome do Grupo"
 
 #: src/security/templates/list_groups.mako:68
 msgid "Members"
@@ -565,7 +565,7 @@ msgstr "Editar %(groupname)s"
 
 #: src/security/templates/list_groups.mako:101
 msgid "There are no groups matching the search criteria."
-msgstr "Não há grupos que correspondam aos critérios da pesquisa."
+msgstr "Não há grupos correspondentes aos critérios de pesquisa."
 
 #: src/security/templates/list_groups.mako:129
 #: src/security/templates/list_permissions.mako:91
@@ -597,7 +597,7 @@ msgstr "Editar permissão"
 
 #: src/security/templates/list_permissions.mako:69
 msgid "There are no permissions matching the search criteria."
-msgstr "Não há permissões que correspondam aos critérios da pesquisa."
+msgstr "Não há permissões correspondentes aos critérios de pesquisa."
 
 #: src/security/templates/list_users.mako:35
 msgid "Search for name, group, etc..."
@@ -605,7 +605,7 @@ msgstr "Pesquisar por nome, grupo, etc..."
 
 #: src/security/templates/list_users.mako:49
 msgid "Add/Sync LDAP user"
-msgstr "Adicionar/sincronizar usuário de LDAP"
+msgstr "Adicionar/Sincronizar usuário de LDAP"
 
 #: src/security/templates/list_users.mako:52
 msgid "Sync LDAP users/groups"
@@ -634,23 +634,23 @@ msgstr "Editar %(username)s"
 
 #: src/security/templates/list_users.mako:109
 msgid "There are no users matching the search criteria."
-msgstr "Não há usuários que correspondam aos critérios da pesquisa."
+msgstr "Não há usuários correspondentes aos critérios de pesquisa."
 
 #: src/security/templates/list_users.mako:124
 msgid "Are you sure you want to delete the selected user(s)?"
-msgstr "Tem certeza de que deseja excluir o(s) usuário(s) selecionado(s)?"
+msgstr "Tem certeza de que deseja excluir os usuários selecionados?"
 
 #: src/security/templates/sync_ldap_users_groups.mako:39
 msgid "Sync LDAP users and groups"
-msgstr "Sincronizar usuários e grupos do LDAP"
+msgstr "Sincronizar usuários e grupos de LDAP"
 
 #: src/security/templates/sync_ldap_users_groups.mako:43
 msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Essa ação não importará nenhum usuário ou grupo que não exista no Hue. Somente usuários e grupos importados do LDAP podem ser sincronizados."
+msgstr "Isso não importará usuários ou grupos que ainda não existem no Hue. Somente usuários e grupos importados do LDAP podem ser sincronizados."
 
 #: src/security/templates/sync_ldap_users_groups.mako:44
 msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Todas as informações de usuários e associações de grupos serão atualizadas com base no estado atual do servidor LDAP."
+msgstr "Todas as informações de usuários e associações a grupos serão atualizadas com base no estado atual do servidor LDAP."
 
 #: src/security/templates/sync_ldap_users_groups.mako:52
 msgid "Sync"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -38,11 +38,10 @@ msgid "No databases are available. Permissions could be missing."
 msgstr "データベースを使用できません。パーミッションがない可能性があります。"
 
 #: src/rdbms/forms.py:23 src/rdbms/templates/common.mako:30
-#: src/rdbms/templates/execute.mako:62
 msgid "Query Editor"
 msgstr "Query Editor"
 
-#: src/rdbms/views.py:98
+#: src/rdbms/views.py:101
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "無効な設計タイプ %(type)s"
@@ -75,127 +74,147 @@ msgstr "現在設定されているデータベースはありません。"
 msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
 msgstr "Hue 設定に移動して、「rdbms」セクションの下にデータベースを追加してください。"
 
-#: src/rdbms/templates/execute.mako:33
-msgid "Server"
-msgstr "サーバー"
+#: src/rdbms/templates/execute.mako:32
+msgid "Assist"
+msgstr "アシスト"
 
-#: src/rdbms/templates/execute.mako:46
-msgid "Database"
-msgstr "データベース"
-
-#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:733
-msgid "Query name"
-msgstr "クエリ名"
-
-#: src/rdbms/templates/execute.mako:82
-msgid "Query description"
-msgstr "クエリの説明"
-
-#: src/rdbms/templates/execute.mako:93
-msgid "Your query has the following error(s):"
-msgstr "クエリに次のエラーがあります："
-
-#: src/rdbms/templates/execute.mako:102
-msgid "Execute"
-msgstr "実行"
-
-#: src/rdbms/templates/execute.mako:103 src/rdbms/templates/execute.mako:196
-msgid "Save"
-msgstr "保存"
-
-#: src/rdbms/templates/execute.mako:104
-msgid "Save as..."
-msgstr "名前を付けて保存..."
-
-#: src/rdbms/templates/execute.mako:105
-msgid "Explain"
-msgstr "Explain"
-
-#: src/rdbms/templates/execute.mako:106
-msgid "or create a"
-msgstr "または"
-
-#: src/rdbms/templates/execute.mako:106
-msgid "New query"
-msgstr "新しいクエリを作成"
-
-#: src/rdbms/templates/execute.mako:132
-msgid "The server returned no results."
-msgstr "サーバーから結果が返されませんでした。"
-
-#: src/rdbms/templates/execute.mako:152
+#: src/rdbms/templates/execute.mako:39
 msgid "Double click on a table name or field to insert it in the editor"
 msgstr "テーブル名またはフィールドをダブルクリックしてエディタに挿入"
 
-#: src/rdbms/templates/execute.mako:153
+#: src/rdbms/templates/execute.mako:40
 msgid "Manually refresh the table list"
 msgstr "テーブルリストを手動で更新"
 
-#: src/rdbms/templates/execute.mako:154
-msgid "Navigator"
-msgstr "Navigator"
+#: src/rdbms/templates/execute.mako:43
 
-#: src/rdbms/templates/execute.mako:157
+msgid "server"
+msgstr "サーバー"
+
+#: src/rdbms/templates/execute.mako:46 src/rdbms/templates/execute.mako:52
+msgid "Choose a database..."
+msgstr "データベースを選択..."
+
+#: src/rdbms/templates/execute.mako:49
+
+msgid "database"
+msgstr "データベース"
+
+#: src/rdbms/templates/execute.mako:54
 msgid "Table name..."
 msgstr "テーブル名..."
 
-#: src/rdbms/templates/execute.mako:158
+#: src/rdbms/templates/execute.mako:55
 msgid "The selected database has no tables."
 msgstr "選択したデータベースにテーブルがありません。"
 
-#: src/rdbms/templates/execute.mako:176
+#: src/rdbms/templates/execute.mako:79
+msgid "Share"
+msgstr "共有"
+
+#: src/rdbms/templates/execute.mako:88 src/rdbms/templates/execute.mako:787
+msgid "Query name"
+msgstr "クエリ名"
+
+#: src/rdbms/templates/execute.mako:96
+msgid "Query description"
+msgstr "クエリの説明"
+
+#: src/rdbms/templates/execute.mako:107
+msgid "Your query has the following error(s):"
+msgstr "クエリに次のエラーがあります："
+
+#: src/rdbms/templates/execute.mako:116
+msgid "Execute"
+msgstr "実行"
+
+#: src/rdbms/templates/execute.mako:117 src/rdbms/templates/execute.mako:192
+msgid "Save"
+msgstr "保存"
+
+#: src/rdbms/templates/execute.mako:118
+msgid "Save as..."
+msgstr "名前を付けて保存..."
+
+#: src/rdbms/templates/execute.mako:119
+msgid "Explain"
+msgstr "新しい"
+
+#: src/rdbms/templates/execute.mako:120
+msgid "or create a"
+msgstr "クエリを説明"
+
+#: src/rdbms/templates/execute.mako:120
+msgid "New query"
+msgstr "または作成"
+
+#: src/rdbms/templates/execute.mako:146
+msgid "The server returned no results."
+msgstr "サーバーから結果が返されませんでした。"
+
+#: src/rdbms/templates/execute.mako:172
 msgid "Save your query"
 msgstr "クエリを保存"
 
-#: src/rdbms/templates/execute.mako:181
+#: src/rdbms/templates/execute.mako:177
 msgid "Name"
 msgstr "名前"
 
-#: src/rdbms/templates/execute.mako:187
+#: src/rdbms/templates/execute.mako:183
 msgid "Description"
 msgstr "説明"
 
-#: src/rdbms/templates/execute.mako:195
+#: src/rdbms/templates/execute.mako:191
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/rdbms/templates/execute.mako:333
+#: src/rdbms/templates/execute.mako:357
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
 
-#: src/rdbms/templates/execute.mako:526
+#: src/rdbms/templates/execute.mako:550
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/rdbms/templates/execute.mako:607
+#: src/rdbms/templates/execute.mako:636
 msgid "No query provided to save."
 msgstr "保存するクエリが指定されていません。"
 
-#: src/rdbms/templates/execute.mako:727
+#: src/rdbms/templates/execute.mako:658
+msgid "Oops, no server found!"
+msgstr "サーバーが見つかりません。"
+
+#: src/rdbms/templates/execute.mako:664
+msgid "Oops, no database found!"
+msgstr "データベースが見つかりません。"
+
+#: src/rdbms/templates/execute.mako:781
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: src/rdbms/templates/execute.mako:740
+#: src/rdbms/templates/execute.mako:794
 msgid "Empty description"
 msgstr "空の説明"
 
-#: src/rdbms/templates/execute.mako:746
+#: src/rdbms/templates/execute.mako:800
 msgid "Query saved successfully!"
 msgstr "クエリが正常に保存されました。"
 
-#: src/rdbms/templates/execute.mako:782
+#: src/rdbms/templates/execute.mako:836
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/rdbms/templates/execute.mako:783
+#: src/rdbms/templates/execute.mako:837
 msgid "No matching records"
 msgstr "一致するレコードがありません"
 
-#: src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:875
 msgid "Server error occured: "
 msgstr "サーバーエラーが発生しました： "
 
-#: src/rdbms/templates/execute.mako:824
+#: src/rdbms/templates/execute.mako:878
 msgid "Unmanageable server error occured: "
 msgstr "管理不能なサーバーエラーが発生しました： "
 
+#~ msgid "Navigator"
+#~ msgstr "Navigator"

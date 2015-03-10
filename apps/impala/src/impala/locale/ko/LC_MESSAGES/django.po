@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -45,7 +45,156 @@ msgstr "Thrift 호출의 제한 시간(단위: 초)입니다."
 msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
 msgstr "사용자가 편집기 페이지를 나가면 Hue가 Impala 쿼리를 닫습니다. 이렇게 하면 Impala의 모든 쿼리 리소스가 비워지지만 해당 결과에 액세스할 수 없게 됩니다."
 
+#: src/impala/conf.py:74
+msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
+msgstr "QUERY_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 해당 쿼리에 대해 아무 작업(계산 또는 결과 다시 전송)도 하지 않으면 시간이 초과됩니다(예: 취소됨)."
+
+#: src/impala/conf.py:82
+msgid "SSL configuration for the server."
+msgstr "서버에 대한 SSL 구성입니다."
+
 #: src/impala/conf.py:86
+msgid "SSL communication enabled for this server."
+msgstr "이 서버에 대해 SSL 통신이 설정되었습니다."
+
+#: src/impala/conf.py:93
+msgid "Path to Certificate Authority certificates."
+msgstr "인증 기관 인증서에 대한 경로입니다."
+
+#: src/impala/conf.py:100
+msgid "Path to the private key file."
+msgstr "개인 키 파일에 대한 경로입니다."
+
+#: src/impala/conf.py:107
+msgid "Path to the public certificate file."
+msgstr "공용 인증서 파일에 대한 경로입니다."
+
+#: src/impala/conf.py:114
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "서버에서 받은 인증서의 유효성을 Hue에서 검사할 것인지 선택합니다."
+
+#: src/impala/conf.py:134
 msgid "No available Impalad to send queries to."
 msgstr "쿼리를 보낼 사용 가능한 Impalad가 없습니다."
+
+#: src/impala/dashboards.py:201
+msgid "Page saved !"
+msgstr "페이지가 저장되었습니다!"
+
+#: src/impala/dashboards.py:203
+msgid "There is no dashboard to search."
+msgstr "검색할 대시보드가 없습니다."
+
+#: src/impala/templates/dashboard.mako:31
+msgid "Grid Results"
+msgstr "눈금선 결과"
+
+#: src/impala/templates/dashboard.mako:39
+msgid "Text Facet"
+msgstr "텍스트 패싯"
+
+#: src/impala/templates/dashboard.mako:46
+msgid "Pie Chart"
+msgstr "파이 차트"
+
+#: src/impala/templates/dashboard.mako:53
+msgid "Bar Chart"
+msgstr "막대 차트"
+
+#: src/impala/templates/dashboard.mako:60
+msgid "Line Chart"
+msgstr "줄 차트"
+
+#: src/impala/templates/dashboard.mako:67
+msgid "Timeline"
+msgstr "시간대"
+
+#: src/impala/templates/dashboard.mako:74
+msgid "Filter Bar"
+msgstr "필터 막대"
+
+#: src/impala/templates/dashboard.mako:81
+msgid "Map"
+msgstr "Map"
+
+#: src/impala/templates/dashboard.mako:91
+msgid "Edit"
+msgstr "편집"
+
+#: src/impala/templates/dashboard.mako:93
+msgid "Save"
+msgstr "저장"
+
+#: src/impala/templates/dashboard.mako:93
+msgid "Saving..."
+msgstr "저장하는 중..."
+
+#: src/impala/templates/dashboard.mako:94
+msgid "New"
+msgstr "새로 만들기"
+
+#: src/impala/templates/dashboard.mako:99
+msgid "Select a database and a table"
+msgstr "데이터베이스 및 테이블 선택"
+
+#: src/impala/templates/dashboard.mako:101
+msgid "Choose a database..."
+msgstr "데이터베이스 선택..."
+
+#: src/impala/templates/dashboard.mako:102
+msgid "Choose a table..."
+msgstr "테이블 선택..."
+
+#: src/impala/templates/dashboard.mako:104
+msgid "Manually refresh the dropdowns"
+msgstr "드롭다운을 수동으로 새로 고침"
+
+#: src/impala/templates/dashboard.mako:109
+msgid "Search"
+msgstr "검색"
+
+#: src/impala/templates/dashboard.mako:139
+msgid "Filter fields"
+msgstr "필터 필드"
+
+#: src/impala/templates/dashboard.mako:147
+msgid "Field Name"
+msgstr "필드 이름"
+
+#: src/impala/templates/dashboard.mako:169
+msgid "Your search did not match any documents."
+msgstr "검색에서 일치하는 문서가 없습니다."
+
+#: src/impala/templates/dashboard.mako:243
+msgid "Exclude this value"
+msgstr "이 값 제외"
+
+#: src/impala/templates/dashboard.mako:377
+msgid "There are currently no filters applied."
+msgstr "현재 적용된 필터가 없습니다."
+
+#: src/impala/templates/dashboard.mako:382
+#: src/impala/templates/dashboard.mako:392
+msgid "field"
+msgstr "필드"
+
+#: src/impala/templates/dashboard.mako:385
+msgid "value"
+msgstr "값"
+
+#: src/impala/templates/dashboard.mako:396
+msgid "from"
+msgstr "원본"
+
+#: src/impala/templates/dashboard.mako:398
+msgid "to"
+msgstr "->"
+
+#: src/impala/templates/dashboard.mako:611
+msgid "Oops, no database found!"
+msgstr "데이터베이스가 없습니다!"
+
+#: src/impala/templates/dashboard.mako:635
+msgid "Oops, no table found!"
+msgstr "테이블을 찾을 수 없습니다!"
 

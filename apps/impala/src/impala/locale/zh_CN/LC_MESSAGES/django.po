@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -45,7 +45,156 @@ msgstr "Thrift 调用的超时时间（以秒为单位）。"
 msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
 msgstr "当用户离开编辑器页面时，Hue 将尝试关闭 Impala 查询。这将释放 Impala 中的所有查询资源，但也会让其结果变得无法访问。"
 
+#: src/impala/conf.py:74
+msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
+msgstr "如果 QUERY_TIMEOUT_S > 0，则当 Impala 在 QUERY_TIMEOUT_S 秒内没有对查询执行任何操作（计算或发回结果）时，该查询将超时（例如，取消）。"
+
+#: src/impala/conf.py:82
+msgid "SSL configuration for the server."
+msgstr "服务器的 SSL 配置。"
+
 #: src/impala/conf.py:86
+msgid "SSL communication enabled for this server."
+msgstr "为此服务器启用的 SSL 通信。"
+
+#: src/impala/conf.py:93
+msgid "Path to Certificate Authority certificates."
+msgstr "证书颁发机构颁发证书的路径。"
+
+#: src/impala/conf.py:100
+msgid "Path to the private key file."
+msgstr "私钥文件的路径。"
+
+#: src/impala/conf.py:107
+msgid "Path to the public certificate file."
+msgstr "公用证书文件的路径。"
+
+#: src/impala/conf.py:114
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "选择 Hue 是否应验证从服务器收到的证书."
+
+#: src/impala/conf.py:134
 msgid "No available Impalad to send queries to."
 msgstr "没有可向其发送请求的 Impalad。"
+
+#: src/impala/dashboards.py:201
+msgid "Page saved !"
+msgstr "页面已保存！"
+
+#: src/impala/dashboards.py:203
+msgid "There is no dashboard to search."
+msgstr "没有要搜索的仪表板。"
+
+#: src/impala/templates/dashboard.mako:31
+msgid "Grid Results"
+msgstr "网格结果"
+
+#: src/impala/templates/dashboard.mako:39
+msgid "Text Facet"
+msgstr "文本方面"
+
+#: src/impala/templates/dashboard.mako:46
+msgid "Pie Chart"
+msgstr "圆形统计图"
+
+#: src/impala/templates/dashboard.mako:53
+msgid "Bar Chart"
+msgstr "条形图"
+
+#: src/impala/templates/dashboard.mako:60
+msgid "Line Chart"
+msgstr "线形图"
+
+#: src/impala/templates/dashboard.mako:67
+msgid "Timeline"
+msgstr "时间线"
+
+#: src/impala/templates/dashboard.mako:74
+msgid "Filter Bar"
+msgstr "筛选器工具栏"
+
+#: src/impala/templates/dashboard.mako:81
+msgid "Map"
+msgstr "映射"
+
+#: src/impala/templates/dashboard.mako:91
+msgid "Edit"
+msgstr "编辑"
+
+#: src/impala/templates/dashboard.mako:93
+msgid "Save"
+msgstr "保存"
+
+#: src/impala/templates/dashboard.mako:93
+msgid "Saving..."
+msgstr "正在保存..."
+
+#: src/impala/templates/dashboard.mako:94
+msgid "New"
+msgstr "新建"
+
+#: src/impala/templates/dashboard.mako:99
+msgid "Select a database and a table"
+msgstr "选择数据库和表"
+
+#: src/impala/templates/dashboard.mako:101
+msgid "Choose a database..."
+msgstr "选择数据库..."
+
+#: src/impala/templates/dashboard.mako:102
+msgid "Choose a table..."
+msgstr "选择表..."
+
+#: src/impala/templates/dashboard.mako:104
+msgid "Manually refresh the dropdowns"
+msgstr "手动刷新下拉列表"
+
+#: src/impala/templates/dashboard.mako:109
+msgid "Search"
+msgstr "搜索"
+
+#: src/impala/templates/dashboard.mako:139
+msgid "Filter fields"
+msgstr "筛选字段"
+
+#: src/impala/templates/dashboard.mako:147
+msgid "Field Name"
+msgstr "字段名称"
+
+#: src/impala/templates/dashboard.mako:169
+msgid "Your search did not match any documents."
+msgstr "您的搜索与所有文档均不匹配。"
+
+#: src/impala/templates/dashboard.mako:243
+msgid "Exclude this value"
+msgstr "排除此值"
+
+#: src/impala/templates/dashboard.mako:377
+msgid "There are currently no filters applied."
+msgstr "当前未应用筛选器。"
+
+#: src/impala/templates/dashboard.mako:382
+#: src/impala/templates/dashboard.mako:392
+msgid "field"
+msgstr "字段"
+
+#: src/impala/templates/dashboard.mako:385
+msgid "value"
+msgstr "值"
+
+#: src/impala/templates/dashboard.mako:396
+msgid "from"
+msgstr "自"
+
+#: src/impala/templates/dashboard.mako:398
+msgid "to"
+msgstr "至"
+
+#: src/impala/templates/dashboard.mako:611
+msgid "Oops, no database found!"
+msgstr "很抱歉，找不到数据库！"
+
+#: src/impala/templates/dashboard.mako:635
+msgid "Oops, no table found!"
+msgstr "很抱歉，找不到表！"
 

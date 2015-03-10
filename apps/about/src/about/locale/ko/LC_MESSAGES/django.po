@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/views.py:68
+#: src/about/views.py:67
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
@@ -177,16 +177,16 @@ msgstr "Hue 및 Hadoop에 대해 자세히 알아보기"
 msgid "Sign in now!"
 msgstr "지금 로그인!"
 
-#: src/about/templates/admin_wizard.mako:299
+#: src/about/templates/admin_wizard.mako:300
 msgid "Check config failed: "
 msgstr "구성 확인 실패: "
 
-#: src/about/templates/admin_wizard.mako:308
-#: src/about/templates/admin_wizard.mako:326
+#: src/about/templates/admin_wizard.mako:310
+#: src/about/templates/admin_wizard.mako:332
 msgid "Examples refreshed"
 msgstr "예제 새로 고쳐짐"
 
-#: src/about/templates/admin_wizard.mako:390
+#: src/about/templates/admin_wizard.mako:396
 msgid "Configuration updated"
 msgstr "구성 업데이트됨"
 

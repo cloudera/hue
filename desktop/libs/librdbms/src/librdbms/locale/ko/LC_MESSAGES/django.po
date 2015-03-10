@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -35,7 +35,7 @@ msgstr "데이터베이스 파일에 대한 경로 또는 이름입니다. 지�
 
 #: src/librdbms/conf.py:44
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
-msgstr "postgresql_psycopg2, mysql, or sqlite3 같은 데이터베이스 엔진입니다."
+msgstr "postgresql_psycopg2, mysql, sqlite3 같은 데이터베이스 엔진입니다."
 
 #: src/librdbms/conf.py:50
 msgid "Database username."
@@ -55,7 +55,7 @@ msgstr "데이터베이스 포트입니다."
 
 #: src/librdbms/conf.py:74
 msgid "Database options to send to the server when connecting."
-msgstr "연결할 때 서버로 보낸 데이터베이스 옵션입니다."
+msgstr "연결할 때 서버로 보내는 데이터베이스 옵션입니다."
 
 #: src/librdbms/conf.py:90
 msgid "Database name should not be empty for the SQLite backend."

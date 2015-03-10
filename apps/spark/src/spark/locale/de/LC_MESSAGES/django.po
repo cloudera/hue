@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2014-05-29 17:11-0700\n"
+"POT-Creation-Date: 2015-02-04 18:48-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,330 +17,511 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/spark/api.py:61 src/spark/views.py:109
-msgid "Requires a POST"
-msgstr "Erfordert POST"
+#: src/spark/api.py:152 src/spark/api.py:165
+msgid "Notebook saved !"
+msgstr "Notizbuch gesperrt!"
 
-#: src/spark/api.py:84
-msgid "Requires a DELETE"
-msgstr "Erfordert DELETE"
+#: src/spark/api.py:182
+msgid "Notebook closed !"
+msgstr "Notizbuch geschlossen!"
 
-#: src/spark/api.py:120 src/spark/api.py:175
-msgid "A POST request is required."
-msgstr "Eine POST-Anforderung ist erforderlich."
-
-#: src/spark/api.py:162
-#, python-format
-msgid "There was an error with your query: %s"
-msgstr "Bei Ihrer Anfrage ist ein Fehler aufgetreten: %s"
-
-#: src/spark/api.py:205
-msgid "A GET request is required."
-msgstr "Eine GET-Anforderung ist erforderlich."
-
-#: src/spark/api.py:234
-msgid "Missing application jar list."
-msgstr "Anwendungs-JAR-Liste fehlt."
-
-#: src/spark/conf.py:28
+#: src/spark/conf.py:34
 msgid "URL of the Spark Job Server."
 msgstr "URL des Spark-Job-Servers."
 
-#: src/spark/conf.py:56
+#: src/spark/conf.py:40
+msgid "List of available types of snippets."
+msgstr "Liste der verfügbaren Arten von Snippets"
+
+#: src/spark/conf.py:73
 msgid "The app won't work without a running Job Server"
 msgstr "Die Anwendung funktioniert nicht, wenn kein Job-Server aktiv ist"
 
-#: src/spark/decorators.py:34
-msgid "An error happened with the Spark Server"
-msgstr "Es ist ein Fehler mit dem Spark-Server aufgetreten."
+#: src/spark/views.py:46 src/spark/views.py:47
+msgid "Example: 1 + 1, or press CTRL + space"
+msgstr "Beispiel: 1 + 1 oder drücken Sie STRG + Leerzeichen"
 
-#: src/spark/forms.py:25
-msgid "Script parameters"
-msgstr "Skriptparameter"
+#: src/spark/views.py:48 src/spark/views.py:49
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "Beispiel: \"SELECT * FROM Tabellenname\", oder STRG + Leerzeichen drücken"
 
-#: src/spark/forms.py:27 src/spark/templates/editor.mako:80
-#: src/spark/templates/list_jobs.mako:36
-msgid "Class path"
-msgstr "Klassenpfad"
+#: src/spark/views.py:50
+msgid "<h2>This is a text snippet</h2>Type your text here"
+msgstr "<h2>Dies ist ein Text-Snippet</h2>Geben Sie Ihren Text hier ein"
 
-#: src/spark/views.py:94
-msgid "Delete context(s)?"
-msgstr "Kontext löschen?"
-
-#: src/spark/templates/common.mako:38
-msgid "Spark Igniter"
-msgstr "Spark Igniter"
-
-#: src/spark/templates/common.mako:41
-msgid "Editor"
-msgstr "Editor"
-
-#: src/spark/templates/common.mako:43
-#: src/spark/templates/list_applications.mako:23
-#: src/spark/templates/list_applications.mako:29
-msgid "Applications"
-msgstr "Anwendungen"
-
-#: src/spark/templates/common.mako:45
-msgid "Dashboard"
-msgstr "Dashboard"
-
-#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
-msgid "Contexts"
-msgstr "Kontexte"
-
-#: src/spark/templates/common.mako:47
-msgid "Uploads"
-msgstr "Uploads"
-
-#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
-#: src/spark/templates/list_contexts.mako:41
-msgid "Create context"
-msgstr "Kontext erstellen"
-
-#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:133
-#: src/spark/templates/editor.mako:221
-#: src/spark/templates/list_applications.mako:45
-#: src/spark/templates/list_contexts.mako:48
-msgid "Name"
-msgstr "Name"
-
-#: src/spark/templates/common.mako:70
-msgid "Num cpu cores"
-msgstr "Num-CPU-Kerne"
-
-#: src/spark/templates/common.mako:76
-msgid "Memory per node"
-msgstr "Speicher pro Knoten"
-
-#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
-#: src/spark/templates/editor.mako:235
-#: src/spark/templates/list_contexts.mako:85
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: src/spark/templates/common.mako:85
-msgid "Create"
-msgstr "Erstellen"
-
-#: src/spark/templates/common.mako:96
-msgid "Upload application"
-msgstr "Upload-Anwendung"
-
-#: src/spark/templates/common.mako:99
-msgid "One class of the jar should implement SparkJob."
-msgstr "Eine Klasse der Jar-Datei muss Spark-Job implementieren."
-
-#: src/spark/templates/common.mako:101
-msgid "Local jar file"
-msgstr "Lokale Jar-Datei"
-
-#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:64
-msgid "App name"
-msgstr "Anwendungsname"
-
-#: src/spark/templates/common.mako:115
-msgid "Upload"
-msgstr "Hochladen"
-
-#: src/spark/templates/editor.mako:23
+#: src/spark/templates/editor.mako:22
 msgid "Query"
 msgstr "Abfrage"
 
-#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:487
-msgid "Application name"
-msgstr "Anwendungsname"
-
-#: src/spark/templates/editor.mako:48
-msgid "Application description"
-msgstr "Anwendungsbeschreibung"
-
-#: src/spark/templates/editor.mako:58
-#: src/spark/templates/list_applications.mako:36
-msgid "Upload app"
-msgstr "Anwendung hochladen"
-
-#: src/spark/templates/editor.mako:67
-msgid "Missing, add one?"
-msgstr "Fehlt, eine hinzufügen?"
-
-#: src/spark/templates/editor.mako:84 src/spark/templates/list_contexts.mako:23
-#: src/spark/templates/list_jobs.mako:37
-msgid "Context"
-msgstr "Kontext"
-
-#: src/spark/templates/editor.mako:87
-msgid "Automatic"
-msgstr "Automatisch"
-
-#: src/spark/templates/editor.mako:93
-msgid "Create one?"
-msgstr "Neu erstellen?"
-
-#: src/spark/templates/editor.mako:116
-msgid "Parameters"
-msgstr "Parameter"
-
 #: src/spark/templates/editor.mako:122
-msgid "Your application has the following error(s):"
-msgstr "Ihre Anwendung enthält folgende(n) Fehler:"
+msgid "Execute all snippets"
+msgstr "Alle Snippets ausführen"
 
-#: src/spark/templates/editor.mako:128
-msgid "No parameters defined yet."
-msgstr "Noch keine Parameter definiert."
+#: src/spark/templates/editor.mako:127
+msgid "Clear all results"
+msgstr "Alle Ergebnisse entfernen"
 
-#: src/spark/templates/editor.mako:134 src/spark/templates/editor.mako:177
-msgid "Value"
-msgstr "Wert"
+#: src/spark/templates/editor.mako:135
 
-#: src/spark/templates/editor.mako:148
-msgid "Delete"
-msgstr "Löschen"
+msgid "Edit"
+msgstr "Bearbeiten"
 
-#: src/spark/templates/editor.mako:154
-msgid "Add"
-msgstr "Hinzufügen"
-
-#: src/spark/templates/editor.mako:160
-msgid "Executing..."
-msgstr "Ausführung läuft..."
-
-#: src/spark/templates/editor.mako:161
-msgid "Execute"
-msgstr "Ausführen"
-
-#: src/spark/templates/editor.mako:163 src/spark/templates/editor.mako:236
+#: src/spark/templates/editor.mako:141
 msgid "Save"
 msgstr "Speichern"
 
-#: src/spark/templates/editor.mako:164
-msgid "Save as..."
-msgstr "Speichern unter..."
+#: src/spark/templates/editor.mako:141
+msgid "Saving..."
+msgstr "Es wird gespeichert..."
+
+#: src/spark/templates/editor.mako:148
+msgid "Brand New"
+msgstr "Völlig neu"
+
+#: src/spark/templates/editor.mako:152 src/spark/templates/notebooks.mako:22
+msgid "Notebooks"
+msgstr "Notizbücher"
 
 #: src/spark/templates/editor.mako:165
-msgid "or create a"
-msgstr "oder erstellen Sie eine"
+msgid "Add a new notebook"
+msgstr "Neues Notizbuch hinzufügen"
 
-#: src/spark/templates/editor.mako:165
-msgid "New application"
-msgstr "Neue Anwendung"
+#: src/spark/templates/editor.mako:171 src/spark/templates/editor.mako:209
+msgid "Toggle Assist"
+msgstr "Hilfe umschalten"
 
-#: src/spark/templates/editor.mako:167
-msgid "Download"
-msgstr "Herunterladen"
+#: src/spark/templates/editor.mako:190
+msgid "Data sample for"
+msgstr "Datenmuster für"
 
-#: src/spark/templates/editor.mako:176
-msgid "Key"
-msgstr "Schlüssel"
+#: src/spark/templates/editor.mako:200
+msgid "Ok"
+msgstr "OK"
 
-#: src/spark/templates/editor.mako:189
-msgid "The server returned no results."
-msgstr "Der Server gab keine Ergebnisse aus."
+#: src/spark/templates/editor.mako:212
+msgid "Manually refresh the table list"
+msgstr "Tabellenliste manuell aktualisieren"
 
 #: src/spark/templates/editor.mako:216
-msgid "Save your query"
-msgstr "Abfrage speichern"
+msgid "database"
+msgstr "Datenbank"
 
-#: src/spark/templates/editor.mako:227
-msgid "Description"
-msgstr "Beschreibung"
+#: src/spark/templates/editor.mako:219
+msgid "Choose a database..."
+msgstr "Datenbank auswählen..."
 
-#: src/spark/templates/editor.mako:243
-msgid "Choose a file"
-msgstr "Datei auswählen"
+#: src/spark/templates/editor.mako:220
 
-#: src/spark/templates/editor.mako:379
-msgid "Did you know?"
-msgstr "Wussten Sie schon?"
+msgid "Table name..."
+msgstr "Tabellenname..."
 
-#: src/spark/templates/editor.mako:481
-msgid "This field is required."
-msgstr "Dieses Feld ist erforderlich."
+#: src/spark/templates/editor.mako:221
+msgid "The selected database has no tables."
+msgstr "Die ausgewählte Datenbank enthält keine Tabellen."
 
-#: src/spark/templates/editor.mako:494
-msgid "Empty description"
-msgstr "Leere Beschreibung"
+#: src/spark/templates/editor.mako:242
+msgid "The database list cannot be loaded."
+msgstr "Die Datenbankliste kann nicht geladen werden."
 
-#: src/spark/templates/editor.mako:500
-msgid "Application saved successfully!"
-msgstr "Anwendung erfolgreich gespeichert!"
+#: src/spark/templates/editor.mako:255
+msgid "Add a snippet to start your new notebook"
+msgstr "Snippet hinzufügen, um das neue Notizbuch zu starten"
 
-#: src/spark/templates/editor.mako:528
-#: src/spark/templates/list_applications.mako:93
-#: src/spark/templates/list_contexts.mako:131
-#: src/spark/templates/list_jobs.mako:96
+#: src/spark/templates/editor.mako:261
+msgid "Add a new snippet"
+msgstr "Neues Snippet hinzufügen"
+
+#: src/spark/templates/editor.mako:285
+
+msgid "Text"
+msgstr "Text"
+
+#: src/spark/templates/editor.mako:331
+msgid "Creating session"
+msgstr "Sitzung wird erstellt"
+
+#: src/spark/templates/editor.mako:333
+msgid "CTRL + ENTER"
+msgstr "STRG + EINGABETASTE"
+
+#: src/spark/templates/editor.mako:336
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: src/spark/templates/editor.mako:345
+msgid "Grid"
+msgstr "Raster"
+
+#: src/spark/templates/editor.mako:363
+msgid "Bars"
+msgstr "Leisten"
+
+#: src/spark/templates/editor.mako:368
+msgid "Lines"
+msgstr "Zeilen"
+
+#: src/spark/templates/editor.mako:373
+msgid "Pie"
+msgstr "Kreis"
+
+#: src/spark/templates/editor.mako:378
+msgid "Scatter"
+msgstr "Punkt"
+
+#: src/spark/templates/editor.mako:383
+msgid "Marker Map"
+msgstr "Markierungskarte"
+
+#: src/spark/templates/editor.mako:388
+msgid "Gradient Map"
+msgstr "Verlaufskarte"
+
+#: src/spark/templates/editor.mako:399
+msgid "Show Logs"
+msgstr "Protokolle anzeigen"
+
+#: src/spark/templates/editor.mako:418
+msgid "Download first rows as CSV"
+msgstr "Erste Zeilen als CSV herunterladen"
+
+#: src/spark/templates/editor.mako:419
+msgid "CSV"
+msgstr "CSV"
+
+#: src/spark/templates/editor.mako:423
+msgid "Download first rows as XLS"
+msgstr "Erste Zeilen als XLS herunterladen"
+
+#: src/spark/templates/editor.mako:424
+msgid "Excel"
+msgstr "Excel"
+
+#: src/spark/templates/editor.mako:435 src/spark/templates/editor.mako:452
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+#: src/spark/templates/editor.mako:444
+msgid "Success."
+msgstr "Erfolg."
+
+#: src/spark/templates/editor.mako:448
+msgid "Success but empty results."
+msgstr "Erfolg, aber leere Ergebnisse."
+
+#: src/spark/templates/editor.mako:465
+msgid "Hide columns"
+msgstr "Spalten ausblenden"
+
+#: src/spark/templates/editor.mako:465
+msgid "columns"
+msgstr "Spalten"
+
+#: src/spark/templates/editor.mako:477
+msgid "Show columns"
+msgstr "Spalten anzeigen"
+
+#: src/spark/templates/editor.mako:480
+msgid "Hide"
+msgstr "Ausblenden"
+
+#: src/spark/templates/editor.mako:501
+msgid "Hide settings"
+msgstr "Einstellungen ausblenden"
+
+#: src/spark/templates/editor.mako:507
+msgid "x-axis"
+msgstr "X-Achse"
+
+#: src/spark/templates/editor.mako:508
+msgid "region"
+msgstr "Region"
+
+#: src/spark/templates/editor.mako:509
+msgid "latitude"
+msgstr "Breite"
+
+#: src/spark/templates/editor.mako:510
+msgid "legend"
+msgstr "Legende"
+
+#: src/spark/templates/editor.mako:513 src/spark/templates/editor.mako:529
+#: src/spark/templates/editor.mako:536 src/spark/templates/editor.mako:543
+#: src/spark/templates/editor.mako:550
+msgid "Choose a column..."
+msgstr "Spalte auswählen..."
+
+#: src/spark/templates/editor.mako:517
+msgid "y-axis"
+msgstr "Y-Achse"
+
+#: src/spark/templates/editor.mako:518 src/spark/templates/editor.mako:520
+
+msgid "value"
+msgstr "Wert"
+
+#: src/spark/templates/editor.mako:519
+msgid "longitude"
+msgstr "Länge"
+
+#: src/spark/templates/editor.mako:533
+msgid "label"
+msgstr "Kennzeichnung"
+
+#: src/spark/templates/editor.mako:540
+msgid "scatter group"
+msgstr "Punktgruppe"
+
+#: src/spark/templates/editor.mako:547
+msgid "scatter size"
+msgstr "Punktgröße"
+
+#: src/spark/templates/editor.mako:554
+msgid "sorting"
+msgstr "Sortieren"
+
+#: src/spark/templates/editor.mako:557
+msgid "No sorting"
+msgstr "Keine Sortierung"
+
+#: src/spark/templates/editor.mako:558
+msgid "Sort ascending"
+msgstr "Aufsteigend sortieren"
+
+#: src/spark/templates/editor.mako:559
+msgid "Sort descending"
+msgstr "Absteigend sortieren"
+
+#: src/spark/templates/editor.mako:566
+msgid "Show settings"
+msgstr "Einstellungen anzeigen"
+
+#: src/spark/templates/editor.mako:651
+msgid "Paste or type a link"
+msgstr "Link einfügen oder eingeben"
+
+#: src/spark/templates/editor.mako:652
+msgid "Open in new window"
+msgstr "In neuem Fenster öffnen"
+
+#: src/spark/templates/editor.mako:1168 src/spark/templates/notebooks.mako:228
 msgid "No data available"
 msgstr "Keine Daten verfügbar"
 
-#: src/spark/templates/editor.mako:529
-#: src/spark/templates/list_applications.mako:94
-#: src/spark/templates/list_contexts.mako:132
-#: src/spark/templates/list_jobs.mako:97
+#: src/spark/templates/editor.mako:1169 src/spark/templates/notebooks.mako:232
 msgid "No matching records"
 msgstr "Keine übereinstimmenden Datensätze"
 
-#: src/spark/templates/editor.mako:580
-msgid "Server error occured: "
-msgstr "Serverfehler aufgetreten: "
+#: src/spark/templates/editor.mako:1484
 
-#: src/spark/templates/editor.mako:583
-msgid "Unmanageable server error occured: "
-msgstr "Unlösbarer Serverfehler: "
+msgid "Distribution"
+msgstr "Verteilung"
 
-#: src/spark/templates/list_applications.mako:33
-#: src/spark/templates/list_contexts.mako:33
-msgid "Search for name"
-msgstr "Nach Namen suchen"
+#: src/spark/templates/editor.mako:1511
+msgid "There was a problem loading the table preview."
+msgstr "Beim Laden der Tabellenvorschau ist ein Problem aufgetreten."
 
-#: src/spark/templates/list_applications.mako:46
-msgid "Upload time"
-msgstr "Zeit hochladen"
+#: src/spark/templates/notebooks.mako:28
 
-#: src/spark/templates/list_applications.mako:53
-msgid "Click to open and execute"
-msgstr "Zum Öffnen und Ausführen hier klicken"
+msgid "Spark Editor"
+msgstr "Spark-Editor"
 
-#: src/spark/templates/list_contexts.mako:36
-msgid "Delete forever"
-msgstr "Dauerhaft löschen"
+#: src/spark/templates/notebooks.mako:33
+msgid "Search for name, description, etc..."
+msgstr "Nach Namen, Beschreibung, usw. suchen"
 
-#: src/spark/templates/list_contexts.mako:37
-msgid "Delete selected"
-msgstr "Auswahl löschen"
+#: src/spark/templates/notebooks.mako:39
+msgid "Submit"
+msgstr "Übermitteln"
 
-#: src/spark/templates/list_contexts.mako:82
-msgid "Confirm action"
-msgstr "Aktion bestätigen"
+#: src/spark/templates/notebooks.mako:45 src/spark/templates/notebooks.mako:47
+msgid "Share"
+msgstr "Freigeben"
 
-#: src/spark/templates/list_contexts.mako:86
+#: src/spark/templates/notebooks.mako:51
+msgid "Copy"
+msgstr "Kopieren"
+
+#: src/spark/templates/notebooks.mako:55
+msgid "Delete"
+msgstr "Löschen"
+
+#: src/spark/templates/notebooks.mako:60
+msgid "Create"
+msgstr "Erstellen"
+
+#: src/spark/templates/notebooks.mako:67
+msgid "Name"
+msgstr "Name"
+
+#: src/spark/templates/notebooks.mako:68
+msgid "Description"
+msgstr "Beschreibung"
+
+#: src/spark/templates/notebooks.mako:69
+msgid "Owner"
+msgstr "Eigentümer"
+
+#: src/spark/templates/notebooks.mako:70
+msgid "Last Modified"
+msgstr "Zuletzt geändert"
+
+#: src/spark/templates/notebooks.mako:107
+
+msgid "Delete the selected notebook(s)?"
+msgstr "Ausgewählte Notizbücher löschen?"
+
+#: src/spark/templates/notebooks.mako:110
+msgid "No"
+msgstr "Nein"
+
+#: src/spark/templates/notebooks.mako:111
 msgid "Yes"
 msgstr "Ja"
 
-#: src/spark/templates/list_contexts.mako:208
-msgid "Delete the selected contexts?"
-msgstr "Ausgewählte Kontexte löschen?"
+#: src/spark/templates/notebooks.mako:229
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "_START_ bis _END_ von _TOTAL_ Einträge werden angezeigt"
 
-#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
-msgid "Jobs"
-msgstr "Jobs"
+#: src/spark/templates/notebooks.mako:230
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "0 bis 0 von 0 Einträgen werden angezeigt"
 
-#: src/spark/templates/list_jobs.mako:34
-msgid "Status"
-msgstr "Status"
+#: src/spark/templates/notebooks.mako:231
+msgid "(filtered from _MAX_ total entries)"
+msgstr "(gefiltert von _MAX_ gesamten Einträgen)"
 
-#: src/spark/templates/list_jobs.mako:35
-msgid "Job id"
-msgstr "Job-ID"
+#: src/spark/templates/notebooks.mako:234
+msgid "First"
+msgstr "Erster"
 
-#: src/spark/templates/list_jobs.mako:38
-msgid "Start time"
-msgstr "Startzeit"
+#: src/spark/templates/notebooks.mako:235
+msgid "Last"
+msgstr "Letzter"
 
-#: src/spark/templates/list_jobs.mako:39
-msgid "Duration"
-msgstr "Dauer"
+#: src/spark/templates/notebooks.mako:236
 
-#: src/spark/templates/list_jobs.mako:51
-msgid "Click to open"
-msgstr "Zum Öffnen hier klicken"
+msgid "Next"
+msgstr "Weiter"
 
+#: src/spark/templates/notebooks.mako:237
+msgid "Previous"
+msgstr "Zurück"
+
+#~ msgid "Requires a POST"
+#~ msgstr "Erfordert POST"
+#~ msgid "Requires a DELETE"
+#~ msgstr "Erfordert DELETE"
+#~ msgid "A POST request is required."
+#~ msgstr "Eine POST-Anforderung ist erforderlich."
+#~ msgid "There was an error with your query: %s"
+#~ msgstr "Bei Ihrer Anfrage ist ein Fehler aufgetreten: %s"
+#~ msgid "A GET request is required."
+#~ msgstr "Eine GET-Anforderung ist erforderlich."
+#~ msgid "Missing application jar list."
+#~ msgstr "Anwendungs-JAR-Liste fehlt."
+#~ msgid "An error happened with the Spark Server"
+#~ msgstr "Es ist ein Fehler mit dem Spark-Server aufgetreten."
+#~ msgid "Script parameters"
+#~ msgstr "Skriptparameter"
+#~ msgid "Class path"
+#~ msgstr "Klassenpfad"
+#~ msgid "Delete context(s)?"
+#~ msgstr "Kontext löschen?"
+#~ msgid "Applications"
+#~ msgstr "Anwendungen"
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+#~ msgid "Contexts"
+#~ msgstr "Kontexte"
+#~ msgid "Uploads"
+#~ msgstr "Uploads"
+#~ msgid "Create context"
+#~ msgstr "Kontext erstellen"
+#~ msgid "Num cpu cores"
+#~ msgstr "Num-CPU-Kerne"
+#~ msgid "Memory per node"
+#~ msgstr "Speicher pro Knoten"
+#~ msgid "Upload application"
+#~ msgstr "Upload-Anwendung"
+#~ msgid "One class of the jar should implement SparkJob."
+#~ msgstr "Eine Klasse der Jar-Datei muss Spark-Job implementieren."
+#~ msgid "Local jar file"
+#~ msgstr "Lokale Jar-Datei"
+#~ msgid "App name"
+#~ msgstr "Anwendungsname"
+#~ msgid "Upload"
+#~ msgstr "Hochladen"
+#~ msgid "Application name"
+#~ msgstr "Anwendungsname"
+#~ msgid "Application description"
+#~ msgstr "Anwendungsbeschreibung"
+#~ msgid "Upload app"
+#~ msgstr "Anwendung hochladen"
+#~ msgid "Missing, add one?"
+#~ msgstr "Fehlt, eine hinzufügen?"
+#~ msgid "Automatic"
+#~ msgstr "Automatisch"
+#~ msgid "Create one?"
+#~ msgstr "Neu erstellen?"
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+#~ msgid "Your application has the following error(s):"
+#~ msgstr "Ihre Anwendung enthält folgende(n) Fehler:"
+#~ msgid "No parameters defined yet."
+#~ msgstr "Noch keine Parameter definiert."
+#~ msgid "Add"
+#~ msgstr "Hinzufügen"
+#~ msgid "Executing..."
+#~ msgstr "Ausführung läuft..."
+#~ msgid "Execute"
+#~ msgstr "Ausführen"
+#~ msgid "or create a"
+#~ msgstr "oder erstellen Sie eine"
+#~ msgid "New application"
+#~ msgstr "Neue Anwendung"
+#~ msgid "Download"
+#~ msgstr "Herunterladen"
+#~ msgid "Key"
+#~ msgstr "Schlüssel"
+#~ msgid "The server returned no results."
+#~ msgstr "Der Server gab keine Ergebnisse aus."
+#~ msgid "Save your query"
+#~ msgstr "Abfrage speichern"
+#~ msgid "Choose a file"
+#~ msgstr "Datei auswählen"
+#~ msgid "Did you know?"
+#~ msgstr "Wussten Sie schon?"
+#~ msgid "This field is required."
+#~ msgstr "Dieses Feld ist erforderlich."
+#~ msgid "Empty description"
+#~ msgstr "Leere Beschreibung"
+#~ msgid "Application saved successfully!"
+#~ msgstr "Anwendung erfolgreich gespeichert!"
+#~ msgid "Server error occured: "
+#~ msgstr "Serverfehler aufgetreten: "
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr "Unlösbarer Serverfehler: "
+#~ msgid "Search for name"
+#~ msgstr "Nach Namen suchen"
+#~ msgid "Upload time"
+#~ msgstr "Zeit hochladen"
+#~ msgid "Click to open and execute"
+#~ msgstr "Zum Öffnen und Ausführen hier klicken"
+#~ msgid "Delete forever"
+#~ msgstr "Dauerhaft löschen"
+#~ msgid "Delete selected"
+#~ msgstr "Auswahl löschen"
+#~ msgid "Confirm action"
+#~ msgstr "Aktion bestätigen"
+#~ msgid "Jobs"
+#~ msgstr "Jobs"
+#~ msgid "Status"
+#~ msgstr "Status"
+#~ msgid "Job id"
+#~ msgstr "Job-ID"
+#~ msgid "Start time"
+#~ msgstr "Startzeit"
+#~ msgid "Duration"
+#~ msgstr "Dauer"
+#~ msgid "Click to open"
+#~ msgstr "Zum Öffnen hier klicken"
