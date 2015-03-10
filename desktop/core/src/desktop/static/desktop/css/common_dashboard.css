@@ -410,3 +410,8 @@ body.modal-open {
 .card-column.span2 .leaflet-align {
   text-align: left;
 }
+
+.logs-icon {
+  font-size: 20px;
+  margin-right: 17px;
+}
