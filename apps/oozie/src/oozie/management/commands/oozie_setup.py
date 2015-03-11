@@ -134,7 +134,6 @@ class Command(NoArgsCommand):
     LOG.info(_("Installing examples..."))
 
     if ENABLE_V2.get():
-      self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.copyFromLocal, local_dir, remote_data_dir)
       management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
     else:
       self.install_examples()
