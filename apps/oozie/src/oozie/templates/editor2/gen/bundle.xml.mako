@@ -28,7 +28,7 @@
     % for p in bundle.data['properties']['parameters']:
     <property>
         <name>${ p['name'] }</name>
-        <value>${ json.dumps(p['value']) }</value>
+        <value>${ p['value'] }</value>
     </property>
     % endfor
   </parameters>

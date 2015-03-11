@@ -337,6 +337,8 @@ class DocumentManager(models.Manager):
               extra = 'workflow2'
             elif job.type == 'oozie-coordinator2':
               extra = 'coordinator2'
+            elif job.type == 'oozie-bundle2':
+              extra = 'bundle2'
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)

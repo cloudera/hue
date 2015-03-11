@@ -1871,7 +1871,7 @@ class Bundle(Job):
               'deployment_dir': '',
               'schema_version': 'uri:oozie:bundle:0.2',
               'kickoff': datetime.today(),
-              'parameters': [{'name': 'oozie.use.system.libpath', 'value': True}]
+              'parameters': [{'name': 'oozie.use.system.libpath', 'value': 'true'}]
           }
       }
 
@@ -1956,7 +1956,10 @@ class Bundle(Job):
     for param in find_json_parameters([self.data['properties']]):
       params.add(param)
 
-    return dict([(param, '') for param in list(params)])
+    # Remove the ones filled up by bundle
+    removable_names = [p['name']  for coord in self.data['coordinators'] for p in coord['properties']]
+
+    return dict([(param, '') for param in list(params) if param not in removable_names])
 
   def get_absolute_url(self):
     return reverse('oozie:edit_bundle') + '?bundle=%s' % self.id
