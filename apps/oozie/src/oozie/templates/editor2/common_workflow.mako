@@ -535,7 +535,7 @@
 </script>
 
 <script type="text/html" id="logs-icon">
-  <!-- ko if: $parent.logsURL() != '' -->
+  <!-- ko if: $parent.logsURL() != '' && $parent.logsURL() != null -->
     <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
   <!-- /ko -->
 </script>
