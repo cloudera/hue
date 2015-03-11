@@ -41,13 +41,13 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
   <div class="pull-right" style="padding-right:50px">
 
     <span data-bind="visible: coordinator.isDirty() || coordinator.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
-    
+
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': coordinator.isDirty()}, visible: coordinator.id() != null">
       <i class="fa fa-play"></i>
     </a>
-    
+
     &nbsp;&nbsp;&nbsp;
-    
+
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
@@ -123,32 +123,41 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
         <div class="card-body">
 
-        <form class="form-horizontal">
-          <div class="control-group" data-bind="visible: ! coordinator.properties.cron_advanced()">
-            <div class="controls" id="jqCron-container">
-              <div id="jqCron-instance" style="margin-top: 5px; display: inline-block"></div>
+          <div class="row-fluid">
+            <div class="span6">
+              <form class="form-horizontal">
+                <div class="control-group" data-bind="visible: ! coordinator.properties.cron_advanced()">
+                  <div class="controls" id="jqCron-container">
+                    <div id="jqCron-instance" style="margin-top: 5px; display: inline-block"></div>
+                  </div>
+                </div>
+                <div class="control-group" data-bind="visible: coordinator.properties.cron_advanced">
+                  <label class="control-label">${ _('Crontab') }</label>
+                  <div class="controls">
+                    <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency" name="cron_frequency"/>
+                    <span class="help-inline"><a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
+                      <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
+                    </span>
+                  </div>
+                </div>
+                <div class="control-group" style="margin-bottom: 0">
+                  <label class="control-label"></label>
+                  <div class="controls">
+                    <a href="#" data-bind="click: function() { $root.coordinator.showAdvancedFrequencyUI(! $root.coordinator.showAdvancedFrequencyUI()) }">
+                      <i class="fa fa-sliders"></i> <span data-bind="visible: ! coordinator.showAdvancedFrequencyUI()">${ _('Options') }</span>
+                      <span data-bind="visible: coordinator.showAdvancedFrequencyUI">${ _('Hide') }</span>
+                    </a>
+                  </div>
+                </div>
+             </form>
             </div>
-          </div>
-          <div class="control-group" data-bind="visible: coordinator.properties.cron_advanced">
-            <label class="control-label">${ _('Crontab') }</label>
-            <div class="controls">
-              <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency" name="cron_frequency"/>
-              <span class="help-inline"><a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
-                <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
-              </span>
-            </div>
-          </div>
-          <div class="control-group" style="margin-bottom: 0">
-            <label class="control-label"></label>
-            <div class="controls">
-            <a href="#" data-bind="click: function() { $root.coordinator.showAdvancedFrequencyUI(! $root.coordinator.showAdvancedFrequencyUI()) }">
-              <i class="fa fa-sliders"></i> <span data-bind="visible: ! coordinator.showAdvancedFrequencyUI()">${ _('Options') }</span>
-              <span data-bind="visible: coordinator.showAdvancedFrequencyUI">${ _('Hide') }</span>
-            </a>
-            </div>
-          </div>
-        </form>
 
+            <div class="span6">
+              <div class="alert alert-warning span8">
+                ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+              </div>
+            </div>
+          </div>
 
           <div data-bind="visible: coordinator.showAdvancedFrequencyUI">
             <form class="form-horizontal">
@@ -247,13 +256,13 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   <!-- /ko -->
                 </ul>
               </div>
-              
+
               &nbsp;&nbsp;
-              
+
               <span data-bind="visible: $root.isEditing">
                 <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
-                  dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' : 
-                  dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' : 
+                  dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' :
+                  dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' :
                   '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
                   valueUpdate: 'afterkeydown', typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
               </span>
@@ -269,7 +278,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                 <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
                   <i class="fa fa-sliders"></i>
                 </a>
-                
+
                 <span style="padding-left:100px">
                   <span data-bind="visible: dataset_variable().length == 0">
                     e.g. /data/${'$'}{YEAR}/${'$'}{MONTH}/${'$'}{DAY}
@@ -309,14 +318,14 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                           <option value="months">Months</option>
                         </select>
                       </div>
-                    </div>                  
+                    </div>
                     <div class="control-group">
                       <label class="control-label">${ _('Same start') }</label>
                       <div class="controls">
                         <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start() ? '9px' : '-1px'}" />
                         <input type="text" data-bind="value: start, visible: ! same_start()"/>
                       </div>
-                    </div>                  
+                    </div>
                     <div class="control-group">
                       <label class="control-label">${ _('Same timezone') }</label>
                       <div class="controls">
@@ -446,7 +455,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
       <h4>${ _('Concurrency') }</h4>
       <select data-bind="options: availableSettings, optionsCaption: '${ _("Default") }', value: coordinator.properties.concurrency"></select>
-      
+
       <h4>${ _('Execution') }</h4>
       <select data-bind="value: coordinator.properties.execution">
 		<option value="FIFO">${ _("FIFO (oldest first)") }</option>
