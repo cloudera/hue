@@ -31,6 +31,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
 
@@ -579,6 +580,16 @@ class HiveAction(Action):
     return [cls.FIELDS['script_path'], cls.FIELDS['hive_xml']]
 
 
+def _get_hiveserver2_url():
+  try:
+    from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT
+    return 'jdbc:hive2://%s:%s/default' % (HIVE_SERVER_HOST.get(), HIVE_SERVER_PORT.get())
+  except Exception, e:
+    # Might fail is Hive is disabled
+    LOG.warn('Could not guess HiveServer2 URL: %s' % smart_str(e))
+    return 'jdbc:hive2://localhost:10000/default'
+
+
 class HiveServer2Action(Action):
   TYPE = 'hive2'
   FIELDS = {
@@ -600,7 +611,7 @@ class HiveServer2Action(Action):
      'jdbc_url': {
           'name': 'jdbc_url',
           'label': _('JDBC URL'),
-          'value': 'jdbc:hive2://localhost:10000/default',
+          'value': _get_hiveserver2_url(),
           'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.'),
           'type': ''
      },
