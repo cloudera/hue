@@ -710,6 +710,20 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="resultset-pagination">
+<!-- ko if: $data.response.numFound > 0 -->
+<div class="pull-right" style="display:inline">
+  <form method="POST" action="${ url('search:download') }" style="display:inline">
+    ${ csrf_token(request) | n,unicode }
+    <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+    <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+    <input type="hidden" name="download">
+    <button class="btn" type="submit" name="json" title="${ _('Download first rows as JSON') }"><i class="hfo hfo-file-json"></i></button>
+    <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="hfo hfo-file-csv"></i></button>
+    <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="hfo hfo-file-xls"></i></button>
+  </form>
+</div>
+<!-- /ko -->
+
 <div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
@@ -742,20 +756,6 @@ ${ dashboard.layout_skeleton() }
         click: function() { $root.query.paginate('next') }">
     </i>
   </a>
-
-  <!-- ko if: $data.response.numFound > 0 -->
-  <span class="pull-right">
-    <form method="POST" action="${ url('search:download') }">
-      ${ csrf_token(request) | n,unicode }
-      <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
-      <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
-      <input type="hidden" name="download">
-      <button class="btn" type="submit" name="json" title="${ _('Download first rows as JSON') }"><i class="hfo hfo-file-json"></i></button>
-      <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="hfo hfo-file-csv"></i></button>
-      <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="hfo hfo-file-xls"></i></button>
-    </form>
-  </span>
-  <!-- /ko -->
 </div>
 </script>
 
