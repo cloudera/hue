@@ -22,15 +22,19 @@
 
 import logging
 import os
-import sys
 import pkg_resources
+import sys
+
 from guppy import hpy
+
 
 import desktop.conf
 import desktop.log
 import desktop.redaction
+
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -388,3 +392,7 @@ os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
 if desktop.conf.MEMORY_PROFILER.get():
   MEMORY_PROFILER = hpy()
   MEMORY_PROFILER.setrelheap()
+
+if not desktop.conf.DATABASE_LOGGING.get():
+  from desktop.monkey_patches import disable_database_logging
+  disable_database_logging()
