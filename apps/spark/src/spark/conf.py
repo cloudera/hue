@@ -21,7 +21,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
 
 
@@ -66,6 +66,13 @@ LIVY_SERVER_SESSION_KIND = Config(
 LIVY_YARN_JAR = Config(
   key="livy_yarn_jar",
   help=_t("Path to livy-assembly.jar inside HDFS"),
+  private=True)
+
+START_LIVY_SERVER = Config(
+  key="start_livy_server",
+  help=_t("Experimental option to launch livy"),
+  default=False,
+  type=coerce_bool,
   private=True)
 
 def get_livy_server_url():
