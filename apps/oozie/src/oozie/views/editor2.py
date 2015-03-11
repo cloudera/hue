@@ -205,6 +205,8 @@ def save_workflow(request):
   if subworkflows:
     dependencies = Document2.objects.filter(uuid__in=subworkflows)
     workflow_doc.dependencies = dependencies
+  else:
+    workflow_doc.dependencies = []
 
   if workflow['properties'].get('imported'): # We save and old format workflow to the latest
     workflow['properties']['imported'] = False
