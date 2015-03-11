@@ -10,6 +10,21 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
+        # Adding model 'Document'
+        if 'desktop_document' not in connection.introspection.table_names():
+            db.create_table('desktop_document', (
+                ('description', self.gf('django.db.models.fields.TextField')(default='')),
+                ('extra', self.gf('django.db.models.fields.TextField')(default='')),
+                ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
+                ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+                ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+                ('version', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
+                ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='doc_owner', to=orm['auth.User'])),
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+                ('name', self.gf('django.db.models.fields.TextField')(default='')),
+            ))
+            db.send_create_signal('desktop', ['Document'])
+
         # Adding model 'DocumentPermission'
         if 'desktop_documentpermission' not in connection.introspection.table_names():
             db.create_table('desktop_documentpermission', (
@@ -45,21 +60,6 @@ class Migration(SchemaMigration):
                 ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ))
             db.send_create_signal('desktop', ['DocumentTag'])
-
-        # Adding model 'Document'
-        if 'desktop_document' not in connection.introspection.table_names():
-            db.create_table('desktop_document', (
-                ('description', self.gf('django.db.models.fields.TextField')(default='')),
-                ('extra', self.gf('django.db.models.fields.TextField')(default='')),
-                ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
-                ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-                ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-                ('version', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
-                ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='doc_owner', to=orm['auth.User'])),
-                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-                ('name', self.gf('django.db.models.fields.TextField')(default='')),
-            ))
-            db.send_create_signal('desktop', ['Document'])
 
         # Adding M2M table for field tags on 'Document'
         if 'desktop_document_tags' not in connection.introspection.table_names():
