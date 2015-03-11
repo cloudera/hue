@@ -212,9 +212,6 @@ FILE_UPLOAD_HANDLERS = (
   'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
-# Wrap each request in a transaction.
-ATOMIC_REQUESTS = True
-
 ############################################################
 # Part 4: Installation of apps
 ############################################################
@@ -294,7 +291,9 @@ else:
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
-    "TEST_NAME" : get_desktop_root('desktop-test.db')
+    "TEST_NAME" : get_desktop_root('desktop-test.db'),
+    # Wrap each request in a transaction.
+    "ATOMIC_REQUESTS" : True,
   }
 
 DATABASES = {
