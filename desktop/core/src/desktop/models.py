@@ -338,6 +338,10 @@ class DocumentManager(models.Manager):
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
+          if job.owner.username == SAMPLE_USERNAME:
+            job.doc.get().share_to_default()
+            tag = DocumentTag.objects.get_example_tag(user=job.owner)
+            doc.tags.add(tag)
     except Exception, e:
       LOG.warn(force_unicode(e))
 

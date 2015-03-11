@@ -733,14 +733,12 @@
 
         <div class="row-fluid">
           <div class="span6">
-        <span data-bind="text: $root.workflow_properties.spark_master.label" style="display: inline-block"></span>
-        <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
-
+            <span data-bind="text: $root.workflow_properties.spark_master.label" style="display: inline-block"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
           </div>
           <div class="span6">
-                 <span data-bind="text: $root.workflow_properties.mode.label" style="display: inline-block"></span>
-        <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
-
+            <span data-bind="text: $root.workflow_properties.mode.label" style="display: inline-block"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
           </div>
         </div>
 
@@ -758,20 +756,21 @@
         <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.jars(), with_label: false}}'></span>
 
-  <h6>
-    <a class="pointer" data-bind="click: function(){ properties.spark_arguments.push({'value': ''}); $(document).trigger('drawArrows') }">
-      ${ _('Arguments') } <i class="fa fa-plus"></i>
-    </a>
-  </h6>
-  <ul class="unstyled" data-bind="visible: properties.spark_arguments().length > 0, foreach: properties.spark_arguments">
-    <li>
-      <input type="text" class="input-xlarge" data-bind="value: value, attr: { placeholder: $root.workflow_properties.spark_arguments.help_text }"/>
-      <a href="#" data-bind="click: function(){ $parent.properties.spark_arguments.remove(this); $(document).trigger('drawArrows') }">
-        <i class="fa fa-minus"></i>
-      </a>
-    </li>
-  </ul>
-  <em data-bind="visible: properties.spark_arguments().length == 0">${ _('No arguments defined.') }</em>
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.spark_arguments.push({'value': ''}); $(document).trigger('drawArrows') }">
+            ${ _('Arguments') } <i class="fa fa-plus"></i>
+          </a>
+        </h6>
+        <ul class="unstyled" data-bind="visible: properties.spark_arguments().length > 0, foreach: properties.spark_arguments">
+          <li>
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
+            <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
+            <a href="#" data-bind="click: function(){ $parent.properties.spark_arguments.remove(this); $(document).trigger('drawArrows') }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+       </ul>
+       <em data-bind="visible: properties.spark_arguments().length == 0">${ _('No arguments defined.') }</em>
       </div>
     </div>
 

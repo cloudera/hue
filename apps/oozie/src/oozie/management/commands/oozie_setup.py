@@ -19,6 +19,7 @@ import logging
 import os
 from lxml import etree
 
+from django.core import management
 from django.core.management.base import NoArgsCommand
 from django.utils.translation import ugettext as _
 
@@ -26,7 +27,7 @@ from hadoop import cluster
 
 from desktop.models import Document
 from liboozie.submittion import create_directories
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
+from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR, ENABLE_V2
 from oozie.models import Workflow, Coordinator, Bundle
 from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
@@ -131,6 +132,11 @@ class Command(NoArgsCommand):
 
     # Load jobs
     LOG.info(_("Installing examples..."))
-    self.install_examples()
+
+    if ENABLE_V2.get():
+      self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.copyFromLocal, local_dir, remote_data_dir)
+      management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
+    else:
+      self.install_examples()
 
     Document.objects.sync()
