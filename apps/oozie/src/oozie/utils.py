@@ -93,14 +93,16 @@ def workflow_to_dict(workflow):
   return workflow_dict
 
 
-def smart_path(path, mapping):
+def smart_path(path, mapping, is_coordinator=False):
   # Try to prepend home_dir and FS scheme if needed.
   # If path starts by a parameter try to get its value from the list of parameters submitted by the user or the coordinator.
   # This dynamic checking enable the use of <prepares> statements in a workflow scheduled manually of by a coordinator.
   # The logic is a bit complicated but Oozie is not consistent with data paths, prepare, coordinator paths and Fs action.
-
   if not path.startswith('$') and not path.startswith('/') and not urlparse.urlsplit(path).scheme:
-    path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
+    path = '/user/%(username)s/%(path)s' % {
+        'username': '${coord:user()}' if is_coordinator else '${wf:user()}',
+        'path': path
+    }
 
   if path.startswith('$'):
     variables = find_variables(path)

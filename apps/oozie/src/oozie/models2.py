@@ -1619,11 +1619,11 @@ class Coordinator(Job):
 
     start_date = filter(lambda a: a['name'] == 'start_date', self._data['properties']['parameters'])
     if start_date and type(start_date[0]['value']) == datetime:
-      start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
+      start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%SZ')
 
     end_date = filter(lambda a: a['name'] == 'end_date', self._data['properties']['parameters'])
     if end_date and type(end_date[0]['value']) == datetime:
-      end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
+      end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return _data
 

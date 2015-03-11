@@ -82,7 +82,7 @@
     % for dataset in coord.datasets:
     <dataset name="${ dataset.data['name'] }" frequency="${ dataset.frequency }"
              initial-instance="${ dataset.start_utc }" timezone="${ dataset.timezone }">
-      <uri-template>${ smart_path(dataset.data['dataset_variable'], mapping) }</uri-template>
+      <uri-template>${ smart_path(dataset.data['dataset_variable'], mapping, is_coordinator=True) }</uri-template>
       % if dataset.data['use_done_flag']:
       <done-flag>${ dataset.data['done_flag'] }</done-flag>
       % else:
