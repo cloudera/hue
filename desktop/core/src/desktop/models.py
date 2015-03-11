@@ -325,6 +325,23 @@ class DocumentManager(models.Manager):
     except Exception, e:
       LOG.warn(force_unicode(e))
 
+    try:
+      with transaction.atomic():
+        for job in Document2.objects.all():
+          if job.doc.count() > 1:
+            LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
+            job.doc.all().delete()
+
+          if not job.doc.exists():
+            if job.type == 'oozie-workflow2':
+              extra = 'workflow2'
+            else:
+              extra = ''
+            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
+    except Exception, e:
+      LOG.warn(force_unicode(e))
+
+
     # Make sure doc have at least a tag
     try:
       for doc in Document.objects.filter(tags=None):
