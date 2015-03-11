@@ -217,7 +217,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <script id="actionTemplate" type="text/html">
           <tr>
             <td>
-              <a data-bind="visible:externalId !='', attr: { href: log}" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
+              <!-- ko if: externalId !='' && log != '' && log != null -->
+              <a data-bind="attr: { href: log}" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
+              <!-- /ko -->
+              <!-- ko if: externalId =='' || log == '' || log == null -->
+              <i class="fa fa-ban muted"></i>
+              <!-- /ko -->
             </td>
             <td>
               <a data-bind="text: id, attr: { href: url}" data-row-selector="true"></a>
