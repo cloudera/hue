@@ -1667,7 +1667,8 @@ class Coordinator(Job):
       params.add(param)
 
     for param in find_json_parameters(self.data['variables']):
-      params.add(param)
+      if param not in ('MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR') and not param.startswith('coord:'):
+        params.add(param)
 
     if self.sla_enabled:
       for param in find_json_parameters(self.sla):
