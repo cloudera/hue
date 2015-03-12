@@ -1110,7 +1110,11 @@ ko.bindingHandlers.hdfsAutocomplete = {
 
     var self = $(element);
     self.attr("autocomplete", "off");
-    self.jHueHdfsAutocomplete({});
+    self.jHueHdfsAutocomplete({
+      skipKeydownEvents: true,
+      skipScrollEvent: true,
+      zIndex: 990
+    });
   }
 };
 
