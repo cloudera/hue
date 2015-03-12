@@ -96,6 +96,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               </tr>
             </thead>
             <tbody>
+              % if 'sub-workflow' == action.type and action.get_external_id_url():
+                <tr>
+                  <td>${ _('Workflow') }</td>
+                  <td><a href="${ action.get_external_id_url() }">${ action.externalId }</a></td>
+                </tr>
+              % endif
               <tr>
                 <td>${ _('External Status') }</td>
                 <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
