@@ -229,11 +229,14 @@ class CollectionManager(models.Manager):
 
 class Collection(models.Model):
   """All the data is now saved into the properties field"""
+  ICON = 'search/art/icon_search_48.png'
+  
   enabled = models.BooleanField(default=False) # Aka shared
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
   is_core_only = models.BooleanField(default=False)
   cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json')) # Unused
+  icon = models.URLField(default=ICON)
   properties = models.TextField(
       default=json.dumps({}), verbose_name=_t('Properties'),
       help_text=_t('Hue properties (e.g. results by pages number)')
@@ -246,7 +249,6 @@ class Collection(models.Model):
   owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who created the job.'), default=None, null=True)
 
   _ATTRIBUTES = ['collection', 'layout', 'autocomplete']
-  ICON = 'search/art/icon_search_48.png'
 
   objects = CollectionManager()
 
@@ -387,17 +389,6 @@ class Collection(models.Model):
     properties_ = self.properties_dict
     properties_['autocomplete'] = autocomplete
     self.properties = json.dumps(properties_)
-
-  @property
-  def icon(self):
-    if self.name == 'twitter_demo':
-      return 'search/art/icon_twitter_48.png'
-    elif self.name == 'yelp_demo':
-      return 'search/art/icon_yelp_48.png'
-    elif self.name == 'log_analytics_demo':
-      return 'search/art/icon_logs_48.png'
-    else:
-      return 'search/art/icon_search_48.png'
 
   def _import_hue_3_5_collections(self, props, user):
     props['collection']['template']['template'] = self.result.get_template()
