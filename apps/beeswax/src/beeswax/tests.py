@@ -605,7 +605,7 @@ for x in sys.stdin:
     So we check the results by looking at the csv files.
     """
     raise SkipTest # sqlite does not support concurrent transaction
-    
+
     PARALLEL_TASKS = 2
     responses = [ None ] * PARALLEL_TASKS
     threads = []

@@ -1077,8 +1077,8 @@
           <input type="text" data-bind="value: name"/>
 
           <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
-          <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>              
-              
+          <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
+
            <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
              <i class="fa fa-minus"></i>
            </a>

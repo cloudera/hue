@@ -100,12 +100,18 @@ class OozieServerProvider(object):
       'oozie.service.SchemaService.wf.ext.schemas': '''shell-action-0.1.xsd,shell-action-0.2.xsd,shell-action-0.3.xsd,email-action-0.1.xsd,hive-action-0.2.xsd,
             hive-action-0.3.xsd,hive-action-0.4.xsd,hive-action-0.5.xsd,sqoop-action-0.2.xsd,sqoop-action-0.3.xsd,
             sqoop-action-0.4.xsd,ssh-action-0.1.xsd,ssh-action-0.2.xsd,distcp-action-0.1.xsd,distcp-action-0.2.xsd,
-            oozie-sla-0.1.xsd,oozie-sla-0.2.xsd''',
+            oozie-sla-0.1.xsd,oozie-sla-0.2.xsd,
+            hive2-action-0.1.xsd,
+            spark-action-0.1.xsd''',
       'oozie.service.ActionService.executor.ext.classes': '''org.apache.oozie.action.email.EmailActionExecutor,
             org.apache.oozie.action.hadoop.HiveActionExecutor,
             org.apache.oozie.action.hadoop.ShellActionExecutor,
             org.apache.oozie.action.hadoop.SqoopActionExecutor,
-            org.apache.oozie.action.hadoop.DistcpActionExecutor''',
+            org.apache.oozie.action.hadoop.DistcpActionExecutor,
+            org.apache.oozie.action.hadoop.Hive2ActionExecutor,
+            org.apache.oozie.action.ssh.SshActionExecutor,
+            org.apache.oozie.action.oozie.SubWorkflowActionExecutor,
+            org.apache.oozie.action.hadoop.SparkActionExecutor''',
       'oozie.service.coord.normal.default.timeout': 120
     }
     write_config(oozie_configs, cluster._tmppath('conf/oozie/oozie-site.xml'))
