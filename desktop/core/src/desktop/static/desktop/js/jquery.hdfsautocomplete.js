@@ -31,7 +31,9 @@
         smartTooltip: "",
         smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
         showOnFocus: false,
-        skipKeydownEvents: false
+        skipKeydownEvents: false,
+        skipScrollEvent: false,
+        zIndex: 33000
       };
 
   function Plugin(element, options) {
@@ -51,7 +53,7 @@
     // creates autocomplete popover
     if ($("#jHueHdfsAutocomplete").length == 0) {
       $("<div>").attr("id", "jHueHdfsAutocomplete").addClass("jHueAutocomplete popover")
-          .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
+          .attr("style", "position:absolute;display:none;max-width:1000px;z-index:" + _this.options.zIndex)
           .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p><ul class="unstyled"></ul></p></div></div>')
           .appendTo($("body"));
     }
@@ -116,17 +118,21 @@
       }
     }
 
-    $(window).on("scroll", function(){
-      $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
-    });
-
-    if (! _this.options.skipKeydownEvents){
-      _el.on("keydown", function(e){
-        if ((e.keyCode==32 && e.ctrlKey) || e.keyCode == 191){
-          e.preventDefault();
-        }
+    if (! _this.options.skipScrollEvent){
+      $(window).on("scroll", function(){
+        $("#jHueHdfsAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
       });
     }
+
+
+    _el.on("keydown", function (e) {
+      if (!_this.options.skipKeydownEvents && e.keyCode == 191) {
+        e.preventDefault();
+      }
+      if (e.keyCode == 32 && e.ctrlKey) {
+        e.preventDefault();
+      }
+    });
 
 
     var _hdfsAutocompleteSelectedIndex = -1;
