@@ -27,10 +27,20 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.lib.rest import resource
 
+from search.api import _round_number_range
 from search.models import Collection
 
 
 QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+
+
+def test_ranges():
+  assert_equal((90.0, 100.0), _round_number_range(99))
+  assert_equal((0.0, 100.0), _round_number_range(100))
+  assert_equal((0.0, 100.0), _round_number_range(101))
+
+  assert_equal((8000000.0, 9000000.0), _round_number_range(9045352))
+
 
 class MockResource():
   RESPONSE = None
