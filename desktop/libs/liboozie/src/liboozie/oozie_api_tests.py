@@ -61,7 +61,7 @@ class OozieServerProvider(object):
     job = cls.oozie.get_job(oozie_jobid)
     start = time.time()
 
-    while job.is_running() and time.time() - start < timeout:
+    while job.is_running() and (time.time() - start) < timeout:
       time.sleep(step)
       LOG.info('Checking status of %s...' % oozie_jobid)
       job = cls.oozie.get_job(oozie_jobid)

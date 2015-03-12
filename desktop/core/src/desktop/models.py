@@ -481,7 +481,13 @@ class Document(models.Model):
     apps = appmanager.get_apps_dict()
 
     try:
-      if self.content_type.app_label == 'beeswax':
+      if self.extra == 'workflow2':
+        return staticfiles_storage.url('oozie/art/icon_oozie_workflow_48.png')
+      elif self.extra == 'coordinator2':
+        return staticfiles_storage.url('oozie/art/icon_oozie_coordinator_48.png')
+      elif self.extra == 'bundle2':
+        return staticfiles_storage.url('oozie/art/icon_oozie_bundle_48.png')
+      elif self.content_type.app_label == 'beeswax':
         if self.extra == '0':
           return staticfiles_storage.url(apps['beeswax'].icon_path)
         elif self.extra == '3':
