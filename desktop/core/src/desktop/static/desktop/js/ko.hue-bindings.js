@@ -1210,6 +1210,13 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
       if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator){
         filePath = inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] + '=' + filePath;
       }
+      if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.deploymentDir){
+        inputElement.data("fullPath", filePath);
+        inputElement.attr("data-original-title", filePath);
+        if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) == 0){
+          filePath = filePath.substr(allBindingsAccessor().filechooserOptions.deploymentDir.length + 1);
+        }
+      }
       if (stripHdfsPrefix){
         inputElement.val(filePath);
       }
