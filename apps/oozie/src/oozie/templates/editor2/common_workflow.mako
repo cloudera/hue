@@ -1066,6 +1066,27 @@
       <!-- /ko -->
     </div>
 
+    <div data-bind="visible: $root.isEditing()">
+      <h6>
+        <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+          ${ _('Properties') } <i class="fa fa-plus"></i>
+        </a>
+      </h6>
+      <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+        <li>
+          <input type="text" data-bind="value: name"/>
+
+          <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
+          <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>              
+              
+           <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
+             <i class="fa fa-minus"></i>
+           </a>
+         </li>
+       </ul>
+      <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+    </div>
+
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
         <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
@@ -1077,25 +1098,6 @@
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.propagate_configuration.label"></span>
           <input type="checkbox" data-bind="checked: properties.propagate_configuration" />
-
-          <br/>
-
-          <h6>
-            <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
-              ${ _('Properties') } <i class="fa fa-plus"></i>
-            </a>
-          </h6>
-          <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
-            <li>
-              <input type="text" data-bind="value: name"/>
-              <input type="text" data-bind="value: value"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
-
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">

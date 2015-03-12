@@ -19,7 +19,7 @@
 
     <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
         <sub-workflow>
-            <app-path>${'${'}nameNode}${ workflow_mapping[node['properties']['workflow']].deployment_dir }</app-path>
+            <app-path>${'${'}nameNode}${ mapping['workspace_%s' % node['properties']['workflow']] }</app-path>
 
             % if node['properties']['propagate_configuration']:
               <propagate-configuration/>

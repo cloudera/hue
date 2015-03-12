@@ -153,14 +153,15 @@ class Submission(object):
     if hasattr(self.job, 'nodes'):
       for action in self.job.nodes:
         # Make sure XML is there
-        # Don't support shared sub-worfklow, ore more than one level sub-workflow
+        # Don't support more than one level sub-workflow
         if action.data['type'] == 'subworkflow':
           from oozie.models2 import Workflow
           workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
-          sub_deploy.deploy()
+          workspace = sub_deploy.deploy()
 
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
+          self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
