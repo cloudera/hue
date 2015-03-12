@@ -1157,8 +1157,18 @@ ${ dashboard.layout_skeleton() }
         </div>
       </div>
       <div class="clearfix"></div>
-
     </div>
+
+    <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
+      <div data-bind="with: $root.collection.getFacetById($parent.id())">
+        <!-- ko if: $data.properties.facets().length == 1 -->
+          <div class="margin-bottom-10">
+            <span data-bind="text: $data.properties.facets()[0].field"></span>
+          </div>
+        <!-- /ko -->
+      </div>
+    </div>
+
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div data-bind="mapChart: {data: {counts: $parent.count, scope: $root.collection.getFacetById($parent.id).properties.scope()},
         transformer: mapChartDataTransformer,
