@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import time
 
 from django.utils.translation import ugettext as _
@@ -26,6 +27,9 @@ from libsentry.sentry_site import get_sentry_server_admin_groups
 from hadoop.cluster import get_defaultfs
 
 from beeswax.api import autocomplete
+
+
+LOG = logging.getLogger(__name__)
 
 
 def fetch_hive_path(request):
@@ -63,6 +67,8 @@ def list_sentry_roles_by_group(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not retrieve roles")
+
     if "couldn't be retrieved." in str(e):
       result['roles'] = []
       result['status'] = 0
@@ -82,6 +88,8 @@ def list_sentry_privileges_by_role(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not list sentry privileges")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -156,6 +164,8 @@ def create_role(request):
     result['message'] = _('Role created!')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not create role")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -180,6 +190,8 @@ def update_role_groups(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not update role groups")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -208,6 +220,8 @@ def save_privileges(request):
     result['message'] = _('Privileges updated')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not save privileges")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -225,6 +239,8 @@ def grant_privilege(request):
     result['message'] = _('Privilege granted successfully to %s.') % roleName
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not grant privileges")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -240,6 +256,8 @@ def create_sentry_role(request):
     result['message'] = _('Role and privileges created.')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not create role")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -255,6 +273,8 @@ def drop_sentry_role(request):
     result['message'] = _('Role and privileges deleted.')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not drop role")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -280,6 +300,8 @@ def list_sentry_privileges_by_authorizable(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not list privileges by authorizable")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -305,6 +327,8 @@ def bulk_delete_privileges(request):
     result['message'] = _('Privileges deleted.')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not bulk delete privileges")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -340,6 +364,8 @@ def bulk_add_privileges(request):
     result['message'] = _('Privileges added.')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not bulk add privileges")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -356,6 +382,8 @@ def rename_sentry_privilege(request):
     result['message'] = _('Privilege deleted.')
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not rename privilege")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
@@ -374,6 +402,8 @@ def list_sentry_privileges_for_provider(request):
     result['message'] = ''
     result['status'] = 0
   except Exception, e:
+    LOG.exception("could not list privileges for provider")
+
     result['message'] = unicode(str(e), "utf8")
 
   return JsonResponse(result)
