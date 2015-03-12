@@ -402,7 +402,8 @@ ${ dashboard.import_bindings() }
       label: '${ _('Workspace') }',
       icon: 'fa-folder-open',
       path: viewModel.workflow.properties.deployment_dir()
-    }
+    },
+    deploymentDir: viewModel.workflow.properties.deployment_dir()
   }
 
   function columnDropAdditionalHandler(widget) {
