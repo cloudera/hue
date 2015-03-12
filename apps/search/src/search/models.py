@@ -28,7 +28,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_unicode, smart_str
 
 from libsolr.api import SolrApi
 
@@ -639,7 +639,7 @@ def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
 
   for c in counts:
     fq_fields = (fields + ':' if fields else '') + c['field']
-    fq_values = (values + ':' if values else '') + c['value']
+    fq_values = (smart_str(values) + ':' if values else '') + smart_str(c['value'])
     if 'pivot' in c:
       _augment_pivot_nd(facet_id, c['pivot'], selected_values, fq_fields, fq_values)
 
