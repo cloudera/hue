@@ -45,12 +45,7 @@
   <properties>
     <hadoop-mr1.version>${cdh.mr1.version}</hadoop-mr1.version>
     <hadoop.version>${cdh.hadoop.version}</hadoop.version>
-    <!--
-    FIXME: We can't use the upstream version yet because spark-1.2.0 does not
-    include the spark-repl.
     <spark.version>${cdh.spark.version}</spark.version>
-    -->
-    <spark.version>1.2.1</spark.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
