@@ -101,7 +101,7 @@ class SolrApi(object):
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'range-up':
         params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
-                    utf_quoter('%s%s:[%s TO %s]' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
+                    utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
                                                           for field, f in zip(fq['filter'], fq['properties'])])),)
     return params
 

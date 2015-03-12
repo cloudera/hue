@@ -468,13 +468,12 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   a, to = itertools.tee(iterable)
   next(to, None)
   counts = iterable[1::2]
-  total_counts = 0
+  total_counts = counts.pop(0) if collection_facet['properties']['sort'] == 'asc' else 0
 
   for element in a:
     next(to, None)
     to_value = next(to, end)
     count = next(a)
-    total_counts += counts.pop(0)
 
     pairs.append({
         'field': field, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
@@ -483,6 +482,7 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
         'total_counts': total_counts,
         'is_up': is_up
     })
+    total_counts += counts.pop(0) if counts else 0
 
   if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up':
     pairs.reverse()
