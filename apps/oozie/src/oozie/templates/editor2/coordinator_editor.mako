@@ -267,7 +267,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' :
                   dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' :
                   '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
-                  valueUpdate: 'afterkeydown', typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
+                  typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
               </span>
 
               <span data-bind="text: dataset_variable, visible: ! $root.isEditing()"></span>
@@ -552,14 +552,18 @@ ${ dashboard.import_bindings() }
       })
       .jqCronGetInstance();
 
+  function zeroPadding(value) {
+    return (value < 10 ? '0':'') + value;
+  }
+
   function convertVariables(path) {
     var _startDate = moment(viewModel.coordinator.start_date.value());
     if (_startDate.isValid()){
       path = path.replace(/\${'$'}{YEAR}/, _startDate.year());
-      path = path.replace(/\${'$'}{MONTH}/, (_startDate.month() < 10 ? '0':'') + _startDate.month());
-      path = path.replace(/\${'$'}{DAY}/, (_startDate.date() < 10 ? '0':'') + _startDate.date());
-      path = path.replace(/\${'$'}{HOUR}/, (_startDate.hours() < 10 ? '0':'') + _startDate.hours());
-      path = path.replace(/\${'$'}{MINUTE}/, (_startDate.minutes() < 10 ? '0':'') + _startDate.minutes());
+      path = path.replace(/\${'$'}{MONTH}/, zeroPadding((_startDate.month() + 1)));
+      path = path.replace(/\${'$'}{DAY}/, zeroPadding(_startDate.date()));
+      path = path.replace(/\${'$'}{HOUR}/, zeroPadding(_startDate.hours()));
+      path = path.replace(/\${'$'}{MINUTE}/, zeroPadding(_startDate.minutes()));
     }
     return path;
   }
