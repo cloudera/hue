@@ -61,16 +61,6 @@ class Command(NoArgsCommand):
     }, path)
     LOG.info(_("Yelp collection successfully installed"))
 
-    LOG.info(_("Installing jobs collection"))
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_jobs_demo/index_data.csv'))
-    self._setup_collection_from_csv({
-      'name': 'jobs_demo',
-      'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id',
-      'df': 'description'
-    }, path)
-    LOG.info(_("Jobs collection successfully installed"))
-
     LOG.info(_("Installing logs collection"))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_log_analytics_demo/index_data.csv'))
     self._setup_collection_from_csv({
