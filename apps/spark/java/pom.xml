@@ -81,16 +81,48 @@
                 <version>${logback.version}</version>
             </dependency>
 
+            <!-- These will be stored in the assembly -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-continuation</artifactId>
+                <version>${jetty.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jetty.version}</version>
+                <scope>provided</scope>
             </dependency>
-
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-webapp</artifactId>
+                <artifactId>jetty-util</artifactId>
                 <version>${jetty.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-plus</artifactId>
+                <version>${jetty.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jetty.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -364,6 +396,50 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <artifactSet>
+                        <includes>
+                            <include>com.cloudera.hue:unused</include>
+                            <include>org.eclipse.jetty:jetty-http</include>
+                            <include>org.eclipse.jetty:jetty-io</include>
+                            <include>org.eclipse.jetty:jetty-continuation</include>
+                            <include>org.eclipse.jetty:jetty-servlet</include>
+                            <include>org.eclipse.jetty:jetty-plus</include>
+                            <include>org.eclipse.jetty:jetty-security</include>
+                            <include>org.eclipse.jetty:jetty-util</include>
+                            <include>org.eclipse.jetty:jetty-server</include>
+                            <include>com.google.guava:guava</include>
+                        </includes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.eclipse.jetty</pattern>
+                            <shadedPattern>com.cloudera.hue.jetty</shadedPattern>
+                            <excludes>
+                                <exclude>com/google/common/base/Absent*</exclude>
+                                <exclude>com/google/common/base/Function*</exclude>
+                                <exclude>com/google/common/base/Optional*</exclude>
+                                <exclude>com/google/common/base/Present*</exclude>
+                                <exclude>com/google/common/base/Supplier</exclude>
+                            </excludes>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>

@@ -6,8 +6,7 @@ import javax.servlet.ServletContextListener
 import ch.qos.logback.access.jetty.RequestLogImpl
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.handler.{HandlerCollection, RequestLogHandler}
-import org.eclipse.jetty.servlet.DefaultServlet
-import org.eclipse.jetty.webapp.WebAppContext
+import org.eclipse.jetty.servlet.{ServletContextHandler, DefaultServlet}
 import org.scalatra.servlet.AsyncSupport
 
 import scala.concurrent.ExecutionContext
@@ -19,7 +18,7 @@ class WebServer(var host: String, var port: Int) extends Logging {
   server.setGracefulShutdown(1000)
   server.setStopAtShutdown(true)
 
-  val context = new WebAppContext()
+  val context = new ServletContextHandler()
 
   context.setContextPath("/")
 
