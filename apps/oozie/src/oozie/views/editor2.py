@@ -218,6 +218,7 @@ def save_workflow(request):
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
   workflow_doc.name = workflow['name']
+  workflow_doc.description = workflow['properties']['description']
   workflow_doc.save()
 
   response['status'] = 0
@@ -503,6 +504,7 @@ def save_coordinator(request):
 
   coordinator_doc.update_data(coordinator_data)
   coordinator_doc.name = coordinator_data['name']
+  coordinator_doc.description = coordinator_data['properties']['description']
   coordinator_doc.save()
 
   response['status'] = 0
@@ -654,6 +656,7 @@ def save_bundle(request):
 
   bundle_doc.update_data(bundle_data)
   bundle_doc.name = bundle_data['name']
+  bundle_doc.description = bundle_data['properties']['description']
   bundle_doc.save()
 
   response['status'] = 0
