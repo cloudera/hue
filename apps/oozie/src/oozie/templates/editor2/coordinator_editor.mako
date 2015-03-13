@@ -266,7 +266,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                 <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
                   dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' :
                   dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' :
-                  '${ _("e.g. 1, 2, 3, /data/logs, coord:nominalTime()") }' },
+                  'e.g. 1, 2, 3, /data/logs, ${"$"}{coord:nominalTime()}' },
                   typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
               </span>
 
