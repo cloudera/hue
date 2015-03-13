@@ -29,8 +29,7 @@ import hadoop.yarn.node_manager_api as node_manager_api
 
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
-from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container
-from jobbrowser.yarn_models import SparkJob
+from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
 from hadoop.cluster import get_next_ha_mrcluster, get_next_ha_yarncluster
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -269,7 +268,7 @@ class YarnApi(JobBrowserApi):
         return KilledYarnJob(self.resource_manager_api, job)
 
       if job.get('applicationType') == 'SPARK':
-        job = YarnJob(job)
+        job = SparkJob(job)
       elif job.get('applicationType') == 'MAPREDUCE':
         jobid = jobid.replace('application', 'job')
 
