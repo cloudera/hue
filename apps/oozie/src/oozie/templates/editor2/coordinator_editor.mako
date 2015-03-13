@@ -87,6 +87,9 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <div class="inline object-name">
       <span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
+    <div class="inline object-description">
+      <span data-bind="editable: $root.coordinator.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+    </div>
   </form>
 </div>
 

@@ -1579,6 +1579,7 @@ class Coordinator(Job):
           'name': 'My Coordinator',
           'variables': [], # Aka workflow parameters
           'properties': {
+              'description': '',
               'deployment_dir': '',
               'schema_version': 'uri:oozie:coordinator:0.2',
               'frequency_number': 1,
@@ -1868,6 +1869,7 @@ class Bundle(Job):
           'name': 'My Bundle',
           'coordinators': [],
           'properties': {
+              'description': '',
               'deployment_dir': '',
               'schema_version': 'uri:oozie:bundle:0.2',
               'kickoff': datetime.today(),
