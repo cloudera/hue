@@ -631,10 +631,10 @@
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
-          <input type="text" data-bind="value: properties.jdbc_url" />
+          <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
           <span data-bind="text: $root.workflow_properties.password.label"></span>
-          <input type="text" data-bind="value: properties.password" />
+          <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
