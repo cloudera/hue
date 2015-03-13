@@ -87,6 +87,9 @@ class PigScript(Document):
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
+    if id == '1100713': # Special case for the Example, just create an history
+      is_design = False
+      raise PigScript.DoesNotExist()
     pig_script.doc.get().can_write_or_exception(user)
   except PigScript.DoesNotExist:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
