@@ -373,7 +373,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
         if (data.jobs.length != numRunning) {
           refreshCompleted();
         }
-        numRunning = data.length;
+        numRunning = data.jobs.length;
 
         window.setTimeout(refreshRunning, 20000);
       });

@@ -399,11 +399,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         if (data.jobs.length == 0) {
           runningTable.fnClearTable();
         }
-
         if (data.jobs.length != numRunning) {
           refreshCompleted();
         }
-        numRunning = data.length;
+        numRunning = data.jobs.length;
 
         window.setTimeout(refreshRunning, 5000);
       });
