@@ -16,6 +16,7 @@ PREFIX=/usr/share make install
 
 ## If you don't have the permissions, you will need to 'sudo' the command and
 ## make sure that the 'hue' user has write access to the 'logs' directory and 'desktop/desktop.db'.
+## e.g. sudo chown -R hue:hue /usr/local/hue
 
 ## Run!
 ${PREFIX}/hue/build/env/bin/supervisor
