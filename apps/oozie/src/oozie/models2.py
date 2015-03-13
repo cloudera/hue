@@ -298,6 +298,9 @@ class Node():
     if workflow_mapping is None:
       workflow_mapping = {}
 
+    if self.data['type'] == 'hive2' and not self.data['properties']['jdbc_url']:
+      self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -610,9 +613,9 @@ class HiveServer2Action(Action):
      # Common
      'jdbc_url': {
           'name': 'jdbc_url',
-          'label': _('JDBC URL'),
-          'value': _get_hiveserver2_url(),
-          'help_text': _('JDBC URL for the Hive Server 2. Beeline will use this to know where to connect to.'),
+          'label': _('HiveServer2 URL'),
+          'value': "",
+          'help_text': _('e.g. jdbc:hive2://localhost:10000/default. JDBC URL for the Hive Server 2.'),
           'type': ''
      },
      'password': {
