@@ -80,6 +80,9 @@ class Application(object):
   def kill(self):
     return self.api.kill(self.id)
 
+  def filter_tasks(self, *args, **kwargs):
+    pass
+
 
 class SparkJob(Application):
 
