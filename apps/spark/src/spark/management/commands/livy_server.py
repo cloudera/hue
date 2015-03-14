@@ -17,6 +17,7 @@
 
 import logging
 import os
+import subprocess
 
 from django.core.management.base import NoArgsCommand
 import spark.conf
@@ -34,14 +35,26 @@ class Command(NoArgsCommand):
 
   def handle(self, *args, **kwargs):
     env = os.environ.copy()
+    classpath = env.get('CLASSPATH', '').split(os.pathsep)
+
+    jar = spark.conf.LIVY_ASSEMBLY_JAR.get()
+    classpath.insert(0, jar)
+
+    # Add the hadoop classpath if it's available.
+    try:
+      p = subprocess.Popen(['hadoop', 'classpath'], stdout=subprocess.PIPE)
+    except OSError:
+      pass
+    else:
+      hadoop_classpath = p.communicate()[0]
+      if p.wait() == 0:
+        classpath.append(hadoop_classpath)
 
     args = [
       "java",
     ]
 
-    jar = spark.conf.LIVY_ASSEMBLY_JAR.get()
-    classpath = jar + os.path.pathsep + env.get('CLASSPATH', '')
-    args.extend(("-cp", classpath))
+    args.extend(("-cp", os.pathsep.join(classpath)))
 
     server_host = spark.conf.LIVY_SERVER_HOST.get()
     args.append("-Dlivy.server.host=" + server_host)

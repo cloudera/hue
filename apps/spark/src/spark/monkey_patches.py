@@ -22,14 +22,8 @@ def _start_livy_server():
   import subprocess
   import sys
   import time
-  import os
 
-  p = subprocess.Popen(['hadoop', 'classpath'], stdout=subprocess.PIPE)
-  classpath = p.communicate()[0]
-  env = os.environ.copy()
-  env['CLASSPATH'] = env.get('CLASSPATH', '') + os.pathsep + classpath
-
-  p = subprocess.Popen([sys.executable, sys.argv[0], 'livy_server'], env=env)
+  p = subprocess.Popen([sys.executable, sys.argv[0], 'livy_server'])
 
   def cleanup():
     p.terminate()
