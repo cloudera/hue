@@ -147,14 +147,14 @@ def save_notebook(request):
 
   if notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
-  else:      
+  else:
     notebook_doc = Document2.objects.create(name=notebook['name'], type='notebook', owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra='notebook')
 
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook['name']
   notebook_doc.save()
-  
+
   response['status'] = 0
   response['id'] = notebook_doc.id
   response['message'] = _('Notebook saved !')
@@ -168,7 +168,7 @@ def open_notebook(request):
 
   notebook_id = request.GET.get('notebook')
   notebook = Notebook(document=Document2.objects.get(id=notebook_id))
-  
+
   response['status'] = 0
   response['notebook'] = notebook.get_json()
   response['message'] = _('Notebook saved !')
@@ -181,11 +181,11 @@ def close_notebook(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  
+
   response['status'] = 0
   for snippet in notebook['snippets']:
     try:
-      if snippet['result']['handle']:      
+      if snippet['result']['handle']:
         get_api(request.user, snippet).close(snippet)
     except QueryExpired:
       pass
@@ -201,7 +201,7 @@ def close_statement(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:    
+  try:
     response['result'] = get_api(request.user, snippet).close(snippet)
   except QueryExpired:
     pass
