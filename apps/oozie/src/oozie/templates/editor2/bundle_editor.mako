@@ -19,32 +19,26 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
+<%namespace name="layout" file="../navigation-bar.mako" />
+
 
 ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
 
-<script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("bundle") > -1) {
-      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-  }
-</script>
-
-
 <div id="editor">
 
+<%def name="buttons()">
+  <div class="pull-right" style="padding-right: 10px">
 
-<div class="search-bar">
-  <div class="pull-right" style="padding-right:50px">
-    
-    <span data-bind="visible: bundle.isDirty() || bundle.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
-    
+    <div data-bind="visible: bundle.isDirty() || bundle.id() == null" class="pull-left muted" style="padding-top: 12px; padding-right: 8px">
+      ${ _('Unsaved') }
+    </div>
+
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': bundle.isDirty()}, visible: bundle.id() != null">
       <i class="fa fa-play"></i>
     </a>
 
     &nbsp;&nbsp;&nbsp;
-    
+
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
@@ -73,27 +67,33 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
     <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
-    <a class="btn" href="${ url('oozie:list_editor_bundles') }" title="${ _('Bundles') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
-    </a>
-  </div>
 
-  <form class="form-search" style="max-height: 26px; overflow-y: auto;">
-    <div class="inline object-name">
-      <span data-bind="editable: $root.bundle.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-    </div>
-    <div class="inline object-description">
-      <span data-bind="editable: $root.bundle.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
-    </div>
-  </form>
-</div>
+  </div>
+</%def>
+
+${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
+
+<script type="text/javascript">
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("bundle") > -1) {
+      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+    }
+  }
+</script>
 
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12 bundle">
 
-      <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px" data-bind="visible: isEditing">
+      <div class="card card-home" style="padding-bottom: 10px">
+        <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.bundle.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
+        <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.bundle.properties.description)">
+          <span data-bind="editable: $root.bundle.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+        </div>
+      </div>
+
+      <div class="card card-home" style="margin-top: 20px; margin-bottom: 20px; padding-bottom: 10px" data-bind="visible: isEditing">
         <h1 class="card-heading simple">${ _('Which schedules to bundle?') }</h1>
 
         <div class="card-body">
