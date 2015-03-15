@@ -33,7 +33,8 @@ urlpatterns = patterns('spark.views',
   url(r'^editor$', 'editor', name='editor'),
   url(r'^notebooks$', 'notebooks', name='notebooks'),
   url(r'^new$', 'new', name='new'),
-  url(r'^download$', 'download', name='download'),  
+  url(r'^download$', 'download', name='download'),
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
 
 # APIs
