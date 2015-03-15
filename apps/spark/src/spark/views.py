@@ -23,9 +23,10 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document2
+from desktop.models import Document2, Document
 
 from spark.conf import LANGUAGES
+from spark.decorators import check_document_access_permission
 from spark.models import Notebook, get_api
 from spark.management.commands.spark_setup import Command
 
@@ -33,6 +34,7 @@ from spark.management.commands.spark_setup import Command
 LOG = logging.getLogger(__name__)
 
 
+@check_document_access_permission()
 def editor(request):
   notebook_id = request.GET.get('notebook')
   
@@ -68,13 +70,14 @@ def new(request):
   
 
 def notebooks(request):
-  notebooks = [d.to_dict() for d in Document2.objects.filter(type='notebook', owner=request.user)]
+  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='notebook')]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
 
 
+@check_document_access_permission()
 def download(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
