@@ -276,11 +276,34 @@ from django.utils.translation import ugettext as _
           $(".navigator").find("ul.dropdown-menu").hide();
         }, 1000);
       });
-      $(".navigator ul.nav li.dropdown-submenu").hover(function () {
-        $(this).find(".dropdown-menu").show();
-      },
-      function () {
-        $(this).find(".dropdown-menu").hide();
+
+      function showSubmenu(menuElement) {
+        $(".tooltip").remove();
+        menuElement.data("lastShown", (new Date()).getTime())
+        menuElement.show();
+      }
+
+      $(".navigator ul.nav li.dropdown-submenu a").on("mouseenter", function () {
+        showSubmenu($(this).siblings(".dropdown-menu"));
+      });
+
+      $(".navigator ul.nav li.dropdown-submenu a img").on("mouseenter", function () {
+        showSubmenu($(this).parent().siblings(".dropdown-menu"));
+      });
+
+      $(".navigator ul.nav li.dropdown-submenu").on("mouseenter", function () {
+        $(this).siblings().find(".dropdown-menu").hide();
+        showSubmenu($(this).find(".dropdown-menu"));
+      });
+
+      $(".navigator ul.nav li.dropdown-submenu").on("mouseleave", function () {
+        var _lastShown = $(this).find(".dropdown-menu").data("lastShown");
+        if (_lastShown == null || (new Date()).getTime() - _lastShown > 300) {
+          var _el = $(this);
+          window.setTimeout(function () {
+            _el.find(".dropdown-menu").hide();
+          }, 50);
+        }
       });
 
       var _skew = -1;
