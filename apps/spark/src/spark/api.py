@@ -26,12 +26,14 @@ from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
 from spark.models import get_api, Notebook, QueryExpired
-from spark.decorators import api_error_handler
+from spark.decorators import api_error_handler, check_document_modify_permission
+from oozie.decorators import check_document_access_permission
 
 
 LOG = logging.getLogger(__name__)
 
 
+@check_document_access_permission()
 @api_error_handler
 def create_session(request):
   response = {'status': -1}
@@ -45,6 +47,7 @@ def create_session(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def execute(request):
   response = {'status': -1}
@@ -58,6 +61,7 @@ def execute(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def check_status(request):
   response = {'status': -1}
@@ -71,6 +75,7 @@ def check_status(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def fetch_result_data(request):
   response = {'status': -1}
@@ -86,6 +91,7 @@ def fetch_result_data(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def fetch_result_metadata(request):
   response = {'status': -1}
@@ -99,6 +105,7 @@ def fetch_result_metadata(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def cancel_statement(request):
   response = {'status': -1}
@@ -112,6 +119,7 @@ def cancel_statement(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 @api_error_handler
 def get_logs(request):
   response = {'status': -1}
@@ -131,10 +139,11 @@ def get_logs(request):
   return JsonResponse(response)
 
 
+@check_document_modify_permission()
 def save_notebook(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}')) # TODO perms
+  notebook = json.loads(request.POST.get('notebook', '{}'))
 
   if notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
@@ -153,11 +162,12 @@ def save_notebook(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 def open_notebook(request):
   response = {'status': -1}
 
   notebook_id = request.GET.get('notebook')
-  notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id))
   
   response['status'] = 0
   response['notebook'] = notebook.get_json()
@@ -166,10 +176,11 @@ def open_notebook(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 def close_notebook(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))  # Todo perms
+  notebook = json.loads(request.POST.get('notebook', '{}'))
   
   response['status'] = 0
   for snippet in notebook['snippets']:
@@ -183,10 +194,11 @@ def close_notebook(request):
   return JsonResponse(response)
 
 
+@check_document_access_permission()
 def close_statement(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))  # Todo perms
+  notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:    
