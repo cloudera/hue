@@ -267,7 +267,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                   dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' :
                   dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' :
                   'e.g. 1, 2, 3, /data/logs, ${"$"}{coord:nominalTime()}' },
-                  typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '/', multipleValuesExtractor: '/' }" style="margin-bottom:0; width: 380px" />
+                  typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '', multipleValuesExtractors: [' ', '/'] }" style="margin-bottom:0; width: 380px" />
               </span>
 
               <span data-bind="text: dataset_variable, visible: ! $root.isEditing()"></span>
@@ -315,10 +315,10 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
                           % endfor
                         </select>
                         <select data-bind="value: frequency_unit, visible: ! same_frequency()" style="width: 100px">
-                          <option value="minutes">Minutes</option>
-                          <option value="hours">Hours</option>
-                          <option value="days" selected="selected">Days</option>
-                          <option value="months">Months</option>
+                          <option value="minutes">${ _('Minutes') }</option>
+                          <option value="hours">${ _('Hours') }</option>
+                          <option value="days" selected="selected">${ _('Days') }</option>
+                          <option value="months">${ _('Months') }</option>
                         </select>
                       </div>
                     </div>
@@ -559,11 +559,11 @@ ${ dashboard.import_bindings() }
   function convertVariables(path) {
     var _startDate = moment(viewModel.coordinator.start_date.value());
     if (_startDate.isValid()){
-      path = path.replace(/\${'$'}{YEAR}/, _startDate.year());
-      path = path.replace(/\${'$'}{MONTH}/, zeroPadding((_startDate.month() + 1)));
-      path = path.replace(/\${'$'}{DAY}/, zeroPadding(_startDate.date()));
-      path = path.replace(/\${'$'}{HOUR}/, zeroPadding(_startDate.hours()));
-      path = path.replace(/\${'$'}{MINUTE}/, zeroPadding(_startDate.minutes()));
+      path = path.replace(/\${'$'}{YEAR}/gi, _startDate.year());
+      path = path.replace(/\${'$'}{MONTH}/gi, zeroPadding((_startDate.month() + 1)));
+      path = path.replace(/\${'$'}{DAY}/gi, zeroPadding(_startDate.date()));
+      path = path.replace(/\${'$'}{HOUR}/gi, zeroPadding(_startDate.hours()));
+      path = path.replace(/\${'$'}{MINUTE}/gi, zeroPadding(_startDate.minutes()));
     }
     return path;
   }

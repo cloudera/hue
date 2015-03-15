@@ -847,30 +847,50 @@ ko.bindingHandlers.typeahead = {
     }
 
     if (valueAccessor.multipleValues) {
+      var _extractorFound = null;
+
+      function updateExtractors() {
+        var _val = elem.val();
+        _extractorFound = null;
+        var _extractors = (typeof valueAccessor.multipleValuesExtractors == "undefined" || valueAccessor.multipleValuesExtractors == null ? [" "] : valueAccessor.multipleValuesExtractors);
+        var _extractorFoundLastIndex = -1;
+        _extractors.forEach(function (extractor) {
+          if (_val.indexOf(extractor) > -1) {
+            if (_val.indexOf(extractor) >= _extractorFoundLastIndex) {
+              _extractorFound = extractor;
+              _extractorFoundLastIndex = _val.indexOf(extractor);
+            }
+          }
+        });
+      }
+
       _options.updater = function (item) {
         var _val = this.$element.val();
-        var _separator = (valueAccessor.multipleValuesSeparator || ":");
+        var _separator = (typeof valueAccessor.multipleValuesSeparator == "undefined" || valueAccessor.multipleValuesSeparator == null ? ":" : valueAccessor.multipleValuesSeparator);
         if (valueAccessor.extraKeywords && valueAccessor.extraKeywords.split(" ").indexOf(item) > -1) {
           _separator = "";
         }
-        if (_val.indexOf((valueAccessor.multipleValuesExtractor || " ")) > -1) {
-          return _val.substring(0, _val.lastIndexOf((valueAccessor.multipleValuesExtractor || " "))) + (valueAccessor.multipleValuesExtractor || " ") + item + _separator;
+        updateExtractors();
+        if (_extractorFound != null) {
+          return _val.substring(0, _val.lastIndexOf(_extractorFound)) + _extractorFound + item + _separator;
         }
         else {
           return item + _separator;
         }
       }
       _options.matcher = function (item) {
-        var _tquery = extractor(this.query, valueAccessor.multipleValuesExtractor);
+        updateExtractors();
+        var _tquery = extractor(this.query, _extractorFound);
         if (!_tquery) return false;
         return ~item.toLowerCase().indexOf(_tquery.toLowerCase());
       },
-      _options.highlighter = function (item) {
-        var _query = extractor(this.query, valueAccessor.multipleValuesExtractor).replace(/[\-\[\]{}()*+?.:\\\^$|#\s]/g, '\\$&');
-        return item.replace(new RegExp('(' + _query + ')', 'ig'), function ($1, match) {
-          return '<strong>' + match + '</strong>'
-        });
-      }
+          _options.highlighter = function (item) {
+            updateExtractors();
+            var _query = extractor(this.query, _extractorFound).replace(/[\-\[\]{}()*+?.:\\\^$|#\s]/g, '\\$&');
+            return item.replace(new RegExp('(' + _query + ')', 'ig'), function ($1, match) {
+              return '<strong>' + match + '</strong>'
+            });
+          }
     }
 
     if (valueAccessor.completeSolrRanges) {
