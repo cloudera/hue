@@ -22,10 +22,13 @@
 <%namespace name="utils" file="utils.inc.mako" />
 
 
-<%def name="menubar(section='', dashboard=False, is_editor=False)">
+<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
+          %if pullright:
+            ${pullright()}
+          %endif
           <div class="nav-collapse">
             <ul class="nav">
               <li class="currentApp">
@@ -58,10 +61,11 @@
 
                 % if dashboard:
                 <a title="${ _('Switch to the editor') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
+                  <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${ _('Oozie Dashboard') }
                 % else:
                 <a title="${ _('Switch to the dashboard') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
+                  <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Oozie Editor') }
                 % endif
-                  ${ _('Oozie Dashboard') if dashboard else _('Oozie Editor') }
                 </a>
                </li>
               % if dashboard:
