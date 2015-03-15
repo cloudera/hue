@@ -29,12 +29,38 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="currentApp">
-                <a href="/${app_name}">
-                  % if dashboard:
-                    <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" />
-                  % else:
-                    <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" />
-                  % endif
+                <%def name="getURL(section, dashboard, is_v2)">
+                <%
+                  if dashboard:
+                    if is_v2:
+                      if section == 'coordinators':
+                        return url('oozie:list_editor_coordinators')
+                      elif section == 'bundles':
+                        return url('oozie:list_editor_bundles')
+                      else:
+                        return url('oozie:list_editor_workflows')
+                    else:
+                      if section == 'coordinators':
+                        return url('oozie:list_coordinators')
+                      elif section == 'bundles':
+                        return url('oozie:list_bundles')
+                      else:
+                        return url('oozie:list_workflows')
+                  else:
+                    if section == 'coordinators':
+                      return url('oozie:list_oozie_coordinators')
+                    elif section == 'bundles':
+                      return url('oozie:list_oozie_bundles')
+                    else:
+                      return url('oozie:list_oozie_workflows')
+                %>
+              </%def>
+
+                % if dashboard:
+                <a title="${ _('Switch to the editor') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
+                % else:
+                <a title="${ _('Switch to the dashboard') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
+                % endif
                   ${ _('Oozie Dashboard') if dashboard else _('Oozie Editor') }
                 </a>
                </li>
