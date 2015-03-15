@@ -21,12 +21,14 @@ import logging
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render
+from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2
 
 from spark.conf import LANGUAGES
 from spark.models import Notebook, get_api
+from spark.management.commands.spark_setup import Command
+
 
 LOG = logging.getLogger(__name__)
 
@@ -80,3 +82,18 @@ def download(request):
 
   return get_api(request.user, snippet).download(notebook, snippet, file_format)
 
+
+def install_examples(request):
+  response = {'status': -1, 'message': ''}
+
+  if request.method == 'POST':
+    try:
+      Command().handle(user=request.user)
+      response['status'] = 0
+    except Exception, err:
+      LOG.exception(err)
+      response['message'] = str(err)
+  else:
+    response['message'] = _('A POST request is required.')
+
+  return JsonResponse(response)

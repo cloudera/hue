@@ -29,7 +29,7 @@
       "name": "log_analytics_demo", 
       "facets": 100000, 
       "enabled": true, 
-      "label": "Apache Logs", 
+      "label": "Web Logs", 
       "is_core_only": false, 
       "result": 100000, 
       "owner": null, 

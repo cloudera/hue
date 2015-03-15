@@ -57,13 +57,15 @@ class Command(BaseCommand):
       app_name = options['app_name']
       user = options['user']
 
+    tables = options['tables'] if 'tables' in options else 'tables.json'
+
     exception = None
 
     # Documents will belong to this user but we run the install as the current user
     try:
       sample_user = install_sample_user()
       self._install_queries(sample_user, app_name)
-      self._install_tables(user, app_name)
+      self._install_tables(user, app_name, tables)
     except Exception, ex:
       exception = ex
 
@@ -82,9 +84,9 @@ class Command(BaseCommand):
       else: 
         raise exception
 
-  def _install_tables(self, django_user, app_name):
+  def _install_tables(self, django_user, app_name, tables):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
-    table_file = file(os.path.join(data_dir, 'tables.json'))
+    table_file = file(os.path.join(data_dir, tables))
     table_list = json.load(table_file)
     table_file.close()
 
