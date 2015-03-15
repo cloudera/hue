@@ -78,7 +78,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
     </a>
   </div>
 
-  <form class="form-search">
+  <form class="form-search" style="max-height: 26px; overflow-y: auto;">
     <div class="inline object-name">
       <span data-bind="editable: $root.bundle.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>

@@ -209,7 +209,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
   </div>
 
 
-  <form class="form-search">
+  <form class="form-search" style="max-height: 26px; overflow-y: auto;">
     <div class="inline object-name">
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
