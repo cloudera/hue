@@ -21,26 +21,18 @@ from django.utils.translation import ugettext as _
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="coordinator_utils" file="coordinator_utils.mako" />
+<%namespace name="layout" file="../navigation-bar.mako" />
 
 ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
 
-<script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("coordinator") > -1) {
-      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-  }
-  var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
-
-</script>
-
-
 <div id="editor">
 
-<div class="search-bar">
-  <div class="pull-right" style="padding-right:50px">
+<%def name="buttons()">
+  <div class="pull-right" style="padding-right: 10px">
 
-    <span data-bind="visible: coordinator.isDirty() || coordinator.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
+    <div data-bind="visible: coordinator.isDirty() || coordinator.id() == null" class="pull-left muted" style="padding-top: 12px; padding-right: 8px">
+      ${ _('Unsaved') }
+    </div>
 
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': coordinator.isDirty()}, visible: coordinator.id() != null">
       <i class="fa fa-play"></i>
@@ -77,21 +69,21 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <a class="btn" href="${ url('oozie:new_coordinator') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
-    <a class="btn" href="${ url('oozie:list_editor_coordinators') }" title="${ _('Coordinators') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
-    </a>
 
   </div>
+</%def>
 
-  <form class="form-search" style="max-height: 26px; overflow-y: auto;">
-    <div class="inline object-name">
-      <span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-    </div>
-    <div class="inline object-description">
-      <span data-bind="editable: $root.coordinator.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
-    </div>
-  </form>
-</div>
+${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
+
+<script type="text/javascript">
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("coordinator") > -1) {
+      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+    }
+  }
+  var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
+
+</script>
 
 
 <div class="container-fluid">
@@ -99,6 +91,13 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     <div class="span12 coordinator">
 
       <div class="card card-home">
+        <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
+        <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.coordinator.properties.description)">
+          <span data-bind="editable: $root.coordinator.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+        </div>
+      </div>
+
+      <div class="card card-home" style="margin-top: 20px">
         <h1 class="card-heading simple">${ _('Which workflow to schedule?') }</h1>
 
         <div class="card-body">
@@ -122,7 +121,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
       </div>
 
       <div class="card card-home" data-bind="visible: coordinator.properties.workflow" style="margin-top: 20px">
-        <h1 class="card-heading simple">${ _('How often?') }</h1>
+        <div class="alert alert-warning pull-right" style="border: none">
+          ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+        </div>
+        <h1 class="card-heading simple">${ _('How often?') }
+        </h1>
 
         <div class="card-body">
 
@@ -155,11 +158,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
              </form>
             </div>
 
-            <div class="span6">
-              <div class="alert alert-warning span8">
-                ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
-              </div>
-            </div>
           </div>
 
           <div data-bind="visible: coordinator.showAdvancedFrequencyUI">
