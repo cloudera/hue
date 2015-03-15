@@ -37,7 +37,7 @@ LOG = logging.getLogger(__name__)
 @check_document_access_permission()
 def editor(request):
   notebook_id = request.GET.get('notebook')
-  
+
   if notebook_id:
     notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
   else:
@@ -67,7 +67,7 @@ def editor(request):
 
 def new(request):
   return editor(request)
-  
+
 
 def notebooks(request):
   notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='notebook')]

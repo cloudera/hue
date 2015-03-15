@@ -52,30 +52,30 @@ class QueryError(Exception):
 
 
 class Notebook():
-  
+
   def __init__(self, document=None):
     self.document = None
-    
+
     if document is not None:
       self.data = document.data
       self.document = document
-    else:    
+    else:
       self.data = json.dumps({
-          'name': 'My Notebook', 
+          'name': 'My Notebook',
           'snippets': []
       })
 
   def get_json(self):
     _data = self.get_data()
-    
+
     return json.dumps(_data)
- 
+
   def get_data(self):
     _data = json.loads(self.data)
-  
+
     if self.document is not None:
-      _data['id'] = self.document.id 
-  
+      _data['id'] = self.document.id
+
     return _data
 
 
@@ -83,26 +83,26 @@ def get_api(user, snippet):
   if snippet['type'] in ('hive', 'impala', 'spark-sql'):
     return HS2Api(user)
   elif snippet['type'] == 'text':
-    return TextApi(user)  
+    return TextApi(user)
   else:
     return SparkApi(user)
 
 
 def _get_snippet_session(notebook, snippet):
-  return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0] 
+  return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0]
 
 
 class TextApi():
-  
+
   def __init__(self, user):
     self.user = user
-    
+
   def create_session(self, lang):
     return {
         'type': lang,
         'id': None
     }
-  
+
 
 # HS2
 
@@ -116,18 +116,18 @@ def query_error_handler(func):
         raise QueryExpired(e)
       else:
         raise QueryError(message)
-  return decorator  
-  
+  return decorator
+
 
 class HS2Api():
-  
+
   def __init__(self, user):
     self.user = user
-    
+
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     return HiveServerQueryHandle(**snippet['result']['handle'])
-    
+
   def _get_db(self, snippet):
     if snippet['type'] == 'hive':
       name = 'beeswax'
@@ -135,22 +135,22 @@ class HS2Api():
       name = 'impala'
     else:
       name = 'spark-sql'
-      
+
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
-    
+
   def create_session(self, lang):
     return {
         'type': lang,
         'id': None # Real one at some point
     }
-  
+
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
     query = hql_query(snippet['statement'], QUERY_TYPES[0])
-    
+
     try:
       handle = db.client.query(query)
-    except QueryServerException, ex:      
+    except QueryServerException, ex:
       raise QueryError(ex.message)
 
     # All good
@@ -162,13 +162,13 @@ class HS2Api():
         'has_result_set': handle.has_result_set,
         'modified_row_count': handle.modified_row_count,
         'log_context': handle.log_context
-    }    
+    }
 
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
     db = self._get_db(snippet)
-      
+
     handle = self._get_handle(snippet)
     operation =  db.get_operation_status(handle)
     status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
@@ -177,16 +177,16 @@ class HS2Api():
       raise QueryError(operation.errorMessage)
 
     response['status'] = 'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'available'
-    
+
     return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     db = self._get_db(snippet)
-      
+
     handle = self._get_handle(snippet)
     results = db.fetch(handle, start_over=start_over, rows=rows)
-    
+
     # No escaping...
     return {
         'has_more': results.has_more,
@@ -201,7 +201,7 @@ class HS2Api():
 
   @query_error_handler
   def fetch_result_metadata(self):
-    pass 
+    pass
 
   @query_error_handler
   def cancel(self, notebook, snippet):
@@ -209,35 +209,35 @@ class HS2Api():
 
     handle = self._get_handle(snippet)
     db.cancel_operation(handle)
-    return {'status': 'canceled'}    
+    return {'status': 'canceled'}
 
   @query_error_handler
   def get_log(self, snippet):
     db = self._get_db(snippet)
-      
-    handle = self._get_handle(snippet)    
+
+    handle = self._get_handle(snippet)
     return db.get_log(handle)
-  
+
   def download(self, notebook, snippet, format):
     try:
       db = self._get_db(snippet)
-      handle = self._get_handle(snippet)  
+      handle = self._get_handle(snippet)
       return data_export.download(handle, format, db)
     except Exception, e:
       if not hasattr(e, 'message') or not e.message:
         message = e
       else:
         message = e.message
-      raise PopupException(message, detail='')  
-  
+      raise PopupException(message, detail='')
+
   def _progress(self, snippet, logs):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
       total = (int(match.group(1)) if match else 1) * 2
-      
+
       started = logs.count('Starting Job')
       ended = logs.count('Ended Job')
-      
+
       return int((started + ended) * 100 / total)
     elif snippet['type'] == 'impala':
       match = re.search('(\d+)% Complete', logs, re.MULTILINE)
@@ -346,7 +346,7 @@ class SparkApi():
       except KeyError:
         data = [[data['text/plain']]]
         meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
-        type = 'text'        
+        type = 'text'
       else:
         data = table['data']
         headers = table['headers']
@@ -375,7 +375,7 @@ class SparkApi():
         msg = ''.join(tb)
 
       raise QueryError(msg)
-    
+
   def download(self, notebook, snippet, format):
     try:
       api = get_spark_api(self.user)
