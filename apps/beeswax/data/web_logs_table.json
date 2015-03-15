@@ -1,0 +1,7 @@
+[
+  {
+    "data_file": "web_logs.csv", 
+    "create_hql": "CREATE TABLE `web_logs`(  `_version_` bigint,   `app` string,   `bytes` smallint,   `city` string,   `client_ip` string,   `code` tinyint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` bigint,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nROW FORMAT DELIMITED \n FIELDS TERMINATED BY ','", 
+    "table_name": "web_logs"
+  }
+]

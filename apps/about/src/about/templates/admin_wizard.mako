@@ -115,6 +115,14 @@ ${ header.menubar() }
                 </a>
               </li>
           % endif
+          % if 'spark' in app_names:
+              <li>
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('spark:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['spark'].nice_name }
+                </a>
+              </li>
+          % endif
           % if 'oozie' in app_names:
               <li>
                 <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"

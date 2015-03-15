@@ -15,7 +15,7 @@
 # limitations under the License.
 
 DJANGO_APPS = ['spark']
-NICE_NAME = 'Spark Editor'
+NICE_NAME = 'Spark Notebooks'
 MENU_INDEX = 11
 ICON = 'spark/art/icon_spark_48.png'
 
