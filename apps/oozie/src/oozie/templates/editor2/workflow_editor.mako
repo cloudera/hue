@@ -24,7 +24,63 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="../navigation-bar.mako" />
 
 ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
-${ layout.menubar(section='workflows', is_editor=True) }
+<div id="editor">
+
+<%def name="buttons()">
+  <div class="pull-right" style="padding-right: 10px">
+
+    <div data-bind="visible: workflow.isDirty() || workflow.id() == null" class="pull-left muted" style="padding-top: 12px; padding-right: 8px">
+      ${ _('Unsaved') }
+    </div>
+
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
+      <i class="fa fa-fw fa-pencil"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
+      <i class="fa fa-fw fa-play"></i>
+    </a>
+    <a title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: schedule, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
+      <i class="fa fa-fw fa-calendar"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
+      <i class="fa fa-fw fa-cog"></i>
+    </a>
+
+    <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
+        data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
+        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
+      <i class="fa fa-fw fa-folder-open"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit">
+      <i class="fa fa-fw fa-save"></i>
+    </a>
+
+    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
+        attr: {'data-original-title': '${ _("Share") } ' + name},
+        css: {'isShared': isShared(), 'btn': true},
+        visible: workflow.id() != null && canEdit()">
+      <i class="fa fa-users"></i>
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-fw fa-file-o"></i>
+    </a>
+
+  </div>
+</%def>
+
+${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
 
 <style type="text/css">
   body {
@@ -41,7 +97,6 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 </script>
 
 
-<div id="editor">
 
 <%dashboard:layout_toolbar>
   <%def name="skipLayout()"></%def>
@@ -155,71 +210,20 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 </%dashboard:layout_toolbar>
 
 
-
-<div class="search-bar">
-  <div class="pull-right" style="padding-right:50px">
-
-    <span data-bind="visible: workflow.isDirty() || workflow.id() == null" class="muted">${ _('Unsaved') }&nbsp;&nbsp;&nbsp;</span>
-
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
-      <i class="fa fa-fw fa-pencil"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
-      <i class="fa fa-fw fa-play"></i>
-    </a>
-    <a title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: schedule, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
-      <i class="fa fa-fw fa-calendar"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
-      <i class="fa fa-fw fa-cog"></i>
-    </a>
-
-    <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
-        data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
-        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
-      <i class="fa fa-fw fa-folder-open"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit">
-      <i class="fa fa-fw fa-save"></i>
-    </a>
-
-    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _("Share") } ' + name},
-        css: {'isShared': isShared(), 'btn': true},
-        visible: workflow.id() != null && canEdit()">
-      <i class="fa fa-users"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-fw fa-file-o"></i>
-    </a>
-
-    <a class="btn" href="${ url('oozie:list_editor_workflows') }" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-fw fa-tags"></i>
-    </a>
-  </div>
-
-
-  <form class="form-search" style="max-height: 26px; overflow-y: auto;">
-    <div class="inline object-name">
+  <div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12" data-bind="style:{'margin-top' : $root.isEditing() ? '120px': '50px'}">
+    <div class="object-name" style="text-align: center">
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
-    <div class="inline object-description">
+    <div class="object-description" style="text-align: center; margin-top: 10px">
       <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
     </div>
-  </form>
+    </div>
+  </div>
 </div>
+
+
 
 
 ${ workflow.render() }

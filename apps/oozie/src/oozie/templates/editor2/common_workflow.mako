@@ -45,7 +45,7 @@
 
 <script type="text/html" id="column-template">
   <div data-bind="css: klass()" style="min-height: 50px !important;">
-    <div data-bind="template: { name: 'row-template', data: oozieStartRow }, style:{'margin-top' : (typeof $root.workflow.properties.imported != 'undefined' && $root.workflow.properties.imported()) || typeof $root.isViewer != 'undefined' ? '0': '50px'}"></div>
+    <div data-bind="template: { name: 'row-template', data: oozieStartRow }" style="margin-top: 0"></div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && oozieRows().length > 0">
       <div class="row-fluid">
         <div data-bind="visible: enableOozieDropOnBefore, css: {'span4 offset4': true, 'drop-target': true, 'drop-target-dragging': $root.isDragging(), 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(x, y){ var _w = $root.addDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
