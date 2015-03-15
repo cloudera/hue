@@ -21,8 +21,10 @@ from django.utils.translation import ugettext as _
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="workflow" file="common_workflow.mako" />
+<%namespace name="layout" file="../navigation-bar.mako" />
 
 ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
+${ layout.menubar(section='workflows', is_editor=True) }
 
 <style type="text/css">
   body {
