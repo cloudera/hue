@@ -222,7 +222,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
             <li style="margin-bottom: 10px">
               <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _("Select a parameter") }', update: workflow_variable, type: 'parameter'}, visible: $root.isEditing" style="width: 250px"></select>
 
-              <span data-bind="text: workflow_variable, visible: ! $root.isEditing()"/></span>
+              <div class="pull-left" style="width: 130px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; line-height: 30px;" data-bind="text: workflow_variable, visible: ! $root.isEditing(), attr:{'title': workflow_variable}"></div>
 
               &nbsp;&nbsp;
 
