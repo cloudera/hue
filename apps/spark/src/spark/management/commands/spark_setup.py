@@ -38,10 +38,10 @@ class Command(BaseCommand):
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
     else:
       user = options['user']
-      
+
     management.call_command('loaddata', 'initial_spark_examples.json', verbosity=2)
     Document.objects.sync()
-    
+
     from beeswax.management.commands.beeswax_install_examples import Command
     app_name = 'beeswax'
     Command().handle(app_name=app_name, user=user, tables='web_logs_table.json')
