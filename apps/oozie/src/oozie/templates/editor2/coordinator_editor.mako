@@ -555,7 +555,7 @@ ${ dashboard.import_bindings() }
   }
 
   function convertVariables(path) {
-    var _startDate = moment(viewModel.coordinator.start_date.value());
+    var _startDate = moment(viewModel.coordinator.start_date.value()).utc();
     if (_startDate.isValid()){
       path = path.replace(/\${'$'}{YEAR}/gi, _startDate.year());
       path = path.replace(/\${'$'}{MONTH}/gi, zeroPadding((_startDate.month() + 1)));
